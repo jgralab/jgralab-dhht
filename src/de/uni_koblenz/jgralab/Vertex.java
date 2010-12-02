@@ -49,42 +49,50 @@ import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 public interface Vertex extends GraphElement {
 
 	/**
+	 * Returns the {@link VertexClass} of which this {@link Vertex} is an
+	 * instance of.
+	 * 
+	 * @return {@link VertexClass}
+	 */
+	public VertexClass getType();
+
+	/**
 	 * Checks if the list of incident edges has changed with respect to the
 	 * given <code>incidenceListVersion</code>.
 	 */
-	public boolean isIncidenceListModified(long incidenceListVersion);
+	public boolean isIncidenceListModified(long incidenceListVersion);// old
 
 	/**
 	 * @return the internal vertex structure version
 	 * @see #isIncidenceListModified(long)
 	 */
-	public long getIncidenceListVersion();
+	public long getIncidenceListVersion();// old
 
 	/**
 	 * @return the number of connected incidences to the vertex
 	 */
-	public int getDegree();
+	public int getDegree();// old
 
 	/**
 	 * @param orientation
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeDirection orientation);
+	public int getDegree(EdgeDirection orientation);// old
 
 	/**
 	 * @param ec
 	 *            an EdgeClass
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(EdgeClass ec);
+	public int getDegree(EdgeClass ec);// old
 
 	/**
 	 * @param ec
 	 *            an EdgeClass
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(Class<? extends Edge> ec);
+	public int getDegree(Class<? extends Edge> ec);// old
 
 	/**
 	 * @param ec
@@ -94,7 +102,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(EdgeClass ec, boolean noSubClasses);
+	public int getDegree(EdgeClass ec, boolean noSubClasses);// old
 
 	/**
 	 * @param ec
@@ -104,7 +112,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(Class<? extends Edge> ec, boolean noSubClasses);
+	public int getDegree(Class<? extends Edge> ec, boolean noSubClasses);// old
 
 	/**
 	 * @param ec
@@ -113,7 +121,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeClass ec, EdgeDirection orientation);
+	public int getDegree(EdgeClass ec, EdgeDirection orientation);// old
 
 	/**
 	 * @param ec
@@ -122,7 +130,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Class<? extends Edge> ec, EdgeDirection orientation);
+	public int getDegree(Class<? extends Edge> ec, EdgeDirection orientation);// old
 
 	/**
 	 * @param ec
@@ -135,7 +143,7 @@ public interface Vertex extends GraphElement {
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
 	public int getDegree(EdgeClass ec, EdgeDirection orientation,
-			boolean noSubClasses);
+			boolean noSubClasses);// old
 
 	/**
 	 * @param ec
@@ -148,31 +156,39 @@ public interface Vertex extends GraphElement {
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
 	public int getDegree(Class<? extends Edge> ec, EdgeDirection orientation,
-			boolean noSubClasses);
+			boolean noSubClasses);// old
 
 	/**
-	 * @return the next vertex in vSeq
+	 * Returns the next {@link Vertex} in the sequence of all vertices in the
+	 * complete {@link Graph} (vSeq). If this {@link Vertex} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex();
+	public Vertex getNextVertex();// old
 
 	/**
-	 * @return the previous vertex in vSeq
+	 * Returns the previous {@link Vertex} in the sequence of all vertices in
+	 * the complete {@link Graph}(vSeq). If this {@link Vertex} is the beginning
+	 * of the sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Vertex}
 	 */
-	public Vertex getPrevVertex();
+	public Vertex getPrevVertex();// old
 
 	/**
 	 * @param aVertexClass
 	 *            the class of the next vertex
 	 * @return the next vertex in vSeq of class aVertexClass or its superclasses
 	 */
-	public Vertex getNextVertex(VertexClass aVertexClass);
+	public Vertex getNextVertex(VertexClass aVertexClass);// old
 
 	/**
 	 * @param aM1VertexClass
 	 *            the class of the next vertex
 	 * @return the next vertex in vSeq of class aVertexClass or its superclasses
 	 */
-	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass);
+	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass);// old
 
 	/**
 	 * @param aVertexClass
@@ -181,8 +197,7 @@ public interface Vertex extends GraphElement {
 	 *            if true, no subclasses are returned
 	 * @return the next vertex in vSeq of explicit class aVertexClass
 	 */
-	public Vertex getNextVertex(VertexClass aVertexClass,
-			boolean noSubclasses);
+	public Vertex getNextVertex(VertexClass aVertexClass, boolean noSubclasses);// old
 
 	/**
 	 * @param aM1VertexClass
@@ -192,24 +207,47 @@ public interface Vertex extends GraphElement {
 	 * @return the next vertex in vSeq of explicit class aVertexClass
 	 */
 	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
+
+	/**
+	 * Returns the sequence of all incoming {@link Edge}s at this {@link Vertex}
+	 * .
+	 * 
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getAlphaEdges();
+
+	/**
+	 * Returns the sequence of all outgoing {@link Edge}s at this {@link Vertex}
+	 * .
+	 * 
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getOmegaEdges();
+
+	/**
+	 * Returns the sequence of all incident {@link Edge}s.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges();
 
 	/**
 	 * @return first incident edge of this vertex
 	 */
-	public Edge getFirstIncidence();
+	public Edge getFirstIncidence();// old
 
 	/**
 	 * @return last incident edge of this vertex
 	 */
-	public Edge getLastIncidence();
+	public Edge getLastIncidence();// old
 
 	/**
 	 * @param orientation
 	 *            of connected incidences,
 	 * @return the first incidence of vertex with direction IN or OUT
 	 */
-	public Edge getFirstIncidence(EdgeDirection orientation);
+	public Edge getFirstIncidence(EdgeDirection orientation);// old
 
 	/**
 	 * Get the first incident edge which as one of the aggregation semantics
@@ -241,7 +279,8 @@ public interface Vertex extends GraphElement {
 	 *         (thisIncidence == true) or that vertex (thisIncidence == false)
 	 *         has one of the aggregation semantics given by <code>kind</code>.
 	 */
-	public Edge getFirstIncidence(boolean thisIncidence, AggregationKind... kinds);
+	public Edge getFirstIncidence(boolean thisIncidence,
+			AggregationKind... kinds);// old
 
 	/**
 	 * @param anEdgeClass
@@ -249,7 +288,7 @@ public interface Vertex extends GraphElement {
 	 * @return the first incidence in iSeq where the corresponding edge is of
 	 *         class anEdgeClass
 	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass);
+	public Edge getFirstIncidence(EdgeClass anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
@@ -257,7 +296,7 @@ public interface Vertex extends GraphElement {
 	 * @return the first incidence in iSeq where the corresponding edge is of
 	 *         class anEdgeClass
 	 */
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass);
+	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
@@ -268,7 +307,7 @@ public interface Vertex extends GraphElement {
 	 *         class anEdgeClass
 	 */
 	public Edge getFirstIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation);
+			EdgeDirection orientation);// old
 
 	/**
 	 * @param anEdgeClass
@@ -279,7 +318,7 @@ public interface Vertex extends GraphElement {
 	 *         class anEdgeClass
 	 */
 	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation);
+			EdgeDirection orientation);// old
 
 	/**
 	 * @param anEdgeClass
@@ -289,7 +328,7 @@ public interface Vertex extends GraphElement {
 	 * @return the first incidence in iSeq where the corresponding edge is of
 	 *         explicit class anEdgeClass
 	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass, boolean noSubclasses);
+	public Edge getFirstIncidence(EdgeClass anEdgeClass, boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -300,7 +339,7 @@ public interface Vertex extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -314,7 +353,7 @@ public interface Vertex extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getFirstIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
+			EdgeDirection orientation, boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -328,38 +367,38 @@ public interface Vertex extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
+			EdgeDirection orientation, boolean noSubclasses);// old
 
 	/**
 	 * @param v
 	 * @return true, if this vertex is somewhere before v in vSeq
 	 */
-	public boolean isBefore(Vertex v);
+	public boolean isBefore(Vertex v);// old
 
 	/**
 	 * puts this vertex immediately before v in vSeq
 	 * 
 	 * @param v
 	 */
-	public void putBefore(Vertex v);
+	public void putBefore(Vertex v);// old
 
 	/**
 	 * @param v
 	 * @return true, if this vertex is somewhere after v in vSeq
 	 */
-	public boolean isAfter(Vertex v);
+	public boolean isAfter(Vertex v);// old
 
 	/**
 	 * puts this vertex immediately after v in vSeq
 	 * 
 	 * @param v
 	 */
-	public void putAfter(Vertex v);
+	public void putAfter(Vertex v);// old
 
 	/**
 	 * removes this vertex from vSeq and erases its attributes
 	 */
-	public void delete();
+	public void delete();// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -368,7 +407,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences();
+	public Iterable<Edge> incidences();// old
 
 	/**
 	 * Return an List&lt;vertexType&gt; over all vertices reachable from this
@@ -383,7 +422,7 @@ public interface Vertex extends GraphElement {
 	 * @return a List of the reachable vertices
 	 */
 	public <T extends Vertex> List<T> reachableVertices(String pathDescription,
-			Class<T> vertexType);
+			Class<T> vertexType);// old
 
 	/**
 	 * @param <T>
@@ -437,7 +476,7 @@ public interface Vertex extends GraphElement {
 	 *         advanced for-loop
 	 */
 	public Iterable<Edge> incidences(Class<? extends Edge> eclass,
-			EdgeDirection dir);
+			EdgeDirection dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -448,7 +487,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(EdgeClass eclass);
+	public Iterable<Edge> incidences(EdgeClass eclass);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -459,39 +498,39 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass);
+	public Iterable<Edge> incidences(Class<? extends Edge> eclass);// old
 
 	/**
 	 * tests if the Edge <code>edge</code> may start at this vertex
 	 * 
 	 * @return <code>true</code> iff <code>edge</code> may start at this vertex
 	 */
-	public boolean isValidAlpha(Edge edge);
+	public boolean isValidAlpha(Edge edge);// old
 
 	/**
 	 * tests if the Edge <code>edge</code> may end at this vertex
 	 * 
 	 * @return <code>true</code> iff <code>edge</code> may end at this vertex
 	 */
-	public boolean isValidOmega(Edge edge);
+	public boolean isValidOmega(Edge edge);// old
 
 	/**
-	 * Sorts the incidence sequence according to the given comparator in ascending
-	 * order.
+	 * Sorts the incidence sequence according to the given comparator in
+	 * ascending order.
 	 * 
 	 * @param comp
 	 *            the comparator that defines the desired incidence order.
 	 */
-	public void sortIncidences(Comparator<Edge> comp);
+	public void sortIncidences(Comparator<Edge> comp);// old
 
-	public DirectedM1EdgeClass getEdgeForRolename(String rolename);
+	public DirectedM1EdgeClass getEdgeForRolename(String rolename);// old
 
-	public List<? extends Vertex> adjacences(String role);
+	public List<? extends Vertex> adjacences(String role);// old
 
-	public Edge addAdjacence(String role, Vertex other);
+	public Edge addAdjacence(String role, Vertex other);// old
 
-	public List<Vertex> removeAdjacences(String role);
+	public List<Vertex> removeAdjacences(String role);// old
 
-	public void removeAdjacence(String role, Vertex other);
+	public void removeAdjacence(String role, Vertex other);// old
 
 }

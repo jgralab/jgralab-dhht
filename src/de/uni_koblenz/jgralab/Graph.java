@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
@@ -59,7 +60,7 @@ public interface Graph extends AttributedElement {
 	 * Creates a vertex the specified class <code>cls</code> and adds the new
 	 * vertex to this Graph.
 	 */
-	public <T extends Vertex> T createVertex(Class<T> cls);
+	public <T extends Vertex> T createVertex(Class<T> cls);// old
 
 	/**
 	 * Creates an edge of the specified class <code>cls</code> that connects
@@ -67,21 +68,21 @@ public interface Graph extends AttributedElement {
 	 * to this Graph.
 	 */
 	public <T extends Edge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega);
+			Vertex omega);// old
 
 	/**
 	 * Checks whether this graph is currently being loaded.
 	 * 
 	 * @return true if the graph is currently being loaded
 	 */
-	public boolean isLoading();
+	public boolean isLoading();// old
 
 	/**
 	 * Callback method: Called immediately after loading of this graph is
 	 * completed. Overwrite this method to perform user defined operations after
 	 * loading a graph.
 	 */
-	public void loadingCompleted();
+	public void loadingCompleted();// old
 
 	/**
 	 * Checks whether this graph has changed with respect to the given
@@ -94,7 +95,7 @@ public interface Graph extends AttributedElement {
 	 * @return <code>true</code> if the internal graph version of the graph is
 	 *         different from the <code>previousVersion</code>.
 	 */
-	public boolean isGraphModified(long previousVersion);
+	public boolean isGraphModified(long previousVersion);// old
 
 	/**
 	 * Returns the version counter of this graph.
@@ -102,7 +103,15 @@ public interface Graph extends AttributedElement {
 	 * @return the graph version
 	 * @see #isGraphModified(long)
 	 */
-	public long getGraphVersion();
+	public long getGraphVersion();// old
+
+	/**
+	 * Returns the {@link GraphClass} of which this {@link Graph} is an instance
+	 * of.
+	 * 
+	 * @return {@link GraphClass}
+	 */
+	public GraphClass getType();
 
 	/**
 	 * Checks if the vertex sequence of this has changed with respect to the
@@ -113,7 +122,7 @@ public interface Graph extends AttributedElement {
 	 * @return <code>true</code> if the vertex list version of this graph is
 	 *         different from <code>previousVersion</code>.
 	 */
-	public boolean isVertexListModified(long previousVersion);
+	public boolean isVertexListModified(long previousVersion);// old
 
 	/**
 	 * Returns the version counter of the vertex sequence of this graph.
@@ -121,7 +130,7 @@ public interface Graph extends AttributedElement {
 	 * @return the vertex sequence version
 	 * @see #isVertexListModified(long)
 	 */
-	public long getVertexListVersion();
+	public long getVertexListVersion();// old
 
 	/**
 	 * Checks if the edge sequence of this has changed with respect to the given
@@ -132,7 +141,7 @@ public interface Graph extends AttributedElement {
 	 * @return <code>true</code> if the edge list version of this graph is
 	 *         different from <code>previousVersion</code>.
 	 */
-	public boolean isEdgeListModified(long edgeListVersion);
+	public boolean isEdgeListModified(long edgeListVersion);// old
 
 	/**
 	 * Returns the version counter of the edge sequence of this graph.
@@ -140,17 +149,17 @@ public interface Graph extends AttributedElement {
 	 * @return the edge sequence version
 	 * @see #isEdgeListModified(long)
 	 */
-	public long getEdgeListVersion();
+	public long getEdgeListVersion();// old
 
 	/**
 	 * @return true if this graph contains the given vertex <code>v</code>.
 	 */
-	public boolean containsVertex(Vertex v);
+	public boolean containsVertex(Vertex v);// old
 
 	/**
 	 * @return true if this graph contains the given edge <code>e</code>.
 	 */
-	boolean containsEdge(Edge e);
+	boolean containsEdge(Edge e);// old
 
 	/**
 	 * Removes the vertex <code>v</code> from the vertex sequence of this graph.
@@ -166,7 +175,7 @@ public interface Graph extends AttributedElement {
 	 * @param v
 	 *            the Vertex to be deleted
 	 */
-	public void deleteVertex(Vertex v);
+	public void deleteVertex(Vertex v);// old
 
 	/**
 	 * Removes the edge <code>e</code> from the edge sequence of this graph.
@@ -181,19 +190,23 @@ public interface Graph extends AttributedElement {
 	 * @param e
 	 *            the Edge to be deleted
 	 */
-	public void deleteEdge(Edge e);
+	public void deleteEdge(Edge e);// old
 
 	/**
-	 * Returns the first Vertex in the vertex sequence of this Graph.
+	 * Returns the first {@link Vertex} in the vertex sequence of this
+	 * {@link Graph}. If it does not contain any vertices <code>null</code> is
+	 * returned.
 	 * 
-	 * @return the first Vertex, or null if this graph contains no vertices.
+	 * @return {@link Vertex}
 	 */
 	public Vertex getFirstVertex();
 
 	/**
-	 * Returns the last Vertex in the vertex sequence of this Graph.
+	 * Returns the last {@link Vertex} in the vertex sequence of this
+	 * {@link Graph}. If it does not contain any vertices <code>null</code> is
+	 * returned.
 	 * 
-	 * @return the last Vertex, or null if this graph contains no vertices.
+	 * @return {@link Vertex}
 	 */
 	public Vertex getLastVertex();
 
@@ -207,7 +220,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(VertexClass vertexClass);
+	public Vertex getFirstVertex(VertexClass vertexClass);// old
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>,
@@ -224,7 +237,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses);
+	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses);// old
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>
@@ -236,7 +249,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass);
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass);// old
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>,
@@ -254,19 +267,21 @@ public interface Graph extends AttributedElement {
 	 *         the specified <code>vertexClass</code>.
 	 */
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
 
 	/**
-	 * Returns the first Edge in the edge sequence of this Graph.
+	 * Returns the first {@link Edge} in the edge sequence of this {@link Graph}
+	 * . If it does not contain any {@link Edge}s <code>null</code> is returned.
 	 * 
-	 * @return the first Edge, or null if this graph contains no edges.
+	 * @return {@link Edge}
 	 */
 	public Edge getFirstEdge();
 
 	/**
-	 * Returns the last Edge in the edge sequence of this Graph.
+	 * Returns the last {@link Edge} in the edge sequence of this {@link Graph}.
+	 * If it does not contain any {@link Edge}s <code>null</code> is returned.
 	 * 
-	 * @return the last Edge, or null if this graph contains no edges.
+	 * @return {@link Edge}
 	 */
 	public Edge getLastEdge();
 
@@ -280,7 +295,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
 	 */
-	public Edge getFirstEdge(EdgeClass edgeClass);
+	public Edge getFirstEdge(EdgeClass edgeClass);// old
 
 	/**
 	 * Returns the first Edge of the specified <code>edgeClass</code>, including
@@ -297,7 +312,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
 	 */
-	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses);
+	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses);// old
 
 	/**
 	 * Returns the first Edge of the specified <code>edgeClass</code> (including
@@ -309,7 +324,7 @@ public interface Graph extends AttributedElement {
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
 	 */
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass);
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass);// old
 
 	/**
 	 * Returns the first Edge of the specified <code>edgeClass</code>, including
@@ -327,7 +342,7 @@ public interface Graph extends AttributedElement {
 	 *         specified <code>edgeClass</code>.
 	 */
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
 
 	/**
 	 * Returns the Vertex with the specified <code>id</code> if such a vertex
@@ -337,7 +352,7 @@ public interface Graph extends AttributedElement {
 	 *            the id of the vertex (must be > 0)
 	 * @return the Vertex, or null if no such vertex exists
 	 */
-	public Vertex getVertex(int id);
+	public Vertex getVertex(int id);// old
 
 	/**
 	 * Returns the oriented Edge with the specified <code>id</code> if such an
@@ -348,7 +363,7 @@ public interface Graph extends AttributedElement {
 	 *            the id of the edge (must be != 0)
 	 * @return the Edge, or null if no such edge exists
 	 */
-	public Edge getEdge(int id);
+	public Edge getEdge(int id);// old
 
 	/**
 	 * The maximum number of vertices that can be stored in the graph before the
@@ -356,21 +371,21 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return the maximum number of vertices
 	 */
-	public int getMaxVCount();
+	public int getMaxVCount();// old
 
 	/**
 	 * Computes the new maximum number of vertices when expansion is needed.
 	 * 
 	 * @return the new maximum number of vertices
 	 */
-	public int getExpandedVertexCount();
+	public int getExpandedVertexCount();// old
 
 	/**
 	 * Computes the new maximum number of edges when expansion is needed.
 	 * 
 	 * @return the new maximum number of edges
 	 */
-	public int getExpandedEdgeCount();
+	public int getExpandedEdgeCount();// old
 
 	/**
 	 * The maximum number of edges that can be stored in the graph before the
@@ -378,21 +393,21 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return the maximum number of edges
 	 */
-	public int getMaxECount();
+	public int getMaxECount();// old
 
 	/**
 	 * Returns the number of vertices in this Graph.
 	 * 
 	 * @return the number of vertices
 	 */
-	public int getVCount();
+	public int getVCount();// old
 
 	/**
 	 * Returns the number of edges in this Graph.
 	 * 
 	 * @return the number of edges
 	 */
-	public int getECount();
+	public int getECount();// old
 
 	/**
 	 * Returns the <code>id</code> of this Graph. JGraLab assigns a 128 bit
@@ -401,7 +416,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return the id of this graph
 	 */
-	public String getId();
+	public String getId();// old
 
 	/**
 	 * Sets the <code>id</code> of this Graph.
@@ -411,15 +426,15 @@ public interface Graph extends AttributedElement {
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(String id);
+	public void setId(String id);// old
 
 	/**
-	 * Returns an Iterable which iterates over all edges of this Graph in the
-	 * order determined by the edge sequence.
+	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this
+	 * {@link Graph} in the order determined by the edge sequence.
 	 * 
-	 * @return an Iterable for all edges
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> edges();
+	public Iterable<Edge> getEdges();
 
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
@@ -431,7 +446,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
-	public Iterable<Edge> edges(EdgeClass edgeClass);
+	public Iterable<Edge> edges(EdgeClass edgeClass);// old
 
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
@@ -443,7 +458,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
-	public Iterable<Edge> edges(Class<? extends Edge> edgeClass);
+	public Iterable<Edge> edges(Class<? extends Edge> edgeClass);// old
 
 	/**
 	 * Returns the list of reachable vertices.
@@ -460,15 +475,15 @@ public interface Graph extends AttributedElement {
 	 *         <code>pathDescription</code>
 	 */
 	public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
-			String pathDescription, Class<T> vertexType);
+			String pathDescription, Class<T> vertexType);// old
 
 	/**
-	 * Returns an Iterable which iterates over all vertices of this Graph in the
-	 * order determined by the vertex sequence.
+	 * Returns an {@link Iterable} which iterates over all vertices of this
+	 * {@link Graph} in the order determined by the vertex sequence.
 	 * 
-	 * @return an Iterable for all vertices
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> vertices();
+	public Iterable<Vertex> getVertices();
 
 	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which
@@ -481,7 +496,7 @@ public interface Graph extends AttributedElement {
 	 * @return an Iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> vertices(VertexClass vertexclass);
+	public Iterable<Vertex> vertices(VertexClass vertexclass);// old
 
 	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which
@@ -494,7 +509,7 @@ public interface Graph extends AttributedElement {
 	 * @return a iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> vertices(Class<? extends Vertex> vertexClass);
+	public Iterable<Vertex> vertices(Class<? extends Vertex> vertexClass);// old
 
 	/**
 	 * Optimizes edge and vertex ids such that after defragmentation
@@ -506,18 +521,18 @@ public interface Graph extends AttributedElement {
 	 * <b>Attention:</b> defragment() possibly changes vertex and edge IDs! *
 	 * <b>Attention:</b> Not supported within when using transactions!
 	 */
-	public void defragment();
+	public void defragment();// old
 
 	// ---- transaction support ----
 	/**
 	 * @return a read-write-<code>Transaction</code>
 	 */
-	public Transaction newTransaction();
+	public Transaction newTransaction();// old
 
 	/**
 	 * @return a read-only-<code>Transaction</code>
 	 */
-	public Transaction newReadOnlyTransaction();
+	public Transaction newReadOnlyTransaction();// old
 
 	/**
 	 * Sets the given <code>transaction</code> as the active
@@ -525,13 +540,13 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @param transaction
 	 */
-	public void setCurrentTransaction(Transaction transaction);
+	public void setCurrentTransaction(Transaction transaction);// old
 
 	/**
 	 * @return the currently active <code>Transaction</code> in the current
 	 *         thread
 	 */
-	public Transaction getCurrentTransaction();
+	public Transaction getCurrentTransaction();// old
 
 	/**
 	 * Delegates to {@link Graph#getCurrentTransaction()
@@ -540,13 +555,13 @@ public interface Graph extends AttributedElement {
 	 * @throws CommitFailedException
 	 *             if commit fails
 	 */
-	public void commit() throws CommitFailedException;
+	public void commit() throws CommitFailedException;// old
 
 	/**
 	 * Delegates to {@link Graph#getCurrentTransaction()
 	 * getCurrentTransaction()}.
 	 */
-	public void abort();
+	public void abort();// old
 
 	/**
 	 * Delegates to {@link Graph#getCurrentTransaction()
@@ -554,7 +569,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return if there have been conflicts
 	 */
-	public boolean isInConflict();
+	public boolean isInConflict();// old
 
 	/**
 	 * Delegates to {@link Graph#getCurrentTransaction()
@@ -562,7 +577,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return the defined <code>Savepoint</code>
 	 */
-	public Savepoint defineSavepoint();
+	public Savepoint defineSavepoint();// old
 
 	/**
 	 * Delegates to {@link Graph#getCurrentTransaction()
@@ -577,7 +592,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 */
 	public void restoreSavepoint(Savepoint savepoint)
-			throws InvalidSavepointException;
+			throws InvalidSavepointException;// old
 
 	/**
 	 * Tells whether this graph instance has standard support.
@@ -585,28 +600,28 @@ public interface Graph extends AttributedElement {
 	 * @return true if this graph instance has standard support
 	 */
 
-	public boolean hasStandardSupport();
+	public boolean hasStandardSupport();// old
 
 	/**
 	 * Tells whether this graph instance supports transactions.
 	 * 
 	 * @return true if this graph instance supports transactions.
 	 */
-	public boolean hasTransactionSupport();
+	public boolean hasTransactionSupport();// old
 
 	/**
 	 * Tells whether this graph instance supports savemem.
 	 * 
 	 * @return true if this graph instance supports savemem.
 	 */
-	public boolean hasSavememSupport();
-	
+	public boolean hasSavememSupport();// old
+
 	/**
 	 * Tells whether this graph instance has database support.
-	 *
+	 * 
 	 * @return true if this graph instance has database support.
 	 */
-	public boolean hasDatabaseSupport();
+	public boolean hasDatabaseSupport();// old
 
 	/**
 	 * 
@@ -616,7 +631,7 @@ public interface Graph extends AttributedElement {
 	 *            the class for the generic type of the list
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList();
+	public <T> JGraLabList<T> createList();// old
 
 	/**
 	 * 
@@ -627,7 +642,7 @@ public interface Graph extends AttributedElement {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection);
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection);// old
 
 	/**
 	 * 
@@ -638,7 +653,7 @@ public interface Graph extends AttributedElement {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(int initialCapacity);
+	public <T> JGraLabList<T> createList(int initialCapacity);// old
 
 	/**
 	 * 
@@ -648,7 +663,7 @@ public interface Graph extends AttributedElement {
 	 *            the class for the generic type of the set
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet();
+	public <T> JGraLabSet<T> createSet();// old
 
 	/**
 	 * 
@@ -659,7 +674,7 @@ public interface Graph extends AttributedElement {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection);
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection);// old
 
 	/**
 	 * 
@@ -670,7 +685,7 @@ public interface Graph extends AttributedElement {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity);
+	public <T> JGraLabSet<T> createSet(int initialCapacity);// old
 
 	/**
 	 * 
@@ -682,7 +697,7 @@ public interface Graph extends AttributedElement {
 	 * @param loadFactor
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor);
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor);// old
 
 	/**
 	 * 
@@ -696,7 +711,7 @@ public interface Graph extends AttributedElement {
 	 *            the class for the generic type of the value
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap();
+	public <K, V> JGraLabMap<K, V> createMap();// old
 
 	/**
 	 * 
@@ -711,7 +726,7 @@ public interface Graph extends AttributedElement {
 	 * @param map
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map);
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map);// old
 
 	/**
 	 * 
@@ -722,7 +737,7 @@ public interface Graph extends AttributedElement {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity);
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity);// old
 
 	/**
 	 * 
@@ -739,7 +754,7 @@ public interface Graph extends AttributedElement {
 	 * @return
 	 */
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor);
+			float loadFactor);// old
 
 	/**
 	 * Generic creation of records.
@@ -750,7 +765,7 @@ public interface Graph extends AttributedElement {
 	 * @param io
 	 * @return
 	 */
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);// old
 
 	/**
 	 * 
@@ -760,7 +775,7 @@ public interface Graph extends AttributedElement {
 	 * @return
 	 */
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields);
+			Map<String, Object> fields);// old
 
 	/**
 	 * 
@@ -770,7 +785,7 @@ public interface Graph extends AttributedElement {
 	 * @return
 	 */
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components);
+			Object... components);// old
 
 	/**
 	 * Sorts the vertex sequence according to the given comparator in ascending
@@ -779,7 +794,7 @@ public interface Graph extends AttributedElement {
 	 * @param comp
 	 *            the comparator defining the desired vertex order.
 	 */
-	public void sortVertices(Comparator<Vertex> comp);
+	public void sortVertices(Comparator<Vertex> comp);// old
 
 	/**
 	 * Sorts the edge sequence according to the given comparator in ascending
@@ -788,7 +803,7 @@ public interface Graph extends AttributedElement {
 	 * @param comp
 	 *            the comparator defining the desired edge order.
 	 */
-	public void sortEdges(Comparator<Edge> comp);
+	public void sortEdges(Comparator<Edge> comp);// old
 
 	/**
 	 * Registers the given <code>newListener</code> to the internal listener
@@ -799,7 +814,7 @@ public interface Graph extends AttributedElement {
 	 *            register.
 	 */
 	public void addGraphStructureChangedListener(
-			GraphStructureChangedListener newListener);
+			GraphStructureChangedListener newListener);// old
 
 	/**
 	 * Removes the given <code>listener</code> from the internal listener list.
@@ -808,13 +823,13 @@ public interface Graph extends AttributedElement {
 	 *            the <code>GraphStructureChangedListener</code> to be removed.
 	 */
 	public void removeGraphStructureChangedListener(
-			GraphStructureChangedListener listener);
+			GraphStructureChangedListener listener);// old
 
 	/**
 	 * Removes all <code>GraphStructureChangedListener</code> from the internal
 	 * listener list.
 	 */
-	public void removeAllGraphStructureChangedListeners();
+	public void removeAllGraphStructureChangedListeners();// old
 
 	/**
 	 * Returns the amount of registered
@@ -823,5 +838,5 @@ public interface Graph extends AttributedElement {
 	 * @return the amount of registered
 	 *         <code>GraphStructureChangedListener</code>s
 	 */
-	public int getGraphStructureChangedListenerCount();
+	public int getGraphStructureChangedListenerCount();// old
 }

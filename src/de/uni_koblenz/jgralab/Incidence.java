@@ -75,9 +75,9 @@ public interface Incidence {
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
-	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If the last
-	 * {@link Incidence} in the sequence is reached, <code>null</code> is
-	 * returned.
+	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
+	 * {@link Incidence} is the last {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
 	 * 
 	 * @return {@link Incidence}
 	 */
@@ -85,9 +85,9 @@ public interface Incidence {
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
-	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If the
-	 * last {@link Incidence} in the sequence is reached, <code>null</code> is
-	 * returned.
+	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
+	 * {@link Incidence} is the last {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
 	 * 
 	 * @return {@link Incidence}
 	 */
@@ -95,9 +95,9 @@ public interface Incidence {
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
-	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If the first
-	 * {@link Incidence} in the sequence is reached, <code>null</code> is
-	 * returned.
+	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
+	 * {@link Incidence} is the first {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
 	 * 
 	 * @return {@link Incidence}
 	 */
@@ -105,9 +105,9 @@ public interface Incidence {
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
-	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If the
-	 * first {@link Incidence} in the sequence is reached, <code>null</code> is
-	 * returned.
+	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
+	 * {@link Incidence} is the first {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
 	 * 
 	 * @return {@link Incidence}
 	 */
@@ -132,10 +132,11 @@ public interface Incidence {
 	public Iterable<Edge> getThoseEdges();
 
 	/**
-	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}. TODO
-	 * Verhalten bei nicht binären Kanten.
+	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}.
 	 * 
 	 * @return {@link Vertex}
+	 * @throws UnsupportedOpperationException
+	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
 	public Vertex getThis();
 
@@ -150,9 +151,11 @@ public interface Incidence {
 
 	/**
 	 * Returns the {@link Vertex} which is at the other end of a binary
-	 * {@link Edge}. TODO Verhalten bei nicht binären Kanten.
+	 * {@link Edge}.
 	 * 
 	 * @return {@link Vertex}
+	 * @throws UnsupportedOpperationException
+	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
 	public Vertex getThat();
 

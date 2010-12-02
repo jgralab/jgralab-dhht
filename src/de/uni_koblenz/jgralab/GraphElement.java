@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+
 /**
  * Aggregates vertices and edges.
  * 
