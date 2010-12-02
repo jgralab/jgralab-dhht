@@ -113,16 +113,56 @@ public interface Incidence {
 	 */
 	public Incidence getPreviousIncidenceAtVertex();
 
+	/**
+	 * Returns the sequence of all {@link Edge}s which are connected to
+	 * {@link Incidence#getVertex()} via an {@link Incidence} of the same
+	 * direction as this {@link Incidence} has.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
 	public Iterable<Edge> getTheseEdges();
 
+	/**
+	 * Returns the sequence of all {@link Edge}s which are connected to
+	 * {@link Incidence#getVertex()} via an {@link Incidence} of the reverted
+	 * direction as this {@link Incidence} has.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
 	public Iterable<Edge> getThoseEdges();
 
+	/**
+	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}. TODO
+	 * Verhalten bei nicht binären Kanten.
+	 * 
+	 * @return {@link Vertex}
+	 */
 	public Vertex getThis();
 
+	/**
+	 * Returns a sequence of all vertices, which are connected to
+	 * {@link Incidence#getEdge()} via an {@link Incidence} of the same
+	 * direction as this one.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
 	public Iterable<Vertex> getTheseVertices();
 
+	/**
+	 * Returns the {@link Vertex} which is at the other end of a binary
+	 * {@link Edge}. TODO Verhalten bei nicht binären Kanten.
+	 * 
+	 * @return {@link Vertex}
+	 */
 	public Vertex getThat();
 
+	/**
+	 * Returns a sequence of all vertices, which are connected to
+	 * {@link Incidence#getEdge()} via an {@link Incidence} of the reverted
+	 * direction as this one.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
 	public Iterable<Vertex> getThoseVertices();
 
 }
