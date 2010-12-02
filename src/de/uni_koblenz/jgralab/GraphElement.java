@@ -32,7 +32,7 @@
 package de.uni_koblenz.jgralab;
 
 /**
- * aggregates vertices and edges
+ * Aggregates vertices and edges.
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -40,23 +40,60 @@ package de.uni_koblenz.jgralab;
 public interface GraphElement extends AttributedElement {
 
 	/**
-	 * returns the id of this graph element
+	 * Returns the id of this {@link GraphElement}.
 	 * 
-	 * @return the id of this graph element
+	 * @return int the id of this {@link GraphElement}.
 	 */
-	public int getId();
+	public int getId();// old
 
 	/**
-	 * returns the graph containing this graph element
+	 * Returns <code>true</code> if this {@link GraphElement} is still present
+	 * in the {@link Graph} (i.e. not deleted). This check is equivalent to
+	 * <code>getGraph().containsVertex(this)</code> or
+	 * <code>getGraph().containsEdge(this)</code>.
 	 * 
-	 * @return the graph containing this graph element
+	 * @return boolean
+	 */
+	public boolean isValid();// old
+
+	/**
+	 * Returns the graph containing this {@link GraphElement}.
+	 * 
+	 * @return {@link Graph} containing this {@link GraphElement}
 	 */
 	public Graph getGraph();
 
 	/**
-	 * returns true if this GraphElement is still present in the Graph (i.e. not
-	 * deleted). This check is equivalent to getGraph().containsVertex(this) or
-	 * getGraph().containsEdge(this).
+	 * Returns the first {@link Incidence} of this {@link GraphElement}.
+	 * 
+	 * @return {@link Incidence}
 	 */
-	public boolean isValid();
+	public Incidence getFirstIncidence();
+
+	/**
+	 * Returns the last {@link Incidence} of this {@link GraphElement}.
+	 * 
+	 * @return {@link Incidence}
+	 */
+	public Incidence getLastIncidence();
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement}.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences();
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code>.
+	 * 
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(Direction direction);
 }

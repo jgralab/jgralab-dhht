@@ -38,45 +38,57 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
- * aggregates graphs, edges and vertices
+ * Aggregates graphs, edges and vertices.
  * 
  * @author ist@uni-koblenz.de
  * 
  */
 public interface AttributedElement extends Comparable<AttributedElement> {
+
 	/**
 	 * @return the corresponding m2-element to this m1-element
 	 */
-	public AttributedElementClass getAttributedElementClass();
+	public AttributedElementClass getAttributedElementClass();// old
 
 	/**
 	 * 
 	 * @return the m1-class of this attributedelement
 	 */
-	public Class<? extends AttributedElement> getM1Class();
+	public Class<? extends AttributedElement> getM1Class();// old
 
-	public GraphClass getGraphClass();
+	public GraphClass getGraphClass();// old
 
 	public void readAttributeValueFromString(String attributeName, String value)
-			throws GraphIOException, NoSuchAttributeException;
+			throws GraphIOException, NoSuchAttributeException;// old
 
 	public String writeAttributeValueToString(String attributeName)
-			throws IOException, GraphIOException, NoSuchAttributeException;
+			throws IOException, GraphIOException, NoSuchAttributeException;// old
 
 	public void writeAttributeValues(GraphIO io) throws IOException,
-			GraphIOException;
+			GraphIOException;// old
 
-	public void readAttributeValues(GraphIO io) throws GraphIOException;
+	public void readAttributeValues(GraphIO io) throws GraphIOException;// old
 
+	/**
+	 * Returns the value of the attribute <code>name</code> of this
+	 * {@link AttributedElement}.
+	 * 
+	 * @param name
+	 *            {@link String} the name of the requested attribute
+	 * @return {@link Object} value of attribute <code>name</code>
+	 * @throws NoSuchAttributeException
+	 *             if the attribute <code>name</code> does not exist at this
+	 *             {@link AttributedElement}
+	 */
 	public Object getAttribute(String name) throws NoSuchAttributeException;
 
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException;
+			throws NoSuchAttributeException;// old
 
 	/**
 	 * @return the schema this AttributedElement belongs to
 	 */
-	public Schema getSchema();
+	public Schema getSchema();// old
 
-	void initializeAttributesWithDefaultValues();
+	void initializeAttributesWithDefaultValues();// old
 }
