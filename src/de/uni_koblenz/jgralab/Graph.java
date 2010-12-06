@@ -437,6 +437,15 @@ public interface Graph extends AttributedElement {
 	public Iterable<Edge> getEdges();
 
 	/**
+	 * Returns an Iterable which iterates over all edges of this Graph in the
+	 * order determined by the edge sequence.
+	 * 
+	 * @return an Iterable for all edges
+	 */
+	@Deprecated
+	public Iterable<Edge> edges();// old
+
+	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
 	 * have the specified <code>edgeClass</code> (including subclasses), in the
 	 * order determined by the edge sequence.
@@ -484,6 +493,15 @@ public interface Graph extends AttributedElement {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getVertices();
+
+	/**
+	 * Returns an Iterable which iterates over all vertices of this Graph in the
+	 * order determined by the vertex sequence.
+	 * 
+	 * @return an Iterable for all vertices
+	 */
+	@Deprecated
+	public Iterable<Vertex> vertices();
 
 	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which

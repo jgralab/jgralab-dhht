@@ -226,21 +226,11 @@ public interface Vertex extends GraphElement {
 	public Iterable<Edge> getOmegaEdges();
 
 	/**
-	 * Returns the sequence of all incident {@link Edge}s.
+	 * Returns a sequence of all incident {@link Edge}s.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
 	public Iterable<Edge> getIncidentEdges();
-
-	/**
-	 * @return first incident edge of this vertex
-	 */
-	public Edge getFirstIncidence();// old
-
-	/**
-	 * @return last incident edge of this vertex
-	 */
-	public Edge getLastIncidence();// old
 
 	/**
 	 * @param orientation
@@ -407,6 +397,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences();// old
 
 	/**
@@ -435,7 +426,7 @@ public interface Vertex extends GraphElement {
 	 *         pathElements
 	 */
 	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
-			PathElement... pathElements);
+			PathElement... pathElements);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -447,7 +438,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(EdgeDirection dir);
+	public Iterable<Edge> incidences(EdgeDirection dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -461,7 +452,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(EdgeClass eclass, EdgeDirection dir);
+	public Iterable<Edge> incidences(EdgeClass eclass, EdgeDirection dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
