@@ -32,33 +32,42 @@
 package de.uni_koblenz.jgralab;
 
 /**
- * Specifies direction of edges for traversal methods. IN: Only incoming edges
- * are traversed, OUT: only outgoing edges are traversed, INOUT: both incoming
- * and outgoing edges are traversed.
+ * Specifies direction of {@link Incidence}s for traversal methods.
  * 
+ * @see Direction#EDGE_TO_VERTEX
+ * @see Direction#VERTEX_TO_EDGE
  * @author ist@uni-koblenz.de
  */
-@Deprecated
-public enum EdgeDirection {
-
-	IN, OUT, INOUT;
+public enum Direction {
 
 	/**
-	 * Parses a given string for edge direction.
+	 * This direction describes an {@link Incidence} which begins at an
+	 * {@link Edge} and leads to a {@link Vertex}. Such an {@link Incidence} is
+	 * called ingoing.
+	 */
+	EDGE_TO_VERTEX, /**
+	 * This direction describes an {@link Incidence} which
+	 * begins at a {@link Vertex} and leads to an {@link Edge}. Such an
+	 * {@link Incidence} is called outgoing.
+	 */
+	VERTEX_TO_EDGE;
+
+	/**
+	 * Parses a given {@link String} for {@link Direction}.
 	 * 
 	 * @param direction
-	 *            A string containing only IN, OUT, or INOUT.
-	 * @return Matching edge direction.
+	 *            {@link String} containing only EDGE_TO_VERTEX or
+	 *            VERTEX_TO_EDGE.
+	 * @return {@link Direction} Matching {@link Incidence} direction.
 	 * @throws Exception
-	 *             When no edge direction could be matched from string.
+	 *             When no {@link Direction} could be matched from
+	 *             <code>direction</code>.
 	 */
-	public static EdgeDirection parse(String direction) throws Exception {
-		if (direction.equals("OUT")) {
-			return EdgeDirection.OUT;
-		} else if (direction.equals("IN")) {
-			return EdgeDirection.IN;
-		} else if (direction.equals("INOUT")) {
-			return EdgeDirection.INOUT;
+	public static Direction parse(String direction) throws Exception {
+		if (direction.equals("EDGE_TO_VERTEX")) {
+			return Direction.EDGE_TO_VERTEX;
+		} else if (direction.equals("VERTEX_TO_EDGE")) {
+			return Direction.VERTEX_TO_EDGE;
 		} else {
 			throw new Exception("Could not determine direction from string.");
 		}
