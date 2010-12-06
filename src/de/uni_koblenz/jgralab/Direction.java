@@ -63,7 +63,7 @@ public enum Direction {
 	 *             When no {@link Direction} could be matched from
 	 *             <code>direction</code>.
 	 */
-	public static Direction parse(String direction) throws Exception {
+	public static Direction parse(String direction) throws Exception {// old
 		if (direction.equals("EDGE_TO_VERTEX")) {
 			return Direction.EDGE_TO_VERTEX;
 		} else if (direction.equals("VERTEX_TO_EDGE")) {
