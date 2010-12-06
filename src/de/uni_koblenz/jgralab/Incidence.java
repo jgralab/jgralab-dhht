@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+
 /**
  * Represents the incidences between the edges and vertices in a graph.
  * 
