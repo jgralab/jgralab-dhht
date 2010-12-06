@@ -43,21 +43,29 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 public interface Edge extends GraphElement {
 
 	/**
+	 * Returns the {@link EdgeClass} of which this {@link Edge} is an instance
+	 * of.
+	 * 
+	 * @return {@link EdgeClass}
+	 */
+	public EdgeClass getType();
+
+	/**
 	 * @return the next incidence object in iSeq of current vertex
 	 */
-	public Edge getNextIncidence();
+	public Edge getNextIncidence();// old
 
 	/**
 	 * @return the previous incidence object in iSeq of current vertex
 	 */
-	public Edge getPrevIncidence();
+	public Edge getPrevIncidence();// old
 
 	/**
 	 * @param orientation
 	 *            the orientation the next incidence should have
 	 * @return the next incidence object in iSeq of current vertex
 	 */
-	public Edge getNextIncidence(EdgeDirection orientation);
+	public Edge getNextIncidence(EdgeDirection orientation);// old
 
 	/**
 	 * Gets the next incident edge at the current vertex, which has one of
@@ -81,7 +89,8 @@ public interface Edge extends GraphElement {
 	 *         <code>thisIncidence == true</code>) or that (
 	 *         <code>thisIncidence == false</code>) side.
 	 */
-	public Edge getNextIncidence(boolean thisIncidence, AggregationKind... kinds);
+	public Edge getNextIncidence(boolean thisIncidence,
+			AggregationKind... kinds);// old
 
 	/**
 	 * @param anEdgeClass
@@ -89,7 +98,7 @@ public interface Edge extends GraphElement {
 	 * @return the next incidence in iSeq where the corresponding edge is of
 	 *         class anEdgeClass
 	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass);
+	public Edge getNextIncidence(EdgeClass anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
@@ -97,7 +106,7 @@ public interface Edge extends GraphElement {
 	 * @return the next incidence in iSeq where the corresponding edge is of
 	 *         class anEdgeClass
 	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass);
+	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
@@ -108,7 +117,7 @@ public interface Edge extends GraphElement {
 	 *         class anEdgeClass
 	 */
 	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation);
+			EdgeDirection orientation);// old
 
 	/**
 	 * @param anEdgeClass
@@ -119,7 +128,7 @@ public interface Edge extends GraphElement {
 	 *         class anEdgeClass
 	 */
 	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation);
+			EdgeDirection orientation);// old
 
 	/**
 	 * @param anEdgeClass
@@ -129,7 +138,7 @@ public interface Edge extends GraphElement {
 	 * @return the next incidence in iSeq where the corresponding edge is of
 	 *         explicit class anEdgeClass
 	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass, boolean noSubclasses);
+	public Edge getNextIncidence(EdgeClass anEdgeClass, boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -140,7 +149,7 @@ public interface Edge extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -153,7 +162,7 @@ public interface Edge extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
+			EdgeDirection orientation, boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -166,37 +175,45 @@ public interface Edge extends GraphElement {
 	 *         explicit class anEdgeClass
 	 */
 	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
+			EdgeDirection orientation, boolean noSubclasses);// old
 
 	/**
 	 * @return the "this" vertex object, that is the object this directed edge
 	 *         starts at
 	 */
-	public Vertex getThis();
+	public Vertex getThis();// old
 
 	/**
 	 * @return the "that" vertex object, that is the object this directed edge
 	 *         ends at
 	 */
-	public Vertex getThat();
+	public Vertex getThat();// old
 
 	/**
 	 * @return the rolename of the edge at the this-vertex
 	 */
-	public String getThisRole();
+	public String getThisRole();// old
 
 	/**
 	 * @return the rolename of the edge at the that-vertex
 	 */
-	public String getThatRole();
+	public String getThatRole();// old
 
 	/**
-	 * @return next edge in eSeq
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge();
 
 	/**
-	 * @return previous edge in eSeq
+	 * Returns the previous {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
+	 * the sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Edge}
 	 */
 	public Edge getPrevEdge();
 
@@ -204,13 +221,13 @@ public interface Edge extends GraphElement {
 	 * @param anEdgeClass
 	 * @return next edge of anEdgeClass or its superclasses in eSeq
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass);
+	public Edge getNextEdge(EdgeClass anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
 	 * @return next edge of anEdgeClass or its superclasses in eSeq
 	 */
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass);
+	public Edge getNextEdge(Class<? extends Edge> anEdgeClass);// old
 
 	/**
 	 * @param anEdgeClass
@@ -218,8 +235,7 @@ public interface Edge extends GraphElement {
 	 *            if true, no subclasses are returned
 	 * @return next edge object of explicit anEdgeClass in eSeq
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass,
-			boolean noSubclasses);
+	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses);// old
 
 	/**
 	 * @param anEdgeClass
@@ -228,63 +244,92 @@ public interface Edge extends GraphElement {
 	 * @return next edge object of explicit anEdgeClass in eSeq
 	 */
 	public Edge getNextEdge(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses);// old
 
 	/**
-	 * @return the alpha vertex of this edge
+	 * Returns the start {@link Vertex} of this binary {@link Edge}.
+	 * 
+	 * @return {@link Vertex} the alpha {@link Vertex} of this {@link Edge}
+	 * @throws UnsupportedOpperationException
+	 *             if this {@link Edge} is not binary.
 	 */
 	public Vertex getAlpha();
 
 	/**
-	 * @return the omega vertex of this edge
+	 * Returns a sequence of all start vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices();
+
+	/**
+	 * Returns the end {@link Vertex} of this binary {@link Edge}.
+	 * 
+	 * @return {@link Vertex} the omega {@link Vertex} of this {@link Edge}
+	 * @throws UnsupportedOpperationException
+	 *             if this {@link Edge} is not binary.
 	 */
 	public Vertex getOmega();
+
+	/**
+	 * Returns a sequence of all end vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices();
+
+	/**
+	 * Returns a sequence of all incident vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices();
 
 	/**
 	 * @param e
 	 * @return true if this edge is somewhere before e in the lambda sequence of
 	 *         the this-vertex
 	 */
-	public boolean isBeforeIncidence(Edge e);
+	public boolean isBeforeIncidence(Edge e);// old
 
 	/**
 	 * @param e
 	 * @return true if this edge is somewhere after e in the lambda sequence of
 	 *         the this-vertex
 	 */
-	public boolean isAfterIncidence(Edge e);
+	public boolean isAfterIncidence(Edge e);// old
 
 	/**
 	 * @param e
 	 * @return true if this edge is somewhere before e in eSeq
 	 */
-	public boolean isBeforeEdge(Edge e);
+	public boolean isBeforeEdge(Edge e);// old
 
 	/**
 	 * puts this edge immediately before e in eSeq
 	 * 
 	 * @param e
 	 */
-	public void putBeforeEdge(Edge e);
+	public void putBeforeEdge(Edge e);// old
 
 	/**
 	 * @param e
 	 * @return true if this edge is somewhere after e in eSeq
 	 */
-	public boolean isAfterEdge(Edge e);
+	public boolean isAfterEdge(Edge e);// old
 
 	/**
 	 * puts this edge immediately after anEdge in eSeq
 	 * 
 	 * @param e
 	 */
-	public void putAfterEdge(Edge e);
+	public void putAfterEdge(Edge e);// old
 
 	/**
 	 * removes this edge from eSeq and erases its attributes @ if used on an
 	 * incidence
 	 */
-	public void delete();
+	public void delete();// old
 
 	/**
 	 * sets the alpha vertex to v
@@ -292,7 +337,7 @@ public interface Edge extends GraphElement {
 	 * @param v
 	 *            a vertex
 	 */
-	void setAlpha(Vertex v);
+	void setAlpha(Vertex v);// old
 
 	/**
 	 * sets the omega vertex to v
@@ -300,7 +345,7 @@ public interface Edge extends GraphElement {
 	 * @param v
 	 *            a vertex
 	 */
-	void setOmega(Vertex v);
+	void setOmega(Vertex v);// old
 
 	/**
 	 * sets the this vertex to v
@@ -308,7 +353,7 @@ public interface Edge extends GraphElement {
 	 * @param v
 	 *            a vertex
 	 */
-	void setThis(Vertex v);
+	void setThis(Vertex v);// old
 
 	/**
 	 * sets the that vertex to v
@@ -316,7 +361,7 @@ public interface Edge extends GraphElement {
 	 * @param v
 	 *            a vertex
 	 */
-	void setThat(Vertex v);
+	void setThat(Vertex v);// old
 
 	/**
 	 * puts this edge immediately before the given edge <code>e</code> in the
@@ -325,7 +370,7 @@ public interface Edge extends GraphElement {
 	 * vertices, only the order of the edges at the <code>this-vertex</code> of
 	 * this edge is changed.
 	 */
-	public void putIncidenceBefore(Edge e);
+	public void putIncidenceBefore(Edge e);// old
 
 	/**
 	 * puts this edge after the after given edge <code>previousEdge</code> in
@@ -334,52 +379,52 @@ public interface Edge extends GraphElement {
 	 * vertices, only the order of the edges at the <code>this-vertex</code> of
 	 * this edge is changed.
 	 */
-	public void putIncidenceAfter(Edge e);
+	public void putIncidenceAfter(Edge e);// old
 
 	/**
 	 * returns the normal edge of this edge
 	 */
-	public Edge getNormalEdge();
+	public Edge getNormalEdge();// old
 
 	/**
 	 * returns the reversed edge of this edge, e.g. for the edge -1 the reversed
 	 * edge is 1, for the edge 1 the reversed edge is -1.
 	 */
-	public Edge getReversedEdge();
+	public Edge getReversedEdge();// old
 
 	/**
 	 * returns true if this edge is the "normal" edge, false otherwise
 	 */
-	public boolean isNormal();
+	public boolean isNormal();// old
 
 	/**
 	 * @return the semantics of this edge, e.g. AggregationKind.NONE, SHARED or
 	 *         COMPOSITE
 	 */
-	public AggregationKind getSemantics();
+	public AggregationKind getSemantics();// old
 
 	/**
 	 * @return the semantics of the alpha end of this edge, e.g.
 	 *         AggregationKind.NONE, SHARED or COMPOSITE
 	 */
-	public AggregationKind getAlphaSemantics();
+	public AggregationKind getAlphaSemantics();// old
 
 	/**
 	 * @return the semantics of the omega end of this edge, e.g.
 	 *         AggregationKind.NONE, SHARED or COMPOSITE
 	 */
-	public AggregationKind getOmegaSemantics();
+	public AggregationKind getOmegaSemantics();// old
 
 	/**
 	 * @return the semantics of the this end of this edge, e.g.
 	 *         AggregationKind.NONE, SHARED or COMPOSITE
 	 */
-	public AggregationKind getThisSemantics();
+	public AggregationKind getThisSemantics();// old
 
 	/**
 	 * @return the semantics of the that end of this edge, e.g.
 	 *         AggregationKind.NONE, SHARED or COMPOSITE
 	 */
-	public AggregationKind getThatSemantics();
+	public AggregationKind getThatSemantics();// old
 
 }

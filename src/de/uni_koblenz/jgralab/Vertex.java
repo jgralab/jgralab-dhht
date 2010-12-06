@@ -165,7 +165,7 @@ public interface Vertex extends GraphElement {
 	 * 
 	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex();// old
+	public Vertex getNextVertex();
 
 	/**
 	 * Returns the previous {@link Vertex} in the sequence of all vertices in
@@ -174,7 +174,7 @@ public interface Vertex extends GraphElement {
 	 * 
 	 * @return {@link Vertex}
 	 */
-	public Vertex getPrevVertex();// old
+	public Vertex getPrevVertex();
 
 	/**
 	 * @param aVertexClass
