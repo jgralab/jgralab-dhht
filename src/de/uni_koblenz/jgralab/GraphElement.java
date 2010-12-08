@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * Aggregates vertices and edges.
@@ -70,6 +72,170 @@ public interface GraphElement extends AttributedElement {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence();
+
+	/**
+	 * Returns the first {@link Incidence} of this {@link GraphElement} with
+	 * direction <code>direction</code>.
+	 * 
+	 * @param direction
+	 *            {@link Direction} of connected {@link Incidence}s,
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Direction direction);
+
+	/**
+	 * Get the first {@link Incidence} which has one of the aggregation
+	 * semantics given by <code>incidentTypes</code> at either this
+	 * {@link Vertex} (<code>thisIncidence == true</code>) or that
+	 * {@link Vertex} (<code>thisIncidence == false</code>). If there are no
+	 * <code>incidentTypes</code> given, it simply returns the first
+	 * {@link Incidence}.<br/>
+	 * <br/>
+	 * For example, this returns the first {@link Incidence} to a parent
+	 * {@link GraphElement} in the containment hierarchy.
+	 * 
+	 * <pre>
+	 * ge.getFirstIncidence(true, IncidenceType.AGGREGATION, IncidenceType.COMPOSITION)
+	 * </pre>
+	 * 
+	 * And this returns the first {@link Incidence} to a child
+	 * {@link GraphElement} in the containment hierarchy.
+	 * 
+	 * <pre>
+	 * v.getFirstIncidence(false, IncidenceType.AGGREGATION, IncidenceType.COMPOSITION)
+	 * </pre>
+	 * 
+	 * @param thisIncidence
+	 *            boolean if true, <code>incidentTypes</code> has to match the
+	 *            {@link Incidence} at this {@link GraphElement}, else it has to
+	 *            match the opposite {@link Incidence}
+	 * @param incidentTypes
+	 *            {@link IncidenceType}...
+	 * 
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes);
+
+	/**
+	 * Returns the first incidence in lambda-seq where the corresponding
+	 * {@link IncidenceClass} is of class <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class} the {@link Incidence} class to search for
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
+	 * direction is <code>direction</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			Direction direction);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
+	 * direction is <code>direction</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
+	 * direction <code>direction</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
+	 * direction <code>direction</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses);
 
 	/**
 	 * Returns the last {@link Incidence} of this {@link GraphElement}.

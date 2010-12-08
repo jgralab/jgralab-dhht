@@ -35,7 +35,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
@@ -57,18 +56,6 @@ public interface Vertex extends GraphElement {
 	public VertexClass getType();
 
 	/**
-	 * Checks if the list of incident edges has changed with respect to the
-	 * given <code>incidenceListVersion</code>.
-	 */
-	public boolean isIncidenceListModified(long incidenceListVersion);// old
-
-	/**
-	 * @return the internal vertex structure version
-	 * @see #isIncidenceListModified(long)
-	 */
-	public long getIncidenceListVersion();// old
-
-	/**
 	 * @return the number of connected incidences to the vertex
 	 */
 	public int getDegree();// old
@@ -78,7 +65,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeDirection orientation);// old
+	public int getDegree(Direction orientation);// old
 
 	/**
 	 * @param ec
@@ -121,7 +108,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeClass ec, EdgeDirection orientation);// old
+	public int getDegree(EdgeClass ec, Direction orientation);// old
 
 	/**
 	 * @param ec
@@ -130,7 +117,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Class<? extends Edge> ec, EdgeDirection orientation);// old
+	public int getDegree(Class<? extends Edge> ec, Direction orientation);// old
 
 	/**
 	 * @param ec
@@ -142,7 +129,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeClass ec, EdgeDirection orientation,
+	public int getDegree(EdgeClass ec, Direction orientation,
 			boolean noSubClasses);// old
 
 	/**
@@ -155,7 +142,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Class<? extends Edge> ec, EdgeDirection orientation,
+	public int getDegree(Class<? extends Edge> ec, Direction orientation,
 			boolean noSubClasses);// old
 
 	/**
@@ -243,133 +230,6 @@ public interface Vertex extends GraphElement {
 	public Iterable<Edge> getIncidentEdges();
 
 	/**
-	 * @param orientation
-	 *            of connected incidences,
-	 * @return the first incidence of vertex with direction IN or OUT
-	 */
-	public Edge getFirstIncidence(EdgeDirection orientation);// old
-
-	/**
-	 * Get the first incident edge which as one of the aggregation semantics
-	 * given by <code>kind</code> at either this vertex (thisIncidence == true)
-	 * or that vertex (thisIncidence == false). If no <code>kind</code> is
-	 * given, it simply returns the first incident edge.<br/>
-	 * <br/>
-	 * For example, this returns the first edge to a parent vertex in the
-	 * containment hierarchy.
-	 * 
-	 * <pre>
-	 * v.getFirstIncidence(true, AggregationKind.SHARED, AggregationKind.COMPOSITE)
-	 * </pre>
-	 * 
-	 * And this returns the first edge to a child vertex in the containment
-	 * hierarchy.
-	 * 
-	 * <pre>
-	 * v.getFirstIncidence(false, AggregationKind.SHARED, AggregationKind.COMPOSITE)
-	 * </pre>
-	 * 
-	 * @see Edge#getNextIncidence(boolean, AggregationKind...)
-	 * 
-	 * @param thisIncidence
-	 *            if true, <code>kinds</code> has to match the incidence at this
-	 *            vertex, else it has to match the opposite incidence
-	 * 
-	 * @return the first incident edge where the incidence at this vertex
-	 *         (thisIncidence == true) or that vertex (thisIncidence == false)
-	 *         has one of the aggregation semantics given by <code>kind</code>.
-	 */
-	public Edge getFirstIncidence(boolean thisIncidence,
-			AggregationKind... kinds);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            of the edge
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            of the edge
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass, boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            set to TRUE, if edge has the 'in'-orientation, set to FALSE,
-	 *            if edge has the 'out'-orientation
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getFirstIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            set to TRUE, if edge has the 'in'-orientation, set to FALSE,
-	 *            if edge has the 'out'-orientation
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the first incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);// old
-
-	/**
 	 * @param v
 	 * @return true, if this vertex is somewhere before v in vSeq
 	 */
@@ -444,11 +304,11 @@ public interface Vertex extends GraphElement {
 	 * 
 	 * @param dir
 	 *            the direction of the edges which should be iterated, either
-	 *            EdgeDirection.IN or EdgeDirection.OUT
+	 *            Direction.IN or Direction.OUT
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(EdgeDirection dir);// old
+	public Iterable<Edge> incidences(Direction dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -458,11 +318,11 @@ public interface Vertex extends GraphElement {
 	 *            the EdgeClass of the edges which should be iterated
 	 * @param dir
 	 *            the direction of the edges which should be iterated, either
-	 *            EdgeDirection.IN or EdgeDirection.OUT
+	 *            Direction.IN or Direction.OUT
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(EdgeClass eclass, EdgeDirection dir);// old
+	public Iterable<Edge> incidences(EdgeClass eclass, Direction dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
@@ -472,12 +332,11 @@ public interface Vertex extends GraphElement {
 	 *            the M1-Class of the edges which should be iterated
 	 * @param dir
 	 *            the direction of the edges which should be iterated, either
-	 *            EdgeDirection.IN or EdgeDirection.OUT
+	 *            Direction.IN or Direction.OUT
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass,
-			EdgeDirection dir);// old
+	public Iterable<Edge> incidences(Class<? extends Edge> eclass, Direction dir);// old
 
 	/**
 	 * Using this method, one can simply iterate over all incident edges of this
