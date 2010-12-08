@@ -54,6 +54,36 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 	 */
 	private Direction direction;
 
+	protected void setIncidentVertex(VertexImpl incidentVertex) {
+		this.incidentVertex = incidentVertex;
+	}
+
+	protected void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
+		this.nextIncidenceAtVertex = nextIncidenceAtVertex;
+	}
+
+	protected void setPreviousIncidenceAtVertex(
+			IncidenceImpl previousIncidenceAtVertex) {
+		this.previousIncidenceAtVertex = previousIncidenceAtVertex;
+	}
+
+	protected void setIncidentEdge(EdgeImpl incidentEdge) {
+		this.incidentEdge = incidentEdge;
+	}
+
+	protected void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
+		this.nextIncidenceAtEdge = nextIncidenceAtEdge;
+	}
+
+	protected void setPreviousIncidenceAtEdge(
+			IncidenceImpl previousIncidenceAtEdge) {
+		this.previousIncidenceAtEdge = previousIncidenceAtEdge;
+	}
+
+	protected void setDirection(Direction direction) {
+		this.direction = direction;
+	}
+
 	@Override
 	public Direction getDirection() {
 		return direction;
