@@ -8,25 +8,50 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceBaseImpl;
 
 /**
- * TODO add comment
+ * Implements the interface {@link Incidence}.
  * 
  * @author ist@uni-koblenz.de
  * 
  */
 public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
+	/**
+	 * The incident {@link VertexImpl}.
+	 */
 	private VertexImpl incidentVertex;
 
+	/**
+	 * The next {@link Incidence} in the lambda-sequence of
+	 * {@link IncidenceImpl#incidentVertex}.
+	 */
 	private IncidenceImpl nextIncidenceAtVertex;
 
+	/**
+	 * The previous {@link Incidence} in the lambda-sequence of
+	 * {@link IncidenceImpl#incidentVertex}.
+	 */
 	private IncidenceImpl previousIncidenceAtVertex;
 
+	/**
+	 * The incident {@link EdgeImpl}.
+	 */
 	private EdgeImpl incidentEdge;
 
+	/**
+	 * The next {@link Incidence} in the lambda-sequence of
+	 * {@link IncidenceImpl#incidentEdge}.
+	 */
 	private IncidenceImpl nextIncidenceAtEdge;
 
+	/**
+	 * The previous {@link Incidence} in the lambda-sequence of
+	 * {@link IncidenceImpl#incidentEdge}.
+	 */
 	private IncidenceImpl previousIncidenceAtEdge;
 
+	/**
+	 * The direction of this {@link Incidence}.
+	 */
 	private Direction direction;
 
 	@Override
@@ -72,14 +97,14 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Edge> getTheseEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return incidentVertex.getIncidentEdges(direction);
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return incidentVertex
+				.getIncidentEdges(direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+						: Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
@@ -93,8 +118,7 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices() {
-		// TODO Auto-generated method stub
-		return null;
+		return incidentEdge.getIncidentVertices(direction);
 	}
 
 	@Override
@@ -109,8 +133,9 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices() {
-		// TODO Auto-generated method stub
-		return null;
+		return incidentEdge
+				.getIncidentVertices(direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+						: Direction.EDGE_TO_VERTEX);
 	}
 
 }

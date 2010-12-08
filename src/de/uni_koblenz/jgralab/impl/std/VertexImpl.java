@@ -30,10 +30,10 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.IncidenceImpl;
 
 /**
  * The implementation of a <code>Vertex</code> accessing attributes without
@@ -147,5 +147,10 @@ public abstract class VertexImpl extends
 	protected void setId(int id) {
 		assert id >= 0;
 		this.id = id;
+	}
+
+	public Iterable<Edge> getIncidentEdges(Direction direction) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
