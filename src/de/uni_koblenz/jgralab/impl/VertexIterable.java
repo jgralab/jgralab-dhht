@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * This class provides an Iterable to iterate over vertices in a graph. One may
  * use this class to use the advanced for-loop of Java 5. Instances of this
  * class should never, and this means <b>never</b> created manually but only
- * using the methods <code>vertices(params)</code> of th graph. Every special
+ * using the methods <code>vertices(params)</code> of the graph. Every special
  * graphclass contains generated methods similar to
  * <code>vertices(params)</code> for every VertexClass that is part of the
  * GraphClass.

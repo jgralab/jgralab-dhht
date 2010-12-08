@@ -125,7 +125,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	 * @see de.uni_koblenz.jgralab.Vertex#getNextVertex()
 	 */
 	@Override
-	abstract public Vertex getNextVertex();
+	public abstract Vertex getNextVertex();
 
 	/*
 	 * (non-Javadoc)
@@ -268,28 +268,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
 		graph.putVertexAfter((VertexBaseImpl) v, this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getFirstEdge()
-	 */
-	@Override
-	public Edge getFirstIncidence() {
-		assert isValid();
-		return getFirstIncidenceInternal();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getLastEdge()
-	 */
-	@Override
-	public Edge getLastIncidence() {
-		assert isValid();
-		return getLastIncidenceInternal();
 	}
 
 	abstract protected IncidenceImpl getFirstIncidenceInternal();
@@ -522,12 +500,13 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 			setLastIncidence(moved);
 			moved.setNextIncidenceInternal(null);
 		} else {
-			if(!graph.hasSavememSupport()) {
-				target.getNextIncidenceInternal().setPrevIncidenceInternal(moved);
+			if (!graph.hasSavememSupport()) {
+				target.getNextIncidenceInternal().setPrevIncidenceInternal(
+						moved);
 			}
 			moved.setNextIncidenceInternal(target.getNextIncidenceInternal());
 		}
-		if(!graph.hasSavememSupport()) {
+		if (!graph.hasSavememSupport()) {
 			moved.setPrevIncidenceInternal(target);
 		}
 		target.setNextIncidenceInternal(moved);
@@ -553,7 +532,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		// remove moved incidence from lambdaSeq
 		if (moved == getFirstIncidenceInternal()) {
 			setFirstIncidence(moved.getNextIncidenceInternal());
-			if(!graph.hasSavememSupport()) {
+			if (!graph.hasSavememSupport()) {
 				moved.getNextIncidenceInternal().setPrevIncidenceInternal(null);
 			}
 		} else if (moved == getLastIncidenceInternal()) {
@@ -562,7 +541,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		} else {
 			moved.getPrevIncidenceInternal().setNextIncidenceInternal(
 					moved.getNextIncidenceInternal());
-			if(!graph.hasSavememSupport()) {
+			if (!graph.hasSavememSupport()) {
 				moved.getNextIncidenceInternal().setPrevIncidenceInternal(
 						moved.getPrevIncidenceInternal());
 			}
@@ -571,18 +550,18 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		// insert moved incidence in lambdaSeq immediately before target
 		if (target == getFirstIncidenceInternal()) {
 			setFirstIncidence(moved);
-			if(!graph.hasSavememSupport()) {
+			if (!graph.hasSavememSupport()) {
 				moved.setPrevIncidenceInternal(null);
 			}
 		} else {
 			IncidenceImpl previousIncidence = target.getPrevIncidenceInternal();
 			previousIncidence.setNextIncidenceInternal(moved);
-			if(!graph.hasSavememSupport()) {
+			if (!graph.hasSavememSupport()) {
 				moved.setPrevIncidenceInternal(previousIncidence);
 			}
 		}
 		moved.setNextIncidenceInternal(target);
-		if(!graph.hasSavememSupport()) {
+		if (!graph.hasSavememSupport()) {
 			target.setPrevIncidenceInternal(moved);
 		}
 		incidenceListModified();
@@ -842,11 +821,12 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return new IncidenceIterable<Edge>(this, eclass);
 	}
 
-	abstract protected void setNextVertex(Vertex nextVertex);
+	protected abstract void setNextVertex(Vertex nextVertex);
 
-	abstract protected void setPrevVertex(Vertex prevVertex);
+	protected abstract void setPrevVertex(Vertex prevVertex);
 
-	abstract public Vertex getPrevVertex();
+	@Override
+	public abstract Vertex getPrevVertex();
 
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;
@@ -945,7 +925,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 				}
 				out = first;
 				first = out.getNextIncidenceInternal();
-				if(!graph.hasSavememSupport()) {
+				if (!graph.hasSavememSupport()) {
 					first.setPrevIncidenceInternal(null);
 				}
 				return out;

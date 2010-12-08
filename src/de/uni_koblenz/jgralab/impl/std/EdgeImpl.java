@@ -30,11 +30,13 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * The implementation of an <code>Edge</code> accessing attributes without
@@ -121,5 +123,19 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	protected void setId(int id) {
 		assert id >= 0;
 		this.id = id;
+	}
+
+	/**
+	 * Checks if this {@link Edge} is a binary edge. An edge is called binary,
+	 * if {@link Edge#getType()} is connected to exactly two {@link VertexClass}
+	 * es by a multiplicity of 1. One of the two {@link Incidence}s must have
+	 * the direction {@link Direction#EDGE_TO_VERTEX} and the other
+	 * {@link Direction#VERTEX_TO_EDGE}.
+	 * 
+	 * @return bolean <code>true</code> if this {@link Edge} is a binary edge.
+	 */
+	boolean isBinaryEdge() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

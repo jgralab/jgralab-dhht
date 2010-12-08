@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceImpl;
@@ -42,10 +43,11 @@ import de.uni_koblenz.jgralab.impl.IncidenceImpl;
  */
 public abstract class VertexImpl extends
 		de.uni_koblenz.jgralab.impl.VertexBaseImpl {
-	private VertexImpl nextVertex;
-	private VertexImpl prevVertex;
-	private IncidenceImpl firstIncidence;
-	private IncidenceImpl lastIncidence;
+
+	private VertexImpl nextVertexInGraph;
+	private VertexImpl prevVertexInGraph;
+	private IncidenceImpl firstIncidenceAtVertex;
+	private IncidenceImpl lastIncidenceAtVertex;
 
 	/**
 	 * holds the version of the vertex structure, for every modification of the
@@ -58,43 +60,66 @@ public abstract class VertexImpl extends
 	@Override
 	public Vertex getNextVertex() {
 		assert isValid();
-		return nextVertex;
+		return nextVertexInGraph;
+	}
+
+	@Override
+	public Vertex getPreviousVertex() {
+		return prevVertexInGraph;
+	}
+
+	@Override
+	public Iterable<Edge> getAlphaEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	protected IncidenceImpl getFirstIncidenceInternal() {
-		return firstIncidence;
+		return firstIncidenceAtVertex;
 	}
 
 	@Override
 	protected IncidenceImpl getLastIncidenceInternal() {
-		return lastIncidence;
+		return lastIncidenceAtVertex;
 	}
 
 	@Override
 	protected void setNextVertex(Vertex nextVertex) {
-		this.nextVertex = (VertexImpl) nextVertex;
+		this.nextVertexInGraph = (VertexImpl) nextVertex;
 	}
 
 	@Override
 	protected void setPrevVertex(Vertex prevVertex) {
-		this.prevVertex = (VertexImpl) prevVertex;
+		this.prevVertexInGraph = (VertexImpl) prevVertex;
 	}
 
 	@Override
 	public Vertex getPrevVertex() {
 		assert isValid();
-		return prevVertex;
+		return prevVertexInGraph;
 	}
 
 	@Override
 	protected void setFirstIncidence(IncidenceImpl firstIncidence) {
-		this.firstIncidence = firstIncidence;
+		this.firstIncidenceAtVertex = firstIncidence;
 	}
 
 	@Override
 	protected void setLastIncidence(IncidenceImpl lastIncidence) {
-		this.lastIncidence = lastIncidence;
+		this.lastIncidenceAtVertex = lastIncidence;
 	}
 
 	@Override

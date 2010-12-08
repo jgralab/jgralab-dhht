@@ -215,7 +215,17 @@ public interface Edge extends GraphElement {
 	 * 
 	 * @return {@link Edge}
 	 */
+	@Deprecated
 	public Edge getPrevEdge();
+
+	/**
+	 * Returns the previous {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
+	 * the sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Edge}
+	 */
+	public Edge getPreviousEdge();
 
 	/**
 	 * @param anEdgeClass

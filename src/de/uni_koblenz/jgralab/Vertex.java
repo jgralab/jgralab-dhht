@@ -174,7 +174,17 @@ public interface Vertex extends GraphElement {
 	 * 
 	 * @return {@link Vertex}
 	 */
+	@Deprecated
 	public Vertex getPrevVertex();
+
+	/**
+	 * Returns the previous {@link Vertex} in the sequence of all vertices in
+	 * the complete {@link Graph}(vSeq). If this {@link Vertex} is the beginning
+	 * of the sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Vertex}
+	 */
+	public Vertex getPreviousVertex();
 
 	/**
 	 * @param aVertexClass

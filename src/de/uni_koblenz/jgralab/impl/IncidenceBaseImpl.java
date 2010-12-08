@@ -28,61 +28,16 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.std;
 
-import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
-import de.uni_koblenz.jgralab.impl.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
+package de.uni_koblenz.jgralab.impl;
+
+import de.uni_koblenz.jgralab.Incidence;
 
 /**
- * The implementation of an ReversedEdge accessing attributes without
- * versioning.
+ * TODO add comment
  * 
- * @author Jose Monte(monte@uni-koblenz.de)
+ * @author ist@uni-koblenz.de
  */
-public abstract class ReversedEdgeImpl extends
-		de.uni_koblenz.jgralab.impl.ReversedEdgeBaseImpl {
-	private VertexBaseImpl incidentVertex;
-	private IncidenceImpl nextIncidence;
-	private IncidenceImpl prevIncidence;
+public abstract class IncidenceBaseImpl implements Incidence {
 
-	@Override
-	protected VertexBaseImpl getIncidentVertex() {
-		return incidentVertex;
-	}
-
-	@Override
-	protected IncidenceImpl getNextIncidenceInternal() {
-		return nextIncidence;
-	}
-
-	@Override
-	protected IncidenceImpl getPrevIncidenceInternal() {
-		return prevIncidence;
-	}
-
-	@Override
-	protected void setIncidentVertex(VertexBaseImpl v) {
-		this.incidentVertex = v;
-	}
-
-	@Override
-	protected void setNextIncidenceInternal(IncidenceImpl nextIncidence) {
-		this.nextIncidence = nextIncidence;
-	}
-
-	@Override
-	protected void setPrevIncidenceInternal(IncidenceImpl prevIncidence) {
-		this.prevIncidence = prevIncidence;
-	}
-
-	/**
-	 * 
-	 * @param normalEdge
-	 * @param graph
-	 */
-	protected ReversedEdgeImpl(EdgeBaseImpl normalEdge, Graph graph) {
-		super(normalEdge, graph);
-	}
 }

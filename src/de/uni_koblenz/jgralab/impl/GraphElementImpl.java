@@ -54,6 +54,7 @@ public abstract class GraphElementImpl implements GraphElement {
 
 	protected GraphBaseImpl graph;
 
+	@Override
 	public Graph getGraph() {
 		return graph;
 	}
