@@ -67,7 +67,8 @@ public interface GraphElement extends AttributedElement {
 	public Graph getGraph();
 
 	/**
-	 * Returns the first {@link Incidence} of this {@link GraphElement}.
+	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
+	 * an {@link Incidence} does not exist, <code>null</code> is returned.
 	 * 
 	 * @return {@link Incidence}
 	 */
@@ -75,7 +76,8 @@ public interface GraphElement extends AttributedElement {
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement} with
-	 * direction <code>direction</code>.
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param direction
 	 *            {@link Direction} of connected {@link Incidence}s,
@@ -89,7 +91,8 @@ public interface GraphElement extends AttributedElement {
 	 * {@link Vertex} (<code>thisIncidence == true</code>) or that
 	 * {@link Vertex} (<code>thisIncidence == false</code>). If there are no
 	 * <code>incidentTypes</code> given, it simply returns the first
-	 * {@link Incidence}.<br/>
+	 * {@link Incidence}. If such an {@link Incidence} does not exist,
+	 * <code>null</code> is returned.<br/>
 	 * <br/>
 	 * For example, this returns the first {@link Incidence} to a parent
 	 * {@link GraphElement} in the containment hierarchy.
@@ -119,7 +122,8 @@ public interface GraphElement extends AttributedElement {
 
 	/**
 	 * Returns the first incidence in lambda-seq where the corresponding
-	 * {@link IncidenceClass} is of class <code>anIncidenceClass</code>.
+	 * {@link IncidenceClass} is of class <code>anIncidenceClass</code>. If such
+	 * an {@link Incidence} does not exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
@@ -129,7 +133,8 @@ public interface GraphElement extends AttributedElement {
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
-	 * {@link Incidence} is of class <code>anIncidenceClass</code>.
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If such an
+	 * {@link Incidence} does not exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link Class} the {@link Incidence} class to search for
@@ -141,7 +146,8 @@ public interface GraphElement extends AttributedElement {
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
 	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
-	 * direction is <code>direction</code>.
+	 * direction is <code>direction</code>. If such an {@link Incidence} does
+	 * not exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
@@ -155,7 +161,8 @@ public interface GraphElement extends AttributedElement {
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
 	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
-	 * direction is <code>direction</code>.
+	 * direction is <code>direction</code>. If such an {@link Incidence} does
+	 * not exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
@@ -171,7 +178,8 @@ public interface GraphElement extends AttributedElement {
 	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
 	 * <code>noSubclasses</code> is set to <code>true</code> the
 	 * {@link Incidence} must not be an instance of a subclass of
-	 * <code>anIncidenceClass</code>.
+	 * <code>anIncidenceClass</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
@@ -187,7 +195,8 @@ public interface GraphElement extends AttributedElement {
 	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
 	 * <code>noSubclasses</code> is set to <code>true</code> the
 	 * {@link Incidence} must not be an instance of a subclass of
-	 * <code>anIncidenceClass</code>.
+	 * <code>anIncidenceClass</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
@@ -204,7 +213,8 @@ public interface GraphElement extends AttributedElement {
 	 * <code>noSubclasses</code> is set to <code>true</code> the
 	 * {@link Incidence} must not be an instance of a subclass of
 	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
-	 * direction <code>direction</code>.
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
@@ -223,7 +233,8 @@ public interface GraphElement extends AttributedElement {
 	 * <code>noSubclasses</code> is set to <code>true</code> the
 	 * {@link Incidence} must not be an instance of a subclass of
 	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
-	 * direction <code>direction</code>.
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for

@@ -170,4 +170,8 @@ public interface Incidence {
 	 */
 	public Iterable<Vertex> getThoseVertices();
 
+	public Class<? extends Incidence> getM1Class();// TODO check if it should be
+													// put into
+													// IncidenceBaseImpl
+
 }

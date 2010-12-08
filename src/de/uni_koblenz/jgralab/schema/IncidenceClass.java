@@ -32,6 +32,8 @@ package de.uni_koblenz.jgralab.schema;
 
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Incidence;
+
 public interface IncidenceClass {
 
 	/**
@@ -132,5 +134,12 @@ public interface IncidenceClass {
 	 *         IncidenceClass belongs to
 	 */
 	public IncidenceClass getOpposite();
+
+	/**
+	 * Returns the M1-class of this {@link Incidence}.
+	 * 
+	 * @return {@link Class}
+	 */
+	public Class<? extends Incidence> getM1Class();
 
 }

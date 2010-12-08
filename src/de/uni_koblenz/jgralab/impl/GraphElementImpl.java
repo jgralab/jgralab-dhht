@@ -31,11 +31,15 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -45,7 +49,17 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  */
 public abstract class GraphElementImpl implements GraphElement {
+
 	protected int id;
+
+	/**
+	 * Holds the version of the {@link Incidence} structure, for every
+	 * modification of the structure (e.g. adding or deleting an
+	 * {@link Incidence} or changing the incidence sequence) this version number
+	 * is increased by one. It is set to 0 when the {@link GraphElement} is
+	 * created or the graph is loaded.
+	 */
+	private long incidenceListVersion = 0;
 
 	protected GraphElementImpl(Graph graph) {
 		assert graph != null;
@@ -114,7 +128,6 @@ public abstract class GraphElementImpl implements GraphElement {
 			try {
 				internalSetDefaultValue(attr);
 			} catch (GraphIOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -129,4 +142,170 @@ public abstract class GraphElementImpl implements GraphElement {
 			throws GraphIOException {
 		attr.setDefaultValue(this);
 	}
+
+	/**
+	 * Must be called by all methods which manipulate the incidence list of this
+	 * GraphElement.
+	 */
+	protected void incidenceListModified() {
+		assert isValid();
+		setIncidenceListVersion(getIncidenceListVersion() + 1);
+	}
+
+	/**
+	 * Checks if the list of {@link Incidence}s has changed with respect to the
+	 * given <code>incidenceListVersion</code>.
+	 * 
+	 * @param incidenceListVersion
+	 *            long
+	 * @return boolean true if <code>incidenceListVersion</code> differs from
+	 *         {@link #incidenceListVersion}
+	 */
+	boolean isIncidenceListModified(long incidenceListVersion) {
+		assert isValid();
+		return (this.getIncidenceListVersion() != incidenceListVersion);
+	}
+
+	/**
+	 * Sets {@link #incidenceListVersion} to <code>incidentListVersion</code>.
+	 * 
+	 * @param incidenceListVersion
+	 *            long
+	 */
+	protected void setIncidenceListVersion(long incidenceListVersion) {
+		this.incidenceListVersion = incidenceListVersion;
+	}
+
+	/**
+	 * @return long the internal incidence list version
+	 * @see #isIncidenceListModified(long)
+	 */
+	long getIncidenceListVersion() {
+		assert isValid();
+		return incidenceListVersion;
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Direction direction) {
+		assert isValid();
+		IncidenceBaseImpl i = (IncidenceBaseImpl) getFirstIncidence();
+		switch (direction) {
+		case EDGE_TO_VERTEX:
+			while ((i != null) && i.getDirection() != Direction.EDGE_TO_VERTEX) {
+				i = i.getNextIncidence(this);
+			}
+			return i;
+		case VERTEX_TO_EDGE:
+			while ((i != null) && i.getDirection() != Direction.VERTEX_TO_EDGE) {
+				i = i.getNextIncidence(this);
+			}
+			return i;
+		default:
+			throw new RuntimeException("FIXME!");
+		}
+	}
+
+	@Override
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		IncidenceBaseImpl i = (IncidenceBaseImpl) getFirstIncidence();
+		if (incidentTypes.length == 0) {
+			return i;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidentTypes) {
+				if ((thisIncidence ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i;
+				}
+			}
+			i = i.getNextIncidence(this);
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass.getM1Class(), null, false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass, null, false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
+				false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass, direction, false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass.getM1Class(), null,
+				noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass, null, noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
+				noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		IncidenceBaseImpl currentIncidence = (IncidenceBaseImpl) getFirstIncidence(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence.getNextIncidence(this/*
+																	 * TODO,
+																	 * direction
+																	 */);
+		}
+		return null;
+	}
+
 }

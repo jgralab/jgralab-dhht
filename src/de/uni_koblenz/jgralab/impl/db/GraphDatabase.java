@@ -719,7 +719,7 @@ public abstract class GraphDatabase {
 
 	/**
 	 * Updates attribute value of an edge.
-	 * @param vertex Edge with attribute value to update.
+	 * @param graphElement Edge with attribute value to update.
 	 * @param attributeName Name of attribute
 	 * @throws GraphDatabaseException Update not successful.
 	 */

@@ -35,8 +35,9 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -44,68 +45,70 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public class IncidenceIterable<E extends Edge> implements Iterable<E> {
+public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
 	/**
-	 * Creates an Iterable for all incident edges of Vertex <code>v</code>.
+	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
+	 * .
 	 * 
-	 * @param v
-	 *            a Vertex
+	 * @param ge
+	 *            a GraphElement
 	 */
-	public IncidenceIterable(Vertex v) {
-		this(v, null, EdgeDirection.INOUT);
+	public IncidenceIterable(GraphElement ge) {
+		this(ge, null, null);
 	}
 
 	/**
-	 * Creates an Iterable for all incident edges of Vertex <code>v</code> with
-	 * the specified <code>orientation</code>.
+	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
+	 * with the specified <code>orientation</code>.
 	 * 
-	 * @param v
-	 *            a Vertex
+	 * @param ge
+	 *            a GraphElement
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public IncidenceIterable(Vertex v, EdgeDirection orientation) {
-		this(v, null, orientation);
+	public IncidenceIterable(GraphElement ge, Direction orientation) {
+		this(ge, null, orientation);
 	}
 
 	/**
-	 * Creates an Iterable for all incident edges of Vertex <code>v</code> with
-	 * the specified edgeclass <code>ec</code>.
+	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
+	 * with the specified edgeclass <code>ec</code>.
 	 * 
-	 * @param v
-	 *            a Vertex
-	 * @param ec
+	 * @param ge
+	 *            a GraphElement
+	 * @param ic
 	 *            restricts edges to that class or subclasses
 	 */
-	public IncidenceIterable(Vertex v, Class<? extends Edge> ec) {
-		this(v, ec, EdgeDirection.INOUT);
+	public IncidenceIterable(GraphElement ge, Class<? extends Incidence> ic) {
+		this(ge, ic, null);
 	}
 
 	/**
-	 * Creates an Iterable for all incident edges of Vertex <code>v</code> with
-	 * the specified edgeclass <code>ec</code> and <code>orientation</code>.
+	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
+	 * with the specified edgeclass <code>ec</code> and <code>orientation</code>
+	 * .
 	 * 
-	 * @param v
-	 *            a Vertex
-	 * @param ec
+	 * @param ge
+	 *            a GraphElement
+	 * @param ic
 	 *            restricts edges to that class or subclasses
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public IncidenceIterable(Vertex v, Class<? extends Edge> ec,
-			EdgeDirection orientation) {
-		assert v != null && v.isValid();
-		iter = new IncidenceIterator(v, ec, orientation);
+	public IncidenceIterable(GraphElement ge, Class<? extends Incidence> ic,
+			Direction orientation) {
+		assert ge != null && ge.isValid();
+		iter = new IncidenceIterator(ge, ic, orientation);
 	}
 
-	class IncidenceIterator implements Iterator<E> {
-		protected E current = null;
+	class IncidenceIterator implements Iterator<I> {
+		protected I current = null;
 
-		protected Vertex vertex = null;
+		protected GraphElement graphElement = null;
 
-		protected Class<? extends Edge> ec;
+		protected Class<? extends Incidence> ic;
 
-		protected EdgeDirection dir;
+		protected Direction dir;
 
 		/**
 		 * the version of the incidence list of the vertex at the beginning of
@@ -116,37 +119,49 @@ public class IncidenceIterable<E extends Edge> implements Iterable<E> {
 		protected long incidenceListVersion;
 
 		@SuppressWarnings("unchecked")
-		public IncidenceIterator(Vertex vertex, Class<? extends Edge> ec,
-				EdgeDirection dir) {
-			this.vertex = vertex;
-			this.ec = ec;
+		public IncidenceIterator(GraphElement graphElement,
+				Class<? extends Incidence> ic, Direction dir) {
+			this.graphElement = graphElement;
+			this.ic = ic;
 			this.dir = dir;
-			incidenceListVersion = vertex.getIncidenceListVersion();
-			current = (E) ((ec == null) ? vertex.getFirstIncidence(dir) : vertex
-					.getFirstIncidence(ec, dir));
+			incidenceListVersion = ((GraphElementImpl) graphElement)
+					.getIncidenceListVersion();
+			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
+					: graphElement.getFirstIncidence(ic, dir));
 		}
 
 		@SuppressWarnings("unchecked")
-		public E next() {
-			if (vertex.isIncidenceListModified(incidenceListVersion)) {
-				throw new ConcurrentModificationException(
-						"The incidence list of the vertex has been modified - the iterator is not longer valid");
-			}
+		public I next() {
+			checkConcurrentModification();
 			if (current == null) {
 				throw new NoSuchElementException();
 			}
-			E result = current;
-			current = (E) ((ec == null) ? current.getNextIncidence(dir) : current
-					.getNextIncidence(ec, dir));
+			I result = current;
+			current = (I) ((ic == null) ? current.getNextIncidence(dir)
+					: current.getNextIncidence(ic, dir));
 			return result;
 		}
 
 		public boolean hasNext() {
-			if (vertex.isIncidenceListModified(incidenceListVersion)) {
-				throw new ConcurrentModificationException(
-						"The incidence list of the vertex has been modified - the iterator is not longer valid");
-			}
+			checkConcurrentModification();
 			return current != null;
+		}
+
+		/**
+		 * Checks if the sequence of {@link Incidence}s was modified. In this
+		 * case a {@link ConcurrentModificationException} is thrown
+		 * 
+		 * @throws ConcurrentModificationException
+		 */
+		private void checkConcurrentModification() {
+			if (((GraphElementImpl) graphElement)
+					.isIncidenceListModified(incidenceListVersion)) {
+				throw new ConcurrentModificationException(
+						"The incidence list of the "
+								+ (graphElement instanceof Vertex ? "vertex"
+										: "edge")
+								+ " has been modified - the iterator is not longer valid");
+			}
 		}
 
 		public void remove() {
@@ -158,7 +173,7 @@ public class IncidenceIterable<E extends Edge> implements Iterable<E> {
 
 	private IncidenceIterator iter = null;
 
-	public Iterator<E> iterator() {
+	public Iterator<I> iterator() {
 		return iter;
 	}
 }

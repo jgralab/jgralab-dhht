@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.impl.std;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -49,13 +50,10 @@ public abstract class VertexImpl extends
 	private IncidenceImpl firstIncidenceAtVertex;
 	private IncidenceImpl lastIncidenceAtVertex;
 
-	/**
-	 * holds the version of the vertex structure, for every modification of the
-	 * structure (e.g. adding or deleting an incident edge or changing the
-	 * incidence sequence) this version number is increased by one. It is set to
-	 * 0 when the vertex is created or the graph is loaded.
-	 */
-	private long incidenceListVersion = 0;
+	@Override
+	public Incidence getFirstIncidence() {
+		return firstIncidenceAtVertex;
+	}
 
 	@Override
 	public Vertex getNextVertex() {
@@ -122,17 +120,6 @@ public abstract class VertexImpl extends
 		this.lastIncidenceAtVertex = lastIncidence;
 	}
 
-	@Override
-	protected void setIncidenceListVersion(long incidenceListVersion) {
-		this.incidenceListVersion = incidenceListVersion;
-	}
-
-	@Override
-	public long getIncidenceListVersion() {
-		assert isValid();
-		return incidenceListVersion;
-	}
-
 	/**
 	 * 
 	 * @param id
@@ -149,7 +136,7 @@ public abstract class VertexImpl extends
 		this.id = id;
 	}
 
-	public Iterable<Edge> getIncidentEdges(Direction direction) {
+	Iterable<Edge> getIncidentEdges(Direction direction) {
 		// TODO Auto-generated method stub
 		return null;
 	}

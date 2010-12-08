@@ -69,6 +69,11 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	}
 
 	@Override
+	public Incidence getFirstIncidence() {
+		return firstIncidenceAtEdge;// Is a new method. Keep this!!
+	}
+
+	@Override
 	protected VertexBaseImpl getIncidentVertex() {
 		return incidentVertex;
 	}
