@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -52,131 +51,9 @@ public interface Edge extends GraphElement {
 	public EdgeClass getType();
 
 	/**
-	 * @return the next incidence object in iSeq of current vertex
-	 */
-	public Edge getNextIncidence();// old
-
-	/**
 	 * @return the previous incidence object in iSeq of current vertex
 	 */
 	public Edge getPrevIncidence();// old
-
-	/**
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence object in iSeq of current vertex
-	 */
-	public Edge getNextIncidence(EdgeDirection orientation);// old
-
-	/**
-	 * Gets the next incident edge at the current vertex, which has one of
-	 * <code>kinds</code> aggregation semantics at this (
-	 * <code>thisIncidence == true</code>) or that (
-	 * <code>thisIncidence == false</code>) side.
-	 * 
-	 * If no <code>kind</code> is given, it simply returns the first incident
-	 * edge.
-	 * 
-	 * @see Vertex#getFirstIncidence(boolean, AggregationKind...)
-	 * 
-	 * @param thisIncidence
-	 *            if true, <code>kinds</code> has to match the incidence at the
-	 *            current vertex, else it has to matche the incedence at the
-	 *            opposite vertex
-	 * @param kinds
-	 *            the acceptable aggregation kinds
-	 * @return the next incident edge at the current vertex, which has one of
-	 *         <code>kinds</code> aggregation semantics at this (
-	 *         <code>thisIncidence == true</code>) or that (
-	 *         <code>thisIncidence == false</code>) side.
-	 */
-	public Edge getNextIncidence(boolean thisIncidence,
-			AggregationKind... kinds);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass, boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);// old
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);// old
 
 	/**
 	 * @return the "this" vertex object, that is the object this directed edge

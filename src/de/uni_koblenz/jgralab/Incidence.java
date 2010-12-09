@@ -87,6 +87,140 @@ public interface Incidence {
 	public Incidence getNextIncidenceAtEdge();
 
 	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Direction direction);
+
+	/**
+	 * Gets the next {@link Incidence} at the current {@link Edge}, which has
+	 * one of <code>incidenceTypes</code> aggregation semantics at this (
+	 * <code>thisIncidence == true</code>) or that (
+	 * <code>thisIncidence == false</code>) side.
+	 * 
+	 * If no <code>incidenceType</code> is given, it simply returns the first
+	 * {@link Incidence} .
+	 * 
+	 * @see GraphElement#getFirstIncidence(boolean, IncidenceType...)
+	 * 
+	 * @param thisIncidence
+	 *            if true, <code>incidenceTypes</code> has to match the
+	 *            incidence at the current vertex, else it has to match the
+	 *            incidence at the opposite vertex
+	 * @param incidenceTypes
+	 *            the acceptable incidence types
+	 * @return {@link Incidence} the next incident edge at the current
+	 *         {@link Edge}, which has one of <code>incidenceTypes</code>
+	 *         aggregation semantics at this (
+	 *         <code>thisIncidence == true</code>) or that (
+	 *         <code>thisIncidence == false</code>) side.
+	 */
+	public Incidence getNextIncidenceAtEdge(boolean thisIncidence,
+			IncidenceType... incidenceTypes);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses);
+
+	/**
 	 * Returns the next {@link Incidence} in the sequence of all
 	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
 	 * {@link Incidence} is the last {@link Incidence} in the sequence,
@@ -95,6 +229,140 @@ public interface Incidence {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex();
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Direction direction);
+
+	/**
+	 * Gets the next {@link Incidence} at the current {@link Vertex}, which has
+	 * one of <code>incidenceTypes</code> aggregation semantics at this (
+	 * <code>thisIncidence == true</code>) or that (
+	 * <code>thisIncidence == false</code>) side.
+	 * 
+	 * If no <code>incidenceType</code> is given, it simply returns the first
+	 * {@link Incidence} .
+	 * 
+	 * @see GraphElement#getFirstIncidence(boolean, IncidenceType...)
+	 * 
+	 * @param thisIncidence
+	 *            if true, <code>incidenceTypes</code> has to match the
+	 *            incidence at the current vertex, else it has to match the
+	 *            incidence at the opposite vertex
+	 * @param incidenceTypes
+	 *            the acceptable incidence types
+	 * @return {@link Incidence} the next incident edge at the current
+	 *         {@link Vertex}, which has one of <code>incidenceTypes</code>
+	 *         aggregation semantics at this (
+	 *         <code>thisIncidence == true</code>) or that (
+	 *         <code>thisIncidence == false</code>) side.
+	 */
+	public Incidence getNextIncidenceAtVertex(boolean thisIncidence,
+			IncidenceType... incidenceTypes);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses);
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
