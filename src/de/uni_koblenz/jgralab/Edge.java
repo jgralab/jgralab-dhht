@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab;
 
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * represents a signed edge, has an orientation
@@ -257,29 +258,11 @@ public interface Edge extends GraphElement {
 			boolean noSubclasses);// old
 
 	/**
-	 * Returns the start {@link Vertex} of this binary {@link Edge}.
-	 * 
-	 * @return {@link Vertex} the alpha {@link Vertex} of this {@link Edge}
-	 * @throws UnsupportedOpperationException
-	 *             if this {@link Edge} is not binary.
-	 */
-	public Vertex getAlpha();
-
-	/**
 	 * Returns a sequence of all start vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getAlphaVertices();
-
-	/**
-	 * Returns the end {@link Vertex} of this binary {@link Edge}.
-	 * 
-	 * @return {@link Vertex} the omega {@link Vertex} of this {@link Edge}
-	 * @throws UnsupportedOpperationException
-	 *             if this {@link Edge} is not binary.
-	 */
-	public Vertex getOmega();
 
 	/**
 	 * Returns a sequence of all end vertices.
@@ -408,33 +391,29 @@ public interface Edge extends GraphElement {
 	public boolean isNormal();// old
 
 	/**
-	 * @return the semantics of this edge, e.g. AggregationKind.NONE, SHARED or
-	 *         COMPOSITE
+	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
+	 * {@link IncidenceType#AGGREGATION} or {@link IncidenceType#COMPOSITION}.
+	 * 
+	 * @return {@link IncidenceType}
 	 */
-	public AggregationKind getSemantics();// old
+	public IncidenceType getSemantics();
 
 	/**
-	 * @return the semantics of the alpha end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * The semanctics of the alpha {@link Incidence} of this {@link Edge}, e.g.
+	 * {@link IncidenceType#EDGE}, {@link IncidenceType#AGGREGATION} or
+	 * {@link IncidenceType#COMPOSITION}.
+	 * 
+	 * @return {@link IncidenceType}
 	 */
-	public AggregationKind getAlphaSemantics();// old
+	public IncidenceType getAlphaSemantics();
 
 	/**
-	 * @return the semantics of the omega end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * The semanctics of the omega {@link Incidence} of this {@link Edge}, e.g.
+	 * {@link IncidenceType#EDGE}, {@link IncidenceType#AGGREGATION} or
+	 * {@link IncidenceType#COMPOSITION}.
+	 * 
+	 * @return {@link IncidenceType}
 	 */
-	public AggregationKind getOmegaSemantics();// old
-
-	/**
-	 * @return the semantics of the this end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
-	 */
-	public AggregationKind getThisSemantics();// old
-
-	/**
-	 * @return the semantics of the that end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
-	 */
-	public AggregationKind getThatSemantics();// old
+	public IncidenceType getOmegaSemantics();
 
 }

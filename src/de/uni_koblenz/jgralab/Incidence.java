@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab;
 
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * Represents the incidences between the edges and vertices in a graph.
@@ -170,8 +171,27 @@ public interface Incidence {
 	 */
 	public Iterable<Vertex> getThoseVertices();
 
-	public Class<? extends Incidence> getM1Class();// TODO check if it should be
-													// put into
-													// IncidenceBaseImpl
+	/**
+	 * Returns the m1-class of this {@link Incidence}.
+	 * 
+	 * @return {@link Class}
+	 */
+	public Class<? extends Incidence> getM1Class();
+
+	/**
+	 * The semanctics of this {@link Incidence}, e.g. {@link IncidenceType#EDGE}
+	 * , {@link IncidenceType#AGGREGATION} or {@link IncidenceType#COMPOSITION}.
+	 * 
+	 * @return {@link IncidenceType}
+	 */
+	public IncidenceType getThisSemantics();
+
+	/**
+	 * The semanctics of that {@link Incidence}, e.g. {@link IncidenceType#EDGE}
+	 * , {@link IncidenceType#AGGREGATION} or {@link IncidenceType#COMPOSITION}.
+	 * 
+	 * @return {@link IncidenceType}
+	 */
+	public IncidenceType getThatSemantics();
 
 }

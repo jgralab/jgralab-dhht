@@ -51,10 +51,11 @@ public interface AttributedElement extends Comparable<AttributedElement> {
 	public AttributedElementClass getAttributedElementClass();// old
 
 	/**
+	 * Returns the m1-class of this {@link AttributedElement}.
 	 * 
-	 * @return the m1-class of this attributedelement
+	 * @return {@link Class}
 	 */
-	public Class<? extends AttributedElement> getM1Class();// old
+	public Class<? extends AttributedElement> getM1Class();
 
 	public GraphClass getGraphClass();// old
 

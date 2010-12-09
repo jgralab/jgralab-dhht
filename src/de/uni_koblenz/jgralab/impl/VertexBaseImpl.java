@@ -274,17 +274,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getFirstEdgeOfClass(java.lang.Class,
-	 * de.uni_koblenz.jgralab.Direction, boolean)
-	 */
-	@Override
-	public Edge getFirstIncidence(Class<? extends Edge> anEdgeClass,
-			Direction orientation, boolean noSubclasses) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see de.uni_koblenz.jgralab.Vertex#delete()
 	 */
 	@Override
