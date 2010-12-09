@@ -31,9 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * TODO add comment
@@ -41,19 +39,5 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  */
 public abstract class IncidenceBaseImpl implements Incidence {
-
-	/**
-	 * If <code>graphElement</code> is an instance of {@link Vertex}
-	 * {@link Incidence#getNextIncidenceAtVertex()} is returned. Otherwise
-	 * {@link Incidence#getNextIncidenceAtEdge()} is returned.
-	 * 
-	 * @param graphElement
-	 *            {@link GraphElement}
-	 * @return {@link IncidenceBaseImpl}
-	 */
-	IncidenceBaseImpl getNextIncidence(GraphElement graphElement) {
-		return (IncidenceBaseImpl) (graphElement instanceof Vertex ? getNextIncidenceAtVertex()
-				: getNextIncidenceAtEdge());
-	}
 
 }

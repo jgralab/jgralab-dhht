@@ -44,10 +44,12 @@ import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.PathElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
@@ -67,6 +69,71 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	protected VertexBaseImpl(int id, Graph graph) {
 		super(graph);
 		this.id = id;
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Direction direction) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		switch (direction) {
+		case EDGE_TO_VERTEX:
+			while ((i != null) && i.getDirection() != Direction.EDGE_TO_VERTEX) {
+				i = i.getNextIncidenceAtVertex();
+			}
+			return i;
+		case VERTEX_TO_EDGE:
+			while ((i != null) && i.getDirection() != Direction.VERTEX_TO_EDGE) {
+				i = i.getNextIncidenceAtVertex();
+			}
+			return i;
+		default:
+			throw new RuntimeException("FIXME!");
+		}
+	}
+
+	@Override
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		if (incidentTypes.length == 0) {
+			return i;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidentTypes) {
+				if ((thisIncidence ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i;
+				}
+			}
+			i = i.getNextIncidenceAtVertex();
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtVertex(/*
+																		 * TODO
+																		 * direction
+																		 */);
+		}
+		return null;
 	}
 
 	/*

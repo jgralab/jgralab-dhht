@@ -32,14 +32,16 @@
 package de.uni_koblenz.jgralab.impl;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * TODO add comment
@@ -68,6 +70,71 @@ public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
 	protected abstract void setPrevIncidenceInternal(IncidenceImpl prevIncidence);
 
 	protected abstract IncidenceImpl getPrevIncidenceInternal();
+
+	@Override
+	public Incidence getFirstIncidence(Direction direction) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		switch (direction) {
+		case EDGE_TO_VERTEX:
+			while ((i != null) && i.getDirection() != Direction.EDGE_TO_VERTEX) {
+				i = i.getNextIncidenceAtEdge();
+			}
+			return i;
+		case VERTEX_TO_EDGE:
+			while ((i != null) && i.getDirection() != Direction.VERTEX_TO_EDGE) {
+				i = i.getNextIncidenceAtEdge();
+			}
+			return i;
+		default:
+			throw new RuntimeException("FIXME!");
+		}
+	}
+
+	@Override
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		if (incidentTypes.length == 0) {
+			return i;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidentTypes) {
+				if ((thisIncidence ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i;
+				}
+			}
+			i = i.getNextIncidenceAtEdge();
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getFirstIncidence(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtEdge(/*
+																		 * TODO
+																		 * direction
+																		 */);
+		}
+		return null;
+	}
 
 	/*
 	 * (non-Javadoc)

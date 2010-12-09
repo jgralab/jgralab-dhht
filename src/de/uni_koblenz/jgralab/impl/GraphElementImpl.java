@@ -39,7 +39,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -186,46 +185,6 @@ public abstract class GraphElementImpl implements GraphElement {
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Direction direction) {
-		assert isValid();
-		IncidenceBaseImpl i = (IncidenceBaseImpl) getFirstIncidence();
-		switch (direction) {
-		case EDGE_TO_VERTEX:
-			while ((i != null) && i.getDirection() != Direction.EDGE_TO_VERTEX) {
-				i = i.getNextIncidence(this);
-			}
-			return i;
-		case VERTEX_TO_EDGE:
-			while ((i != null) && i.getDirection() != Direction.VERTEX_TO_EDGE) {
-				i = i.getNextIncidence(this);
-			}
-			return i;
-		default:
-			throw new RuntimeException("FIXME!");
-		}
-	}
-
-	@Override
-	public Incidence getFirstIncidence(boolean thisIncidence,
-			IncidenceType... incidentTypes) {
-		assert isValid();
-		IncidenceBaseImpl i = (IncidenceBaseImpl) getFirstIncidence();
-		if (incidentTypes.length == 0) {
-			return i;
-		}
-		while (i != null) {
-			for (IncidenceType element : incidentTypes) {
-				if ((thisIncidence ? i.getThisSemantics() : i
-						.getThatSemantics()) == element) {
-					return i;
-				}
-			}
-			i = i.getNextIncidence(this);
-		}
-		return null;
-	}
-
-	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -281,31 +240,6 @@ public abstract class GraphElementImpl implements GraphElement {
 		assert isValid();
 		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
 				noSubclasses);
-	}
-
-	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		IncidenceBaseImpl currentIncidence = (IncidenceBaseImpl) getFirstIncidence(direction);
-		while (currentIncidence != null) {
-			if (noSubclasses) {
-				if (anIncidenceClass == currentIncidence.getM1Class()) {
-					return currentIncidence;
-				}
-			} else {
-				if (anIncidenceClass.isInstance(currentIncidence)) {
-					return currentIncidence;
-				}
-			}
-			currentIncidence = currentIncidence.getNextIncidence(this/*
-																	 * TODO,
-																	 * direction
-																	 */);
-		}
-		return null;
 	}
 
 }
