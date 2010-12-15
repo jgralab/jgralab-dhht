@@ -35,6 +35,7 @@ import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -117,6 +118,61 @@ public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
 			} else {
 				if (anIncidenceClass.isInstance(currentIncidence)) {
 					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence
+					.getNextIncidenceAtEdge(direction);
+		}
+		return null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(Direction direction) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		while ((i != null) && direction != null
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtEdge();
+		}
+		return i != null ? i.getVertex() : null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(boolean thisGraphElement,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		if (incidentTypes.length == 0) {
+			return i != null ? i.getVertex() : null;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidentTypes) {
+				if ((thisGraphElement ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i != null ? i.getVertex() : null;
+				}
+			}
+			i = i.getNextIncidenceAtEdge();
+		}
+		return null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			Class<? extends GraphElement> aGraphElementClass,
+			Direction direction, boolean noSubclasses) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (aGraphElementClass == currentIncidence.getVertex()
+						.getM1Class()) {
+					return currentIncidence.getVertex();
+				}
+			} else {
+				if (aGraphElementClass.isInstance(currentIncidence.getVertex())) {
+					return currentIncidence.getVertex();
 				}
 			}
 			currentIncidence = currentIncidence

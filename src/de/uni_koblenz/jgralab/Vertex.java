@@ -308,6 +308,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences(Direction dir);// old
 
 	/**
@@ -322,6 +323,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences(EdgeClass eclass, Direction dir);// old
 
 	/**
@@ -336,6 +338,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences(Class<? extends Edge> eclass, Direction dir);// old
 
 	/**
@@ -347,6 +350,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences(EdgeClass eclass);// old
 
 	/**
@@ -358,6 +362,7 @@ public interface Vertex extends GraphElement {
 	 * @return a iterable object which can be iterated through using the
 	 *         advanced for-loop
 	 */
+	@Deprecated
 	public Iterable<Edge> incidences(Class<? extends Edge> eclass);// old
 
 	/**

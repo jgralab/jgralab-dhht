@@ -44,6 +44,7 @@ import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.PathElement;
 import de.uni_koblenz.jgralab.Vertex;
@@ -117,6 +118,61 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 			} else {
 				if (anIncidenceClass.isInstance(currentIncidence)) {
 					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence
+					.getNextIncidenceAtVertex(direction);
+		}
+		return null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(Direction direction) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		while ((i != null) && direction != null
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtVertex();
+		}
+		return i != null ? i.getEdge() : null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(boolean thisGraphElement,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		Incidence i = getFirstIncidence();
+		if (incidentTypes.length == 0) {
+			return i != null ? i.getEdge() : null;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidentTypes) {
+				if ((thisGraphElement ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i != null ? i.getEdge() : null;
+				}
+			}
+			i = i.getNextIncidenceAtVertex();
+		}
+		return null;
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			Class<? extends GraphElement> aGraphElementClass,
+			Direction direction, boolean noSubclasses) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (aGraphElementClass == currentIncidence.getEdge()
+						.getM1Class()) {
+					return currentIncidence.getEdge();
+				}
+			} else {
+				if (aGraphElementClass.isInstance(currentIncidence.getEdge())) {
+					return currentIncidence.getEdge();
 				}
 			}
 			currentIncidence = currentIncidence
@@ -259,6 +315,29 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass.getM1Class(), noSubclasses);
+	}
+
+	@Override
+	public Iterable<Edge> getAlphaEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Iterable<Edge> getIncidentEdges(Direction direction) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/*

@@ -1,0 +1,118 @@
+package de.uni_koblenz.jgralab.impl;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
+
+/**
+ * This class provides an {@link Iterable} for the incident {@link Vertex} at a
+ * given {@link Edge}.
+ * 
+ * @author ist@uni-koblenz.de
+ */
+public class IncidentVertexIterable<V extends Vertex> extends
+		IncidentGraphElementIterable<V> {
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Vertex} of
+	 * <code>edge</code> .
+	 * 
+	 * @param edge
+	 *            {@link Edge}
+	 */
+	public IncidentVertexIterable(Edge edge) {
+		this(edge, null, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Vertex} of
+	 * <code>edge</code> with the specified <code>direction</code>.
+	 * 
+	 * @param edge
+	 *            {@link Edge}
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidentVertexIterable(Edge edge, Direction direction) {
+		this(edge, null, direction);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Vertex} of
+	 * <code>edge</code> which are instances of <code>vc</code>.
+	 * 
+	 * @param edge
+	 *            {@link Edge}
+	 * @param vc
+	 *            {@link Class} returned {@link Vertex} are restricted to that
+	 *            class or subclasses
+	 */
+	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc) {
+		this(edge, vc, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Vertex} of
+	 * <code>edge</code> which are instances of <code>vc</code> and with the
+	 * specified <code>direction</code>.
+	 * 
+	 * @param edge
+	 *            {@link Edge}
+	 * @param vc
+	 *            {@link Class} returned {@link Vertex} are restricted to that
+	 *            class or subclasses
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc,
+			Direction direction) {
+		assert edge != null && edge.isValid();
+		iter = new IncidentVertexIterator(edge, vc, direction);
+	}
+
+	/**
+	 * This class provides an {@link Iterator} for the incident
+	 * {@link GraphElement}s at a given {@link Edge}.
+	 * 
+	 * @author ist@uni-koblenz.de
+	 * 
+	 */
+	class IncidentVertexIterator extends IncidentGraphElementIterator {
+
+		/**
+		 * Creates an Iterator over the incident {@link GraphElements}s of
+		 * <code>edge</code>.
+		 * 
+		 * @param edge
+		 *            {@link Edge} which {@link Incidence}s should be iterated.
+		 * @param vc
+		 *            {@link Class} only instances of this class are returned.
+		 * @param dir
+		 *            {@link Direction} of the desired {@link Incidence}s.
+		 */
+		public IncidentVertexIterator(Edge edge, Class<? extends Vertex> vc,
+				Direction dir) {
+			super(edge, vc, dir);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public V next() {
+			checkConcurrentModification();
+			if (current == null) {
+				throw new NoSuchElementException();
+			}
+			V result = current;
+			current = (gc == null) ? current.getNextIncidenceAtEdge(dir)
+					: current.getNextIncidenceAtEdge(gc, dir);
+			return result;
+		}
+
+	}
+
+}

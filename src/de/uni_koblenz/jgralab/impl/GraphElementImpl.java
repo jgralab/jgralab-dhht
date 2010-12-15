@@ -38,6 +38,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -240,6 +241,79 @@ public abstract class GraphElementImpl implements GraphElement {
 		assert isValid();
 		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
 				noSubclasses);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			GraphElementClass aGraphElementClass) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(
+				(Class<? extends GraphElement>) aGraphElementClass.getM1Class(),
+				null, false);
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			Class<? extends GraphElement> aGraphElementClass) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(aGraphElementClass, null, false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			GraphElementClass aGraphElementClass, Direction direction) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(
+				(Class<? extends GraphElement>) aGraphElementClass.getM1Class(),
+				direction, false);
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			Class<? extends GraphElement> aGraphElementClass,
+			Direction direction) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(aGraphElementClass, direction,
+				false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			GraphElementClass aGraphElementClass, boolean noSubclasses) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(
+				(Class<? extends GraphElement>) aGraphElementClass.getM1Class(),
+				null, noSubclasses);
+	}
+
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			Class<? extends GraphElement> aGraphElementClass,
+			boolean noSubclasses) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(aGraphElementClass, null,
+				noSubclasses);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GraphElement getFirstIncidentGraphElement(
+			GraphElementClass aGraphElementClass, Direction direction,
+			boolean noSubclasses) {
+		assert aGraphElementClass != null;
+		assert isValid();
+		return getFirstIncidentGraphElement(
+				(Class<? extends GraphElement>) aGraphElementClass.getM1Class(),
+				direction, noSubclasses);
 	}
 
 }

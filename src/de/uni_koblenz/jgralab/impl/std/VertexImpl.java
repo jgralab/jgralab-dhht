@@ -30,9 +30,8 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
-import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
@@ -56,6 +55,11 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
+	public GraphElement getFirstIncidentGraphElement() {
+		return firstIncidenceAtVertex.getEdge();
+	}
+
+	@Override
 	public Vertex getNextVertex() {
 		assert isValid();
 		return nextVertexInGraph;
@@ -64,29 +68,6 @@ public abstract class VertexImpl extends
 	@Override
 	public Vertex getPreviousVertex() {
 		return prevVertexInGraph;
-	}
-
-	@Override
-	public Iterable<Edge> getAlphaEdges() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Iterable<Edge> getOmegaEdges() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Iterable<Edge> getIncidentEdges() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected IncidenceImpl getFirstIncidenceInternal() {
-		return firstIncidenceAtVertex;
 	}
 
 	@Override
@@ -134,10 +115,5 @@ public abstract class VertexImpl extends
 	protected void setId(int id) {
 		assert id >= 0;
 		this.id = id;
-	}
-
-	Iterable<Edge> getIncidentEdges(Direction direction) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
