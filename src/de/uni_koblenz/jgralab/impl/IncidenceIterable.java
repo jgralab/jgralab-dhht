@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -41,83 +40,64 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
- * This class provides an Iterable for the Edges incident to a given vertex.
+ * This class provides an {@link Iterable} for the {@link Incidence}s at a given
+ * {@link GraphElement}.
  * 
  * @author ist@uni-koblenz.de
  */
-public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
-	/**
-	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
-	 * .
-	 * 
-	 * @param ge
-	 *            a GraphElement
-	 */
-	public IncidenceIterable(GraphElement ge) {
-		this(ge, null, null);
-	}
+public abstract class IncidenceIterable<I extends Incidence> implements
+		Iterable<I> {
 
 	/**
-	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
-	 * with the specified <code>orientation</code>.
+	 * This class provides an {@link Iterator} for the {@link Incidence}s at a
+	 * given {@link GraphElement}.
 	 * 
-	 * @param ge
-	 *            a GraphElement
-	 * @param orientation
-	 *            desired orientation
-	 */
-	public IncidenceIterable(GraphElement ge, Direction orientation) {
-		this(ge, null, orientation);
-	}
-
-	/**
-	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
-	 * with the specified edgeclass <code>ec</code>.
+	 * @author ist@uni-koblenz.de
 	 * 
-	 * @param ge
-	 *            a GraphElement
-	 * @param ic
-	 *            restricts edges to that class or subclasses
 	 */
-	public IncidenceIterable(GraphElement ge, Class<? extends Incidence> ic) {
-		this(ge, ic, null);
-	}
+	abstract class IncidenceIterator implements Iterator<I> {
 
-	/**
-	 * Creates an Iterable for all incident edges of GraphElement <code>v</code>
-	 * with the specified edgeclass <code>ec</code> and <code>orientation</code>
-	 * .
-	 * 
-	 * @param ge
-	 *            a GraphElement
-	 * @param ic
-	 *            restricts edges to that class or subclasses
-	 * @param orientation
-	 *            desired orientation
-	 */
-	public IncidenceIterable(GraphElement ge, Class<? extends Incidence> ic,
-			Direction orientation) {
-		assert ge != null && ge.isValid();
-		iter = new IncidenceIterator(ge, ic, orientation);
-	}
-
-	class IncidenceIterator implements Iterator<I> {
+		/**
+		 * The current instance of I.
+		 */
 		protected I current = null;
 
+		/**
+		 * {@link GraphElement} which {@link Incidence}s are iterated.
+		 */
 		protected GraphElement graphElement = null;
 
+		/**
+		 * The {@link Class} of the desired {@link Incidence}s.
+		 */
 		protected Class<? extends Incidence> ic;
 
+		/**
+		 * {@link Direction} of the desired {@link Incidence}s.
+		 */
 		protected Direction dir;
 
 		/**
-		 * the version of the incidence list of the vertex at the beginning of
-		 * the iteration. This information is used to check if the incidence
-		 * list has changed, the failfast-iterator will then throw an exception
-		 * the next time "next()" is called
+		 * The version of the incidence list of the {@link GraphElement} at the
+		 * beginning of the iteration. This information is used to check if the
+		 * incidence list has changed. The failfast-{@link Iterator} will throw
+		 * an {@link ConcurrentModificationException} if the {@link #hasNext()}
+		 * or {@link #next()} is called.
 		 */
 		protected long incidenceListVersion;
 
+		/**
+		 * Creates an Iterator over the {@link Incidence}s of
+		 * <code>graphElement</code>.
+		 * 
+		 * @param graphElement
+		 *            {@link GraphElement} which {@link Incidence}s should be
+		 *            iterated.
+		 * @param ic
+		 *            {@link Class} only instances of this class are returned.
+		 * @param dir
+		 *            {@link Direction} of the desired {@link Incidence}s.
+		 */
 		@SuppressWarnings("unchecked")
 		public IncidenceIterator(GraphElement graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
@@ -130,18 +110,7 @@ public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
 					: graphElement.getFirstIncidence(ic, dir));
 		}
 
-		@SuppressWarnings("unchecked")
-		public I next() {
-			checkConcurrentModification();
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			I result = current;
-			current = (I) ((ic == null) ? current.getNextIncidence(dir)
-					: current.getNextIncidence(ic, dir));
-			return result;
-		}
-
+		@Override
 		public boolean hasNext() {
 			checkConcurrentModification();
 			return current != null;
@@ -153,7 +122,7 @@ public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
 		 * 
 		 * @throws ConcurrentModificationException
 		 */
-		private void checkConcurrentModification() {
+		protected void checkConcurrentModification() {
 			if (((GraphElementImpl) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
@@ -164,6 +133,7 @@ public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
 			}
 		}
 
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(
 					"Cannot remove Edges using Iterator");
@@ -171,8 +141,12 @@ public class IncidenceIterable<I extends Incidence> implements Iterable<I> {
 
 	}
 
-	private IncidenceIterator iter = null;
+	/**
+	 * The current {@link Iterator}.
+	 */
+	protected IncidenceIterator iter = null;
 
+	@Override
 	public Iterator<I> iterator() {
 		return iter;
 	}

@@ -125,6 +125,18 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return null;
 	}
 
+	@Override
+	public Iterable<Incidence> getIncidences() {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this, direction);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

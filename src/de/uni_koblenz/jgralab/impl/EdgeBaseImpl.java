@@ -125,6 +125,18 @@ public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
 		return null;
 	}
 
+	@Override
+	public Iterable<Incidence> getIncidences() {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this, direction);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
