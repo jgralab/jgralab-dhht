@@ -51,11 +51,6 @@ public interface Edge extends GraphElement {
 	public EdgeClass getType();
 
 	/**
-	 * @return the previous incidence object in iSeq of current vertex
-	 */
-	public Edge getPrevIncidence();// old
-
-	/**
 	 * @return the "this" vertex object, that is the object this directed edge
 	 *         starts at
 	 */

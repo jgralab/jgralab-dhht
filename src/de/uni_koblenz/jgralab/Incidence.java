@@ -89,7 +89,9 @@ public interface Incidence {
 	/**
 	 * @see #getNextIncidenceAtEdge()
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Direction direction);
@@ -144,7 +146,9 @@ public interface Incidence {
 	 *            {@link IncidenceClass} the next incidence should be an
 	 *            instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
@@ -155,7 +159,9 @@ public interface Incidence {
 	 * @param anIncidenceClass
 	 *            {@link Class} the next incidence should be an instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(
@@ -194,7 +200,9 @@ public interface Incidence {
 	 *            {@link IncidenceClass} the next incidence should be an
 	 *            instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @param noSubclasses
 	 *            boolean if <code>true</code> the next {@link Incidence} must
 	 *            not be an instance of an subclass of
@@ -209,7 +217,9 @@ public interface Incidence {
 	 * @param anIncidenceClass
 	 *            {@link Class} the next incidence should be an instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @param noSubclasses
 	 *            boolean if <code>true</code> the next {@link Incidence} must
 	 *            not be an instance of an subclass of
@@ -233,7 +243,9 @@ public interface Incidence {
 	/**
 	 * @see #getNextIncidenceAtVertex()
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Direction direction);
@@ -288,7 +300,9 @@ public interface Incidence {
 	 *            {@link IncidenceClass} the next incidence should be an
 	 *            instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
@@ -299,7 +313,9 @@ public interface Incidence {
 	 * @param anIncidenceClass
 	 *            {@link Class} the next incidence should be an instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(
@@ -338,7 +354,9 @@ public interface Incidence {
 	 *            {@link IncidenceClass} the next incidence should be an
 	 *            instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @param noSubclasses
 	 *            boolean if <code>true</code> the next {@link Incidence} must
 	 *            not be an instance of an subclass of
@@ -353,7 +371,9 @@ public interface Incidence {
 	 * @param anIncidenceClass
 	 *            {@link Class} the next incidence should be an instance of
 	 * @param direction
-	 *            {@link Direction} the direction the next incidence should have
+	 *            {@link Direction} the direction the next incidence should
+	 *            have. If set to <code>null</code> {@link Incidence}s of both
+	 *            directions are returned.
 	 * @param noSubclasses
 	 *            boolean if <code>true</code> the next {@link Incidence} must
 	 *            not be an instance of an subclass of

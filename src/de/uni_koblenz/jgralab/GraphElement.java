@@ -80,7 +80,9 @@ public interface GraphElement extends AttributedElement {
 	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param direction
-	 *            {@link Direction} of connected {@link Incidence}s,
+	 *            {@link Direction} of connected {@link Incidence}s. If set to
+	 *            <code>null</code> {@link Incidence}s of both directions are
+	 *            returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(Direction direction);
@@ -152,7 +154,9 @@ public interface GraphElement extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}
+	 *            {@link Direction} of the {@link Incidence}s. If set to
+	 *            <code>null</code> {@link Incidence}s of both directions are
+	 *            returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
@@ -167,7 +171,9 @@ public interface GraphElement extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}
+	 *            {@link Direction} of the {@link Incidence}s. If set to
+	 *            <code>null</code> {@link Incidence}s of both directions are
+	 *            returned.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(
@@ -219,7 +225,9 @@ public interface GraphElement extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}
+	 *            {@link Direction} of the {@link Incidence}s. If set to
+	 *            <code>null</code> {@link Incidence}s of both directions are
+	 *            returned.
 	 * @param noSubclasses
 	 *            boolean
 	 * @return {@link Incidence}
@@ -239,7 +247,9 @@ public interface GraphElement extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}
+	 *            {@link Direction} of the {@link Incidence}s. If set to
+	 *            <code>null</code> {@link Incidence}s of both directions are
+	 *            returned.
 	 * @param noSubclasses
 	 *            boolean
 	 * @return {@link Incidence}
@@ -270,7 +280,8 @@ public interface GraphElement extends AttributedElement {
 	 * 
 	 * @param direction
 	 *            {@link Direction} specifies the direction of the requested
-	 *            {@link Incidence}s
+	 *            {@link Incidence}s. If set to <code>null</code>
+	 *            {@link Incidence}s of both directions are returned.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(Direction direction);

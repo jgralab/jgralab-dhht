@@ -31,7 +31,10 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * TODO add comment
@@ -39,5 +42,205 @@ import de.uni_koblenz.jgralab.Incidence;
  * @author ist@uni-koblenz.de
  */
 public abstract class IncidenceBaseImpl implements Incidence {
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(Direction direction) {
+		Incidence i = getNextIncidenceAtEdge();
+		while ((i != null) && direction != null
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtEdge();
+		}
+		return i;
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(boolean thisIncidence,
+			IncidenceType... incidenceTypes) {
+		Incidence i = getNextIncidenceAtEdge();
+		if (incidenceTypes.length == 0) {
+			return i;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidenceTypes) {
+				if ((thisIncidence ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i;
+				}
+			}
+			i = i.getNextIncidenceAtEdge();
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, null, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, null, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, direction, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, direction, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, null, noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass, null, noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtEdge(anIncidenceClass.getM1Class(), direction,
+				noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtEdge(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		Incidence currentIncidence = getNextIncidenceAtEdge(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence
+					.getNextIncidenceAtEdge(direction);
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(Direction direction) {
+		Incidence i = getNextIncidenceAtVertex();
+		while ((i != null) && direction != null
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtVertex();
+		}
+		return i;
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(boolean thisIncidence,
+			IncidenceType... incidenceTypes) {
+		Incidence i = getNextIncidenceAtVertex();
+		if (incidenceTypes.length == 0) {
+			return i;
+		}
+		while (i != null) {
+			for (IncidenceType element : incidenceTypes) {
+				if ((thisIncidence ? i.getThisSemantics() : i
+						.getThatSemantics()) == element) {
+					return i;
+				}
+			}
+			i = i.getNextIncidenceAtVertex();
+		}
+		return null;
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, null, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, null, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, direction, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, direction, false);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, null, noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass, null, noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		return getNextIncidenceAtVertex(anIncidenceClass.getM1Class(),
+				direction, noSubclasses);
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex(
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		Incidence currentIncidence = getNextIncidenceAtVertex(direction);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence
+					.getNextIncidenceAtVertex(direction);
+		}
+		return null;
+	}
 
 }

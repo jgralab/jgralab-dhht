@@ -75,20 +75,11 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	public Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
 		Incidence i = getFirstIncidence();
-		switch (direction) {
-		case EDGE_TO_VERTEX:
-			while ((i != null) && i.getDirection() != Direction.EDGE_TO_VERTEX) {
-				i = i.getNextIncidenceAtVertex();
-			}
-			return i;
-		case VERTEX_TO_EDGE:
-			while ((i != null) && i.getDirection() != Direction.VERTEX_TO_EDGE) {
-				i = i.getNextIncidenceAtVertex();
-			}
-			return i;
-		default:
-			throw new RuntimeException("FIXME!");
+		while ((i != null) && direction != null
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtVertex();
 		}
+		return i;
 	}
 
 	@Override
@@ -128,10 +119,8 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 					return currentIncidence;
 				}
 			}
-			currentIncidence = currentIncidence.getNextIncidenceAtVertex(/*
-																		 * TODO
-																		 * direction
-																		 */);
+			currentIncidence = currentIncidence
+					.getNextIncidenceAtVertex(direction);
 		}
 		return null;
 	}
