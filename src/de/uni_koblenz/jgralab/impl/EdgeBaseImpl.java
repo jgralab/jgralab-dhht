@@ -41,6 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
@@ -135,6 +136,36 @@ public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
 	public Iterable<Incidence> getIncidences(Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this, direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this, anIncidenceClass);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this,
+				anIncidenceClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this, anIncidenceClass,
+				direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this,
+				anIncidenceClass.getM1Class(), direction);
 	}
 
 	/*
