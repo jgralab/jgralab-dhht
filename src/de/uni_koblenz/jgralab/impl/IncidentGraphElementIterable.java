@@ -58,9 +58,9 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 	abstract class IncidentGraphElementIterator implements Iterator<I> {
 
 		/**
-		 * The current I.
+		 * The current {@link Incidence}.
 		 */
-		protected I current = null;
+		protected Incidence current = null;
 
 		/**
 		 * {@link GraphElement} which incident {@link GraphElement}s are
