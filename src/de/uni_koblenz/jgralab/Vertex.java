@@ -174,37 +174,55 @@ public interface Vertex extends GraphElement {
 	public Vertex getPreviousVertex();
 
 	/**
+	 * Returns the next {@link Vertex} in the sequence of all vertices in the
+	 * complete {@link Graph} (vSeq). If this {@link Vertex} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param aVertexClass
-	 *            the class of the next vertex
-	 * @return the next vertex in vSeq of class aVertexClass or its superclasses
+	 *            {@link VertexClass} the next {@link Vertex} should have
+	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(VertexClass aVertexClass);// old
+	public Vertex getNextVertex(VertexClass aVertexClass);
 
 	/**
+	 * Returns the next {@link Vertex} in the sequence of all vertices in the
+	 * complete {@link Graph} (vSeq). If this {@link Vertex} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param aM1VertexClass
-	 *            the class of the next vertex
-	 * @return the next vertex in vSeq of class aVertexClass or its superclasses
+	 *            {@link Class} the next {@link Vertex} should have
+	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass);// old
+	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass);
 
 	/**
+	 * Returns the next {@link Vertex} in the sequence of all vertices in the
+	 * complete {@link Graph} (vSeq). If this {@link Vertex} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param aVertexClass
-	 *            the class of the next vertex
+	 *            {@link VertexClass} the next {@link Vertex} should have
 	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next vertex in vSeq of explicit class aVertexClass
+	 *            boolean if <code>true</code>, no verices which are an instance
+	 *            of a subclass of <code>aVertexClass</code> are returned
+	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(VertexClass aVertexClass, boolean noSubclasses);// old
+	public Vertex getNextVertex(VertexClass aVertexClass, boolean noSubclasses);
 
 	/**
+	 * Returns the next {@link Vertex} in the sequence of all vertices in the
+	 * complete {@link Graph} (vSeq). If this {@link Vertex} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param aM1VertexClass
-	 *            the class of the next vertex
+	 *            {@link Class} the next {@link Vertex} should have
 	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next vertex in vSeq of explicit class aVertexClass
+	 *            boolean if <code>true</code>, no verices which are an instance
+	 *            of a subclass of <code>aM1VertexClass</code> are returned
+	 * @return {@link Vertex}
 	 */
 	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass,
-			boolean noSubclasses);// old
+			boolean noSubclasses);
 
 	/**
 	 * Returns the sequence of all incoming {@link Edge}s at this {@link Vertex}

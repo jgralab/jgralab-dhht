@@ -37,7 +37,6 @@ import java.util.Iterator;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * This class provides an {@link Iterable} for the {@link Incidence}s at a given
@@ -126,17 +125,14 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 			if (((GraphElementImpl) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
-						"The incidence list of the "
-								+ (graphElement instanceof Vertex ? "vertex"
-										: "edge")
-								+ " has been modified - the iterator is not longer valid");
+						"The incidence list of this graphelement has been modified - the iterator is not longer valid");
 			}
 		}
 
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(
-					"Cannot remove Edges using Iterator");
+					"Cannot remove Incidences using Iterator");
 		}
 
 	}

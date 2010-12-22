@@ -217,19 +217,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getNextVertex()
-	 */
-	@Override
-	public abstract Vertex getNextVertex();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getNextVertexOfClass(java.lang.Class)
-	 */
 	@Override
 	public Vertex getNextVertex(Class<? extends Vertex> vertexClass) {
 		assert vertexClass != null;
@@ -237,12 +224,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return getNextVertex(vertexClass, false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getNextVertexOfClass(java.lang.Class,
-	 * boolean)
-	 */
 	@Override
 	public Vertex getNextVertex(Class<? extends Vertex> m1VertexClass,
 			boolean noSubclasses) {
@@ -264,13 +245,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#getNextVertexOfClass(de.uni_koblenz.jgralab
-	 * .schema.VertexClass)
-	 */
 	@Override
 	public Vertex getNextVertex(VertexClass vertexClass) {
 		assert vertexClass != null;
@@ -278,13 +252,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return getNextVertex(vertexClass.getM1Class(), false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#getNextVertexOfClass(de.uni_koblenz.jgralab
-	 * .schema.VertexClass, boolean)
-	 */
 	@Override
 	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
@@ -705,9 +672,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	protected abstract void setNextVertex(Vertex nextVertex);
 
 	protected abstract void setPrevVertex(Vertex prevVertex);
-
-	@Override
-	public abstract Vertex getPrevVertex();
 
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;

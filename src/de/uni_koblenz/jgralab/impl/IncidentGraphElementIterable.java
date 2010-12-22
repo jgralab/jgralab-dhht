@@ -38,7 +38,6 @@ import java.util.NoSuchElementException;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
@@ -90,7 +89,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement>
 		protected long incidenceListVersion;
 
 		/**
-		 * Creates an Iterator over the {@link Incidence}s of
+		 * Creates an {@link Iterator} over the {@link Incidence}s of
 		 * <code>graphElement</code>.
 		 * 
 		 * @param graphElement
@@ -127,10 +126,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement>
 			if (((GraphElementImpl) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
-						"The incidence list of the "
-								+ (graphElement instanceof Vertex ? "vertex"
-										: "edge")
-								+ " has been modified - the iterator is not longer valid");
+						"The incidence list of the GraphElement has been modified - the iterator is not longer valid");
 			}
 		}
 
@@ -158,7 +154,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement>
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(
-					"Cannot remove Edges using Iterator");
+					"Cannot remove GraphElements using Iterator");
 		}
 
 	}
