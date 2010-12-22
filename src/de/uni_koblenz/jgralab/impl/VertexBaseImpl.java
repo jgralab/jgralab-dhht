@@ -168,55 +168,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 				anIncidenceClass.getM1Class(), direction);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#getDegree()
-	 */
-	@Override
-	public int getDegree() {
-		return getDegree(Direction.INOUT);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#getDegree(de.uni_koblenz.jgralab.Direction
-	 * )
-	 */
-	@Override
-	public int getDegree(Direction orientation) {
-		int d = 0;
-		IncidenceImpl i = getFirstIncidenceInternal();
-		switch (orientation) {
-		case IN:
-			while (i != null) {
-				if (!i.isNormal()) {
-					++d;
-				}
-				i = i.getNextIncidenceInternal();
-			}
-			return d;
-		case OUT:
-			while (i != null) {
-				if (i.isNormal()) {
-					++d;
-				}
-				i = i.getNextIncidenceInternal();
-			}
-			return d;
-		case INOUT:
-			while (i != null) {
-				++d;
-				i = i.getNextIncidenceInternal();
-			}
-			return d;
-		default:
-			throw new RuntimeException("FIXME!");
-		}
-	}
-
 	@Override
 	public Vertex getNextVertex(Class<? extends Vertex> vertexClass) {
 		assert vertexClass != null;
@@ -521,125 +472,111 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		incidenceListModified();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(jgralab.EdgeClass)
-	 */
 	@Override
-	public int getDegree(EdgeClass ec) {
-		assert ec != null;
-		assert isValid();
-		return getDegree(ec, false);
+	public int getDegree() {
+		int d = 0;
+		Incidence i = getFirstIncidence();
+		while (i != null) {
+			d++;
+			i = i.getNextIncidenceAtVertex();
+		}
+		return d;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(Class)
-	 */
 	@Override
-	public int getDegree(Class<? extends Edge> ec) {
-		assert ec != null;
+	public int getDegree(IncidenceClass ic) {
+		assert ic != null;
 		assert isValid();
-		return getDegree(ec, false);
+		return getDegree(ic, false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(jgralab.EdgeClass, boolean)
-	 */
 	@Override
-	public int getDegree(EdgeClass ec, boolean noSubClasses) {
-		assert ec != null;
+	public int getDegree(Direction direction) {
+		if (direction == null) {
+			return getDegree();
+		}
+		int d = 0;
+		Incidence i = getFirstIncidence();
+		while (i != null) {
+			if (i.getDirection() == direction) {
+				d++;
+			}
+			i = i.getNextIncidenceAtVertex();
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, false);
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
+		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Edge e = getFirstIncidence(ec, noSubClasses);
-		while (e != null) {
+		Incidence i = getFirstIncidence(ic, noSubClasses);
+		while (i != null) {
 			++degree;
-			e = e.getNextIncidence(ec, noSubClasses);
+			i = i.getNextIncidenceAtVertex(ic, noSubClasses);
 		}
 		return degree;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(Class, boolean)
-	 */
 	@Override
-	public int getDegree(Class<? extends Edge> ec, boolean noSubClasses) {
-		assert ec != null;
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
+		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Edge e = getFirstIncidence(ec, noSubClasses);
-		while (e != null) {
+		Incidence i = getFirstIncidence(ic, noSubClasses);
+		while (i != null) {
 			++degree;
-			e = e.getNextIncidence(ec, noSubClasses);
+			i = i.getNextIncidenceAtVertex(ic, noSubClasses);
 		}
 		return degree;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(jgralab.EdgeClass, jgralab.Direction)
-	 */
 	@Override
-	public int getDegree(EdgeClass ec, Direction orientation) {
-		assert ec != null;
+	public int getDegree(IncidenceClass ic, Direction direction) {
+		assert ic != null;
 		assert isValid();
-		return getDegree(ec, orientation, false);
+		return getDegree(ic, direction, false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(Class, jgralab.Direction)
-	 */
 	@Override
-	public int getDegree(Class<? extends Edge> ec, Direction orientation) {
-		assert ec != null;
+	public int getDegree(Class<? extends Incidence> ic, Direction direction) {
+		assert ic != null;
 		assert isValid();
-		return getDegree(ec, orientation, false);
+		return getDegree(ic, direction, false);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(jgralab.EdgeClass, jgralab.Direction,
-	 * boolean)
-	 */
 	@Override
-	public int getDegree(EdgeClass ec, Direction orientation,
+	public int getDegree(IncidenceClass ic, Direction direction,
 			boolean noSubClasses) {
-		assert ec != null;
+		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Edge e = getFirstIncidence(ec, orientation, noSubClasses);
-		while (e != null) {
+		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
+		while (i != null) {
 			++degree;
-			e = e.getNextIncidence(ec, orientation, noSubClasses);
+			i = i.getNextIncidenceAtVertex(ic, direction, noSubClasses);
 		}
 		return degree;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.Vertex#getDegree(Class, jgralab.Direction, boolean)
-	 */
 	@Override
-	public int getDegree(Class<? extends Edge> ec, Direction orientation,
+	public int getDegree(Class<? extends Incidence> ic, Direction direction,
 			boolean noSubClasses) {
-		assert ec != null;
+		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Edge e = getFirstIncidence(ec, orientation, noSubClasses);
-		while (e != null) {
+		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
+		while (i != null) {
 			++degree;
-			e = e.getNextIncidence(ec, orientation, noSubClasses);
+			i = i.getNextIncidenceAtVertex(ic, direction, noSubClasses);
 		}
 		return degree;
 	}

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
@@ -56,30 +57,36 @@ public interface Vertex extends GraphElement {
 	public VertexClass getType();
 
 	/**
-	 * @return the number of connected incidences to the vertex
+	 * Returns the number of connected {@link Incidence}s to this {@link Vertex}
+	 * .
+	 * 
+	 * @return int
 	 */
-	public int getDegree();// old
+	public int getDegree();
 
 	/**
-	 * @param orientation
+	 * Returns the number of connected {@link Incidence}s to this {@link Vertex}
+	 * which have the {@link Direction} specified by <code>direction</code>.
+	 * 
+	 * @param direction
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Direction orientation);// old
+	public int getDegree(Direction direction);// old
 
 	/**
 	 * @param ec
 	 *            an EdgeClass
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(EdgeClass ec);// old
+	public int getDegree(IncidenceClass ic);// old
 
 	/**
 	 * @param ec
 	 *            an EdgeClass
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(Class<? extends Edge> ec);// old
+	public int getDegree(Class<? extends Incidence> ic);// old
 
 	/**
 	 * @param ec
@@ -89,7 +96,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(EdgeClass ec, boolean noSubClasses);// old
+	public int getDegree(IncidenceClass ic, boolean noSubClasses);// old
 
 	/**
 	 * @param ec
@@ -99,7 +106,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences of the specified EdgeClass
 	 */
-	public int getDegree(Class<? extends Edge> ec, boolean noSubClasses);// old
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses);// old
 
 	/**
 	 * @param ec
@@ -108,7 +115,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeClass ec, Direction orientation);// old
+	public int getDegree(IncidenceClass ic, Direction direction);// old
 
 	/**
 	 * @param ec
@@ -117,7 +124,7 @@ public interface Vertex extends GraphElement {
 	 *            of connected incidences,
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Class<? extends Edge> ec, Direction orientation);// old
+	public int getDegree(Class<? extends Incidence> ic, Direction direction);// old
 
 	/**
 	 * @param ec
@@ -129,7 +136,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(EdgeClass ec, Direction orientation,
+	public int getDegree(IncidenceClass ic, Direction direction,
 			boolean noSubClasses);// old
 
 	/**
@@ -142,7 +149,7 @@ public interface Vertex extends GraphElement {
 	 *            not counted
 	 * @return number of IN or OUT incidences connected to the vertex
 	 */
-	public int getDegree(Class<? extends Edge> ec, Direction orientation,
+	public int getDegree(Class<? extends Incidence> ic, Direction direction,
 			boolean noSubClasses);// old
 
 	/**
