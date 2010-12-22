@@ -359,16 +359,6 @@ public interface Vertex extends GraphElement {
 	public void delete();// old
 
 	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences();// old
-
-	/**
 	 * Return an List&lt;vertexType&gt; over all vertices reachable from this
 	 * vertex via the specified <code>pathDescription</code>.
 	 * 

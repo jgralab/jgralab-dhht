@@ -65,7 +65,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	protected IncidenceImpl getLastIncidenceInternal() {
+	public Incidence getLastIncidence() {
 		return lastIncidenceAtVertex;
 	}
 

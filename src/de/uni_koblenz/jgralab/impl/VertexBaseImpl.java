@@ -299,12 +299,14 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 
 	@Override
 	public Iterable<Edge> getAlphaEdges(EdgeClass anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this,anEdgeClass.getM1Class(), Direction.EDGE_TO_VERTEX);
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),
+				Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public Iterable<Edge> getAlphaEdges(Class<? extends Edge> anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this,anEdgeClass, Direction.EDGE_TO_VERTEX);
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,
+				Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
@@ -314,12 +316,14 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 
 	@Override
 	public Iterable<Edge> getOmegaEdges(EdgeClass anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),Direction.VERTEX_TO_EDGE);
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),
+				Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
 	public Iterable<Edge> getOmegaEdges(Class<? extends Edge> anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,Direction.VERTEX_TO_EDGE);
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,
+				Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
@@ -343,13 +347,17 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	}
 
 	@Override
-	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass, Direction direction) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),direction);
+	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass,
+			Direction direction) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),
+				direction);
 	}
 
 	@Override
-	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass, Direction direction) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,direction);
+	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass,
+			Direction direction) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass, direction);
+	}
 
 	/*
 	 * (non-Javadoc)
