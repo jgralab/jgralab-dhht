@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -98,19 +97,17 @@ public class IncidentVertexIterable<V extends Vertex> extends
 		public IncidentVertexIterator(Edge edge, Class<? extends Vertex> vc,
 				Direction dir) {
 			super(edge, vc, dir);
+			if (vc != null && current.getVertex().getM1Class().isInstance(vc)) {
+				setCurrentToNextIncidentGraphElement();
+			}
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public V next() {
-			checkConcurrentModification();
-			if (current == null) {
-				throw new NoSuchElementException();
+		protected void setCurrentToNextIncidentGraphElement() {
+			while (current != null
+					&& !current.getVertex().getM1Class().isInstance(gc)) {
+				current = current.getNextIncidenceAtEdge(dir);
 			}
-			V result = current;
-			current = (gc == null) ? current.getNextIncidenceAtEdge(dir)
-					: current.getNextIncidenceAtEdge(gc, dir);
-			return result;
 		}
 
 	}

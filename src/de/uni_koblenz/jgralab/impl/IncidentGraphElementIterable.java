@@ -33,11 +33,13 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
  * This class provides an {@link Iterable} for the incident {@link GraphElement}
@@ -45,8 +47,8 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class IncidentGraphElementIterable<I extends GraphElement>
-		implements Iterable<I> {
+public abstract class IncidentGraphElementIterable<G extends GraphElement>
+		implements Iterable<G> {
 
 	/**
 	 * This class provides an {@link Iterator} for the incident
@@ -55,7 +57,7 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 	 * @author ist@uni-koblenz.de
 	 * 
 	 */
-	abstract class IncidentGraphElementIterator implements Iterator<I> {
+	abstract class IncidentGraphElementIterator implements Iterator<G> {
 
 		/**
 		 * The current {@link Incidence}.
@@ -99,7 +101,6 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
-		@SuppressWarnings("unchecked")
 		public IncidentGraphElementIterator(GraphElement graphElement,
 				Class<? extends GraphElement> gc, Direction dir) {
 			this.graphElement = graphElement;
@@ -107,9 +108,7 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 			this.dir = dir;
 			incidenceListVersion = ((GraphElementImpl) graphElement)
 					.getIncidenceListVersion();
-			current = (I) ((gc == null) ? graphElement
-					.getFirstIncidentGraphElement(dir) : graphElement
-					.getFirstIncidentGraphElement(gc, dir));
+			current = graphElement.getFirstIncidence(dir);
 		}
 
 		@Override
@@ -135,6 +134,27 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 			}
 		}
 
+		@SuppressWarnings("unchecked")
+		@Override
+		public G next() {
+			checkConcurrentModification();
+			if (current == null) {
+				throw new NoSuchElementException();
+			}
+			G result = (G) current;
+			setCurrentToNextIncidentGraphElement();
+			return result;
+		}
+
+		/**
+		 * Sets {@link #current} to the next {@link Incidence} which is
+		 * connected to an {@link GraphElement} different from
+		 * {@link #graphElement} and of {@link GraphElementClass} {@link #gc}.
+		 * If such an element does not exist {@link #current} is set to
+		 * <code>null</code>.
+		 */
+		protected abstract void setCurrentToNextIncidentGraphElement();
+
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(
@@ -149,7 +169,7 @@ public abstract class IncidentGraphElementIterable<I extends GraphElement>
 	protected IncidentGraphElementIterator iter = null;
 
 	@Override
-	public Iterator<I> iterator() {
+	public Iterator<G> iterator() {
 		return iter;
 	}
 }
