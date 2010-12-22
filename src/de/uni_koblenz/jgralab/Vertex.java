@@ -215,6 +215,26 @@ public interface Vertex extends GraphElement {
 	public Iterable<Edge> getAlphaEdges();
 
 	/**
+	 * Returns the sequence of all incoming {@link Edge}s at this {@link Vertex}
+	 * which are an instance of <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link EdgeClass}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getAlphaEdges(EdgeClass anEdgeClass);
+
+	/**
+	 * Returns the sequence of all incoming {@link Edge}s at this {@link Vertex}
+	 * which are an instance of <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getAlphaEdges(Class<? extends Edge> anEdgeClass);
+
+	/**
 	 * Returns the sequence of all outgoing {@link Edge}s at this {@link Vertex}
 	 * .
 	 * 
@@ -223,11 +243,89 @@ public interface Vertex extends GraphElement {
 	public Iterable<Edge> getOmegaEdges();
 
 	/**
+	 * Returns the sequence of all outgoing {@link Edge}s at this {@link Vertex}
+	 * which are an instance of <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link EdgeClass}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getOmegaEdges(EdgeClass anEdgeClass);
+
+	/**
+	 * Returns the sequence of all outgoing {@link Edge}s at this {@link Vertex}
+	 * which are an instance of <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getOmegaEdges(Class<? extends Edge> anEdgeClass);
+
+	/**
 	 * Returns a sequence of all incident {@link Edge}s.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
 	public Iterable<Edge> getIncidentEdges();
+
+	/**
+	 * Returns a sequence of all incident {@link Edge}s which are reachable via
+	 * an {@link Incidence} of direction <code>direction</code>.
+	 * 
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges(Direction direction);
+
+	/**
+	 * Returns a sequence of all incident {@link Edge}s which are an instance of
+	 * <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link EdgeClass}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass);
+
+	/**
+	 * Returns a sequence of all incident {@link Edge}s which are an instance of
+	 * <code>anEdgeClass</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass);
+
+	/**
+	 * Returns a sequence of all incident {@link Edge}s which which are an
+	 * instance of <code>anEdgeClass</code> and are reachable via an
+	 * {@link Incidence} of direction <code>direction</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link EdgeClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass,
+			Direction direction);
+
+	/**
+	 * Returns a sequence of all incident {@link Edge}s which are which are an
+	 * instance of <code>anEdgeClass</code> and are reachable via an
+	 * {@link Incidence} of direction <code>direction</code>.
+	 * 
+	 * @param anEdgeClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass,
+			Direction direction);
 
 	/**
 	 * @param v
@@ -297,73 +395,6 @@ public interface Vertex extends GraphElement {
 	 */
 	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
 			PathElement... pathElements);// old
-
-	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @param dir
-	 *            the direction of the edges which should be iterated, either
-	 *            Direction.IN or Direction.OUT
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences(Direction dir);// old
-
-	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @param eclass
-	 *            the EdgeClass of the edges which should be iterated
-	 * @param dir
-	 *            the direction of the edges which should be iterated, either
-	 *            Direction.IN or Direction.OUT
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences(EdgeClass eclass, Direction dir);// old
-
-	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @param eclass
-	 *            the M1-Class of the edges which should be iterated
-	 * @param dir
-	 *            the direction of the edges which should be iterated, either
-	 *            Direction.IN or Direction.OUT
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass, Direction dir);// old
-
-	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @param eclass
-	 *            the EdgeClass of the edges which should be iterated
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences(EdgeClass eclass);// old
-
-	/**
-	 * Using this method, one can simply iterate over all incident edges of this
-	 * vertex using the advanced for-loop
-	 * 
-	 * @param eclass
-	 *            the M1-Class of the edges which should be iterated
-	 * @return a iterable object which can be iterated through using the
-	 *         advanced for-loop
-	 */
-	@Deprecated
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass);// old
 
 	/**
 	 * tests if the Edge <code>edge</code> may start at this vertex

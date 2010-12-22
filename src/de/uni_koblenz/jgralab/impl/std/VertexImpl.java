@@ -31,7 +31,6 @@
 package de.uni_koblenz.jgralab.impl.std;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
@@ -52,11 +51,6 @@ public abstract class VertexImpl extends
 	@Override
 	public Incidence getFirstIncidence() {
 		return firstIncidenceAtVertex;
-	}
-
-	@Override
-	public GraphElement getFirstIncidentGraphElement() {
-		return firstIncidenceAtVertex.getEdge();
 	}
 
 	@Override

@@ -294,26 +294,62 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 
 	@Override
 	public Iterable<Edge> getAlphaEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IncidentEdgeIterable<Edge>(this, Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Edge> getAlphaEdges(EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this,anEdgeClass.getM1Class(), Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Edge> getAlphaEdges(Class<? extends Edge> anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this,anEdgeClass, Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public Iterable<Edge> getOmegaEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IncidentEdgeIterable<Edge>(this, Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges(EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges(Class<? extends Edge> anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
 	public Iterable<Edge> getIncidentEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return new IncidentEdgeIterable<Edge>(this);
 	}
 
+	@Override
 	public Iterable<Edge> getIncidentEdges(Direction direction) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IncidentEdgeIterable<Edge>(this, direction);
 	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(EdgeClass anEdgeClass, Direction direction) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass.getM1Class(),direction);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass, Direction direction) {
+		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,direction);
 
 	/*
 	 * (non-Javadoc)
@@ -656,83 +692,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		assert isValid() && v.isValid();
 		assert getGraph() == v.getGraph();
 		return getId() - v.getId();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#incidences()
-	 */
-	@Override
-	public Iterable<Edge> incidences() {
-		assert isValid();
-		return new IncidenceIterable<Edge>(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#incidences(de.uni_koblenz.jgralab.Direction
-	 * )
-	 */
-	@Override
-	public Iterable<Edge> incidences(Direction dir) {
-		assert isValid();
-		return new IncidenceIterable<Edge>(this, dir);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#incidences(de.uni_koblenz.jgralab.schema
-	 * .EdgeClass, de.uni_koblenz.jgralab.Direction)
-	 */
-	@Override
-	public Iterable<Edge> incidences(EdgeClass eclass, Direction dir) {
-		assert eclass != null;
-		assert isValid();
-		return new IncidenceIterable<Edge>(this, eclass.getM1Class(), dir);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#incidences(java.lang.Class,
-	 * de.uni_koblenz.jgralab.Direction)
-	 */
-	@Override
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass, Direction dir) {
-		assert eclass != null;
-		assert isValid();
-		return new IncidenceIterable<Edge>(this, eclass, dir);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#incidences(de.uni_koblenz.jgralab.schema
-	 * .EdgeClass)
-	 */
-	@Override
-	public Iterable<Edge> incidences(EdgeClass eclass) {
-		assert eclass != null;
-		assert isValid();
-		return new IncidenceIterable<Edge>(this, eclass.getM1Class());
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#incidences(java.lang.Class)
-	 */
-	@Override
-	public Iterable<Edge> incidences(Class<? extends Edge> eclass) {
-		assert eclass != null;
-		assert isValid();
-		return new IncidenceIterable<Edge>(this, eclass);
 	}
 
 	protected abstract void setNextVertex(Vertex nextVertex);
