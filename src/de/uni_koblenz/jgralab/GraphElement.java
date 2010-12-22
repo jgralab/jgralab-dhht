@@ -285,4 +285,61 @@ public interface GraphElement extends AttributedElement {
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(Direction direction);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass}
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code> and is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s. If set to <code>null</code>
+	 *            {@link Incidence}s of both directions are returned.
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code> and is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s. If set to <code>null</code>
+	 *            {@link Incidence}s of both directions are returned.
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
+			Direction direction);
 }

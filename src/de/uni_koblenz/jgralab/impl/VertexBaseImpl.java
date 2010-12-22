@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.PathElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
@@ -135,6 +136,36 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	public Iterable<Incidence> getIncidences(Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtVertex<Incidence>(this, direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this, anIncidenceClass);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this,
+				anIncidenceClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(
+			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this, anIncidenceClass,
+				direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(this,
+				anIncidenceClass.getM1Class(), direction);
 	}
 
 	/*
