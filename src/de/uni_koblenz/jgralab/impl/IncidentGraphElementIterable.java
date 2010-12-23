@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -128,18 +127,6 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement>
 				throw new ConcurrentModificationException(
 						"The incidence list of the GraphElement has been modified - the iterator is not longer valid");
 			}
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public G next() {
-			checkConcurrentModification();
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			G result = (G) current;
-			setCurrentToNextIncidentGraphElement();
-			return result;
 		}
 
 		/**

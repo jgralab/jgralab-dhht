@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -100,6 +101,18 @@ public class IncidentEdgeIterable<E extends Edge> extends
 			if (ec != null && current.getEdge().getM1Class().isInstance(ec)) {
 				setCurrentToNextIncidentGraphElement();
 			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public E next() {
+			checkConcurrentModification();
+			if (current == null) {
+				throw new NoSuchElementException();
+			}
+			E result = (E) current.getEdge();
+			setCurrentToNextIncidentGraphElement();
+			return result;
 		}
 
 		@Override
