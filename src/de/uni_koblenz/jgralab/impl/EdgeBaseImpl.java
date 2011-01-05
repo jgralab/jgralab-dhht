@@ -259,6 +259,87 @@ public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
 		}
 	}
 
+	@Override
+	public int getDegree() {
+		int d = 0;
+		Incidence i = getFirstIncidence();
+		while (i != null) {
+			d++;
+			i = i.getNextIncidenceAtEdge();
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Direction direction) {
+		if (direction == null) {
+			return getDegree();
+		}
+		int d = 0;
+		Incidence i = getFirstIncidence();
+		while (i != null) {
+			if (i.getDirection() == direction) {
+				d++;
+			}
+			i = i.getNextIncidenceAtEdge();
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(ic, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(ic, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, Direction direction,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(ic, direction, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic, Direction direction,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(ic, direction, noSubClasses);
+		}
+		return degree;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 

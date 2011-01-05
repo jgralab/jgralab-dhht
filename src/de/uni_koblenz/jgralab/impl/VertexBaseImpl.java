@@ -484,13 +484,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 	}
 
 	@Override
-	public int getDegree(IncidenceClass ic) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(ic, false);
-	}
-
-	@Override
 	public int getDegree(Direction direction) {
 		if (direction == null) {
 			return getDegree();
@@ -504,13 +497,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 			i = i.getNextIncidenceAtVertex();
 		}
 		return d;
-	}
-
-	@Override
-	public int getDegree(Class<? extends Incidence> ic) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(ic, false);
 	}
 
 	@Override
@@ -537,20 +523,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 			i = i.getNextIncidenceAtVertex(ic, noSubClasses);
 		}
 		return degree;
-	}
-
-	@Override
-	public int getDegree(IncidenceClass ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(ic, direction, false);
-	}
-
-	@Override
-	public int getDegree(Class<? extends Incidence> ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(ic, direction, false);
 	}
 
 	@Override

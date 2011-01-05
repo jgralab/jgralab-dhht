@@ -242,4 +242,32 @@ public abstract class GraphElementImpl implements GraphElement {
 				noSubclasses);
 	}
 
+	@Override
+	public int getDegree(IncidenceClass ic) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, false);
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, false);
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, Direction direction) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, direction, false);
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic, Direction direction) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, direction, false);
+	}
+
 }
