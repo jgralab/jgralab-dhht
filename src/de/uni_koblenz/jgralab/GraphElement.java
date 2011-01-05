@@ -47,7 +47,7 @@ public interface GraphElement extends AttributedElement {
 	 * 
 	 * @return int the id of this {@link GraphElement}.
 	 */
-	public int getId();// old
+	public int getId();
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present
@@ -57,7 +57,7 @@ public interface GraphElement extends AttributedElement {
 	 * 
 	 * @return boolean
 	 */
-	public boolean isValid();// old
+	public boolean isValid();
 
 	/**
 	 * Returns the graph containing this {@link GraphElement}.

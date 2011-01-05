@@ -96,9 +96,12 @@ public abstract class VertexImpl extends
 	}
 
 	/**
+	 * Creates a new {@link VertexImpl} instance.
 	 * 
 	 * @param id
+	 *            int
 	 * @param graph
+	 *            {@link Graph}
 	 */
 	protected VertexImpl(int id, Graph graph) {
 		super(id, graph);

@@ -55,17 +55,20 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
 /**
- * TODO add comment
+ * Implementation of all methods of the interface {@link Vertex} which are
+ * independent of the fields of a specific VertexImpl.
  * 
  * @author ist@uni-koblenz.de
  */
 public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex {
 
 	/**
+	 * Creates a new {@link Vertex} instance.
+	 * 
 	 * @param id
-	 *            the id of the vertex
+	 *            int the id of the vertex
 	 * @param graph
-	 *            its corresponding graph
+	 *            {@link Graph} its corresponding graph
 	 */
 	protected VertexBaseImpl(int id, Graph graph) {
 		super(graph);
@@ -277,12 +280,11 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return new IncidentEdgeIterable<Edge>(this, anEdgeClass, direction);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#isBefore(de.uni_koblenz.jgralab.Vertex)
-	 */
+	@Override
+	public boolean isValid() {
+		return graph.containsVertex(this);
+	}
+
 	@Override
 	public boolean isBefore(Vertex v) {
 		assert v != null;
@@ -291,24 +293,13 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		if (this == v) {
 			return false;
 		}
-		Vertex prev = ((VertexBaseImpl) v).getPrevVertex();
+		Vertex prev = v.getPreviousVertex();
 		while ((prev != null) && (prev != this)) {
-			prev = ((VertexBaseImpl) prev).getPrevVertex();
+			prev = v.getPreviousVertex();
 		}
 		return prev != null;
 	}
 
-	@Override
-	public boolean isValid() {
-		return graph.containsVertex(this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#putBefore(de.uni_koblenz.jgralab.Vertex)
-	 */
 	@Override
 	public void putBefore(Vertex v) {
 		assert v != null;
@@ -318,11 +309,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		graph.putVertexBefore((VertexBaseImpl) v, this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#isAfter(de.uni_koblenz.jgralab.Vertex)
-	 */
 	@Override
 	public boolean isAfter(Vertex v) {
 		assert v != null;
@@ -338,12 +324,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return next != null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Vertex#putAfter(de.uni_koblenz.jgralab.Vertex)
-	 */
 	@Override
 	public void putAfter(Vertex v) {
 		assert v != null;
@@ -353,13 +333,8 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		graph.putVertexAfter((VertexBaseImpl) v, this);
 	}
 
-	protected abstract IncidenceImpl getLastIncidenceInternal();
+	protected abstract IncidenceImpl getLastIncidenceInternal();// TODO delete?
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#delete()
-	 */
 	@Override
 	public void delete() {
 		assert isValid() : this + " is not valid!";

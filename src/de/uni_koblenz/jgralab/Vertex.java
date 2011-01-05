@@ -256,6 +256,8 @@ public interface Vertex extends GraphElement {
 			Direction direction);
 
 	/**
+	 * Returns <code>true</code> if this {@link GraphElement} is
+	 * 
 	 * @param v
 	 * @return true, if this vertex is somewhere before v in vSeq
 	 */

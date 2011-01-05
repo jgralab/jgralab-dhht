@@ -42,13 +42,17 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
- * TODO add comment
+ * Implementation of all methods of the interface {@link GraphElement} which are
+ * independent of the fields of a specific GraphElementImpl.
  * 
  * @author ist@uni-koblenz.de
  * 
  */
 public abstract class GraphElementImpl implements GraphElement {
 
+	/**
+	 * The id of this {@link GraphElement}.
+	 */
 	protected int id;
 
 	/**
@@ -60,32 +64,33 @@ public abstract class GraphElementImpl implements GraphElement {
 	 */
 	private long incidenceListVersion = 0;
 
+	/**
+	 * The {@link Graph} to which this {@link GraphElement} belongs.
+	 */
+	protected GraphBaseImpl graph;
+
+	/**
+	 * Creates a new {@link GraphElement} which belongs to <code>graph</code>.
+	 * 
+	 * @param graph
+	 *            {@link Graph}
+	 */
 	protected GraphElementImpl(Graph graph) {
 		assert graph != null;
 		this.graph = (GraphBaseImpl) graph;
 	}
-
-	protected GraphBaseImpl graph;
 
 	@Override
 	public Graph getGraph() {
 		return graph;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.AttributedElement#getGraphClass()
-	 */
+	@Override
 	public GraphClass getGraphClass() {
 		return (GraphClass) graph.getAttributedElementClass();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jgralab.AttributedElement#getSchema()
-	 */
+	@Override
 	public Schema getSchema() {
 		return graph.getSchema();
 	}
@@ -100,24 +105,22 @@ public abstract class GraphElementImpl implements GraphElement {
 		graph.graphModified();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.GraphElement#getId()
-	 */
 	@Override
 	public int getId() {
 		return id;
 	}
 
 	/**
-	 * sets the id field of this graph element
+	 * Sets {@link GraphElement#id}.
 	 * 
 	 * @param id
-	 *            an id
+	 *            int an id
 	 */
 	protected abstract void setId(int id);
 
+	/**
+	 * TODO old
+	 */
 	@Override
 	public void initializeAttributesWithDefaultValues() {
 		for (Attribute attr : getAttributedElementClass().getAttributeList()) {
@@ -133,6 +136,7 @@ public abstract class GraphElementImpl implements GraphElement {
 	}
 
 	/**
+	 * TODO old
 	 * 
 	 * @param attr
 	 * @throws GraphIOException
@@ -144,7 +148,7 @@ public abstract class GraphElementImpl implements GraphElement {
 
 	/**
 	 * Must be called by all methods which manipulate the incidence list of this
-	 * GraphElement.
+	 * {@link GraphElement}.
 	 */
 	protected void incidenceListModified() {
 		assert isValid();
