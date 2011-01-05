@@ -37,7 +37,8 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
- * TODO add comment
+ * Implementation of all methods of the interface {@link Incidence} which are
+ * independent of the fields of an IncidenceImpl.
  * 
  * @author ist@uni-koblenz.de
  */
