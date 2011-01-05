@@ -342,4 +342,138 @@ public interface GraphElement extends AttributedElement {
 	 */
 	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
 			Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} .
+	 * 
+	 * @return int
+	 */
+	public int getDegree();
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code>.
+	 * 
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         connected to this GraphElement
+	 */
+	public int getDegree(Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(IncidenceClass ic);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link Class}
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Class<? extends Incidence> ic);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(IncidenceClass ic, boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link Class}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(IncidenceClass ic, Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Class<? extends Incidence> ic, Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(IncidenceClass ic, Direction direction,
+			boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Class<? extends Incidence> ic, Direction direction,
+			boolean noSubClasses);
 }

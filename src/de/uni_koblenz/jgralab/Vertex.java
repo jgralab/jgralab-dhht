@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
@@ -55,102 +54,6 @@ public interface Vertex extends GraphElement {
 	 * @return {@link VertexClass}
 	 */
 	public VertexClass getType();
-
-	/**
-	 * Returns the number of connected {@link Incidence}s to this {@link Vertex}
-	 * .
-	 * 
-	 * @return int
-	 */
-	public int getDegree();
-
-	/**
-	 * Returns the number of connected {@link Incidence}s to this {@link Vertex}
-	 * which have the {@link Direction} specified by <code>direction</code>.
-	 * 
-	 * @param direction
-	 *            of connected incidences,
-	 * @return number of IN or OUT incidences connected to the vertex
-	 */
-	public int getDegree(Direction direction);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @return number of IN or OUT incidences of the specified EdgeClass
-	 */
-	public int getDegree(IncidenceClass ic);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @return number of IN or OUT incidences of the specified EdgeClass
-	 */
-	public int getDegree(Class<? extends Incidence> ic);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param noSubClasses
-	 *            if set to <code>true</code>, subclasses of <code>ec</code> are
-	 *            not counted
-	 * @return number of IN or OUT incidences of the specified EdgeClass
-	 */
-	public int getDegree(IncidenceClass ic, boolean noSubClasses);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param noSubClasses
-	 *            if set to <code>true</code>, subclasses of <code>ec</code> are
-	 *            not counted
-	 * @return number of IN or OUT incidences of the specified EdgeClass
-	 */
-	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param orientation
-	 *            of connected incidences,
-	 * @return number of IN or OUT incidences connected to the vertex
-	 */
-	public int getDegree(IncidenceClass ic, Direction direction);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param orientation
-	 *            of connected incidences,
-	 * @return number of IN or OUT incidences connected to the vertex
-	 */
-	public int getDegree(Class<? extends Incidence> ic, Direction direction);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param orientation
-	 *            of connected incidences,
-	 * @param noSubClasses
-	 *            if set to <code>true</code>, subclasses of <code>ec</code> are
-	 *            not counted
-	 * @return number of IN or OUT incidences connected to the vertex
-	 */
-	public int getDegree(IncidenceClass ic, Direction direction,
-			boolean noSubClasses);// old
-
-	/**
-	 * @param ec
-	 *            an EdgeClass
-	 * @param orientation
-	 *            of connected incidences,
-	 * @param noSubClasses
-	 *            if set to <code>true</code>, subclasses of <code>ec</code> are
-	 *            not counted
-	 * @return number of IN or OUT incidences connected to the vertex
-	 */
-	public int getDegree(Class<? extends Incidence> ic, Direction direction,
-			boolean noSubClasses);// old
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the
