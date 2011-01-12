@@ -60,7 +60,8 @@ import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex {
+public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
+		implements Vertex {
 
 	/**
 	 * Creates a new {@link Vertex} instance.
@@ -333,119 +334,23 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		graph.putVertexAfter((VertexBaseImpl) v, this);
 	}
 
-	protected abstract IncidenceImpl getLastIncidenceInternal();// TODO delete?
+	/**
+	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
+	 * all vertices in the graph.
+	 * 
+	 * @param nextVertex
+	 *            {@link Vertex}which should be put after this {@link Vertex}
+	 */
+	protected abstract void setNextVertex(Vertex nextVertex);
 
-	@Override
-	public void delete() {
-		assert isValid() : this + " is not valid!";
-		graph.deleteVertex(this);
-	}
-
-	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.isValid() && moved.isValid();
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved) || (target.getNextIncidenceInternal() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidenceInternal() != getLastIncidenceInternal();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidenceInternal()) {
-			setFirstIncidence(moved.getNextIncidenceInternal());
-			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(null);
-			}
-		} else if (moved == getLastIncidenceInternal()) {
-			setLastIncidence(moved.getPrevIncidenceInternal());
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(null);
-		} else {
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(
-					moved.getNextIncidenceInternal());
-			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(
-						moved.getPrevIncidenceInternal());
-			}
-		}
-
-		// insert moved incidence in lambdaSeq immediately after target
-		if (target == getLastIncidenceInternal()) {
-			setLastIncidence(moved);
-			moved.setNextIncidenceInternal(null);
-		} else {
-			if (!graph.hasSavememSupport()) {
-				target.getNextIncidenceInternal().setPrevIncidenceInternal(
-						moved);
-			}
-			moved.setNextIncidenceInternal(target.getNextIncidenceInternal());
-		}
-		if (!graph.hasSavememSupport()) {
-			moved.setPrevIncidenceInternal(target);
-		}
-		target.setNextIncidenceInternal(moved);
-		incidenceListModified();
-	}
-
-	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.isValid() && moved.isValid();
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved) || (target.getPrevIncidenceInternal() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidenceInternal() != getLastIncidenceInternal();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidenceInternal()) {
-			setFirstIncidence(moved.getNextIncidenceInternal());
-			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(null);
-			}
-		} else if (moved == getLastIncidenceInternal()) {
-			setLastIncidence(moved.getPrevIncidenceInternal());
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(null);
-		} else {
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(
-					moved.getNextIncidenceInternal());
-			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(
-						moved.getPrevIncidenceInternal());
-			}
-		}
-
-		// insert moved incidence in lambdaSeq immediately before target
-		if (target == getFirstIncidenceInternal()) {
-			setFirstIncidence(moved);
-			if (!graph.hasSavememSupport()) {
-				moved.setPrevIncidenceInternal(null);
-			}
-		} else {
-			IncidenceImpl previousIncidence = target.getPrevIncidenceInternal();
-			previousIncidence.setNextIncidenceInternal(moved);
-			if (!graph.hasSavememSupport()) {
-				moved.setPrevIncidenceInternal(previousIncidence);
-			}
-		}
-		moved.setNextIncidenceInternal(target);
-		if (!graph.hasSavememSupport()) {
-			target.setPrevIncidenceInternal(moved);
-		}
-		incidenceListModified();
-	}
+	/**
+	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
+	 * of all vertices in the graph.
+	 * 
+	 * @param prevVertex
+	 *            {@link Vertex}which should be put before this {@link Vertex}
+	 */
+	protected abstract void setPrevVertex(Vertex prevVertex);
 
 	@Override
 	public int getDegree() {
@@ -528,22 +433,12 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return degree;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		assert isValid();
 		return "v" + id + ": " + getAttributedElementClass().getQualifiedName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(AttributedElement a) {
 		assert a instanceof Vertex;
@@ -553,9 +448,123 @@ public abstract class VertexBaseImpl extends GraphElementImpl implements Vertex 
 		return getId() - v.getId();
 	}
 
-	protected abstract void setNextVertex(Vertex nextVertex);
+	@Override
+	public void delete() {
+		assert isValid() : this + " is not valid!";
+		graph.deleteVertex(this);
+	}
 
-	protected abstract void setPrevVertex(Vertex prevVertex);
+	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
+		assert (target != null) && (moved != null);
+		assert target.getGraph() == moved.getGraph();// TODO adapt to
+														// hierarchical graphs
+		assert target.getGraph() == getGraph();
+		assert target.getThis() == moved.getThis();
+		assert target != moved;
+
+		if ((target == moved) || (target.getNextIncidenceAtVertex() == moved)) {
+			return;
+		}
+
+		// there are at least 2 incidences in the incidence list
+		// such that firstIncidence != lastIncidence
+		assert getFirstIncidence() != getLastIncidence();
+
+		// remove moved incidence from lambdaSeq
+		if (moved == getFirstIncidence()) {
+			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex(null);
+			}
+		} else if (moved == getLastIncidence()) {
+			setLastIncidence((IncidenceImpl) moved
+					.getPreviousIncidenceAtVertex());
+			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex(null);
+		} else {
+			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex((IncidenceImpl) moved
+							.getNextIncidenceAtVertex());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex((IncidenceImpl) moved
+								.getPreviousIncidenceAtVertex());
+			}
+		}
+
+		// insert moved incidence in lambdaSeq immediately after target
+		if (target == getLastIncidence()) {
+			setLastIncidence(moved);
+			moved.setNextIncidenceAtVertex(null);
+		} else {
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) target.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex(moved);
+			}
+			moved.setNextIncidenceAtVertex((IncidenceImpl) target
+					.getNextIncidenceAtVertex());
+		}
+		if (!graph.hasSavememSupport()) {
+			moved.setPreviousIncidenceAtVertex(target);
+		}
+		target.setNextIncidenceAtVertex(moved);
+		incidenceListModified();
+	}
+
+	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
+		assert (target != null) && (moved != null);
+		assert target.isValid() && moved.isValid();
+		assert target.getGraph() == moved.getGraph();
+		assert target.getGraph() == getGraph();
+		assert target.getThis() == moved.getThis();
+		assert target != moved;
+
+		if ((target == moved) || (target.getPrevIncidenceInternal() == moved)) {
+			return;
+		}
+
+		// there are at least 2 incidences in the incidence list
+		// such that firstIncidence != lastIncidence
+		assert getFirstIncidenceInternal() != getLastIncidenceInternal();
+
+		// remove moved incidence from lambdaSeq
+		if (moved == getFirstIncidenceInternal()) {
+			setFirstIncidence(moved.getNextIncidenceInternal());
+			if (!graph.hasSavememSupport()) {
+				moved.getNextIncidenceInternal().setPrevIncidenceInternal(null);
+			}
+		} else if (moved == getLastIncidenceInternal()) {
+			setLastIncidence(moved.getPrevIncidenceInternal());
+			moved.getPrevIncidenceInternal().setNextIncidenceInternal(null);
+		} else {
+			moved.getPrevIncidenceInternal().setNextIncidenceInternal(
+					moved.getNextIncidenceInternal());
+			if (!graph.hasSavememSupport()) {
+				moved.getNextIncidenceInternal().setPrevIncidenceInternal(
+						moved.getPrevIncidenceInternal());
+			}
+		}
+
+		// insert moved incidence in lambdaSeq immediately before target
+		if (target == getFirstIncidenceInternal()) {
+			setFirstIncidence(moved);
+			if (!graph.hasSavememSupport()) {
+				moved.setPrevIncidenceInternal(null);
+			}
+		} else {
+			IncidenceImpl previousIncidence = target.getPrevIncidenceInternal();
+			previousIncidence.setNextIncidenceInternal(moved);
+			if (!graph.hasSavememSupport()) {
+				moved.setPrevIncidenceInternal(previousIncidence);
+			}
+		}
+		moved.setNextIncidenceInternal(target);
+		if (!graph.hasSavememSupport()) {
+			target.setPrevIncidenceInternal(moved);
+		}
+		incidenceListModified();
+	}
 
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;

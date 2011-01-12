@@ -482,4 +482,43 @@ public interface Incidence {
 	 */
 	public IncidenceType getThatSemantics();
 
+	/*
+	 * TODO Following methods should be implemented. And the corresponding
+	 * ..AtEdge methods. Adapt JavaDoc.
+	 */
+
+	/**
+	 * Returns <code>true</code> if this {@link GraphElement} is before
+	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 * @return boolean
+	 */
+	public boolean isBeforeAtVertex(Incidence g);
+
+	/**
+	 * Puts this {@link GraphElement} immediately before <code>g</code> in the
+	 * sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 */
+	public void putBeforeAtVertex(Incidence g);
+
+	/**
+	 * Returns <code>true</code> if this {@link GraphElement} is after
+	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 * @return boolean
+	 */
+	public boolean isAfterAtVertex(Incidence g);
+
+	/**
+	 * Puts this {@link GraphElement} immediately after <code>g</code> in the
+	 * sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 */
+	public void putAfterAtVertex(Incidence g);
+
 }

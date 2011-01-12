@@ -58,11 +58,11 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 		this.incidentVertex = incidentVertex;
 	}
 
-	protected void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
+	public void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
 		this.nextIncidenceAtVertex = nextIncidenceAtVertex;
 	}
 
-	protected void setPreviousIncidenceAtVertex(
+	public void setPreviousIncidenceAtVertex(
 			IncidenceImpl previousIncidenceAtVertex) {
 		this.previousIncidenceAtVertex = previousIncidenceAtVertex;
 	}

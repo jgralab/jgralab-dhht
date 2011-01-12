@@ -45,7 +45,7 @@ import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface Vertex extends GraphElement {
+public interface Vertex extends GraphElement<Vertex, Edge> {
 
 	/**
 	 * Returns the {@link VertexClass} of which this {@link Vertex} is an
@@ -254,34 +254,6 @@ public interface Vertex extends GraphElement {
 	 */
 	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass,
 			Direction direction);
-
-	/**
-	 * Returns <code>true</code> if this {@link GraphElement} is
-	 * 
-	 * @param v
-	 * @return true, if this vertex is somewhere before v in vSeq
-	 */
-	public boolean isBefore(Vertex v);// old
-
-	/**
-	 * puts this vertex immediately before v in vSeq
-	 * 
-	 * @param v
-	 */
-	public void putBefore(Vertex v);// old
-
-	/**
-	 * @param v
-	 * @return true, if this vertex is somewhere after v in vSeq
-	 */
-	public boolean isAfter(Vertex v);// old
-
-	/**
-	 * puts this vertex immediately after v in vSeq
-	 * 
-	 * @param v
-	 */
-	public void putAfter(Vertex v);// old
 
 	/**
 	 * removes this vertex from vSeq and erases its attributes

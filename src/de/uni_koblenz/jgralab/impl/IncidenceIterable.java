@@ -64,7 +64,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		/**
 		 * {@link GraphElement} which {@link Incidence}s are iterated.
 		 */
-		protected GraphElement graphElement = null;
+		protected GraphElement<?, ?> graphElement = null;
 
 		/**
 		 * The {@link Class} of the desired {@link Incidence}s.
@@ -98,12 +98,12 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		@SuppressWarnings("unchecked")
-		public IncidenceIterator(GraphElement graphElement,
+		public <G1, G2> IncidenceIterator(GraphElement<G1, G2> graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;
-			incidenceListVersion = ((GraphElementImpl) graphElement)
+			incidenceListVersion = ((GraphElementImpl<G1, G2>) graphElement)
 					.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
 					: graphElement.getFirstIncidence(ic, dir));
@@ -122,7 +122,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 * @throws ConcurrentModificationException
 		 */
 		protected void checkConcurrentModification() {
-			if (((GraphElementImpl) graphElement)
+			if (((GraphElementImpl<?, ?>) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
 						"The incidence list of this graphelement has been modified - the iterator is not longer valid");

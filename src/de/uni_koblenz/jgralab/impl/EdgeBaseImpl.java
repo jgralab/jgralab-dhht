@@ -49,7 +49,8 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeBaseImpl extends GraphElementImpl implements Edge {
+public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
+		implements Edge {
 
 	/**
 	 * @param anId

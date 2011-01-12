@@ -32,10 +32,12 @@
 package de.uni_koblenz.jgralab.impl;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
@@ -47,8 +49,16 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  * 
+ * @param <OwnType>
+ *            This parameter must be either {@link Vertex} in case of a vertex
+ *            or {@link Edge} in case of an edge.
+ * @param <DualType>
+ *            If <code>&lt;OwnType&gt;</code> is {@link Vertex} this parameter
+ *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
+ * 
  */
-public abstract class GraphElementImpl implements GraphElement {
+public abstract class GraphElementImpl<OwnType, DualType> implements
+		GraphElement<OwnType, DualType> {
 
 	/**
 	 * The id of this {@link GraphElement}.

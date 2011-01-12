@@ -39,8 +39,14 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * 
  * @author ist@uni-koblenz.de
  * 
+ * @param <OwnType>
+ *            This parameter must be either {@link Vertex} in case of a vertex
+ *            or {@link Edge} in case of an edge.
+ * @param <DualType>
+ *            If <code>&lt;OwnType&gt;</code> is {@link Vertex} this parameter
+ *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
-public interface GraphElement extends AttributedElement {
+public interface GraphElement<OwnType, DualType> extends AttributedElement {
 
 	/**
 	 * Returns the id of this {@link GraphElement}.
@@ -476,4 +482,38 @@ public interface GraphElement extends AttributedElement {
 	 */
 	public int getDegree(Class<? extends Incidence> ic, Direction direction,
 			boolean noSubClasses);
+
+	/**
+	 * Returns <code>true</code> if this {@link GraphElement} is before
+	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 * @return boolean
+	 */
+	public boolean isBefore(OwnType g);
+
+	/**
+	 * Puts this {@link GraphElement} immediately before <code>g</code> in the
+	 * sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 */
+	public void putBefore(OwnType g);
+
+	/**
+	 * Returns <code>true</code> if this {@link GraphElement} is after
+	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 * @return boolean
+	 */
+	public boolean isAfter(OwnType g);
+
+	/**
+	 * Puts this {@link GraphElement} immediately after <code>g</code> in the
+	 * sequence of incident {@link GraphElement}s.
+	 * 
+	 * @param g
+	 */
+	public void putAfter(OwnType g);
 }
