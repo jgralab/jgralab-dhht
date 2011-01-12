@@ -31,13 +31,11 @@
 
 package de.uni_koblenz.jgralab;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
 /**
  * represents a vertex, m1 classes inherit from this class
@@ -256,69 +254,34 @@ public interface Vertex extends GraphElement<Vertex, Edge> {
 			Direction direction);
 
 	/**
-	 * removes this vertex from vSeq and erases its attributes
-	 */
-	public void delete();// old
-
-	/**
-	 * Return an List&lt;vertexType&gt; over all vertices reachable from this
-	 * vertex via the specified <code>pathDescription</code>.
+	 * Returns a {@link List}&lt;<code>vertexType</code>&gt; over all vertices
+	 * reachable from this vertex via the specified <code>pathDescription</code>
+	 * .
 	 * 
 	 * @param pathDescription
-	 *            a GReQL path description like
+	 *            {@link String} a GReQL path description like
 	 *            <code>-->{EdgeType1}+ <>--{EdgeType2}</code>
 	 * @param vertexType
-	 *            the class of the vertices you can reach with that path (acts
-	 *            as implicit GoalRestriction)
-	 * @return a List of the reachable vertices
+	 *            {@link Class} of the vertices you can reach with that path
+	 *            (acts as implicit GoalRestriction)
+	 * @return {@link List} of the reachable vertices
 	 */
 	public <T extends Vertex> List<T> reachableVertices(String pathDescription,
-			Class<T> vertexType);// old
+			Class<T> vertexType);
 
 	/**
-	 * @param <T>
+	 * Returns a {@link Set}&lt;<code>vertexType</code>&gt; over all vertices
+	 * reachable from this vertex via the specified <code>pathElements</code> .
+	 * 
 	 * @param returnType
-	 *            the class of the vertices you can reach with that path (acts
-	 *            as implicit GoalRestriction)
+	 *            {@link Class} of the vertices you can reach with that path
+	 *            (acts as implicit GoalRestriction)
 	 * @param pathElements
-	 *            an array of {@link PathElement}s
-	 * @return a Set of vertices reachable by traversing the path given by
+	 *            {@link PathElement}...
+	 * @return {@link Set} of vertices reachable by traversing the path given by
 	 *         pathElements
 	 */
 	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
-			PathElement... pathElements);// old
-
-	/**
-	 * tests if the Edge <code>edge</code> may start at this vertex
-	 * 
-	 * @return <code>true</code> iff <code>edge</code> may start at this vertex
-	 */
-	public boolean isValidAlpha(Edge edge);// old
-
-	/**
-	 * tests if the Edge <code>edge</code> may end at this vertex
-	 * 
-	 * @return <code>true</code> iff <code>edge</code> may end at this vertex
-	 */
-	public boolean isValidOmega(Edge edge);// old
-
-	/**
-	 * Sorts the incidence sequence according to the given comparator in
-	 * ascending order.
-	 * 
-	 * @param comp
-	 *            the comparator that defines the desired incidence order.
-	 */
-	public void sortIncidences(Comparator<Edge> comp);// old
-
-	public DirectedM1EdgeClass getEdgeForRolename(String rolename);// old
-
-	public List<? extends Vertex> adjacences(String role);// old
-
-	public Edge addAdjacence(String role, Vertex other);// old
-
-	public List<Vertex> removeAdjacences(String role);// old
-
-	public void removeAdjacence(String role, Vertex other);// old
+			PathElement... pathElements);
 
 }

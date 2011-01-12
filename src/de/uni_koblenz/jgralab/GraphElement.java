@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.util.List;
+
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -45,6 +47,12 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * @param <DualType>
  *            If <code>&lt;OwnType&gt;</code> is {@link Vertex} this parameter
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
+ */
+/**
+ * @author ist@uni-koblenz.de
+ * 
+ * @param <OwnType>
+ * @param <DualType>
  */
 public interface GraphElement<OwnType, DualType> extends AttributedElement {
 
@@ -516,4 +524,120 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * @param g
 	 */
 	public void putAfter(OwnType g);
+
+	/**
+	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
+	 * this {@link GraphElement}. The connected <code>DualType</code> object is
+	 * connected to this {@link GraphElement} via an {@link IncidenceClass} of
+	 * name <code>role</code>.
+	 * 
+	 * @see GraphElement
+	 * @param role
+	 *            {@link String}
+	 * @return {@link List} of <code>OwnType</code> objects
+	 */
+	public List<? extends OwnType> adjacences(String role);
+
+	/**
+	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
+	 * this {@link GraphElement}. The connected <code>DualType</code> object is
+	 * connected to this {@link GraphElement} via an {@link Incidence} of type
+	 * <code>ic</code>.
+	 * 
+	 * @see GraphElement
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @return {@link List} of <code>OwnType</code> objects
+	 */
+	public List<? extends OwnType> adjacences(IncidenceClass ic);
+
+	/**
+	 * TODO
+	 * 
+	 * @param role
+	 * @param other
+	 * @return
+	 */
+	public DualType addAdjacence(String role, OwnType other);
+
+	/**
+	 * TODO
+	 * 
+	 * @param ic
+	 * @param other
+	 * @return
+	 */
+	public DualType addAdjacence(IncidenceClass ic, OwnType other);
+
+	/**
+	 * TODO
+	 * 
+	 * @param role
+	 * @return
+	 */
+	public List<OwnType> removeAdjacences(String role);
+
+	/**
+	 * TODO
+	 * 
+	 * @param ic
+	 * @return
+	 */
+	public List<OwnType> removeAdjacences(IncidenceClass ic);
+
+	/**
+	 * TODO
+	 * 
+	 * @param role
+	 * @param other
+	 */
+	public void removeAdjacence(String role, OwnType other);
+
+	/**
+	 * TODO
+	 * 
+	 * @param ic
+	 * @param other
+	 */
+	public void removeAdjacence(IncidenceClass ic, OwnType other);
+
+	/**
+	 * Returns the {@link IncidenceClass} corresponding to <code>rolename</code>
+	 * .
+	 * 
+	 * @param rolename
+	 *            {@link String}
+	 * @return {@link IncidenceClass}
+	 */
+	public IncidenceClass getIncidenceClassForRolename(String rolename);
+
+	/**
+	 * Removes this {@link GraphElement} from the corresponding sequence and
+	 * erases its attributes.
+	 */
+	public void delete();
+
+	/**
+	 * Tests if the <code>DualType</code> <code>graphElement</code> may start at
+	 * this GraphElement
+	 * 
+	 * @see GraphElement
+	 * @param graphElement
+	 *            <code>DualType</code>
+	 * @return <code>true</code> iff <code>graphElement</code> may start at this
+	 *         {@link GraphElement}
+	 */
+	public boolean isValidAlpha(DualType graphElement);
+
+	/**
+	 * Tests if the <code>DualType</code> <code>graphElement</code> may end at
+	 * this GraphElement
+	 * 
+	 * @see GraphElement
+	 * @param graphElement
+	 *            <code>DualType</code>
+	 * @return <code>true</code> iff <code>graphElement</code> may end at this
+	 *         {@link GraphElement}
+	 */
+	public boolean isValidOmega(DualType graphElement);
 }

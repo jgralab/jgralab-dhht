@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.util.Comparator;
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -38,6 +40,7 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
@@ -284,4 +287,76 @@ public abstract class GraphElementImpl<OwnType, DualType> implements
 		return getDegree(ic, direction, false);
 	}
 
+	/**
+	 * Removes <code>moved</code> from the sequence of {@link Incidence}s at
+	 * this {@link GraphElement} and puts it after <code>target</code>.
+	 * 
+	 * @param target
+	 *            {@link IncidenceImpl} after which <code>moved</code> should be
+	 *            put
+	 * @param moved
+	 *            {@link IncidenceImpl} which should be moved to a new position
+	 */
+	protected abstract void putIncidenceAfter(IncidenceImpl target,
+			IncidenceImpl moved);
+
+	/**
+	 * Removes <code>moved</code> from the sequence of {@link Incidence}s at
+	 * this {@link GraphElement} and puts it before <code>target</code>.
+	 * 
+	 * @param target
+	 *            {@link IncidenceImpl} before which <code>moved</code> should
+	 *            be put
+	 * @param moved
+	 *            {@link IncidenceImpl} which should be moved to a new position
+	 */
+	protected abstract void putIncidenceBefore(IncidenceImpl target,
+			IncidenceImpl moved);
+
+	/**
+	 * Appends <code>i</code> to the sequence of {@link Incidence}s at this
+	 * {@link GraphElement}. {@link IncidenceImpl#nextIncidenceAtVertex} will be
+	 * set to <code>null</code>.
+	 * 
+	 * @param i
+	 *            {@link IncidenceImpl}
+	 */
+	protected abstract void appendIncidenceToLambdaSeq(IncidenceImpl i);
+
+	/**
+	 * Removes <code>i</code> from the sequence of {@link Incidence}s at this
+	 * {@link GraphElement}. <code>i</code> must be part of the sequence.
+	 * 
+	 * @param i
+	 *            {@link IncidenceImpl}
+	 */
+	protected abstract void removeIncidenceFromLambdaSeq(IncidenceImpl i);
+
+	/**
+	 * Sets the first {@link Incidence} of this {@link GraphElement} to
+	 * <code>firstIncidence</code>.
+	 * 
+	 * @param firstIncidence
+	 *            {@link IncidenceImpl}
+	 */
+	protected abstract void setFirstIncidence(IncidenceImpl firstIncidence);
+
+	/**
+	 * Sets the last {@link Incidence} of this {@link GraphElement} to
+	 * <code>lastIncidence</code>.
+	 * 
+	 * @param lastIncidence
+	 *            {@link IncidenceImpl}
+	 */
+	protected abstract void setLastIncidence(IncidenceImpl lastIncidence);
+
+	/**
+	 * Sorts the incidence sequence according to the given {@link Comparator} in
+	 * ascending order.
+	 * 
+	 * @param comp
+	 *            {@link Comparator} that defines the desired {@link Incidence}
+	 *            order.
+	 */
+	public abstract void sortIncidences(Comparator<Incidence> comp);
 }

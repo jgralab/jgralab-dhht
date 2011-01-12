@@ -32,6 +32,7 @@ package de.uni_koblenz.jgralab.schema;
 
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
 
 public interface IncidenceClass {
@@ -52,7 +53,7 @@ public interface IncidenceClass {
 	 * @return the direction of this incidenceclass - either Vertex (from edge
 	 *         to vertex) or edge (from vertex to edge)
 	 */
-	public IncidenceDirection getDirection();
+	public Direction getDirection();
 
 	/**
 	 * @return the name of this incidence class, i.e. the rolename of the edge

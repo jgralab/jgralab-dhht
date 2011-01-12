@@ -35,7 +35,7 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
- * The implementation of a <code>Vertex</code> accessing attributes without
+ * The implementation of a {@link Vertex} accessing attributes without
  * versioning.
  * 
  * @author Jose Monte(monte@uni-koblenz.de)

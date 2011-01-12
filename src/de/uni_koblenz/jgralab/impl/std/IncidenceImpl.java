@@ -54,7 +54,7 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 	 */
 	private Direction direction;
 
-	protected void setIncidentVertex(VertexImpl incidentVertex) {
+	public void setIncidentVertex(VertexImpl incidentVertex) {
 		this.incidentVertex = incidentVertex;
 	}
 

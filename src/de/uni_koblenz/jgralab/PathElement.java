@@ -38,30 +38,48 @@ package de.uni_koblenz.jgralab;
  * 
  */
 public class PathElement {
+
+	/**
+	 * Only instances of this {@link Class}, which has to be an subclass of
+	 * {@link Edge}, are considered.
+	 */
 	public Class<? extends Edge> edgeClass;
-	public EdgeDirection edgeDirection;
+
+	/**
+	 * Only edges which are connected to the current vertex via an
+	 * {@link Incidence} of this direction are considered.
+	 */
+	public Direction direction;
+
+	/**
+	 * Should only be edges considered which have the exact type
+	 * {@link #edgeClass}?
+	 */
 	public boolean strictType = false;
 
 	/**
-	 * see {@link #PathElement(Class, EdgeDirection, boolean)}.
-	 * <code>stricts</code> defaults to false.
+	 * @see {@link #PathElement(Class, Direction, boolean)}.
+	 *      <code>stricts</code> defaults to false.
+	 * @param ec
+	 *            {@link Class}
+	 * @param d
+	 *            {@link Direction}
 	 */
-	public PathElement(Class<? extends Edge> ec, EdgeDirection ed) {
+	public PathElement(Class<? extends Edge> ec, Direction d) {
 		this.edgeClass = ec;
-		this.edgeDirection = ed;
+		this.direction = d;
 	}
 
 	/**
 	 * @param ec
-	 *            the class of allowed edges
-	 * @param ed
-	 *            the direction of allowed edges
+	 *            {@link Class} of allowed {@link Edge}s
+	 * @param d
+	 *            {@link Direction} of allowed {@link Edge}
 	 * @param strict
-	 *            allow only the exact type
+	 *            boolean allow only the exact type
 	 */
-	public PathElement(Class<? extends Edge> ec, EdgeDirection ed,
-			boolean strict) {
-		this(ec, ed);
+	public PathElement(Class<? extends Edge> ec, Direction d, boolean strict) {
+		this(ec, d);
 		this.strictType = strict;
 	}
 }

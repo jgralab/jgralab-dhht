@@ -151,6 +151,16 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Iterable<Vertex> getIncidentVertices();
 
 	/**
+	 * Returns a sequence of all incident vertices which are connected via an
+	 * {@link Incidence} of direction <code>dir</code>.
+	 * 
+	 * @param dir
+	 *            {Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Direction dir);
+
+	/**
 	 * @param e
 	 * @return true if this edge is somewhere before e in the lambda sequence of
 	 *         the this-vertex

@@ -48,11 +48,11 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.PathElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
+import de.uni_koblenz.jgralab.impl.std.VertexImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.impl.DirectedM1EdgeClass;
 
 /**
  * Implementation of all methods of the interface {@link Vertex} which are
@@ -454,10 +454,11 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		graph.deleteVertex(this);
 	}
 
+	@Override
 	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();// TODO adapt to
-														// hierarchical graphs
+		// TODO adapt to hierarchical graphs
+		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
 		assert target.getThis() == moved.getThis();
 		assert target != moved;
@@ -512,122 +513,132 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		incidenceListModified();
 	}
 
+	@Override
 	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
-		assert target.isValid() && moved.isValid();
+		// TODO adapt to hierarchical graphs
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
 		assert target.getThis() == moved.getThis();
 		assert target != moved;
 
-		if ((target == moved) || (target.getPrevIncidenceInternal() == moved)) {
+		if ((target == moved)
+				|| (target.getPreviousIncidenceAtVertex() == moved)) {
 			return;
 		}
 
 		// there are at least 2 incidences in the incidence list
 		// such that firstIncidence != lastIncidence
-		assert getFirstIncidenceInternal() != getLastIncidenceInternal();
+		assert getFirstIncidence() != getLastIncidence();
 
 		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidenceInternal()) {
-			setFirstIncidence(moved.getNextIncidenceInternal());
+		if (moved == getFirstIncidence()) {
+			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
 			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(null);
+				((IncidenceImpl) moved.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex(null);
 			}
-		} else if (moved == getLastIncidenceInternal()) {
-			setLastIncidence(moved.getPrevIncidenceInternal());
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(null);
+		} else if (moved == getLastIncidence()) {
+			setLastIncidence((IncidenceImpl) moved
+					.getPreviousIncidenceAtVertex());
+			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex(null);
 		} else {
-			moved.getPrevIncidenceInternal().setNextIncidenceInternal(
-					moved.getNextIncidenceInternal());
+			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex((IncidenceImpl) moved
+							.getNextIncidenceAtVertex());
 			if (!graph.hasSavememSupport()) {
-				moved.getNextIncidenceInternal().setPrevIncidenceInternal(
-						moved.getPrevIncidenceInternal());
+				((IncidenceImpl) moved.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex((IncidenceImpl) moved
+								.getPreviousIncidenceAtVertex());
 			}
 		}
 
 		// insert moved incidence in lambdaSeq immediately before target
-		if (target == getFirstIncidenceInternal()) {
+		if (target == getFirstIncidence()) {
 			setFirstIncidence(moved);
 			if (!graph.hasSavememSupport()) {
-				moved.setPrevIncidenceInternal(null);
+				moved.setPreviousIncidenceAtVertex(null);
 			}
 		} else {
-			IncidenceImpl previousIncidence = target.getPrevIncidenceInternal();
-			previousIncidence.setNextIncidenceInternal(moved);
+			IncidenceImpl previousIncidence = (IncidenceImpl) target
+					.getPreviousIncidenceAtVertex();
+			previousIncidence.setNextIncidenceAtVertex(moved);
 			if (!graph.hasSavememSupport()) {
-				moved.setPrevIncidenceInternal(previousIncidence);
+				moved.setPreviousIncidenceAtVertex(previousIncidence);
 			}
 		}
-		moved.setNextIncidenceInternal(target);
+		moved.setNextIncidenceAtVertex(target);
 		if (!graph.hasSavememSupport()) {
-			target.setPrevIncidenceInternal(moved);
+			target.setPreviousIncidenceAtVertex(moved);
 		}
 		incidenceListModified();
 	}
 
+	@Override
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;
-		assert i.getIncidentVertex() != this;
-		i.setIncidentVertex(this);
-		if (getFirstIncidenceInternal() == null) {
+		assert i.getVertex() != this;
+		i.setIncidentVertex((VertexImpl) this);
+		i.setNextIncidenceAtVertex(null);
+		if (getFirstIncidence() == null) {
 			setFirstIncidence(i);
 		}
-		if (getLastIncidenceInternal() != null) {
-			getLastIncidenceInternal().setNextIncidenceInternal(i);
+		if (getLastIncidence() != null) {
+			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtVertex(i);
 			if (!graph.hasSavememSupport()) {
-				i.setPrevIncidenceInternal(getLastIncidenceInternal());
+				i.setPreviousIncidenceAtVertex((IncidenceImpl) getLastIncidence());
 			}
 		}
 		setLastIncidence(i);
 	}
 
+	@Override
 	protected void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
 		assert i != null;
-		assert i.getIncidentVertex() == this;
-		if (i == getFirstIncidenceInternal()) {
+		assert i.getVertex() == this;
+		if (i == getFirstIncidence()) {
 			// delete at head of incidence list
-			setFirstIncidence(i.getNextIncidenceInternal());
-			if (getFirstIncidenceInternal() != null) {
-				if (!graph.hasSavememSupport()) {
-					getFirstIncidenceInternal().setPrevIncidenceInternal(null);
-				}
+			setFirstIncidence((IncidenceImpl) i.getNextIncidenceAtVertex());
+			if (getFirstIncidence() != null && !graph.hasSavememSupport()) {
+				((IncidenceImpl) getFirstIncidence())
+						.setPreviousIncidenceAtVertex(null);
 			}
-			if (i == getLastIncidenceInternal()) {
+			if (i == getLastIncidence()) {
 				// this incidence was the only one...
 				setLastIncidence(null);
 			}
-		} else if (i == getLastIncidenceInternal()) {
+		} else if (i == getLastIncidence()) {
 			// delete at tail of incidence list
-			setLastIncidence(i.getPrevIncidenceInternal());
-			if (getLastIncidenceInternal() != null) {
-				getLastIncidenceInternal().setNextIncidenceInternal(null);
+			setLastIncidence((IncidenceImpl) i.getPreviousIncidenceAtVertex());
+			if (getLastIncidence() != null) {
+				((IncidenceImpl) getLastIncidence())
+						.setNextIncidenceAtVertex(null);
 			}
 		} else {
 			// delete somewhere in the middle
-			i.getPrevIncidenceInternal().setNextIncidenceInternal(
-					i.getNextIncidenceInternal());
+			((IncidenceImpl) i.getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex((IncidenceImpl) i
+							.getNextIncidenceAtVertex());
 			if (!graph.hasSavememSupport()) {
-				i.getNextIncidenceInternal().setPrevIncidenceInternal(
-						i.getPrevIncidenceInternal());
+				((IncidenceImpl) i.getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex((IncidenceImpl) i
+								.getPreviousIncidenceAtVertex());
 			}
 		}
 		// delete incidence
 		i.setIncidentVertex(null);
-		i.setNextIncidenceInternal(null);
+		i.setNextIncidenceAtVertex(null);
 		if (!graph.hasSavememSupport()) {
-			i.setPrevIncidenceInternal(null);
+			i.setPreviousIncidenceAtVertex(null);
 		}
 	}
 
-	abstract protected void setFirstIncidence(IncidenceImpl firstIncidence);
-
-	abstract protected void setLastIncidence(IncidenceImpl lastIncidence);
-
-	public void sortIncidences(Comparator<Edge> comp) {
+	@Override
+	public void sortIncidences(Comparator<Incidence> comp) {
 		assert isValid();
 
-		if (getFirstIncidenceInternal() == null) {
+		if (getFirstIncidence() == null) {
 			// no sorting required for empty incidence lists
 			return;
 		}
@@ -635,19 +646,19 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 			IncidenceImpl first;
 			IncidenceImpl last;
 
-			public void add(IncidenceImpl e) {
+			public void add(IncidenceImpl i) {
 				if (first == null) {
-					first = e;
+					first = i;
 					assert (last == null);
-					last = e;
+					last = i;
 				} else {
 					if (!graph.hasSavememSupport()) {
-						e.setPrevIncidenceInternal(last);
+						i.setPreviousIncidenceAtVertex(last);
 					}
-					last.setNextIncidenceInternal(e);
-					last = e;
+					last.setNextIncidenceAtVertex(i);
+					last = i;
 				}
-				e.setNextIncidenceInternal(null);
+				i.setNextIncidenceAtVertex(null);
 			}
 
 			public IncidenceImpl remove() {
@@ -662,9 +673,9 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 					return out;
 				}
 				out = first;
-				first = out.getNextIncidenceInternal();
+				first = (IncidenceImpl) out.getNextIncidenceAtVertex();
 				if (!graph.hasSavememSupport()) {
-					first.setPrevIncidenceInternal(null);
+					first.setPreviousIncidenceAtVertex(null);
 				}
 				return out;
 			}
@@ -683,8 +694,8 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		// split
 		IncidenceImpl last;
 		IncidenceList l = new IncidenceList();
-		l.first = getFirstIncidenceInternal();
-		l.last = getLastIncidenceInternal();
+		l.first = (IncidenceImpl) getFirstIncidence();
+		l.last = (IncidenceImpl) getLastIncidence();
 
 		out.add(last = l.remove());
 		while (!l.isEmpty()) {
@@ -764,86 +775,113 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 
 	}
 
+	@Override
 	public List<? extends Vertex> adjacences(String role) {
-		assert (role != null) && (role.length() > 0);
+		return adjacences(getIncidenceClassForRolename(role));
+	}
+
+	@Override
+	public List<? extends Vertex> adjacences(IncidenceClass ic) {
+		assert ic != null;
 		assert isValid();
-		DirectedM1EdgeClass entry = getEdgeForRolename(role);
 		List<Vertex> adjacences = new ArrayList<Vertex>();
-		Class<? extends Edge> ec = entry.getM1Class();
-		Direction dir = entry.getDirection();
-		for (Edge e : incidences(ec, dir)) {
-			adjacences.add(e.getThat());
-		}
-		return adjacences;
-	}
-
-	public Edge addAdjacence(String role, Vertex other) {
-		assert (role != null) && (role.length() > 0);
-		assert isValid();
-		assert other.isValid();
-		assert getGraph() == other.getGraph();
-
-		DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		Class<? extends Edge> ec = entry.getM1Class();
-		Direction dir = entry.getDirection();
-		Vertex from = null;
-		Vertex to = null;
-		if (dir == Direction.IN) {
-			from = other;
-			to = this;
-		} else {
-			to = other;
-			from = this;
-		}
-		Edge e = getGraph().createEdge(ec, from, to);
-		return e;
-	}
-
-	public List<Vertex> removeAdjacences(String role) {
-		assert (role != null) && (role.length() > 0);
-		assert isValid();
-
-		DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		Class<? extends Edge> ec = entry.getM1Class();
-		List<Vertex> adjacences = new ArrayList<Vertex>();
-		List<Edge> deleteList = new ArrayList<Edge>();
-		Direction dir = entry.getDirection();
-		for (Edge e : incidences(ec, dir)) {
-			deleteList.add(e);
-			adjacences.add(e.getThat());
-		}
-		for (Edge e : deleteList) {
-			e.delete();
-		}
-		return adjacences;
-	}
-
-	public void removeAdjacence(String role, Vertex other) {
-		assert (role != null) && (role.length() > 0);
-		assert isValid();
-		assert other.isValid();
-		assert getGraph() == other.getGraph();
-
-		DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		Class<? extends Edge> ec = entry.getM1Class();
-		List<Edge> deleteList = new ArrayList<Edge>();
-		Direction dir = entry.getDirection();
-		for (Edge e : incidences(ec, dir)) {
-			if (e.getThat() == other) {
-				deleteList.add(e);
+		Class<? extends Edge> ec = ic.getEdgeClass().getM1Class();
+		Direction dir = ic.getDirection();
+		for (Edge e : getIncidentEdges(ec, dir)) {
+			for (Vertex v : e
+					.getIncidentVertices(dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+							: Direction.EDGE_TO_VERTEX)) {
+				adjacences.add(v);
 			}
 		}
-		for (Edge e : deleteList) {
-			e.delete();
-		}
+		return adjacences;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Vertex#reachableVertices(java.lang.String,
-	 * java.lang.Class)
-	 */
+	@Override
+	public Edge addAdjacence(String role, Vertex other) {
+		return addAdjacence(getIncidenceClassForRolename(role), other);
+	}
+
+	@Override
+	public Edge addAdjacence(IncidenceClass ic, Vertex other) {
+		// TODO there should exists methods of type addIncident(..) which should
+		// be used
+		return null;
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		// assert other.isValid();
+		// assert getGraph() == other.getGraph();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// Direction dir = entry.getDirection();
+		// Vertex from = null;
+		// Vertex to = null;
+		// if (dir == Direction.IN) {
+		// from = other;
+		// to = this;
+		// } else {
+		// to = other;
+		// from = this;
+		// }
+		// Edge e = getGraph().createEdge(ec, from, to);
+		// return e;
+	}
+
+	@Override
+	public List<Vertex> removeAdjacences(String role) {
+		return removeAdjacences(getIncidenceClassForRolename(role));
+	}
+
+	@Override
+	public List<Vertex> removeAdjacences(IncidenceClass ic) {
+		// TODO
+		return null;
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Vertex> adjacences = new ArrayList<Vertex>();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// deleteList.add(e);
+		// adjacences.add(e.getThat());
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
+		// return adjacences;
+	}
+
+	@Override
+	public void removeAdjacence(String role, Vertex other) {
+		removeAdjacence(getIncidenceClassForRolename(role), other);
+	}
+
+	@Override
+	public void removeAdjacence(IncidenceClass ic, Vertex other) {
+		// TODO
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		// assert other.isValid();
+		// assert getGraph() == other.getGraph();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// if (e.getThat() == other) {
+		// deleteList.add(e);
+		// }
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
+	}
+
 	@Override
 	public synchronized <T extends Vertex> List<T> reachableVertices(
 			String pathDescription, Class<T> vertexType) {
@@ -851,6 +889,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
 			PathElement... pathElements) {
 		Set<T> result = new LinkedHashSet<T>();
@@ -863,13 +902,17 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 			q.add(null);
 			Vertex vx = q.poll();
 			while (vx != null) {
-				for (Edge e : vx.incidences(t.edgeClass, t.edgeDirection)) {
+				for (Edge e : vx.getIncidentEdges(t.edgeClass, t.direction)) {
 					if (!t.strictType
 							|| (t.strictType && (t.edgeClass == e.getM1Class()))) {
 						if (i == pathElements.length - 1) {
-							Vertex r = e.getThat();
-							if (returnType.isInstance(r)) {
-								result.add((T) r);
+							for (Incidence inci : e
+									.getIncidences(t.direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+											: Direction.EDGE_TO_VERTEX)) {
+								Vertex r = inci.getVertex();
+								if (returnType.isInstance(r)) {
+									result.add((T) r);
+								}
 							}
 						} else {
 							q.add(e.getThat());
@@ -881,5 +924,4 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		}
 		return result;
 	}
-
 }
