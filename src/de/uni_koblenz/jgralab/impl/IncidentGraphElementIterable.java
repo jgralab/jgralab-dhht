@@ -99,13 +99,12 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?>>
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
-		public <G1, G2> IncidentGraphElementIterator(
-				GraphElement<G1, G2> graphElement,
-				Class<? extends GraphElement<G1, G2>> gc, Direction dir) {
+		public IncidentGraphElementIterator(GraphElement<?, ?> graphElement,
+				Class<? extends GraphElement<?, ?>> gc, Direction dir) {
 			this.graphElement = graphElement;
 			this.gc = gc;
 			this.dir = dir;
-			incidenceListVersion = ((GraphElementImpl<G1, G2>) graphElement)
+			incidenceListVersion = ((GraphElementImpl<?, ?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
 		}
