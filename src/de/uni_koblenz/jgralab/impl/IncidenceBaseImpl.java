@@ -244,4 +244,71 @@ public abstract class IncidenceBaseImpl implements Incidence {
 		return null;
 	}
 
+	@Override
+	public boolean isBeforeAtVertex(Incidence i) {
+		assert i != null;
+		assert getGraph() == i.getGraph();
+		if (this == i) {
+			return false;
+		}
+		Incidence prev = i.getPreviousIncidenceAtVertex();
+		while ((prev != null) && (prev != this)) {
+			prev = i.getPreviousIncidenceAtVertex();
+		}
+		return prev != null;
+	}
+
+	@Override
+	public void putBeforeAtVertex(Incidence i) {
+		assert i != null;
+		assert i != this;
+		assert getGraph() == i.getGraph();
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isAfterAtVertex(Incidence i) {
+		assert i != null;
+		assert getGraph() == i.getGraph();
+		if (this == i) {
+			return false;
+		}
+		Incidence prev = i.getNextIncidenceAtVertex();
+		while ((prev != null) && (prev != this)) {
+			prev = i.getNextIncidenceAtVertex();
+		}
+		return prev != null;
+	}
+
+	@Override
+	public void putAfterAtVertex(Incidence i) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isBeforeAtEdge(Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void putBeforeAtEdge(Incidence i) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isAfterAtEdge(Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void putAfterAtEdge(Incidence i) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

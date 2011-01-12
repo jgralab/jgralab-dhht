@@ -39,7 +39,7 @@ import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
- * The implementation of an <code>Edge</code> accessing attributes without
+ * The implementation of an {@link Edge} accessing attributes without
  * versioning.
  * 
  * @author Jose Monte(monte@uni-koblenz.de)

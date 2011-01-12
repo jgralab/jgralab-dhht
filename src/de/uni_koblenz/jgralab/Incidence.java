@@ -482,43 +482,84 @@ public interface Incidence {
 	 */
 	public IncidenceType getThatSemantics();
 
-	/*
-	 * TODO Following methods should be implemented. And the corresponding
-	 * ..AtEdge methods. Adapt JavaDoc.
-	 */
-
 	/**
-	 * Returns <code>true</code> if this {@link GraphElement} is before
-	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * Returns <code>true</code> if this {@link Incidence} is before
+	 * <code>i</code> in the sequence of {@link Incidence}s of
+	 * {@link #getVertex()}.
 	 * 
-	 * @param g
+	 * @param i
+	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isBeforeAtVertex(Incidence g);
+	public boolean isBeforeAtVertex(Incidence i);
 
 	/**
-	 * Puts this {@link GraphElement} immediately before <code>g</code> in the
-	 * sequence of incident {@link GraphElement}s.
+	 * Puts this {@link Incidence} immediately before <code>i</code> in the
+	 * sequence of {@link Incidence}s of {@link #getVertex()}.
 	 * 
-	 * @param g
+	 * @param i
+	 *            {@link Incidence}
 	 */
-	public void putBeforeAtVertex(Incidence g);
+	public void putBeforeAtVertex(Incidence i);
 
 	/**
-	 * Returns <code>true</code> if this {@link GraphElement} is after
-	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
+	 * Returns <code>true</code> if this {@link Incidence} is after
+	 * <code>i</code> in the sequence of {@link Incidence}s of
+	 * {@link #getVertex()}.
 	 * 
-	 * @param g
+	 * @param i
+	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isAfterAtVertex(Incidence g);
+	public boolean isAfterAtVertex(Incidence i);
 
 	/**
-	 * Puts this {@link GraphElement} immediately after <code>g</code> in the
-	 * sequence of incident {@link GraphElement}s.
+	 * Puts this {@link Incidence} immediately after <code>i</code> in the
+	 * sequence of {@link Incidence}s of {@link #getVertex()}.
 	 * 
-	 * @param g
+	 * @param i
+	 *            {@link Incidence}
 	 */
-	public void putAfterAtVertex(Incidence g);
+	public void putAfterAtVertex(Incidence i);
+
+	/**
+	 * Returns <code>true</code> if this {@link Incidence} is before
+	 * <code>i</code> in the sequence of {@link Incidence}s of
+	 * {@link #getEdge()}.
+	 * 
+	 * @param i
+	 *            {@link Incidence}
+	 * @return boolean
+	 */
+	public boolean isBeforeAtEdge(Incidence i);
+
+	/**
+	 * Puts this {@link Incidence} immediately before <code>i</code> in the
+	 * sequence of {@link Incidence}s of {@link #getEdge()}.
+	 * 
+	 * @param i
+	 *            {@link Incidence}
+	 */
+	public void putBeforeAtEdge(Incidence i);
+
+	/**
+	 * Returns <code>true</code> if this {@link Incidence} is after
+	 * <code>i</code> in the sequence of {@link Incidence}s of
+	 * {@link #getEdge()}.
+	 * 
+	 * @param i
+	 *            {@link Incidence}
+	 * @return boolean
+	 */
+	public boolean isAfterAtEdge(Incidence i);
+
+	/**
+	 * Puts this {@link Incidence} immediately after <code>i</code> in the
+	 * sequence of {@link Incidence}s of {@link #getEdge()}.
+	 * 
+	 * @param i
+	 *            {@link Incidence}
+	 */
+	public void putAfterAtEdge(Incidence i);
 
 }
