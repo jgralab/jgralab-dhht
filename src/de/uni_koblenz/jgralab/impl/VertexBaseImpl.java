@@ -907,17 +907,17 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 				for (Edge e : vx.getIncidentEdges(t.edgeClass, t.direction)) {
 					if (!t.strictType
 							|| (t.strictType && (t.edgeClass == e.getM1Class()))) {
-						if (i == pathElements.length - 1) {
-							for (Incidence inci : e
-									.getIncidences(t.direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-											: Direction.EDGE_TO_VERTEX)) {
+						for (Incidence inci : e
+								.getIncidences(t.direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+										: Direction.EDGE_TO_VERTEX)) {
+							if (i == pathElements.length - 1) {
 								Vertex r = inci.getVertex();
 								if (returnType.isInstance(r)) {
 									result.add((T) r);
 								}
+							} else {
+								q.add(inci.getVertex());
 							}
-						} else {
-							q.add(e.getThat());
 						}
 					}
 				}
