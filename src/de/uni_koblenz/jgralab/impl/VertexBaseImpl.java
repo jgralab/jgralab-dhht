@@ -916,7 +916,9 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 									result.add((T) r);
 								}
 							} else {
-								q.add(inci.getVertex());
+								if (!q.contains(inci.getVertex())) {
+									q.add(inci.getVertex());
+								}
 							}
 						}
 					}
