@@ -226,9 +226,9 @@ public interface Vertex extends GraphElement<Vertex, Edge> {
 	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass);
 
 	/**
-	 * Returns a sequence of all incident {@link Edge}s which which are an
-	 * instance of <code>anEdgeClass</code> and are reachable via an
-	 * {@link Incidence} of direction <code>direction</code>.
+	 * Returns a sequence of all incident {@link Edge}s which are an instance of
+	 * <code>anEdgeClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
 	 * 
 	 * @param anEdgeClass
 	 *            {@link EdgeClass}
@@ -240,9 +240,9 @@ public interface Vertex extends GraphElement<Vertex, Edge> {
 			Direction direction);
 
 	/**
-	 * Returns a sequence of all incident {@link Edge}s which are which are an
-	 * instance of <code>anEdgeClass</code> and are reachable via an
-	 * {@link Incidence} of direction <code>direction</code>.
+	 * Returns a sequence of all incident {@link Edge}s which are an instance of
+	 * <code>anEdgeClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
 	 * 
 	 * @param anEdgeClass
 	 *            {@link Class}

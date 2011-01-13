@@ -640,4 +640,45 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 *         {@link GraphElement}
 	 */
 	public boolean isValidOmega(DualType graphElement);
+
+	/**
+	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
+	 * {@link Incidence} which corresponds to <code>rolename</code>.
+	 * 
+	 * @see GraphElement
+	 * @param rolename
+	 *            {@link String} the rolename of the {@link IncidenceClass}
+	 *            which should be used for the connection
+	 * @param elemToConnect
+	 *            <code>DualType</code> to which this GraphElement should be
+	 *            connected
+	 */
+	void connect(String rolename, DualType elemToConnect);
+
+	/**
+	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
+	 * {@link Incidence} of type <code>incidenceClass</code>.
+	 * 
+	 * @see GraphElement
+	 * @param incidenceClass
+	 *            {@link IncidenceClass} which should be used for the connection
+	 * @param elemToConnect
+	 *            <code>DualType</code> to which this GraphElement should be
+	 *            connected
+	 */
+	void connect(IncidenceClass incidenceClass, DualType elemToConnect);
+
+	/**
+	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
+	 * {@link Incidence} of type <code>incidenceClass</code>.
+	 * 
+	 * @see GraphElement
+	 * @param incidenceClass
+	 *            {@link Class} which should be used for the connection
+	 * @param elemToConnect
+	 *            <code>DualType</code> to which this GraphElement should be
+	 *            connected
+	 */
+	void connect(Class<? extends Incidence> incidenceClass,
+			DualType elemToConnect);
 }

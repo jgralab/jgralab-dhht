@@ -20,7 +20,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public interface BinaryEdge extends Edge {
 
 	/**
-	 * Returns the start {@link Vertex} of this binary {@link Edge}.
+	 * Returns the start {@link Vertex} of this {@link BinaryEdge}.
 	 * 
 	 * @return {@link Vertex} the alpha {@link Vertex} of this {@link Edge}
 	 * @throws UnsupportedOpperationException
@@ -29,12 +29,11 @@ public interface BinaryEdge extends Edge {
 	public Vertex getAlpha();
 
 	/**
-	 * Returns the end {@link Vertex} of this binary {@link Edge}.
+	 * Returns the end {@link Vertex} of this {@link BinaryEdge}.
 	 * 
 	 * @return {@link Vertex} the omega {@link Vertex} of this {@link Edge}
 	 * @throws UnsupportedOpperationException
 	 *             if this {@link Edge} is not binary.
 	 */
 	public Vertex getOmega();
-
 }

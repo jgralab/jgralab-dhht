@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * represents a signed edge, has an orientation
@@ -49,28 +50,6 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	 * @return {@link EdgeClass}
 	 */
 	public EdgeClass getType();
-
-	/**
-	 * @return the "this" vertex object, that is the object this directed edge
-	 *         starts at
-	 */
-	public Vertex getThis();// old
-
-	/**
-	 * @return the "that" vertex object, that is the object this directed edge
-	 *         ends at
-	 */
-	public Vertex getThat();// old
-
-	/**
-	 * @return the rolename of the edge at the this-vertex
-	 */
-	public String getThisRole();// old
-
-	/**
-	 * @return the rolename of the edge at the that-vertex
-	 */
-	public String getThatRole();// old
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -101,33 +80,55 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Edge getPreviousEdge();
 
 	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param anEdgeClass
-	 * @return next edge of anEdgeClass or its superclasses in eSeq
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass);// old
+	public Edge getNextEdge(EdgeClass anEdgeClass);
 
 	/**
-	 * @param anEdgeClass
-	 * @return next edge of anEdgeClass or its superclasses in eSeq
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass);// old
+	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass);
 
 	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param anEdgeClass
+	 *            {@link EdgeClass} the next {@link Edge} should have
 	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return next edge object of explicit anEdgeClass in eSeq
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>anEdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses);// old
+	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses);
 
 	/**
-	 * @param anEdgeClass
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
 	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return next edge object of explicit anEdgeClass in eSeq
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>aM1EdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);// old
+	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass,
+			boolean noSubclasses);
 
 	/**
 	 * Returns a sequence of all start vertices.
@@ -137,11 +138,53 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Iterable<Vertex> getAlphaVertices();
 
 	/**
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices(
+			Class<? extends Vertex> aVertexClass);
+
+	/**
 	 * Returns a sequence of all end vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getOmegaVertices();
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(
+			Class<? extends Vertex> aVertexClass);
 
 	/**
 	 * Returns a sequence of all incident vertices.
@@ -161,116 +204,53 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Iterable<Vertex> getIncidentVertices(Direction dir);
 
 	/**
-	 * @param e
-	 * @return true if this edge is somewhere before e in the lambda sequence of
-	 *         the this-vertex
-	 */
-	public boolean isBeforeIncidence(Edge e);// old
-
-	/**
-	 * @param e
-	 * @return true if this edge is somewhere after e in the lambda sequence of
-	 *         the this-vertex
-	 */
-	public boolean isAfterIncidence(Edge e);// old
-
-	/**
-	 * @param e
-	 * @return true if this edge is somewhere before e in eSeq
-	 */
-	public boolean isBeforeEdge(Edge e);// old
-
-	/**
-	 * puts this edge immediately before e in eSeq
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
 	 * 
-	 * @param e
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public void putBeforeEdge(Edge e);// old
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass);
 
 	/**
-	 * @param e
-	 * @return true if this edge is somewhere after e in eSeq
-	 */
-	public boolean isAfterEdge(Edge e);// old
-
-	/**
-	 * puts this edge immediately after anEdge in eSeq
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
 	 * 
-	 * @param e
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public void putAfterEdge(Edge e);// old
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass);
 
 	/**
-	 * removes this edge from eSeq and erases its attributes @ if used on an
-	 * incidence
-	 */
-	public void delete();// old
-
-	/**
-	 * sets the alpha vertex to v
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
 	 * 
-	 * @param v
-	 *            a vertex
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	void setAlpha(Vertex v);// old
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
+			Direction direction);
 
 	/**
-	 * sets the omega vertex to v
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
 	 * 
-	 * @param v
-	 *            a vertex
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	void setOmega(Vertex v);// old
-
-	/**
-	 * sets the this vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setThis(Vertex v);// old
-
-	/**
-	 * sets the that vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setThat(Vertex v);// old
-
-	/**
-	 * puts this edge immediately before the given edge <code>e</code> in the
-	 * incidence list of the <code>this-vertex</code> of this edge. This does
-	 * neither affect the global edge sequence eSeq nor the alpha or omega
-	 * vertices, only the order of the edges at the <code>this-vertex</code> of
-	 * this edge is changed.
-	 */
-	public void putIncidenceBefore(Edge e);// old
-
-	/**
-	 * puts this edge after the after given edge <code>previousEdge</code> in
-	 * the incidence list of the <code>this-vertex</code> of this edge. This
-	 * does neither affect the global edge sequence eSeq nor the alpha or omega
-	 * vertices, only the order of the edges at the <code>this-vertex</code> of
-	 * this edge is changed.
-	 */
-	public void putIncidenceAfter(Edge e);// old
-
-	/**
-	 * returns the normal edge of this edge
-	 */
-	public Edge getNormalEdge();// old
-
-	/**
-	 * returns the reversed edge of this edge, e.g. for the edge -1 the reversed
-	 * edge is 1, for the edge 1 the reversed edge is -1.
-	 */
-	public Edge getReversedEdge();// old
-
-	/**
-	 * returns true if this edge is the "normal" edge, false otherwise
-	 */
-	public boolean isNormal();// old
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass, Direction direction);
 
 	/**
 	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
