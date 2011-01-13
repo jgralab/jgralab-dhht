@@ -86,12 +86,12 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	protected void setFirstIncidence(IncidenceImpl firstIncidence) {
+	public void setFirstIncidence(IncidenceImpl firstIncidence) {
 		this.firstIncidenceAtVertex = firstIncidence;
 	}
 
 	@Override
-	protected void setLastIncidence(IncidenceImpl lastIncidence) {
+	public void setLastIncidence(IncidenceImpl lastIncidence) {
 		this.lastIncidenceAtVertex = lastIncidence;
 	}
 

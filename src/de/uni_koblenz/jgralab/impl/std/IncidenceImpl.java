@@ -6,6 +6,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceBaseImpl;
+import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 
 /**
  * Implements the interface {@link Incidence}.
@@ -166,6 +167,66 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 		return incidentEdge
 				.getIncidentVertices(direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
 						: Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public void putBeforeAtVertex(Incidence i) {
+		assert i != null;
+		assert i != this;
+		assert getGraph() == i.getGraph();
+
+		Incidence prevIncidence = i.getPreviousIncidenceAtVertex();
+		if ((i == this) || (prevIncidence == this)) {
+			return;
+		}
+
+		assert i.getVertex().getFirstIncidence() != i.getVertex()
+				.getLastIncidence();
+
+		// remove this incidence from the sequence of incidences at the vertex
+		if (this == getVertex().getFirstIncidence()) {
+			((VertexBaseImpl) getVertex())
+					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex(null);
+			}
+		} else if (this == getVertex().getLastIncidence()) {
+			((VertexBaseImpl) getVertex())
+					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
+			((IncidenceImpl) getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex(null);
+		} else {
+			((IncidenceImpl) getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
+			}
+		}
+
+		// insert moved incidence in the sequence of incidences at the vertex
+		// immediately before i
+		if (i == getVertex().getFirstIncidence()) {
+			((VertexBaseImpl) getVertex()).setFirstIncidence(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtVertex(null);
+			}
+		} else {
+			IncidenceImpl previousIncidence = (IncidenceImpl) i
+					.getPreviousIncidenceAtVertex();
+			previousIncidence.setNextIncidenceAtVertex(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtVertex(previousIncidence);
+			}
+		}
+		(this).setNextIncidenceAtVertex((IncidenceImpl) i);
+		if (!getGraph().hasSavememSupport()) {
+			((IncidenceImpl) i).setPreviousIncidenceAtVertex(this);
+		}
+		((VertexImpl) getVertex()).graphModified();
+		((VertexImpl) getVertex()).incidenceListModified();
+
 	}
 
 }

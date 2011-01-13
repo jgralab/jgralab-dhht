@@ -591,6 +591,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 			}
 		}
 		setLastIncidence(i);
+		incidenceListModified();
 	}
 
 	@Override
@@ -632,6 +633,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		if (!graph.hasSavememSupport()) {
 			i.setPreviousIncidenceAtVertex(null);
 		}
+		incidenceListModified();
 	}
 
 	@Override
@@ -805,7 +807,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 	@Override
 	public Edge addAdjacence(IncidenceClass ic, Vertex other) {
 		// TODO there should exists methods of type addIncident(..) which should
-		// be used
+		// be used (graph and incidencelists modified)
 		return null;
 		// assert (role != null) && (role.length() > 0);
 		// assert isValid();
@@ -835,7 +837,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 
 	@Override
 	public List<Vertex> removeAdjacences(IncidenceClass ic) {
-		// TODO
+		// TODO (graph and incidencelists modified)
 		return null;
 		// assert (role != null) && (role.length() > 0);
 		// assert isValid();
@@ -862,7 +864,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 
 	@Override
 	public void removeAdjacence(IncidenceClass ic, Vertex other) {
-		// TODO
+		// TODO (graph and incidencelists modified)
 		// assert (role != null) && (role.length() > 0);
 		// assert isValid();
 		// assert other.isValid();

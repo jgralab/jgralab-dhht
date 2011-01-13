@@ -163,7 +163,7 @@ public abstract class GraphElementImpl<OwnType, DualType> implements
 	 * Must be called by all methods which manipulate the incidence list of this
 	 * {@link GraphElement}.
 	 */
-	protected void incidenceListModified() {
+	public void incidenceListModified() {
 		assert isValid();
 		setIncidenceListVersion(getIncidenceListVersion() + 1);
 	}
@@ -339,7 +339,7 @@ public abstract class GraphElementImpl<OwnType, DualType> implements
 	 * @param firstIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	protected abstract void setFirstIncidence(IncidenceImpl firstIncidence);
+	public abstract void setFirstIncidence(IncidenceImpl firstIncidence);
 
 	/**
 	 * Sets the last {@link Incidence} of this {@link GraphElement} to
@@ -348,7 +348,7 @@ public abstract class GraphElementImpl<OwnType, DualType> implements
 	 * @param lastIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	protected abstract void setLastIncidence(IncidenceImpl lastIncidence);
+	public abstract void setLastIncidence(IncidenceImpl lastIncidence);
 
 	/**
 	 * Sorts the incidence sequence according to the given {@link Comparator} in

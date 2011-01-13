@@ -259,15 +259,6 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	}
 
 	@Override
-	public void putBeforeAtVertex(Incidence i) {
-		assert i != null;
-		assert i != this;
-		assert getGraph() == i.getGraph();
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean isAfterAtVertex(Incidence i) {
 		assert i != null;
 		assert getGraph() == i.getGraph();
