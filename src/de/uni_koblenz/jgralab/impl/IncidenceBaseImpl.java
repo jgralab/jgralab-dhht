@@ -265,41 +265,39 @@ public abstract class IncidenceBaseImpl implements Incidence {
 		if (this == i) {
 			return false;
 		}
-		Incidence prev = i.getNextIncidenceAtVertex();
+		Incidence next = i.getNextIncidenceAtVertex();
+		while ((next != null) && (next != this)) {
+			next = i.getNextIncidenceAtVertex();
+		}
+		return next != null;
+	}
+
+	@Override
+	public boolean isBeforeAtEdge(Incidence i) {
+		assert i != null;
+		assert getGraph() == i.getGraph();
+		if (this == i) {
+			return false;
+		}
+		Incidence prev = i.getPreviousIncidenceAtEdge();
 		while ((prev != null) && (prev != this)) {
-			prev = i.getNextIncidenceAtVertex();
+			prev = i.getPreviousIncidenceAtEdge();
 		}
 		return prev != null;
 	}
 
 	@Override
-	public void putAfterAtVertex(Incidence i) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isBeforeAtEdge(Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void putBeforeAtEdge(Incidence i) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public boolean isAfterAtEdge(Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void putAfterAtEdge(Incidence i) {
-		// TODO Auto-generated method stub
-
+		assert i != null;
+		assert getGraph() == i.getGraph();
+		if (this == i) {
+			return false;
+		}
+		Incidence next = i.getNextIncidenceAtEdge();
+		while ((next != null) && (next != this)) {
+			next = i.getNextIncidenceAtEdge();
+		}
+		return next != null;
 	}
 
 }

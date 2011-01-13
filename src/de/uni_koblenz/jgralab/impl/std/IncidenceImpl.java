@@ -5,6 +5,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
 import de.uni_koblenz.jgralab.impl.IncidenceBaseImpl;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 
@@ -220,13 +221,185 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 				setPreviousIncidenceAtVertex(previousIncidence);
 			}
 		}
-		(this).setNextIncidenceAtVertex((IncidenceImpl) i);
+		setNextIncidenceAtVertex((IncidenceImpl) i);
 		if (!getGraph().hasSavememSupport()) {
 			((IncidenceImpl) i).setPreviousIncidenceAtVertex(this);
 		}
-		((VertexImpl) getVertex()).graphModified();
-		((VertexImpl) getVertex()).incidenceListModified();
 
+		((VertexImpl) getVertex()).incidenceListModified();
+	}
+
+	@Override
+	public void putAfterAtVertex(Incidence i) {
+		assert i != null;
+		assert i != this;
+		assert getGraph() == i.getGraph();
+
+		Incidence nextIncidence = i.getNextIncidenceAtVertex();
+		if ((i == this) || (nextIncidence == this)) {
+			return;
+		}
+
+		assert i.getVertex().getLastIncidence() != i.getVertex()
+				.getFirstIncidence();
+
+		// remove this incidence from the sequence of incidences at the vertex
+		if (this == getVertex().getFirstIncidence()) {
+			((VertexBaseImpl) getVertex())
+					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex(null);
+			}
+		} else if (this == getVertex().getLastIncidence()) {
+			((VertexBaseImpl) getVertex())
+					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
+			((IncidenceImpl) getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex(null);
+		} else {
+			((IncidenceImpl) getPreviousIncidenceAtVertex())
+					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtVertex())
+						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
+			}
+		}
+
+		// insert moved incidence in the sequence of incidences at the vertex
+		// immediately after i
+		if (i == getVertex().getLastIncidence()) {
+			((VertexBaseImpl) getVertex()).setLastIncidence(this);
+			setNextIncidenceAtVertex(null);
+		} else {
+			IncidenceImpl nxtIncidence = (IncidenceImpl) i
+					.getNextIncidenceAtVertex();
+			setNextIncidenceAtVertex(nxtIncidence);
+			if (!getGraph().hasSavememSupport()) {
+				nxtIncidence.setPreviousIncidenceAtVertex(this);
+			}
+		}
+		((IncidenceImpl) i).setNextIncidenceAtVertex(this);
+		if (!getGraph().hasSavememSupport()) {
+			setPreviousIncidenceAtVertex((IncidenceImpl) i);
+		}
+
+		((VertexImpl) getVertex()).incidenceListModified();
+	}
+
+	@Override
+	public void putBeforeAtEdge(Incidence i) {
+		assert i != null;
+		assert i != this;
+		assert getGraph() == i.getGraph();
+
+		Incidence prevIncidence = i.getPreviousIncidenceAtEdge();
+		if ((i == this) || (prevIncidence == this)) {
+			return;
+		}
+
+		assert i.getEdge().getFirstIncidence() != i.getEdge()
+				.getLastIncidence();
+
+		// remove this incidence from the sequence of incidences at the vertex
+		if (this == getEdge().getFirstIncidence()) {
+			((EdgeBaseImpl) getEdge())
+					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge(null);
+			}
+		} else if (this == getEdge().getLastIncidence()) {
+			((EdgeBaseImpl) getEdge())
+					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
+			((IncidenceImpl) getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge(null);
+		} else {
+			((IncidenceImpl) getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
+			}
+		}
+
+		// insert moved incidence in the sequence of incidences at the vertex
+		// immediately before i
+		if (i == getEdge().getFirstIncidence()) {
+			((EdgeBaseImpl) getEdge()).setFirstIncidence(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtEdge(null);
+			}
+		} else {
+			IncidenceImpl previousIncidence = (IncidenceImpl) i
+					.getPreviousIncidenceAtEdge();
+			previousIncidence.setNextIncidenceAtEdge(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtEdge(previousIncidence);
+			}
+		}
+		setNextIncidenceAtEdge((IncidenceImpl) i);
+		if (!getGraph().hasSavememSupport()) {
+			((IncidenceImpl) i).setPreviousIncidenceAtEdge(this);
+		}
+
+		((EdgeImpl) getEdge()).incidenceListModified();
+	}
+
+	@Override
+	public void putAfterAtEdge(Incidence i) {
+		assert i != null;
+		assert i != this;
+		assert getGraph() == i.getGraph();
+
+		Incidence nextIncidence = i.getNextIncidenceAtEdge();
+		if ((i == this) || (nextIncidence == this)) {
+			return;
+		}
+
+		assert i.getEdge().getLastIncidence() != i.getEdge()
+				.getFirstIncidence();
+
+		// remove this incidence from the sequence of incidences at the vertex
+		if (this == getEdge().getFirstIncidence()) {
+			((EdgeBaseImpl) getEdge())
+					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge(null);
+			}
+		} else if (this == getEdge().getLastIncidence()) {
+			((EdgeBaseImpl) getEdge())
+					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
+			((IncidenceImpl) getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge(null);
+		} else {
+			((IncidenceImpl) getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
+			if (!getGraph().hasSavememSupport()) {
+				((IncidenceImpl) getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
+			}
+		}
+
+		// insert moved incidence in the sequence of incidences at the vertex
+		// immediately after i
+		if (i == getEdge().getLastIncidence()) {
+			((EdgeBaseImpl) getEdge()).setLastIncidence(this);
+			setNextIncidenceAtEdge(null);
+		} else {
+			IncidenceImpl nxtIncidence = (IncidenceImpl) i
+					.getNextIncidenceAtEdge();
+			setNextIncidenceAtEdge(nxtIncidence);
+			if (!getGraph().hasSavememSupport()) {
+				nxtIncidence.setPreviousIncidenceAtEdge(this);
+			}
+		}
+		((IncidenceImpl) i).setNextIncidenceAtEdge(this);
+		if (!getGraph().hasSavememSupport()) {
+			setPreviousIncidenceAtEdge((IncidenceImpl) i);
+		}
+
+		((EdgeImpl) getEdge()).incidenceListModified();
 	}
 
 }

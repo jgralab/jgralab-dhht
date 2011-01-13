@@ -144,7 +144,7 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 		return false;
 	}
 
-	Iterable<Vertex> getIncidentVertices(Direction direction) {
+	public Iterable<Vertex> getIncidentVertices(Direction direction) {
 		// TODO Auto-generated method stub
 		return null;
 	}
