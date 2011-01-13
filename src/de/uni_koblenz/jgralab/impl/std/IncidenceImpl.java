@@ -18,6 +18,55 @@ import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	/**
+	 * Creates a new instance of IncidenceImpl and appends it to the lambda
+	 * sequences of <code>v</code> and <code>e</code>.
+	 * 
+	 * @param v
+	 *            {@link Vertex}
+	 * @param e
+	 *            {@link Edge}
+	 */
+	protected IncidenceImpl(VertexImpl v, EdgeImpl e) {
+		super(v, e);
+		setIncidentEdge(e);
+		setIncidentVertex(v);
+
+		// add this incidence to the sequence of incidences of v
+		if (v.getFirstIncidence() == null) {
+			// v has no incidences
+			v.setFirstIncidence(this);
+			v.setLastIncidence(this);
+		} else {
+			((IncidenceImpl) v.getLastIncidence())
+					.setNextIncidenceAtVertex(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtVertex((IncidenceImpl) v
+						.getLastIncidence());
+			}
+			v.setLastIncidence(this);
+		}
+
+		v.incidenceListModified();
+
+		// add this incidence to the sequence of incidences of e
+		if (e.getFirstIncidence() == null) {
+			// v has no incidences
+			e.setFirstIncidence(this);
+			e.setLastIncidence(this);
+		} else {
+			((IncidenceImpl) e.getLastIncidence())
+					.setNextIncidenceAtVertex(this);
+			if (!getGraph().hasSavememSupport()) {
+				setPreviousIncidenceAtVertex((IncidenceImpl) e
+						.getLastIncidence());
+			}
+			e.setLastIncidence(this);
+		}
+
+		e.incidenceListModified();
+	}
+
+	/**
 	 * The incident {@link VertexImpl}.
 	 */
 	private VertexImpl incidentVertex;

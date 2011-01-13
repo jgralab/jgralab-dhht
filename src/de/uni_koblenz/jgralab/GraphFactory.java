@@ -65,6 +65,24 @@ public interface GraphFactory {
 			Graph g);
 
 	/**
+	 * Creates a {@link Incidence}-object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified
+	 * <code>incidenceClass</code>.
+	 * 
+	 * @param incidenceClass
+	 *            {@link Class}
+	 * @param v
+	 *            {@link Vertex} to which the created {@link Incidence} is
+	 *            connected
+	 * @param e
+	 *            {@link Edge} to which the created {@link Incidence} is
+	 *            connected
+	 * @return {@link Incidence}
+	 */
+	public Incidence createIncidence(Class<? extends Incidence> incidenceClass,
+			Vertex v, Edge e);
+
+	/**
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */

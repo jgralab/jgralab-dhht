@@ -38,6 +38,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
@@ -157,6 +158,23 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	@Override
+	public Incidence createIncidence(Class<? extends Incidence> incidenceClass,
+			Vertex v, Edge e) {
+		try {
+			Incidence i = incidenceMap.get(incidenceClass).newInstance(v, e);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException(
+					"Cannot create incidence of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
+
 	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
 			Graph g) {
 		try {
@@ -178,8 +196,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				graphMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for graphclass "
@@ -194,8 +212,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				vertexMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				vertexMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for vertexclass"
@@ -210,8 +228,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { int.class, Graph.class, Vertex.class,
 						Vertex.class };
-				edgeMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				edgeMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -225,8 +243,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordMap.put(m1Class, implementationClass
-						.getConstructor(params));
+				recordMap.put(m1Class,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for record"
@@ -324,8 +342,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class,
 						GraphDatabase.class };
-				graphDatabaseMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				graphDatabaseMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException exception) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for graphclass "
@@ -341,8 +359,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				vertexDatabaseMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				vertexDatabaseMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException exception) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for vertex class"
@@ -359,8 +377,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { int.class, Graph.class, Vertex.class,
 						Vertex.class };
-				edgeDatabaseMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				edgeDatabaseMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException exception) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edge class"
@@ -375,8 +393,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordMap.put(m1Class, implementationClass
-						.getConstructor(params));
+				recordMap.put(m1Class,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for record"
@@ -491,8 +509,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphTransactionMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				graphTransactionMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate transaction constructor for graphclass "
@@ -507,8 +525,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				vertexTransactionMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				vertexTransactionMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate transaction constructor for vertexclass"
@@ -524,8 +542,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { int.class, Graph.class, Vertex.class,
 						Vertex.class };
-				edgeTransactionMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				edgeTransactionMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate transaction constructor for edgeclass"
@@ -540,8 +558,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordTransactionMap.put(m1Class, implementationClass
-						.getConstructor(params));
+				recordTransactionMap.put(m1Class,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for record"
@@ -631,8 +649,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphSavememMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				graphSavememMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for graphclass "
@@ -647,8 +665,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				vertexSavememMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				vertexSavememMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for vertexclass"
@@ -664,8 +682,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { int.class, Graph.class, Vertex.class,
 						Vertex.class };
-				edgeSavememMap.put(originalClass, implementationClass
-						.getConstructor(params));
+				edgeSavememMap.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -680,8 +698,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordSavememMap.put(m1Class, implementationClass
-						.getConstructor(params));
+				recordSavememMap.put(m1Class,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for record"

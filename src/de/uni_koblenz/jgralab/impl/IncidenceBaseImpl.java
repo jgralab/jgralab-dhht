@@ -32,7 +32,9 @@
 package de.uni_koblenz.jgralab.impl;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -43,6 +45,19 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * @author ist@uni-koblenz.de
  */
 public abstract class IncidenceBaseImpl implements Incidence {
+
+	/**
+	 * Creates a new instance of IncidenceImpl and appends it to the lambda
+	 * sequences of <code>v</code> and <code>e</code>.
+	 * 
+	 * @param v
+	 *            {@link Vertex}
+	 * @param e
+	 *            {@link Edge}
+	 */
+	protected IncidenceBaseImpl(Vertex v, Edge e) {
+		super();
+	}
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Direction direction) {
