@@ -35,13 +35,19 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
  * This class provides an {@link Iterable} for the incident {@link GraphElement}
- * s at a given {@link GraphElement}.
+ * s at a given {@link GraphElement}.<br>
+ * If there is a {@link Vertex} v and an {@link Edge} e and there are two
+ * {@link Incidence}s i1, which connects v with e, and i2, which connects v with
+ * e as well, then e is returned twice if you iterate over the incident
+ * {@link GraphElement}s of v.
  * 
  * @author ist@uni-koblenz.de
  */

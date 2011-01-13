@@ -13,6 +13,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * This class provides an {@link Iterable} for the incident {@link Vertex} at a
  * given {@link Edge}.
  * 
+ * @see IncidentGraphElementIterable
  * @author ist@uni-koblenz.de
  */
 public class IncidentVertexIterable<V extends Vertex> extends
