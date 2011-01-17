@@ -31,21 +31,27 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.std.EdgeImpl;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
- * TODO add comment
+ * Implementation of all methods of the interface {@link Edge} which are
+ * independent of the fields of a specific EdgeImpl.
  * 
  * @author ist@uni-koblenz.de
  */
@@ -60,18 +66,6 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		super(graph);
 		setId(anId);
 	}
-
-	protected abstract void setIncidentVertex(VertexBaseImpl v);
-
-	protected abstract VertexBaseImpl getIncidentVertex();
-
-	protected abstract void setNextIncidenceInternal(IncidenceImpl nextIncidence);
-
-	protected abstract IncidenceImpl getNextIncidenceInternal();
-
-	protected abstract void setPrevIncidenceInternal(IncidenceImpl prevIncidence);
-
-	protected abstract IncidenceImpl getPrevIncidenceInternal();
 
 	@Override
 	public Incidence getFirstIncidence(Direction direction) {
@@ -169,96 +163,205 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 				anIncidenceClass.getM1Class(), direction);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#isBefore(de.uni_koblenz.jgralab.Edge)
-	 */
 	@Override
-	public boolean isBeforeIncidence(Edge e) {
-		assert e != null;
+	public Edge getNextEdge(Class<? extends Edge> edgeClass) {
+		assert edgeClass != null;
 		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		assert getThis() == e.getThis();
+		return getNextEdge(edgeClass, false);
+	}
 
-		if (e == this) {
+	@Override
+	public Edge getNextEdge(Class<? extends Edge> m1EdgeClass,
+			boolean noSubclasses) {
+		assert m1EdgeClass != null;
+		assert isValid();
+		EdgeBaseImpl e = (EdgeBaseImpl) getNextEdge();
+		while (e != null) {
+			if (noSubclasses) {
+				if (m1EdgeClass == e.getM1Class()) {
+					return e;
+				}
+			} else {
+				if (m1EdgeClass.isInstance(e)) {
+					return e;
+				}
+			}
+			e = (EdgeBaseImpl) e.getNextEdge();
+		}
+		return null;
+	}
+
+	@Override
+	public Edge getNextEdge(EdgeClass edgeClass) {
+		assert edgeClass != null;
+		assert isValid();
+		return getNextEdge(edgeClass.getM1Class(), false);
+	}
+
+	@Override
+	public Edge getNextEdge(EdgeClass edgeClass, boolean noSubclasses) {
+		assert edgeClass != null;
+		assert isValid();
+		return getNextEdge(edgeClass.getM1Class(), noSubclasses);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices() {
+		return new IncidentVertexIterable<Vertex>(this,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getOmegaVertices() {
+		return new IncidentVertexIterable<Vertex>(this,
+				Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Vertex> getOmegaVertices(
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
+				Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices() {
+		return new IncidentVertexIterable<Vertex>(this);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this, direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
+			Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass, direction);
+	}
+
+	@Override
+	public boolean isValid() {
+		return graph.containsEdge(this);
+	}
+
+	@Override
+	public boolean isBefore(Edge e) {
+		assert e != null;
+		assert getGraph() == e.getGraph();
+		assert isValid() && e.isValid();
+		if (this == e) {
 			return false;
 		}
-		IncidenceImpl i = getNextIncidenceInternal();
-		while ((i != null) && (i != e)) {
-			i = i.getNextIncidenceInternal();
+		Edge prev = e.getPreviousEdge();
+		while ((prev != null) && (prev != this)) {
+			prev = e.getPreviousEdge();
 		}
-		return i != null;
+		return prev != null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#isAfter(de.uni_koblenz.jgralab.Edge)
-	 */
 	@Override
-	public boolean isAfterIncidence(Edge e) {
+	public void putBefore(Edge e) {
 		assert e != null;
+		assert e != this;
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		assert getThis() == e.getThis();
+		assert isValid() && e.isValid();
+		graph.putEdgeBeforeInGraph((EdgeBaseImpl) e, this);
+	}
 
-		if (e == this) {
+	@Override
+	public boolean isAfter(Edge e) {
+		assert e != null;
+		assert getGraph() == e.getGraph();
+		assert isValid() && e.isValid();
+		if (this == e) {
 			return false;
 		}
-		IncidenceImpl i = getPrevIncidenceInternal();
-		while ((i != null) && (i != e)) {
-			i = i.getPrevIncidenceInternal();
+		EdgeBaseImpl next = (EdgeBaseImpl) e.getNextEdge();
+		while ((next != null) && (next != this)) {
+			next = (EdgeBaseImpl) next.getNextEdge();
 		}
-		return i != null;
+		return next != null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#putEdgeBefore(de.uni_koblenz.jgralab.Edge)
-	 */
 	@Override
-	public void putIncidenceBefore(Edge e) {
+	public void putAfter(Edge e) {
 		assert e != null;
+		assert e != this;
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		assert getThis() == e.getThis();
-		VertexBaseImpl v = (VertexBaseImpl) getThis();
-		assert v.isValid();
-		assert e != this;
-
-		if (this != e) {
-			v.putIncidenceBefore((IncidenceImpl) e, this);
-		}
+		assert isValid() && e.isValid();
+		graph.putEdgeAfterInGraph((EdgeBaseImpl) e, this);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Puts <code>nextEdge</code> after this {@link Edge} in the sequence of all
+	 * edges in the graph.
 	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#putEdgeAfter(de.uni_koblenz.jgralab.Edge)
+	 * @param nextEdge
+	 *            {@link Edge} which should be put after this {@link Edge}
 	 */
-	@Override
-	public void putIncidenceAfter(Edge e) {
-		assert e != null;
-		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		assert getThis() == e.getThis() : "this-vertices don't match: "
-				+ getThis() + " != " + e.getThis();
-		VertexBaseImpl v = (VertexBaseImpl) getThis();
-		assert v.isValid();
-		assert e != this;
+	protected abstract void setNextEdge(Edge nextEdge);
 
-		if (this != e) {
-			v.putIncidenceAfter((IncidenceImpl) e, this);
-		}
-	}
+	/**
+	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
+	 * all edges in the graph.
+	 * 
+	 * @param prevEdge
+	 *            {@link Edge} which should be put before this {@link Edge}
+	 */
+	protected abstract void setPreviousEdge(Edge prevEdge);
+
+	/**
+	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
+	 * all edges in the graph.
+	 * 
+	 * @param prevEdge
+	 *            {@link Edge} which should be put before this {@link Edge}
+	 */
+	@Deprecated
+	protected abstract void setPrevEdge(Edge prevEdge);
 
 	@Override
 	public int getDegree() {
@@ -341,11 +444,13 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		return degree;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
+	@Override
+	public String toString() {
+		assert isValid();
+		return "+e" + id + ": "
+				+ getAttributedElementClass().getQualifiedName();
+	}
+
 	@Override
 	public int compareTo(AttributedElement a) {
 		assert a != null;
@@ -355,421 +460,451 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 
-		if (e == this.getReversedEdge()) {
-			return -1;
-		} else {
-			return Math.abs(getId()) - Math.abs(e.getId());
-		}
+		return getId() - e.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#delete()
-	 */
 	@Override
 	public void delete() {
-		assert isValid();
+		assert isValid() : this + " is not valid!";
 		graph.deleteEdge(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getAlpha()
-	 */
 	@Override
-	public Vertex getAlpha() {
-		assert isValid();
-		return getIncidentVertex();
-	}
+	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
+		assert (target != null) && (moved != null);
+		// TODO adapt to hierarchical graphs
+		assert target.getGraph() == moved.getGraph();
+		assert target.getGraph() == getGraph();
+		assert target.getThis() == moved.getThis();
+		assert target != moved;
 
-	@Override
-	public abstract Edge getNextEdge();
+		if ((target == moved) || (target.getNextIncidenceAtEdge() == moved)) {
+			return;
+		}
 
-	/**
-	 * @param nextEdge
-	 */
-	abstract protected void setNextEdgeInGraph(Edge nextEdge);
+		// there are at least 2 incidences in the incidence list
+		// such that firstIncidence != lastIncidence
+		assert getFirstIncidence() != getLastIncidence();
 
-	/**
-	 * @param prevEdge
-	 */
-	abstract protected void setPrevEdgeInGraph(Edge prevEdge);
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#getNextEdgeOfClassInGraph(java.lang.Class)
-	 */
-	@Override
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass) {
-		assert anEdgeClass != null;
-		assert isValid();
-		return getNextEdge(anEdgeClass, false);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#getNextEdgeOfClassInGraph(de.uni_koblenz.
-	 * jgralab.schema.EdgeClass)
-	 */
-	@Override
-	public Edge getNextEdge(EdgeClass anEdgeClass) {
-		assert anEdgeClass != null;
-		assert isValid();
-		return getNextEdge(anEdgeClass.getM1Class(), false);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#getNextEdgeOfClassInGraph(de.uni_koblenz.
-	 * jgralab.schema.EdgeClass, boolean)
-	 */
-	@Override
-	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses) {
-		assert anEdgeClass != null;
-		assert isValid();
-		return getNextEdge(anEdgeClass.getM1Class(), noSubclasses);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#getNextEdgeOfClassInGraph(java.lang.Class,
-	 * boolean)
-	 */
-	@Override
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses) {
-		assert anEdgeClass != null;
-		assert isValid();
-		Edge currentEdge = getNextEdge();
-		while (currentEdge != null) {
-			if (noSubclasses) {
-				if (anEdgeClass == currentEdge.getM1Class()) {
-					return currentEdge;
-				}
-			} else if (anEdgeClass.isInstance(currentEdge)) {
-				return currentEdge;
+		// remove moved incidence from lambdaSeq
+		if (moved == getFirstIncidence()) {
+			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge(null);
 			}
-			currentEdge = currentEdge.getNextEdge();
+		} else if (moved == getLastIncidence()) {
+			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
+			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge(null);
+		} else {
+			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtVertex((IncidenceImpl) moved
+							.getNextIncidenceAtEdge());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge((IncidenceImpl) moved
+								.getPreviousIncidenceAtEdge());
+			}
 		}
+
+		// insert moved incidence in lambdaSeq immediately after target
+		if (target == getLastIncidence()) {
+			setLastIncidence(moved);
+			moved.setNextIncidenceAtEdge(null);
+		} else {
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) target.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge(moved);
+			}
+			moved.setNextIncidenceAtEdge((IncidenceImpl) target
+					.getNextIncidenceAtEdge());
+		}
+		if (!graph.hasSavememSupport()) {
+			moved.setPreviousIncidenceAtEdge(target);
+		}
+		target.setNextIncidenceAtEdge(moved);
+		incidenceListModified();
+	}
+
+	@Override
+	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
+		assert (target != null) && (moved != null);
+		// TODO adapt to hierarchical graphs
+		assert target.getGraph() == moved.getGraph();
+		assert target.getGraph() == getGraph();
+		assert target.getThis() == moved.getThis();
+		assert target != moved;
+
+		if ((target == moved) || (target.getPreviousIncidenceAtEdge() == moved)) {
+			return;
+		}
+
+		// there are at least 2 incidences in the incidence list
+		// such that firstIncidence != lastIncidence
+		assert getFirstIncidence() != getLastIncidence();
+
+		// remove moved incidence from lambdaSeq
+		if (moved == getFirstIncidence()) {
+			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge(null);
+			}
+		} else if (moved == getLastIncidence()) {
+			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
+			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge(null);
+		} else {
+			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge((IncidenceImpl) moved
+							.getNextIncidenceAtEdge());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) moved.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge((IncidenceImpl) moved
+								.getPreviousIncidenceAtEdge());
+			}
+		}
+
+		// insert moved incidence in lambdaSeq immediately before target
+		if (target == getFirstIncidence()) {
+			setFirstIncidence(moved);
+			if (!graph.hasSavememSupport()) {
+				moved.setPreviousIncidenceAtEdge(null);
+			}
+		} else {
+			IncidenceImpl previousIncidence = (IncidenceImpl) target
+					.getPreviousIncidenceAtEdge();
+			previousIncidence.setNextIncidenceAtEdge(moved);
+			if (!graph.hasSavememSupport()) {
+				moved.setPreviousIncidenceAtEdge(previousIncidence);
+			}
+		}
+		moved.setNextIncidenceAtEdge(target);
+		if (!graph.hasSavememSupport()) {
+			target.setPreviousIncidenceAtEdge(moved);
+		}
+		incidenceListModified();
+	}
+
+	@Override
+	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
+		assert i != null;
+		assert i.getEdge() != this;
+		i.setIncidentEdge((EdgeImpl) this);
+		i.setNextIncidenceAtEdge(null);
+		if (getFirstIncidence() == null) {
+			setFirstIncidence(i);
+		}
+		if (getLastIncidence() != null) {
+			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtEdge(i);
+			if (!graph.hasSavememSupport()) {
+				i.setPreviousIncidenceAtEdge((IncidenceImpl) getLastIncidence());
+			}
+		}
+		setLastIncidence(i);
+		incidenceListModified();
+	}
+
+	@Override
+	protected void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
+		assert i != null;
+		assert i.getEdge() == this;
+		if (i == getFirstIncidence()) {
+			// delete at head of incidence list
+			setFirstIncidence((IncidenceImpl) i.getNextIncidenceAtEdge());
+			if (getFirstIncidence() != null && !graph.hasSavememSupport()) {
+				((IncidenceImpl) getFirstIncidence())
+						.setPreviousIncidenceAtEdge(null);
+			}
+			if (i == getLastIncidence()) {
+				// this incidence was the only one...
+				setLastIncidence(null);
+			}
+		} else if (i == getLastIncidence()) {
+			// delete at tail of incidence list
+			setLastIncidence((IncidenceImpl) i.getPreviousIncidenceAtEdge());
+			if (getLastIncidence() != null) {
+				((IncidenceImpl) getLastIncidence())
+						.setNextIncidenceAtEdge(null);
+			}
+		} else {
+			// delete somewhere in the middle
+			((IncidenceImpl) i.getPreviousIncidenceAtEdge())
+					.setNextIncidenceAtEdge((IncidenceImpl) i
+							.getNextIncidenceAtEdge());
+			if (!graph.hasSavememSupport()) {
+				((IncidenceImpl) i.getNextIncidenceAtEdge())
+						.setPreviousIncidenceAtEdge((IncidenceImpl) i
+								.getPreviousIncidenceAtEdge());
+			}
+		}
+		// delete incidence
+		i.setIncidentEdge(null);
+		i.setNextIncidenceAtEdge(null);
+		if (!graph.hasSavememSupport()) {
+			i.setPreviousIncidenceAtEdge(null);
+		}
+		incidenceListModified();
+	}
+
+	@Override
+	public void sortIncidences(Comparator<Incidence> comp) {
+		assert isValid();
+
+		if (getFirstIncidence() == null) {
+			// no sorting required for empty incidence lists
+			return;
+		}
+		class IncidenceList {
+			IncidenceImpl first;
+			IncidenceImpl last;
+
+			public void add(IncidenceImpl i) {
+				if (first == null) {
+					first = i;
+					assert (last == null);
+					last = i;
+				} else {
+					if (!graph.hasSavememSupport()) {
+						i.setPreviousIncidenceAtEdge(last);
+					}
+					last.setNextIncidenceAtEdge(i);
+					last = i;
+				}
+				i.setNextIncidenceAtEdge(null);
+			}
+
+			public IncidenceImpl remove() {
+				if (first == null) {
+					throw new NoSuchElementException();
+				}
+				IncidenceImpl out;
+				if (first == last) {
+					out = first;
+					first = null;
+					last = null;
+					return out;
+				}
+				out = first;
+				first = (IncidenceImpl) out.getNextIncidenceAtEdge();
+				if (!graph.hasSavememSupport()) {
+					first.setPreviousIncidenceAtEdge(null);
+				}
+				return out;
+			}
+
+			public boolean isEmpty() {
+				assert ((first == null) == (last == null));
+				return first == null;
+			}
+
+		}
+
+		IncidenceList a = new IncidenceList();
+		IncidenceList b = new IncidenceList();
+		IncidenceList out = a;
+
+		// split
+		IncidenceImpl last;
+		IncidenceList l = new IncidenceList();
+		l.first = (IncidenceImpl) getFirstIncidence();
+		l.last = (IncidenceImpl) getLastIncidence();
+
+		out.add(last = l.remove());
+		while (!l.isEmpty()) {
+			IncidenceImpl current = l.remove();
+			if (comp.compare(current, last) < 0) {
+				out = (out == a) ? b : a;
+			}
+			out.add(current);
+			last = current;
+		}
+		if (a.isEmpty() || b.isEmpty()) {
+			out = a.isEmpty() ? b : a;
+			setFirstIncidence(out.first);
+			setLastIncidence(out.last);
+			return;
+		}
+
+		while (true) {
+			if (a.isEmpty() || b.isEmpty()) {
+				out = a.isEmpty() ? b : a;
+				setFirstIncidence(out.first);
+				setLastIncidence(out.last);
+				incidenceListModified();
+				return;
+			}
+
+			IncidenceList c = new IncidenceList();
+			IncidenceList d = new IncidenceList();
+			out = c;
+
+			last = null;
+			while (!a.isEmpty() && !b.isEmpty()) {
+				int compareAToLast = last != null ? comp.compare(a.first, last)
+						: 0;
+				int compareBToLast = last != null ? comp.compare(b.first, last)
+						: 0;
+
+				if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
+					if (comp.compare(a.first, b.first) <= 0) {
+						out.add(last = a.remove());
+					} else {
+						out.add(last = b.remove());
+					}
+				} else if ((compareAToLast < 0) && (compareBToLast < 0)) {
+					out = (out == c) ? d : c;
+					last = null;
+				} else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
+					out.add(last = b.remove());
+				} else {
+					out.add(last = a.remove());
+				}
+			}
+
+			// copy rest of A
+			while (!a.isEmpty()) {
+				IncidenceImpl current = a.remove();
+				if (comp.compare(current, last) < 0) {
+					out = (out == c) ? d : c;
+				}
+				out.add(current);
+				last = current;
+			}
+
+			// copy rest of B
+			while (!b.isEmpty()) {
+				IncidenceImpl current = b.remove();
+				if (comp.compare(current, last) < 0) {
+					out = (out == c) ? d : c;
+				}
+				out.add(current);
+				last = current;
+			}
+
+			a = c;
+			b = d;
+		}
+
+	}
+
+	@Override
+	public List<? extends Edge> adjacences(String role) {
+		return adjacences(getIncidenceClassForRolename(role));
+	}
+
+	@Override
+	public List<? extends Edge> adjacences(IncidenceClass ic) {
+		assert ic != null;
+		assert isValid();
+		List<Edge> adjacences = new ArrayList<Edge>();
+		Class<? extends Vertex> vc = ic.getVertexClass().getM1Class();
+		Direction dir = ic.getDirection();
+		for (Vertex v : getIncidentVertices(vc, dir)) {
+			for (Edge e : v
+					.getIncidentEdges(dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+							: Direction.EDGE_TO_VERTEX)) {
+				adjacences.add(e);
+			}
+		}
+		return adjacences;
+	}
+
+	@Override
+	public Vertex addAdjacence(String role, Edge other) {
+		return addAdjacence(getIncidenceClassForRolename(role), other);
+	}
+
+	@Override
+	public Vertex addAdjacence(IncidenceClass ic, Edge other) {
+		// TODO there should exists methods of type addIncident(..) which should
+		// be used (graph and incidencelists modified)
 		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getNormalEdge()
-	 */
-	@Override
-	public Edge getNormalEdge() {
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getOmega()
-	 */
-	@Override
-	public Vertex getOmega() {
-		assert isValid();
-		return reversedEdge.getIncidentVertex();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getReversedEdge()
-	 */
-	@Override
-	public Edge getReversedEdge() {
-		return reversedEdge;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getThat()
-	 */
-	@Override
-	public Vertex getThat() {
-		assert isValid();
-		return getOmega();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getThatRole()
-	 */
-	@Override
-	public String getThatRole() {
-		assert isValid();
-		return ((EdgeClass) this.getAttributedElementClass()).getTo()
-				.getRolename();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getThis()
-	 */
-	@Override
-	public Vertex getThis() {
-		assert isValid();
-		return getAlpha();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#getThisRole()
-	 */
-	@Override
-	public String getThisRole() {
-		assert isValid();
-		return ((EdgeClass) this.getAttributedElementClass()).getFrom()
-				.getRolename();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#isAfterInGraph(de.uni_koblenz.jgralab.Edge)
-	 */
-	@Override
-	public boolean isAfterEdge(Edge e) {
-		assert e != null;
-		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		e = e.getNormalEdge();
-		if (e == this) {
-			return false;
-		}
-		Edge p = getPrevEdge();
-		while ((p != null) && (p != e)) {
-			p = p.getPrevEdge();
-		}
-		return p != null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#isBeforeInGraph(de.uni_koblenz.jgralab.Edge)
-	 */
-	@Override
-	public boolean isBeforeEdge(Edge e) {
-		assert e != null;
-		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-
-		e = e.getNormalEdge();
-		if (e == this) {
-			return false;
-		}
-		Edge n = getNextEdge();
-		while ((n != null) && (n != e)) {
-			n = n.getNextEdge();
-		}
-		return n != null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#isNormal()
-	 */
-	@Override
-	public boolean isNormal() {
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#putAfterInGraph(de.uni_koblenz.jgralab.Edge)
-	 */
-	@Override
-	public void putAfterEdge(Edge e) {
-		assert e != null;
-		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		assert e != this;
-		assert e != reversedEdge;
-
-		graph.putEdgeAfterInGraph((EdgeBaseImpl) e.getNormalEdge(), this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Edge#putBeforeInGraph(de.uni_koblenz.jgralab.Edge)
-	 */
-	@Override
-	public void putBeforeEdge(Edge e) {
-		assert e != null;
-		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		assert e != this;
-		assert e != reversedEdge;
-
-		graph.putEdgeBeforeInGraph((EdgeBaseImpl) e.getNormalEdge(), this);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#setAlpha(de.uni_koblenz.jgralab.Vertex)
-	 */
-	@Override
-	public void setAlpha(Vertex alpha) {
-		assert isValid();
-		assert alpha != null;
-		assert alpha.isValid();
-		assert getGraph() == alpha.getGraph();
-
-		VertexBaseImpl oldAlpha = getIncidentVertex();
-		if (alpha == oldAlpha) {
-			return; // nothing to change
-		}
-
-		if (!alpha.isValidAlpha(this)) {
-			throw new GraphException("Edges of class "
-					+ getAttributedElementClass().getUniqueName()
-					+ " may not start at vertices of class "
-					+ alpha.getAttributedElementClass().getUniqueName());
-		}
-
-		oldAlpha.removeIncidenceFromLambdaSeq(this);
-		oldAlpha.incidenceListModified();
-
-		VertexBaseImpl newAlpha = (VertexBaseImpl) alpha;
-		newAlpha.appendIncidenceToLambdaSeq(this);
-		newAlpha.incidenceListModified();
-		setIncidentVertex(newAlpha);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#setOmega(de.uni_koblenz.jgralab.Vertex)
-	 */
-	@Override
-	public void setOmega(Vertex omega) {
-		assert isValid();
-		assert omega != null;
-		assert omega.isValid();
-		assert getGraph() == omega.getGraph();
-
-		VertexBaseImpl oldOmgea = reversedEdge.getIncidentVertex();
-		if (omega == oldOmgea) {
-			return; // nothing to change
-		}
-
-		if (!omega.isValidOmega(this)) {
-			throw new GraphException("Edges of class "
-					+ getAttributedElementClass().getUniqueName()
-					+ " may not end at at vertices of class "
-					+ omega.getAttributedElementClass().getUniqueName());
-		}
-
-		oldOmgea.removeIncidenceFromLambdaSeq(reversedEdge);
-		oldOmgea.incidenceListModified();
-
-		VertexBaseImpl newOmega = (VertexBaseImpl) omega;
-		newOmega.appendIncidenceToLambdaSeq(reversedEdge);
-		newOmega.incidenceListModified();
-		reversedEdge.setIncidentVertex(newOmega); // TODO Check if this is
-		// really needed as
-		// appenIncidenceToLambdaSeq
-		// called it before.
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#setThat(de.uni_koblenz.jgralab.Vertex)
-	 */
-	@Override
-	public void setThat(Vertex v) {
-		assert isValid();
-		assert v != null;
-		assert v.isValid();
-		assert getGraph() == v.getGraph();
-
-		setOmega(v);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#setThis(de.uni_koblenz.jgralab.Vertex)
-	 */
-	@Override
-	public void setThis(Vertex v) {
-		assert isValid();
-		assert v != null;
-		assert v.isValid();
-		assert getGraph() == v.getGraph();
-
-		setAlpha(v);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		assert isValid();
-		return "+e" + id + ": "
-				+ getAttributedElementClass().getQualifiedName();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Edge#isValid()
-	 */
-	@Override
-	public boolean isValid() {
-		return graph.containsEdge(this);
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		// assert other.isValid();
+		// assert getGraph() == other.getGraph();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// Direction dir = entry.getDirection();
+		// Vertex from = null;
+		// Vertex to = null;
+		// if (dir == Direction.IN) {
+		// from = other;
+		// to = this;
+		// } else {
+		// to = other;
+		// from = this;
+		// }
+		// Edge e = getGraph().createEdge(ec, from, to);
+		// return e;
 	}
 
 	@Override
-	public AggregationKind getThisSemantics() {
-		assert isValid();
-		return getAlphaSemantics();
+	public List<Edge> removeAdjacences(String role) {
+		return removeAdjacences(getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public AggregationKind getThatSemantics() {
-		assert isValid();
-		return getOmegaSemantics();
+	public List<Edge> removeAdjacences(IncidenceClass ic) {
+		// TODO (graph and incidencelists modified)
+		return null;
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Vertex> adjacences = new ArrayList<Vertex>();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// deleteList.add(e);
+		// adjacences.add(e.getThat());
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
+		// return adjacences;
+	}
+
+	@Override
+	public void removeAdjacence(String role, Edge other) {
+		removeAdjacence(getIncidenceClassForRolename(role), other);
+	}
+
+	@Override
+	public void removeAdjacence(IncidenceClass ic, Edge other) {
+		// TODO (graph and incidencelists modified)
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		// assert other.isValid();
+		// assert getGraph() == other.getGraph();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// if (e.getThat() == other) {
+		// deleteList.add(e);
+		// }
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
 	}
 
 	/**
-	 * Creates the reversed edge for this edge. Should be implemented by the
-	 * generated edge classes.
+	 * @see #setNextEdge(Edge)
 	 */
-	abstract protected ReversedEdgeBaseImpl createReversedEdge();
+	@Deprecated
+	protected abstract void setNextEdgeInGraph(Edge nextEdge);
+
+	/**
+	 * @see #setPreviousEdge(Edge)
+	 */
+	@Deprecated
+	protected abstract void setPrevEdgeInGraph(Edge prevEdge);
 }

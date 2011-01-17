@@ -118,16 +118,15 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 		this.previousIncidenceAtVertex = previousIncidenceAtVertex;
 	}
 
-	protected void setIncidentEdge(EdgeImpl incidentEdge) {
-		this.incidentEdge = incidentEdge;
+	public void setIncidentEdge(EdgeImpl edgeImpl) {
+		this.incidentEdge = edgeImpl;
 	}
 
-	protected void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
+	public void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
 		this.nextIncidenceAtEdge = nextIncidenceAtEdge;
 	}
 
-	protected void setPreviousIncidenceAtEdge(
-			IncidenceImpl previousIncidenceAtEdge) {
+	public void setPreviousIncidenceAtEdge(IncidenceImpl previousIncidenceAtEdge) {
 		this.previousIncidenceAtEdge = previousIncidenceAtEdge;
 	}
 

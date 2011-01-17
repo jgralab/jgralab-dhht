@@ -35,7 +35,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
+import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -46,74 +46,76 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl {
 	// global edge sequence
-	private EdgeImpl nextEdge;
-	private EdgeImpl prevEdge;
+	private EdgeImpl nextEdgeInGraph;
+	private EdgeImpl prevEdgeInGraph;
 
-	// the this-vertex
-	private VertexBaseImpl incidentVertex;
+	private IncidenceImpl firstIncidenceAtEdge;
+	private IncidenceImpl lastIncidenceAtEdge;
 
-	// incidence list
-	private IncidenceImpl nextIncidence;
-	private IncidenceImpl prevIncidence;
+	@Override
+	public Incidence getFirstIncidence() {
+		return firstIncidenceAtEdge;
+	}
 
 	@Override
 	public Edge getNextEdge() {
 		assert isValid();
-		return this.nextEdge;
+		return nextEdgeInGraph;
+	}
+
+	@Override
+	public Edge getPreviousEdge() {
+		return prevEdgeInGraph;
+	}
+
+	@Override
+	public Incidence getLastIncidence() {
+		return lastIncidenceAtEdge;
+	}
+
+	@Override
+	protected void setNextEdge(Edge nextEdge) {
+		nextEdgeInGraph = (EdgeImpl) nextEdge;
+	}
+
+	@Override
+	protected void setPrevEdge(Edge prevEdge) {
+		prevEdgeInGraph = (EdgeImpl) prevEdge;
+	}
+
+	@Override
+	protected void setPreviousEdge(Edge prevEdge) {
+		prevEdgeInGraph = (EdgeImpl) prevEdge;
 	}
 
 	@Override
 	public Edge getPrevEdge() {
 		assert isValid();
-		return this.prevEdge;
+		return prevEdgeInGraph;
 	}
 
 	@Override
-	public Incidence getFirstIncidence() {
-		return firstIncidenceAtEdge;// Is a new method. Keep this!!
+	public void setFirstIncidence(IncidenceImpl firstIncidence) {
+		firstIncidenceAtEdge = firstIncidence;
 	}
 
 	@Override
-	protected VertexBaseImpl getIncidentVertex() {
-		return incidentVertex;
-	}
-
-	@Override
-	protected IncidenceImpl getNextIncidenceInternal() {
-		return nextIncidence;
-	}
-
-	@Override
-	protected IncidenceImpl getPrevIncidenceInternal() {
-		return prevIncidence;
+	public void setLastIncidence(IncidenceImpl lastIncidence) {
+		lastIncidenceAtEdge = lastIncidence;
 	}
 
 	@Override
 	protected void setNextEdgeInGraph(Edge nextEdge) {
-		this.nextEdge = (EdgeImpl) nextEdge;
+		nextEdgeInGraph = (EdgeImpl) nextEdge;
 	}
 
 	@Override
 	protected void setPrevEdgeInGraph(Edge prevEdge) {
-		this.prevEdge = (EdgeImpl) prevEdge;
-	}
-
-	@Override
-	protected void setIncidentVertex(VertexBaseImpl v) {
-		this.incidentVertex = v;
-	}
-
-	@Override
-	protected void setNextIncidenceInternal(IncidenceImpl nextIncidence) {
-		this.nextIncidence = nextIncidence;
-	}
-
-	@Override
-	protected void setPrevIncidenceInternal(IncidenceImpl prevIncidence) {
-		this.prevIncidence = prevIncidence;
+		prevEdgeInGraph = (EdgeImpl) prevEdge;
 	}
 
 	/**
+	 * TODO adapt to dhht
 	 * 
 	 * @param anId
 	 * @param graph
@@ -137,15 +139,12 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	 * the direction {@link Direction#EDGE_TO_VERTEX} and the other
 	 * {@link Direction#VERTEX_TO_EDGE}.
 	 * 
-	 * @return bolean <code>true</code> if this {@link Edge} is a binary edge.
+	 * @return boolean <code>true</code> if this {@link Edge} is a binary edge.
 	 */
-	boolean isBinaryEdge() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	abstract boolean isBinaryEdge();
 
+	@Override
 	public Iterable<Vertex> getIncidentVertices(Direction direction) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IncidentVertexIterable<Vertex>(this, direction);
 	}
 }

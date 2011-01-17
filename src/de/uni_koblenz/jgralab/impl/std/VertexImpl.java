@@ -71,12 +71,12 @@ public abstract class VertexImpl extends
 
 	@Override
 	protected void setNextVertex(Vertex nextVertex) {
-		this.nextVertexInGraph = (VertexImpl) nextVertex;
+		nextVertexInGraph = (VertexImpl) nextVertex;
 	}
 
 	@Override
 	protected void setPrevVertex(Vertex prevVertex) {
-		this.prevVertexInGraph = (VertexImpl) prevVertex;
+		prevVertexInGraph = (VertexImpl) prevVertex;
 	}
 
 	@Override
@@ -87,12 +87,12 @@ public abstract class VertexImpl extends
 
 	@Override
 	public void setFirstIncidence(IncidenceImpl firstIncidence) {
-		this.firstIncidenceAtVertex = firstIncidence;
+		firstIncidenceAtVertex = firstIncidence;
 	}
 
 	@Override
 	public void setLastIncidence(IncidenceImpl lastIncidence) {
-		this.lastIncidenceAtVertex = lastIncidence;
+		lastIncidenceAtVertex = lastIncidence;
 	}
 
 	/**
