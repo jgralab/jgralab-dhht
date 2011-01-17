@@ -907,4 +907,21 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 	 */
 	@Deprecated
 	protected abstract void setPrevEdgeInGraph(Edge prevEdge);
+
+	@Override
+	public void connect(String rolename, Vertex elemToConnect) {
+		connect(getIncidenceClassForRolename(rolename), elemToConnect);
+	}
+
+	@Override
+	public void connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
+		connect(incidenceClass.getM1Class(), elemToConnect);
+	}
+
+	@Override
+	public void connect(Class<? extends Incidence> incidenceClass,
+			Vertex elemToConnect) {
+		getSchema().getGraphFactory().createIncidence(incidenceClass,
+				elemToConnect, this);
+	}
 }

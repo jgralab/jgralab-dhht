@@ -46,11 +46,11 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl {
 	// global edge sequence
-	private EdgeImpl nextEdgeInGraph;
-	private EdgeImpl prevEdgeInGraph;
+	protected EdgeImpl nextEdgeInGraph;
+	protected EdgeImpl prevEdgeInGraph;
 
-	private IncidenceImpl firstIncidenceAtEdge;
-	private IncidenceImpl lastIncidenceAtEdge;
+	protected IncidenceImpl firstIncidenceAtEdge;
+	protected IncidenceImpl lastIncidenceAtEdge;
 
 	@Override
 	public Incidence getFirstIncidence() {
@@ -141,10 +141,13 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	 * 
 	 * @return boolean <code>true</code> if this {@link Edge} is a binary edge.
 	 */
-	abstract boolean isBinaryEdge();
+	boolean isBinaryEdge() {
+		return false;
+	}
 
 	@Override
 	public Iterable<Vertex> getIncidentVertices(Direction direction) {
 		return new IncidentVertexIterable<Vertex>(this, direction);
 	}
+
 }
