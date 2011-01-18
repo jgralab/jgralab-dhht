@@ -63,12 +63,26 @@ public interface Graph extends AttributedElement {
 	public <T extends Vertex> T createVertex(Class<T> cls);// old
 
 	/**
-	 * Creates an edge of the specified class <code>cls</code> that connects
-	 * <code>alpha</code> and <code>omega</code> vertices and adds the new edge
+	 * Creates an edge of the specified class <code>cls</code> and adds the new edge
 	 * to this Graph.
 	 */
-	public <T extends Edge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega);// old
+	public <T extends Edge> T createEdge(Class<T> cls);
+	
+	
+	/** 
+	 * Connects the given vertex and the given edge by an incidence of class cls.
+	 * The direction of the connection is automatically determined by cls
+	 * @return the incidence created
+	 */
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge);
+	
+	/**
+	 * Creates an binary edge of the specified class <code>cls</code> and adds the new edge
+	 * to this Graph.
+	 */
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega);
+	
+
 
 	/**
 	 * Checks whether this graph is currently being loaded.
@@ -436,15 +450,7 @@ public interface Graph extends AttributedElement {
 	 */
 	public Iterable<Edge> getEdges();
 
-	/**
-	 * Returns an Iterable which iterates over all edges of this Graph in the
-	 * order determined by the edge sequence.
-	 * 
-	 * @return an Iterable for all edges
-	 */
-	@Deprecated
-	public Iterable<Edge> edges();// old
-
+	
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
 	 * have the specified <code>edgeClass</code> (including subclasses), in the
@@ -455,8 +461,9 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
-	public Iterable<Edge> edges(EdgeClass edgeClass);// old
-
+	public Iterable<Edge> getEdges(EdgeClass edgeClass);
+	
+	
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
 	 * have the specified <code>edgeClass</code> (including subclasses), in the
@@ -467,8 +474,7 @@ public interface Graph extends AttributedElement {
 	 * 
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
-	public Iterable<Edge> edges(Class<? extends Edge> edgeClass);// old
-
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass);
 	/**
 	 * Returns the list of reachable vertices.
 	 * 
@@ -495,15 +501,6 @@ public interface Graph extends AttributedElement {
 	public Iterable<Vertex> getVertices();
 
 	/**
-	 * Returns an Iterable which iterates over all vertices of this Graph in the
-	 * order determined by the vertex sequence.
-	 * 
-	 * @return an Iterable for all vertices
-	 */
-	@Deprecated
-	public Iterable<Vertex> vertices();
-
-	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which
 	 * have the specified <code>vertexClass</code> (including subclasses), in
 	 * the order determined by the vertex sequence.
@@ -514,7 +511,7 @@ public interface Graph extends AttributedElement {
 	 * @return an Iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> vertices(VertexClass vertexclass);// old
+	public Iterable<Vertex> getVertices(VertexClass vertexclass);// old
 
 	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which
@@ -527,7 +524,7 @@ public interface Graph extends AttributedElement {
 	 * @return a iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> vertices(Class<? extends Vertex> vertexClass);// old
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass);// old
 
 	/**
 	 * Optimizes edge and vertex ids such that after defragmentation

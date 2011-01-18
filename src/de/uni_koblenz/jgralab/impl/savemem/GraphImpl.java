@@ -240,12 +240,12 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void setFirstEdgeInGraph(EdgeBaseImpl firstEdge) {
+	protected void setFirstEdge(EdgeBaseImpl firstEdge) {
 		this.firstEdge = firstEdge;
 	}
 
 	@Override
-	protected void setLastEdgeInGraph(EdgeBaseImpl lastEdge) {
+	protected void setLastEdge(EdgeBaseImpl lastEdge) {
 		this.lastEdge = lastEdge;
 	}
 

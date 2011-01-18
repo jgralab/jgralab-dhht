@@ -512,7 +512,7 @@ public abstract class GraphImpl extends GraphBaseImpl implements
 	}
 
 	@Override
-	protected void setFirstEdgeInGraph(EdgeBaseImpl edge) {
+	protected void setFirstEdge(EdgeBaseImpl edge) {
 		// assert edge != null;
 		if (edge != null) { // because of super constructor
 			DatabasePersistableEdge persistentEdge = (DatabasePersistableEdge) edge;
@@ -529,7 +529,7 @@ public abstract class GraphImpl extends GraphBaseImpl implements
 	}
 
 	@Override
-	protected void setLastEdgeInGraph(EdgeBaseImpl edge) {
+	protected void setLastEdge(EdgeBaseImpl edge) {
 		if (edge != null) { // because of super constructor
 			DatabasePersistableEdge persistentEdge = (DatabasePersistableEdge) edge;
 			this.eSeq.append(persistentEdge);

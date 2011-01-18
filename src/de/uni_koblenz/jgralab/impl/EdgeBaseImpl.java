@@ -913,6 +913,7 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
 
+
 	@Override
 	public void connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
 		connect(incidenceClass.getM1Class(), elemToConnect);
@@ -924,4 +925,5 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		getSchema().getGraphFactory().createIncidence(incidenceClass,
 				elemToConnect, this);
 	}
+
 }

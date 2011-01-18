@@ -382,7 +382,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void setFirstEdgeInGraph(
+	protected void setFirstEdge(
 			de.uni_koblenz.jgralab.impl.EdgeBaseImpl firstEdge) {
 		if ((this.firstEdge == null) || isLoading()) {
 			this.firstEdge = new VersionedReferenceImpl<EdgeImpl>(this,
@@ -406,7 +406,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void setLastEdgeInGraph(
+	protected void setLastEdge(
 			de.uni_koblenz.jgralab.impl.EdgeBaseImpl lastEdge) {
 		if ((this.lastEdge == null) || isLoading()) {
 			this.lastEdge = new VersionedReferenceImpl<EdgeImpl>(this,

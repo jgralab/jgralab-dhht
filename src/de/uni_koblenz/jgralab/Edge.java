@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -252,30 +251,13 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Iterable<Vertex> getIncidentVertices(
 			Class<? extends Vertex> aVertexClass, Direction direction);
 
-	/**
-	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
-	 * {@link IncidenceType#AGGREGATION} or {@link IncidenceType#COMPOSITION}.
-	 * 
-	 * @return {@link IncidenceType}
-	 */
-	public IncidenceType getSemantics();
 
 	/**
-	 * The semanctics of the alpha {@link Incidence} of this {@link Edge}, e.g.
-	 * {@link IncidenceType#EDGE}, {@link IncidenceType#AGGREGATION} or
-	 * {@link IncidenceType#COMPOSITION}.
-	 * 
-	 * @return {@link IncidenceType}
+	 * Tests if this edge is a binary one (i.e., its edge class has only two incidences both with 
+	 * multiplicity 1 for the number of vertices at the edge)
+	 * @return true for binary edges, false otherwise
 	 */
-	public IncidenceType getAlphaSemantics();
-
-	/**
-	 * The semanctics of the omega {@link Incidence} of this {@link Edge}, e.g.
-	 * {@link IncidenceType#EDGE}, {@link IncidenceType#AGGREGATION} or
-	 * {@link IncidenceType#COMPOSITION}.
-	 * 
-	 * @return {@link IncidenceType}
-	 */
-	public IncidenceType getOmegaSemantics();
+	public boolean isBinary();
+	
 
 }
