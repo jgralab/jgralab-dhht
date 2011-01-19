@@ -30,93 +30,114 @@
  */
 package de.uni_koblenz.jgralab.schema.impl;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceDirection;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
+import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
 public class IncidenceClassImpl implements IncidenceClass {
 
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
-			String rolename, int minEdgesAtVertex, int maxEdgesAtVertex,
-			IncidenceDirection direction, AggregationKind aggregationKind) {
+			String rolename, boolean isAbstract, int minEdgesAtVertex,
+			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
+			Direction direction, IncidenceType incidenceType) {
 		super();
-		this.aggregationKind = aggregationKind;
+		this.incidenceType = incidenceType;
+		this.isAbstract = isAbstract;
 		this.direction = direction;
 		this.edgeClass = edgeClass;
 		this.maxEdgesAtVertex = maxEdgesAtVertex;
 		this.minEdgesAtVertex = minEdgesAtVertex;
+		this.maxVerticesAtEdge = maxVerticesAtEdge;
+		this.minVerticesAtEdge = minVerticesAtEdge;
 		this.rolename = rolename;
 		if (rolename == null) {
 			rolename = "";
 		}
 		this.vertexClass = vertexClass;
-		this.subsettedIncidenceClasses = new HashSet<IncidenceClass>();
-		this.redefinedIncidenceClasses = new HashSet<IncidenceClass>();
 	}
 
-	private AggregationKind aggregationKind;
+	private final Direction direction;
 
-	private IncidenceDirection direction;
+	private IncidenceType incidenceType;
 
-	private EdgeClass edgeClass;
+	private boolean isAbstract = false;
 
-	private VertexClass vertexClass;
+	private final EdgeClass edgeClass;
 
-	private int maxEdgesAtVertex;
+	private final VertexClass vertexClass;
 
-	private int minEdgesAtVertex;
+	private final int maxEdgesAtVertex;
 
-	private String rolename;
+	private final int minEdgesAtVertex;
 
-	private Set<IncidenceClass> redefinedIncidenceClasses;
+	private final int maxVerticesAtEdge;
 
-	private Set<IncidenceClass> subsettedIncidenceClasses;
-	
-	
-	public GraphElementClass<?> getOtherGraphElementClass(GraphElementClass<?> connectedGc) {
+	private final int minVerticesAtEdge;
+
+	@Override
+	public GraphElementClass<?, ?> getOtherGraphElementClass(
+			GraphElementClass<?, ?> connectedGc) {
 		if (connectedGc == edgeClass) {
 			return vertexClass;
 		} else {
 			return edgeClass;
 		}
 	}
-	
-	
+
+	private final String rolename;
+
+	private final Set<IncidenceClass> hiddenEndsAtEdge = new HashSet<IncidenceClass>();
+
+	private final Set<IncidenceClass> hiddenEndsAtVertex = new HashSet<IncidenceClass>();
+
+	/**
+	 * The class object representing the generated interface for this
+	 * AttributedElementClass
+	 */
+	private Class<? extends Incidence> m1Class;
+
+	/**
+	 * The class object representing the implementation class for this
+	 * AttributedElementClass. This may be either the generated class or a
+	 * subclass of this
+	 */
+	private Class<? extends Incidence> m1ImplementationClass;
+
+	/**
+	 * the immediate sub classes of this class
+	 */
+	protected HashSet<IncidenceClass> directSubClasses = new HashSet<IncidenceClass>();
+
+	/**
+	 * the immediate super classes of this class
+	 */
+	protected HashSet<IncidenceClass> directSuperClasses = new HashSet<IncidenceClass>();
 
 	@Override
-	public AggregationKind getAggregationKind() {
-		return aggregationKind;
+	public IncidenceType getIncidenceType() {
+		return incidenceType;
 	}
 
 	@Override
-	public IncidenceClass getOpposite() {
-		if (edgeClass.getFrom() == this) {
-			return edgeClass.getTo();
-		} else {
-			return edgeClass.getFrom();
-		}
+	public void setIncidenceType(IncidenceType type) {
+		incidenceType = type;
 	}
 
 	@Override
-	public void setAggregationKind(AggregationKind kind) {
-		if ((kind != AggregationKind.NONE)
-				&& (getOpposite().getAggregationKind() != AggregationKind.NONE)) {
-			throw new SchemaException(
-					"At least one end of each EdgeClass must be of AggregationKind NONE at EdgeClass "
-							+ edgeClass.getQualifiedName());
-		}
-		this.aggregationKind = kind;
-	}
-
-	@Override
-	public IncidenceDirection getDirection() {
+	public Direction getDirection() {
 		return direction;
 	}
 
@@ -126,31 +147,167 @@ public class IncidenceClassImpl implements IncidenceClass {
 	}
 
 	@Override
-	public int getMax() {
+	public int getMaxEdgesAtVertex() {
 		return maxEdgesAtVertex;
 	}
 
 	@Override
-	public int getMin() {
+	public int getMinEdgesAtVertex() {
 		return minEdgesAtVertex;
 	}
 
 	@Override
-	public Set<IncidenceClass> getRedefinedIncidenceClasses() {
-		Set<IncidenceClass> result = new HashSet<IncidenceClass>();
-		result.addAll(redefinedIncidenceClasses);
-		for (IncidenceClass ic : subsettedIncidenceClasses) {
-			result.addAll(ic.getRedefinedIncidenceClasses());
-		}
-		for (IncidenceClass ic : redefinedIncidenceClasses) {
-			result.addAll(ic.getRedefinedIncidenceClasses());
-		}
-		return result;
+	public int getMaxVerticesAtEdge() {
+		return maxVerticesAtEdge;
 	}
 
 	@Override
-	public Set<IncidenceClass> getOwnRedefinedIncidenceClasses() {
-		return redefinedIncidenceClasses;
+	public int getMinVerticesAtEdge() {
+		return minVerticesAtEdge;
+	}
+
+	/**
+	 * adds a superClass to this class
+	 * 
+	 * @param superClass
+	 *            the class to add as superclass
+	 */
+	@Override
+	public void addSuperClass(IncidenceClass superClass) {
+		checkIncidenceClassSpecialization(this, superClass);
+		if ((superClass == this) || (superClass == null)) {
+			return;
+		}
+		directSuperClasses.remove(getSchema().getDefaultIncidenceClass(
+				direction));
+
+		if (superClass.isSubClassOf(this)) {
+			for (IncidenceClass incidentClass : superClass.getAllSuperClasses()) {
+				System.out.println(incidentClass.getRolename());
+			}
+			System.out.println();
+			throw new InheritanceException(
+					"Cycle in class hierarchie for classes: " + getRolename()
+							+ " and " + superClass.getRolename());
+		}
+		directSuperClasses.add(superClass);
+		((IncidenceClassImpl) superClass).directSubClasses.add(this);
+	}
+
+	@Override
+	public Set<IncidenceClass> getAllSubClasses() {
+		Set<IncidenceClass> returnSet = new HashSet<IncidenceClass>();
+		for (IncidenceClass subclass : directSubClasses) {
+			returnSet.add(subclass);
+			returnSet.addAll(subclass.getAllSubClasses());
+		}
+		return returnSet;
+	}
+
+	@Override
+	public Set<IncidenceClass> getDirectSubClasses() {
+		return directSubClasses;
+	}
+
+	@Override
+	public Set<IncidenceClass> getDirectSuperClasses() {
+		return directSuperClasses;
+	}
+
+	@Override
+	public String getIncidenceClassName(IncidenceClass ic) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Class<? extends Incidence> getM1Class() {
+		if (m1Class == null) {
+			String m1ClassName = getIncidenceClassName(this);
+			try {
+				m1Class = (Class<? extends Incidence>) Class
+						.forName(m1ClassName, true, M1ClassManager
+								.instance(getSchema().getQualifiedName()));
+			} catch (ClassNotFoundException e) {
+				throw new M1ClassAccessException(
+						"Can't load M1 class for IncidenceClass '"
+								+ getIncidenceClassName(this) + "'", e);
+			}
+		}
+		return m1Class;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Class<? extends Incidence> getM1ImplementationClass() {
+		if (isAbstract()) {
+			throw new M1ClassAccessException(
+					"Can't get M1 implementation class. IncidenceClass '"
+							+ getIncidenceClassName(this) + "' is abstract!");
+		}
+		if (m1ImplementationClass == null) {
+			try {
+				Field f = getM1Class().getField("IMPLEMENTATION_CLASS");
+				m1ImplementationClass = (Class<? extends Incidence>) f
+						.get(m1Class);
+			} catch (SecurityException e) {
+				throw new M1ClassAccessException(e);
+			} catch (NoSuchFieldException e) {
+				throw new M1ClassAccessException(e);
+			} catch (IllegalArgumentException e) {
+				throw new M1ClassAccessException(e);
+			} catch (IllegalAccessException e) {
+				throw new M1ClassAccessException(e);
+			}
+		}
+		return m1ImplementationClass;
+	}
+
+	@Override
+	public Set<IncidenceClass> getAllSuperClasses() {
+		HashSet<IncidenceClass> allSuperClasses = new HashSet<IncidenceClass>();
+		allSuperClasses.addAll(directSuperClasses);
+		for (IncidenceClass superClass : directSuperClasses) {
+			allSuperClasses.addAll(superClass.getAllSuperClasses());
+		}
+		return allSuperClasses;
+	}
+
+	@Override
+	public boolean isAbstract() {
+		return isAbstract;
+	}
+
+	@Override
+	public boolean isDirectSubClassOf(IncidenceClass anIncidenceClass) {
+		return directSuperClasses.contains(anIncidenceClass);
+	}
+
+	@Override
+	public boolean isDirectSuperClassOf(IncidenceClass anIncidenceClass) {
+		return (((IncidenceClassImpl) anIncidenceClass).directSuperClasses
+				.contains(this));
+	}
+
+	@Override
+	public boolean isSubClassOf(IncidenceClass anIncidenceClass) {
+		return getAllSuperClasses().contains(anIncidenceClass);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IncidenceClass anIncidenceClass) {
+		return anIncidenceClass.getAllSuperClasses().contains(this);
+	}
+
+	@Override
+	public boolean isSuperClassOfOrEquals(IncidenceClass anIncidenceClass) {
+		return ((this == anIncidenceClass) || (isSuperClassOf(anIncidenceClass)));
+	}
+
+	@Override
+	public void setAbstract(boolean isAbstract) {
+		this.isAbstract = isAbstract;
 	}
 
 	@Override
@@ -159,110 +316,35 @@ public class IncidenceClassImpl implements IncidenceClass {
 	}
 
 	@Override
-	public Set<IncidenceClass> getOwnSubsettedIncidenceClasses() {
-		return subsettedIncidenceClasses;
-	}
-
-	@Override
-	public Set<IncidenceClass> getSubsettedIncidenceClasses() {
-		Set<IncidenceClass> result = new HashSet<IncidenceClass>();
-		result.addAll(subsettedIncidenceClasses);
-		for (IncidenceClass ic : subsettedIncidenceClasses) {
-			result.addAll(ic.getSubsettedIncidenceClasses());
-		}
-		return result;
-	}
-
-	@Override
 	public VertexClass getVertexClass() {
 		return vertexClass;
 	}
 
-	public void addRedefinedRole(String rolename) {
-		boolean foundRole = false;
-
-		for (IncidenceClass ic : getSubsettedIncidenceClasses()) {
-			if (ic.getRolename().equals(rolename)) {
-				// found a base incidence class whose rolename matches
-
-				// TODO This check does not cover all illegal cases
-				// TODO Daniel's job: give a specification of illegal
-				// redefinitions
-
-				// Check if this rolename is redefined by another EdgeClass
-				// originating from the same VertexClass
-				for (EdgeClass ec : getOpposite().getVertexClass()
-						.getOwnConnectedEdgeClasses()) {
-					if (ec == edgeClass) {
-						// skip the EdgeClass of this IncidenceClass
-						continue;
-					}
-					// determine proper end
-					IncidenceClass other = direction == IncidenceDirection.IN ? ec
-							.getTo()
-							: ec.getFrom();
-					if (other.getRedefinedIncidenceClasses().contains(ic)) {
-						throw new SchemaException("The role '" + rolename
-								+ "' of EdgeClass '"
-								+ edgeClass.getQualifiedName()
-								+ "' is already redefined in EdgeClass '"
-								+ ec.getQualifiedName() + "'");
-					}
-				}
-				redefinedIncidenceClasses.add(ic);
-				foundRole = true;
-				break;
-			}
-		}
-		if (!foundRole) {
-			throw new SchemaException(
-					"The role '"
-							+ rolename
-							+ "' is not defined in any subsetted IncidenceClass, so it cannot be redefined.");
-		}
+	@Override
+	public Schema getSchema() {
+		return getEdgeClass().getSchema();
 	}
 
-	public void addRedefinedRoles(Set<String> rolenames) {
-		if (rolenames == null) {
-			return;
-		}
-		for (String role : rolenames) {
-			addRedefinedRole(role);
-		}
-	}
-
-	public void addSubsettedIncidenceClass(IncidenceClass other) {
-		EdgeClassImpl.checkIncidenceClassSpecialization(this, other);
-		if (other.getSubsettedIncidenceClasses().contains(this)) {
-			throw new SchemaException(
-					"Subsetting/Redefinition of IncidenceClasses need to be acyclic");
-		}
-		subsettedIncidenceClasses.add(other);
-	}
-
+	@Override
 	public Set<String> getAllRoles() {
 		Set<String> result = new HashSet<String>();
 		result.add(getRolename());
-		for (IncidenceClass ic : getSubsettedIncidenceClasses()) {
+		for (IncidenceClass ic : getAllSuperClasses()) {
 			result.add(ic.getRolename());
 		}
 		return result;
 	}
 
-	public Set<String> getRedefinedRoles() {
-		Set<String> result = new HashSet<String>();
-		for (IncidenceClass ic : getRedefinedIncidenceClasses()) {
-			result.add(ic.getRolename());
-		}
-		return result;
+	@Override
+	public Set<IncidenceClass> getHiddenEndsAtEdge() {
+		return hiddenEndsAtEdge;
 	}
 
-	// public Set<String> getRedefinedAndOwnRoles() {
-	// Set<String> roles = new HashSet<String>(getRedefinedRoles());
-	// roles.add(getRolename());
-	// return roles;
-	// }
-	
+	@Override
+	public Set<IncidenceClass> getHiddenEndsAtVertex() {
+		return hiddenEndsAtVertex;
+	}
+
 	/**
 	 * checks if the incidence classes own and inherited are compatible, i.e. if
 	 * the upper multiplicity of own is lower or equal than the one of inherited
@@ -278,7 +360,7 @@ public class IncidenceClassImpl implements IncidenceClass {
 		if ((special.getVertexClass() != general.getVertexClass())
 				&& (!general.getVertexClass().isSuperClassOf(
 						special.getVertexClass()))) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+			String dir = special.getDirection() == Direction.VERTEX_TO_EDGE ? "Alpha"
 					: "Omega";
 			throw new SchemaException(
 					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
@@ -289,8 +371,8 @@ public class IncidenceClassImpl implements IncidenceClass {
 							+ " at end " + dir);
 		}
 		// Multiplicities
-		if (special.getMax() > general.getMax()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+		if (special.getMaxEdgesAtVertex() > general.getMaxEdgesAtVertex()) {
+			String dir = special.getDirection() == Direction.VERTEX_TO_EDGE ? "Alpha"
 					: "Omega";
 			throw new SchemaException(
 					"The multiplicity of an edge class may not be larger than the multiplicities of its superclass. Offending"
@@ -300,12 +382,23 @@ public class IncidenceClassImpl implements IncidenceClass {
 							+ general.getEdgeClass().getQualifiedName()
 							+ " at end " + dir);
 		}
+		if (special.getMaxVerticesAtEdge() > general.getMaxVerticesAtEdge()) {
+			String dir = special.getDirection() == Direction.VERTEX_TO_EDGE ? "Alpha"
+					: "Omega";
+			throw new SchemaException(
+					"The multiplicity of an vertex class may not be larger than the multiplicities of its superclass. Offending"
+							+ "VertexClasses are "
+							+ special.getVertexClass().getQualifiedName()
+							+ " and "
+							+ general.getVertexClass().getQualifiedName()
+							+ " at end " + dir);
+		}
 
 		// name clashes
 		if (general.getRolename().equals(special.getRolename())
 				&& !general.getRolename().isEmpty()
 				&& !special.getRolename().isEmpty()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+			String dir = special.getDirection() == Direction.VERTEX_TO_EDGE ? "Alpha"
 					: "Omega";
 			throw new SchemaException(
 					"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
@@ -315,11 +408,11 @@ public class IncidenceClassImpl implements IncidenceClass {
 							+ general.getEdgeClass().getQualifiedName()
 							+ " at end " + dir);
 		}
-		for (IncidenceClass ic : general.getSubsettedIncidenceClasses()) {
+		for (IncidenceClass ic : general.getAllSuperClasses()) {
 			if (ic.getRolename().equals(special.getRolename())
 					&& !general.getRolename().isEmpty()
 					&& !ic.getRolename().isEmpty()) {
-				String dir = ic.getDirection() == IncidenceDirection.OUT ? "Alpha"
+				String dir = ic.getDirection() == Direction.VERTEX_TO_EDGE ? "Alpha"
 						: "Omega";
 				throw new SchemaException(
 						"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
@@ -332,6 +425,4 @@ public class IncidenceClassImpl implements IncidenceClass {
 		}
 
 	}
-
-
 }

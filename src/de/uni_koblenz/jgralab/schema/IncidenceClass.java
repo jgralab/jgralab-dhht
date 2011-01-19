@@ -273,7 +273,6 @@ public interface IncidenceClass {
 	 *         <code>false</code>
 	 */
 
-	
 	/**
 	 * 
 	 * @param graphElementClass
@@ -282,14 +281,10 @@ public interface IncidenceClass {
 	 *         e.g. if graphElementClass is the EdgeClass connected, the method
 	 *         returns the VertexClass and vice versa
 	 */
-	public GraphElementClass<?,?> getOtherGraphElementClass(
-			GraphElementClass<?,?> graphElementClass);
+	public GraphElementClass<?, ?> getOtherGraphElementClass(
+			GraphElementClass<?, ?> graphElementClass);
 
-	
-	
-	
 	public boolean isSubClassOf(IncidenceClass anIncidenceClass);
-
 
 	/**
 	 * Lists all direct and indirect superclasses of this IncidenceClass.
@@ -539,5 +534,13 @@ public interface IncidenceClass {
 	 */
 	public boolean isSuperClassOfOrEquals(IncidenceClass anIncidenceClass);
 
+	/**
+	 * @return {@link Schema} of {@link #getEdgeClass()}
+	 */
+	public Schema getSchema();
 
+	/**
+	 * @return the set of all role names valid for this IncidenceClass
+	 */
+	public Set<String> getAllRoles();
 }
