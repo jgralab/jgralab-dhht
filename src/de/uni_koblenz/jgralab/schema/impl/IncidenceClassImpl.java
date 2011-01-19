@@ -262,5 +262,76 @@ public class IncidenceClassImpl implements IncidenceClass {
 	// roles.add(getRolename());
 	// return roles;
 	// }
+	
+	/**
+	 * checks if the incidence classes own and inherited are compatible, i.e. if
+	 * the upper multiplicity of own is lower or equal than the one of inherited
+	 * and so on
+	 * 
+	 * @param special
+	 * @param general
+	 * @return true iff the IncidenceClasses are compatible
+	 */
+	public static void checkIncidenceClassSpecialization(
+			IncidenceClass special, IncidenceClass general) {
+		// Vertex same
+		if ((special.getVertexClass() != general.getVertexClass())
+				&& (!general.getVertexClass().isSuperClassOf(
+						special.getVertexClass()))) {
+			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+					: "Omega";
+			throw new SchemaException(
+					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
+							+ "EdgeClasses are "
+							+ special.getEdgeClass().getQualifiedName()
+							+ " and "
+							+ general.getEdgeClass().getQualifiedName()
+							+ " at end " + dir);
+		}
+		// Multiplicities
+		if (special.getMax() > general.getMax()) {
+			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+					: "Omega";
+			throw new SchemaException(
+					"The multiplicity of an edge class may not be larger than the multiplicities of its superclass. Offending"
+							+ "EdgeClasses are "
+							+ special.getEdgeClass().getQualifiedName()
+							+ " and "
+							+ general.getEdgeClass().getQualifiedName()
+							+ " at end " + dir);
+		}
+
+		// name clashes
+		if (general.getRolename().equals(special.getRolename())
+				&& !general.getRolename().isEmpty()
+				&& !special.getRolename().isEmpty()) {
+			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
+					: "Omega";
+			throw new SchemaException(
+					"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
+							+ "EdgeClasses are "
+							+ special.getEdgeClass().getQualifiedName()
+							+ " and "
+							+ general.getEdgeClass().getQualifiedName()
+							+ " at end " + dir);
+		}
+		for (IncidenceClass ic : general.getSubsettedIncidenceClasses()) {
+			if (ic.getRolename().equals(special.getRolename())
+					&& !general.getRolename().isEmpty()
+					&& !ic.getRolename().isEmpty()) {
+				String dir = ic.getDirection() == IncidenceDirection.OUT ? "Alpha"
+						: "Omega";
+				throw new SchemaException(
+						"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
+								+ "EdgeClasses are "
+								+ special.getEdgeClass().getQualifiedName()
+								+ " and "
+								+ ic.getEdgeClass().getQualifiedName()
+								+ " at end " + dir);
+			}
+		}
+
+	}
+
 
 }
