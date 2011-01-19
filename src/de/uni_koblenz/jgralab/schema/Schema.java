@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
@@ -466,5 +467,7 @@ public interface Schema extends Comparable<Schema> {
 	 * sets the factory that is used to create graphs, vertices and edges
 	 */
 	public void setGraphFactory(GraphFactory factory);
+
+	public IncidenceClass getDefaultIncidenceClass(Direction dir);
 
 }
