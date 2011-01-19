@@ -33,6 +33,8 @@ package de.uni_koblenz.jgralab.schema;
 
 import java.util.List;
 
+import de.uni_koblenz.jgralab.Direction;
+
 /**
  * Represents a <code>GraphClass</code> in the <code>Schema</code>, that holds
  * all <code>GraphElementClasses</code>.
@@ -56,39 +58,32 @@ public interface GraphClass extends AttributedElementClass {
 	public final static String DEFAULTGRAPHCLASS_NAME = "Graph";
 
 	/**
-	 * creates an edge class between vertex class from, multiplicity fromMin and
-	 * fromMax with the rolename fromRoleName, and vertex class to, multiplicity
-	 * toMin and toMax with the rolename toRoleName and the edgeclassname name
+	 * creates an edge class with the given qualified name
 	 * 
 	 * @param qualifiedName
-	 *            a unique name in the schema
-	 * @param from
-	 *            the vertex class where the edge class starts
-	 * @param fromMin
-	 *            the minimum multiplicity of the edge class on the 'from'-end
-	 * @param fromMax
-	 *            the maximum multiplicity of the edge class on the 'from'-end
-	 * @param fromRoleName
-	 *            the unique rolename of the 'from'-end
-	 * @param aggrFrom
-	 *            the aggregation kind of the 'from' end
-	 * @param to
-	 *            the vertex class where the edge class ends
-	 * @param toMin
-	 *            the minimum multiplicity of the edge class on the 'to'-end
-	 * @param toMax
-	 *            the maximum multiplicity of the edge class on the 'to-end
-	 * @param toRoleName
-	 *            the unique rolename of the 'to'-end
-	 * @param aggrTo
-	 *            the aggregation kind of the 'to' end
+	 *            the qualified name of the edge class to be created
 	 * @return the created edge class
 	 */
-	public EdgeClass createEdgeClass(String qualifiedName, VertexClass from,
-			int fromMin, int fromMax, String fromRoleName,
-			AggregationKind aggrFrom, VertexClass to, int toMin, int toMax,
-			String toRoleName, AggregationKind aggrTo);
-
+	public EdgeClass createEdgeClass(String qualifiedName);
+	
+	
+	
+	/**
+	 * Creates a new IncidenceClass between vertexClass and edgeClass with the name rolename
+	 * @param vertexClass the vertex class the created incidence class should be connected to
+	 * @param edgeClass the edge class the created incidence class should be connected to
+	 * @param rolename the name of the incidence class to be created, need to be unique at edge and vertex class
+	 * @param dir the direction of the incidence (from edge to vertex or vice versa)
+	 * @param kind the kind of the incidence (aggregation, composition)
+	 * @param minEdgesAtVertex the minimal number of edges to be connected by such an incidence to each vertex
+	 * @param maxEdgesAtVertex the maximal number of edges to be connected by such an incidence to each vertex
+	 * @param minVerticesAtEdge the minimal number of vertices to be connected by such an incidence to each edge
+	 * @param maxVerticesAtEdge the maximal number of vertices to be connected by such an incidence to each edge
+	 * @return
+	 */
+	public IncidenceClass createIncidenceClass(VertexClass vertexClass, EdgeClass edgeClass, String rolename, Direction dir, IncidenceType kind, int minEdgesAtVertex, int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge);
+	
+	
 	/**
 	 * creates a vertex class with the vertexclassname name
 	 * 
@@ -159,6 +154,8 @@ public interface GraphClass extends AttributedElementClass {
 	 * @return the number of EdgeClasses defined in this GraphClass.
 	 */
 	public int getEdgeClassCount();
+	
+	
 
 	/**
 	 * @param aGraphElementClass
