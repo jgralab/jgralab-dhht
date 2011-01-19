@@ -36,6 +36,7 @@ package de.uni_koblenz.jgralab;
  * 
  * @see Direction#EDGE_TO_VERTEX
  * @see Direction#VERTEX_TO_EDGE
+ * @see Direction#BOTH
  * @author ist@uni-koblenz.de
  */
 public enum Direction {
@@ -45,12 +46,18 @@ public enum Direction {
 	 * {@link Edge} and leads to a {@link Vertex}. Such an {@link Incidence} is
 	 * called ingoing.
 	 */
-	EDGE_TO_VERTEX, /**
-	 * This direction describes an {@link Incidence} which
-	 * begins at a {@link Vertex} and leads to an {@link Edge}. Such an
-	 * {@link Incidence} is called outgoing.
+	EDGE_TO_VERTEX,
+	/**
+	 * This direction describes an {@link Incidence} which begins at a
+	 * {@link Vertex} and leads to an {@link Edge}. Such an {@link Incidence} is
+	 * called outgoing.
 	 */
-	VERTEX_TO_EDGE;
+	VERTEX_TO_EDGE,
+	/**
+	 * This direction describes an {@link Incidence} which begins at a
+	 * {@link Vertex} and leads to an {@link Edge} or the other way round.
+	 */
+	BOTH;
 
 	/**
 	 * Parses a given {@link String} for {@link Direction}.
@@ -63,13 +70,20 @@ public enum Direction {
 	 *             When no {@link Direction} could be matched from
 	 *             <code>direction</code>.
 	 */
-	public static Direction parse(String direction) throws Exception {// old
+	public static Direction parse(String direction) throws Exception {
 		if (direction.equals("EDGE_TO_VERTEX")) {
-			return Direction.EDGE_TO_VERTEX;
+			return EDGE_TO_VERTEX;
 		} else if (direction.equals("VERTEX_TO_EDGE")) {
-			return Direction.VERTEX_TO_EDGE;
+			return VERTEX_TO_EDGE;
+		} else if (direction.equals("BOTH")) {
+			return BOTH;
 		} else {
 			throw new Exception("Could not determine direction from string.");
 		}
+	}
+
+	public Direction getOppositeDirection() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

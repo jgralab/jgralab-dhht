@@ -60,7 +60,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  * 
  */
-public abstract class GraphElementImpl<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> implements GraphElement<OwnType, DualType> {
+public abstract class GraphElementImpl<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>>
+		implements GraphElement<OwnType, DualType> {
 
 	/**
 	 * The id of this {@link GraphElement}.
@@ -130,9 +131,6 @@ public abstract class GraphElementImpl<OwnType extends GraphElement<OwnType, Dua
 	 */
 	protected abstract void setId(int id);
 
-	/**
-	 * TODO old
-	 */
 	@Override
 	public void initializeAttributesWithDefaultValues() {
 		for (Attribute attr : getAttributedElementClass().getAttributeList()) {
@@ -147,12 +145,6 @@ public abstract class GraphElementImpl<OwnType extends GraphElement<OwnType, Dua
 		}
 	}
 
-	/**
-	 * TODO old
-	 * 
-	 * @param attr
-	 * @throws GraphIOException
-	 */
 	protected void internalSetDefaultValue(Attribute attr)
 			throws GraphIOException {
 		attr.setDefaultValue(this);

@@ -62,7 +62,7 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge(Direction direction) {
 		Incidence i = getNextIncidenceAtEdge();
-		while ((i != null) && direction != null
+		while ((i != null) && direction != null && direction != Direction.BOTH
 				&& i.getDirection() != direction) {
 			i = i.getNextIncidenceAtEdge();
 		}
@@ -162,7 +162,7 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtVertex(Direction direction) {
 		Incidence i = getNextIncidenceAtVertex();
-		while ((i != null) && direction != null
+		while ((i != null) && direction != null && direction != Direction.BOTH
 				&& i.getDirection() != direction) {
 			i = i.getNextIncidenceAtVertex();
 		}

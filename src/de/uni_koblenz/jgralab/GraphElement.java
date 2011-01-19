@@ -48,12 +48,6 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            If <code>&lt;OwnType&gt;</code> is {@link Vertex} this parameter
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
-/**
- * @author ist@uni-koblenz.de
- * 
- * @param <OwnType>
- * @param <DualType>
- */
 public interface GraphElement<OwnType, DualType> extends AttributedElement {
 
 	/**
@@ -94,9 +88,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * exist, <code>null</code> is returned.
 	 * 
 	 * @param direction
-	 *            {@link Direction} of connected {@link Incidence}s. If set to
-	 *            <code>null</code> {@link Incidence}s of both directions are
-	 *            returned.
+	 *            {@link Direction} of connected {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(Direction direction);
@@ -168,9 +160,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}s. If set to
-	 *            <code>null</code> {@link Incidence}s of both directions are
-	 *            returned.
+	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
@@ -185,9 +175,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}s. If set to
-	 *            <code>null</code> {@link Incidence}s of both directions are
-	 *            returned.
+	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(
@@ -239,9 +227,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link IncidenceClass} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}s. If set to
-	 *            <code>null</code> {@link Incidence}s of both directions are
-	 *            returned.
+	 *            {@link Direction} of the {@link Incidence}s.
 	 * @param noSubclasses
 	 *            boolean
 	 * @return {@link Incidence}
@@ -261,9 +247,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * @param anIncidenceClass
 	 *            {@link Class} to search for
 	 * @param direction
-	 *            {@link Direction} of the {@link Incidence}s. If set to
-	 *            <code>null</code> {@link Incidence}s of both directions are
-	 *            returned.
+	 *            {@link Direction} of the {@link Incidence}s.
 	 * @param noSubclasses
 	 *            boolean
 	 * @return {@link Incidence}
@@ -294,8 +278,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 * 
 	 * @param direction
 	 *            {@link Direction} specifies the direction of the requested
-	 *            {@link Incidence}s. If set to <code>null</code>
-	 *            {@link Incidence}s of both directions are returned.
+	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(Direction direction);
@@ -333,8 +316,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 *            {@link Class}
 	 * @param direction
 	 *            {@link Direction} specifies the direction of the requested
-	 *            {@link Incidence}s. If set to <code>null</code>
-	 *            {@link Incidence}s of both directions are returned.
+	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(
@@ -350,8 +332,7 @@ public interface GraphElement<OwnType, DualType> extends AttributedElement {
 	 *            {@link Class}
 	 * @param direction
 	 *            {@link Direction} specifies the direction of the requested
-	 *            {@link Incidence}s. If set to <code>null</code>
-	 *            {@link Incidence}s of both directions are returned.
+	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,

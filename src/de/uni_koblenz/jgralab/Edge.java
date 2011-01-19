@@ -251,13 +251,13 @@ public interface Edge extends GraphElement<Edge, Vertex> {
 	public Iterable<Vertex> getIncidentVertices(
 			Class<? extends Vertex> aVertexClass, Direction direction);
 
-
 	/**
-	 * Tests if this edge is a binary one (i.e., its edge class has only two incidences both with 
-	 * multiplicity 1 for the number of vertices at the edge)
+	 * Tests if this edge is a binary one (i.e., its edge class has only two
+	 * incidences both with multiplicity 1 for the number of vertices at the
+	 * edge)
+	 * 
 	 * @return true for binary edges, false otherwise
 	 */
 	public boolean isBinary();
-	
 
 }

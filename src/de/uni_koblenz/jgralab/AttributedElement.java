@@ -48,7 +48,7 @@ public interface AttributedElement extends Comparable<AttributedElement> {
 	/**
 	 * @return the corresponding m2-element to this m1-element
 	 */
-	public AttributedElementClass getAttributedElementClass();// old
+	public AttributedElementClass getAttributedElementClass();
 
 	/**
 	 * Returns the m1-class of this {@link AttributedElement}.
@@ -57,18 +57,18 @@ public interface AttributedElement extends Comparable<AttributedElement> {
 	 */
 	public Class<? extends AttributedElement> getM1Class();
 
-	public GraphClass getGraphClass();// old
+	public GraphClass getGraphClass();
 
 	public void readAttributeValueFromString(String attributeName, String value)
-			throws GraphIOException, NoSuchAttributeException;// old
+			throws GraphIOException, NoSuchAttributeException;
 
 	public String writeAttributeValueToString(String attributeName)
-			throws IOException, GraphIOException, NoSuchAttributeException;// old
+			throws IOException, GraphIOException, NoSuchAttributeException;
 
 	public void writeAttributeValues(GraphIO io) throws IOException,
-			GraphIOException;// old
+			GraphIOException;
 
-	public void readAttributeValues(GraphIO io) throws GraphIOException;// old
+	public void readAttributeValues(GraphIO io) throws GraphIOException;
 
 	/**
 	 * Returns the value of the attribute <code>name</code> of this
@@ -84,12 +84,12 @@ public interface AttributedElement extends Comparable<AttributedElement> {
 	public Object getAttribute(String name) throws NoSuchAttributeException;
 
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException;// old
+			throws NoSuchAttributeException;
 
 	/**
 	 * @return the schema this AttributedElement belongs to
 	 */
-	public Schema getSchema();// old
+	public Schema getSchema();
 
-	void initializeAttributesWithDefaultValues();// old
+	void initializeAttributesWithDefaultValues();
 }

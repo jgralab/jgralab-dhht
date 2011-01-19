@@ -38,7 +38,7 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
- * represents a vertex, m1 classes inherit from this class
+ * Represents a vertex, m1 classes inherit from this class.
  * 
  * @author ist@uni-koblenz.de
  * 

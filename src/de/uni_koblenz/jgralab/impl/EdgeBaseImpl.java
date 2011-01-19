@@ -75,7 +75,7 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 	public Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
 		Incidence i = getFirstIncidence();
-		while ((i != null) && direction != null
+		while ((i != null) && direction != null && direction != Direction.BOTH
 				&& i.getDirection() != direction) {
 			i = i.getNextIncidenceAtEdge();
 		}
@@ -386,7 +386,7 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		int d = 0;
 		Incidence i = getFirstIncidence();
 		while (i != null) {
-			if (i.getDirection() == direction) {
+			if (direction == Direction.BOTH || i.getDirection() == direction) {
 				d++;
 			}
 			i = i.getNextIncidenceAtEdge();
