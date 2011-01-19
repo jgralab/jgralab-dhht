@@ -59,8 +59,12 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 		implements Edge {
 
 	/**
-	 * @param anId
+	 * Creates a new {@link Edge} instance.
+	 * 
+	 * @param id
+	 *            int the id of the edge
 	 * @param graph
+	 *            {@link Graph} its corresponding graph
 	 */
 	protected EdgeBaseImpl(int anId, Graph graph) {
 		super(graph);
@@ -912,7 +916,6 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 	public void connect(String rolename, Vertex elemToConnect) {
 		connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
-
 
 	@Override
 	public void connect(IncidenceClass incidenceClass, Vertex elemToConnect) {

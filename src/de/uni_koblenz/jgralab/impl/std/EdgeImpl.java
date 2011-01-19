@@ -115,11 +115,12 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	}
 
 	/**
-	 * TODO adapt to dhht
+	 * Creates a new {@link EdgeImpl} instance.
 	 * 
-	 * @param anId
+	 * @param id
+	 *            int
 	 * @param graph
-	 * @throws Exception
+	 *            {@link Graph}
 	 */
 	protected EdgeImpl(int anId, Graph graph) {
 		super(anId, graph);
