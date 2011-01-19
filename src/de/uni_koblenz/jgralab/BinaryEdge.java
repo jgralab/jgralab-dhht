@@ -3,7 +3,6 @@
  */
 package de.uni_koblenz.jgralab;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -38,7 +37,7 @@ public interface BinaryEdge extends Edge {
 	 *             if this {@link Edge} is not binary.
 	 */
 	public Vertex getOmega();
-	
+
 	/**
 	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
 	 * {@link IncidenceType#AGGREGATION} or {@link IncidenceType#COMPOSITION}.
@@ -65,5 +64,4 @@ public interface BinaryEdge extends Edge {
 	 */
 	public IncidenceType getOmegaSemantics();
 
-	
 }
