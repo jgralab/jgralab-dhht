@@ -97,7 +97,6 @@ public class DirectedGraphMarker<O> extends
 	@Override
 	public void edgeDeleted(Edge e) {
 		tempAttributeMap.remove(e);
-		tempAttributeMap.remove(e.getReversedEdge());
 	}
 
 	@Override

@@ -36,7 +36,7 @@ import java.util.HashMap;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.impl.ReversedEdgeBaseImpl;
+
 
 /**
  * This class can be used to "colorize" graphs, edges and vertices. If a
@@ -89,9 +89,6 @@ public abstract class MapGraphMarker<T extends AttributedElement, O> extends
 		}
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = getNormalEdge(elem);
-		}
 		return tempAttributeMap.get(elem);
 	}
 
@@ -109,19 +106,11 @@ public abstract class MapGraphMarker<T extends AttributedElement, O> extends
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
 
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = getNormalEdge(elem);
-		}
 
 		return tempAttributeMap.put(elem, value);
 
 	}
 
-	@SuppressWarnings("unchecked")
-	private T getNormalEdge(T elem) {
-		elem = (T) ((ReversedEdgeBaseImpl) elem).getNormalEdge();
-		return elem;
-	}
 
 	/**
 	 * Returns the number of marked elements in this GraphMarker.
@@ -165,9 +154,6 @@ public abstract class MapGraphMarker<T extends AttributedElement, O> extends
 	public boolean isMarked(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = getNormalEdge(elem);
-		}
 		return tempAttributeMap.containsKey(elem);
 	}
 
@@ -175,9 +161,6 @@ public abstract class MapGraphMarker<T extends AttributedElement, O> extends
 	public boolean removeMark(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = getNormalEdge(elem);
-		}
 		return tempAttributeMap.remove(elem) != null;
 	}
 

@@ -46,7 +46,7 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 
 	@Override
 	public void edgeDeleted(Edge e) {
-		removeMark(e.getNormalEdge());
+		removeMark(e);
 	}
 
 	@Override
@@ -69,17 +69,17 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 
 	@Override
 	public long mark(Edge edge, long value) {
-		return super.mark(edge.getNormalEdge(), value);
+		return super.mark(edge, value);
 	}
 
 	@Override
 	public boolean isMarked(Edge edge) {
-		return super.isMarked(edge.getNormalEdge());
+		return super.isMarked(edge);
 	}
 
 	@Override
 	public long getMark(Edge edge) {
-		return super.getMark(edge.getNormalEdge());
+		return super.getMark(edge);
 	}
 
 	@Override

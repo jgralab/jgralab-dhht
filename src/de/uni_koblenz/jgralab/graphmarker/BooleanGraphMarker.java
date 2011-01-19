@@ -38,7 +38,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.ReversedEdgeBaseImpl;
 
 /**
  * This class can be used to "colorize" graphs, it supports only two "colors",
@@ -73,9 +72,6 @@ public class BooleanGraphMarker extends AbstractGraphMarker<AttributedElement> {
 	public final boolean isMarked(AttributedElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = ((ReversedEdgeBaseImpl) elem).getNormalEdge();
-		}
 		return markedElements.contains(elem);
 	}
 
@@ -90,9 +86,6 @@ public class BooleanGraphMarker extends AbstractGraphMarker<AttributedElement> {
 	public final boolean mark(AttributedElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = ((ReversedEdgeBaseImpl) elem).getNormalEdge();
-		}
 
 		return markedElements.add(elem);
 
@@ -110,9 +103,6 @@ public class BooleanGraphMarker extends AbstractGraphMarker<AttributedElement> {
 	public final boolean removeMark(AttributedElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement) elem)
 				.getGraph() == graph) || elem == graph);
-		if (elem instanceof ReversedEdgeBaseImpl) {
-			elem = ((ReversedEdgeBaseImpl) elem).getNormalEdge();
-		}
 		return markedElements.remove(elem);
 	}
 

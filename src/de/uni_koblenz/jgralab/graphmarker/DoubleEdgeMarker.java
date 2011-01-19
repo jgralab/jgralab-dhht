@@ -46,7 +46,7 @@ public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 
 	@Override
 	public void edgeDeleted(Edge e) {
-		removeMark(e.getNormalEdge());
+		removeMark(e);
 	}
 
 	@Override
@@ -69,17 +69,17 @@ public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 
 	@Override
 	public double mark(Edge edge, double value) {
-		return super.mark(edge.getNormalEdge(), value);
+		return super.mark(edge, value);
 	}
 
 	@Override
 	public boolean isMarked(Edge edge) {
-		return super.isMarked(edge.getNormalEdge());
+		return super.isMarked(edge);
 	}
 
 	@Override
 	public double getMark(Edge edge) {
-		return super.getMark(edge.getNormalEdge());
+		return super.getMark(edge);
 	}
 
 	@Override
