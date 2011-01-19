@@ -98,12 +98,12 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		@SuppressWarnings("unchecked")
-		public <G1, G2> IncidenceIterator(GraphElement<G1, G2> graphElement,
+		public <OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> IncidenceIterator(GraphElement<OwnType, DualType> graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;
-			incidenceListVersion = ((GraphElementImpl<G1, G2>) graphElement)
+			incidenceListVersion = ((GraphElementImpl<OwnType, DualType>) graphElement)
 					.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
 					: graphElement.getFirstIncidence(ic, dir));

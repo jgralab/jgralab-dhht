@@ -42,8 +42,8 @@ import de.uni_koblenz.jgralab.Incidence;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> implements
-		Iterable<OwnType> {
+public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?>, AdjacentElementClass extends GraphElement<?, ?>> implements
+		Iterable<AdjacentElementClass> {
 	
 	/**
 	 * Creates an Iterable for all neighbours adjacent to <code>elem</code>.
@@ -51,7 +51,7 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 	 * @param elem 
 	 *            
 	 */
-	public NeighbourIterable(OwnType elem) {
+	public AdjacentElementsIterable(OwnType elem) {
 		this(elem, null, Direction.BOTH);
 	}
 
@@ -62,10 +62,11 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 	 * @param v
 	 *            
 	 * @param ec
-	 *            restricts edges to that class or subclasses
+	 *            restricts elements
+	 *           to that class or subclasses
 	 */
-	public NeighbourIterable(OwnType elem, Class<? extends DualType> other) {
-		this(elem, other, Direction.BOTH);
+	public AdjacentElementsIterable(OwnType elem, Class<? extends AdjacentElementClass> ec) {
+		this(elem, ec, Direction.BOTH);
 	}
 
 	/**
@@ -77,7 +78,7 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public NeighbourIterable(OwnType elem, Direction dir) {
+	public AdjacentElementsIterable(OwnType elem, Direction dir) {
 		this(elem, null, dir);
 	}
 
@@ -93,22 +94,22 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public NeighbourIterable(OwnType elem, Class<? extends DualType> ec,
+	public AdjacentElementsIterable(OwnType elem, Class<? extends AdjacentElementClass> ec,
 			Direction dir) {
 		assert elem != null && elem.isValid();
-		
+		adjacentElementsIterator = new AdjacenctElementsIterator(elem, ec, dir);
 	}
 		
-	class NeigbourIterator implements Iterator<OwnType> {
+	class AdjacenctElementsIterator implements Iterator<AdjacentElementClass> {
         private Iterator<Incidence> incidencesAtOwnElementIterator;
         private Iterator<Incidence> incidencesAtIncidentElementIterator;
         private Incidence currentIncidenceToIncidentElement;
         private boolean gotNext = false;
-        private OwnType nextElem = null;
-        private Class<? extends OwnType> classOfAdjacentElements;
+        private AdjacentElementClass nextElem = null;
+        private Class<? extends AdjacentElementClass> classOfAdjacentElements;
        
 		
-		public NeigbourIterator(OwnType elem, Class<? extends OwnType> oc, Direction dir ) {
+		public AdjacenctElementsIterator(OwnType elem, Class<? extends AdjacentElementClass> oc, Direction dir ) {
 			classOfAdjacentElements = oc;
 			incidencesAtOwnElementIterator = elem.getIncidences(dir).iterator();			
 		}
@@ -122,19 +123,19 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 		}	
 		
 		@SuppressWarnings("unchecked")
-		private OwnType findNextElem() {
-			OwnType element = null;
+		private AdjacentElementClass findNextElem() {
+			AdjacentElementClass element = null;
 			do {
 				element = null;
 				if ((incidencesAtIncidentElementIterator != null) && incidencesAtIncidentElementIterator.hasNext()) {
-					element = (OwnType) incidencesAtIncidentElementIterator.next().getThat();
+					element = (AdjacentElementClass) incidencesAtIncidentElementIterator.next().getThat();
 				} else {
 					while (incidencesAtOwnElementIterator.hasNext()) {
 						currentIncidenceToIncidentElement = incidencesAtOwnElementIterator.next();
 						Direction currentDirection = currentIncidenceToIncidentElement.getDirection();
 						incidencesAtIncidentElementIterator = currentIncidenceToIncidentElement.getEdge().getIncidences(currentDirection.getOppositeDirection()).iterator(); 
 						if (incidencesAtIncidentElementIterator.hasNext()) {
-							element = (OwnType) incidencesAtIncidentElementIterator.next().getThat();
+							element = (AdjacentElementClass) incidencesAtIncidentElementIterator.next().getThat();
 							break;
 						}	
 					}
@@ -144,7 +145,8 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 		}
 
 		@Override
-		public OwnType next() {
+		public AdjacentElementClass next() {
+			gotNext = true;
 			hasNext();
 			return nextElem;
 		}
@@ -155,10 +157,10 @@ public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, Du
 		}
 	}
 
-	private Iterator<OwnType> neighbourIterator;
+	private Iterator<AdjacentElementClass> adjacentElementsIterator;
 
 	@Override
-	public Iterator<OwnType> iterator() {
-		return neighbourIterator;
+	public Iterator<AdjacentElementClass> iterator() {
+		return adjacentElementsIterator;
 	}
 }

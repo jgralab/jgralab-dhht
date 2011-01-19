@@ -121,9 +121,9 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	 * @param graph
 	 * @throws Exception
 	 */
-	protected EdgeImpl(int anId, Graph graph, Vertex alpha, Vertex omega) {
+	protected EdgeImpl(int anId, Graph graph) {
 		super(anId, graph);
-		((GraphImpl) graph).addEdge(this, alpha, omega);
+		((GraphImpl) graph).addEdge(this);
 	}
 
 	@Override
@@ -141,7 +141,8 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	 * 
 	 * @return boolean <code>true</code> if this {@link Edge} is a binary edge.
 	 */
-	boolean isBinaryEdge() {
+	@Override
+	public boolean isBinary() {
 		return false;
 	}
 

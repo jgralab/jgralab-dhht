@@ -53,7 +53,6 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -191,28 +190,6 @@ public abstract class GraphImpl extends
 		return value;
 	}
 
-	@Override
-	protected ReversedEdgeImpl[] getRevEdge() {
-		// accessing revEdge-Array while expanding it should not be allowed
-		edgeSync.readLock().lock();
-		ReversedEdgeImpl[] value = null;
-		if (isLoading()) {
-			value = revEdge.getLatestPersistentValue();
-		} else {
-			Transaction transaction = getCurrentTransaction();
-			if (transaction == null) {
-				throw new GraphException("Current transaction is null.");
-			}
-			// important for correct execution of validation-phase
-			if (transaction.getState() == TransactionState.VALIDATING) {
-				value = revEdge.getLatestPersistentValue();
-			} else {
-				value = revEdge.getValidValue(getCurrentTransaction());
-			}
-		}
-		edgeSync.readLock().unlock();
-		return value;
-	}
 
 	@Override
 	protected VertexImpl[] getVertex() {
@@ -429,17 +406,6 @@ public abstract class GraphImpl extends
 		}
 	}
 
-	@Override
-	protected void setRevEdge(
-			de.uni_koblenz.jgralab.impl.ReversedEdgeBaseImpl[] revEdge) {
-		edgeSync.readLock().lock();
-		try {
-			this.revEdge.setValidValue((ReversedEdgeImpl[]) revEdge,
-					getCurrentTransaction());
-		} finally {
-			edgeSync.readLock().unlock();
-		}
-	}
 
 	@Override
 	protected void setVCount(int count) {
@@ -860,63 +826,68 @@ public abstract class GraphImpl extends
 			edgeSync.writeLock().unlock();
 		}
 	}
-
+	
 	@Override
-	protected void addEdge(Edge newEdge, Vertex alpha, Vertex omega) {
-		if (isLoading()) {
-			super.addEdge(newEdge, alpha, omega);
-		} else {
-			TransactionImpl transaction = (TransactionImpl) getCurrentTransaction();
-			if (transaction == null) {
-				throw new GraphException("Current transaction is null.");
-			}
-			if (transaction.isReadOnly()) {
-				throw new GraphException(
-						"Read-only transactions are not allowed to add edges.");
-			}
-			// It should not be possible to add newEdge, if alpha isn't
-			// valid in the current transaction.
-			if (!alpha.isValid()) {
-				throw new GraphException("Alpha-vertex " + alpha
-						+ " is not valid within the current transaction "
-						+ transaction + ".");
-			}
-			// It should not be possible to add newEdge, if omega isn't
-			// valid in the current transaction.
-			if (!omega.isValid()) {
-				throw new GraphException("Omega-vertex " + omega
-						+ " is not valid within the current transaction "
-						+ transaction + ".");
-			}
-			synchronized (transaction) {
-				// create temporary versions of edge and revEdge if not already
-				// existing
-				if (transaction.getState() == TransactionState.RUNNING) {
-					edgeSync.writeLock().lock();
-					edge.prepareValueChangeAfterReference(transaction);
-					revEdge.prepareValueChangeAfterReference(transaction);
-					edgeSync.writeLock().unlock();
-				}
-				try {
-					super.addEdge(newEdge, alpha, omega);
-				} catch (GraphException e) {
-					throw e;
-				}
-				assert ((transaction != null) && !transaction.isReadOnly()
-						&& transaction.isValid() && (transaction.getState() != TransactionState.NOTRUNNING));
-				if (transaction.getState() == TransactionState.RUNNING) {
-					if (transaction.addedEdges == null) {
-						transaction.addedEdges = new ArrayList<EdgeImpl>(1);
-					}
-					transaction.addedEdges
-							.add((de.uni_koblenz.jgralab.impl.trans.EdgeImpl) (newEdge));
-					if (transaction.deletedEdges != null) {
-						transaction.deletedEdges.remove(newEdge);
-					}
-				}
-			}
-		}
-	}
+	protected void addEdge(Edge newEdge) {
+		throw new UnsupportedOperationException();
+	}	
+
+//	@Override
+//	protected void addEdge(Edge newEdge) {
+//		if (isLoading()) {
+//			super.addEdge(newEdge);
+//		} else {
+//			TransactionImpl transaction = (TransactionImpl) getCurrentTransaction();
+//			if (transaction == null) {
+//				throw new GraphException("Current transaction is null.");
+//			}
+//			if (transaction.isReadOnly()) {
+//				throw new GraphException(
+//						"Read-only transactions are not allowed to add edges.");
+//			}
+//			// It should not be possible to add newEdge, if alpha isn't
+//			// valid in the current transaction.
+//			if (!alpha.isValid()) {
+//				throw new GraphException("Alpha-vertex " + alpha
+//						+ " is not valid within the current transaction "
+//						+ transaction + ".");
+//			}
+//			// It should not be possible to add newEdge, if omega isn't
+//			// valid in the current transaction.
+//			if (!omega.isValid()) {
+//				throw new GraphException("Omega-vertex " + omega
+//						+ " is not valid within the current transaction "
+//						+ transaction + ".");
+//			}
+//			synchronized (transaction) {
+//				// create temporary versions of edge and revEdge if not already
+//				// existing
+//				if (transaction.getState() == TransactionState.RUNNING) {
+//					edgeSync.writeLock().lock();
+//					edge.prepareValueChangeAfterReference(transaction);
+//					revEdge.prepareValueChangeAfterReference(transaction);
+//					edgeSync.writeLock().unlock();
+//				}
+//				try {
+//					super.addEdge(newEdge, alpha, omega);
+//				} catch (GraphException e) {
+//					throw e;
+//				}
+//				assert ((transaction != null) && !transaction.isReadOnly()
+//						&& transaction.isValid() && (transaction.getState() != TransactionState.NOTRUNNING));
+//				if (transaction.getState() == TransactionState.RUNNING) {
+//					if (transaction.addedEdges == null) {
+//						transaction.addedEdges = new ArrayList<EdgeImpl>(1);
+//					}
+//					transaction.addedEdges
+//							.add((de.uni_koblenz.jgralab.impl.trans.EdgeImpl) (newEdge));
+//					if (transaction.deletedEdges != null) {
+//						transaction.deletedEdges.remove(newEdge);
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	@Override
 	protected void addVertex(Vertex newVertex) {
@@ -959,10 +930,8 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected Edge internalCreateEdge(Class<? extends Edge> cls, Vertex alpha,
-			Vertex omega) {
-		return graphFactory.createEdgeWithTransactionSupport(cls, 0, this,
-				alpha, omega);
+	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
+		return graphFactory.createEdgeWithTransactionSupport(cls, 0, this);
 	}
 
 	@Override
@@ -1003,8 +972,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void edgeAfterDeleted(Edge edgeToBeDeleted, Vertex oldAlpha,
-			Vertex oldOmega) {
+	protected void edgeAfterDeleted(Edge edgeToBeDeleted) {
 		TransactionImpl transaction = (TransactionImpl) getCurrentTransaction();
 		assert ((transaction != null) && !transaction.isReadOnly()
 				&& transaction.isValid() && (transaction.getState() != TransactionState.NOTRUNNING));
@@ -1018,7 +986,7 @@ public abstract class GraphImpl extends
 				}
 				transaction.deletedEdges
 						.add((de.uni_koblenz.jgralab.impl.trans.EdgeImpl) (edgeToBeDeleted
-								.getNormalEdge()));
+								));
 			}
 			// delete references to edgeToBeDeleted in other change sets
 			if (transaction.changedAttributes != null) {
@@ -1027,38 +995,40 @@ public abstract class GraphImpl extends
 			if (transaction.changedEdges != null) {
 				transaction.changedEdges.remove(edgeToBeDeleted);
 			}
-			if (transaction.changedEseqEdges != null) {
-				transaction.changedEseqEdges.remove(edgeToBeDeleted);
-				Edge prevEdge = edgeToBeDeleted.getPrevIncidence();
-				if (transaction.changedEseqEdges.containsKey(prevEdge)) {
-					if (transaction.changedEseqEdges.get(prevEdge).containsKey(
-							ListPosition.NEXT)) {
-						transaction.changedEseqEdges.remove(prevEdge);
-					}
-				}
-				Edge nextEdge = edgeToBeDeleted.getNextIncidence();
-				// check if current (temporary) nextEdge has been changed
-				// explicitly
-				if (transaction.changedEseqEdges.containsKey(nextEdge)) {
-					if (transaction.changedEseqEdges.get(nextEdge).containsKey(
-							ListPosition.PREV)) {
-						transaction.changedEseqEdges.remove(nextEdge);
-					}
-				}
-			}
-			if (transaction.changedIncidences != null) {
-				// remove edgeToBeDeleted from incidence lists
-				Map<IncidenceImpl, Map<ListPosition, Boolean>> changedAlphaIncidences = transaction.changedIncidences
-						.get(oldAlpha);
-				if (changedAlphaIncidences != null) {
-					changedAlphaIncidences.remove(edgeToBeDeleted);
-				}
-				Map<IncidenceImpl, Map<ListPosition, Boolean>> changedOmegaIncidences = transaction.changedIncidences
-						.get(oldOmega);
-				if (changedOmegaIncidences != null) {
-					changedOmegaIncidences.remove(edgeToBeDeleted);
-				}
-			}
+			throw new UnsupportedOperationException();
+			//TODO: Incidences anpassend
+//			if (transaction.changedEseqEdges != null) {
+//				transaction.changedEseqEdges.remove(edgeToBeDeleted);
+//				Edge prevEdge = edgeToBeDeleted.getPrevIncidence();
+//				if (transaction.changedEseqEdges.containsKey(prevEdge)) {
+//					if (transaction.changedEseqEdges.get(prevEdge).containsKey(
+//							ListPosition.NEXT)) {
+//						transaction.changedEseqEdges.remove(prevEdge);
+//					}
+//				}
+//				Edge nextEdge = edgeToBeDeleted.getNextIncidence();
+//				// check if current (temporary) nextEdge has been changed
+//				// explicitly
+//				if (transaction.changedEseqEdges.containsKey(nextEdge)) {
+//					if (transaction.changedEseqEdges.get(nextEdge).containsKey(
+//							ListPosition.PREV)) {
+//						transaction.changedEseqEdges.remove(nextEdge);
+//					}
+//				}
+//			}
+//			if (transaction.changedIncidences != null) {
+//				// remove edgeToBeDeleted from incidence lists
+//				Map<IncidenceImpl, Map<ListPosition, Boolean>> changedAlphaIncidences = transaction.changedIncidences
+//						.get(oldAlpha);
+//				if (changedAlphaIncidences != null) {
+//					changedAlphaIncidences.remove(edgeToBeDeleted);
+//				}
+//				Map<IncidenceImpl, Map<ListPosition, Boolean>> changedOmegaIncidences = transaction.changedIncidences
+//						.get(oldOmega);
+//				if (changedOmegaIncidences != null) {
+//					changedOmegaIncidences.remove(edgeToBeDeleted);
+//				}
+//			}
 		}
 	}
 
@@ -1134,9 +1104,10 @@ public abstract class GraphImpl extends
 					}
 				}
 			}
-			if (transaction.changedIncidences != null) {
-				transaction.changedIncidences.remove(vertexToBeDeleted);
-			}
+			throw new UnsupportedOperationException();
+//			if (transaction.changedIncidences != null) {
+//				transaction.changedIncidences.remove(vertexToBeDeleted);
+//			}
 		}
 		if (transaction.getState() == TransactionState.WRITING) {
 			if (transaction.deletedVerticesWhileWriting == null) {
@@ -1412,35 +1383,35 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	public Iterable<Vertex> vertices() {
-		return new AttributedElementIterable<Vertex>(super.vertices(), this);
+	public Iterable<Vertex> getVertices() {
+		return new AttributedElementIterable<Vertex>(super.getVertices(), this);
 	}
 
 	@Override
-	public Iterable<Vertex> vertices(Class<? extends Vertex> vertexClass) {
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
 		return new AttributedElementIterable<Vertex>(super
-				.vertices(vertexClass), this);
+				.getVertices(vertexClass), this);
 	}
 
 	@Override
-	public Iterable<Vertex> vertices(VertexClass vertexClass) {
+	public Iterable<Vertex> getVertices(VertexClass vertexClass) {
 		return new AttributedElementIterable<Vertex>(super
-				.vertices(vertexClass), this);
+				.getVertices(vertexClass), this);
 	}
 
 	@Override
-	public Iterable<Edge> edges() {
-		return new AttributedElementIterable<Edge>(super.edges(), this);
+	public Iterable<Edge> getEdges() {
+		return new AttributedElementIterable<Edge>(super.getEdges(), this);
 	}
 
 	@Override
-	public Iterable<Edge> edges(Class<? extends Edge> edgeClass) {
-		return new AttributedElementIterable<Edge>(super.edges(edgeClass), this);
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
+		return new AttributedElementIterable<Edge>(super.getEdges(edgeClass), this);
 	}
 
 	@Override
-	public Iterable<Edge> edges(EdgeClass edgeClass) {
-		return new AttributedElementIterable<Edge>(super.edges(edgeClass), this);
+	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
+		return new AttributedElementIterable<Edge>(super.getEdges(edgeClass), this);
 	}
 
 	@Override

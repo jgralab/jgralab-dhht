@@ -533,8 +533,7 @@ public abstract class GraphBaseImpl implements Graph {
 			Vertex omega) {
 		try {
 			T edge = (T) internalCreateEdge(cls);
-			((BinaryEdgeBaseImpl) edge).setAlpha(alpha);
-			((BinaryEdgeBaseImpl) edge).setOmega(omega);
+
 			//TODO: Add linking to vertices
 			return edge;
 		} catch (Exception exception) {

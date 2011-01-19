@@ -44,7 +44,6 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
 import de.uni_koblenz.jgralab.impl.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.ReversedEdgeBaseImpl;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.trans.Savepoint;
@@ -61,7 +60,6 @@ public abstract class GraphImpl extends
 	private VertexBaseImpl[] vertex;
 	private int vCount;
 	private EdgeBaseImpl[] edge;
-	private ReversedEdgeBaseImpl[] revEdge;
 	private int eCount;
 	private VertexBaseImpl firstVertex;
 	private VertexBaseImpl lastVertex;
@@ -101,11 +99,6 @@ public abstract class GraphImpl extends
 	@Override
 	protected EdgeBaseImpl[] getEdge() {
 		return edge;
-	}
-
-	@Override
-	protected ReversedEdgeBaseImpl[] getRevEdge() {
-		return revEdge;
 	}
 
 	@Override
@@ -156,11 +149,6 @@ public abstract class GraphImpl extends
 	@Override
 	protected void setEdge(EdgeBaseImpl[] edge) {
 		this.edge = edge;
-	}
-
-	@Override
-	protected void setRevEdge(ReversedEdgeBaseImpl[] revEdge) {
-		this.revEdge = revEdge;
 	}
 
 	@Override
@@ -328,8 +316,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void edgeAfterDeleted(Edge edgeToBeDeleted, Vertex oldAlpha,
-			Vertex oldOmega) {
+	protected void edgeAfterDeleted(Edge edgeToBeDeleted) {
 
 	}
 
@@ -442,7 +429,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void addEdge(Edge newEdge, Vertex alpha, Vertex omega) {
-		super.addEdge(newEdge, alpha, omega);
+	protected void addEdge(Edge newEdge) {
+		super.addEdge(newEdge);
 	}
 }

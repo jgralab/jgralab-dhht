@@ -8,7 +8,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 
 	protected BinaryEdgeImpl(int anId, Graph graph, Vertex alpha, Vertex omega) {
-		super(anId, graph, alpha, omega);
+		super(anId, graph);
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	}
 
 	@Override
-	boolean isBinaryEdge() {
+	public boolean isBinary() {
 		return true;
 	}
 }

@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.std;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -189,7 +190,7 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Vertex getThis() {
-		if (incidentEdge.isBinaryEdge()) {
+		if (incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
 		}
@@ -203,12 +204,12 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Vertex getThat() {
-		if (incidentEdge.isBinaryEdge()) {
+		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
 		}
-		return incidentEdge.getAlpha() == this ? incidentEdge.getOmega()
-				: incidentEdge.getAlpha();
+		return (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge).getOmega()
+				: ((BinaryEdge) incidentEdge).getAlpha();
 	}
 
 	@Override
