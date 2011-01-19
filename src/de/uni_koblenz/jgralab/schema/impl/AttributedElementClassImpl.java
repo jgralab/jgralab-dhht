@@ -50,8 +50,8 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class AttributedElementClassImpl extends NamedElementImpl
-		implements AttributedElementClass {
+public abstract class AttributedElementClassImpl<T extends AttributedElementClass<T>> extends NamedElementImpl
+		implements AttributedElementClass<T> {
 
 	/**
 	 * a list of attributes which belongs to the m2 element
@@ -68,12 +68,12 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	/**
 	 * the immediate sub classes of this class
 	 */
-	protected HashSet<AttributedElementClass> directSubClasses = new HashSet<AttributedElementClass>();
+	protected HashSet<T> directSubClasses = new HashSet<T>();
 
 	/**
 	 * the immediate super classes of this class
 	 */
-	protected HashSet<AttributedElementClass> directSuperClasses = new HashSet<AttributedElementClass>();
+	protected HashSet<T> directSuperClasses = new HashSet<T>();
 
 	/**
 	 * defines the m2 element as abstract, i.e. that it may not have any
@@ -142,7 +142,8 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	 * @param superClass
 	 *            the class to add as superclass
 	 */
-	protected void addSuperClass(AttributedElementClass superClass) {
+	@SuppressWarnings("unchecked")
+	protected void addSuperClass(T superClass) {
 		if ((superClass == this) || (superClass == null)) {
 			return;
 		}
@@ -158,8 +159,8 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 						+ a.getName() + " is declared in both classes");
 			}
 		}
-		if (superClass.isSubClassOf(this)) {
-			for (AttributedElementClass attr : superClass.getAllSuperClasses()) {
+		if (superClass.isSubClassOf((T) this)) {
+			for (T attr : superClass.getAllSuperClasses()) {
 				System.out.println(attr.getQualifiedName());
 			}
 			System.out.println();
@@ -169,7 +170,7 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 							+ superClass.getQualifiedName());
 		}
 		directSuperClasses.add(superClass);
-		((AttributedElementClassImpl) superClass).directSubClasses.add(this);
+		((AttributedElementClassImpl) superClass).directSubClasses.add((AttributedElementClass<T>)this);
 	}
 
 	/**
@@ -198,9 +199,9 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	}
 
 	@Override
-	public Set<AttributedElementClass> getAllSubClasses() {
-		Set<AttributedElementClass> returnSet = new HashSet<AttributedElementClass>();
-		for (AttributedElementClass subclass : directSubClasses) {
+	public Set<T> getAllSubClasses() {
+		Set<T> returnSet = new HashSet<T>();
+		for (T subclass : directSubClasses) {
 			returnSet.add(subclass);
 			returnSet.addAll(subclass.getAllSubClasses());
 		}
@@ -208,10 +209,10 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	}
 
 	@Override
-	public Set<AttributedElementClass> getAllSuperClasses() {
-		HashSet<AttributedElementClass> allSuperClasses = new HashSet<AttributedElementClass>();
+	public Set<T> getAllSuperClasses() {
+		HashSet<T> allSuperClasses = new HashSet<T>();
 		allSuperClasses.addAll(directSuperClasses);
-		for (AttributedElementClass superClass : directSuperClasses) {
+		for (T superClass : directSuperClasses) {
 			allSuperClasses.addAll(superClass.getAllSuperClasses());
 		}
 		return allSuperClasses;
@@ -223,7 +224,7 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 		if (ownAttr != null) {
 			return ownAttr;
 		}
-		for (AttributedElementClass superClass : directSuperClasses) {
+		for (T superClass : directSuperClasses) {
 			Attribute inheritedAttr = superClass.getAttribute(name);
 			if (inheritedAttr != null) {
 				return inheritedAttr;
@@ -235,7 +236,7 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	@Override
 	public int getAttributeCount() {
 		int attrCount = getOwnAttributeCount();
-		for (AttributedElementClass superClass : directSuperClasses) {
+		for (T superClass : directSuperClasses) {
 			attrCount += superClass.getAttributeCount();
 		}
 		return attrCount;
@@ -245,7 +246,7 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	public SortedSet<Attribute> getAttributeList() {
 		TreeSet<Attribute> attrList = new TreeSet<Attribute>();
 		attrList.addAll(attributeList);
-		for (AttributedElementClass superClass : directSuperClasses) {
+		for (T superClass : directSuperClasses) {
 			attrList.addAll(superClass.getAttributeList());
 		}
 		return attrList;
@@ -257,13 +258,13 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	}
 
 	@Override
-	public Set<AttributedElementClass> getDirectSubClasses() {
+	public Set<T> getDirectSubClasses() {
 		return directSubClasses;
 	}
 
 	@Override
-	public Set<AttributedElementClass> getDirectSuperClasses() {
-		return new HashSet<AttributedElementClass>(directSuperClasses);
+	public Set<T> getDirectSuperClasses() {
+		return new HashSet<T>(directSuperClasses);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -351,14 +352,14 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 
 	@Override
 	public boolean isDirectSubClassOf(
-			AttributedElementClass anAttributedElementClass) {
+			T anAttributedElementClass) {
 		return directSuperClasses.contains(anAttributedElementClass);
 	}
 
 	@Override
 	public boolean isDirectSuperClassOf(
-			AttributedElementClass anAttributedElementClass) {
-		return (((AttributedElementClassImpl) anAttributedElementClass).directSuperClasses
+			T anAttributedElementClass) {
+		return (((T) anAttributedElementClass).getDirectSuperClasses()
 				.contains(this));
 	}
 
@@ -371,19 +372,19 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	}
 
 	@Override
-	public boolean isSubClassOf(AttributedElementClass anAttributedElementClass) {
+	public boolean isSubClassOf(T anAttributedElementClass) {
 		return getAllSuperClasses().contains(anAttributedElementClass);
 	}
 
 	@Override
 	public boolean isSuperClassOf(
-			AttributedElementClass anAttributedElementClass) {
+			T anAttributedElementClass) {
 		return anAttributedElementClass.getAllSuperClasses().contains(this);
 	}
 
 	@Override
 	public boolean isSuperClassOfOrEquals(
-			AttributedElementClass anAttributedElementClass) {
+			T anAttributedElementClass) {
 		return ((this == anAttributedElementClass) || (isSuperClassOf(anAttributedElementClass)));
 	}
 
@@ -393,7 +394,7 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 	}
 
 	protected boolean subclassContainsAttribute(String name) {
-		for (AttributedElementClass subClass : getAllSubClasses()) {
+		for (T subClass : getAllSubClasses()) {
 			Attribute subclassAttr = subClass.getAttribute(name);
 			if (subclassAttr != null) {
 				return true;
@@ -402,13 +403,14 @@ public abstract class AttributedElementClassImpl extends NamedElementImpl
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
 			return false;
 		}
 		if (getClass() == o.getClass()) {
-			AttributedElementClass other = (AttributedElementClass) o;
+			T other = (T) o;
 			if (!qualifiedName.equals(other.getQualifiedName())) {
 				return false;
 			}

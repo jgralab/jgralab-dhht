@@ -31,7 +31,7 @@
 
 package de.uni_koblenz.jgralab.schema;
 
-import java.util.Map;
+
 import java.util.Set;
 
 /**
@@ -39,7 +39,7 @@ import java.util.Set;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface GraphElementClass extends AttributedElementClass {
+public interface GraphElementClass<T extends GraphElementClass<T>> extends AttributedElementClass<T> {
 
 	/**
 	 * Returns the GraphClass of this AttributedElementClass.
@@ -49,13 +49,36 @@ public interface GraphElementClass extends AttributedElementClass {
 	public GraphClass getGraphClass();
 	
 	
-	public Map<String, IncidenceClass> getIncidenceClassesMap();
-	
+	/**
+	 * 
+	 * @return the set of incidence classes connected to this graph element class
+	 */ 
 	public Set<IncidenceClass> getIncidenceClasses();
 	
 	public void addIncidenceClass(IncidenceClass incClass);
 	
+	/**
+	 * Checks if a incidence class with the given rolename is known
+	 * to be incident to this graph element class either directly or
+	 * by inheritance
+	 * @return true iff this graph element class or a superclass defines a
+	 *         incidence class with the name rolename 
+	 */
 	public boolean hasIncidenceClass(String rolename);
 	
+	/**
+	 * Checks if a incidence class with the given rolename is known
+	 * to be adjacent to this graph element class either directly or
+	 * by inheritance
+	 * @return true iff this graph element class or a superclass defines has 
+	 *         an adjacent incidence class with the name rolename 
+	 */
 	public boolean hasAdjacentIncidenceClass(String rolename);
+
+	/**
+	 * 
+	 * @return the set of all incidence classes connected to this 
+	 *         class or a superclass
+	 */
+	public Set<IncidenceClass> getAllIncidenceClasses();
 }

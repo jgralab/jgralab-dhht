@@ -37,11 +37,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
@@ -147,22 +150,10 @@ public final class GraphClassImpl extends AttributedElementClassImpl implements
 	}
 
 	@Override
-	public EdgeClass createEdgeClass(String qualifiedName, VertexClass from,
-			int fromMin, int fromMax, String fromRoleName,
-			AggregationKind aggrFrom, VertexClass to, int toMin, int toMax,
-			String toRoleName, AggregationKind aggrTo) {
-		if (!(aggrFrom == AggregationKind.NONE)
-				&& !(aggrTo == AggregationKind.NONE)) {
-			throw new SchemaException(
-					"At least one end of each class must be of AggregationKind NONE at EdgeClass "
-							+ qualifiedName);
-		}
+	public EdgeClass createEdgeClass(String qualifiedName) {
 		String[] qn = SchemaImpl.splitQualifiedName(qualifiedName);
-		Package parent = ((SchemaImpl) getSchema())
-				.createPackageWithParents(qn[0]);
-		EdgeClassImpl ec = new EdgeClassImpl(qn[1], parent, this, from,
-				fromMin, fromMax, fromRoleName, aggrFrom, to, toMin, toMax,
-				toRoleName, aggrTo);
+		Package parent = ((SchemaImpl) getSchema()).createPackageWithParents(qn[0]);
+		EdgeClassImpl ec = new EdgeClassImpl(qn[1], parent, this);
 		if (!ec.getQualifiedName().equals(EdgeClass.DEFAULTEDGECLASS_NAME)) {
 			EdgeClass s = getSchema().getDefaultEdgeClass();
 			ec.addSuperClass(s);
@@ -318,6 +309,17 @@ public final class GraphClassImpl extends AttributedElementClassImpl implements
 	@Override
 	public int getVertexClassCount() {
 		return vertexClasses.size();
+	}
+
+	@Override
+	public IncidenceClass createIncidenceClass(VertexClass vertexClass,
+			EdgeClass edgeClass, String rolename, Direction dir,
+			IncidenceType kind, int minEdgesAtVertex, int maxEdgesAtVertex,
+			int minVerticesAtEdge, int maxVerticesAtEdge) {
+		IncidenceClass incClass = new IncidenceClass(vertexClass, edgeClass, rolename, dir, kind, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge);
+		vertexClass.addIncidenceClass(incClass);
+		edgeClass.addIncidenceClass(incClass);
+		return null;
 	}
 
 }

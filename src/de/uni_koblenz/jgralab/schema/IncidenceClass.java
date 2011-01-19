@@ -184,7 +184,7 @@ public interface IncidenceClass {
 	 * AGGREGATION for an aggregation end and COMPOSITION for a composition end
 	 */
 	public void setIncidenceType(IncidenceType kind);
-
+	
 	/**
 	 * @return a set of IncidenceClasses which are hidden by this at the edge
 	 */
@@ -211,5 +211,25 @@ public interface IncidenceClass {
 	 * @return {@link Class}
 	 */
 	public Class<? extends Incidence> getM1Class();
+
+	/**
+	 * 
+	 * @param graphElementClass
+	 * @return the other GraphElementClass connected to this incidenceClass, e.g. if
+	 *         graphElementClass is the EdgeClass connected, the method returns the
+	 *         VertexClass and vice versa
+	 */
+	public GraphElementClass<?> getOtherGraphElementClass(
+			GraphElementClass<?> graphElementClass);
+
+	/**
+	 * 
+	 * @param ic2
+	 * @return true is this incidence class is a superclass of other
+	 */
+	public boolean isSuperclassOf(IncidenceClass other);
+
+	
+	
 
 }

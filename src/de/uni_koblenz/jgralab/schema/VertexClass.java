@@ -40,47 +40,13 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface VertexClass extends GraphElementClass {
+public interface VertexClass extends GraphElementClass<VertexClass> {
 
 	public final static String DEFAULTVERTEXCLASS_NAME = "Vertex";
 
-	/**
-	 * adds a superclass to the list of superclasses, all attributes get
-	 * inherited from those classes
-	 * 
-	 * @param superClass
-	 *            the vertex class to be added to the list of superclasses
-	 * 
-	 */
-	public void addSuperClass(VertexClass superClass);
-
-	// public Set<IncidenceClass> getOwnInIncidenceClasses();
-
-	// public Set<IncidenceClass> getOwnOutIncidenceClasses();
-
-	public Set<IncidenceClass> getAllInIncidenceClasses();
-
-	public Set<IncidenceClass> getAllOutIncidenceClasses();
-
-	public Set<IncidenceClass> getValidFromFarIncidenceClasses();
-
-	public Set<IncidenceClass> getValidToFarIncidenceClasses();
-
-	// public Set<IncidenceClass> getOwnAndInheritedFarIncidenceClasses();
-
-	public void addInIncidenceClass(IncidenceClass ic);
-
-	public void addOutIncidenceClass(IncidenceClass ic);
 
 	@Override
 	public Class<? extends Vertex> getM1Class();
 
-	public Set<EdgeClass> getValidToEdgeClasses();
-
-	public Set<EdgeClass> getValidFromEdgeClasses();
-
-	public Set<EdgeClass> getConnectedEdgeClasses();
-
-	public Set<EdgeClass> getOwnConnectedEdgeClasses();
 
 }

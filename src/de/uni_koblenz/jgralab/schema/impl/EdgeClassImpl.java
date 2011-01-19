@@ -50,11 +50,11 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
 		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
 		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
-		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
-				DEFAULTEDGECLASS_NAME, schema.getDefaultVertexClass(), 0,
-				Integer.MAX_VALUE, "", AggregationKind.NONE,
-				schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
-				AggregationKind.NONE);
+		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(DEFAULTEDGECLASS_NAME);
+		//, 0,
+			//	Integer.MAX_VALUE, "", AggregationKind.NONE,
+				//schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
+				//AggregationKind.NONE);
 		ec.setAbstract(true);
 		return ec;
 	}
@@ -92,9 +92,7 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 	 *            unique way
 	 */
 	protected EdgeClassImpl(String simpleName, Package pkg,
-			GraphClass aGraphClass, VertexClass from, int fromMin, int fromMax,
-			String fromRoleName, AggregationKind aggrFrom, VertexClass to,
-			int toMin, int toMax, String toRoleName, AggregationKind aggrTo) {
+			GraphClass aGraphClass) {
 		super(simpleName, pkg, aGraphClass);
 		IncidenceClass fromInc = new IncidenceClassImpl(this, from,
 				fromRoleName, fromMin, fromMax, IncidenceDirection.OUT,

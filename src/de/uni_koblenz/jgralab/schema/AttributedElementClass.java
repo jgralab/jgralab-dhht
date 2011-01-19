@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface AttributedElementClass extends NamedElement {
+public interface AttributedElementClass<T extends AttributedElementClass<T>> extends NamedElement {
 
 	/**
 	 * Adds a new attribute <code>anAttribute</code> to this element.
@@ -214,7 +214,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * 
 	 * @return a Set of all direct and indirect subclasses of this element
 	 */
-	public Set<AttributedElementClass> getAllSubClasses();
+	public Set<T> getAllSubClasses();
 
 	/**
 	 * Lists all direct and indirect superclasses of this element.
@@ -247,7 +247,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * 
 	 * @return a Set of all direct and indirect superclasses of this element
 	 */
-	public Set<AttributedElementClass> getAllSuperClasses();
+	public Set<T> getAllSuperClasses();
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -389,7 +389,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * 
 	 * @return a Set of all direct subclasses of this element
 	 */
-	public Set<AttributedElementClass> getDirectSubClasses();
+	public Set<T> getDirectSubClasses();
 
 	/**
 	 * Returns all direct superclasses of this element.
@@ -423,7 +423,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * 
 	 * @return a Set of all direct superclasses of this element
 	 */
-	public Set<AttributedElementClass> getDirectSuperClasses();
+	public Set<T> getDirectSuperClasses();
 
 	/**
 	 * Returns the M1 interface class for this attributed element.
@@ -705,8 +705,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSubClassOf(
-			AttributedElementClass anAttributedElementClass);
+	public boolean isDirectSubClassOf(T anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct superclass of another
@@ -744,8 +743,7 @@ public interface AttributedElementClass extends NamedElement {
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSuperClassOf(
-			AttributedElementClass anAttributedElementClass);
+	public boolean isDirectSuperClassOf(T anAttributedElementClass);
 
 	/**
 	 * @return true, if this AttributedElementClass is only for internal use
@@ -789,7 +787,7 @@ public interface AttributedElementClass extends NamedElement {
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSubClassOf(AttributedElementClass anAttributedElementClass);
+	public boolean isSubClassOf(T anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct or inherited superclass of
@@ -828,8 +826,7 @@ public interface AttributedElementClass extends NamedElement {
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSuperClassOf(
-			AttributedElementClass anAttributedElementClass);
+	public boolean isSuperClassOf(T anAttributedElementClass);
 
 	/**
 	 * Tests if the current element equals another attributed element or is
@@ -866,8 +863,7 @@ public interface AttributedElementClass extends NamedElement {
 	 *         direct or indirect subclass of this element or <code>this</code>
 	 *         attributed element itself, otherwise <code>false</code>
 	 */
-	public boolean isSuperClassOfOrEquals(
-			AttributedElementClass anAttributedElementClass);
+	public boolean isSuperClassOfOrEquals(T anAttributedElementClass);
 
 	/**
 	 * Defines if this attributed element is abstract. Abstract elements can´t

@@ -35,6 +35,7 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceDirection;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -77,6 +78,17 @@ public class IncidenceClassImpl implements IncidenceClass {
 	private Set<IncidenceClass> redefinedIncidenceClasses;
 
 	private Set<IncidenceClass> subsettedIncidenceClasses;
+	
+	
+	public GraphElementClass<?> getOtherGraphElementClass(GraphElementClass<?> connectedGc) {
+		if (connectedGc == edgeClass) {
+			return vertexClass;
+		} else {
+			return edgeClass;
+		}
+	}
+	
+	
 
 	@Override
 	public AggregationKind getAggregationKind() {
