@@ -34,6 +34,7 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public interface IncidenceClass {
 
@@ -173,6 +174,28 @@ public interface IncidenceClass {
 	public boolean isAbstract();
 
 	/**
+	 * Defines if this IncidenceClass is abstract. Abstract IncidenceClass can´t
+	 * have instances.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b> <code>incidenceClass.setAbstract(value);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>incidenceClass'</code> is abstract and no
+	 * new instances can be created
+	 * </p>
+	 * 
+	 * @param isAbstract
+	 *            the new value defining the state of this IncidenceClass
+	 */
+	public void setAbstract(boolean isAbstract);
+
+	/**
 	 * @return the type of this IncidenceClass, EDGE for a normal edge end,
 	 *         AGGREGATION for an aggregation end and COMPOSITION for a
 	 *         composition end
@@ -184,7 +207,7 @@ public interface IncidenceClass {
 	 * AGGREGATION for an aggregation end and COMPOSITION for a composition end
 	 */
 	public void setIncidenceType(IncidenceType kind);
-	
+
 	/**
 	 * @return a set of IncidenceClasses which are hidden by this at the edge
 	 */
@@ -213,23 +236,300 @@ public interface IncidenceClass {
 	public Class<? extends Incidence> getM1Class();
 
 	/**
+	 * Checks if the current element is a direct or indirect subclass of another
+	 * incidence class.
 	 * 
-	 * @param graphElementClass
-	 * @return the other GraphElementClass connected to this incidenceClass, e.g. if
-	 *         graphElementClass is the EdgeClass connected, the method returns the
-	 *         VertexClass and vice versa
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code> isSubClass = attrElement.isSubClassOf(other);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>isSubClass</code> is:
+	 * <ul>
+	 * <li><code>true</code> if the <code>other</code> incidence class is a
+	 * direct or inherited superclass of this incidence</li>
+	 * <li><code>false</code> if one of the following occurs:
+	 * <ul>
+	 * <li><code>incClass</code> and the given <code>other</code> incidence
+	 * class are the same</li>
+	 * <li>the <code>other</code> incidence class is not a direct or inherited
+	 * superclass of <code>incClass</code></li>
+	 * <li>the <code>other</code> incidence class has no relation with
+	 * <code>incClass</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param anIncidenceClass
+	 *            the possible superclass of this incidence class
+	 * @return <code>true</code> if <code>anIncidenceClass</code> is a direct or
+	 *         indirect subclass of this incidence class, otherwise
+	 *         <code>false</code>
 	 */
-	public GraphElementClass<?> getOtherGraphElementClass(
-			GraphElementClass<?> graphElementClass);
+	public boolean isSubClassOf(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Lists all direct and indirect superclasses of this IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Note:</b> Each instance of a subclass of
+	 * <code>IncidenceClassClass</code> has a dedicated default superclass at
+	 * the top of its inheritance hierarchy. Please consult the specifications
+	 * of the used subclass for details.
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code>superClasses = incidenceClass.getAllSuperClasses();</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b>
+	 * <ul>
+	 * <li><code>superClasses != null </code></li>
+	 * <li><code>superClasses.size() >= 0</code></li>
+	 * <li><code>superClasses</code> holds all of <code>incidenceClass´s</code>
+	 * direct and indirect superclasses (including the default superclass)</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @return a Set of all direct and indirect superclasses of this
+	 *         IncidenceClass
+	 */
+	public Set<IncidenceClass> getAllSuperClasses();
+
+	/**
+	 * Returns all direct and indirect subclasses of this IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code>subClasses = incidenceClass.getAllSubClasses();</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b>
+	 * <ul>
+	 * <li><code>subClasses != null</code></li>
+	 * <li><code>subClasses.size() >= 0</code></li>
+	 * <li><code>subClasses</code> holds all of <code>incidenceClass´s</code>
+	 * direct and indirect subclasses</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @return a Set of all direct and indirect subclasses of this
+	 *         IncidenceClass
+	 */
+	public Set<IncidenceClass> getAllSubClasses();
+
+	/**
+	 * Returns the name of the {@link Class} of <code>ic</code>.
+	 * 
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @return {@link String}
+	 */
+	public String getIncidenceClassName(IncidenceClass ic);
+
+	/**
+	 * Returns the M1 implementation class for this IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b> <code>m1ImplClass = incidenceClass.getM1Class();</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> not yet defined
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> not yet defined
+	 * </p>
+	 * 
+	 * @return the M1 implementation class for this IncidenceClass
+	 * 
+	 * @throws M1ClassAccessException
+	 *             if:
+	 *             <ul>
+	 *             <li>this IncidenceClass is abstract</li>
+	 *             <li>there are reflection exceptions</li>
+	 *             </ul>
+	 */
+	public Class<? extends Incidence> getM1ImplementationClass();
+
+	/**
+	 * Checks if the current element is a direct subclass of another
+	 * IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code> isDirectSubClass = incidenceClass.isDirectSubClassOf(other);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>isDirectSubClass</code> is:
+	 * <ul>
+	 * <li><code>true</code> if the <code>other</code> IncidenceClass is a
+	 * direct superclass of this element</li>
+	 * <li><code>false</code> if one of the following occurs:
+	 * <ul>
+	 * <li><code>incidenceClass</code> and the given <code>other</code>
+	 * IncidenceClass are the same</li>
+	 * <li>the <code>other</code> IncidenceClass is not a direct superclass of
+	 * <code>incidenceClass</code></li>
+	 * <li>the <code>other</code> IncidenceClass has no relation with
+	 * <code>incidenceClass</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param anIncidenceClass
+	 *            the possible superclass of this IncidenceClass
+	 * @return <code>true</code> if <code>anIncidenceClass</code> is a direct
+	 *         subclass of this IncidenceClass, otherwise <code>false</code>
+	 */
+	public boolean isDirectSubClassOf(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Checks if the current IncidenceClass is a direct superclass of another
+	 * IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code> isDirectSuperClass = incidenceClass.isDirectSuperClassOf(other);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>isDirectSuperClass</code> is:
+	 * <ul>
+	 * <li><code>true</code> if the <code>other</code> IncidenceClass is a
+	 * direct subclass of this IncidenceClass</li>
+	 * <li><code>false</code> if one of the following occurs:
+	 * <ul>
+	 * <li><code>incidenceClass</code> and the given <code>other</code>
+	 * IncidenceClass are the same</li>
+	 * <li>the <code>other</code> IncidenceClass is not a direct subclass of
+	 * <code>incidenceClass</code></li>
+	 * <li>the <code>other</code> IncidenceClass has no relation with
+	 * <code>incidenceClass</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param anIncidenceClass
+	 *            the possible subclass of this IncidenceClass
+	 * @return <code>true</code> if <code>anIncidenceClass</code> is a direct
+	 *         subclass of this IncidenceClass, otherwise <code>false</code>
+	 */
+	public boolean isDirectSuperClassOf(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Checks if the current element is a direct or inherited superclass of
+	 * another IncidenceClass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code> isSuperClass = incidenceClass.isSuperClass(other);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>isSuperClass</code> is:
+	 * <ul>
+	 * <li><code>true</code> if the <code>other</code> incidenceClass is a
+	 * direct or inherited subclass of this element</li>
+	 * <li><code>false</code> if one of the following occurs:
+	 * <ul>
+	 * <li><code>incidenceClass</code> and the given <code>other</code>
+	 * IncidenceClass are the same</li>
+	 * <li>the <code>other</code> IncidenceClass is not a direct or indirect
+	 * subclass of <code>incidenceClass</code></li>
+	 * <li>the <code>other</code> IncidenceClass has no relation with
+	 * <code>incidenceClass</code></li>
+	 * </ul>
+	 * </li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param anIncidenceClass
+	 *            the possible subclass of this IncidenceClass
+	 * @return <code>true</code> if <code>anIncidenceClass</code> is a direct or
+	 *         indirect subclass of this IncidenceClass, otherwise
+	 *         <code>false</code>
+	 */
+	public boolean isSuperClassOf(IncidenceClass anIncidenceClass);
+
+	/**
+	 * Tests if the current element equals another aIncidenceClass or is another
+	 * IncidenceClass´ direct or indirect superclass.
+	 * 
+	 * <p>
+	 * <b>Pattern:</b>
+	 * <code> isSuperClassOrEquals = incidenceClass.isSuperClassOfOrEquals(other);</code>
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Preconditions:</b> none
+	 * </p>
+	 * 
+	 * <p>
+	 * <b>Postconditions:</b> <code>isSuperClassOrEquals</code> is:
+	 * <ul>
+	 * <li><code>true</code> if one of the following occurs:
+	 * <ul>
+	 * <li>the <code>other</code> IncidenceClass is a direct or indirect
+	 * subclass of this IncidenceClass</li>
+	 * <li><code>incidenceClass == other</code></li>
+	 * </ul>
+	 * </li>
+	 * <li><code>false</code> if the <code>other</code> IncidenceClass has no
+	 * relation with <code>incidenceClass</code> (not the same, not a direct or
+	 * indirect subclass)</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @param anIncidenceClass
+	 *            the possible subclass of this IncidenceClass
+	 * @return <code>true</code> if <code>anIncidenceClass</code> is a direct or
+	 *         indirect subclass of this IncidenceClass or <code>this</code>
+	 *         IncidenceClass itself, otherwise <code>false</code>
+	 */
+	public boolean isSuperClassOfOrEquals(IncidenceClass anIncidenceClass);
 
 	/**
 	 * 
-	 * @param ic2
-	 * @return true is this incidence class is a superclass of other
+	 * @param graphElementClass
+	 * 
+	 * @return the other GraphElementClass connected to this incidenceClass,
+	 *         e.g. if graphElementClass is the EdgeClass connected, the method
+	 *         returns the VertexClass and vice versa
 	 */
-	public boolean isSuperclassOf(IncidenceClass other);
-
-	
-	
-
+	public GraphElementClass<?> getOtherGraphElementClass(
+			GraphElementClass<?> graphElementClass);
 }
