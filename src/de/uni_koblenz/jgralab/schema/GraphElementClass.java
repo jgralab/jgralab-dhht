@@ -31,6 +31,9 @@
 
 package de.uni_koblenz.jgralab.schema;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Base class for Vertex/Edge/Aggregation/Composition classes.
  * 
@@ -44,4 +47,15 @@ public interface GraphElementClass extends AttributedElementClass {
 	 * @return the GraphClass in which this graph element class resides
 	 */
 	public GraphClass getGraphClass();
+	
+	
+	public Map<String, IncidenceClass> getIncidenceClassesMap();
+	
+	public Set<IncidenceClass> getIncidenceClasses();
+	
+	public void addIncidenceClass(IncidenceClass incClass);
+	
+	public boolean hasIncidenceClass(String rolename);
+	
+	public boolean hasAdjacentIncidenceClass(String rolename);
 }
