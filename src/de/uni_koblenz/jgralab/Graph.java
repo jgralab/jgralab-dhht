@@ -39,10 +39,10 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-import de.uni_koblenz.jgralab.trans.Savepoint;
-import de.uni_koblenz.jgralab.trans.Transaction;
+//import de.uni_koblenz.jgralab.trans.CommitFailedException;
+//import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
+//import de.uni_koblenz.jgralab.trans.Savepoint;
+//import de.uni_koblenz.jgralab.trans.Transaction;
 
 /**
  * The interface Graph is the base of all JGraLab graphs. It provides access to
@@ -538,82 +538,82 @@ public interface Graph extends AttributedElement {
 	 */
 	public void defragment();// old
 
-	// ---- transaction support ----
-	/**
-	 * @return a read-write-<code>Transaction</code>
-	 */
-	public Transaction newTransaction();// old
-
-	/**
-	 * @return a read-only-<code>Transaction</code>
-	 */
-	public Transaction newReadOnlyTransaction();// old
-
-	/**
-	 * Sets the given <code>transaction</code> as the active
-	 * <code>Transaction</code> for the current thread.
-	 * 
-	 * @param transaction
-	 */
-	public void setCurrentTransaction(Transaction transaction);// old
-
-	/**
-	 * @return the currently active <code>Transaction</code> in the current
-	 *         thread
-	 */
-	public Transaction getCurrentTransaction();// old
-
-	/**
-	 * Delegates to {@link Graph#getCurrentTransaction()
-	 * getCurrentTransaction()}.
-	 * 
-	 * @throws CommitFailedException
-	 *             if commit fails
-	 */
-	public void commit() throws CommitFailedException;// old
-
-	/**
-	 * Delegates to {@link Graph#getCurrentTransaction()
-	 * getCurrentTransaction()}.
-	 */
-	public void abort();// old
-
-	/**
-	 * Delegates to {@link Graph#getCurrentTransaction()
-	 * getCurrentTransaction()}.
-	 * 
-	 * @return if there have been conflicts
-	 */
-	public boolean isInConflict();// old
-
-	/**
-	 * Delegates to {@link Graph#getCurrentTransaction()
-	 * getCurrentTransaction()}.
-	 * 
-	 * @return the defined <code>Savepoint</code>
-	 */
-	public Savepoint defineSavepoint();// old
-
-	/**
-	 * Delegates to {@link Graph#getCurrentTransaction()
-	 * getCurrentTransaction()}.
-	 * 
-	 * @param savepoint
-	 *            the <code>Savepoint</code> to be restored.
-	 * 
-	 * @throws InvalidSavepointException
-	 *             if {@link Savepoint#getGraph() <code>savepoint</code>
-	 *             .getGraph()} != {@link Graph#getCurrentTransaction()
-	 * 
-	 */
-	public void restoreSavepoint(Savepoint savepoint)
-			throws InvalidSavepointException;// old
-
-	/**
-	 * Tells whether this graph instance has standard support.
-	 * 
-	 * @return true if this graph instance has standard support
-	 */
+//	// ---- transaction support ----
+//	/**
+//	 * @return a read-write-<code>Transaction</code>
+//	 */
+//	public Transaction newTransaction();// old
+//
+//	/**
+//	 * @return a read-only-<code>Transaction</code>
+//	 */
+//	public Transaction newReadOnlyTransaction();// old
+//
+//	/**
+//	 * Sets the given <code>transaction</code> as the active
+//	 * <code>Transaction</code> for the current thread.
+//	 * 
+//	 * @param transaction
+//	 */
+//	public void setCurrentTransaction(Transaction transaction);// old
+//
+//	/**
+//	 * @return the currently active <code>Transaction</code> in the current
+//	 *         thread
+//	 */
+//	public Transaction getCurrentTransaction();// old
+//
+//	/**
+//	 * Delegates to {@link Graph#getCurrentTransaction()
+//	 * getCurrentTransaction()}.
+//	 * 
+//	 * @throws CommitFailedException
+//	 *             if commit fails
+//	 */
+//	public void commit() throws CommitFailedException;// old
+//
+//	/**
+//	 * Delegates to {@link Graph#getCurrentTransaction()
+//	 * getCurrentTransaction()}.
+//	 */
+//	public void abort();// old
+//
+//	/**
+//	 * Delegates to {@link Graph#getCurrentTransaction()
+//	 * getCurrentTransaction()}.
+//	 * 
+//	 * @return if there have been conflicts
+//	 */
+//	public boolean isInConflict();// old
+//
+//	/**
+//	 * Delegates to {@link Graph#getCurrentTransaction()
+//	 * getCurrentTransaction()}.
+//	 * 
+//	 * @return the defined <code>Savepoint</code>
+//	 */
+//	public Savepoint defineSavepoint();// old
+//
+//	/**
+//	 * Delegates to {@link Graph#getCurrentTransaction()
+//	 * getCurrentTransaction()}.
+//	 * 
+//	 * @param savepoint
+//	 *            the <code>Savepoint</code> to be restored.
+//	 * 
+//	 * @throws InvalidSavepointException
+//	 *             if {@link Savepoint#getGraph() <code>savepoint</code>
+//	 *             .getGraph()} != {@link Graph#getCurrentTransaction()
+//	 * 
+//	 */
+//	public void restoreSavepoint(Savepoint savepoint)
+//			throws InvalidSavepointException;// old
+//
+//	/**
+//	 * Tells whether this graph instance has standard support.
+//	 * 
+//	 * @return true if this graph instance has standard support
+//	 */
 
 	public boolean hasStandardSupport();// old
 

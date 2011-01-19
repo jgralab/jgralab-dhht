@@ -59,14 +59,14 @@ public abstract class GraphVisitor {
 		preVisitor();
 
 		// visit all (marked) vertices
-		for (Vertex currentVertex : graph.vertices()) {
+		for (Vertex currentVertex : graph.getVertices()) {
 			if (isMarked(currentVertex)) {
 				visitVertex(currentVertex);
 			}
 		}
 
 		// visit all (marked) edges
-		for (Edge currentEdge : graph.edges()) {
+		for (Edge currentEdge : graph.getEdges()) {
 			if (isMarked(currentEdge)) {
 				visitEdge(currentEdge);
 			}

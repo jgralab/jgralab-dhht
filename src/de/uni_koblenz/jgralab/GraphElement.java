@@ -48,7 +48,8 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            If <code>&lt;OwnType&gt;</code> is {@link Vertex} this parameter
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
-public interface GraphElement<OwnType, DualType> extends AttributedElement {
+
+public interface GraphElement<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> extends AttributedElement {
 
 	/**
 	 * Returns the id of this {@link GraphElement}.

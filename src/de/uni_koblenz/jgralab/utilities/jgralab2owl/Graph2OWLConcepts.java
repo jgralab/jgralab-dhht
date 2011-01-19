@@ -42,6 +42,7 @@ import org.w3c.dom.Document;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.AggregationKind;
@@ -263,7 +264,7 @@ class Graph2OWLConcepts {
 		// rdfElem.appendChild(gElem);
 
 		// write "graphContains..." properties
-		for (Vertex v : g.vertices()) {
+		for (Vertex v : g.getVertices()) {
 			vElemId = HelperMethods.firstToLowerCase(v
 					.getAttributedElementClass().getQualifiedName())
 					+ "_" + gId + "_" + v.getId();
@@ -272,7 +273,7 @@ class Graph2OWLConcepts {
 		}
 
 		if (!edgeClasses2Props) {
-			for (Edge e : g.edges()) {
+			for (Edge e : g.getEdges()) {
 				eElemId = HelperMethods.firstToLowerCase(e
 						.getAttributedElementClass().getQualifiedName())
 						+ edgeClassNameSuffix + "_" + gId + "_" + e.getId();
@@ -284,7 +285,7 @@ class Graph2OWLConcepts {
 		writer.writeEndElement();
 
 		// convert vertices
-		for (Vertex v : g.vertices()) {
+		for (Vertex v : g.getVertices()) {
 			vElemId = HelperMethods.firstToLowerCase(v
 					.getAttributedElementClass().getQualifiedName())
 					+ "_" + gId + "_" + v.getId();
@@ -294,7 +295,7 @@ class Graph2OWLConcepts {
 
 		if (!edgeClasses2Props) {
 			// convert edges
-			for (Edge e : g.edges()) {
+			for (Edge e : g.getEdges()) {
 				eElemId = HelperMethods.firstToLowerCase(e
 						.getAttributedElementClass().getQualifiedName())
 						+ edgeClassNameSuffix + "_" + gId + "_" + e.getId();
@@ -390,13 +391,14 @@ class Graph2OWLConcepts {
 
 		// create individual properties referring to individuals representing
 		// incident edges
-		for (Edge e : v.incidences()) {
+		for (Incidence i : v.getIncidences()) {
+			Edge e = i.getEdge();
 			eSuffixedLowerCaseQName = HelperMethods.firstToLowerCase(e
 					.getAttributedElementClass().getQualifiedName())
 					+ edgeClassNameSuffix;
 
 			eElemId = eSuffixedLowerCaseQName
-					+ String.valueOf(e.getNormalEdge().getId());
+					+ String.valueOf(e.getId());
 
 			if (edgeClasses2Props) {
 				if (e.getAlpha() == v) {

@@ -47,6 +47,7 @@ import java.util.Map.Entry;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
@@ -58,7 +59,7 @@ import de.uni_koblenz.jgralab.greql2.jvalue.JValuePath;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValuePathSystem;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
+//import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
 
 public class GreqlServer extends Thread {
 
@@ -155,12 +156,20 @@ public class GreqlServer extends Thread {
 		Graph g = eval.getDatagraph();
 		BooleanGraphMarker marker = new BooleanGraphMarker(g);
 		markResultElements(val, marker);
-		for (Edge e : g.edges()) {
-			if (marker.isMarked(e.getAlpha()) && marker.isMarked(e.getOmega())) {
+		for (Edge e : g.getEdges()) {
+			boolean incidencesMarked = true;
+			for (Incidence i : e.getIncidences()) {
+				if (!marker.isMarked(i.getVertex())) {
+					incidencesMarked = false;
+					break;
+				}
+			}
+			if (incidencesMarked) {
 				marker.mark(e);
 			}
 		}
-		Tg2Dot.printGraphAsDot(marker, false, dotFileName);
+		//TODO: Uncomment as soon as TG2Dot works
+		//Tg2Dot.printGraphAsDot(marker, false, dotFileName);
 	}
 
 	private void markResultElements(JValue val, BooleanGraphMarker marker) {
