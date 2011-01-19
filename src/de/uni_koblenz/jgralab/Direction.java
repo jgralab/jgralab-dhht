@@ -46,18 +46,19 @@ public enum Direction {
 	 * {@link Edge} and leads to a {@link Vertex}. Such an {@link Incidence} is
 	 * called ingoing.
 	 */
-	EDGE_TO_VERTEX,
+	EDGE_TO_VERTEX, 
+	
 	/**
-	 * This direction describes an {@link Incidence} which begins at a
-	 * {@link Vertex} and leads to an {@link Edge}. Such an {@link Incidence} is
-	 * called outgoing.
-	 */
+	 * This direction describes an {@link Incidence} which
+	 * begins at a {@link Vertex} and leads to an {@link Edge}. Such an
+	 * {@link Incidence} is called outgoing. */
 	VERTEX_TO_EDGE,
+	
 	/**
-	 * This direction describes an {@link Incidence} which begins at a
-	 * {@link Vertex} and leads to an {@link Edge} or the other way round.
+	 * This direction describes an {@link Incidence} running from edge to vertex or from vertex to edge
 	 */
 	BOTH;
+
 
 	/**
 	 * Parses a given {@link String} for {@link Direction}.
@@ -77,8 +78,27 @@ public enum Direction {
 			return VERTEX_TO_EDGE;
 		} else if (direction.equals("BOTH")) {
 			return BOTH;
+		} else if (direction.equals("BOTH")) {
+			return Direction.BOTH;
 		} else {
 			throw new Exception("Could not determine direction from string.");
+		}
+	}
+	
+	/**
+	 * Returns the opposite of the direction, e.g. VERTEX_TO_EDGE for EDGE_TO_VERTEX
+	 * @return
+	 */
+	public Direction getOppositeDirection() {
+		switch (this) {
+			case EDGE_TO_VERTEX:
+				return VERTEX_TO_EDGE;
+			case VERTEX_TO_EDGE:
+				return EDGE_TO_VERTEX;
+			case BOTH:
+				return BOTH;
+			default:
+				throw new RuntimeException("Unhandled enum-value: " + this);
 		}
 	}
 }
