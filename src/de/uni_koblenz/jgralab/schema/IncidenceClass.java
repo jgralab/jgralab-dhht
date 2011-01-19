@@ -177,7 +177,7 @@ public interface IncidenceClass {
 	 *         AGGREGATION for an aggregation end and COMPOSITION for a
 	 *         composition end
 	 */
-	public IncidenceType getIncidentType();
+	public IncidenceType getIncidenceType();
 
 	/**
 	 * sets the type of this IncidenceClass, EDGE for a normal edge end,
@@ -221,12 +221,14 @@ public interface IncidenceClass {
 	@Deprecated
 	public Set<IncidenceClass> getOwnRedefinedIncidenceClasses();
 
-	public Set<IncidenceClass> getHidingEndsAtEdge();
-
+	/**
+	 * @return a set of IncidenceClasses which are hidden by this at the edge
+	 */
 	public Set<IncidenceClass> getHiddenEndsAtEdge();
 
-	public Set<IncidenceClass> getHidingEndsAtVertex();
-
+	/**
+	 * @return a set of IncidenceClasses which are hidden by this at the vertex
+	 */
 	public Set<IncidenceClass> getHiddenEndsAtVertex();
 
 	/**
@@ -264,9 +266,12 @@ public interface IncidenceClass {
 	public void addRedefinedRoles(Set<String> rolenames);
 
 	/**
+	 * TODO
+	 * 
 	 * @return the IncidenceClass at the other end of the EdgeClass this
 	 *         IncidenceClass belongs to
 	 */
+	@Deprecated
 	public IncidenceClass getOpposite();
 
 	/**
