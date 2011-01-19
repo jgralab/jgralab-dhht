@@ -54,7 +54,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.RandomIdGenerator;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -271,7 +270,7 @@ public abstract class GraphBaseImpl implements Graph {
 		setLastEdge(null);
 		setECount(0);
 	}
-	
+
 	/**
 	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
 	 * otherwise the edges current id is used if possible. Should only be used
@@ -282,9 +281,8 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param newEdge
 	 *            Edge to add
 	 * @throws GraphException
-	 *             an edge with same id already exists in graph, 
-	 *             id of edge greater than possible count of
-	 *             edges in graph
+	 *             an edge with same id already exists in graph, id of edge
+	 *             greater than possible count of edges in graph
 	 */
 	protected void addEdge(Edge newEdge) {
 		assert newEdge != null;
@@ -292,7 +290,7 @@ public abstract class GraphBaseImpl implements Graph {
 		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
 
 		EdgeBaseImpl e = (EdgeBaseImpl) newEdge;
-		
+
 		int eId = e.getId();
 		if (isLoading()) {
 			if (eId > 0) {
@@ -316,7 +314,7 @@ public abstract class GraphBaseImpl implements Graph {
 			assert eId != 0;
 			e.setId(eId);
 		}
-		
+
 		appendEdgeToESeq(e);
 
 		if (!isLoading()) {
@@ -325,7 +323,6 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-	
 	protected void internalEdgeAdded(EdgeBaseImpl e) {
 		notifyEdgeAdded(e);
 	}
@@ -379,9 +376,6 @@ public abstract class GraphBaseImpl implements Graph {
 	protected void internalVertexAdded(VertexBaseImpl v) {
 		notifyVertexAdded(v);
 	}
-	
-
-	
 
 	/**
 	 * Appends the edge e to the global edge sequence of this graph.
@@ -480,8 +474,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@Override
 	public boolean containsEdge(Edge e) {
-		return (e != null)
-				&& (e.getGraph() == this)
+		return (e != null) && (e.getGraph() == this)
 				&& containsEdgeId(((EdgeBaseImpl) e).id);
 	}
 
@@ -534,7 +527,7 @@ public abstract class GraphBaseImpl implements Graph {
 		try {
 			T edge = (T) internalCreateEdge(cls);
 
-			//TODO: Add linking to vertices
+			// TODO: Add linking to vertices
 			return edge;
 		} catch (Exception exception) {
 			if (exception instanceof GraphException) {
@@ -545,8 +538,7 @@ public abstract class GraphBaseImpl implements Graph {
 			}
 		}
 	}
-	
-	
+
 	/**
 	 * Creates an edge of the given class and adds this edge to the graph.
 	 * <code>cls</code> has to be the "Impl" class.
@@ -565,8 +557,6 @@ public abstract class GraphBaseImpl implements Graph {
 			}
 		}
 	}
-	
-	
 
 	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
 		return graphFactory.createEdge(cls, 0, this);
@@ -1037,16 +1027,17 @@ public abstract class GraphBaseImpl implements Graph {
 
 		EdgeBaseImpl e = (EdgeBaseImpl) edge;
 		internalEdgeDeleted(e);
-		
+
 		Incidence inc = e.getFirstIncidence();
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		while (inc != null) {
 			vertices.add(inc.getVertex());
-			((VertexBaseImpl)inc.getVertex()).removeIncidenceFromLambdaSeq((IncidenceImpl)inc);
+			((VertexBaseImpl) inc.getVertex())
+					.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
 			inc = e.getFirstIncidence();
 		}
 		for (Vertex vertex : vertices) {
-			((VertexBaseImpl)vertex).incidenceListModified();
+			((VertexBaseImpl) vertex).incidenceListModified();
 		}
 
 		removeEdgeFromESeq(e);
@@ -1072,7 +1063,7 @@ public abstract class GraphBaseImpl implements Graph {
 			internalVertexDeleted(v);
 			// delete all incident edges including incidence objects
 			Incidence inc = v.getFirstIncidence();
-			
+
 			Set<EdgeBaseImpl> edges = new HashSet<EdgeBaseImpl>();
 			while (inc != null) {
 				EdgeBaseImpl edge = (EdgeBaseImpl) inc.getEdge();
@@ -1080,34 +1071,36 @@ public abstract class GraphBaseImpl implements Graph {
 				if (edge.isBinary()) {
 					BinaryEdge bedge = (BinaryEdge) edge;
 					if (bedge.getAlpha() == v) {
-						if (bedge.getOmegaSemantics() == IncidenceType.COMPOSITION)  {
-							VertexBaseImpl omega = (VertexBaseImpl) bedge.getOmega();
+						if (bedge.getOmegaSemantics() == IncidenceType.COMPOSITION) {
+							VertexBaseImpl omega = (VertexBaseImpl) bedge
+									.getOmega();
 							if ((omega != v) && containsVertex(omega)
 									&& !getDeleteVertexList().contains(omega)) {
 								getDeleteVertexList().add(omega);
-								removeEdgeFromESeq((EdgeBaseImpl)bedge);
-								edgeAfterDeleted((EdgeBaseImpl)bedge);
+								removeEdgeFromESeq((EdgeBaseImpl) bedge);
+								edgeAfterDeleted(bedge);
 								deleteEdge = true;
-							}	
-						}	
+							}
+						}
 					} else if (bedge.getOmega() == v) {
-						if (bedge.getAlphaSemantics() == IncidenceType.COMPOSITION)  {
-							VertexBaseImpl alpha = (VertexBaseImpl) bedge.getAlpha();
+						if (bedge.getAlphaSemantics() == IncidenceType.COMPOSITION) {
+							VertexBaseImpl alpha = (VertexBaseImpl) bedge
+									.getAlpha();
 							if ((alpha != v) && containsVertex(alpha)
 									&& !getDeleteVertexList().contains(alpha)) {
 								getDeleteVertexList().add(alpha);
-								removeEdgeFromESeq((EdgeBaseImpl)bedge);
-								edgeAfterDeleted((EdgeBaseImpl)bedge);
+								removeEdgeFromESeq((EdgeBaseImpl) bedge);
+								edgeAfterDeleted(bedge);
 								deleteEdge = true;
-							}	
-						}	
+							}
+						}
 					}
 				}
 				edgeHasBeenDeleted |= deleteEdge;
 				if (!deleteEdge) {
 					edges.add(edge);
-					edge.removeIncidenceFromLambdaSeq((IncidenceImpl)inc);
-				}	
+					edge.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+				}
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeBaseImpl edge : edges) {
@@ -1117,8 +1110,9 @@ public abstract class GraphBaseImpl implements Graph {
 			vertexAfterDeleted(v);
 		}
 		vertexListModified();
-	   if (edgeHasBeenDeleted)
-		   edgeListModified();
+		if (edgeHasBeenDeleted) {
+			edgeListModified();
+		}
 	}
 
 	protected void internalVertexDeleted(VertexBaseImpl v) {
@@ -1282,19 +1276,20 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	public void internalLoadingCompleted(int[] firstIncidence,
 			int[] nextIncidence) {
-		throw new UnsupportedOperationException("Method internalLoadingCompleted not yet implemented");
-//		getFreeVertexList().reinitialize(getVertex());
-//		getFreeEdgeList().reinitialize(getEdge());
-//		for (int vId = 1; vId < getVertex().length; ++vId) {
-//			VertexBaseImpl v = getVertex()[vId];
-//			if (v != null) {
-//				int eId = firstIncidence[vId];
-//				while (eId != 0) {
-//					v.appendIncidenceToLambdaSeq(getEdge()[eId]);
-//					eId = nextIncidence[eMax + eId];
-//				}
-//			}
-//		}
+		throw new UnsupportedOperationException(
+				"Method internalLoadingCompleted not yet implemented");
+		// getFreeVertexList().reinitialize(getVertex());
+		// getFreeEdgeList().reinitialize(getEdge());
+		// for (int vId = 1; vId < getVertex().length; ++vId) {
+		// VertexBaseImpl v = getVertex()[vId];
+		// if (v != null) {
+		// int eId = firstIncidence[vId];
+		// while (eId != 0) {
+		// v.appendIncidenceToLambdaSeq(getEdge()[eId]);
+		// eId = nextIncidence[eMax + eId];
+		// }
+		// }
+		// }
 	}
 
 	/**
@@ -2201,7 +2196,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            the edge that has been created.
 	 */
 	protected void notifyEdgeAdded(Edge e) {
-		assert (e != null) && e.isValid()  && containsEdge(e);
+		assert (e != null) && e.isValid() && containsEdge(e);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {

@@ -534,22 +534,39 @@ public interface GraphElement<OwnType extends GraphElement<OwnType, DualType>, D
 	public List<? extends OwnType> adjacences(IncidenceClass ic);
 
 	/**
-	 * TODO
+	 * Creates and returns a new instance of <code>DualType</code> connected to
+	 * <code>this</code> and <code>other</code> via instances of
+	 * {@link IncidenceClass}es which correspond to <code>incidentRole</code>
+	 * and <code>adjacentRole</code>.
 	 * 
-	 * @param role
+	 * @see #addAdjacence(IncidenceClass, IncidenceClass, Object)
+	 * @see #getIncidenceClassForRolename(String)
+	 * @param incidentRole
+	 *            {@link String}
+	 * @param adjacentRole
+	 *            {@link String}
 	 * @param other
-	 * @return
+	 *            <code>OwnType</code>
+	 * @return <code>DualType</code>
 	 */
-	public DualType addAdjacence(String role, OwnType other);
+	public DualType addAdjacence(String incidentRole, String adjacentRole,
+			OwnType other);
 
 	/**
-	 * TODO
+	 * Creates and returns a new <code>DualType</code> instance, which is
+	 * connected to <code>this</code> via an instance of <code>incidentIc</code>
+	 * and to <code>other</code> via an instance of <code>adjacentIc</code>.
 	 * 
-	 * @param ic
+	 * @param incidentIc
+	 *            {@link IncidenceClass}
+	 * @param adjacentIc
+	 *            {@link IncidenceClass}
 	 * @param other
-	 * @return
+	 *            <code>OwnType</code>
+	 * @return <code>DualType</code>
 	 */
-	public DualType addAdjacence(IncidenceClass ic, OwnType other);
+	public DualType addAdjacence(IncidenceClass incidentIc,
+			IncidenceClass adjacentIc, OwnType other);
 
 	/**
 	 * TODO

@@ -800,34 +800,34 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 	}
 
 	@Override
-	public Edge addAdjacence(String role, Vertex other) {
-		return addAdjacence(getIncidenceClassForRolename(role), other);
+	public Edge addAdjacence(String incidentRole, String adjacentRole,
+			Vertex other) {
+		return addAdjacence(getIncidenceClassForRolename(incidentRole),
+				getIncidenceClassForRolename(adjacentRole), other);
 	}
 
 	@Override
-	public Edge addAdjacence(IncidenceClass ic, Vertex other) {
-		// TODO there should exists methods of type addIncident(..) which should
-		// be used (graph and incidencelists modified)
-		return null;
-		// assert (role != null) && (role.length() > 0);
-		// assert isValid();
-		// assert other.isValid();
-		// assert getGraph() == other.getGraph();
-		//
-		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		// Class<? extends Edge> ec = entry.getM1Class();
-		// Direction dir = entry.getDirection();
-		// Vertex from = null;
-		// Vertex to = null;
-		// if (dir == Direction.IN) {
-		// from = other;
-		// to = this;
-		// } else {
-		// to = other;
-		// from = this;
-		// }
-		// Edge e = getGraph().createEdge(ec, from, to);
-		// return e;
+	public Edge addAdjacence(IncidenceClass incidentIc,
+			IncidenceClass adjacentIc, Vertex other) {
+		assert incidentIc != null;
+		assert adjacentIc != null;
+		assert isValid();
+		assert other.isValid();
+		assert getGraph() == other.getGraph();
+
+		EdgeClass entry = incidentIc.getEdgeClass();
+		Class<? extends Edge> ec = entry.getM1Class();
+
+		assert adjacentIc.getEdgeClass() == entry;
+
+		Edge e = getGraph().createEdge(ec);
+		e.connect(incidentIc, this);
+		e.connect(adjacentIc, other);
+
+		incidenceListModified();
+		((VertexBaseImpl) other).incidenceListModified();
+		graph.edgeListModified();
+		return e;
 	}
 
 	@Override
