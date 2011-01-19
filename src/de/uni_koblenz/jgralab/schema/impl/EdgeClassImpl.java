@@ -32,19 +32,12 @@
 package de.uni_koblenz.jgralab.schema.impl;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceDirection;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
-
-	private IncidenceClass from, to;
+public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implements EdgeClass {
 
 	static EdgeClass createDefaultEdgeClass(Schema schema) {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
@@ -94,15 +87,6 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 	protected EdgeClassImpl(String simpleName, Package pkg,
 			GraphClass aGraphClass) {
 		super(simpleName, pkg, aGraphClass);
-		IncidenceClass fromInc = new IncidenceClassImpl(this, from,
-				fromRoleName, fromMin, fromMax, IncidenceDirection.OUT,
-				aggrFrom);
-		IncidenceClass toInc = new IncidenceClassImpl(this, to, toRoleName,
-				toMin, toMax, IncidenceDirection.IN, aggrTo);
-		this.from = fromInc;
-		this.to = toInc;
-		from.addOutIncidenceClass(fromInc);
-		to.addInIncidenceClass(toInc);
 		register();
 	}
 
@@ -116,102 +100,6 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 	public String getVariableName() {
 		return "ec_" + getQualifiedName().replace('.', '_');
 	}
-
-	@Override
-	public void addSuperClass(EdgeClass superClass) {
-		checkIncidenceClassSpecialization(getFrom(), superClass.getFrom());
-		checkIncidenceClassSpecialization(getTo(), superClass.getTo());
-		super.addSuperClass(superClass);
-		((IncidenceClassImpl) getFrom()).addSubsettedIncidenceClass(superClass
-				.getFrom());
-		((IncidenceClassImpl) getTo()).addSubsettedIncidenceClass(superClass
-				.getTo());
-	}
-
-	@Override
-	public IncidenceClass getFrom() {
-		return from;
-	}
-
-	@Override
-	public IncidenceClass getTo() {
-		return to;
-	}
-
-	/**
-	 * checks if the incidence classes own and inherited are compatible, i.e. if
-	 * the upper multiplicity of own is lower or equal than the one of inherited
-	 * and so on
-	 * 
-	 * @param special
-	 * @param general
-	 * @return true iff the IncidenceClasses are compatible
-	 */
-	public static void checkIncidenceClassSpecialization(
-			IncidenceClass special, IncidenceClass general) {
-		// Vertex same
-		if ((special.getVertexClass() != general.getVertexClass())
-				&& (!general.getVertexClass().isSuperClassOf(
-						special.getVertexClass()))) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
-							+ "EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " and "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
-		// Multiplicities
-		if (special.getMax() > general.getMax()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"The multiplicity of an edge class may not be larger than the multiplicities of its superclass. Offending"
-							+ "EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " and "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
-
-		// name clashes
-		if (general.getRolename().equals(special.getRolename())
-				&& !general.getRolename().isEmpty()
-				&& !special.getRolename().isEmpty()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
-							+ "EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " and "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
-		for (IncidenceClass ic : general.getSubsettedIncidenceClasses()) {
-			if (ic.getRolename().equals(special.getRolename())
-					&& !general.getRolename().isEmpty()
-					&& !ic.getRolename().isEmpty()) {
-				String dir = ic.getDirection() == IncidenceDirection.OUT ? "Alpha"
-						: "Omega";
-				throw new SchemaException(
-						"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
-								+ "EdgeClasses are "
-								+ special.getEdgeClass().getQualifiedName()
-								+ " and "
-								+ ic.getEdgeClass().getQualifiedName()
-								+ " at end " + dir);
-			}
-		}
-
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Class<? extends Edge> getM1Class() {
-		return (Class<? extends Edge>) super.getM1Class();
-	}
+	
 
 }

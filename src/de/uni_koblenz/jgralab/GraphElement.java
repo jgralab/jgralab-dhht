@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab;
 
 import java.util.List;
 
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -49,7 +50,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
 
-public interface GraphElement<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> extends AttributedElement {
+public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>,  OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
 	 * Returns the id of this {@link GraphElement}.

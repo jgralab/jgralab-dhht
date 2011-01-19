@@ -42,20 +42,23 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  * 
+ * @param ConcreteAttributeElementClass the non-abstract metaclass of this class, e.g. VertexClass or EdgeClass, used for generic implementations of methods such as addSuperclass
+ * @param ConcreteInterface the non-abstract interface for the instances of this class, e.g. Vertex for a VertexClass
+ * 
  */
-public interface AttributedElement extends Comparable<AttributedElement> {
+public interface AttributedElement<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends Comparable<ConcreteInterface> {
 
 	/**
 	 * @return the corresponding m2-element to this m1-element
 	 */
-	public AttributedElementClass getAttributedElementClass();
+	public ConcreteAttributedElementClass getAttributedElementClass();
 
 	/**
 	 * Returns the m1-class of this {@link AttributedElement}.
 	 * 
 	 * @return {@link Class}
 	 */
-	public Class<? extends AttributedElement> getM1Class();
+	public Class<? extends ConcreteInterface> getM1Class();
 
 	public GraphClass getGraphClass();
 

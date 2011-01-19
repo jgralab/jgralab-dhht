@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class VertexClassImpl extends GraphElementClassImpl<VertexClass> implements
+public final class VertexClassImpl extends GraphElementClassImpl<VertexClass, Vertex> implements
 		VertexClass {
 
 
@@ -88,11 +88,4 @@ public final class VertexClassImpl extends GraphElementClassImpl<VertexClass> im
     }
 
 	
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Class<? extends Vertex> getM1Class() {
-		return (Class<? extends Vertex>) super.getM1Class();
-	}
-
 }

@@ -50,8 +50,8 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class AttributedElementClassImpl<T extends AttributedElementClass<T>> extends NamedElementImpl
-		implements AttributedElementClass<T> {
+public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass,ConcreteInterface>> extends NamedElementImpl
+		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
 	 * a list of attributes which belongs to the m2 element
@@ -68,12 +68,12 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	/**
 	 * the immediate sub classes of this class
 	 */
-	protected HashSet<T> directSubClasses = new HashSet<T>();
+	protected HashSet<ConcreteMetaClass> directSubClasses = new HashSet<ConcreteMetaClass>();
 
 	/**
 	 * the immediate super classes of this class
 	 */
-	protected HashSet<T> directSuperClasses = new HashSet<T>();
+	protected HashSet<ConcreteMetaClass> directSuperClasses = new HashSet<ConcreteMetaClass>();
 
 	/**
 	 * defines the m2 element as abstract, i.e. that it may not have any
@@ -85,14 +85,14 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	 * The class object representing the generated interface for this
 	 * AttributedElementClass
 	 */
-	private Class<? extends AttributedElement> m1Class;
+	private Class<? extends ConcreteInterface> m1Class;
 
 	/**
 	 * The class object representing the implementation class for this
 	 * AttributedElementClass. This may be either the generated class or a
 	 * subclass of this
 	 */
-	private Class<? extends AttributedElement> m1ImplementationClass;
+	private Class<? extends ConcreteInterface> m1ImplementationClass;
 
 	/**
 	 * builds a new attributed element class
@@ -143,7 +143,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	 *            the class to add as superclass
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addSuperClass(T superClass) {
+	protected void addSuperClass(ConcreteMetaClass superClass) {
 		if ((superClass == this) || (superClass == null)) {
 			return;
 		}
@@ -159,8 +159,8 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 						+ a.getName() + " is declared in both classes");
 			}
 		}
-		if (superClass.isSubClassOf((T) this)) {
-			for (T attr : superClass.getAllSuperClasses()) {
+		if (superClass.isSubClassOf((ConcreteMetaClass) this)) {
+			for (ConcreteMetaClass attr : superClass.getAllSuperClasses()) {
 				System.out.println(attr.getQualifiedName());
 			}
 			System.out.println();
@@ -170,7 +170,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 							+ superClass.getQualifiedName());
 		}
 		directSuperClasses.add(superClass);
-		((AttributedElementClassImpl) superClass).directSubClasses.add((AttributedElementClass<T>)this);
+		((AttributedElementClassImpl) superClass).directSubClasses.add((AttributedElementClass<ConcreteMetaClass, ConcreteInterface>)this);
 	}
 
 	/**
@@ -199,9 +199,9 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	}
 
 	@Override
-	public Set<T> getAllSubClasses() {
-		Set<T> returnSet = new HashSet<T>();
-		for (T subclass : directSubClasses) {
+	public Set<ConcreteMetaClass> getAllSubClasses() {
+		Set<ConcreteMetaClass> returnSet = new HashSet<ConcreteMetaClass>();
+		for (ConcreteMetaClass subclass : directSubClasses) {
 			returnSet.add(subclass);
 			returnSet.addAll(subclass.getAllSubClasses());
 		}
@@ -209,10 +209,10 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	}
 
 	@Override
-	public Set<T> getAllSuperClasses() {
-		HashSet<T> allSuperClasses = new HashSet<T>();
+	public Set<ConcreteMetaClass> getAllSuperClasses() {
+		HashSet<ConcreteMetaClass> allSuperClasses = new HashSet<ConcreteMetaClass>();
 		allSuperClasses.addAll(directSuperClasses);
-		for (T superClass : directSuperClasses) {
+		for (ConcreteMetaClass superClass : directSuperClasses) {
 			allSuperClasses.addAll(superClass.getAllSuperClasses());
 		}
 		return allSuperClasses;
@@ -224,7 +224,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 		if (ownAttr != null) {
 			return ownAttr;
 		}
-		for (T superClass : directSuperClasses) {
+		for (ConcreteMetaClass superClass : directSuperClasses) {
 			Attribute inheritedAttr = superClass.getAttribute(name);
 			if (inheritedAttr != null) {
 				return inheritedAttr;
@@ -236,7 +236,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	@Override
 	public int getAttributeCount() {
 		int attrCount = getOwnAttributeCount();
-		for (T superClass : directSuperClasses) {
+		for (ConcreteMetaClass superClass : directSuperClasses) {
 			attrCount += superClass.getAttributeCount();
 		}
 		return attrCount;
@@ -246,7 +246,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	public SortedSet<Attribute> getAttributeList() {
 		TreeSet<Attribute> attrList = new TreeSet<Attribute>();
 		attrList.addAll(attributeList);
-		for (T superClass : directSuperClasses) {
+		for (ConcreteMetaClass superClass : directSuperClasses) {
 			attrList.addAll(superClass.getAttributeList());
 		}
 		return attrList;
@@ -258,23 +258,23 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	}
 
 	@Override
-	public Set<T> getDirectSubClasses() {
+	public Set<ConcreteMetaClass> getDirectSubClasses() {
 		return directSubClasses;
 	}
 
 	@Override
-	public Set<T> getDirectSuperClasses() {
-		return new HashSet<T>(directSuperClasses);
+	public Set<ConcreteMetaClass> getDirectSuperClasses() {
+		return new HashSet<ConcreteMetaClass>(directSuperClasses);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<? extends AttributedElement> getM1Class() {
+	public Class<? extends ConcreteInterface> getM1Class() {
 		if (m1Class == null) {
 			String m1ClassName = getSchema().getPackagePrefix() + "."
 					+ getQualifiedName();
 			try {
-				m1Class = (Class<? extends AttributedElement>) Class
+				m1Class = (Class<? extends ConcreteInterface>) Class
 						.forName(m1ClassName, true, M1ClassManager
 								.instance(getSchema().getQualifiedName()));
 			} catch (ClassNotFoundException e) {
@@ -288,7 +288,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<? extends AttributedElement> getM1ImplementationClass() {
+	public Class<? extends ConcreteInterface> getM1ImplementationClass() {
 		if (isAbstract()) {
 			throw new M1ClassAccessException(
 					"Can't get M1 implementation class. AttributedElementClass '"
@@ -297,7 +297,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 		if (m1ImplementationClass == null) {
 			try {
 				Field f = getM1Class().getField("IMPLEMENTATION_CLASS");
-				m1ImplementationClass = (Class<? extends AttributedElement>) f
+				m1ImplementationClass = (Class<? extends ConcreteInterface>) f
 						.get(m1Class);
 			} catch (SecurityException e) {
 				throw new M1ClassAccessException(e);
@@ -352,14 +352,14 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 
 	@Override
 	public boolean isDirectSubClassOf(
-			T anAttributedElementClass) {
+			ConcreteMetaClass anAttributedElementClass) {
 		return directSuperClasses.contains(anAttributedElementClass);
 	}
 
 	@Override
 	public boolean isDirectSuperClassOf(
-			T anAttributedElementClass) {
-		return (((T) anAttributedElementClass).getDirectSuperClasses()
+			ConcreteMetaClass anAttributedElementClass) {
+		return (((ConcreteMetaClass) anAttributedElementClass).getDirectSuperClasses()
 				.contains(this));
 	}
 
@@ -372,19 +372,19 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	}
 
 	@Override
-	public boolean isSubClassOf(T anAttributedElementClass) {
+	public boolean isSubClassOf(ConcreteMetaClass anAttributedElementClass) {
 		return getAllSuperClasses().contains(anAttributedElementClass);
 	}
 
 	@Override
 	public boolean isSuperClassOf(
-			T anAttributedElementClass) {
+			ConcreteMetaClass anAttributedElementClass) {
 		return anAttributedElementClass.getAllSuperClasses().contains(this);
 	}
 
 	@Override
 	public boolean isSuperClassOfOrEquals(
-			T anAttributedElementClass) {
+			ConcreteMetaClass anAttributedElementClass) {
 		return ((this == anAttributedElementClass) || (isSuperClassOf(anAttributedElementClass)));
 	}
 
@@ -394,7 +394,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 	}
 
 	protected boolean subclassContainsAttribute(String name) {
-		for (T subClass : getAllSubClasses()) {
+		for (ConcreteMetaClass subClass : getAllSubClasses()) {
 			Attribute subclassAttr = subClass.getAttribute(name);
 			if (subclassAttr != null) {
 				return true;
@@ -410,7 +410,7 @@ public abstract class AttributedElementClassImpl<T extends AttributedElementClas
 			return false;
 		}
 		if (getClass() == o.getClass()) {
-			T other = (T) o;
+			ConcreteMetaClass other = (ConcreteMetaClass) o;
 			if (!qualifiedName.equals(other.getQualifiedName())) {
 				return false;
 			}

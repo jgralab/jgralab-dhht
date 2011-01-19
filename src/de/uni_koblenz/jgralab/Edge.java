@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface Edge extends GraphElement<Edge, Vertex> {
+public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 
 	/**
 	 * Returns the {@link EdgeClass} of which this {@link Edge} is an instance

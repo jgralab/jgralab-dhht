@@ -54,7 +54,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface Graph extends AttributedElement {
+public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	/**
 	 * Creates a vertex the specified class <code>cls</code> and adds the new

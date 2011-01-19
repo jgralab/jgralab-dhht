@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface AttributedElementClass<T extends AttributedElementClass<T>> extends NamedElement {
+public interface AttributedElementClass<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends NamedElement {
 
 	/**
 	 * Adds a new attribute <code>anAttribute</code> to this element.
@@ -214,7 +214,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * 
 	 * @return a Set of all direct and indirect subclasses of this element
 	 */
-	public Set<T> getAllSubClasses();
+	public Set<ConcreteAttributedElementClass> getAllSubClasses();
 
 	/**
 	 * Lists all direct and indirect superclasses of this element.
@@ -247,7 +247,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * 
 	 * @return a Set of all direct and indirect superclasses of this element
 	 */
-	public Set<T> getAllSuperClasses();
+	public Set<ConcreteAttributedElementClass> getAllSuperClasses();
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -389,7 +389,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * 
 	 * @return a Set of all direct subclasses of this element
 	 */
-	public Set<T> getDirectSubClasses();
+	public Set<ConcreteAttributedElementClass> getDirectSubClasses();
 
 	/**
 	 * Returns all direct superclasses of this element.
@@ -423,7 +423,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * 
 	 * @return a Set of all direct superclasses of this element
 	 */
-	public Set<T> getDirectSuperClasses();
+	public Set<ConcreteAttributedElementClass> getDirectSuperClasses();
 
 	/**
 	 * Returns the M1 interface class for this attributed element.
@@ -445,7 +445,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * @throws M1ClassAccessException
 	 *             if reflection exceptions occur.
 	 */
-	public Class<? extends AttributedElement> getM1Class();
+	public Class<? extends ConcreteInterface> getM1Class();
 
 	/**
 	 * Returns the M1 implementation class for this attributed element.
@@ -471,7 +471,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 *             <li>there are reflection exceptions</li>
 	 *             </ul>
 	 */
-	public Class<? extends AttributedElement> getM1ImplementationClass();
+	public Class<? extends ConcreteInterface> getM1ImplementationClass();
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -705,7 +705,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSubClassOf(T anAttributedElementClass);
+	public boolean isDirectSubClassOf(ConcreteAttributedElementClass anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct superclass of another
@@ -743,7 +743,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSuperClassOf(T anAttributedElementClass);
+	public boolean isDirectSuperClassOf(ConcreteAttributedElementClass anAttributedElementClass);
 
 	/**
 	 * @return true, if this AttributedElementClass is only for internal use
@@ -787,7 +787,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSubClassOf(T anAttributedElementClass);
+	public boolean isSubClassOf(ConcreteAttributedElementClass anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct or inherited superclass of
@@ -826,7 +826,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSuperClassOf(T anAttributedElementClass);
+	public boolean isSuperClassOf(ConcreteAttributedElementClass anAttributedElementClass);
 
 	/**
 	 * Tests if the current element equals another attributed element or is
@@ -863,7 +863,7 @@ public interface AttributedElementClass<T extends AttributedElementClass<T>> ext
 	 *         direct or indirect subclass of this element or <code>this</code>
 	 *         attributed element itself, otherwise <code>false</code>
 	 */
-	public boolean isSuperClassOfOrEquals(T anAttributedElementClass);
+	public boolean isSuperClassOfOrEquals(ConcreteAttributedElementClass anAttributedElementClass);
 
 	/**
 	 * Defines if this attributed element is abstract. Abstract elements can´t

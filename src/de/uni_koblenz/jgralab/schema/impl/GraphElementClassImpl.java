@@ -34,15 +34,15 @@ package de.uni_koblenz.jgralab.schema.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public abstract class GraphElementClassImpl<T extends GraphElementClass<T>> extends AttributedElementClassImpl<T>
-		implements GraphElementClass<T> {
+public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S extends GraphElement<T,S,?>> extends AttributedElementClassImpl<T, S>
+		implements GraphElementClass<T, S> {
 
 	protected GraphClass graphClass;
 
@@ -152,7 +152,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T>> exte
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
-			GraphElementClass<?> ogc = ic.getOtherGraphElementClass((GraphElementClass)this);
+			GraphElementClass<?,?> ogc = ic.getOtherGraphElementClass((GraphElementClass<?,?>)this);
 			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
 				if (ic != ic2) {
 					adjacentIncidenceClasses.add(ic2);
@@ -165,9 +165,9 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T>> exte
 	protected Set<IncidenceClass> getAllAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : getAllIncidenceClasses()) {
-			GraphElementClass<?> ogc = ic.getOtherGraphElementClass(this);
+			GraphElementClass<?,?> ogc = ic.getOtherGraphElementClass(this);
 			for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
-				if ((ic != ic2) && (!ic.isSuperclassOf(ic2)) && (!ic2.isSuperclassOf(ic))) { 
+				if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) && (!ic2.isSuperClassOf(ic))) { 
 					adjacentIncidenceClasses.add(ic2);
 				}
 			}

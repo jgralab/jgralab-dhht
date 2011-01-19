@@ -272,7 +272,24 @@ public interface IncidenceClass {
 	 *         indirect subclass of this incidence class, otherwise
 	 *         <code>false</code>
 	 */
+
+	
+	/**
+	 * 
+	 * @param graphElementClass
+	 * 
+	 * @return the other GraphElementClass connected to this incidenceClass,
+	 *         e.g. if graphElementClass is the EdgeClass connected, the method
+	 *         returns the VertexClass and vice versa
+	 */
+	public GraphElementClass<?,?> getOtherGraphElementClass(
+			GraphElementClass<?,?> graphElementClass);
+
+	
+	
+	
 	public boolean isSubClassOf(IncidenceClass anIncidenceClass);
+
 
 	/**
 	 * Lists all direct and indirect superclasses of this IncidenceClass.
@@ -522,14 +539,5 @@ public interface IncidenceClass {
 	 */
 	public boolean isSuperClassOfOrEquals(IncidenceClass anIncidenceClass);
 
-	/**
-	 * 
-	 * @param graphElementClass
-	 * 
-	 * @return the other GraphElementClass connected to this incidenceClass,
-	 *         e.g. if graphElementClass is the EdgeClass connected, the method
-	 *         returns the VertexClass and vice versa
-	 */
-	public GraphElementClass<?> getOtherGraphElementClass(
-			GraphElementClass<?> graphElementClass);
+
 }

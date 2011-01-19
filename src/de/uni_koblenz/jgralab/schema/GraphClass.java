@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.schema;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Graph;
 
 /**
  * Represents a <code>GraphClass</code> in the <code>Schema</code>, that holds
@@ -53,7 +54,7 @@ import de.uni_koblenz.jgralab.Direction;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface GraphClass extends AttributedElementClass {
+public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 
 	public final static String DEFAULTGRAPHCLASS_NAME = "Graph";
 

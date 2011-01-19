@@ -34,12 +34,17 @@ package de.uni_koblenz.jgralab.schema;
 
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.GraphElement;
+
 /**
- * Base class for Vertex/Edge/Aggregation/Composition classes.
+ * Base class for Vertex/Edge classes.
+ * 
+ * @param ConcreteAttributeElementClass the non-abstract subclass of this class, e.g. VertexClass or EdgeClass, used for generic implementations of methods such as addSuperclass
+ * @param ConcreteInterface the non-abstract interface for the instances of this class, e.g. Vertex for a VertexClass
  * 
  * @author ist@uni-koblenz.de
  */
-public interface GraphElementClass<T extends GraphElementClass<T>> extends AttributedElementClass<T> {
+public interface GraphElementClass<T extends GraphElementClass<T, S>, S extends GraphElement<T, S,?>> extends AttributedElementClass<T, S> {
 
 	/**
 	 * Returns the GraphClass of this AttributedElementClass.

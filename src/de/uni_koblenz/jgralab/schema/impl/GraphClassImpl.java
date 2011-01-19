@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -50,7 +50,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class GraphClassImpl extends AttributedElementClassImpl implements
+public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass, Graph> implements
 		GraphClass {
 
 	private Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
@@ -231,20 +231,6 @@ public final class GraphClassImpl extends AttributedElementClassImpl implements
 		}
 		output.append(": \n");
 
-		output.append("subClasses of '" + getQualifiedName() + "': ");
-		Iterator<AttributedElementClass> it = getAllSubClasses().iterator();
-		while (it.hasNext()) {
-			output.append("'" + ((GraphClassImpl) it.next()).getQualifiedName()
-					+ "' ");
-		}
-
-		output.append("\nsuperClasses of '" + getQualifiedName() + "': ");
-		Iterator<AttributedElementClass> it2 = getAllSuperClasses().iterator();
-		while (it2.hasNext()) {
-			output.append("'"
-					+ ((GraphClassImpl) it2.next()).getQualifiedName() + "' ");
-		}
-		output.append(attributesToString());
 
 		output.append("\n\nGraphElementClasses of '" + getQualifiedName()
 				+ "':\n\n");
@@ -316,7 +302,7 @@ public final class GraphClassImpl extends AttributedElementClassImpl implements
 			EdgeClass edgeClass, String rolename, Direction dir,
 			IncidenceType kind, int minEdgesAtVertex, int maxEdgesAtVertex,
 			int minVerticesAtEdge, int maxVerticesAtEdge) {
-		IncidenceClass incClass = new IncidenceClass(vertexClass, edgeClass, rolename, dir, kind, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge);
+		IncidenceClass incClass = new IncidenceClassImpl(vertexClass, edgeClass, rolename, dir, kind, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
 		return null;
