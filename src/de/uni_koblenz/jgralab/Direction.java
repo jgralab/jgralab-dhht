@@ -81,9 +81,4 @@ public enum Direction {
 			throw new Exception("Could not determine direction from string.");
 		}
 	}
-
-	public Direction getOppositeDirection() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
