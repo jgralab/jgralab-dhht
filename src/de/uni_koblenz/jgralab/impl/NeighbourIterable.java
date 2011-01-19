@@ -33,25 +33,26 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.util.Iterator;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 
 /**
  * This class provides an Iterable for the Vertices adjacent to a given vertex.
  * 
  * @author ist@uni-koblenz.de
  */
-public class NeighbourIterable<E extends Edge, V extends Vertex> implements
-		Iterable<V> {
+public abstract class NeighbourIterable<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> implements
+		Iterable<OwnType> {
+	
 	/**
-	 * Creates an Iterable for all neighbours adjacent to <code>v</code>.
+	 * Creates an Iterable for all neighbours adjacent to <code>elem</code>.
 	 * 
-	 * @param v
-	 *            a Vertex
+	 * @param elem 
+	 *            
 	 */
-	public NeighbourIterable(Vertex v) {
-		this(v, null, EdgeDirection.INOUT);
+	public NeighbourIterable(OwnType elem) {
+		this(elem, null, Direction.BOTH);
 	}
 
 	/**
@@ -59,12 +60,12 @@ public class NeighbourIterable<E extends Edge, V extends Vertex> implements
 	 * edges of the specified edgeclass <code>ec</code>.
 	 * 
 	 * @param v
-	 *            a Vertex
+	 *            
 	 * @param ec
 	 *            restricts edges to that class or subclasses
 	 */
-	public NeighbourIterable(Vertex v, Class<? extends Edge> ec) {
-		this(v, ec, EdgeDirection.INOUT);
+	public NeighbourIterable(OwnType elem, Class<? extends DualType> other) {
+		this(elem, other, Direction.BOTH);
 	}
 
 	/**
@@ -76,8 +77,8 @@ public class NeighbourIterable<E extends Edge, V extends Vertex> implements
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public NeighbourIterable(Vertex v, EdgeDirection dir) {
-		this(v, null, dir);
+	public NeighbourIterable(OwnType elem, Direction dir) {
+		this(elem, null, dir);
 	}
 
 	/**
@@ -92,41 +93,72 @@ public class NeighbourIterable<E extends Edge, V extends Vertex> implements
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public NeighbourIterable(Vertex v, Class<? extends Edge> ec,
-			EdgeDirection dir) {
-		assert v != null && v.isValid();
-		Iterable<E> it = new IncidenceIterable<E>(v, ec, dir);
-		neighbourIterator = new NeigbourIterator(it.iterator());
+	public NeighbourIterable(OwnType elem, Class<? extends DualType> ec,
+			Direction dir) {
+		assert elem != null && elem.isValid();
+		
 	}
-
-	class NeigbourIterator implements Iterator<V> {
-		Iterator<E> incidenceIterator;
-
-		public NeigbourIterator(Iterator<E> i) {
-			incidenceIterator = i;
+		
+	class NeigbourIterator implements Iterator<OwnType> {
+        private Iterator<Incidence> incidencesAtOwnElementIterator;
+        private Iterator<Incidence> incidencesAtIncidentElementIterator;
+        private Incidence currentIncidenceToIncidentElement;
+        private boolean gotNext = false;
+        private OwnType nextElem = null;
+        private Class<? extends OwnType> classOfAdjacentElements;
+       
+		
+		public NeigbourIterator(OwnType elem, Class<? extends OwnType> oc, Direction dir ) {
+			classOfAdjacentElements = oc;
+			incidencesAtOwnElementIterator = elem.getIncidences(dir).iterator();			
 		}
+		
 
 		@Override
 		public boolean hasNext() {
-			return incidenceIterator.hasNext();
+			if (gotNext)
+				nextElem = findNextElem();
+			return nextElem != null;
+		}	
+		
+		@SuppressWarnings("unchecked")
+		private OwnType findNextElem() {
+			OwnType element = null;
+			do {
+				element = null;
+				if ((incidencesAtIncidentElementIterator != null) && incidencesAtIncidentElementIterator.hasNext()) {
+					element = (OwnType) incidencesAtIncidentElementIterator.next().getThat();
+				} else {
+					while (incidencesAtOwnElementIterator.hasNext()) {
+						currentIncidenceToIncidentElement = incidencesAtOwnElementIterator.next();
+						Direction currentDirection = currentIncidenceToIncidentElement.getDirection();
+						incidencesAtIncidentElementIterator = currentIncidenceToIncidentElement.getEdge().getIncidences(currentDirection.getOppositeDirection()).iterator(); 
+						if (incidencesAtIncidentElementIterator.hasNext()) {
+							element = (OwnType) incidencesAtIncidentElementIterator.next().getThat();
+							break;
+						}	
+					}
+				}
+			} while ((element != null) && !classOfAdjacentElements.isInstance(element));	
+			return element;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public V next() {
-			return (V) incidenceIterator.next().getThat();
+		public OwnType next() {
+			hasNext();
+			return nextElem;
 		}
 
 		@Override
 		public void remove() {
-			incidenceIterator.remove();
+			throw new UnsupportedOperationException();
 		}
 	}
 
-	private Iterator<V> neighbourIterator;
+	private Iterator<OwnType> neighbourIterator;
 
 	@Override
-	public Iterator<V> iterator() {
+	public Iterator<OwnType> iterator() {
 		return neighbourIterator;
 	}
 }
