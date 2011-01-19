@@ -186,42 +186,6 @@ public interface IncidenceClass {
 	public void setIncidenceType(IncidenceType kind);
 
 	/**
-	 * TODO
-	 * 
-	 * @return the set of IncidenceClasses which are subsetted (i.e.
-	 *         specialized) by this IncidenceClass
-	 */
-	@Deprecated
-	public Set<IncidenceClass> getSubsettedIncidenceClasses();
-
-	/**
-	 * TODO
-	 * 
-	 * @return the set of IncidenceClasses which are directly subsetted (i.e.
-	 *         specialized) by this IncidenceClass
-	 */
-	@Deprecated
-	public Set<IncidenceClass> getOwnSubsettedIncidenceClasses();
-
-	/**
-	 * TODO
-	 * 
-	 * @return the set of IncidenceClasses which are redefined (i.e. specialized
-	 *         and overwritten) by this IncidenceClass
-	 */
-	@Deprecated
-	public Set<IncidenceClass> getRedefinedIncidenceClasses();
-
-	/**
-	 * TODO
-	 * 
-	 * @return the set of IncidenceClasses which are directly redefined (i.e.
-	 *         specialized and overwritten) by this IncidenceClass
-	 */
-	@Deprecated
-	public Set<IncidenceClass> getOwnRedefinedIncidenceClasses();
-
-	/**
 	 * @return a set of IncidenceClasses which are hidden by this at the edge
 	 */
 	public Set<IncidenceClass> getHiddenEndsAtEdge();
@@ -240,39 +204,6 @@ public interface IncidenceClass {
 	 * @return the EdgeClass this IncidenceClass is connected to
 	 */
 	public EdgeClass getEdgeClass();
-
-	/**
-	 * @return the set of all role names valid for this IncidenceClass
-	 */
-	public Set<String> getAllRoles();
-
-	/**
-	 * TODO
-	 * 
-	 * @return the set of roles which are redefined by this IncidenceClass
-	 */
-	public Set<String> getRedefinedRoles();
-
-	/**
-	 * TODO Marks a role which is already subsetted by this IncidenceClass as
-	 * redefined.
-	 */
-	public void addRedefinedRole(String rolename);
-
-	/**
-	 * TODO Marks a set of roles which are already subsetted by this
-	 * IncidenceClass as redefined.
-	 */
-	public void addRedefinedRoles(Set<String> rolenames);
-
-	/**
-	 * TODO
-	 * 
-	 * @return the IncidenceClass at the other end of the EdgeClass this
-	 *         IncidenceClass belongs to
-	 */
-	@Deprecated
-	public IncidenceClass getOpposite();
 
 	/**
 	 * Returns the M1-class of this {@link Incidence}.
