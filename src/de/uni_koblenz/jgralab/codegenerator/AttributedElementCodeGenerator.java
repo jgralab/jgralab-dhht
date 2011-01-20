@@ -47,7 +47,7 @@ import de.uni_koblenz.jgralab.schema.RecordDomain;
  * @author ist@uni-koblenz.de
  * 
  */
-public class AttributedElementCodeGenerator extends CodeGenerator {
+public class AttributedElementCodeGenerator<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ?>> extends CodeGenerator {
 
 	/**
 	 * all the interfaces of the class which are being implemented
@@ -57,7 +57,7 @@ public class AttributedElementCodeGenerator extends CodeGenerator {
 	/**
 	 * the AttributedElementClass to generate code for
 	 */
-	protected AttributedElementClass aec;
+	protected ConcreteMetaClass aec;
 
 	/**
 	 * specifies if the generated code is a special JGraLab class of layer M2
@@ -65,7 +65,7 @@ public class AttributedElementCodeGenerator extends CodeGenerator {
 	 * values: "Graph", "Vertex", "Edge", "Incidence"
 	 */
 	protected AttributedElementCodeGenerator(
-			AttributedElementClass attributedElementClass,
+			ConcreteMetaClass attributedElementClass,
 			String schemaRootPackageName, String implementationName,
 			CodeGeneratorConfiguration config) {
 		super(schemaRootPackageName, attributedElementClass.getPackageName(),
@@ -105,7 +105,7 @@ public class AttributedElementCodeGenerator extends CodeGenerator {
 	 * @param aec
 	 * @return
 	 */
-	protected String absoluteName(AttributedElementClass aec) {
+	protected String absoluteName(ConcreteMetaClass aec) {
 		return schemaRootPackageName + "." + aec.getQualifiedName();
 	}
 

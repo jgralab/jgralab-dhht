@@ -33,9 +33,10 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
 /**
  * TODO add comment
@@ -43,7 +44,7 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public class EdgeCodeGenerator extends AttributedElementCodeGenerator {
+public class EdgeCodeGenerator extends AttributedElementCodeGenerator<EdgeClass> {
 
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
 			String implementationName, CodeGeneratorConfiguration config) {
@@ -54,32 +55,47 @@ public class EdgeCodeGenerator extends AttributedElementCodeGenerator {
 	@Override
 	protected CodeBlock createHeader() {
 		CodeList code = new CodeList();
-		EdgeClass ec = (EdgeClass) aec;
-		code.setVariable("fromVertexClass", ec.getFrom().getVertexClass()
-				.getQualifiedName());
-		code.setVariable("toVertexClass", ec.getTo().getVertexClass()
-				.getQualifiedName());
-		code.setVariable("fromRoleName", ec.getFrom().getRolename());
-		code.setVariable("toRoleName", ec.getTo().getRolename());
-		code.setVariable("ecName", ec.getQualifiedName());
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("/**");
-		snippet.add(" * FromVertexClass: #fromVertexClass#");
-		snippet.add(" * FromRoleName : #fromRoleName#");
-		snippet.add(" * ToVertexClass: #toVertexClass#");
-		snippet.add(" * ToRoleName : #toRoleName#");
+		snippet.add(" * Incomming IncidenceClasses:");
+		code.addNoIndent(snippet);
+		for (IncidenceClass ic : aec.getIncidenceClasses()) {
+			if (ic.getDirection()==Direction.VERTEX_TO_EDGE)
+			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
+		}	
+		snippet = new CodeSnippet();
+		snippet.add("/**");
+		snippet.add(" * Outgoing IncidenceClasses:");
+		code.addNoIndent(snippet);
+		for (IncidenceClass ic : aec.getIncidenceClasses()) {
+			if (ic.getDirection()==Direction.EDGE_TO_VERTEX)
+			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
+		}	
+		
+		snippet = new CodeSnippet();
 		snippet.add(" */");
 		code.addNoIndent(snippet);
 		code.addNoIndent(super.createHeader());
 		return code;
 	}
+	
+
+	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
+		CodeSnippet snippet = new CodeSnippet();
+		snippet.add(" *   Role: '#rolename#', VertexClass: '#vcName#");
+		snippet.setVariable("rolename", ic.getRolename());
+		snippet.setVariable("vcName", ic.getVertexClass().getQualifiedName());
+		return snippet;
+	}
+	
+	
+	
 
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.Vertex");
-		code
-				.addNoIndent(new CodeSnippet(
+		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, Vertex alpha, Vertex omega) {",
 						"\tsuper(id, g, alpha, omega);"));
@@ -115,39 +131,15 @@ public class EdgeCodeGenerator extends AttributedElementCodeGenerator {
 			code.add(createNextEdgeInGraphMethods());
 			code.add(createNextEdgeAtVertexMethods());
 		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			code.add(createGetSemanticsMethod());
-			code.add(createGetAlphaSemanticsMethod());
-			code.add(createGetOmegaSemanticsMethod());
-			code.add(createReversedEdgeMethod());
-		}
+        createMethodsForBinaryEdge(code);
 		// code.add(createValidRolesMethod());
 		return code;
 	}
-
-	/**
-	 * 
-	 * @return
-	 */
-	private CodeBlock createReversedEdgeMethod() {
-		CodeSnippet code = new CodeSnippet(true,
-				"protected #jgImplPackage#.ReversedEdgeBaseImpl createReversedEdge() {");
-		if (currentCycle.isStdImpl()) {
-			addImports("#schemaImplStdPackage#.Reversed#simpleClassName#Impl");
-		}
-		if (currentCycle.isTransImpl()) {
-			addImports("#schemaImplTransPackage#.Reversed#simpleClassName#Impl");
-		}
-		if (currentCycle.isSaveMemImpl()) {
-			addImports("#schemaImplSaveMemPackage#.Reversed#simpleClassName#Impl");
-		}
-		if (currentCycle.isDbImpl()) {
-			addImports("#schemaImplDbPackage#.Reversed#simpleClassName#Impl");
-		}
-		code.add("\treturn new Reversed#simpleClassName#Impl(this, graph);");
-		code.add("}");
-		return code;
+	
+	protected void createMethodsForBinaryEdge(CodeList code) {
+		
 	}
+
 
 	private CodeBlock createNextEdgeInGraphMethods() {
 		CodeList code = new CodeList();
@@ -250,77 +242,25 @@ public class EdgeCodeGenerator extends AttributedElementCodeGenerator {
 						+ (withOrientation && withTypeFlag ? ", " : "")
 						+ (withTypeFlag ? "noSubClasses" : ""));
 		if (currentCycle.isAbstract()) {
-			code
-					.add("/**",
+			code.add("/**",
 							" * @return the next edge of class #ecQualifiedName# at the \"this\" vertex");
 
 			if (withOrientation) {
 				code.add(" * @param orientation the orientation of the edge");
 			}
 			if (withTypeFlag) {
-				code
-						.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecQualifiedName# are accepted");
+				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecQualifiedName# are accepted");
 			}
-			code
-					.add(" */",
+			code.add(" */",
 							"public #ecQualifiedName# getNext#ecCamelName#(#formalParams#);");
 		}
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			code
-					.add(
-							"public #ecQualifiedName# getNext#ecCamelName#(#formalParams#) {",
-							"\treturn (#ecQualifiedName#)getNextIncidence(#ecQualifiedName#.class#actualParams#);",
-							"}");
+			code.add("public #ecQualifiedName# getNext#ecCamelName#(#formalParams#) {",
+					 "\treturn (#ecQualifiedName#)getNextIncidence(#ecQualifiedName#.class#actualParams#);",
+					 "}");
 		}
 		return code;
 	}
 
-	private CodeBlock createGetSemanticsMethod() {
-		CodeSnippet code = new CodeSnippet(true);
-		EdgeClass ec = (EdgeClass) aec;
-		String val = "NONE";
-
-		if ((ec.getTo().getAggregationKind() == AggregationKind.COMPOSITE)
-				|| (ec.getFrom().getAggregationKind() == AggregationKind.COMPOSITE)) {
-			val = "COMPOSITE";
-		} else if ((ec.getTo().getAggregationKind() == AggregationKind.SHARED)
-				|| (ec.getFrom().getAggregationKind() == AggregationKind.SHARED)) {
-			val = "SHARED";
-		}
-		code.setVariable("semantics", val);
-		code
-				.add(
-						"public de.uni_koblenz.jgralab.schema.AggregationKind getSemantics() {",
-						"\treturn de.uni_koblenz.jgralab.schema.AggregationKind.#semantics#;",
-						"}");
-		return code;
-	}
-
-	private CodeBlock createGetAlphaSemanticsMethod() {
-		CodeSnippet code = new CodeSnippet(true);
-		EdgeClass ec = (EdgeClass) aec;
-		code.setVariable("semantics", ec.getFrom().getAggregationKind()
-				.toString());
-		code
-				.add(
-						"@Override",
-						"public de.uni_koblenz.jgralab.schema.AggregationKind getAlphaSemantics() {",
-						"\treturn de.uni_koblenz.jgralab.schema.AggregationKind.#semantics#;",
-						"}");
-		return code;
-	}
-
-	private CodeBlock createGetOmegaSemanticsMethod() {
-		CodeSnippet code = new CodeSnippet(true);
-		EdgeClass ec = (EdgeClass) aec;
-		code.setVariable("semantics", ec.getTo().getAggregationKind()
-				.toString());
-		code
-				.add(
-						"@Override",
-						"public de.uni_koblenz.jgralab.schema.AggregationKind getOmegaSemantics() {",
-						"\treturn de.uni_koblenz.jgralab.schema.AggregationKind.#semantics#;",
-						"}");
-		return code;
-	}
+	
 }
