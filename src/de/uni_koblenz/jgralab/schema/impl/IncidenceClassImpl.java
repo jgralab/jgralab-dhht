@@ -364,9 +364,9 @@ public class IncidenceClassImpl implements IncidenceClass {
 			throw new SchemaException(
 					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
 							+ "IncidenceClasses are "
-							+ special
+							+ special.getIncidenceClassName(special)
 							+ " and "
-							+ general + ".");
+							+ general.getIncidenceClassName(general) + ".");
 		}
 		// Edge same
 		if ((special.getEdgeClass() != general.getEdgeClass())
@@ -375,9 +375,9 @@ public class IncidenceClassImpl implements IncidenceClass {
 			throw new SchemaException(
 					"An IncidenceClass may specialize only IncidenceClasses whose connected edge class is identical or a superclass of the own one. Offending"
 							+ "IncidenceClasses are "
-							+ special
+							+ special.getIncidenceClassName(special)
 							+ " and "
-							+ general + ".");
+							+ general.getIncidenceClassName(general) + ".");
 		}
 		// Multiplicities
 		if (special.getMaxEdgesAtVertex() > general.getMaxEdgesAtVertex()) {
@@ -496,7 +496,8 @@ public class IncidenceClassImpl implements IncidenceClass {
 			IncidenceClass icWithSameRolename = rolenames.get(ic.getRolename());
 			if (icWithSameRolename != null) {
 				throw new SchemaException("The rolename '" + ic.getRolename()
-						+ "' already exists at IncidenceClass '" + ic + "'.");
+						+ "' already exists at IncidenceClass '"
+						+ ic.getIncidenceClassName(ic) + "'.");
 			}
 		}
 	}
@@ -546,11 +547,5 @@ public class IncidenceClassImpl implements IncidenceClass {
 			assert rolenames.get(ic.getRolename()) == null;
 			rolenames.put(ic.getRolename(), ic);
 		}
-	}
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
 	}
 }
