@@ -55,7 +55,7 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 
 	private Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
 
-	private Map<String, GraphElementClass> graphElementClasses = new HashMap<String, GraphElementClass>();
+	private Map<String, GraphElementClass<?, ?>> graphElementClasses = new HashMap<String, GraphElementClass<?,?>>();
 
 	private Map<String, VertexClass> vertexClasses = new HashMap<String, VertexClass>();
 
@@ -171,27 +171,12 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		return vc;
 	}
 
-	@Override
-	public boolean knowsOwn(GraphElementClass aGraphElementClass) {
-		return (graphElementClasses.containsKey(aGraphElementClass
-				.getQualifiedName()));
-	}
 
 	@Override
-	public boolean knowsOwn(String qn) {
-		return (graphElementClasses.containsKey(qn));
-	}
-
-	@Override
-	public boolean knows(GraphElementClass aGraphElementClass) {
+	public boolean knows(GraphElementClass<?,?>  aGraphElementClass) {
 		if (graphElementClasses.containsKey(aGraphElementClass
 				.getQualifiedName())) {
 			return true;
-		}
-		for (AttributedElementClass superClass : directSuperClasses) {
-			if (((GraphClass) superClass).knows(aGraphElementClass)) {
-				return true;
-			}
 		}
 		return false;
 	}
@@ -201,23 +186,13 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		if (graphElementClasses.containsKey(qn)) {
 			return true;
 		}
-		for (AttributedElementClass superClass : directSuperClasses) {
-			if (((GraphClass) superClass).knows(qn)) {
-				return true;
-			}
-		}
 		return false;
 	}
 
 	@Override
-	public GraphElementClass getGraphElementClass(String qn) {
+	public GraphElementClass<?,?> getGraphElementClass(String qn) {
 		if (graphElementClasses.containsKey(qn)) {
 			return graphElementClasses.get(qn);
-		}
-		for (AttributedElementClass superClass : directSuperClasses) {
-			if (((GraphClass) superClass).knows(qn)) {
-				return ((GraphClass) superClass).getGraphElementClass(qn);
-			}
 		}
 		return null;
 	}
@@ -234,17 +209,15 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 
 		output.append("\n\nGraphElementClasses of '" + getQualifiedName()
 				+ "':\n\n");
-		Iterator<GraphElementClass> it3 = graphElementClasses.values()
-				.iterator();
-		while (it3.hasNext()) {
-			output.append(it3.next().toString() + "\n");
+		for (GraphElementClass<?,?> gc : graphElementClasses.values())  {
+				output.append(gc.toString() + "\n");
 		}
 		return output.toString();
 	}
 
 	@Override
-	public List<GraphElementClass> getGraphElementClasses() {
-		return new ArrayList<GraphElementClass>(graphElementClasses.values());
+	public List<GraphElementClass<?, ?>> getGraphElementClasses() {
+		return (List<GraphElementClass<?, ?>>) new ArrayList<GraphElementClass<?,?>>(graphElementClasses.values());
 	}
 
 	@Override
@@ -262,12 +235,6 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		VertexClass vc = vertexClasses.get(qn);
 		if (vc != null) {
 			return vc;
-		}
-		for (AttributedElementClass superclass : directSuperClasses) {
-			vc = ((GraphClass) superclass).getVertexClass(qn);
-			if (vc != null) {
-				return vc;
-			}
 		}
 		return null;
 	}
@@ -296,13 +263,15 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 	public int getVertexClassCount() {
 		return vertexClasses.size();
 	}
+	
+
 
 	@Override
-	public IncidenceClass createIncidenceClass(VertexClass vertexClass,
-			EdgeClass edgeClass, String rolename, Direction dir,
-			IncidenceType kind, int minEdgesAtVertex, int maxEdgesAtVertex,
-			int minVerticesAtEdge, int maxVerticesAtEdge) {
-		IncidenceClass incClass = new IncidenceClassImpl(vertexClass, edgeClass, rolename, dir, kind, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge);
+	public IncidenceClass createIncidenceClass(EdgeClass edgeClass,
+			VertexClass vertexClass, String rolename, boolean isAbstract, 
+			int minEdgesAtVertex, int maxEdgesAtVertex,
+			int minVerticesAtEdge, int maxVerticesAtEdge, Direction dir, IncidenceType kind) {
+		IncidenceClass incClass = new IncidenceClassImpl(edgeClass, vertexClass, rolename, isAbstract, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge, dir, kind);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
 		return null;

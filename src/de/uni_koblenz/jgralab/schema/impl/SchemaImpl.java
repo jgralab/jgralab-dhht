@@ -55,6 +55,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -82,6 +83,7 @@ import de.uni_koblenz.jgralab.schema.DoubleDomain;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.ListDomain;
 import de.uni_koblenz.jgralab.schema.LongDomain;
@@ -1282,6 +1284,12 @@ public class SchemaImpl implements Schema {
 	 */
 	public void setConfiguration(CodeGeneratorConfiguration config) {
 		this.config = config;
+	}
+
+	@Override
+	public IncidenceClass getDefaultIncidenceClass(Direction dir) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
