@@ -55,7 +55,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
+public abstract class EdgeBaseImpl extends GraphElementImpl<EdgeClass, Edge, Vertex>
 		implements Edge {
 
 	/**
@@ -456,7 +456,7 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<Edge, Vertex>
 	}
 
 	@Override
-	public int compareTo(AttributedElement a) {
+	public int compareTo(Edge a) {
 		assert a != null;
 		assert a instanceof Edge;
 		Edge e = (Edge) a;

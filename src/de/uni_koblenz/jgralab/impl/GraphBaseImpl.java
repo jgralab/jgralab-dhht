@@ -458,7 +458,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(AttributedElement a) {
+	public int compareTo(Graph a) {
 		if (a instanceof Graph) {
 			Graph g = (Graph) a;
 			return hashCode() - g.hashCode();

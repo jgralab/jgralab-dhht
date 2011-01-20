@@ -43,6 +43,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -60,8 +61,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  * 
  */
-public abstract class GraphElementImpl<OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>>
-		implements GraphElement<OwnType, DualType> {
+public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
+		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**
 	 * The id of this {@link GraphElement}.

@@ -60,7 +60,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
+public abstract class VertexBaseImpl extends GraphElementImpl<VertexClass, Vertex, Edge>
 		implements Vertex {
 
 	/**
@@ -440,7 +440,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 	}
 
 	@Override
-	public int compareTo(AttributedElement a) {
+	public int compareTo(Vertex a) {
 		assert a instanceof Vertex;
 		Vertex v = (Vertex) a;
 		assert isValid() && v.isValid();
@@ -945,5 +945,6 @@ public abstract class VertexBaseImpl extends GraphElementImpl<Vertex, Edge>
 		getSchema().getGraphFactory().createIncidence(incidenceClass, this,
 				elemToConnect);
 	}
+
 
 }

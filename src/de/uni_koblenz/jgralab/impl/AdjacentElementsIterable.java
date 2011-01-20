@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.Incidence;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?>, AdjacentElementClass extends GraphElement<?, ?>> implements
+public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?, ?>, AdjacentElementClass extends GraphElement<?, ?, ?>> implements
 		Iterable<AdjacentElementClass> {
 	
 	/**
@@ -113,7 +113,6 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 			classOfAdjacentElements = oc;
 			incidencesAtOwnElementIterator = elem.getIncidences(dir).iterator();			
 		}
-		
 
 		@Override
 		public boolean hasNext() {

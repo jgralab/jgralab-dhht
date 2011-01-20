@@ -37,6 +37,7 @@ import java.util.Iterator;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
  * This class provides an {@link Iterable} for the {@link Incidence}s at a given
@@ -64,7 +65,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		/**
 		 * {@link GraphElement} which {@link Incidence}s are iterated.
 		 */
-		protected GraphElement<?, ?> graphElement = null;
+		protected GraphElement<?, ?, ?> graphElement = null;
 
 		/**
 		 * The {@link Class} of the desired {@link Incidence}s.
@@ -98,12 +99,12 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		@SuppressWarnings("unchecked")
-		public <OwnType extends GraphElement<OwnType, DualType>, DualType extends GraphElement<DualType, OwnType>> IncidenceIterator(GraphElement<OwnType, DualType> graphElement,
+		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;
-			incidenceListVersion = ((GraphElementImpl<OwnType, DualType>) graphElement)
+			incidenceListVersion = ((GraphElementImpl<OwnTypeClass, OwnType, DualType>) graphElement)
 					.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
 					: graphElement.getFirstIncidence(ic, dir));
@@ -122,7 +123,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 * @throws ConcurrentModificationException
 		 */
 		protected void checkConcurrentModification() {
-			if (((GraphElementImpl<?, ?>) graphElement)
+			if (((GraphElementImpl<?, ?, ?>) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
 						"The incidence list of this graphelement has been modified - the iterator is not longer valid");

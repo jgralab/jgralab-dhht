@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="de/uni_koblenz/jgralab/impl/trans/|de/uni_koblenz/jgralab/impl/savemem/|de/uni_koblenz/jgralab/impl/db/|de/uni_koblenz/jgralab/trans/|de/uni_koblenz/jgralab/jniserver/|de/uni_koblenz/jgralab/utilities/jgralab2owl/|de/uni_koblenz/jgralab/utilities/tg2dot/|de/uni_koblenz/jgralab/utilities/tg2gdl/|de/uni_koblenz/jgralab/utilities/tg2gxl/|de/uni_koblenz/jgralab/utilities/tg2schemagraph/|de/uni_koblenz/jgralab/utilities/tg2sidiff/|de/uni_koblenz/jgralab/utilities/tg2whatever/|de/uni_koblenz/jgralab/utilities/tgmerge/|de/uni_koblenz/jgralab/utilities/tgraphbrowser/|de/uni_koblenz/jgralab/utilities/xml/|de/uni_koblenz/jgralab/greql2/|de/uni_koblenz/jgralab/utilities/greqlinterface/|de/uni_koblenz/jgralab/graphvalidator/GraphValidator.java" kind="src" path="src"/>
 	<classpathentry excluding="testdata/|testgraphs/|testschemas/" kind="src" path="testit"/>
+	<classpathentry excluding="de/uni_koblenz/jgralab/impl/db/|de/uni_koblenz/jgralab/impl/savemem/|de/uni_koblenz/jgralab/impl/trans/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/common/lib/apache/commons/cli/commons-cli-1.2.jar"/>
