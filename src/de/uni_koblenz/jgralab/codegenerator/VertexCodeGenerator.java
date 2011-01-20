@@ -45,7 +45,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public class VertexCodeGenerator extends AttributedElementCodeGenerator {
+public class VertexCodeGenerator extends AttributedElementCodeGenerator<VertexClass> {
 
 	private RolenameCodeGenerator rolenameGenerator;
 
@@ -54,7 +54,7 @@ public class VertexCodeGenerator extends AttributedElementCodeGenerator {
 			CodeGeneratorConfiguration config) {
 		super(vertexClass, schemaPackageName, implementationName, config);
 		rootBlock.setVariable("graphElementClass", "Vertex");
-		rolenameGenerator = new RolenameCodeGenerator((VertexClass) aec);
+		rolenameGenerator = new RolenameCodeGenerator(aec);
 	}
 
 	/**
@@ -102,6 +102,21 @@ public class VertexCodeGenerator extends AttributedElementCodeGenerator {
 		return code;
 	}
 
+	
+	private CodeBlock createFirstIncidenceMethods() {
+		//Iterate all IncidenceClasses known at this vertex class
+		  //for interface
+		    //if incidence class is connected to exactly this vertex or to vertex and this class is a direct subclass of vertex
+		      //create appropriate method
+		  //for implementation
+		    //create appripriate method
+		
+
+		
+		return null;
+	}
+	
+	
 	/**
 	 * creates the methods <code>getFirstEdgeName()</code>
 	 * 

@@ -101,5 +101,10 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implem
 		return "ec_" + getQualifiedName().replace('.', '_');
 	}
 	
+	@Override
+	public boolean isBinary() {
+		return false;
+	}
+	
 
 }

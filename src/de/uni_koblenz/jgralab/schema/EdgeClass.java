@@ -43,5 +43,7 @@ public interface EdgeClass extends GraphElementClass<EdgeClass, Edge> {
 
 	public static final String DEFAULTEDGECLASS_NAME = "Edge";
 
+	boolean isBinary();
+
 
 }

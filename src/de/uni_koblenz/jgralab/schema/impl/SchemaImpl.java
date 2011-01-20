@@ -52,8 +52,8 @@ import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
+import javax.tools.JavaFileObject.Kind;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
@@ -62,6 +62,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.ProgressFunction;
+import de.uni_koblenz.jgralab.codegenerator.BinaryEdgeCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.ClassFileAbstraction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
@@ -71,11 +72,11 @@ import de.uni_koblenz.jgralab.codegenerator.GraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.GraphFactoryGenerator;
 import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
-import de.uni_koblenz.jgralab.codegenerator.ReversedEdgeCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
 import de.uni_koblenz.jgralab.schema.Domain;
@@ -91,11 +92,11 @@ import de.uni_koblenz.jgralab.schema.MapDomain;
 import de.uni_koblenz.jgralab.schema.NamedElement;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.schema.StringDomain;
 import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
@@ -409,15 +410,16 @@ public class SchemaImpl implements Schema {
 		}
 
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
-			CodeGenerator codeGen = new EdgeCodeGenerator(edgeClass,
+			
+			CodeGenerator codeGen;
+			if (edgeClass.isBinary())
+				codeGen = new BinaryEdgeCodeGenerator((BinaryEdgeClass)edgeClass,
 					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			else 
+				codeGen = new EdgeCodeGenerator(edgeClass,
+						packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
 			javaSources.addAll(codeGen.createJavaSources());
 
-			if (!edgeClass.isAbstract()) {
-				codeGen = new ReversedEdgeCodeGenerator(edgeClass,
-						packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-				javaSources.addAll(codeGen.createJavaSources());
-			}
 		}
 
 		// build records and enums
@@ -488,15 +490,17 @@ public class SchemaImpl implements Schema {
 		}
 
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
-			CodeGenerator codeGen = new EdgeCodeGenerator(edgeClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-			codeGen.createFiles(pathPrefix);
+			CodeGenerator codeGen;
 
-			if (!edgeClass.isAbstract()) {
-				codeGen = new ReversedEdgeCodeGenerator(edgeClass,
+			if (edgeClass.isBinary())
+				codeGen = new BinaryEdgeCodeGenerator((BinaryEdgeClass)edgeClass,
+					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			else 
+				codeGen = new EdgeCodeGenerator(edgeClass,
 						packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-				codeGen.createFiles(pathPrefix);
-			}
+			
+			codeGen.createFiles(pathPrefix);			
+			
 			if (progressFunction != null) {
 				schemaElements++;
 				currentCount++;

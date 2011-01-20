@@ -10,6 +10,9 @@ public class BinaryEdgeClassImpl  extends EdgeClassImpl {
 		super(simpleName, pkg, graphClass);
 	}
 	
-	
+	@Override
+	public boolean isBinary() {
+		return true;
+	}
 
 }

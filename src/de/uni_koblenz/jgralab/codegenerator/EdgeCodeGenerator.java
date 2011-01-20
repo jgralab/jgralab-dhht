@@ -50,6 +50,7 @@ public class EdgeCodeGenerator extends AttributedElementCodeGenerator<EdgeClass>
 			String implementationName, CodeGeneratorConfiguration config) {
 		super(edgeClass, schemaPackageName, implementationName, config);
 		rootBlock.setVariable("graphElementClass", "Edge");
+		rolenameGenerator = new RolenameCodeGenerator(aec);
 	}
 
 	@Override
