@@ -31,12 +31,8 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
-import java.util.TreeSet;
-
-import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
+
 
 /**
  * TODO add comment
@@ -53,180 +49,29 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 
 
-	
 
-
-	
-	
-
-	@Override
-	protected CodeBlock createConstructor() {
-		CodeList code = new CodeList();
-		addImports("#jgPackage#.Vertex");
-		code.addNoIndent(new CodeSnippet(
-						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, Vertex alpha, Vertex omega) {",
-						"\tsuper(id, g, alpha, omega);"));
-		if (hasDefaultAttributeValues()) {
-			code.addNoIndent(new CodeSnippet(
-					"\tinitializeAttributesWithDefaultValues();"));
-		}
-		code.add(createSpecialConstructorCode());
-		code.addNoIndent(new CodeSnippet("}"));
-		return code;
-	}
 
 	@Override
 	protected CodeBlock createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			rootBlock.setVariable("baseClassName", "EdgeImpl");
-			if (currentCycle.isStdImpl()) {
-				addImports("#jgImplStdPackage#.#baseClassName#");
-			}
-			if (currentCycle.isSaveMemImpl()) {
-				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-			}
-			if (currentCycle.isTransImpl()) {
-				addImports("#jgImplTransPackage#.#baseClassName#");
-			}
-			if (currentCycle.isDbImpl()) {
-				addImports("#jgImplDbPackage#.#baseClassName#");
-			}
-		}
-		if (config.hasTypeSpecificMethodsSupport()
-				&& !currentCycle.isClassOnly()) {
-			code.add(createNextEdgeInGraphMethods());
-			code.add(createNextEdgeAtVertexMethods());
-		}
-        createMethodsForBinaryEdge(code);
-		// code.add(createValidRolesMethod());
+	    createMethodsForBinaryEdge(code);
 		return code;
 	}
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		
+		code.add(createBinaryConstructor());
 	}
 
 
-	private CodeBlock createNextEdgeInGraphMethods() {
+	protected CodeBlock createBinaryConstructor() {
 		CodeList code = new CodeList();
-		TreeSet<AttributedElementClass> superClasses = new TreeSet<AttributedElementClass>();
-		superClasses.addAll(aec.getAllSuperClasses());
-		superClasses.add(aec);
-
-		if (config.hasTypeSpecificMethodsSupport()) {
-			for (AttributedElementClass ec : superClasses) {
-				if (ec.isInternal()) {
-					continue;
-				}
-				EdgeClass ecl = (EdgeClass) ec;
-				code.addNoIndent(createNextEdgeInGraphMethod(ecl, false));
-				if (config.hasMethodsForSubclassesSupport()) {
-					if (!ecl.isAbstract()) {
-						code
-								.addNoIndent(createNextEdgeInGraphMethod(ecl,
-										true));
-					}
-				}
-			}
-		}
-		return code;
-	}
-
-	private CodeBlock createNextEdgeInGraphMethod(EdgeClass ec,
-			boolean withTypeFlag) {
-		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("ecQualifiedName", schemaRootPackageName + "."
-				+ ec.getQualifiedName());
-		code.setVariable("ecCamelName", camelCase(ec.getUniqueName()));
-		code.setVariable("formalParams", (withTypeFlag ? "boolean noSubClasses"
-				: ""));
-		code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"
-						: ""));
-
-		if (currentCycle.isAbstract()) {
-			code.add("/**",
-							" * @return the next #ecQualifiedName# edge in the global edge sequence");
-			if (withTypeFlag) {
-				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecQualifiedName# are accepted");
-			}
-			code.add(" */",
-							"public #ecQualifiedName# getNext#ecCamelName#InGraph(#formalParams#);");
-		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			code.add("public #ecQualifiedName# getNext#ecCamelName#InGraph(#formalParams#) {",
-					 "\treturn (#ecQualifiedName#)getNextEdge(#ecQualifiedName#.class#actualParams#);",
-					 "}");
-		}
-		return code;
-	}
-
-	private CodeBlock createNextEdgeAtVertexMethods() {
-		CodeList code = new CodeList();
-
-		TreeSet<AttributedElementClass> superClasses = new TreeSet<AttributedElementClass>();
-		superClasses.addAll(aec.getAllSuperClasses());
-		superClasses.add(aec);
-
-		if (config.hasTypeSpecificMethodsSupport()) {
-			for (AttributedElementClass ec : superClasses) {
-				if (ec.isInternal()) {
-					continue;
-				}
-				addImports("#jgPackage#.EdgeDirection");
-				EdgeClass ecl = (EdgeClass) ec;
-				code.addNoIndent(createNextEdgeAtVertexMethod(ecl, false,
-								false));
-				code.addNoIndent(createNextEdgeAtVertexMethod(ecl, true,
-								false));
-				if (config.hasMethodsForSubclassesSupport()) {
-					if (!ecl.isAbstract()) {
-						code.addNoIndent(createNextEdgeAtVertexMethod(ecl,
-								false, true));
-						code.addNoIndent(createNextEdgeAtVertexMethod(ecl,
-								true, true));
-					}
-				}
-			}
-		}
-		return code;
-	}
-
-	private CodeBlock createNextEdgeAtVertexMethod(EdgeClass ec,
-			boolean withOrientation, boolean withTypeFlag) {
-
-		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("ecQualifiedName", schemaRootPackageName + "."
-				+ ec.getQualifiedName());
-		code.setVariable("ecCamelName", camelCase(ec.getUniqueName()));
-		code.setVariable("formalParams",
-				(withOrientation ? "EdgeDirection orientation" : "")
-						+ (withOrientation && withTypeFlag ? ", " : "")
-						+ (withTypeFlag ? "boolean noSubClasses" : ""));
-		code.setVariable("actualParams",
-				(withOrientation || withTypeFlag ? ", " : "")
-						+ (withOrientation ? "orientation" : "")
-						+ (withOrientation && withTypeFlag ? ", " : "")
-						+ (withTypeFlag ? "noSubClasses" : ""));
-		if (currentCycle.isAbstract()) {
-			code.add("/**",
-							" * @return the next edge of class #ecQualifiedName# at the \"this\" vertex");
-
-			if (withOrientation) {
-				code.add(" * @param orientation the orientation of the edge");
-			}
-			if (withTypeFlag) {
-				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecQualifiedName# are accepted");
-			}
-			code.add(" */",
-							"public #ecQualifiedName# getNext#ecCamelName#(#formalParams#);");
-		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			code.add("public #ecQualifiedName# getNext#ecCamelName#(#formalParams#) {",
-					 "\treturn (#ecQualifiedName#)getNextIncidence(#ecQualifiedName#.class#actualParams#);",
-					 "}");
-		}
+		addImports("#jgPackage#.#ownElementClass#");
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, Vertex alpha, Vertex omega) {",
+						"\tthis(id, g);"));
+		code.addNoIndent(new CodeSnippet("/* implement setting of alpha and omega */"));
+		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
 

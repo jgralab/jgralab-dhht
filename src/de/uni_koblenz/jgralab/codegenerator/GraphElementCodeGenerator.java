@@ -53,6 +53,24 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		return code;
 	}
 	
+	
+	@Override
+	protected CodeBlock createConstructor() {
+		CodeList code = new CodeList();
+		addImports("#jgPackage#.#ownElementClass#");
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) {",
+						"\tsuper(id, g);"));
+		if (hasDefaultAttributeValues()) {
+			code.addNoIndent(new CodeSnippet("\tinitializeAttributesWithDefaultValues();"));
+		}
+		code.add(createSpecialConstructorCode());
+		code.addNoIndent(new CodeSnippet("}"));
+		return code;
+	}
+	
+	
 	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add(" *   Role: '#rolename#', VertexClass: '#vcName#");
