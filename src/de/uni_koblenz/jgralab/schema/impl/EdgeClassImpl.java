@@ -36,6 +36,7 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implements EdgeClass {
 
@@ -106,5 +107,10 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implem
 		return false;
 	}
 	
+	@Override
+	public EdgeClass getDefaultClass() {
+		return graphClass.getSchema().getDefaultEdgeClass();
+	}
+
 
 }

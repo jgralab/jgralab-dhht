@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface AttributedElementClass<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends NamedElement {
+public interface AttributedElementClass<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>> extends NamedElement {
 
 	/**
 	 * Adds a new attribute <code>anAttribute</code> to this element.
@@ -214,7 +214,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * 
 	 * @return a Set of all direct and indirect subclasses of this element
 	 */
-	public Set<ConcreteAttributedElementClass> getAllSubClasses();
+	public Set<ConcreteMetaClass> getAllSubClasses();
 
 	/**
 	 * Lists all direct and indirect superclasses of this element.
@@ -247,7 +247,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * 
 	 * @return a Set of all direct and indirect superclasses of this element
 	 */
-	public Set<ConcreteAttributedElementClass> getAllSuperClasses();
+	public Set<ConcreteMetaClass> getAllSuperClasses();
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -389,7 +389,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * 
 	 * @return a Set of all direct subclasses of this element
 	 */
-	public Set<ConcreteAttributedElementClass> getDirectSubClasses();
+	public Set<ConcreteMetaClass> getDirectSubClasses();
 
 	/**
 	 * Returns all direct superclasses of this element.
@@ -423,7 +423,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * 
 	 * @return a Set of all direct superclasses of this element
 	 */
-	public Set<ConcreteAttributedElementClass> getDirectSuperClasses();
+	public Set<ConcreteMetaClass> getDirectSuperClasses();
 
 	/**
 	 * Returns the M1 interface class for this attributed element.
@@ -705,7 +705,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSubClassOf(ConcreteAttributedElementClass anAttributedElementClass);
+	public boolean isDirectSubClassOf(ConcreteMetaClass anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct superclass of another
@@ -743,7 +743,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
 	 *         direct subclass of this element, otherwise <code>false</code>
 	 */
-	public boolean isDirectSuperClassOf(ConcreteAttributedElementClass anAttributedElementClass);
+	public boolean isDirectSuperClassOf(ConcreteMetaClass anAttributedElementClass);
 
 	/**
 	 * @return true, if this AttributedElementClass is only for internal use
@@ -787,7 +787,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSubClassOf(ConcreteAttributedElementClass anAttributedElementClass);
+	public boolean isSubClassOf(ConcreteMetaClass anAttributedElementClass);
 
 	/**
 	 * Checks if the current element is a direct or inherited superclass of
@@ -826,7 +826,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 *         direct or indirect subclass of this element, otherwise
 	 *         <code>false</code>
 	 */
-	public boolean isSuperClassOf(ConcreteAttributedElementClass anAttributedElementClass);
+	public boolean isSuperClassOf(ConcreteMetaClass anAttributedElementClass);
 
 	/**
 	 * Tests if the current element equals another attributed element or is
@@ -863,7 +863,7 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 *         direct or indirect subclass of this element or <code>this</code>
 	 *         attributed element itself, otherwise <code>false</code>
 	 */
-	public boolean isSuperClassOfOrEquals(ConcreteAttributedElementClass anAttributedElementClass);
+	public boolean isSuperClassOfOrEquals(ConcreteMetaClass anAttributedElementClass);
 
 	/**
 	 * Defines if this attributed element is abstract. Abstract elements can´t
@@ -886,5 +886,12 @@ public interface AttributedElementClass<ConcreteAttributedElementClass extends A
 	 *            the new value defining the state of this attributed element
 	 */
 	public void setAbstract(boolean isAbstract);
+	
+	/**
+	 * 
+	 * @return the default class of type ConcreteMetaClass of the schema
+	 *         e.g., for an EdgeClass the DefaultEdgeClass is returned
+	 */
+	public abstract ConcreteMetaClass getDefaultClass();
 
 }

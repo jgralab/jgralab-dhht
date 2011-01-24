@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -430,5 +432,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		}
 		return false;
 	}
+	
+
 
 }

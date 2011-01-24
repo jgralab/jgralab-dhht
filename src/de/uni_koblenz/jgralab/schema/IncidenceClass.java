@@ -283,6 +283,10 @@ public interface IncidenceClass {
 	 */
 	public GraphElementClass<?, ?> getOtherGraphElementClass(
 			GraphElementClass<?, ?> graphElementClass);
+	
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?, ?> graphElementClass);
+	
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(GraphElementClass<?, ?> graphElementClass);
 
 	public boolean isSubClassOf(IncidenceClass anIncidenceClass);
 
@@ -543,4 +547,11 @@ public interface IncidenceClass {
 	 * @return the set of all role names valid for this IncidenceClass
 	 */
 	public Set<String> getAllRoles();
+
+	/** 
+	 * @return the QualifiedName of this IncidenceClass, this is a combination of 
+	 *         the EdgeClassName and the rolename, since the rolename as such is 
+	 *         not necessarily unique
+	 */
+	public String getQualifiedName();
 }

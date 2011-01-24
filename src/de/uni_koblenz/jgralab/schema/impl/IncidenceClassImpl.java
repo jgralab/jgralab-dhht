@@ -548,4 +548,26 @@ public class IncidenceClassImpl implements IncidenceClass {
 			rolenames.put(ic.getRolename(), ic);
 		}
 	}
+	
+	
+	public String getQualifiedName() {
+		return edgeClass.getQualifiedName() + "_" + rolename;
+	}
+	
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?, ?> graphElementClass) {
+		if (graphElementClass instanceof VertexClass) {
+			return getVertexClass();
+		} else {
+			return getEdgeClass();
+		}
+	}
+	
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(GraphElementClass<?, ?> graphElementClass) {
+		if (graphElementClass instanceof VertexClass) {
+			return getEdgeClass();
+		} else {
+			return getVertexClass();
+		}
+	}
+	
 }

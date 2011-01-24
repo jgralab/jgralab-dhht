@@ -44,51 +44,18 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public class EdgeCodeGenerator extends AttributedElementCodeGenerator<EdgeClass> {
+public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
+	
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
 			String implementationName, CodeGeneratorConfiguration config) {
-		super(edgeClass, schemaPackageName, implementationName, config);
-		rootBlock.setVariable("graphElementClass", "Edge");
-		rolenameGenerator = new RolenameCodeGenerator(aec);
+		super(edgeClass, schemaPackageName, implementationName, config, false);
 	}
 
-	@Override
-	protected CodeBlock createHeader() {
-		CodeList code = new CodeList();
-		CodeSnippet snippet = new CodeSnippet();
-		snippet.add("/**");
-		snippet.add(" * Incomming IncidenceClasses:");
-		code.addNoIndent(snippet);
-		for (IncidenceClass ic : aec.getIncidenceClasses()) {
-			if (ic.getDirection()==Direction.VERTEX_TO_EDGE)
-			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
-		}	
-		snippet = new CodeSnippet();
-		snippet.add("/**");
-		snippet.add(" * Outgoing IncidenceClasses:");
-		code.addNoIndent(snippet);
-		for (IncidenceClass ic : aec.getIncidenceClasses()) {
-			if (ic.getDirection()==Direction.EDGE_TO_VERTEX)
-			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
-		}	
-		
-		snippet = new CodeSnippet();
-		snippet.add(" */");
-		code.addNoIndent(snippet);
-		code.addNoIndent(super.createHeader());
-		return code;
-	}
+
 	
 
-	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
-		CodeSnippet snippet = new CodeSnippet();
-		snippet.add(" *   Role: '#rolename#', VertexClass: '#vcName#");
-		snippet.setVariable("rolename", ic.getRolename());
-		snippet.setVariable("vcName", ic.getVertexClass().getQualifiedName());
-		return snippet;
-	}
-	
+
 	
 	
 

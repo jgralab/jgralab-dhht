@@ -277,4 +277,10 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		return null;
 	}
 
+	@Override
+	public GraphClass getDefaultClass() {
+		return getSchema().getDefaultGraphClass();
+	}
+
+	
 }
