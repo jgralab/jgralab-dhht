@@ -68,7 +68,6 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -89,8 +88,6 @@ import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 
-import de.uni_koblenz.jgralab.impl.db.*;
-
 /**
  * class for loading and storing schema and graphs in tg format
  * 
@@ -101,12 +98,12 @@ public class GraphIO {
 	/**
 	 * TG File Version this GraphIO recognizes.
 	 */
-	public static int TGFILE_VERSION = 2;
+	public static int TGFILE_VERSION = 1;
 	public static String NULL_LITERAL = "n";
 	public static String TRUE_LITERAL = "t";
 	public static String FALSE_LITERAL = "f";
-	public static String TGRAPH_FILE_EXTENSION = ".tg";
-	public static String TGRAPH_COMPRESSED_FILE_EXTENSION = ".tg.gz";
+	public static String TGRAPH_FILE_EXTENSION = ".dhhtg";
+	public static String TGRAPH_COMPRESSED_FILE_EXTENSION = ".dhhtg.gz";
 
 	/**
 	 * A {@link FilenameFilter} that accepts TG files.
@@ -135,7 +132,7 @@ public class GraphIO {
 		 */
 		@Override
 		public boolean accept(File dir, String name) {
-			if (name.matches(".+\\.[Tt][Gg](\\.[Gg][Zz])?$")) {
+			if (name.matches(".+\\.[Dd][Hh][Hh][Tt][Gg](\\.[Gg][Zz])?$")) {
 				return true;
 			}
 			return false;
@@ -153,7 +150,7 @@ public class GraphIO {
 
 		@Override
 		public String getDescription() {
-			return "TG Files";
+			return "DHHTG Files";
 		}
 	}
 
@@ -168,14 +165,14 @@ public class GraphIO {
 	/**
 	 * Maps domain names to the respective Domains.
 	 */
-	private Map<String, Domain> domains;
+	private final Map<String, Domain> domains;
 
 	/**
 	 * Maps GraphElementClasses to their containing GraphClasses
 	 */
-	private Map<GraphElementClass, GraphClass> GECsearch;
+	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
 
-	private Map<String, Method> createMethods;
+	private final Map<String, Method> createMethods;
 
 	private int line; // line number
 
@@ -190,7 +187,7 @@ public class GraphIO {
 
 	private String gcName; // GraphClass name of the currently loaded graph
 
-	private byte buffer[];
+	private final byte buffer[];
 
 	private int bufferPos;
 
@@ -206,7 +203,7 @@ public class GraphIO {
 	 * Buffers the parsed data of enum domains prior to their creation in
 	 * JGraLab.
 	 */
-	private Set<EnumDomainData> enumDomainBuffer;
+	private final Set<EnumDomainData> enumDomainBuffer;
 
 	/**
 	 * Buffers the parsed data of record domains prior to their creation in
@@ -224,32 +221,32 @@ public class GraphIO {
 	 * Buffers the parsed data of vertex classes prior to their creation in
 	 * JGraLab.
 	 */
-	private Map<String, List<GraphElementClassData>> vertexClassBuffer;
+	private final Map<String, List<GraphElementClassData>> vertexClassBuffer;
 
 	/**
 	 * Buffers the parsed data of edge classes prior to their creation in
 	 * JGraLab.
 	 */
-	private Map<String, List<GraphElementClassData>> edgeClassBuffer;
+	private final Map<String, List<GraphElementClassData>> edgeClassBuffer;
 
-	private Map<String, List<String>> commentData;
+	private final Map<String, List<String>> commentData;
 
 	private int putBackChar;
 
 	private String currentPackageName;
 
-	private Object[] vertexDescTempObject = { 0 };
+	private final Object[] vertexDescTempObject = { 0 };
 
-	private Object[] edgeDescTempObject = { 0, 0, 0 };
+	private final Object[] edgeDescTempObject = { 0, 0, 0 };
 	private ByteArrayOutputStream BAOut;
 
 	// stringPool allows re-use string values, saves memory if
 	// multiple identical strings are used as attribute values
-	private HashMap<String, String> stringPool;
+	private final HashMap<String, String> stringPool;
 
 	private GraphIO() {
 		domains = new TreeMap<String, Domain>();
-		GECsearch = new HashMap<GraphElementClass, GraphClass>();
+		GECsearch = new HashMap<GraphElementClass<?, ?>, GraphClass>();
 		createMethods = new HashMap<String, Method>();
 		buffer = new byte[BUFFER_SIZE];
 		bufferPos = 0;
@@ -418,8 +415,8 @@ public class GraphIO {
 				// from (min,max) rolename
 				write(" from");
 				space();
-				writeIdentifier(ec.getFrom().getVertexClass().getQualifiedName(
-						pkg));
+				writeIdentifier(ec.getFrom().getVertexClass()
+						.getQualifiedName(pkg));
 				write(" (");
 				write(ec.getFrom().getMin() + ",");
 				if (ec.getFrom().getMax() == Integer.MAX_VALUE) {
@@ -457,8 +454,8 @@ public class GraphIO {
 				// to (min,max) rolename
 				write(" to");
 				space();
-				writeIdentifier(ec.getTo().getVertexClass().getQualifiedName(
-						pkg));
+				writeIdentifier(ec.getTo().getVertexClass()
+						.getQualifiedName(pkg));
 				write(" (");
 				write(ec.getTo().getMin() + ",");
 				if (ec.getTo().getMax() == Integer.MAX_VALUE) {
@@ -806,7 +803,7 @@ public class GraphIO {
 
 	private void saveHeader() throws IOException {
 		write(JGraLab.getVersionInfo(true));
-		write("TGraph " + TGFILE_VERSION + ";\n");
+		write("DHHTGraph " + TGFILE_VERSION + ";\n");
 	}
 
 	private void writeHierarchy(Package pkg, AttributedElementClass aec)
@@ -972,8 +969,8 @@ public class GraphIO {
 			throws GraphIOException {
 		Schema schema = loadSchemaFromDatabase(graphDatabase, packagePrefix,
 				schemaName);
-		schema.commit("test", new CodeGeneratorConfiguration()
-				.withDatabaseSupport());
+		schema.commit("test",
+				new CodeGeneratorConfiguration().withDatabaseSupport());
 		return schema;
 	}
 
@@ -1018,8 +1015,7 @@ public class GraphIO {
 			return loadGraphFromFileWithStandardSupport(filename, null, pf);
 		} catch (GraphIOException ex) {
 			if (ex.getCause() instanceof ClassNotFoundException) {
-				logger
-						.fine("Compiled schema classes were not found, so load and compile the schema first.");
+				logger.fine("Compiled schema classes were not found, so load and compile the schema first.");
 				Schema s = loadSchemaFromFile(filename);
 				s.compile(config);
 				return loadGraphFromFileWithStandardSupport(filename, s, pf);
@@ -1936,11 +1932,11 @@ public class GraphIO {
 
 	private EdgeClass createEdgeClass(GraphElementClassData ecd, GraphClass gc)
 			throws GraphIOException, SchemaException {
-		EdgeClass ec = gc.createEdgeClass(ecd.getQualifiedName(), gc
-				.getVertexClass(ecd.fromVertexClassName),
+		EdgeClass ec = gc.createEdgeClass(ecd.getQualifiedName(),
+				gc.getVertexClass(ecd.fromVertexClassName),
 				ecd.fromMultiplicity[0], ecd.fromMultiplicity[1],
-				ecd.fromRoleName, ecd.fromAggregation, gc
-						.getVertexClass(ecd.toVertexClassName),
+				ecd.fromRoleName, ecd.fromAggregation,
+				gc.getVertexClass(ecd.toVertexClassName),
 				ecd.toMultiplicity[0], ecd.toMultiplicity[1], ecd.toRoleName,
 				ecd.toAggregation);
 
