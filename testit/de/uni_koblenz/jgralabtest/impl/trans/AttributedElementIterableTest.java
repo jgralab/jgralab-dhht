@@ -45,10 +45,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.trans.AttributedElementIterable;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 //import junit.framework.JUnit4TestAdapter;
 

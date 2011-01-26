@@ -38,16 +38,10 @@ import java.util.HashSet;
 import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerUtility;
-import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
 
 /**
  * TODO: (heimdall) Comment class!

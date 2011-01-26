@@ -39,20 +39,9 @@ import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.funlib.And;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.ThisLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * Holds various static methods used by {@link Optimizer}s.

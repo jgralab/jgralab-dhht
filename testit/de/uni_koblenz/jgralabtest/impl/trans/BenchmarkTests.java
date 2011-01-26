@@ -37,10 +37,6 @@ import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 public class BenchmarkTests {
 	private MotorwayMap motorwayMap;

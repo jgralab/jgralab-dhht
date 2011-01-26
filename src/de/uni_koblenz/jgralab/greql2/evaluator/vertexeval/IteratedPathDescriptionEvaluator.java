@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
@@ -39,10 +38,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IteratedPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IterationType;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
 
 /**
  * Evaluates an iterated path description. Creates a NFA that accepts the

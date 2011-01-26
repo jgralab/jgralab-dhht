@@ -35,9 +35,6 @@ import java.util.HashMap;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralabtest.schemas.record.Node;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestSchema;
 
 public class TryRecordLoading {
 

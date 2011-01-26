@@ -40,18 +40,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
 import de.uni_koblenz.jgralab.greql2.optimizer.condexp.Formula;
-import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
 
 /**
  * TODO: (heimdall) Comment class!

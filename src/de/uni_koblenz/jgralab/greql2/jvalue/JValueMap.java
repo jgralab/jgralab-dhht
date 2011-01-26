@@ -33,9 +33,9 @@ package de.uni_koblenz.jgralab.greql2.jvalue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>

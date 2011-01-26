@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
@@ -41,8 +40,6 @@ import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
-import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOf;
 
 /**
  * Creates a NFA wich accepts a single edge out of the --edge-> - clause

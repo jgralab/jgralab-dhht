@@ -51,10 +51,6 @@ import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralabtest.instancetest.InstanceTest;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class SubGraphMarkerTest extends InstanceTest {

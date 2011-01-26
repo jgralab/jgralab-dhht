@@ -33,9 +33,9 @@ package de.uni_koblenz.jgralab.graphmarker;
 
 import java.util.HashMap;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.TypedElement;
 
 
 /**
@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.TypedElement;
  * @author ist@uni-koblenz.de
  * 
  */
-public abstract class MapGraphMarker<T extends TypedElement, O> extends
+public abstract class MapGraphMarker<T extends AttributedElement<?,?>, O> extends
 		AbstractGraphMarker<T> {
 
 	/**

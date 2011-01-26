@@ -43,8 +43,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
 
 /**

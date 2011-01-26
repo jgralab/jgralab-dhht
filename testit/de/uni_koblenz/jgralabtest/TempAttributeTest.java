@@ -39,13 +39,9 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMap;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMapSchema;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Intersection;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Street;
+import de.uni_koblenz.jgralab.greql2.funlib.Intersection;
 
 public class TempAttributeTest extends TestCase {
 

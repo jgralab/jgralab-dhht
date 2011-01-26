@@ -51,7 +51,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class GraphMarker<O> extends MapGraphMarker<AttributedElement, O> {
+public class GraphMarker<O> extends MapGraphMarker<AttributedElement<?, ?>, O> {
 
 	public GraphMarker(Graph g) {
 		super(g);

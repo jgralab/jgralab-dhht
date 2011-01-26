@@ -33,6 +33,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator;
 
 import java.util.List;
 
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.logging.EvaluationLogger;
@@ -42,7 +44,6 @@ import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
 import de.uni_koblenz.jgralab.greql2.exception.WrongResultTypeException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 
 /**
  * This class models all Variables of one Declaration-Vertex. It allowes to

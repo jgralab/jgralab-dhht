@@ -36,7 +36,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
-import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 
 /**
  * Evaluates a SetComprehension vertex in the GReQL-2 Syntaxgraph

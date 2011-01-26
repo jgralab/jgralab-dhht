@@ -35,7 +35,6 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;

@@ -40,7 +40,6 @@ import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**

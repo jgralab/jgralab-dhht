@@ -38,13 +38,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.tools.ant.types.Quantifier;
+
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.SerializableGreql2Impl;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
-import de.uni_koblenz.jgralab.greql2.schema.*;
+import de.uni_koblenz.jgralab.greql2.funlib.IsSubPathOf;
 
 public class GreqlParser extends ParserHelper {
 

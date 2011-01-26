@@ -51,10 +51,6 @@ import de.uni_koblenz.jgralab.greql2.jvalue.JValueList;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueMap;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTuple;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>

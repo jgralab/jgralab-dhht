@@ -59,20 +59,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.A;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.B;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.C;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.C2;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.D;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.D2;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.E;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.F;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.G;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.H;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.I;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.J;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 @RunWith(Parameterized.class)
 public class RoleNameTest extends InstanceTest {

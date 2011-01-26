@@ -39,7 +39,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -49,11 +50,6 @@ import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTable;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTuple;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
-import de.uni_koblenz.jgralab.greql2.schema.TableComprehension;
 
 /**
  * Evaluates a TableComprehensionvertex in the GReQL-2 Syntaxgraph. A

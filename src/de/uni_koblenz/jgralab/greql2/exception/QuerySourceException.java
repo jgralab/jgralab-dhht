@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
 
 /**
  * This is the base class for all exceptions that refeer to the querysource with

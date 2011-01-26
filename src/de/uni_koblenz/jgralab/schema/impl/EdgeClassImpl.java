@@ -36,19 +36,20 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
-public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implements EdgeClass {
+public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
+		implements EdgeClass {
 
 	static EdgeClass createDefaultEdgeClass(Schema schema) {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
 		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
 		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
-		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(DEFAULTEDGECLASS_NAME);
-		//, 0,
-			//	Integer.MAX_VALUE, "", AggregationKind.NONE,
-				//schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
-				//AggregationKind.NONE);
+		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
+				DEFAULTEDGECLASS_NAME);
+		// , 0,
+		// Integer.MAX_VALUE, "", AggregationKind.NONE,
+		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
+		// AggregationKind.NONE);
 		ec.setAbstract(true);
 		return ec;
 	}
@@ -101,16 +102,15 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge> implem
 	public String getVariableName() {
 		return "ec_" + getQualifiedName().replace('.', '_');
 	}
-	
+
 	@Override
 	public boolean isBinary() {
 		return false;
 	}
-	
+
 	@Override
 	public EdgeClass getDefaultClass() {
 		return graphClass.getSchema().getDefaultEdgeClass();
 	}
-
 
 }

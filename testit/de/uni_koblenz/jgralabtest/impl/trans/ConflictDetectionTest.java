@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.taskdefs.Exit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,12 +51,6 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Exit;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.TestRecord;
 
 /**
  * 

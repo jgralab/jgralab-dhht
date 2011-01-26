@@ -33,9 +33,6 @@ package de.uni_koblenz.jgralab.greql2.exception;
 
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-
 /**
  * Should be thrown if there is a Vertex in the GReQL Syntaxgraph for which no
  * VertexEvaluator exists

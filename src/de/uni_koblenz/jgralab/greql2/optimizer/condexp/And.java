@@ -35,10 +35,6 @@ package de.uni_koblenz.jgralab.greql2.optimizer.condexp;
 
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerUtility;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 
 /**
  * TODO: (heimdall) Comment class!

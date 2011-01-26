@@ -34,8 +34,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;

@@ -42,8 +42,6 @@ import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * This class models the declaration of one variable. It allowes the iteration

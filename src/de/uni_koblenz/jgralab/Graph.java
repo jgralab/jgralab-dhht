@@ -39,10 +39,6 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-//import de.uni_koblenz.jgralab.trans.CommitFailedException;
-//import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-//import de.uni_koblenz.jgralab.trans.Savepoint;
-//import de.uni_koblenz.jgralab.trans.Transaction;
 
 /**
  * The interface Graph is the base of all JGraLab graphs. It provides access to

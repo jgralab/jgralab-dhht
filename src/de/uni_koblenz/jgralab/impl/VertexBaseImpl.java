@@ -40,7 +40,6 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -60,8 +59,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class VertexBaseImpl extends GraphElementImpl<VertexClass, Vertex, Edge>
-		implements Vertex {
+public abstract class VertexBaseImpl extends
+		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
 	/**
 	 * Creates a new {@link Vertex} instance.
@@ -442,7 +441,7 @@ public abstract class VertexBaseImpl extends GraphElementImpl<VertexClass, Verte
 	@Override
 	public int compareTo(Vertex a) {
 		assert a instanceof Vertex;
-		Vertex v = (Vertex) a;
+		Vertex v = a;
 		assert isValid() && v.isValid();
 		assert getGraph() == v.getGraph();
 		return getId() - v.getId();
@@ -945,6 +944,5 @@ public abstract class VertexBaseImpl extends GraphElementImpl<VertexClass, Verte
 		getSchema().getGraphFactory().createIncidence(incidenceClass, this,
 				elemToConnect);
 	}
-
 
 }

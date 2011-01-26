@@ -33,8 +33,6 @@
  */
 package de.uni_koblenz.jgralab.greql2;
 
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 
 /**
  * @author Tassilo Horn &lt;horn@uni-koblenz.de&gt;

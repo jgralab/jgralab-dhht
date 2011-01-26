@@ -33,9 +33,6 @@ package de.uni_koblenz.jgralab.greql2.exception;
 
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
-
 /**
  * Should be thrown if a undefined Variable is used
  * 

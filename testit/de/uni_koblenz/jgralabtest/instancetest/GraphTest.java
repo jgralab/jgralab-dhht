@@ -55,17 +55,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.DoubleSubNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.Link;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.LinkBack;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SubLink;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SubNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SuperNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 @RunWith(Parameterized.class)
 public class GraphTest extends InstanceTest {

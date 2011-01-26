@@ -37,8 +37,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueBoolean;
-import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 
 /**
  * Evaluates a boolean literal, that means, provides access to the literal value

@@ -53,7 +53,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -64,15 +63,6 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.AbstractSuperNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.DoubleSubNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.Link;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.LinkBack;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SubLink;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SubNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SuperNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 @RunWith(Parameterized.class)
 public class EdgeTest extends InstanceTest {

@@ -7,10 +7,6 @@ import de.uni_koblenz.jgralab.impl.db.DatabasePersistableGraph;
 import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public class GraphDatabaseHandler {
 

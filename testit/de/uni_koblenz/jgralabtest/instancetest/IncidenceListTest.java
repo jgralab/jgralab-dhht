@@ -54,15 +54,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 import de.uni_koblenz.jgralabtest.tools.RandomBufferGeneric;
 
 @RunWith(Parameterized.class)

@@ -50,8 +50,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;
@@ -62,8 +60,8 @@ import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.ListDomain;
 import de.uni_koblenz.jgralab.schema.LongDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
+import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.utilities.tg2schemagraph.Schema2SchemaGraph;
 import de.uni_koblenz.jgralab.utilities.tg2whatever.Tg2Whatever;
 

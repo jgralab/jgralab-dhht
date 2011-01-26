@@ -33,28 +33,32 @@ package de.uni_koblenz.jgralab.schema.impl;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.M1ClassManager;
+import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
+import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public class IncidenceClassImpl implements IncidenceClass {
+public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, Incidence> implements IncidenceClass{
 
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
-		super();
+		super(edgeClass.getSimpleName() + "_" + rolename, edgeClass.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
 		this.isAbstract = isAbstract;
 		this.direction = direction;
@@ -173,7 +177,6 @@ public class IncidenceClassImpl implements IncidenceClass {
 	 * @param superClass
 	 *            the class to add as superclass
 	 */
-	@Override
 	public void addSuperClass(IncidenceClass superClass) {
 		checkIncidenceClassSpecialization(this, superClass);
 		if ((superClass == this) || (superClass == null)) {
@@ -215,17 +218,12 @@ public class IncidenceClassImpl implements IncidenceClass {
 		return directSuperClasses;
 	}
 
-	@Override
-	public String getIncidenceClassName(IncidenceClass ic) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Class<? extends Incidence> getM1Class() {
 		if (m1Class == null) {
-			String m1ClassName = getIncidenceClassName(this);
+			String m1ClassName = getQualifiedName();
 			try {
 				m1Class = (Class<? extends Incidence>) Class
 						.forName(m1ClassName, true, M1ClassManager
@@ -233,7 +231,7 @@ public class IncidenceClassImpl implements IncidenceClass {
 			} catch (ClassNotFoundException e) {
 				throw new M1ClassAccessException(
 						"Can't load M1 class for IncidenceClass '"
-								+ getIncidenceClassName(this) + "'", e);
+								+ getQualifiedName() + "'", e);
 			}
 		}
 		return m1Class;
@@ -245,7 +243,7 @@ public class IncidenceClassImpl implements IncidenceClass {
 		if (isAbstract()) {
 			throw new M1ClassAccessException(
 					"Can't get M1 implementation class. IncidenceClass '"
-							+ getIncidenceClassName(this) + "' is abstract!");
+							+ getQualifiedName() + "' is abstract!");
 		}
 		if (m1ImplementationClass == null) {
 			try {
@@ -364,9 +362,9 @@ public class IncidenceClassImpl implements IncidenceClass {
 			throw new SchemaException(
 					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
 							+ "IncidenceClasses are "
-							+ special.getIncidenceClassName(special)
+							+ special.getQualifiedName()
 							+ " and "
-							+ general.getIncidenceClassName(general) + ".");
+							+ general.getQualifiedName()+ ".");
 		}
 		// Edge same
 		if ((special.getEdgeClass() != general.getEdgeClass())
@@ -375,9 +373,9 @@ public class IncidenceClassImpl implements IncidenceClass {
 			throw new SchemaException(
 					"An IncidenceClass may specialize only IncidenceClasses whose connected edge class is identical or a superclass of the own one. Offending"
 							+ "IncidenceClasses are "
-							+ special.getIncidenceClassName(special)
+							+ special.getQualifiedName()
 							+ " and "
-							+ general.getIncidenceClassName(general) + ".");
+							+ general.getQualifiedName() + ".");
 		}
 		// Multiplicities
 		if (special.getMaxEdgesAtVertex() > general.getMaxEdgesAtVertex()) {
@@ -497,7 +495,7 @@ public class IncidenceClassImpl implements IncidenceClass {
 			if (icWithSameRolename != null) {
 				throw new SchemaException("The rolename '" + ic.getRolename()
 						+ "' already exists at IncidenceClass '"
-						+ ic.getIncidenceClassName(ic) + "'.");
+						+ ic.getQualifiedName() + "'.");
 			}
 		}
 	}
@@ -569,5 +567,30 @@ public class IncidenceClassImpl implements IncidenceClass {
 			return getVertexClass();
 		}
 	}
+	
+	@Override
+	public String getVariableName() {
+		return "ic_" + getQualifiedName().replace('.', '_');
+	}
+
+
+	@Override
+	public IncidenceClass getDefaultClass() {
+		return getSchema().getDefaultIncidenceClass(direction);
+	}
+	
+	@Override
+	protected void register() {
+	//	((PackageImpl) parentPackage).addIncidencClass(this);
+	//	((GraphClassImpl) graphClass).addIncidenceClass(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 	
 }

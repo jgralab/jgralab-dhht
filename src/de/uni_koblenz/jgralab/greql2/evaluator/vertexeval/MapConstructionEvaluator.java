@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -39,10 +38,6 @@ import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueList;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueMap;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsKeyExprOfConstruction;
-import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfConstruction;
-import de.uni_koblenz.jgralab.greql2.schema.MapConstruction;
 
 public class MapConstructionEvaluator extends VertexEvaluator {
 	private MapConstruction mapConstruction;

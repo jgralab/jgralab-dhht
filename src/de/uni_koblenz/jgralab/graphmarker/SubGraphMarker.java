@@ -49,7 +49,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
+public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 
 	// TODO maybe replace with BitSets
 
@@ -75,7 +75,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
 	}
 
 	@Override
-	public boolean isMarked(GraphElement graphElement) {
+	public boolean isMarked(GraphElement<?, ?, ?> graphElement) {
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.isMarked((Edge) graphElement);
 		} else {
@@ -89,7 +89,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
 	}
 
 	@Override
-	public boolean removeMark(GraphElement graphElement) {
+	public boolean removeMark(GraphElement<?, ?, ?> graphElement) {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.removeMark((Edge) graphElement);
@@ -134,7 +134,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
 	 * @return false if the given <code>graphElement</code> has already been
 	 *         marked.
 	 */
-	public boolean mark(GraphElement graphElement) {
+	public boolean mark(GraphElement<?, ?, ?> graphElement) {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.mark((Edge) graphElement);
@@ -192,12 +192,13 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
 	}
 
 	@Override
-	public Iterable<GraphElement> getMarkedElements() {
-		return new Iterable<GraphElement>() {
+	public Iterable<GraphElement<?, ?, ?>> getMarkedElements() {
+		return new Iterable<GraphElement<?, ?, ?>>() {
 
 			@Override
-			public Iterator<GraphElement> iterator() {
-				return new ArrayGraphMarkerIterator<GraphElement>(version) {
+			public Iterator<GraphElement<?, ?, ?>> iterator() {
+				return new ArrayGraphMarkerIterator<GraphElement<?, ?, ?>>(
+						version) {
 
 					Iterator<Vertex> vertexIterator;
 					Iterator<Edge> edgeIterator;
@@ -221,7 +222,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement> {
 					}
 
 					@Override
-					public GraphElement next() {
+					public GraphElement<?, ?, ?> next() {
 						if (version != SubGraphMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);

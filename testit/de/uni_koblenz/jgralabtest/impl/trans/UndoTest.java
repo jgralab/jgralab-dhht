@@ -46,11 +46,6 @@ import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 import de.uni_koblenz.jgralab.trans.Savepoint;
 import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.record.Hugo;
-import de.uni_koblenz.jgralabtest.schemas.record.Link;
-import de.uni_koblenz.jgralabtest.schemas.record.Node;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestSchema;
 
 public class UndoTest {
 

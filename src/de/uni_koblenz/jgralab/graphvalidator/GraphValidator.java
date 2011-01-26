@@ -42,7 +42,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;

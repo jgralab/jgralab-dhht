@@ -34,15 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 import de.uni_koblenz.jgralab.trans.Savepoint;
-
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.TestRecord;
 
 public class Test {
 

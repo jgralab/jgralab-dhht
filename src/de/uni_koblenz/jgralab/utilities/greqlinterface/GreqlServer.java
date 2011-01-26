@@ -59,7 +59,6 @@ import de.uni_koblenz.jgralab.greql2.jvalue.JValuePath;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValuePathSystem;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-//import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
 
 public class GreqlServer extends Thread {
 

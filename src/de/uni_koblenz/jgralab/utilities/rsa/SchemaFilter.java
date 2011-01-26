@@ -34,24 +34,18 @@ import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
-import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
-import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
-import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
+import de.uni_koblenz.jgralab.greql2.funlib.HasAttribute;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.CollectionDomain;
+import de.uni_koblenz.jgralab.schema.Domain;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.EnumDomain;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.MapDomain;
+import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This class handles the filtering of schemas. It is used for example in

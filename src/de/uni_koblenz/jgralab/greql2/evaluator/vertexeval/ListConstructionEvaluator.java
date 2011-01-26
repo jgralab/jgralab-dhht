@@ -37,7 +37,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueList;
-import de.uni_koblenz.jgralab.greql2.schema.ListConstruction;
 
 /**
  * Evaluates a ListConstruction vertex in the GReQL 2 syntaxgraph

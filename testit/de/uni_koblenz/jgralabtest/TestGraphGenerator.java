@@ -33,13 +33,8 @@ package de.uni_koblenz.jgralabtest;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.greql2.funlib.Intersection;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Bridge;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CarPark;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMap;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMapSchema;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Intersection;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Street;
 
 /**
  * Generates a TestGrapg which is used to perform several tests on

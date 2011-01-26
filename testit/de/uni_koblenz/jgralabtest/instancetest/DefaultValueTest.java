@@ -39,8 +39,8 @@ import static org.junit.Assert.fail;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +54,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -66,13 +65,6 @@ import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.DefaultValueTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.DefaultValueTestSchema;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.TestEdge;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.TestEnumDomain;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.TestRecordDomain;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.TestSubVertex;
-import de.uni_koblenz.jgralabtest.schemas.defaultvaluetestschema.TestVertex;
 
 @RunWith(Parameterized.class)
 public class DefaultValueTest extends InstanceTest {

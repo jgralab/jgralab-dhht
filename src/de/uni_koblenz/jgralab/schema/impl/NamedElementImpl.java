@@ -419,7 +419,7 @@ public abstract class NamedElementImpl implements NamedElementClass {
 	}
 
 	@Override
-	public final String getQualifiedName() {
+	public String getQualifiedName() {
 		return qualifiedName;
 	}
 

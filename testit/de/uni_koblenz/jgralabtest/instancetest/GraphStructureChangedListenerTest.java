@@ -51,10 +51,6 @@ import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class GraphStructureChangedListenerTest extends InstanceTest {

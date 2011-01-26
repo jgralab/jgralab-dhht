@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import java.util.ArrayList;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
@@ -45,13 +44,6 @@ import de.uni_koblenz.jgralab.greql2.funlib.Greql2Function;
 import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOf;
-import de.uni_koblenz.jgralab.greql2.schema.TypeId;
 
 /**
  * Evaluates a FunctionApplication vertex in the GReQL-2 Syntaxgraph

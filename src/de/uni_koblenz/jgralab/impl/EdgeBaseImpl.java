@@ -36,7 +36,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -55,8 +54,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeBaseImpl extends GraphElementImpl<EdgeClass, Edge, Vertex>
-		implements Edge {
+public abstract class EdgeBaseImpl extends
+		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 	/**
 	 * Creates a new {@link Edge} instance.
@@ -459,7 +458,7 @@ public abstract class EdgeBaseImpl extends GraphElementImpl<EdgeClass, Edge, Ver
 	public int compareTo(Edge a) {
 		assert a != null;
 		assert a instanceof Edge;
-		Edge e = (Edge) a;
+		Edge e = a;
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();

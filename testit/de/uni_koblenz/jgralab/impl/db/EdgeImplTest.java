@@ -30,15 +30,11 @@
  */
 package de.uni_koblenz.jgralab.impl.db;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import de.uni_koblenz.jgralabtest.schemas.vertextest.A;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.B;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.E;
 
 public class EdgeImplTest extends ImplTest {
 

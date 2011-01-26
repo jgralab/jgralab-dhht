@@ -49,10 +49,6 @@ import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.graphvalidator.MultiplicityConstraintViolation;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.A;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.B;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public class MultiplicityTest {
 	private VertexTestGraph graph;

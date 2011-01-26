@@ -34,7 +34,6 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incidence > {
 

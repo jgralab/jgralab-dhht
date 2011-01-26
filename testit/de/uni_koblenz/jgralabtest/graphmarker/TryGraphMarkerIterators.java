@@ -46,10 +46,6 @@ import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.LongEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.LongVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 public class TryGraphMarkerIterators {
 	private static ArrayVertexMarker<String> arrayVertexMarker;

@@ -36,6 +36,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
+import org.apache.tools.ant.taskdefs.Exit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +46,6 @@ import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 import de.uni_koblenz.jgralab.trans.Savepoint;
 import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Exit;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 /**
  * Test cases for class SavepointImpl.

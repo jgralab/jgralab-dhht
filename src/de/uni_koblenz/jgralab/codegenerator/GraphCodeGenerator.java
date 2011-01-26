@@ -32,11 +32,8 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.greql2.funlib.GetVertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;

@@ -37,9 +37,9 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 /**
  * JValueBag implements a mathematical multiset of JValue-Objects. This includes

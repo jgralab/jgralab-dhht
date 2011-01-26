@@ -41,7 +41,6 @@ import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
 import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 
 /**

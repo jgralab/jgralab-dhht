@@ -46,8 +46,6 @@ import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
 import de.uni_koblenz.jgralab.impl.FreeIndexList;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
-//import de.uni_koblenz.jgralab.trans.Savepoint;
-//import de.uni_koblenz.jgralab.trans.Transaction;
 
 /**
  * The implementation of a <code>Graph</code> accessing attributes without

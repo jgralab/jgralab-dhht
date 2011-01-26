@@ -45,11 +45,6 @@ import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GReQLConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.graphvalidator.MultiplicityConstraintViolation;
-import de.uni_koblenz.jgralabtest.schemas.constrained.ConstrainedGraph;
-import de.uni_koblenz.jgralabtest.schemas.constrained.ConstrainedLink;
-import de.uni_koblenz.jgralabtest.schemas.constrained.ConstrainedNode;
-import de.uni_koblenz.jgralabtest.schemas.constrained.ConstrainedSchema;
-import de.uni_koblenz.jgralabtest.schemas.constrained.OtherConstrainedNode;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>

@@ -35,17 +35,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTargetExprOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 
 /**
  * This {@link MergeSimpleDeclarationsOptimizer} finds and merges all

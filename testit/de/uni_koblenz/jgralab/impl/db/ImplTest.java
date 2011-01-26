@@ -33,8 +33,6 @@ package de.uni_koblenz.jgralab.impl.db;
 import static junit.framework.Assert.fail;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public abstract class ImplTest {
 
