@@ -262,8 +262,10 @@ public class JniServer {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Edge> m1Class = graph.getGraphClass().getEdgeClass(
 				edgeClassName).getM1Class();
-		return graph.createEdge(m1Class, graph.getVertex(alphaId),
-				graph.getVertex(omegaId)).getId();
+		Edge e = graph.createEdge(m1Class);
+		
+		
+		return e.getId();
 	}
 
 	public void deleteEdge(int graphId, int edgeId) {
@@ -361,22 +363,23 @@ public class JniServer {
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
+	
 
-	public int getAlpha(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getAlpha().getId();
-	}
-
-	public int getOmega(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getOmega().getId();
-	}
-
-	public int getThis(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getThis().getId();
-	}
-
-	public int getThat(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getThat().getId();
-	}
+//	public int getAlpha(int graphId, int edgeId) {
+//		return graphs.get(graphId).getEdge(edgeId).getAlpha().getId();
+//	}
+//
+//	public int getOmega(int graphId, int edgeId) {
+//		return graphs.get(graphId).getEdge(edgeId).getOmega().getId();
+//	}
+//
+//	public int getThis(int graphId, int edgeId) {
+//		return graphs.get(graphId).getEdge(edgeId).getThis().getId();
+//	}
+//
+//	public int getThat(int graphId, int edgeId) {
+//		return graphs.get(graphId).getEdge(edgeId).getThat().getId();
+//	}
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
@@ -423,25 +426,25 @@ public class JniServer {
 		return (e == null) ? 0 : e.getId();
 	}
 
-	public int getFirstEdge(int graphId, int vertexId, String edgeClassName) {
-		Graph g = graphs.get(graphId);
-		Edge e = (edgeClassName != null) ? g.getVertex(vertexId)
-				.getFirstIncidence(
-						(EdgeClass) g.getSchema().getAttributedElementClass(
-								edgeClassName)) : g.getVertex(vertexId)
-				.getFirstIncidence();
-		return (e == null) ? 0 : e.getId();
-	}
-
-	public int getNextEdge(int graphId, int edgeId, String edgeClassName) {
-		Graph g = graphs.get(graphId);
-		Edge e = (edgeClassName != null) ? g.getEdge(edgeId)
-				.getNextIncidence(
-						((EdgeClass) g.getSchema().getAttributedElementClass(
-								edgeClassName))) : g.getEdge(edgeId)
-				.getNextIncidence();
-		return (e == null) ? 0 : e.getId();
-	}
+//	public int getFirstEdge(int graphId, int vertexId, String edgeClassName) {
+//		Graph g = graphs.get(graphId);
+//		Edge e = (edgeClassName != null) ? g.getVertex(vertexId)
+//				.getFirstIncidence(
+//						(EdgeClass) g.getSchema().getAttributedElementClass(
+//								edgeClassName)) : g.getVertex(vertexId)
+//				.getFirstIncidence();
+//		return (e == null) ? 0 : e.getId();
+//	}
+//
+//	public int getNextEdge(int graphId, int edgeId, String edgeClassName) {
+//		Graph g = graphs.get(graphId);
+//		Edge e = (edgeClassName != null) ? g.getEdge(edgeId)
+//				.getNextIncidence(
+//						((EdgeClass) g.getSchema().getAttributedElementClass(
+//								edgeClassName))) : g.getEdge(edgeId)
+//				.getNextIncidence();
+//		return (e == null) ? 0 : e.getId();
+//	}
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
