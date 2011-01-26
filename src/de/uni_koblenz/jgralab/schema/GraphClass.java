@@ -41,9 +41,9 @@ import de.uni_koblenz.jgralab.Graph;
  * all <code>GraphElementClasses</code>.
  * 
  * <p>
- * <b>Note:</b> in the following, <code>graphClass</code>, and <code>graphClass'</code>,
- * will represent the states of the given <code>GraphClass</code> before,
- * respectively after, any operation.
+ * <b>Note:</b> in the following, <code>graphClass</code>, and
+ * <code>graphClass'</code>, will represent the states of the given
+ * <code>GraphClass</code> before, respectively after, any operation.
  * </p>
  * 
  * <p>
@@ -66,27 +66,55 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 * @return the created edge class
 	 */
 	public EdgeClass createEdgeClass(String qualifiedName);
-	
 
 	/**
-	 * Creates a new IncidenceClass between vertexClass and edgeClass and adds it to those classes
-	 * @param vertexClass the vertex class the created incidence class should be connected to
-	 * @param edgeClass the edge class the created incidence class should be connected to
-	 * @param rolename the name of the incidence class to be created, need to be unique at edge and vertex class
-	 * @param isAbstract if the incidence class is an abstract one (derived in UML)
-	 * @param minEdgesAtVertex the minimal number of edges to be connected by such an incidence to each vertex
-	 * @param maxEdgesAtVertex the maximal number of edges to be connected by such an incidence to each vertex
-	 * @param minVerticesAtEdge the minimal number of vertices to be connected by such an incidence to each edge
-	 * @param maxVerticesAtEdge the maximal number of vertices to be connected by such an incidence to each edge
-	 * @param dir the direction of the incidence (from edge to vertex or vice versa)
-	 * @param kind the kind of the incidence (aggregation, composition)
+	 * creates an binary edge class with the given qualified name
+	 * 
+	 * @param qualifiedName
+	 *            the qualified name of the edge class to be created
+	 * @return the created edge class
+	 */
+	public BinaryEdgeClass createBinaryEdgeClass(String qualifiedName);
+
+	/**
+	 * Creates a new IncidenceClass between vertexClass and edgeClass and adds
+	 * it to those classes
+	 * 
+	 * @param vertexClass
+	 *            the vertex class the created incidence class should be
+	 *            connected to
+	 * @param edgeClass
+	 *            the edge class the created incidence class should be connected
+	 *            to
+	 * @param rolename
+	 *            the name of the incidence class to be created, need to be
+	 *            unique at edge and vertex class
+	 * @param isAbstract
+	 *            if the incidence class is an abstract one (derived in UML)
+	 * @param minEdgesAtVertex
+	 *            the minimal number of edges to be connected by such an
+	 *            incidence to each vertex
+	 * @param maxEdgesAtVertex
+	 *            the maximal number of edges to be connected by such an
+	 *            incidence to each vertex
+	 * @param minVerticesAtEdge
+	 *            the minimal number of vertices to be connected by such an
+	 *            incidence to each edge
+	 * @param maxVerticesAtEdge
+	 *            the maximal number of vertices to be connected by such an
+	 *            incidence to each edge
+	 * @param dir
+	 *            the direction of the incidence (from edge to vertex or vice
+	 *            versa)
+	 * @param kind
+	 *            the kind of the incidence (aggregation, composition)
 	 * @return the created IncidenceClass
 	 */
-	public IncidenceClass createIncidenceClass(EdgeClass edgeClass,	VertexClass vertexClass, 
-			                                   String rolename, boolean isAbstract, 
-			                                   int minEdgesAtVertex, int maxEdgesAtVertex,
-			                                   int minVerticesAtEdge, int maxVerticesAtEdge, 
-			                                   Direction dir, IncidenceType kind);	
+	public IncidenceClass createIncidenceClass(EdgeClass edgeClass,
+			VertexClass vertexClass, String rolename, boolean isAbstract,
+			int minEdgesAtVertex, int maxEdgesAtVertex, int minVerticesAtEdge,
+			int maxVerticesAtEdge, Direction dir, IncidenceType kind);
+
 	/**
 	 * creates a vertex class with the vertexclassname name
 	 * 
@@ -101,7 +129,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 *            the name to search for
 	 * @return the contained graph element class with the name name
 	 */
-	public GraphElementClass<?,?> getGraphElementClass(String name);
+	public GraphElementClass<?, ?> getGraphElementClass(String name);
 
 	/**
 	 * @return a list of all EdgeClasses this graphclass knows, including
@@ -113,7 +141,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 * @return a list of all the edge/vertex/aggregation/composition classes of
 	 *         this graph class, including inherited classes
 	 */
-	public List<GraphElementClass<?,?>> getGraphElementClasses();
+	public List<GraphElementClass<?, ?>> getGraphElementClasses();
 
 	/**
 	 * @return a list of all the vertex classes of this graph class, including
@@ -163,7 +191,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 *            a vertex/edge/aggregation/composition class name
 	 * @return true, if this graph class aggregates aGraphElementClass
 	 */
-	public boolean knows(GraphElementClass<?,?> aGraphElementClass);
+	public boolean knows(GraphElementClass<?, ?> aGraphElementClass);
 
 	/**
 	 * @param aGraphElementClass
