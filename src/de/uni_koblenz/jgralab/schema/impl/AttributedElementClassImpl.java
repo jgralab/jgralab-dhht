@@ -44,7 +44,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 
-public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>> extends TypedElementClassImpl<ConcreteMetaClass, ConcreteInterface>
+public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>>
+		extends TypedElementClassImpl<ConcreteMetaClass, ConcreteInterface>
 		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
@@ -90,14 +91,14 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 			String defaultValueAsString) {
 		addAttribute(new AttributeImpl(name, domain, this, defaultValueAsString));
 	}
-	
+
 	/**
 	 * adds a superClass to this class
 	 * 
 	 * @param superClass
 	 *            the class to add as superclass
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void addSuperClass(ConcreteMetaClass superClass) {
 		if ((superClass == this) || (superClass == null)) {
 			return;
@@ -105,7 +106,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		directSuperClasses.remove(getSchema().getDefaultGraphClass());
 		directSuperClasses.remove(getSchema().getDefaultEdgeClass());
 		directSuperClasses.remove(getSchema().getDefaultVertexClass());
-	
+
 		for (Attribute a : superClass.getAttributeList()) {
 			if (getOwnAttribute(a.getName()) != null) {
 				throw new InheritanceException("Cannot add "
@@ -124,9 +125,8 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 							+ superClass.getQualifiedName());
 		}
 		directSuperClasses.add(superClass);
-		((AttributedElementClassImpl)superClass).directSubClasses.add((AttributedElementClass)this);
+		((AttributedElementClassImpl) superClass).directSubClasses.add(this);
 	}
-
 
 	/**
 	 * @return a textual representation of all attributes the element holds
@@ -257,7 +257,5 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		}
 		return false;
 	}
-	
-
 
 }

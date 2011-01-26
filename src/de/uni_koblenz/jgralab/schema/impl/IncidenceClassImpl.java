@@ -33,32 +33,31 @@ package de.uni_koblenz.jgralab.schema.impl;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.M1ClassManager;
-import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
-import de.uni_koblenz.jgralab.schema.NamedElementClass;
-import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, Incidence> implements IncidenceClass{
+public class IncidenceClassImpl extends
+		TypedElementClassImpl<IncidenceClass, Incidence> implements
+		IncidenceClass {
 
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
-		super(edgeClass.getSimpleName() + "_" + rolename, edgeClass.getPackage(), edgeClass.getSchema());
+		super(edgeClass.getSimpleName() + "_" + rolename, edgeClass
+				.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
 		this.isAbstract = isAbstract;
 		this.direction = direction;
@@ -218,7 +217,6 @@ public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, I
 		return directSuperClasses;
 	}
 
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Class<? extends Incidence> getM1Class() {
@@ -364,7 +362,7 @@ public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, I
 							+ "IncidenceClasses are "
 							+ special.getQualifiedName()
 							+ " and "
-							+ general.getQualifiedName()+ ".");
+							+ general.getQualifiedName() + ".");
 		}
 		// Edge same
 		if ((special.getEdgeClass() != general.getEdgeClass())
@@ -546,43 +544,44 @@ public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, I
 			rolenames.put(ic.getRolename(), ic);
 		}
 	}
-	
-	
+
+	@Override
 	public String getQualifiedName() {
 		return edgeClass.getQualifiedName() + "_" + rolename;
 	}
-	
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?, ?> graphElementClass) {
+
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(
+			GraphElementClass<?, ?> graphElementClass) {
 		if (graphElementClass instanceof VertexClass) {
 			return getVertexClass();
 		} else {
 			return getEdgeClass();
 		}
 	}
-	
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(GraphElementClass<?, ?> graphElementClass) {
+
+	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(
+			GraphElementClass<?, ?> graphElementClass) {
 		if (graphElementClass instanceof VertexClass) {
 			return getEdgeClass();
 		} else {
 			return getVertexClass();
 		}
 	}
-	
+
 	@Override
 	public String getVariableName() {
 		return "ic_" + getQualifiedName().replace('.', '_');
 	}
 
-
 	@Override
 	public IncidenceClass getDefaultClass() {
 		return getSchema().getDefaultIncidenceClass(direction);
 	}
-	
+
 	@Override
 	protected void register() {
-	//	((PackageImpl) parentPackage).addIncidencClass(this);
-	//	((GraphClassImpl) graphClass).addIncidenceClass(this);
+		// ((PackageImpl) parentPackage).addIncidencClass(this);
+		// ((GraphClassImpl) graphClass).addIncidenceClass(this);
 	}
 
 	@Override
@@ -591,6 +590,4 @@ public class IncidenceClassImpl  extends TypedElementClassImpl<IncidenceClass, I
 		return false;
 	}
 
-
-	
 }
