@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -41,14 +40,12 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +74,7 @@ import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.MapDomain;
 import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
@@ -446,6 +444,9 @@ public class GraphIO {
 
 	private void writeIncidenceClassDefintion(Package pkg, IncidenceClass ic)
 			throws IOException {
+		if (ic.isAbstract()) {
+			write(" abstract");
+		}
 		space();
 		writeIdentifier(ic.getVertexClass().getQualifiedName(pkg));
 
@@ -1009,23 +1010,23 @@ public class GraphIO {
 		}
 	}
 
-	public static Schema loadSchemaFromDatabase(GraphDatabase graphDatabase,
-			String packagePrefix, String schemaName) throws GraphIOException {
-		String definition = graphDatabase.getSchemaDefinition(packagePrefix,
-				schemaName);
-		InputStream input = new ByteArrayInputStream(definition.getBytes());
-		return loadSchemaFromStream(input);
-	}
+	// public static Schema loadSchemaFromDatabase(GraphDatabase graphDatabase,
+	// String packagePrefix, String schemaName) throws GraphIOException {
+	// String definition = graphDatabase.getSchemaDefinition(packagePrefix,
+	// schemaName);
+	// InputStream input = new ByteArrayInputStream(definition.getBytes());
+	// return loadSchemaFromStream(input);
+	// }
 
-	public static Schema loadAndCommitSchemaFromDatabase(
-			GraphDatabase graphDatabase, String packagePrefix, String schemaName)
-			throws GraphIOException {
-		Schema schema = loadSchemaFromDatabase(graphDatabase, packagePrefix,
-				schemaName);
-		schema.commit("test",
-				new CodeGeneratorConfiguration().withDatabaseSupport());
-		return schema;
-	}
+	// public static Schema loadAndCommitSchemaFromDatabase(
+	// GraphDatabase graphDatabase, String packagePrefix, String schemaName)
+	// throws GraphIOException {
+	// Schema schema = loadSchemaFromDatabase(graphDatabase, packagePrefix,
+	// schemaName);
+	// schema.commit("test",
+	// new CodeGeneratorConfiguration().withDatabaseSupport());
+	// return schema;
+	// }
 
 	public static Schema loadSchemaFromStream(InputStream in)
 			throws GraphIOException {
@@ -1379,11 +1380,11 @@ public class GraphIO {
 	 *             if version number in file can not be processed
 	 */
 	private void header() throws GraphIOException {
-		match("TGraph");
+		match("DHHTGraph");
 		int version = matchInteger();
 		if (version != TGFILE_VERSION) {
-			throw new GraphIOException("Can't read TGFile version " + version
-					+ ". Expected version " + TGFILE_VERSION);
+			throw new GraphIOException("Can't read DHHTGFile version "
+					+ version + ". Expected version " + TGFILE_VERSION);
 		}
 		match(";");
 	}
@@ -1575,7 +1576,9 @@ public class GraphIO {
 				|| lookAhead.equals("EnumDomain")
 				|| lookAhead.equals("abstract")
 				|| lookAhead.equals("VertexClass")
-				|| lookAhead.equals("EdgeClass") || lookAhead.equals("Comment")) {
+				|| lookAhead.equals("EdgeClass")
+				|| lookAhead.equals("BinaryEdgeClass")
+				|| lookAhead.equals("Comment")) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
 			} else if (lookAhead.equals("RecordDomain")) {
@@ -1910,7 +1913,8 @@ public class GraphIO {
 				graphElementClassData.directSuperClasses = parseHierarchy();
 			}
 			vertexClassBuffer.get(gcName).add(graphElementClassData);
-		} else if (lookAhead.equals("EdgeClass")) {
+		} else if (lookAhead.equals("EdgeClass")
+				|| lookAhead.equals("BinaryEdgeClass")) {
 			match();
 			String[] qn = matchQualifiedName(true);
 			graphElementClassData.packageName = qn[0];
@@ -3174,6 +3178,34 @@ public class GraphIO {
 	}
 
 	/**
+	 * IncidenceClassData contains the parsed data of an IncidenceClass. This
+	 * data is used to create an IncidenceClass.
+	 */
+	public class IncidenceClassData {
+
+		boolean isAbstract = false;
+
+		List<String> directSuperClasses = new LinkedList<String>();
+
+		String roleName = "";
+
+		String vertexClassName;
+
+		int[] multiplicityAtVertex = { 0, Integer.MAX_VALUE };
+
+		Set<String> redefinedRolesAtVertex = null;
+
+		String edgeClassName;
+
+		int[] multiplicityAtEdge = { 0, Integer.MAX_VALUE };
+
+		Set<String> redefinedRolesAtEdge = null;
+
+		IncidenceType incidenceType;
+
+	}
+
+	/**
 	 * GraphElementClassData contains the parsed data of a GraphElementClass.
 	 * This data is used to create a GraphElementClass.
 	 */
@@ -3189,59 +3221,44 @@ public class GraphIO {
 
 		List<String> directSuperClasses = new LinkedList<String>();
 
-		String fromVertexClassName;
+		List<IncidenceClassData> fromIncidenceClasses = new LinkedList<IncidenceClassData>();
 
-		int[] fromMultiplicity = { 1, Integer.MAX_VALUE };
-
-		String fromRoleName = "";
-
-		Set<String> redefinedFromRoles = null;
-
-		AggregationKind fromAggregation;
-
-		String toVertexClassName;
-
-		int[] toMultiplicity = { 1, Integer.MAX_VALUE };
-
-		String toRoleName = "";
-
-		Set<String> redefinedToRoles = null;
-
-		AggregationKind toAggregation;
+		List<IncidenceClassData> toIncidenceClasses = new LinkedList<IncidenceClassData>();
 
 		List<AttributeData> attributes = new ArrayList<AttributeData>();
 
 		Set<Constraint> constraints = new HashSet<Constraint>(1);
 	}
 
-	public static Graph loadGraphFromDatabase(String id,
-			GraphDatabase graphDatabase) throws GraphDatabaseException {
-		if (graphDatabase != null) {
-			return graphDatabase.getGraph(id);
-		} else {
-			throw new GraphDatabaseException("No graph database given.");
-		}
-	}
+	// public static Graph loadGraphFromDatabase(String id,
+	// GraphDatabase graphDatabase) throws GraphDatabaseException {
+	// if (graphDatabase != null) {
+	// return graphDatabase.getGraph(id);
+	// } else {
+	// throw new GraphDatabaseException("No graph database given.");
+	// }
+	// }
 
-	public static void loadSchemaIntoGraphDatabase(String filePath,
-			GraphDatabase graphDatabase) throws IOException, GraphIOException,
-			SQLException {
-		String schemaDefinition = readFileAsString(filePath);
-		Schema schema = loadSchemaFromFile(filePath);
-		graphDatabase.insertSchema(schema, schemaDefinition);
-	}
+	// public static void loadSchemaIntoGraphDatabase(String filePath,
+	// GraphDatabase graphDatabase) throws IOException, GraphIOException,
+	// SQLException {
+	// String schemaDefinition = readFileAsString(filePath);
+	// Schema schema = loadSchemaFromFile(filePath);
+	// graphDatabase.insertSchema(schema, schemaDefinition);
+	// }
 
-	private static String readFileAsString(String filePath) throws IOException {
-		StringBuffer fileData = new StringBuffer(1024);
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
-		}
-		reader.close();
-		return fileData.toString();
-	}
+	// private static String readFileAsString(String filePath) throws
+	// IOException {
+	// StringBuffer fileData = new StringBuffer(1024);
+	// BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	// char[] buf = new char[1024];
+	// int numRead = 0;
+	// while ((numRead = reader.read(buf)) != -1) {
+	// String readData = String.valueOf(buf, 0, numRead);
+	// fileData.append(readData);
+	// buf = new char[1024];
+	// }
+	// reader.close();
+	// return fileData.toString();
+	// }
 }
