@@ -85,7 +85,9 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
+import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
+import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
 
 /**
  * class for loading and storing schema and graphs in tg format
@@ -1464,7 +1466,7 @@ public class GraphIO {
 				throw new GraphIOException("Annotated element '" + e.getKey()
 						+ "' not found in schema " + schema.getQualifiedName());
 			}
-			NamedElement el = schema.getNamedElement(e.getKey());
+			NamedElementClass el = schema.getNamedElement(e.getKey());
 			if (el instanceof Domain
 					&& !(el instanceof EnumDomain || el instanceof RecordDomain)) {
 				throw new GraphIOException(
@@ -2030,7 +2032,8 @@ public class GraphIO {
 
 	private EdgeClass createEdgeClass(GraphElementClassData ecd, GraphClass gc)
 			throws GraphIOException, SchemaException {
-		EdgeClass ec = ecd.isBinaryEdge ? null : gc.createEdgeClass(ecd
+		EdgeClass ec = ecd.isBinaryEdge ? gc.createBinaryEdgeClass(ecd
+				.getQualifiedName()) : gc.createEdgeClass(ecd
 				.getQualifiedName());
 		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
 			gc.createIncidenceClass(ec, gc.getVertexClass(icd.vertexClassName),
@@ -2040,6 +2043,15 @@ public class GraphIO {
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
 					Direction.VERTEX_TO_EDGE, icd.incidenceType);
+		}
+		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
+			gc.createIncidenceClass(ec, gc.getVertexClass(icd.vertexClassName),
+					icd.roleName, icd.isAbstract,
+					icd.multiplicityEdgesAtVertex[0],
+					icd.multiplicityEdgesAtVertex[1],
+					icd.multiplicityVerticesAtEdge[0],
+					icd.multiplicityVerticesAtEdge[1],
+					Direction.EDGE_TO_VERTEX, icd.incidenceType);
 		}
 
 		addAttributes(ecd.attributes, ec);
@@ -2242,7 +2254,7 @@ public class GraphIO {
 									"undefined VertexClass '" + superClassName
 											+ "'");
 						}
-						((VertexClass) aec).addSuperClass(superClass);
+						((VertexClassImpl) aec).addSuperClass(superClass);
 					}
 				}
 			}
@@ -2277,7 +2289,7 @@ public class GraphIO {
 						throw new GraphIOException("undefined EdgeClass '"
 								+ superClassName + "'");
 					}
-					ec.addSuperClass(superClass);
+					((EdgeClassImpl) ec).addSuperClass(superClass);
 				}
 				ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
 				ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
