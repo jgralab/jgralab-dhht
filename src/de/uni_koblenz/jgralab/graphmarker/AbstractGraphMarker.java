@@ -36,8 +36,8 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRevome;
 import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class AbstractGraphMarker<T extends AttributedElement> extends
-		GraphStructureChangedAdapterWithAutoRevome {
+public abstract class AbstractGraphMarker<T extends AttributedElement<?, ?>>
+		extends GraphStructureChangedAdapterWithAutoRevome {
 	protected final Graph graph;
 
 	protected AbstractGraphMarker(Graph graph) {

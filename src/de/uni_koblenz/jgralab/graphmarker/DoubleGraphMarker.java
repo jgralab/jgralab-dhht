@@ -34,8 +34,8 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class DoubleGraphMarker<T extends GraphElement> extends
-		AbstractGraphMarker<T> {
+public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
+		extends AbstractGraphMarker<T> {
 
 	protected double[] temporaryAttributes;
 	protected int marked;

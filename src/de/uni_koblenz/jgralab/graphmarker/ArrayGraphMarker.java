@@ -41,8 +41,8 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @param <T>
  */
-public abstract class ArrayGraphMarker<T extends GraphElement, O> extends
-		AbstractGraphMarker<T> {
+public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
+		extends AbstractGraphMarker<T> {
 
 	/**
 	 * The array of temporary attributes.
