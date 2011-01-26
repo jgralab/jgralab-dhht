@@ -42,7 +42,6 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
 		implements EdgeClass {
@@ -119,25 +118,28 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
 	public EdgeClass getDefaultClass() {
 		return graphClass.getSchema().getDefaultEdgeClass();
 	}
-	
+
 	@Override
 	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder() {
 		ArrayList<IncidenceClass> topologicalOrderList = new ArrayList<IncidenceClass>();
 		HashSet<IncidenceClass> incidenceClassSet = new HashSet<IncidenceClass>();
 
 		incidenceClassSet.addAll(getIncidenceClasses());
-		
-		// first only the incidence classes without a superclass at this edge class are in the topo list
+
+		// first only the incidence classes without a superclass at this edge
+		// class are in the topo list
 		for (IncidenceClass ic : getIncidenceClasses()) {
 			boolean specializedOwnIncClass = false;
-			for (IncidenceClass sc: ic.getAllSuperClasses()) {
-				if (sc.getEdgeClass() == this)
+			for (IncidenceClass sc : ic.getAllSuperClasses()) {
+				if (sc.getEdgeClass() == this) {
 					specializedOwnIncClass = true;
+				}
 			}
-			if (!specializedOwnIncClass)
+			if (!specializedOwnIncClass) {
 				topologicalOrderList.add(ic);
+			}
 		}
-		
+
 		incidenceClassSet.removeAll(topologicalOrderList);
 
 		// iteratively add classes from vertexClassSet,
@@ -147,12 +149,14 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
 		while (!incidenceClassSet.isEmpty()) {
 			for (IncidenceClass ic : incidenceClassSet) {
 				Set<IncidenceClass> superclassesAtThisEdgeClass = new HashSet<IncidenceClass>();
-				for (IncidenceClass sc: ic.getDirectSuperClasses()) {
-					if (sc.getEdgeClass() == this)
+				for (IncidenceClass sc : ic.getDirectSuperClasses()) {
+					if (sc.getEdgeClass() == this) {
 						superclassesAtThisEdgeClass.add(sc);
+					}
 				}
-				//nur superklasen an gelicher kantenklasse
-				if (topologicalOrderList.containsAll(superclassesAtThisEdgeClass)) {
+				// nur superklasen an gelicher kantenklasse
+				if (topologicalOrderList
+						.containsAll(superclassesAtThisEdgeClass)) {
 					topologicalOrderList.add(ic);
 				}
 			}
