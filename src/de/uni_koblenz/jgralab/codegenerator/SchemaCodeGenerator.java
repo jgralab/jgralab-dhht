@@ -52,6 +52,7 @@ import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.SetDomain;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -501,26 +502,17 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.setVariable("aecVariable", "gc");
 		code.setVariable("schemaVariable", gc.getVariableName());
 		code.setVariable("gcAbstract", gc.isAbstract() ? "true" : "false");
-		code
-				.addNoIndent(new CodeSnippet(
+		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
 						"\tGraphClass #gcVariable# = #schemaVariable# = createGraphClass(\"#gcName#\");",
 						"\t#gcVariable#.setAbstract(#gcAbstract#);"));
-		for (AttributedElementClass superClass : gc.getDirectSuperClasses()) {
-			if (superClass.isInternal()) {
-				continue;
-			}
-			CodeSnippet s = new CodeSnippet(
-					"#gcVariable#.addSuperClass(getGraphClass(\"#superClassName#\"));");
-			s.setVariable("superClassName", superClass.getQualifiedName());
-			code.add(s);
-		}
 		code.add(createAttributes(gc));
 		code.add(createConstraints(gc));
 		code.add(createComments("gc", gc));
 		code.add(createVertexClasses(gc));
 		code.add(createEdgeClasses(gc));
+		code.add(createIncidenceClasses(gc));
 		code.addNoIndent(new CodeSnippet(false, "}"));
 		return code;
 	}
@@ -556,16 +548,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		return code;
 	}
 
-	private CodeBlock createEdgeClasses(GraphClass gc) {
-		CodeList code = new CodeList();
-		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
-			if (!ec.isInternal() && (ec.getGraphClass() == gc)) {
-				code.addNoIndent(createGraphElementClass(ec, "Edge"));
-			}
-		}
-		return code;
-	}
-	
+
 	
 	private CodeBlock createIncidenceClass(IncidenceClass ic) {
 		CodeList code = new CodeList();
@@ -596,30 +579,52 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		}
 
 
-		code.add(createAttributes(ec));
-		code.add(createConstraints(ec));
-		code.add(createComments("ec", ec));
+		code.add(createConstraints(ic));
+		code.add(createComments("ic", ic));
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
 	
 	
+	private CodeBlock createIncidenceClasses(GraphClass gc) {
+		CodeList code = new CodeList();
+		for (IncidenceClass ic : schema.getIncidenceClassesInTopologicalOrder()) {
+			if (!ic.isInternal()) {
+				code.addNoIndent(createIncidenceClass(ic));
+			}
+		}
+		return code;
+	}
+	
 
 	private CodeBlock createVertexClasses(GraphClass gc) {
 		CodeList code = new CodeList();
 		for (VertexClass vc : schema.getVertexClassesInTopologicalOrder()) {
-			if (vc.isInternal()) {
-				CodeSnippet s = new CodeSnippet();
-				s.setVariable("schemaVariable", vc.getVariableName());
-				s.add("@SuppressWarnings(\"unused\")");
-				s.add("VertexClass #schemaVariable# = getDefaultVertexClass();");
-				code.addNoIndent(s);
-			} else if (vc.getGraphClass() == gc) {
+//			if (vc.isInternal()) {
+//				CodeSnippet s = new CodeSnippet();
+//				s.setVariable("schemaVariable", vc.getVariableName());
+//				s.add("@SuppressWarnings(\"unused\")");
+//				s.add("VertexClass #schemaVariable# = getDefaultVertexClass();");
+//				code.addNoIndent(s);
+//			} 
+//			else
+				if (!vc.isInternal() && vc.getGraphClass() == gc) {
 				code.addNoIndent(createGraphElementClass(vc, "Vertex"));
 			}
 		}
 		return code;
 	}
+	
+	private CodeBlock createEdgeClasses(GraphClass gc) {
+		CodeList code = new CodeList();
+		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
+			if (!ec.isInternal() && (ec.getGraphClass() == gc)) {
+				code.addNoIndent(createGraphElementClass(ec, "Edge"));
+			}
+		}
+		return code;
+	}
+	
 
 	/**
 	 * Generates the code snippet to create the metaclass gec in the schema as soon as the 
@@ -677,7 +682,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		return code;
 	}
 
-	private CodeBlock createConstraints(AttributedElementClass<?, ?> aec) {
+	private CodeBlock createConstraints(TypedElementClass<?, ?> aec) {
 		CodeList code = new CodeList();
 		for (Constraint constraint : aec.getConstraints()) {
 			addImports("#jgSchemaImplPackage#.ConstraintImpl");

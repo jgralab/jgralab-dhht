@@ -470,4 +470,6 @@ public interface Schema extends Comparable<Schema> {
 
 	public IncidenceClass getDefaultIncidenceClass(Direction dir);
 
+	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
+
 }
