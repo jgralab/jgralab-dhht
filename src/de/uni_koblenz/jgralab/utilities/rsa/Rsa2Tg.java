@@ -118,6 +118,7 @@ import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
@@ -954,7 +955,7 @@ public class Rsa2Tg extends XmlProcessor {
 				handleDefaultValue(xmiId, content.toString().trim());
 			}
 		}
-		AttributedElement elem = idMap.get(xmiId);
+		TypedElement elem = idMap.get(xmiId);
 		if (elem != null) {
 			if (elem instanceof Package) {
 
@@ -1252,12 +1253,12 @@ public class Rsa2Tg extends XmlProcessor {
 	private void attachComments() {
 		System.out.println("Attaching comments to annotated elements...");
 		for (String id : comments.keySet()) {
-			NamedElement annotatedElement = null;
+			NamedElementClass annotatedElement = null;
 			if (domainMap.containsKey(id)) {
 				annotatedElement = domainMap.get(id);
 			} else if (idMap.containsKey(id)) {
 				Vertex v = idMap.get(id);
-				annotatedElement = (NamedElement) v;
+				annotatedElement = (NamedElementClass) v;
 			}
 			if (annotatedElement == null) {
 				System.out
@@ -1311,7 +1312,7 @@ public class Rsa2Tg extends XmlProcessor {
 		// indirect superclass is redefined, this results in a redefines edge to
 		// that incidence class, without replacing a subsets edge.
 
-		for (AttributedElement ae : redefines.getMarkedElements()) {
+		for (TypedElement ae : redefines.getMarkedElements()) {
 			IncidenceClass inc = (IncidenceClass) ae;
 			Set<String> redefinedRolenames = redefines.getMark(inc);
 			for (String rolename : redefinedRolenames) {
@@ -1527,7 +1528,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private Vertex handleClass(String xmiId) throws XMLStreamException {
 
-		AttributedElement ae = idMap.get(xmiId);
+		TypedElement ae = idMap.get(xmiId);
 		VertexClass vc = null;
 		if (ae != null) {
 
@@ -2199,7 +2200,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		for (AttributedElement ae : generalizations.getMarkedElements()) {
+		for (TypedElement ae : generalizations.getMarkedElements()) {
 			AttributedElementClass sub = (AttributedElementClass) ae;
 
 			Set<String> superclasses = generalizations.getMark(sub);

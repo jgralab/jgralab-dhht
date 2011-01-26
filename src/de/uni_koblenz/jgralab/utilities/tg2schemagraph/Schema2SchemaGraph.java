@@ -344,8 +344,8 @@ public class Schema2SchemaGraph {
 	 *            schemaGraph
 	 */
 	private void createComments(
-			de.uni_koblenz.jgralab.schema.NamedElement namedElement,
-			NamedElement gNamedElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass namedElement,
+			NamedElementClass gNamedElement) {
 
 		assert (checkSchemaAndSchemaGraph());
 

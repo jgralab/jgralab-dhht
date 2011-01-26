@@ -40,8 +40,8 @@ import java.util.TreeSet;
 
 import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.M1ClassManager;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -52,7 +52,7 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass,ConcreteInterface>> extends NamedElementImpl
+public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>> extends NamedElementImpl
 		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**

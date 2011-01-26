@@ -78,7 +78,7 @@ import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
@@ -504,7 +504,7 @@ public class GraphIO {
 		}
 	}
 
-	private void writeComments(NamedElement elem, String name)
+	private void writeComments(NamedElementClass elem, String name)
 			throws IOException {
 		if (!elem.getComments().isEmpty()) {
 			write("Comment");
@@ -694,7 +694,7 @@ public class GraphIO {
 		if (subGraph != null) {
 			vCount = 0;
 			eCount = 0;
-			for (AttributedElement ae : subGraph.getMarkedElements()) {
+			for (TypedElement ae : subGraph.getMarkedElements()) {
 				if (ae instanceof Vertex) {
 					vCount++;
 				} else if (ae instanceof Edge) {
@@ -1413,7 +1413,7 @@ public class GraphIO {
 				throw new GraphIOException("Annotated element '" + e.getKey()
 						+ "' not found in schema " + schema.getQualifiedName());
 			}
-			NamedElement el = schema.getNamedElement(e.getKey());
+			NamedElementClass el = schema.getNamedElement(e.getKey());
 			if (el instanceof Domain
 					&& !(el instanceof EnumDomain || el instanceof RecordDomain)) {
 				throw new GraphIOException(

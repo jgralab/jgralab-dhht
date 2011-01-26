@@ -91,7 +91,7 @@ public class AttributedElementCodeGenerator<ConcreteMetaClass extends Attributed
 		interfaces.add(aec.getQualifiedName());
 		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true"
 				: "false");
-		for (AttributedElementClass superClass : attributedElementClass
+		for (AttributedElementClass<?,?> superClass : attributedElementClass
 				.getDirectSuperClasses()) {
 			interfaces.add(superClass.getQualifiedName());
 		}

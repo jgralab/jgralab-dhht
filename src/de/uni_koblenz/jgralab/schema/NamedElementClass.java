@@ -51,7 +51,7 @@ import java.util.List;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface NamedElement extends Comparable<NamedElement> {
+public interface NamedElementClass extends Comparable<NamedElementClass> {
 
 	/**
 	 * Returns the full path to this named element. The filename (simpleName) is
@@ -187,7 +187,7 @@ public interface NamedElement extends Comparable<NamedElement> {
 	public String getQualifiedName();
 
 	/**
-	 * Computes the qualified name of this {@link NamedElement NamedElement}
+	 * Computes the qualified name of this {@link NamedElementClass NamedElement}
 	 * relatively to the given {@link Package Package}.
 	 * 
 	 * <p>

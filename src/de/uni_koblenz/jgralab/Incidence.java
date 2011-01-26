@@ -39,7 +39,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface Incidence {
+public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 
 	/**
 	 * Returns the role of this {@link Incidence}.

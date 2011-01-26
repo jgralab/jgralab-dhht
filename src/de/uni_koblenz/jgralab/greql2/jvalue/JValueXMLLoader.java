@@ -39,9 +39,9 @@ import java.util.Stack;
 import javax.xml.stream.XMLStreamException;
 
 import de.uni_koblenz.ist.utilities.xml.XmlProcessor;
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.JValueLoadException;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -328,7 +328,7 @@ public class JValueXMLLoader extends XmlProcessor implements JValueXMLConstants 
 		}
 
 		// process browsing info
-		AttributedElement browsingInfo = null;
+		TypedElement browsingInfo = null;
 		String vl = getAttribute(ATTR_VERTEX_LINK);
 		if (vl != null) {
 			Graph g = defaultGraph;

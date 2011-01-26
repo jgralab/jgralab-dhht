@@ -38,6 +38,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.FiniteAutomaton;
@@ -60,7 +61,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * This attributedElement holds the information, that can be browsed.
 	 */
-	protected AttributedElement browsingInfo;
+	protected TypedElement browsingInfo;
 
 	/**
 	 * The stored hashCode
@@ -72,7 +73,7 @@ public class JValueImpl implements JValue {
 	 * 
 	 * @see de.uni_koblenz.jgralab.greql2.jvalue.JValue#getBrowsingInfo()
 	 */
-	public AttributedElement getBrowsingInfo() {
+	public TypedElement getBrowsingInfo() {
 		return browsingInfo;
 	}
 
@@ -83,7 +84,7 @@ public class JValueImpl implements JValue {
 	 * de.uni_koblenz.jgralab.greql2.jvalue.JValue#setBrowsingInfo(de.uni_koblenz
 	 * .jgralab.AttributedElement)
 	 */
-	public void setBrowsingInfo(AttributedElement bInfo) {
+	public void setBrowsingInfo(TypedElement bInfo) {
 		storedHashCode = 0;
 		browsingInfo = bInfo;
 	}
@@ -320,7 +321,7 @@ public class JValueImpl implements JValue {
 	 * called type)
 	 */
 	public JValueImpl(AttributedElementClass type,
-			AttributedElement browsingInfo) {
+			TypedElement browsingInfo) {
 		this(type);
 		this.browsingInfo = browsingInfo;
 	}
@@ -405,7 +406,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * constructs a new JValue with encapsulates a TrivalentBoolean value
 	 */
-	public JValueImpl(Boolean b, AttributedElement browsingInfo) {
+	public JValueImpl(Boolean b, TypedElement browsingInfo) {
 		this(b);
 		this.browsingInfo = browsingInfo;
 	}
@@ -473,7 +474,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * constructs a new JValue with encapsulates a Integer or int value
 	 */
-	public JValueImpl(Integer i, AttributedElement browsingInfo) {
+	public JValueImpl(Integer i, TypedElement browsingInfo) {
 		this(i);
 		this.browsingInfo = browsingInfo;
 	}
@@ -490,7 +491,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given Long
 	 */
-	public JValueImpl(Long l, AttributedElement browsingInfo) {
+	public JValueImpl(Long l, TypedElement browsingInfo) {
 		this(l);
 		this.browsingInfo = browsingInfo;
 	}
@@ -533,7 +534,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given Double
 	 */
-	public JValueImpl(Double d, AttributedElement browsingInfo) {
+	public JValueImpl(Double d, TypedElement browsingInfo) {
 		this(d);
 		this.browsingInfo = browsingInfo;
 	}
@@ -578,7 +579,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given String
 	 */
-	public JValueImpl(String s, AttributedElement browsingInfo) {
+	public JValueImpl(String s, TypedElement browsingInfo) {
 		this(s);
 		this.browsingInfo = browsingInfo;
 	}
@@ -619,7 +620,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given String
 	 */
-	public JValueImpl(Enum<?> e, AttributedElement browsingInfo) {
+	public JValueImpl(Enum<?> e, TypedElement browsingInfo) {
 		this(e);
 		this.browsingInfo = browsingInfo;
 	}
@@ -678,7 +679,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given vertex
 	 */
-	public JValueImpl(Vertex vertex, AttributedElement browsingInfo) {
+	public JValueImpl(Vertex vertex, TypedElement browsingInfo) {
 		this(vertex);
 		this.browsingInfo = browsingInfo;
 	}
@@ -716,7 +717,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given edge
 	 */
-	public JValueImpl(Edge edge, AttributedElement browsingInfo) {
+	public JValueImpl(Edge edge, TypedElement browsingInfo) {
 		this(edge);
 		this.browsingInfo = browsingInfo;
 	}
@@ -733,7 +734,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given graph
 	 */
-	public JValueImpl(Graph graph, AttributedElement browsingInfo) {
+	public JValueImpl(Graph graph, TypedElement browsingInfo) {
 		this(graph);
 		this.browsingInfo = browsingInfo;
 	}
@@ -809,7 +810,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * creates a new JValue which encapsulates the given Object
 	 */
-	public JValueImpl(Object o, AttributedElement browsingInfo) {
+	public JValueImpl(Object o, TypedElement browsingInfo) {
 		this(o);
 		this.browsingInfo = browsingInfo;
 	}
@@ -937,7 +938,7 @@ public class JValueImpl implements JValue {
 	/**
 	 * constructs a new invalid JValue. Is only called in subclasses
 	 */
-	public JValueImpl(AbstractGraphMarker<?> t, AttributedElement browsingInfo) {
+	public JValueImpl(AbstractGraphMarker<?> t, TypedElement browsingInfo) {
 		this(t);
 		this.browsingInfo = browsingInfo;
 	}
@@ -1155,7 +1156,7 @@ public class JValueImpl implements JValue {
 	 *            the AttributedElement to set as browsing info
 	 * @return the encapsulated object
 	 */
-	public static JValueImpl fromObject(Object o, AttributedElement browsingInfo) {
+	public static JValueImpl fromObject(Object o, TypedElement browsingInfo) {
 		JValueImpl j = fromObject(o);
 		j.setBrowsingInfo(browsingInfo);
 		return j;

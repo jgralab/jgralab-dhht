@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
@@ -100,7 +101,7 @@ public class IsTree extends Greql2Function {
 		boolean foundOneRoot = false;
 
 		if (subgraph != null) {
-			for (AttributedElement ae : subgraph.getMarkedElements()) {
+			for (TypedElement ae : subgraph.getMarkedElements()) {
 				if (!(ae instanceof Vertex)) {
 					continue;
 				}

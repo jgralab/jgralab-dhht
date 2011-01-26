@@ -1233,13 +1233,13 @@ public class SchemaGraph2XMI {
 	 * @param writer
 	 *            {@link XMLStreamWriter} of the current XMI file
 	 * @param nelement
-	 *            {@link NamedElement} if null <code>references</code> is
+	 *            {@link NamedElementClass} if null <code>references</code> is
 	 *            created otherwise the stereotype <code>keyValue</code>.
 	 * @param keyValue
 	 *            {@link String} the stereotype to be created
 	 * @throws XMLStreamException
 	 */
-	private void createExtension(XMLStreamWriter writer, NamedElement nelement,
+	private void createExtension(XMLStreamWriter writer, NamedElementClass nelement,
 			String keyValue) throws XMLStreamException {
 		// start Extension
 		writer.writeStartElement(XMIConstants4SchemaGraph2XMI.NAMESPACE_XMI,
@@ -1649,11 +1649,11 @@ public class SchemaGraph2XMI {
 	 * @param writer
 	 *            {@link XMLStreamWriter} of the current XMI file
 	 * @param nelement
-	 *            {@link NamedElement} of which the {@link Comment}s should be
+	 *            {@link NamedElementClass} of which the {@link Comment}s should be
 	 *            created
 	 * @throws XMLStreamException
 	 */
-	private void createComments(XMLStreamWriter writer, NamedElement nelement)
+	private void createComments(XMLStreamWriter writer, NamedElementClass nelement)
 			throws XMLStreamException {
 		int uniqueNumber = 0;
 		for (Annotates annotates : nelement.getAnnotatesIncidences()) {
@@ -1676,7 +1676,7 @@ public class SchemaGraph2XMI {
 	 *            {@link String} the id of the created <code>ownedComment</code>
 	 *            tag, which represents <code>comment</code>
 	 * @param annotatedElement
-	 *            {@link String} qualified name of the {@link NamedElement}
+	 *            {@link String} qualified name of the {@link NamedElementClass}
 	 *            which is commented
 	 * @throws XMLStreamException
 	 */

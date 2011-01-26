@@ -41,10 +41,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
 import de.uni_koblenz.ist.utilities.xml.IndentingXMLStreamWriter;
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.JValueVisitorException;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -141,7 +141,7 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 	}
 
 	private void writeBrowsingInfo(JValue v) throws XMLStreamException {
-		AttributedElement bi = v.getBrowsingInfo();
+		TypedElement bi = v.getBrowsingInfo();
 		if (bi == null) {
 			return;
 		}

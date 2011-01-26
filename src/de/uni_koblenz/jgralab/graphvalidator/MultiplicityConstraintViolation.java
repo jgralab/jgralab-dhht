@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.graphvalidator;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 /**
@@ -91,7 +92,7 @@ public class MultiplicityConstraintViolation extends ConstraintViolation {
 		sb.append(message);
 		sb.append(" Offending vertices: ");
 		boolean first = true;
-		for (AttributedElement v : offendingElements) {
+		for (TypedElement v : offendingElements) {
 			if (first) {
 				first = false;
 			} else {

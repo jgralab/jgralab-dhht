@@ -34,8 +34,6 @@ package de.uni_koblenz.jgralab;
 import java.io.IOException;
 
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * Aggregates graphs, edges and vertices.
@@ -46,21 +44,12 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @param ConcreteInterface the non-abstract interface for the instances of this class, e.g. Vertex for a VertexClass
  * 
  */
-public interface AttributedElement<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends Comparable<ConcreteInterface> {
+public interface AttributedElement<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends Comparable<ConcreteInterface>, TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 
 	/**
 	 * @return the corresponding m2-element to this m1-element
 	 */
 	public ConcreteAttributedElementClass getAttributedElementClass();
-
-	/**
-	 * Returns the m1-class of this {@link AttributedElement}.
-	 * 
-	 * @return {@link Class}
-	 */
-	public Class<? extends ConcreteInterface> getM1Class();
-
-	public GraphClass getGraphClass();
 
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException;
@@ -88,11 +77,6 @@ public interface AttributedElement<ConcreteAttributedElementClass extends Attrib
 
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException;
-
-	/**
-	 * @return the schema this AttributedElement belongs to
-	 */
-	public Schema getSchema();
 
 	void initializeAttributesWithDefaultValues();
 }

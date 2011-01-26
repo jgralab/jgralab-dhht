@@ -46,6 +46,7 @@ import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.Greql2Exception;
@@ -325,7 +326,7 @@ public class GraphValidator {
 					bw.append("</td>");
 					bw.append("<td class=\"" + cssClass + "\">");
 					if (ci.getOffendingElements() != null) {
-						for (AttributedElement ae : ci.getOffendingElements()) {
+						for (TypedElement ae : ci.getOffendingElements()) {
 							bw.append(ae.toString());
 							bw.append("<br/>");
 						}

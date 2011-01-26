@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.graphvalidator;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
 
@@ -94,7 +95,7 @@ public class GReQLConstraintViolation extends ConstraintViolation {
 		if (offendingElements != null) {
 			sb.append(" Offending elements: ");
 			boolean first = true;
-			for (AttributedElement ae : offendingElements) {
+			for (TypedElement ae : offendingElements) {
 				if (first) {
 					first = false;
 				} else {

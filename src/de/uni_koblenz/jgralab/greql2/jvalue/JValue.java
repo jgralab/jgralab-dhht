@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.greql2.jvalue;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.FiniteAutomaton;
@@ -45,12 +46,12 @@ public interface JValue extends Comparable<JValue> {
 	/**
 	 * @return the browsing info or null if none exists
 	 */
-	public AttributedElement getBrowsingInfo();
+	public TypedElement getBrowsingInfo();
 
 	/**
 	 * sets the browsing info of this jvalue
 	 */
-	public void setBrowsingInfo(AttributedElement bInfo);
+	public void setBrowsingInfo(TypedElement bInfo);
 
 	/**
 	 * accepts the given visitor to visit this jvalue

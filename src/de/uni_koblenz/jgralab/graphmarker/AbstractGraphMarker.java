@@ -30,13 +30,13 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRevome;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class AbstractGraphMarker<T extends AttributedElement> extends
+public abstract class AbstractGraphMarker<T extends TypedElement> extends
 		GraphStructureChangedAdapterWithAutoRevome {
 	protected final Graph graph;
 

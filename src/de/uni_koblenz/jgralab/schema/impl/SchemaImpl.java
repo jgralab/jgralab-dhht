@@ -89,7 +89,7 @@ import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.ListDomain;
 import de.uni_koblenz.jgralab.schema.LongDomain;
 import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -203,10 +203,10 @@ public class SchemaImpl implements Schema {
 	private String packagePrefix;
 
 	/**
-	 * Maps from simple names to a set of {@link NamedElement}s which have this
+	 * Maps from simple names to a set of {@link NamedElementClass}s which have this
 	 * simple name. Used for creation of unique names.
 	 */
-	private Map<String, Set<NamedElement>> namedElementsBySimpleName = new HashMap<String, Set<NamedElement>>();
+	private Map<String, Set<NamedElementClass>> namedElementsBySimpleName = new HashMap<String, Set<NamedElementClass>>();
 
 	/**
 	 * Maps from qualified name to the {@link Package} with that qualified name.
@@ -222,7 +222,7 @@ public class SchemaImpl implements Schema {
 	/**
 	 * A set of all qualified names known to this schema.
 	 */
-	private Map<String, NamedElement> namedElements = new TreeMap<String, NamedElement>();
+	private Map<String, NamedElementClass> namedElements = new TreeMap<String, NamedElementClass>();
 
 	private BooleanDomain booleanDomain;
 
@@ -340,7 +340,7 @@ public class SchemaImpl implements Schema {
 		packages.put(pkg.getQualifiedName(), pkg);
 	}
 
-	void addNamedElement(NamedElement namedElement) {
+	void addNamedElement(NamedElementClass namedElement) {
 		assert !namedElements.containsKey(namedElement.getQualifiedName()) : "You are trying to add the NamedElement '"
 				+ namedElement.getQualifiedName()
 				+ "' to this Schema, but that does already exist!";
@@ -349,7 +349,7 @@ public class SchemaImpl implements Schema {
 
 		// Check if any element's unique name needs adaptation after addition of
 		// the new named element.
-		Set<NamedElement> elementsWithSameSimpleName = namedElementsBySimpleName
+		Set<NamedElementClass> elementsWithSameSimpleName = namedElementsBySimpleName
 				.get(namedElement.getSimpleName());
 
 		// add element to map
@@ -357,7 +357,7 @@ public class SchemaImpl implements Schema {
 				&& !elementsWithSameSimpleName.isEmpty()) {
 			elementsWithSameSimpleName.add(namedElement);
 		} else {
-			elementsWithSameSimpleName = new TreeSet<NamedElement>();
+			elementsWithSameSimpleName = new TreeSet<NamedElementClass>();
 			elementsWithSameSimpleName.add(namedElement);
 			namedElementsBySimpleName.put(namedElement.getSimpleName(),
 					elementsWithSameSimpleName);
@@ -371,7 +371,7 @@ public class SchemaImpl implements Schema {
 		// create<SimpleName> or getFirst/Next<SimpleName> methods have to be
 		// created.
 		List<AttributedElementClass> aecsWithSameSimpleName = new LinkedList<AttributedElementClass>();
-		for (NamedElement ne : elementsWithSameSimpleName) {
+		for (NamedElementClass ne : elementsWithSameSimpleName) {
 			if (ne instanceof AttributedElementClass) {
 				aecsWithSameSimpleName.add((AttributedElementClass) ne);
 			}
@@ -384,7 +384,7 @@ public class SchemaImpl implements Schema {
 	}
 
 	@Override
-	public NamedElement getNamedElement(String qualifiedName) {
+	public NamedElementClass getNamedElement(String qualifiedName) {
 		return namedElements.get(qualifiedName);
 	}
 

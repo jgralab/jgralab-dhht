@@ -47,7 +47,7 @@ import de.uni_koblenz.jgralab.schema.Domain;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -284,9 +284,9 @@ public class SchemaCompare {
 		}
 	}
 
-	private Set<String> getQNameSet(Set<? extends NamedElement> a) {
+	private Set<String> getQNameSet(Set<? extends NamedElementClass> a) {
 		Set<String> q = new TreeSet<String>();
-		for (NamedElement aec : a) {
+		for (NamedElementClass aec : a) {
 			q.add(aec.getQualifiedName());
 		}
 		return q;

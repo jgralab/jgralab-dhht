@@ -40,13 +40,13 @@ import de.uni_koblenz.jgralab.schema.BasicDomain;
 import de.uni_koblenz.jgralab.schema.CollectionDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public abstract class NamedElementImpl implements NamedElement {
+public abstract class NamedElementImpl implements NamedElementClass {
 
 	/**
 	 * The package containing this named element. <code>null</code> if this
@@ -393,7 +393,7 @@ public abstract class NamedElementImpl implements NamedElement {
 	}
 
 	@Override
-	public int compareTo(NamedElement other) {
+	public int compareTo(NamedElementClass other) {
 		return this.qualifiedName.compareTo(other.getQualifiedName());
 	}
 

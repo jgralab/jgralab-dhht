@@ -451,7 +451,7 @@ public interface Schema extends Comparable<Schema> {
 	 *            the qualified name of the desired element
 	 * @return the corresponding NamedElement, or null if no such element exists
 	 */
-	public NamedElement getNamedElement(String qualifiedName);
+	public NamedElementClass getNamedElement(String qualifiedName);
 
 	/**
 	 * Sets the schema to allow lowercase enum constants

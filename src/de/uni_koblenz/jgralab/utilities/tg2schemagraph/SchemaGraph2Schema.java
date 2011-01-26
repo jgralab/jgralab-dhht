@@ -536,7 +536,7 @@ public class SchemaGraph2Schema {
 	 * @param gNamedElement
 	 * @return String array of all comments
 	 */
-	private String[] createComments(NamedElement gNamedElement) {
+	private String[] createComments(NamedElementClass gNamedElement) {
 
 		// create array of all comment Strings
 		String[] comments = new String[gNamedElement.getDegree(Annotates.class)];

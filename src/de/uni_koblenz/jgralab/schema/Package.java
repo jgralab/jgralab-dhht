@@ -40,7 +40,7 @@ import java.util.Map;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface Package extends NamedElement {
+public interface Package extends NamedElementClass {
 
 	/*
 	 * Touch and die!

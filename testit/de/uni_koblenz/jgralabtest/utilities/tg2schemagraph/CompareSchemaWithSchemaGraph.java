@@ -280,8 +280,8 @@ public class CompareSchemaWithSchemaGraph {
 	}
 
 	private void compareNamedElement(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 
 		compareQualifiedName(element, gElement);
 
@@ -289,16 +289,16 @@ public class CompareSchemaWithSchemaGraph {
 	}
 
 	private void compareQualifiedName(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 		// Comparison of the QualifiedName
 		assertEquals("Both Package objects have a different name.", element
 				.getQualifiedName(), gElement.get_qualifiedName());
 	}
 
 	private void compareComments(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 
 		List<String> comments = element.getComments();
 		List<String> gComments = retrieveComments(gElement);
@@ -307,7 +307,7 @@ public class CompareSchemaWithSchemaGraph {
 		gComments.containsAll(comments);
 	}
 
-	private List<String> retrieveComments(NamedElement gElement) {
+	private List<String> retrieveComments(NamedElementClass gElement) {
 		List<String> gComments = new ArrayList<String>();
 
 		Annotates annotates = gElement.getFirstAnnotatesIncidence();

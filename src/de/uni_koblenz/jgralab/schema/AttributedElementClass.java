@@ -31,12 +31,10 @@
 
 package de.uni_koblenz.jgralab.schema;
 
-import java.util.Set;
 import java.util.SortedSet;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**
  * This is the base class of any <code>GraphClass</code>/
@@ -58,7 +56,7 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface AttributedElementClass<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>> extends NamedElement {
+public interface AttributedElementClass<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>> extends NamedElementClass, TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
 	 * Adds a new attribute <code>anAttribute</code> to this element.
@@ -129,41 +127,7 @@ public interface AttributedElementClass<ConcreteMetaClass extends AttributedElem
 	public void addAttribute(String name, Domain domain,
 			String defaultValueAsString);
 
-	/**
-	 * Adds a {@link Constraint} to this attributed element. Constraints are
-	 * greql2 predicates, that can be used to validate the graph.
-	 * 
-	 * <p>
-	 * <b>Note:</b> Constraints are not inheritable.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>attrElement.addConstraint(constr);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>attrElement'.getConstraints().size >= 0</code></li>
-	 * <li>
-	 * <code>attrElement'.getConstraints().size() == attrElement.getConstraints().size() + 1</code>
-	 * , if for each constraint <code>c</code> of <code>attrElement</code> the
-	 * following condition holds: <code>!constr.equals(c)</code></li>
-	 * <li><code>attrElement'.getConstraints()</code> does not contain any
-	 * inherited constraints from possible superclasses of
-	 * <code>attrElement</code></li>
-	 * </ul>
-	 * </p>
-	 * </p>
-	 * 
-	 * @param constraint
-	 *            a {@link Constraint} to add to this element
-	 */
-	public void addConstraint(Constraint constraint);
+
 
 	/**
 	 * Checks if this element or a superclass has an attribute with the given
@@ -191,63 +155,7 @@ public interface AttributedElementClass<ConcreteMetaClass extends AttributedElem
 	 */
 	public boolean containsAttribute(String name);
 
-	/**
-	 * Returns all direct and indirect subclasses of this element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>subClasses = attrElement.getAllSubClasses();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>subClasses != null</code></li>
-	 * <li><code>subClasses.size() >= 0</code></li>
-	 * <li><code>subClasses</code> holds all of <code>attrElement´s</code>
-	 * direct and indirect subclasses</li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @return a Set of all direct and indirect subclasses of this element
-	 */
-	public Set<ConcreteMetaClass> getAllSubClasses();
-
-	/**
-	 * Lists all direct and indirect superclasses of this element.
-	 * 
-	 * <p>
-	 * <b>Note:</b> Each instance of a subclass of
-	 * <code>AttributedElementClass</code> has a dedicated default superclass at
-	 * the top of its inheritance hierarchy. Please consult the specifications
-	 * of the used subclass for details.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code>superClasses = attrElement.getAllSuperClasses();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>superClasses != null </code></li>
-	 * <li><code>superClasses.size() >= 0</code></li>
-	 * <li><code>superClasses</code> holds all of <code>attrElement´s</code>
-	 * direct and indirect superclasses (including the default superclass)</li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @return a Set of all direct and indirect superclasses of this element
-	 */
-	public Set<ConcreteMetaClass> getAllSuperClasses();
+	
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -332,146 +240,7 @@ public interface AttributedElementClass<ConcreteMetaClass extends AttributedElem
 	 */
 	public SortedSet<Attribute> getAttributeList();
 
-	/**
-	 * Returns this element's Set of {@link Constraint}s.
-	 * 
-	 * <p>
-	 * Constraints are greql2 predicates, that can be used to validate the
-	 * graph. Constraints are bound to a specific attributed element and are not
-	 * inheritable.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>constrs = attrElement.getConstraints();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>constrs != null</code></li>
-	 * <li><code>constrs.size() >= 0</code></li>
-	 * <li><code>constrs</code> contains all of this element's constraints</li>
-	 * <li><code>constrs</code> does not contain any inherited constraint</li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @return a Set of all {@link Constraint}s of this attributed element
-	 */
-	public Set<Constraint> getConstraints();
-
-	/**
-	 * Lists all direct subclasses of this element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code>subClasses = attrElement.getDirectSubClasses();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>subClasses != null</code></li>
-	 * <li><code>subClasses.size() >= 0</code></li>
-	 * <li><code>subClasses</code> holds all of <code>attrElement´s</code>
-	 * direct subclasses</li>
-	 * <li><code>subClasses</code> does not hold any of
-	 * <code>attrElement´s</code> inherited subclasses</li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @return a Set of all direct subclasses of this element
-	 */
-	public Set<ConcreteMetaClass> getDirectSubClasses();
-
-	/**
-	 * Returns all direct superclasses of this element.
-	 * 
-	 * <p>
-	 * <b>Note:</b> Each instance of a subclass of
-	 * <code>AttributedElementClass</code> has one default direct superclass.
-	 * Please consult the specifications of the used subclass for details.
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code>superClasses = attrElement.getDirectSuperClasses();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b>
-	 * <ul>
-	 * <li><code>superClasses != null</code></li>
-	 * <li><code>superClasses.size() >= 0</code></li>
-	 * <li><code>superClasses</code> holds all of <code>attrElement´s</code>
-	 * direct superclasses (including the default superclass)</li>
-	 * <li><code>superClasses</code> does not hold any of
-	 * <code>attrElement´s</code> inherited superclasses
-	 * </ul>
-	 * </p>
-	 * 
-	 * @return a Set of all direct superclasses of this element
-	 */
-	public Set<ConcreteMetaClass> getDirectSuperClasses();
-
-	/**
-	 * Returns the M1 interface class for this attributed element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>m1Class = attrElement.getM1Class();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> not yet defined
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> not yet defined
-	 * </p>
-	 * 
-	 * @return the M1 interface class for this element
-	 * 
-	 * @throws M1ClassAccessException
-	 *             if reflection exceptions occur.
-	 */
-	public Class<? extends ConcreteInterface> getM1Class();
-
-	/**
-	 * Returns the M1 implementation class for this attributed element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>m1ImplClass = attrElement.getM1Class();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> not yet defined
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> not yet defined
-	 * </p>
-	 * 
-	 * @return the M1 implementation class for this element
-	 * 
-	 * @throws M1ClassAccessException
-	 *             if:
-	 *             <ul>
-	 *             <li>this element is abstract</li>
-	 *             <li>there are reflection exceptions</li>
-	 *             </ul>
-	 */
-	public Class<? extends ConcreteInterface> getM1ImplementationClass();
+	
 
 	/**
 	 * Fetches the attribute with the specified <code>name</code> from this
@@ -576,13 +345,7 @@ public interface AttributedElementClass<ConcreteMetaClass extends AttributedElem
 	 */
 	public SortedSet<Attribute> getOwnAttributeList();
 
-	/**
-	 * Retrieves the name used for elements of this AttributedElementClass in
-	 * files created by the code generator.
-	 * 
-	 * @return the variable name.
-	 */
-	public String getVariableName();
+
 
 	/**
 	 * Checks if this element has direct or inherited attributes.
@@ -644,254 +407,6 @@ public interface AttributedElementClass<ConcreteMetaClass extends AttributedElem
 	 */
 	public boolean hasOwnAttributes();
 
-	/**
-	 * States if this attributed element is abstract. Abstract elements can´t
-	 * have instances.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>isAbstract = attrElement.isAbstract();</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isAbstract</code> is:
-	 * <ul>
-	 * <li><code>true</code> if <code>attrElement</code> is abstract and
-	 * therefore may not have any instances</li>
-	 * <li>otherwise <code>false</code>
-	 * </ul>
-	 * 
-	 * @return <code>true</code>, if the element is abstract , otherwise
-	 *         <code>false</code>
-	 */
-	public boolean isAbstract();
-
-	/**
-	 * Checks if the current element is a direct subclass of another attributed
-	 * element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code> isDirectSubClass = attrElement.isDirectSubClassOf(other);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isDirectSubClass</code> is:
-	 * <ul>
-	 * <li><code>true</code> if the <code>other</code> attributed element is a
-	 * direct superclass of this element</li>
-	 * <li><code>false</code> if one of the following occurs:
-	 * <ul>
-	 * <li><code>attrElement</code> and the given <code>other</code> attributed
-	 * element are the same</li>
-	 * <li>the <code>other</code> attributed element is not a direct superclass
-	 * of <code>attrElement</code></li>
-	 * <li>the <code>other</code> attributed element has no relation with
-	 * <code>attrElement</code></li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param anAttributedElementClass
-	 *            the possible superclass of this attributed element
-	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
-	 *         direct subclass of this element, otherwise <code>false</code>
-	 */
-	public boolean isDirectSubClassOf(ConcreteMetaClass anAttributedElementClass);
-
-	/**
-	 * Checks if the current element is a direct superclass of another
-	 * attributed element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code> isDirectSuperClass = attrElement.isDirectSuperClassOf(other);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isDirectSuperClass</code> is:
-	 * <ul>
-	 * <li><code>true</code> if the <code>other</code> attributed element is a
-	 * direct subclass of this element</li>
-	 * <li><code>false</code> if one of the following occurs:
-	 * <ul>
-	 * <li><code>attrElement</code> and the given <code>other</code> attributed
-	 * element are the same</li>
-	 * <li>the <code>other</code> attributed element is not a direct subclass of
-	 * <code>attrElement</code></li>
-	 * <li>the <code>other</code> attributed element has no relation with
-	 * <code>attrElement</code></li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param anAttributedElementClass
-	 *            the possible subclass of this attributed element
-	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
-	 *         direct subclass of this element, otherwise <code>false</code>
-	 */
-	public boolean isDirectSuperClassOf(ConcreteMetaClass anAttributedElementClass);
-
-	/**
-	 * @return true, if this AttributedElementClass is only for internal use
-	 */
-	public boolean isInternal();
-
-	/**
-	 * Checks if the current element is a direct or indirect subclass of another
-	 * attributed element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code> isSubClass = attrElement.isSubClassOf(other);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isSubClass</code> is:
-	 * <ul>
-	 * <li><code>true</code> if the <code>other</code> attributed element is a
-	 * direct or inherited superclass of this element</li>
-	 * <li><code>false</code> if one of the following occurs:
-	 * <ul>
-	 * <li><code>attrElement</code> and the given <code>other</code> attributed
-	 * element are the same</li>
-	 * <li>the <code>other</code> attributed element is not a direct or
-	 * inherited superclass of <code>attrElement</code></li>
-	 * <li>the <code>other</code> attributed element has no relation with
-	 * <code>attrElement</code></li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param anAttributedElementClass
-	 *            the possible superclass of this attributed element
-	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
-	 *         direct or indirect subclass of this element, otherwise
-	 *         <code>false</code>
-	 */
-	public boolean isSubClassOf(ConcreteMetaClass anAttributedElementClass);
-
-	/**
-	 * Checks if the current element is a direct or inherited superclass of
-	 * another attributed element.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code> isSuperClass = attrElement.isSuperClass(other);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isSuperClass</code> is:
-	 * <ul>
-	 * <li><code>true</code> if the <code>other</code> attributed element is a
-	 * direct or inherited subclass of this element</li>
-	 * <li><code>false</code> if one of the following occurs:
-	 * <ul>
-	 * <li><code>attrElement</code> and the given <code>other</code> attributed
-	 * element are the same</li>
-	 * <li>the <code>other</code> attributed element is not a direct or indirect
-	 * subclass of <code>attrElement</code></li>
-	 * <li>the <code>other</code> attributed element has no relation with
-	 * <code>attrElement</code></li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param anAttributedElementClass
-	 *            the possible subclass of this attributed element
-	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
-	 *         direct or indirect subclass of this element, otherwise
-	 *         <code>false</code>
-	 */
-	public boolean isSuperClassOf(ConcreteMetaClass anAttributedElementClass);
-
-	/**
-	 * Tests if the current element equals another attributed element or is
-	 * another attributes element´s direct or indirect superclass.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b>
-	 * <code> isSuperClassOrEquals = attrElement.isSuperClassOfOrEquals(other);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>isSuperClassOrEquals</code> is:
-	 * <ul>
-	 * <li><code>true</code> if one of the following occurs:
-	 * <ul>
-	 * <li>the <code>other</code> attributed element is a direct or indirect
-	 * subclass of this element</li>
-	 * <li><code>attrElement == other</code></li>
-	 * </ul>
-	 * </li>
-	 * <li><code>false</code> if the <code>other</code> attributed element has
-	 * no relation with <code>attrElement</code> (not the same, not a direct or
-	 * indirect subclass)</li>
-	 * </ul>
-	 * </p>
-	 * 
-	 * @param anAttributedElementClass
-	 *            the possible subclass of this attributed element
-	 * @return <code>true</code> if <code>anAttributedElementClass</code> is a
-	 *         direct or indirect subclass of this element or <code>this</code>
-	 *         attributed element itself, otherwise <code>false</code>
-	 */
-	public boolean isSuperClassOfOrEquals(ConcreteMetaClass anAttributedElementClass);
-
-	/**
-	 * Defines if this attributed element is abstract. Abstract elements can´t
-	 * have instances.
-	 * 
-	 * <p>
-	 * <b>Pattern:</b> <code>attrElement.setAbstract(value);</code>
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Preconditions:</b> none
-	 * </p>
-	 * 
-	 * <p>
-	 * <b>Postconditions:</b> <code>attrElement'</code> is abstract and no new
-	 * instances can be created
-	 * </p>
-	 * 
-	 * @param isAbstract
-	 *            the new value defining the state of this attributed element
-	 */
-	public void setAbstract(boolean isAbstract);
 	
-	/**
-	 * 
-	 * @return the default class of type ConcreteMetaClass of the schema
-	 *         e.g., for an EdgeClass the DefaultEdgeClass is returned
-	 */
-	public abstract ConcreteMetaClass getDefaultClass();
 
 }

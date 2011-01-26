@@ -260,7 +260,7 @@ public class SchemaGraph2Tg {
 		currentPackageName = pkg.get_qualifiedName();
 	}
 
-	private void printComments(NamedElement ne) {
+	private void printComments(NamedElementClass ne) {
 		for (Annotates ann : ne.getAnnotatesIncidences(EdgeDirection.IN)) {
 			Comment com = (Comment) ann.getThat();
 			println(COMMENT, SPACE, ne.get_qualifiedName(), SPACE,
