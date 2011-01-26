@@ -76,8 +76,9 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
@@ -407,48 +408,59 @@ public class GraphIO {
 				if (ec.isAbstract()) {
 					write("abstract ");
 				}
-				write("EdgeClass");
+				if (ec.isBinary()) {
+					write("BinaryEdgeClass");
+				} else {
+					write("EdgeClass");
+				}
 				space();
 				writeIdentifier(ec.getSimpleName());
 				writeHierarchy(pkg, ec);
 
-				// from (min,max) rolename
-				write(" from");
-				space();
-				writeIdentifier(ec.getFrom().getVertexClass()
-						.getQualifiedName(pkg));
-				write(" (");
-				write(ec.getFrom().getMin() + ",");
-				if (ec.getFrom().getMax() == Integer.MAX_VALUE) {
-					write("*)");
-				} else {
-					write(ec.getFrom().getMax() + ")");
-				}
-
-				if (!ec.getFrom().getRolename().equals("")) {
-					write(" role");
-					space();
-					writeIdentifier(ec.getFrom().getRolename());
-					String delim = " redefines";
-					for (String redefinedRolename : ec.getFrom()
-							.getRedefinedRoles()) {
-						write(delim);
-						delim = ",";
+				// write from incidence classes
+				for (IncidenceClass ic : ec.getIncidenceClasses()) {
+					if (ic.getDirection() == Direction.VERTEX_TO_EDGE) {
+						write(" from");
 						space();
-						writeIdentifier(redefinedRolename);
-					}
-				}
+						writeIdentifier(ic.getVertexClass().getQualifiedName(
+								pkg));
+						write(" role");
+						space();
+						writeIdentifier(ic.getRolename());
+						write(" (");
+						write(ec.getFrom().getMin() + ",");
+						if (ec.getFrom().getMax() == Integer.MAX_VALUE) {
+							write("*)");
+						} else {
+							write(ec.getFrom().getMax() + ")");
+						}
 
-				switch (ec.getFrom().getAggregationKind()) {
-				case NONE:
-					// do nothing
-					break;
-				case SHARED:
-					write(" aggregation shared");
-					break;
-				case COMPOSITE:
-					write(" aggregation composite");
-					break;
+						if (!ec.getFrom().getRolename().equals("")) {
+							write(" role");
+							space();
+							writeIdentifier(ec.getFrom().getRolename());
+							String delim = " redefines";
+							for (String redefinedRolename : ec.getFrom()
+									.getRedefinedRoles()) {
+								write(delim);
+								delim = ",";
+								space();
+								writeIdentifier(redefinedRolename);
+							}
+						}
+
+						switch (ec.getFrom().getAggregationKind()) {
+						case NONE:
+							// do nothing
+							break;
+						case SHARED:
+							write(" aggregation shared");
+							break;
+						case COMPOSITE:
+							write(" aggregation composite");
+							break;
+						}
+					}
 				}
 
 				// to (min,max) rolename
@@ -501,7 +513,7 @@ public class GraphIO {
 		}
 	}
 
-	private void writeComments(NamedElement elem, String name)
+	private void writeComments(NamedElementClass elem, String name)
 			throws IOException {
 		if (!elem.getComments().isEmpty()) {
 			write("Comment");
@@ -691,7 +703,7 @@ public class GraphIO {
 		if (subGraph != null) {
 			vCount = 0;
 			eCount = 0;
-			for (AttributedElement ae : subGraph.getMarkedElements()) {
+			for (AttributedElement<?, ?> ae : subGraph.getMarkedElements()) {
 				if (ae instanceof Vertex) {
 					vCount++;
 				} else if (ae instanceof Edge) {
@@ -715,7 +727,8 @@ public class GraphIO {
 				continue;
 			}
 			vId = nextV.getId();
-			AttributedElementClass aec = nextV.getAttributedElementClass();
+			AttributedElementClass<?, ?> aec = nextV
+					.getAttributedElementClass();
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
 				write("Package");
@@ -766,7 +779,8 @@ public class GraphIO {
 				continue;
 			}
 			eId = nextE.getId();
-			AttributedElementClass aec = nextE.getAttributedElementClass();
+			AttributedElementClass<?, ?> aec = nextE
+					.getAttributedElementClass();
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
 				write("Package");
@@ -806,10 +820,11 @@ public class GraphIO {
 		write("DHHTGraph " + TGFILE_VERSION + ";\n");
 	}
 
-	private void writeHierarchy(Package pkg, AttributedElementClass aec)
+	private void writeHierarchy(Package pkg, AttributedElementClass<?, ?> aec)
 			throws IOException {
 		String delim = ":";
-		for (AttributedElementClass superClass : aec.getDirectSuperClasses()) {
+		for (AttributedElementClass<?, ?> superClass : aec
+				.getDirectSuperClasses()) {
 			if (!superClass.isInternal()) {
 				write(delim);
 				space();
@@ -819,7 +834,19 @@ public class GraphIO {
 		}
 	}
 
-	private void writeAttributes(Package pkg, AttributedElementClass aec)
+	private void writeHierarchy(IncidenceClass ic) throws IOException {
+		String delim = ":";
+		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
+			if (!superClass.isInternal()) {
+				write(delim);
+				space();
+				writeIdentifier(superClass.getRolename());
+				delim = ",";
+			}
+		}
+	}
+
+	private void writeAttributes(Package pkg, AttributedElementClass<?, ?> aec)
 			throws IOException {
 		if (aec.hasOwnAttributes()) {
 			write(" {");
@@ -1702,7 +1729,7 @@ public class GraphIO {
 	}
 
 	private void addAttributes(List<AttributeData> attributesData,
-			AttributedElementClass aec) throws GraphIOException {
+			AttributedElementClass<?, ?> aec) throws GraphIOException {
 		for (AttributeData ad : attributesData) {
 			aec.addAttribute(ad.name, attrDomain(ad.domainDescription),
 					ad.defaultValue);
@@ -2122,7 +2149,7 @@ public class GraphIO {
 
 	private void buildVertexClassHierarchy() throws GraphIOException,
 			SchemaException {
-		AttributedElementClass aec;
+		AttributedElementClass<?, ?> aec;
 		VertexClass superClass;
 
 		for (Entry<String, List<GraphElementClassData>> gcElements : vertexClassBuffer
@@ -2153,7 +2180,7 @@ public class GraphIO {
 
 	private void buildEdgeClassHierarchy() throws GraphIOException,
 			SchemaException {
-		AttributedElementClass aec;
+		AttributedElementClass<?, ?> aec;
 		EdgeClass superClass;
 
 		for (Entry<String, List<GraphElementClassData>> gcElements : edgeClassBuffer
