@@ -99,7 +99,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 	 *            the class to add as superclass
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void addSuperClass(ConcreteMetaClass superClass) {
+	public void addSuperClass(ConcreteMetaClass superClass) {
 		if ((superClass == this) || (superClass == null)) {
 			return;
 		}
