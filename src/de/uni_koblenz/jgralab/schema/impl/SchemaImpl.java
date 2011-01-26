@@ -52,8 +52,8 @@ import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
 import javax.tools.JavaFileObject.Kind;
+import javax.tools.ToolProvider;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
@@ -92,11 +92,11 @@ import de.uni_koblenz.jgralab.schema.MapDomain;
 import de.uni_koblenz.jgralab.schema.NamedElement;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.schema.StringDomain;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
@@ -165,20 +165,20 @@ public class SchemaImpl implements Schema {
 	 */
 	private boolean allowLowercaseEnumConstants = true;
 
-	private EdgeClass defaultEdgeClass;
+	private final EdgeClass defaultEdgeClass;
 
-	private GraphClass defaultGraphClass;
+	private final GraphClass defaultGraphClass;
 
-	private Package defaultPackage;
+	private final Package defaultPackage;
 
-	private VertexClass defaultVertexClass;
+	private final VertexClass defaultVertexClass;
 
 	protected CodeGeneratorConfiguration config;
 
 	/**
 	 * Maps from qualified name to the {@link Domain}.
 	 */
-	private Map<String, Domain> domains = new HashMap<String, Domain>();
+	private final Map<String, Domain> domains = new HashMap<String, Domain>();
 
 	/**
 	 * Holds a reference to the {@link GraphClass} of this schema (not the
@@ -195,34 +195,34 @@ public class SchemaImpl implements Schema {
 	/**
 	 * The name of this schema without the package prefix.
 	 */
-	private String name;
+	private final String name;
 
 	/**
 	 * The package prefix of this schema.
 	 */
-	private String packagePrefix;
+	private final String packagePrefix;
 
 	/**
 	 * Maps from simple names to a set of {@link NamedElement}s which have this
 	 * simple name. Used for creation of unique names.
 	 */
-	private Map<String, Set<NamedElement>> namedElementsBySimpleName = new HashMap<String, Set<NamedElement>>();
+	private final Map<String, Set<NamedElement>> namedElementsBySimpleName = new HashMap<String, Set<NamedElement>>();
 
 	/**
 	 * Maps from qualified name to the {@link Package} with that qualified name.
 	 */
-	private Map<String, Package> packages = new TreeMap<String, Package>();
+	private final Map<String, Package> packages = new TreeMap<String, Package>();
 
 	/**
 	 * The qualified name of this schema, that is {@link #packagePrefix} DOT
 	 * {@link #name}
 	 */
-	private String qualifiedName;
+	private final String qualifiedName;
 
 	/**
 	 * A set of all qualified names known to this schema.
 	 */
-	private Map<String, NamedElement> namedElements = new TreeMap<String, NamedElement>();
+	private final Map<String, NamedElement> namedElements = new TreeMap<String, NamedElement>();
 
 	private BooleanDomain booleanDomain;
 
@@ -370,14 +370,14 @@ public class SchemaImpl implements Schema {
 		// We don't have to worry about domains and packages, cause for those no
 		// create<SimpleName> or getFirst/Next<SimpleName> methods have to be
 		// created.
-		List<AttributedElementClass> aecsWithSameSimpleName = new LinkedList<AttributedElementClass>();
+		List<AttributedElementClass<?, ?>> aecsWithSameSimpleName = new LinkedList<AttributedElementClass<?, ?>>();
 		for (NamedElement ne : elementsWithSameSimpleName) {
 			if (ne instanceof AttributedElementClass) {
-				aecsWithSameSimpleName.add((AttributedElementClass) ne);
+				aecsWithSameSimpleName.add((AttributedElementClass<?, ?>) ne);
 			}
 		}
 		if (aecsWithSameSimpleName.size() >= 2) {
-			for (AttributedElementClass other : aecsWithSameSimpleName) {
+			for (AttributedElementClass<?, ?> other : aecsWithSameSimpleName) {
 				((NamedElementImpl) other).changeUniqueName();
 			}
 		}
@@ -410,14 +410,16 @@ public class SchemaImpl implements Schema {
 		}
 
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
-			
+
 			CodeGenerator codeGen;
-			if (edgeClass.isBinary())
-				codeGen = new BinaryEdgeCodeGenerator((BinaryEdgeClass)edgeClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-			else 
-				codeGen = new EdgeCodeGenerator(edgeClass,
-						packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			if (edgeClass.isBinary()) {
+				codeGen = new BinaryEdgeCodeGenerator(
+						(BinaryEdgeClass) edgeClass, packagePrefix,
+						GRAPH_IMPLEMENTATION_PACKAGE, config);
+			} else {
+				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
+						GRAPH_IMPLEMENTATION_PACKAGE, config);
+			}
 			javaSources.addAll(codeGen.createJavaSources());
 
 		}
@@ -492,15 +494,17 @@ public class SchemaImpl implements Schema {
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
 			CodeGenerator codeGen;
 
-			if (edgeClass.isBinary())
-				codeGen = new BinaryEdgeCodeGenerator((BinaryEdgeClass)edgeClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-			else 
-				codeGen = new EdgeCodeGenerator(edgeClass,
-						packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
-			
-			codeGen.createFiles(pathPrefix);			
-			
+			if (edgeClass.isBinary()) {
+				codeGen = new BinaryEdgeCodeGenerator(
+						(BinaryEdgeClass) edgeClass, packagePrefix,
+						GRAPH_IMPLEMENTATION_PACKAGE, config);
+			} else {
+				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
+						GRAPH_IMPLEMENTATION_PACKAGE, config);
+			}
+
+			codeGen.createFiles(pathPrefix);
+
 			if (progressFunction != null) {
 				schemaElements++;
 				currentCount++;
@@ -641,7 +645,7 @@ public class SchemaImpl implements Schema {
 
 	@Override
 	public Attribute createAttribute(String name, Domain dom,
-			AttributedElementClass aec, String defaultValueAsString) {
+			AttributedElementClass<?, ?> aec, String defaultValueAsString) {
 		return new AttributeImpl(name, dom, aec, defaultValueAsString);
 	}
 
@@ -873,7 +877,8 @@ public class SchemaImpl implements Schema {
 	}
 
 	@Override
-	public AttributedElementClass getAttributedElementClass(String qualifiedName) {
+	public AttributedElementClass<?, ?> getAttributedElementClass(
+			String qualifiedName) {
 		if (graphClass == null) {
 			return null;
 		} else if (graphClass.getQualifiedName().equals(qualifiedName)) {
@@ -918,7 +923,7 @@ public class SchemaImpl implements Schema {
 	private Method getCreateMethod(String className, String graphClassName,
 			Class<?>[] signature, ImplementationType implementationType) {
 		Class<? extends Graph> m1Class = null;
-		AttributedElementClass aec = null;
+		AttributedElementClass<?, ?> aec = null;
 		try {
 			m1Class = getGraphClassImpl(implementationType);
 			if (className.equals(graphClassName)) {
@@ -1012,7 +1017,7 @@ public class SchemaImpl implements Schema {
 		// from-class. Those subclasses are unknown in this method. Therefore,
 		// we look for a method with correct name and 3 parameters
 		// (int, vertex, Vertex).
-		AttributedElementClass aec = getAttributedElementClass(edgeClassName);
+		AttributedElementClass<?, ?> aec = getAttributedElementClass(edgeClassName);
 		if ((aec == null) || !(aec instanceof EdgeClass)) {
 			throw new SchemaException(
 					"There's no EdgeClass with qualified name " + edgeClassName

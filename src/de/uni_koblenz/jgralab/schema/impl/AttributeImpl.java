@@ -59,7 +59,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 	/**
 	 * the owning AttributedElementClass of the atribute
 	 */
-	private final AttributedElementClass aec;
+	private final AttributedElementClass<?, ?> aec;
 
 	/**
 	 * defines a total order of all attributes
@@ -91,7 +91,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 	 *            Attribute, or null if no default value shall be specified.
 	 */
 	public AttributeImpl(String name, Domain domain,
-			AttributedElementClass aec, String defaultValue) {
+			AttributedElementClass<?, ?> aec, String defaultValue) {
 		this.name = name;
 		this.domain = domain;
 		this.aec = aec;
@@ -127,7 +127,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 		return name;
 	}
 
-	public AttributedElementClass getAttributedElementClass() {
+	public AttributedElementClass<?, ?> getAttributedElementClass() {
 		return aec;
 	}
 
@@ -170,13 +170,11 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 	}
 
 	@Override
-	public void setDefaultTransactionValue(AttributedElement element)
+	public void setDefaultTransactionValue(AttributedElement<?, ?> element)
 			throws GraphIOException {
 		if (defaultValueAsString != null) {
 			if (!defaultTransactionValueComputed) {
-				element
-						.readAttributeValueFromString(name,
-								defaultValueAsString);
+				element.readAttributeValueFromString(name, defaultValueAsString);
 				if (!domain.isComposite()) {
 					defaultTransactionValue = element.getAttribute(name);
 					defaultTransactionValueComputed = true;
@@ -188,13 +186,11 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 	}
 
 	@Override
-	public void setDefaultValue(AttributedElement element)
+	public void setDefaultValue(AttributedElement<?, ?> element)
 			throws GraphIOException {
 		if (!defaultValueComputed) {
 			if (defaultValueAsString != null) {
-				element
-						.readAttributeValueFromString(name,
-								defaultValueAsString);
+				element.readAttributeValueFromString(name, defaultValueAsString);
 			}
 			defaultValue = element.getAttribute(name);
 			defaultValueComputed = true;

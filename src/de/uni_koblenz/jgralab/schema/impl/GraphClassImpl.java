@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.schema.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,14 +49,14 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass, Graph> implements
-		GraphClass {
+public final class GraphClassImpl extends
+		AttributedElementClassImpl<GraphClass, Graph> implements GraphClass {
 
-	private Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
+	private final Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
 
-	private Map<String, GraphElementClass<?, ?>> graphElementClasses = new HashMap<String, GraphElementClass<?,?>>();
+	private final Map<String, GraphElementClass<?, ?>> graphElementClasses = new HashMap<String, GraphElementClass<?, ?>>();
 
-	private Map<String, VertexClass> vertexClasses = new HashMap<String, VertexClass>();
+	private final Map<String, VertexClass> vertexClasses = new HashMap<String, VertexClass>();
 
 	static GraphClass createDefaultGraphClass(SchemaImpl schema) {
 		assert schema.getDefaultPackage() != null : "DefaultPackage has not yet been created!";
@@ -125,6 +124,7 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		vertexClasses.put(vc.getQualifiedName(), vc);
 	}
 
+	@Override
 	public void addSuperClass(GraphClass superClass) {
 		// only the internal abstract base class "Graph" can be a superclass
 		if (!superClass.getQualifiedName().equals(
@@ -152,7 +152,8 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 	@Override
 	public EdgeClass createEdgeClass(String qualifiedName) {
 		String[] qn = SchemaImpl.splitQualifiedName(qualifiedName);
-		Package parent = ((SchemaImpl) getSchema()).createPackageWithParents(qn[0]);
+		Package parent = ((SchemaImpl) getSchema())
+				.createPackageWithParents(qn[0]);
 		EdgeClassImpl ec = new EdgeClassImpl(qn[1], parent, this);
 		if (!ec.getQualifiedName().equals(EdgeClass.DEFAULTEDGECLASS_NAME)) {
 			EdgeClass s = getSchema().getDefaultEdgeClass();
@@ -171,9 +172,8 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		return vc;
 	}
 
-
 	@Override
-	public boolean knows(GraphElementClass<?,?>  aGraphElementClass) {
+	public boolean knows(GraphElementClass<?, ?> aGraphElementClass) {
 		if (graphElementClasses.containsKey(aGraphElementClass
 				.getQualifiedName())) {
 			return true;
@@ -190,7 +190,7 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 	}
 
 	@Override
-	public GraphElementClass<?,?> getGraphElementClass(String qn) {
+	public GraphElementClass<?, ?> getGraphElementClass(String qn) {
 		if (graphElementClasses.containsKey(qn)) {
 			return graphElementClasses.get(qn);
 		}
@@ -206,18 +206,18 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		}
 		output.append(": \n");
 
-
 		output.append("\n\nGraphElementClasses of '" + getQualifiedName()
 				+ "':\n\n");
-		for (GraphElementClass<?,?> gc : graphElementClasses.values())  {
-				output.append(gc.toString() + "\n");
+		for (GraphElementClass<?, ?> gc : graphElementClasses.values()) {
+			output.append(gc.toString() + "\n");
 		}
 		return output.toString();
 	}
 
 	@Override
 	public List<GraphElementClass<?, ?>> getGraphElementClasses() {
-		return (List<GraphElementClass<?, ?>>) new ArrayList<GraphElementClass<?,?>>(graphElementClasses.values());
+		return new ArrayList<GraphElementClass<?, ?>>(
+				graphElementClasses.values());
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		if (ec != null) {
 			return ec;
 		}
-		for (AttributedElementClass superclass : directSuperClasses) {
+		for (AttributedElementClass<?, ?> superclass : directSuperClasses) {
 			ec = ((GraphClass) superclass).getEdgeClass(qn);
 			if (ec != null) {
 				return ec;
@@ -263,15 +263,16 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 	public int getVertexClassCount() {
 		return vertexClasses.size();
 	}
-	
-
 
 	@Override
 	public IncidenceClass createIncidenceClass(EdgeClass edgeClass,
-			VertexClass vertexClass, String rolename, boolean isAbstract, 
-			int minEdgesAtVertex, int maxEdgesAtVertex,
-			int minVerticesAtEdge, int maxVerticesAtEdge, Direction dir, IncidenceType kind) {
-		IncidenceClass incClass = new IncidenceClassImpl(edgeClass, vertexClass, rolename, isAbstract, minEdgesAtVertex, maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge, dir, kind);
+			VertexClass vertexClass, String rolename, boolean isAbstract,
+			int minEdgesAtVertex, int maxEdgesAtVertex, int minVerticesAtEdge,
+			int maxVerticesAtEdge, Direction dir, IncidenceType kind) {
+		IncidenceClass incClass = new IncidenceClassImpl(edgeClass,
+				vertexClass, rolename, isAbstract, minEdgesAtVertex,
+				maxEdgesAtVertex, minVerticesAtEdge, maxVerticesAtEdge, dir,
+				kind);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
 		return null;
@@ -282,5 +283,4 @@ public final class GraphClassImpl extends AttributedElementClassImpl<GraphClass,
 		return getSchema().getDefaultGraphClass();
 	}
 
-	
 }

@@ -38,8 +38,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.sun.xml.internal.ws.api.addressing.WSEndpointReference.Metadata;
-
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -52,8 +50,9 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass,ConcreteInterface>> extends NamedElementImpl
-		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
+public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>>
+		extends NamedElementImpl implements
+		AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
 	 * a list of attributes which belongs to the m2 element
@@ -144,7 +143,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 	 * @param superClass
 	 *            the class to add as superclass
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void addSuperClass(ConcreteMetaClass superClass) {
 		if ((superClass == this) || (superClass == null)) {
 			return;
@@ -172,7 +171,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 							+ superClass.getQualifiedName());
 		}
 		directSuperClasses.add(superClass);
-		((AttributedElementClassImpl) superClass).directSubClasses.add((AttributedElementClass<ConcreteMetaClass, ConcreteInterface>)this);
+		((AttributedElementClassImpl) superClass).directSubClasses.add(this);
 	}
 
 	/**
@@ -353,15 +352,14 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 	}
 
 	@Override
-	public boolean isDirectSubClassOf(
-			ConcreteMetaClass anAttributedElementClass) {
+	public boolean isDirectSubClassOf(ConcreteMetaClass anAttributedElementClass) {
 		return directSuperClasses.contains(anAttributedElementClass);
 	}
 
 	@Override
 	public boolean isDirectSuperClassOf(
 			ConcreteMetaClass anAttributedElementClass) {
-		return (((ConcreteMetaClass) anAttributedElementClass).getDirectSuperClasses()
+		return ((anAttributedElementClass).getDirectSuperClasses()
 				.contains(this));
 	}
 
@@ -379,8 +377,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 	}
 
 	@Override
-	public boolean isSuperClassOf(
-			ConcreteMetaClass anAttributedElementClass) {
+	public boolean isSuperClassOf(ConcreteMetaClass anAttributedElementClass) {
 		return anAttributedElementClass.getAllSuperClasses().contains(this);
 	}
 
@@ -432,7 +429,5 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		}
 		return false;
 	}
-	
-
 
 }
