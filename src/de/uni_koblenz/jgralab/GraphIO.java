@@ -718,6 +718,7 @@ public class GraphIO {
 			vId = nextV.getId();
 			AttributedElementClass<?, ?> aec = nextV
 					.getAttributedElementClass();
+
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
 				write("Package");
@@ -726,24 +727,31 @@ public class GraphIO {
 				write(";\n");
 				oldPackage = currentPackage;
 			}
+
 			write(Long.toString(vId));
 			space();
 			writeIdentifier(aec.getSimpleName());
-			// write incident edges
-			Edge nextI = nextV.getFirstIncidence();
+
+			// write incidences
+			Incidence nextI = nextV.getFirstIncidence();
 			write(" <");
 			noSpace();
 			// System.out.print("  Writing incidences of vertex.");
 			while (nextI != null) {
-				if (subGraph != null && !subGraph.isMarked(nextI)) {
-					nextI = nextI.getNextIncidence();
+				if (subGraph != null && !subGraph.isMarked(nextI.getEdge())) {
+					nextI = nextI.getNextIncidenceAtVertex();
 					continue;
 				}
-				writeLong(nextI.getId());
-				nextI = nextI.getNextIncidence();
+				writeLong(nextI.getEdge().getId());
+				write("-");
+				noSpace();
+				writeInteger(getLambdaPositionOfIncidenceAtEdge(nextI, subGraph));
+				nextI = nextI.getNextIncidenceAtVertex();
+				space();
 			}
 			write(">");
 			space();
+
 			nextV.writeAttributeValues(this);
 			write(";\n");
 			nextV = nextV.getNextVertex();
@@ -770,6 +778,7 @@ public class GraphIO {
 			eId = nextE.getId();
 			AttributedElementClass<?, ?> aec = nextE
 					.getAttributedElementClass();
+
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
 				write("Package");
@@ -778,9 +787,24 @@ public class GraphIO {
 				write(";\n");
 				oldPackage = currentPackage;
 			}
+
 			write(Long.toString(eId));
 			space();
 			writeIdentifier(aec.getSimpleName());
+
+			// write OrderedTypedIncidences
+			write("<");
+			noSpace();
+			for (Incidence i : nextE.getIncidences()) {
+				if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
+					continue;
+				}
+				writeSpace();
+				write(i.getRole().getRolename());
+				space();
+			}
+			write(">");
+
 			space();
 			nextE.writeAttributeValues(this);
 			write(";\n");
@@ -802,6 +826,19 @@ public class GraphIO {
 		if (pf != null) {
 			pf.finished();
 		}
+	}
+
+	private int getLambdaPositionOfIncidenceAtEdge(Incidence nextI,
+			BooleanGraphMarker subGraph) {
+		int position = 1;
+		Incidence currentI = nextI.getPreviousIncidenceAtEdge();
+		while (currentI != null) {
+			if (subGraph == null || subGraph.isMarked(currentI.getVertex())) {
+				position++;
+			}
+			currentI = currentI.getPreviousIncidenceAtEdge();
+		}
+		return position;
 	}
 
 	private void saveHeader() throws IOException {
