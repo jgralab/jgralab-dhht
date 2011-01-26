@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.schema;
 
+import java.util.List;
+
 import de.uni_koblenz.jgralab.Edge;
 
 /**
@@ -44,6 +46,8 @@ public interface EdgeClass extends GraphElementClass<EdgeClass, Edge> {
 	public static final String DEFAULTEDGECLASS_NAME = "Edge";
 
 	boolean isBinary();
+
+	List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
 
 
 }

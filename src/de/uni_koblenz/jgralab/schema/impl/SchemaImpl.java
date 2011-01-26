@@ -172,6 +172,10 @@ public class SchemaImpl implements Schema {
 	private Package defaultPackage;
 
 	private VertexClass defaultVertexClass;
+	
+	private IncidenceClass defaultEdgeToVertexIncidenceClass;
+	
+	private IncidenceClass defaultVertexToEdgeIncidenceClass;
 
 	protected CodeGeneratorConfiguration config;
 
@@ -1292,8 +1296,21 @@ public class SchemaImpl implements Schema {
 
 	@Override
 	public IncidenceClass getDefaultIncidenceClass(Direction dir) {
-		// TODO Auto-generated method stub
-		return null;
+		if (dir == Direction.EDGE_TO_VERTEX)
+			return defaultEdgeToVertexIncidenceClass;
+		else
+			return defaultVertexToEdgeIncidenceClass;
+	}
+
+	@Override
+	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder() {
+		List<IncidenceClass> incidenceClasses = new ArrayList<IncidenceClass>();
+		for (EdgeClass ec : getEdgeClassesInTopologicalOrder()) {
+			for (IncidenceClass ic : ec.getIncidenceClasses()) {
+				incidenceClasses.add(ic);
+			}
+		}
+		return incidenceClasses;
 	}
 
 }
