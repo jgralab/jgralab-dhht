@@ -86,6 +86,7 @@ import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
+import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
 
@@ -173,6 +174,8 @@ public class GraphIO {
 	 */
 	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
 
+	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
+
 	private final Map<String, Method> createMethods;
 
 	private int line; // line number
@@ -256,6 +259,7 @@ public class GraphIO {
 		graphClass = null;
 		vertexClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
 		edgeClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
+		incidenceClassMap = new TreeMap<IncidenceClass, GraphIO.IncidenceClassData>();
 		commentData = new HashMap<String, List<String>>();
 		stringPool = new HashMap<String, String>();
 		putBackChar = -1;
@@ -2036,22 +2040,22 @@ public class GraphIO {
 				.getQualifiedName()) : gc.createEdgeClass(ecd
 				.getQualifiedName());
 		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
-			gc.createIncidenceClass(ec, gc.getVertexClass(icd.vertexClassName),
-					icd.roleName, icd.isAbstract,
-					icd.multiplicityEdgesAtVertex[0],
+			incidenceClassMap.put(gc.createIncidenceClass(ec,
+					gc.getVertexClass(icd.vertexClassName), icd.roleName,
+					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
 					icd.multiplicityEdgesAtVertex[1],
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
-					Direction.VERTEX_TO_EDGE, icd.incidenceType);
+					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
-			gc.createIncidenceClass(ec, gc.getVertexClass(icd.vertexClassName),
-					icd.roleName, icd.isAbstract,
-					icd.multiplicityEdgesAtVertex[0],
+			incidenceClassMap.put(gc.createIncidenceClass(ec,
+					gc.getVertexClass(icd.vertexClassName), icd.roleName,
+					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
 					icd.multiplicityEdgesAtVertex[1],
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
-					Direction.EDGE_TO_VERTEX, icd.incidenceType);
+					Direction.EDGE_TO_VERTEX, icd.incidenceType), icd);
 		}
 
 		addAttributes(ecd.attributes, ec);
@@ -2290,9 +2294,27 @@ public class GraphIO {
 								+ superClassName + "'");
 					}
 					((EdgeClassImpl) ec).addSuperClass(superClass);
+					buildIncidenceClassHierarchie(ec,
+							superClass);
 				}
+
 				ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
 				ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
+			}
+		}
+	}
+
+	private void buildIncidenceClassHierarchie(EdgeClass ec,
+			EdgeClass superClass) {
+		for (IncidenceClass subIc : ec.getIncidenceClasses()) {
+			IncidenceClassData subIcd = incidenceClassMap.get(subIc);
+			for (IncidenceClass superIc : superClass.getIncidenceClasses()) {
+				if (subIc.getDirection() != superIc.getDirection()) {
+					continue;
+				}
+				if (subIcd.directSuperClasses.contains(superIc.getRolename())) {
+					((IncidenceClassImpl) subIc).addSuperClass(superIc);
+				}
 			}
 		}
 	}
