@@ -1433,6 +1433,7 @@ public class GraphIO {
 		// test for correct syntax, because otherwise, the following
 		// sorting/creation methods probably can't work.
 		if (!(lookAhead.equals("") || lookAhead.equals("Graph"))) {
+			// TODO adapt for hierarchical graphs
 			throw new GraphIOException("symbol '" + lookAhead
 					+ "' not recognized in line " + line, null);
 		}
@@ -1941,37 +1942,17 @@ public class GraphIO {
 			}
 
 			while (lookAhead.equals("from")) {
-				IncidenceClassData incidenceClassData = new IncidenceClassData();
-				incidenceClassData.edgeClassName = graphElementClassData
-						.getQualifiedName();
-				match();
-				if (lookAhead.equals("abstract")) {
-					incidenceClassData.isAbstract = true;
-					match();
-				}
-				String[] vqn = matchQualifiedName(true);
-				incidenceClassData.vertexClassName = toQNameString(vqn);
-				incidenceClassData.roleName = parseRoleName();
-				if (lookAhead.equals(":")) {
-					incidenceClassData.directSuperClasses = parseHierarchy();
-				}
-				incidenceClassData.multiplicityEdgesAtVertex = parseMultiplicity();
-
+				IncidenceClassData incidenceClassData = parseIncidenceClass(graphElementClassData);
 				graphElementClassData.fromIncidenceClasses
 						.add(incidenceClassData);
 			}
 
-			graphElementClassData.fromMultiplicity = parseMultiplicity();
-			graphElementClassData.redefinedFromRoles = parseRolenameRedefinitions();
-			graphElementClassData.fromAggregation = parseAggregation();
+			while (lookAhead.equals("to")) {
+				IncidenceClassData incidenceClassData = parseIncidenceClass(graphElementClassData);
+				graphElementClassData.toIncidenceClasses
+						.add(incidenceClassData);
+			}
 
-			match("to");
-			String[] tqn = matchQualifiedName(true);
-			graphElementClassData.toVertexClassName = toQNameString(tqn);
-			graphElementClassData.toMultiplicity = parseMultiplicity();
-			graphElementClassData.toRoleName = parseRoleName();
-			graphElementClassData.redefinedToRoles = parseRolenameRedefinitions();
-			graphElementClassData.toAggregation = parseAggregation();
 			edgeClassBuffer.get(gcName).add(graphElementClassData);
 		} else {
 			throw new SchemaException("Undefined keyword: " + lookAhead
@@ -1987,6 +1968,31 @@ public class GraphIO {
 			graphElementClassData.constraints = parseConstraints();
 		}
 		match(";");
+	}
+
+	private IncidenceClassData parseIncidenceClass(
+			GraphElementClassData graphElementClassData)
+			throws GraphIOException {
+		IncidenceClassData incidenceClassData = new IncidenceClassData();
+		incidenceClassData.edgeClassName = graphElementClassData
+				.getQualifiedName();
+		match();
+		if (lookAhead.equals("abstract")) {
+			incidenceClassData.isAbstract = true;
+			match();
+		}
+		String[] vqn = matchQualifiedName(true);
+		incidenceClassData.vertexClassName = toQNameString(vqn);
+		incidenceClassData.roleName = parseRoleName();
+		if (lookAhead.equals(":")) {
+			incidenceClassData.directSuperClasses = parseHierarchy();
+		}
+		incidenceClassData.multiplicityEdgesAtVertex = parseMultiplicity();
+		incidenceClassData.redefinedRolesAtVertex = parseRolenameRedefinitions();
+		incidenceClassData.multiplicityVerticesAtEdge = parseMultiplicity();
+		incidenceClassData.redefinedRolesAtEdge = parseRolenameRedefinitions();
+		incidenceClassData.incidenceType = parseIncidenceType();
+		return incidenceClassData;
 	}
 
 	private Set<Constraint> parseConstraints() throws GraphIOException {
@@ -2024,13 +2030,17 @@ public class GraphIO {
 
 	private EdgeClass createEdgeClass(GraphElementClassData ecd, GraphClass gc)
 			throws GraphIOException, SchemaException {
-		EdgeClass ec = gc.createEdgeClass(ecd.getQualifiedName(),
-				gc.getVertexClass(ecd.fromVertexClassName),
-				ecd.fromMultiplicity[0], ecd.fromMultiplicity[1],
-				ecd.fromRoleName, ecd.fromAggregation,
-				gc.getVertexClass(ecd.toVertexClassName),
-				ecd.toMultiplicity[0], ecd.toMultiplicity[1], ecd.toRoleName,
-				ecd.toAggregation);
+		EdgeClass ec = ecd.isBinaryEdge ? null : gc.createEdgeClass(ecd
+				.getQualifiedName());
+		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
+			gc.createIncidenceClass(ec, gc.getVertexClass(icd.vertexClassName),
+					icd.roleName, icd.isAbstract,
+					icd.multiplicityEdgesAtVertex[0],
+					icd.multiplicityEdgesAtVertex[1],
+					icd.multiplicityVerticesAtEdge[0],
+					icd.multiplicityVerticesAtEdge[1],
+					Direction.VERTEX_TO_EDGE, icd.incidenceType);
+		}
 
 		addAttributes(ecd.attributes, ec);
 
@@ -2117,23 +2127,19 @@ public class GraphIO {
 		return result;
 	}
 
-	private AggregationKind parseAggregation() throws GraphIOException {
-		if (!lookAhead.equals("aggregation")) {
-			return AggregationKind.NONE;
-		}
-		match();
-		if (lookAhead.equals("none")) {
+	private IncidenceType parseIncidenceType() throws GraphIOException {
+		if (lookAhead.equals("EDGE")) {
 			match();
-			return AggregationKind.NONE;
-		} else if (lookAhead.equals("shared")) {
+			return IncidenceType.EDGE;
+		} else if (lookAhead.equals("AGGREGATE")) {
 			match();
-			return AggregationKind.SHARED;
-		} else if (lookAhead.equals("composite")) {
+			return IncidenceType.AGGREGATION;
+		} else if (lookAhead.equals("COMPOSITE")) {
 			match();
-			return AggregationKind.COMPOSITE;
+			return IncidenceType.COMPOSITION;
 		} else {
 			throw new GraphIOException(
-					"invalid aggregation: expected none, shared, or composite, but found '"
+					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
 							+ lookAhead + "' in line " + line);
 		}
 	}
@@ -3112,47 +3118,45 @@ public class GraphIO {
 	 * checks if from- and to-VertexClasses given in EdgeClass definitions exist
 	 */
 	private void checkFromToVertexClasses() throws GraphIOException {
-		boolean existingFromVertexClass;
-		boolean existingToVertexClass;
-
 		for (Entry<String, List<GraphElementClassData>> graphClassEdge : edgeClassBuffer
 				.entrySet()) {
 			for (GraphElementClassData ec : graphClassEdge.getValue()) {
-				existingFromVertexClass = false;
-				existingToVertexClass = false;
 
-				for (Entry<String, List<GraphElementClassData>> graphClassVertex : vertexClassBuffer
-						.entrySet()) {
-					for (GraphElementClassData vc : graphClassVertex.getValue()) {
-						if (ec.fromVertexClassName
-								.equals(vc.getQualifiedName())
-								|| ec.fromVertexClassName.equals("Vertex")) {
-							existingFromVertexClass = true;
-						}
-						if (ec.toVertexClassName.equals(vc.getQualifiedName())
-								|| ec.toVertexClassName.equals("Vertex")) {
-							existingToVertexClass = true;
-						}
-						if (existingFromVertexClass && existingToVertexClass) {
-							break;
-						}
-					}
-					if (existingFromVertexClass && existingToVertexClass) {
-						break;
+				for (IncidenceClassData icd : ec.fromIncidenceClasses) {
+					if (!checkExistanceOfVertexClass(icd)) {
+						throw new GraphIOException("FromVertexClass "
+								+ icd.vertexClassName + " at EdgeClass "
+								+ ec.getQualifiedName() + " does not exist.");
 					}
 				}
-				if (!existingFromVertexClass) {
-					throw new GraphIOException("FromVertexClass "
-							+ ec.fromVertexClassName + " at EdgeClass "
-							+ ec.getQualifiedName() + " + does not exist");
-				}
-				if (!existingToVertexClass) {
-					throw new GraphIOException("ToVertexClass "
-							+ ec.toVertexClassName + " at EdgeClass "
-							+ ec.getQualifiedName() + " does not exist");
+
+				for (IncidenceClassData icd : ec.toIncidenceClasses) {
+					if (!checkExistanceOfVertexClass(icd)) {
+						throw new GraphIOException("ToVertexClass "
+								+ icd.vertexClassName + " at EdgeClass "
+								+ ec.getQualifiedName() + " does not exist.");
+					}
 				}
 			}
 		}
+	}
+
+	private boolean checkExistanceOfVertexClass(IncidenceClassData icd) {
+		boolean existingVertexClass = false;
+		for (Entry<String, List<GraphElementClassData>> graphClassVertex : vertexClassBuffer
+				.entrySet()) {
+			for (GraphElementClassData vc : graphClassVertex.getValue()) {
+				if (icd.vertexClassName.equals(vc.getQualifiedName())
+						|| icd.vertexClassName.equals("Vertex")) {
+					existingVertexClass = true;
+					break;
+				}
+			}
+			if (existingVertexClass) {
+				break;
+			}
+		}
+		return existingVertexClass;
 	}
 
 	/**
