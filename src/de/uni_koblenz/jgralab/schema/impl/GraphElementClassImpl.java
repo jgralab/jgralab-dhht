@@ -46,6 +46,12 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 
 	protected GraphClass graphClass;
 
+	protected Set<GraphElementClass<?, ?>> allowedSigmaClasses;
+	
+	protected int minKappa = 0;
+	
+	protected int maxKappa = Integer.MAX_VALUE;
+	
 	private Set<IncidenceClass> incidenceClasses = new HashSet<IncidenceClass>();
 	
 	/**
@@ -58,6 +64,17 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 			GraphClass graphClass) {
 		super(simpleName, pkg, graphClass.getSchema());
 		this.graphClass = graphClass;
+		allowedSigmaClasses = new HashSet<GraphElementClass<?, ?>>();
+	}
+	
+	@Override
+	public void addAllowedSigmaClass(GraphElementClass<?,?> gec) {
+		allowedSigmaClasses.add(gec);
+	}
+	
+	@Override
+	public Set<GraphElementClass<?,?>> getAllowedSigmaClasses() {
+		return allowedSigmaClasses;
 	}
 
 	@Override
@@ -195,4 +212,18 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 		return false;
 	}
 
+	
+	public void setAllowedKappaRange(int min, int max) {
+		minKappa = min;
+		maxKappa = max;
+	}
+	
+	public int getAllowedMinKappa() {
+		return minKappa;
+	}
+	
+	public int getAllowedMaxKappa() {
+		return maxKappa;
+	}
+	
 }

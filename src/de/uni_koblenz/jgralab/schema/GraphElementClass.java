@@ -86,4 +86,16 @@ public interface GraphElementClass<T extends GraphElementClass<T, S>, S extends 
 	 *         class or a superclass
 	 */
 	public Set<IncidenceClass> getAllIncidenceClasses();
+
+
+	public Set<GraphElementClass<?, ?>> getAllowedSigmaClasses();
+
+
+	public void addAllowedSigmaClass(GraphElementClass<?,?> gec);
+	
+	public void setAllowedKappaRange(int min, int max);
+	
+	public int getAllowedMinKappa();
+	
+	public int getAllowedMaxKappa();
 }
