@@ -1720,6 +1720,19 @@ public class GraphIO {
 		return hierarchy;
 	}
 
+	private List<String> parseIncidenceHierarchy() throws GraphIOException {
+		List<String> hierarchy = new LinkedList<String>();
+		match(":");
+		String roleName = matchSimpleName(false);
+		hierarchy.add(roleName);
+		while (lookAhead.equals(",")) {
+			match();
+			roleName = matchSimpleName(false);
+			hierarchy.add(roleName);
+		}
+		return hierarchy;
+	}
+
 	private List<AttributeData> parseAttributes() throws GraphIOException {
 		List<AttributeData> attributesData = new ArrayList<AttributeData>();
 		Set<String> names = new TreeSet<String>();
@@ -1915,18 +1928,40 @@ public class GraphIO {
 			vertexClassBuffer.get(gcName).add(graphElementClassData);
 		} else if (lookAhead.equals("EdgeClass")
 				|| lookAhead.equals("BinaryEdgeClass")) {
+			if (lookAhead.equals("BinaryEdgeClass")) {
+				graphElementClassData.isBinaryEdge = true;
+			}
+
 			match();
 			String[] qn = matchQualifiedName(true);
 			graphElementClassData.packageName = qn[0];
 			graphElementClassData.simpleName = qn[1];
 			if (lookAhead.equals(":")) {
-				graphElementClassData.directSuperClasses = parseHierarchy();
+				graphElementClassData.directSuperClasses = parseIncidenceHierarchy();
 			}
-			match("from");
-			String[] fqn = matchQualifiedName(true);
-			graphElementClassData.fromVertexClassName = toQNameString(fqn);
+
+			while (lookAhead.equals("from")) {
+				IncidenceClassData incidenceClassData = new IncidenceClassData();
+				incidenceClassData.edgeClassName = graphElementClassData
+						.getQualifiedName();
+				match();
+				if (lookAhead.equals("abstract")) {
+					incidenceClassData.isAbstract = true;
+					match();
+				}
+				String[] vqn = matchQualifiedName(true);
+				incidenceClassData.vertexClassName = toQNameString(vqn);
+				incidenceClassData.roleName = parseRoleName();
+				if (lookAhead.equals(":")) {
+					incidenceClassData.directSuperClasses = parseHierarchy();
+				}
+				incidenceClassData.multiplicityEdgesAtVertex = parseMultiplicity();
+
+				graphElementClassData.fromIncidenceClasses
+						.add(incidenceClassData);
+			}
+
 			graphElementClassData.fromMultiplicity = parseMultiplicity();
-			graphElementClassData.fromRoleName = parseRoleName();
 			graphElementClassData.redefinedFromRoles = parseRolenameRedefinitions();
 			graphElementClassData.fromAggregation = parseAggregation();
 
@@ -3191,13 +3226,13 @@ public class GraphIO {
 
 		String vertexClassName;
 
-		int[] multiplicityAtVertex = { 0, Integer.MAX_VALUE };
+		int[] multiplicityEdgesAtVertex = { 0, Integer.MAX_VALUE };
 
 		Set<String> redefinedRolesAtVertex = null;
 
 		String edgeClassName;
 
-		int[] multiplicityAtEdge = { 0, Integer.MAX_VALUE };
+		int[] multiplicityVerticesAtEdge = { 0, Integer.MAX_VALUE };
 
 		Set<String> redefinedRolesAtEdge = null;
 
@@ -3218,6 +3253,8 @@ public class GraphIO {
 		}
 
 		boolean isAbstract = false;
+
+		boolean isBinaryEdge = false;
 
 		List<String> directSuperClasses = new LinkedList<String>();
 
