@@ -420,86 +420,17 @@ public class GraphIO {
 				// write from incidence classes
 				for (IncidenceClass ic : ec.getIncidenceClasses()) {
 					if (ic.getDirection() == Direction.VERTEX_TO_EDGE) {
-						write(" from");
-						space();
-						writeIdentifier(ic.getVertexClass().getQualifiedName(
-								pkg));
-						write(" role");
-						space();
-						writeIdentifier(ic.getRolename());
-						write(" (");
-						write(ec.getFrom().getMin() + ",");
-						if (ec.getFrom().getMax() == Integer.MAX_VALUE) {
-							write("*)");
-						} else {
-							write(ec.getFrom().getMax() + ")");
-						}
-
-						if (!ec.getFrom().getRolename().equals("")) {
-							write(" role");
-							space();
-							writeIdentifier(ec.getFrom().getRolename());
-							String delim = " redefines";
-							for (String redefinedRolename : ec.getFrom()
-									.getRedefinedRoles()) {
-								write(delim);
-								delim = ",";
-								space();
-								writeIdentifier(redefinedRolename);
-							}
-						}
-
-						switch (ec.getFrom().getAggregationKind()) {
-						case NONE:
-							// do nothing
-							break;
-						case SHARED:
-							write(" aggregation shared");
-							break;
-						case COMPOSITE:
-							write(" aggregation composite");
-							break;
-						}
+						write("\n\tfrom");
+						writeIncidenceClassDefintion(pkg, ic);
 					}
 				}
 
-				// to (min,max) rolename
-				write(" to");
-				space();
-				writeIdentifier(ec.getTo().getVertexClass()
-						.getQualifiedName(pkg));
-				write(" (");
-				write(ec.getTo().getMin() + ",");
-				if (ec.getTo().getMax() == Integer.MAX_VALUE) {
-					write("*)");
-				} else {
-					write(ec.getTo().getMax() + ")");
-				}
-
-				if (!ec.getTo().getRolename().equals("")) {
-					write(" role");
-					space();
-					writeIdentifier(ec.getTo().getRolename());
-					String delim = " redefines";
-					for (String redefinedRolename : ec.getTo()
-							.getRedefinedRoles()) {
-						write(delim);
-						delim = ",";
-						space();
-						writeIdentifier(redefinedRolename);
+				// write to incidence classes
+				for (IncidenceClass ic : ec.getIncidenceClasses()) {
+					if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
+						write("\n\tto");
+						writeIncidenceClassDefintion(pkg, ic);
 					}
-				}
-
-				switch (ec.getTo().getAggregationKind()) {
-				case NONE:
-					// do nothing
-					break;
-				case SHARED:
-					write(" aggregation shared");
-					break;
-				case COMPOSITE:
-					write(" aggregation composite");
-					break;
 				}
 
 				writeAttributes(pkg, ec);
@@ -510,6 +441,64 @@ public class GraphIO {
 
 			// write package comments
 			writeComments(pkg, pkg.getQualifiedName());
+		}
+	}
+
+	private void writeIncidenceClassDefintion(Package pkg, IncidenceClass ic)
+			throws IOException {
+		space();
+		writeIdentifier(ic.getVertexClass().getQualifiedName(pkg));
+
+		write(" role");
+		space();
+		writeIdentifier(ic.getRolename());
+		writeHierarchy(ic);
+
+		// multiplicity and redefinitions at vertex class
+		write(" (");
+		write(ic.getMinEdgesAtVertex() + ",");
+		if (ic.getMaxEdgesAtVertex() == Integer.MAX_VALUE) {
+			write("*)");
+		} else {
+			write(ic.getMaxEdgesAtVertex() + ")");
+		}
+
+		String delim = " redefines";
+		for (IncidenceClass redefinedIncidenceClass : ic
+				.getHiddenEndsAtVertex()) {
+			write(delim);
+			delim = ",";
+			space();
+			writeIdentifier(redefinedIncidenceClass.getRolename());
+		}
+
+		// multiplicity and redefinitions at edge class
+		write(" (");
+		write(ic.getMinVerticesAtEdge() + ",");
+		if (ic.getMaxVerticesAtEdge() == Integer.MAX_VALUE) {
+			write("*)");
+		} else {
+			write(ic.getMaxVerticesAtEdge() + ")");
+		}
+
+		delim = " redefines";
+		for (IncidenceClass redefinedIncidenceClass : ic.getHiddenEndsAtEdge()) {
+			write(delim);
+			delim = ",";
+			space();
+			writeIdentifier(redefinedIncidenceClass.getRolename());
+		}
+
+		switch (ic.getIncidenceType()) {
+		case EDGE:
+			// do nothing
+			break;
+		case AGGREGATION:
+			write(" AGGREGATE");
+			break;
+		case COMPOSITION:
+			write(" COMPOSITE");
+			break;
 		}
 	}
 
@@ -527,7 +516,7 @@ public class GraphIO {
 		}
 	}
 
-	private void writeConstraints(AttributedElementClass aec)
+	private void writeConstraints(AttributedElementClass<?, ?> aec)
 			throws IOException {
 		for (Constraint c : aec.getConstraints()) {
 			writeSpace();
