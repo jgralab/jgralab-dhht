@@ -33,18 +33,13 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.PathElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.std.VertexImpl;
@@ -883,50 +878,51 @@ public abstract class VertexBaseImpl extends
 		// }
 	}
 
-//	@Override
-//	public synchronized <T extends Vertex> List<T> reachableVertices(
-//			String pathDescription, Class<T> vertexType) {
-//		return graph.reachableVertices(this, pathDescription, vertexType);
-//	}
+	// @Override
+	// public synchronized <T extends Vertex> List<T> reachableVertices(
+	// String pathDescription, Class<T> vertexType) {
+	// return graph.reachableVertices(this, pathDescription, vertexType);
+	// }
 
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
-//			PathElement... pathElements) {
-//		Set<T> result = new LinkedHashSet<T>();
-//		Queue<Vertex> q = new LinkedList<Vertex>();
-//		q.add(this);
-//
-//		for (int i = 0; i < pathElements.length; i++) {
-//			PathElement t = pathElements[i];
-//			// the null marks the end of the iteration with PathElement t
-//			q.add(null);
-//			Vertex vx = q.poll();
-//			while (vx != null) {
-//				for (Edge e : vx.getIncidentEdges(t.edgeClass, t.direction)) {
-//					if (!t.strictType
-//							|| (t.strictType && (t.edgeClass == e.getM1Class()))) {
-//						for (Incidence inci : e
-//								.getIncidences(t.direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-//										: Direction.EDGE_TO_VERTEX)) {
-//							if (i == pathElements.length - 1) {
-//								Vertex r = inci.getVertex();
-//								if (returnType.isInstance(r)) {
-//									result.add((T) r);
-//								}
-//							} else {
-//								if (!q.contains(inci.getVertex())) {
-//									q.add(inci.getVertex());
-//								}
-//							}
-//						}
-//					}
-//				}
-//				vx = q.poll();
-//			}
-//		}
-//		return result;
-//	}
+	// @SuppressWarnings("unchecked")
+	// @Override
+	// public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
+	// PathElement... pathElements) {
+	// Set<T> result = new LinkedHashSet<T>();
+	// Queue<Vertex> q = new LinkedList<Vertex>();
+	// q.add(this);
+	//
+	// for (int i = 0; i < pathElements.length; i++) {
+	// PathElement t = pathElements[i];
+	// // the null marks the end of the iteration with PathElement t
+	// q.add(null);
+	// Vertex vx = q.poll();
+	// while (vx != null) {
+	// for (Edge e : vx.getIncidentEdges(t.edgeClass, t.direction)) {
+	// if (!t.strictType
+	// || (t.strictType && (t.edgeClass == e.getM1Class()))) {
+	// for (Incidence inci : e
+	// .getIncidences(t.direction == Direction.EDGE_TO_VERTEX ?
+	// Direction.VERTEX_TO_EDGE
+	// : Direction.EDGE_TO_VERTEX)) {
+	// if (i == pathElements.length - 1) {
+	// Vertex r = inci.getVertex();
+	// if (returnType.isInstance(r)) {
+	// result.add((T) r);
+	// }
+	// } else {
+	// if (!q.contains(inci.getVertex())) {
+	// q.add(inci.getVertex());
+	// }
+	// }
+	// }
+	// }
+	// }
+	// vx = q.poll();
+	// }
+	// }
+	// return result;
+	// }
 
 	@Override
 	public void connect(String rolename, Edge elemToConnect) {
