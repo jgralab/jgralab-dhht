@@ -46,12 +46,12 @@ public interface JValue extends Comparable<JValue> {
 	/**
 	 * @return the browsing info or null if none exists
 	 */
-	public TypedElement getBrowsingInfo();
+	public TypedElement<?,?> getBrowsingInfo();
 
 	/**
 	 * sets the browsing info of this jvalue
 	 */
-	public void setBrowsingInfo(TypedElement bInfo);
+	public void setBrowsingInfo(TypedElement<?,?> bInfo);
 
 	/**
 	 * accepts the given visitor to visit this jvalue
@@ -122,7 +122,7 @@ public interface JValue extends Comparable<JValue> {
 	 * @throws JValueInvalidTypeException
 	 *             if this JValue does not encapsulate a GraphElementClass
 	 */
-	public AttributedElementClass toAttributedElementClass()
+	public AttributedElementClass<?,?> toAttributedElementClass()
 			throws JValueInvalidTypeException;
 
 	/**
@@ -150,7 +150,7 @@ public interface JValue extends Comparable<JValue> {
 	 * @throws JValueInvalidTypeException
 	 *             if this JValue does not encapsulate a AttributedElement
 	 */
-	public AttributedElement toAttributedElement()
+	public AttributedElement<?,?> toAttributedElement()
 			throws JValueInvalidTypeException;
 
 	/**
@@ -374,7 +374,7 @@ public interface JValue extends Comparable<JValue> {
 	 * @throws JValueInvalidTypeException
 	 *             if this JValue does not encapsulate a boolean value
 	 */
-	public AbstractGraphMarker<AttributedElement> toGraphMarker()
+	public AbstractGraphMarker<AttributedElement<?,?>> toGraphMarker()
 			throws JValueInvalidTypeException;
 
 	/**

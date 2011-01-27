@@ -32,9 +32,9 @@ package de.uni_koblenz.jgralab.graphvalidator;
 
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.Constraint;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * Describes a violation of some constraint, either an explicit
@@ -44,24 +44,24 @@ import de.uni_koblenz.jgralab.schema.Constraint;
  * @see GReQLConstraintViolation
  * @see BrokenGReQLConstraintViolation
  * 
- * @author Tassilo Horn <horn@uni-koblenz.de>
+ * @author ist@uni-koblenz.de
  */
 public abstract class ConstraintViolation implements
 		Comparable<ConstraintViolation> {
 
-	protected AttributedElementClass attributedElementClass;
-	protected Set<AttributedElement> offendingElements;
+	protected TypedElementClass<?,?> affectedTypedElementClass;
+	protected Set<? extends TypedElement<?,?>> offendingElements;
 
 	/**
-	 * @return the {@link AttributedElementClass} the violated constraint is
+	 * @return the {@link TypedElementClass} the violated constraint is
 	 *         attached to
 	 */
-	public AttributedElementClass getAttributedElementClass() {
-		return attributedElementClass;
+	public TypedElementClass<?,?> getAttributedElementClass() {
+		return affectedTypedElementClass;
 	}
 
-	public ConstraintViolation(AttributedElementClass aec) {
-		attributedElementClass = aec;
+	public ConstraintViolation(TypedElementClass<?,?> aec) {
+		affectedTypedElementClass = aec;
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public abstract class ConstraintViolation implements
 	public abstract String getMessage();
 
 	/**
-	 * @return a set of {@link AttributedElement}s which violate the constraint
+	 * @return a set of {@link TypedElement}s which violate the constraint
 	 */
-	public abstract Set<AttributedElement> getOffendingElements();
+	public abstract Set<? extends TypedElement<?,?>> getOffendingElements();
 }

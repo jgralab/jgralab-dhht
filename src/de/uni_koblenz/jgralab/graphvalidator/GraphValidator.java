@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -55,13 +55,15 @@ import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * A <code>GraphValidator</code> can be used to check if all {@link Constraint}s
  * specified in the {@link Schema} of a given {@link Graph} are fulfilled.
  * 
- * @author Tassilo Horn <horn@uni-koblenz.de>
+ * @author ist@uni-koblenz.de
  */
 public class GraphValidator {
 
@@ -100,42 +102,37 @@ public class GraphValidator {
 	 *         and where {@link MultiplicityConstraintViolation} constraints
 	 *         where violated
 	 */
-	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(EdgeClass ec) {
+	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(IncidenceClass ic) {
 		SortedSet<MultiplicityConstraintViolation> brokenConstraints = new TreeSet<MultiplicityConstraintViolation>();
-        for ()
-		
-		
-		int toMin = ec.getTo().getMin();
-		int toMax = ec.getTo().getMax();
-		Set<AttributedElement> badOutgoing = new HashSet<AttributedElement>();
-		for (Vertex v : graph.vertices(ec.getFrom().getVertexClass())) {
-			int degree = v.getDegree(ec, EdgeDirection.OUT);
-			if (degree < toMin || degree > toMax) {
-				badOutgoing.add(v);
+
+		Set<Vertex> badEdgesAtVertex = new HashSet<Vertex>();
+
+		for (Vertex v : graph.getVertices(ic.getVertexClass())) {
+			int degree = v.getDegree(ic);
+			if (degree < ic.getMinEdgesAtVertex() || degree > ic.getMaxEdgesAtVertex()) {
+				badEdgesAtVertex.add(v);
 			}
 		}
-		if (!badOutgoing.isEmpty()) {
-			brokenConstraints.add(new MultiplicityConstraintViolation(ec,
-					"Invalid number of outgoing edges, allowed are (" + toMin
-							+ "," + (toMax == Integer.MAX_VALUE ? "*" : toMax)
-							+ ").", badOutgoing));
+		if (!badEdgesAtVertex.isEmpty()) {
+			brokenConstraints.add(new MultiplicityConstraintViolation(ic,
+					"Invalid number of incidences at vertices, allowed are (" + ic.getMinEdgesAtVertex()
+							+ "," + (ic.getMaxEdgesAtVertex() == Integer.MAX_VALUE ? "*" : ic.getMaxEdgesAtVertex())
+							+ ").", badEdgesAtVertex));
 		}
 
-		int fromMin = ec.getFrom().getMin();
-		int fromMax = ec.getFrom().getMax();
-		Set<AttributedElement> badIncoming = new HashSet<AttributedElement>();
-		for (Vertex v : graph.vertices(ec.getTo().getVertexClass())) {
-			int degree = v.getDegree(ec, EdgeDirection.IN);
-			if (degree < fromMin || degree > fromMax) {
-				badIncoming.add(v);
+		Set<Edge> badVerticesAtEdge = new HashSet<Edge>();
+		for (Edge e : graph.getEdges(ic.getEdgeClass())) {
+			int degree = e.getDegree(ic);
+			if (degree < ic.getMinVerticesAtEdge() || degree > ic.getMaxVerticesAtEdge()) {
+				badVerticesAtEdge.add(e);
 			}
 		}
-		if (!badIncoming.isEmpty()) {
-			brokenConstraints.add(new MultiplicityConstraintViolation(ec,
-					"Invalid number of incoming edges, allowed are (" + fromMin
+		if (!badVerticesAtEdge.isEmpty()) {
+			brokenConstraints.add(new MultiplicityConstraintViolation(ic,
+					"Invalid number of incoming edges, allowed are (" + ic.getMinVerticesAtEdge()
 							+ ","
-							+ (fromMax == Integer.MAX_VALUE ? "*" : fromMax)
-							+ ").", badIncoming));
+							+ (ic.getMaxVerticesAtEdge() == Integer.MAX_VALUE ? "*" : ic.getMaxVerticesAtEdge())
+							+ ").", badVerticesAtEdge));
 		}
 
 		return brokenConstraints;
@@ -153,20 +150,19 @@ public class GraphValidator {
 		SortedSet<ConstraintViolation> brokenConstraints = new TreeSet<ConstraintViolation>();
 
 		// Check if all multiplicities are correct
-		for (EdgeClass ec : graph.getSchema()
-				.getEdgeClassesInTopologicalOrder()) {
-			if (ec.isInternal()) {
+		for (IncidenceClass ic : graph.getSchema().getIncidenceClassesInTopologicalOrder()) {
+			if (ic.isInternal()) {
 				continue;
 			}
-			brokenConstraints.addAll(validateMultiplicities(ec));
+			brokenConstraints.addAll(validateMultiplicities(ic));
 		}
 
 		// check if all greql constraints are met
-		List<AttributedElementClass> aecs = new ArrayList<AttributedElementClass>();
+		List<TypedElementClass<?,?>> aecs = new ArrayList<TypedElementClass<?,?>>();
 		aecs.add(graph.getSchema().getGraphClass());
 		aecs.addAll(graph.getSchema().getVertexClassesInTopologicalOrder());
 		aecs.addAll(graph.getSchema().getEdgeClassesInTopologicalOrder());
-		for (AttributedElementClass aec : aecs) {
+		for (TypedElementClass<?,?> aec : aecs) {
 			if (aec.isInternal()) {
 				continue;
 			}
@@ -184,7 +180,7 @@ public class GraphValidator {
 	 * @return a set of {@link ConstraintViolation} objects
 	 */
 	public SortedSet<ConstraintViolation> validateConstraints(
-			AttributedElementClass aec) {
+			TypedElementClass<?,?> aec) {
 		SortedSet<ConstraintViolation> brokenConstraints = new TreeSet<ConstraintViolation>();
 		for (Constraint constraint : aec.getConstraints()) {
 			String query = constraint.getPredicate();
@@ -213,11 +209,11 @@ public class GraphValidator {
 		return brokenConstraints;
 	}
 
-	private Set<AttributedElement> jvalueSet2Set(JValueSet resultSet) {
-		Set<AttributedElement> set = new HashSet<AttributedElement>(resultSet
-				.size());
+	private Set<? extends TypedElement<?,?>> jvalueSet2Set(JValueSet resultSet) {
+		Set<TypedElement<?,?>> set = new HashSet<TypedElement<?,?>>(resultSet.size());
 		for (JValue jv : resultSet) {
-			set.add(jv.toAttributedElement());
+			TypedElement<?, ?> elem = jv.toAttributedElement();
+			set.add(elem);
 		}
 		return set;
 	}
@@ -326,7 +322,7 @@ public class GraphValidator {
 					bw.append("</td>");
 					bw.append("<td class=\"" + cssClass + "\">");
 					if (ci.getOffendingElements() != null) {
-						for (TypedElement ae : ci.getOffendingElements()) {
+						for (TypedElement<?,?> ae : ci.getOffendingElements()) {
 							bw.append(ae.toString());
 							bw.append("<br/>");
 						}
