@@ -73,9 +73,9 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	
 	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
 		CodeSnippet snippet = new CodeSnippet();
-		snippet.add(" *   Role: '#rolename#', VertexClass: '#vcName#");
+		snippet.add(" *   Role: '#rolename#', ConnectedClass: '#gecName#");
 		snippet.setVariable("rolename", ic.getRolename());
-		snippet.setVariable("vcName", ic.getVertexClass().getQualifiedName());
+		snippet.setVariable("gecName", ic.getOtherGraphElementClass(aec).getQualifiedName());
 		return snippet;
 	}
 	
@@ -85,7 +85,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	 * creates the body of the class file, that are methods and attributes
 	 */
 	@Override
-	protected CodeBlock createBody() {
+	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			if (currentCycle.isStdImpl()) {

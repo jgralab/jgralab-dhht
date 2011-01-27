@@ -64,7 +64,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	}
 
 	@Override
-	protected CodeBlock createBody() {
+	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			if (currentCycle.isStdImpl()) {
@@ -93,25 +93,24 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			addImports("de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator");
 
 			// for Vertex.reachableVertices()
-			code
-					.add(new CodeSnippet(
-							"\n\tprotected GreqlEvaluator greqlEvaluator = null;\n",
-							"@SuppressWarnings(\"unchecked\") ",
-							"@Override ",
-							"public synchronized <T extends Vertex> List<T> reachableVertices(Vertex startVertex, String pathDescription, Class<T> vertexType) { ",
-							"\tif (greqlEvaluator == null) { ",
-							"\t\tgreqlEvaluator = new GreqlEvaluator((String) null, this, null); ",
-							"\t} ",
-							"\tgreqlEvaluator.setVariable(\"v\", new JValueImpl(startVertex)); ",
-							"\tgreqlEvaluator.setQuery(\"using v: v \" + pathDescription); ",
-							"\tgreqlEvaluator.startEvaluation(); ",
-							"\tJValueSet rs = greqlEvaluator.getEvaluationResult().toJValueSet(); ",
-							"\tjava.util.List<T> lst = new java.util.LinkedList<T>(); ",
-							"\tfor (JValue jv : rs) { ",
-							"\t\tVertex v = jv.toVertex();",
-							"\t\tif (vertexType.isInstance(v)) {",
-							"\t\t\tlst.add((T) v);", "\t\t}", "\t}",
-							"\treturn lst; ", "}"));
+//			code.add(new CodeSnippet(
+//						"\n\tprotected GreqlEvaluator greqlEvaluator = null;\n",
+//						"@SuppressWarnings(\"unchecked\") ",
+//						"@Override ",
+//						"public synchronized <T extends Vertex> List<T> reachableVertices(Vertex startVertex, String pathDescription, Class<T> vertexType) { ",
+//						"\tif (greqlEvaluator == null) { ",
+//						"\t\tgreqlEvaluator = new GreqlEvaluator((String) null, this, null); ",
+//						"\t} ",
+//						"\tgreqlEvaluator.setVariable(\"v\", new JValueImpl(startVertex)); ",
+//						"\tgreqlEvaluator.setQuery(\"using v: v \" + pathDescription); ",
+//						"\tgreqlEvaluator.startEvaluation(); ",
+//						"\tJValueSet rs = greqlEvaluator.getEvaluationResult().toJValueSet(); ",
+//						"\tjava.util.List<T> lst = new java.util.LinkedList<T>(); ",
+//						"\tfor (JValue jv : rs) { ",
+//						"\t\tVertex v = jv.toVertex();",
+//						"\t\tif (vertexType.isInstance(v)) {",
+//						"\t\t\tlst.add((T) v);", "\t\t}", "\t}",
+//						"\treturn lst; ", "}"));
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
@@ -278,8 +277,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		// TODO if(currentCycle.isDbImpl()) only write ctors and create with
 		// GraphDatabase as param.
 		if (!currentCycle.isDbImpl()) {
-			code
-					.add(
+			code.add(
 							"/* Constructors and create methods with values for initial vertex and edge count */",
 							"public #simpleClassName#Impl(int vMax, int eMax) {",
 							"\tthis(null, vMax, eMax);",
@@ -316,12 +314,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id);",
 							"}");
 		} else {
-			code
-					.add(
-							"/* Constructors and create methods for database support */",
-							"",
-							/*
-							 * "public #simpleClassName#Impl(java.lang.String id) {",
+			code.add("/* Constructors and create methods for database support */",
+					 "",
+					 /*
+					 * "public #simpleClassName#Impl(java.lang.String id) {",
 							 * "\tsuper(id, #schemaName#.instance().#schemaVariableName#);"
 							 * , // TODO Should not be allowed. "}", "",
 							 * "public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {"
@@ -357,15 +353,14 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
-		TreeSet<GraphElementClass> sortedClasses = new TreeSet<GraphElementClass>();
+		TreeSet<GraphElementClass<?,?>> sortedClasses = new TreeSet<GraphElementClass<?,?>>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
-		for (GraphElementClass gec : sortedClasses) {
+		for (GraphElementClass<?,?> gec : sortedClasses) {
 			if (!gec.isInternal()) {
 				CodeList gecCode = new CodeList();
 				code.addNoIndent(gecCode);
 
-				gecCode
-						.addNoIndent(new CodeSnippet(
+				gecCode.addNoIndent(new CodeSnippet(
 								true,
 								"// ------------------------ Code for #ecQualifiedName# ------------------------"));
 
@@ -395,7 +390,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		return code;
 	}
 
-	private CodeBlock createGetFirstMethods(GraphElementClass gec) {
+	private CodeBlock createGetFirstMethods(GraphElementClass<?,?> gec) {
 		CodeList code = new CodeList();
 		if (config.hasTypeSpecificMethodsSupport()) {
 			code.addNoIndent(createGetFirstMethod(gec, false));
@@ -408,32 +403,25 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		return code;
 	}
 
-	private CodeBlock createGetFirstMethod(GraphElementClass gec,
+	private CodeBlock createGetFirstMethod(GraphElementClass<?,?> gec,
 			boolean withTypeFlag) {
 		CodeSnippet code = new CodeSnippet(true);
 		if (currentCycle.isAbstract()) {
-			code
-					.add("/**",
-							" * @return the first #ecSimpleName# #ecTypeInComment# in this graph");
+			code.add("/**",
+					 " * @return the first #ecSimpleName# #ecTypeInComment# in this graph");
 			if (withTypeFlag) {
-				code
-						.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
+				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
 			}
-			code
-					.add(" */",
+			code.add(" */",
 							"public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#);");
 		}
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			code
-					.add(
-							"public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
-							"\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
-							"}");
+			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
+					 "\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
+					 "}");
 		}
-		code.setVariable("formalParams", (withTypeFlag ? "boolean noSubClasses"
-				: ""));
-		code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"
-						: ""));
+		code.setVariable("formalParams", (withTypeFlag ? "boolean noSubClasses"	: ""));
+		code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
 
 		return code;
 	}
@@ -538,9 +526,9 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		return code;
 	}
 	
-	protected CodeBlock createIteratorMethods(Iterable<? extends GraphElementClass> set) {
+	protected CodeBlock createIteratorMethods(Iterable<? extends GraphElementClass<?,?>> set) {
 		CodeList code = new CodeList();
-		for (GraphElementClass gec : set) {
+		for (GraphElementClass<?,?> gec : set) {
 			if (gec.isInternal()) {
 				continue;
 			}
@@ -554,7 +542,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	
 	
 	
-	protected CodeBlock createIteratorMethods(GraphElementClass gec) {
+	protected CodeBlock createIteratorMethods(GraphElementClass<?,?> gec) {
 		CodeList code = new CodeList();
 		CodeSnippet s = new CodeSnippet(true);
 		code.addNoIndent(s);

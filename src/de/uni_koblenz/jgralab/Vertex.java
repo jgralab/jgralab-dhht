@@ -62,15 +62,6 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 */
 	public Vertex getNextVertex();
 
-	/**
-	 * Returns the previous {@link Vertex} in the sequence of all vertices in
-	 * the complete {@link Graph}(vSeq). If this {@link Vertex} is the beginning
-	 * of the sequence <code>null</code> is returned.
-	 * 
-	 * @return {@link Vertex}
-	 */
-	@Deprecated
-	public Vertex getPrevVertex();
 
 	/**
 	 * Returns the previous {@link Vertex} in the sequence of all vertices in
@@ -266,8 +257,8 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            (acts as implicit GoalRestriction)
 	 * @return {@link List} of the reachable vertices
 	 */
-	public <T extends Vertex> List<T> reachableVertices(String pathDescription,
-			Class<T> vertexType);
+	//public <T extends Vertex> List<T> reachableVertices(String pathDescription,
+	//		Class<T> vertexType);
 
 	/**
 	 * Returns a {@link Set}&lt;<code>vertexType</code>&gt; over all vertices
@@ -281,7 +272,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 * @return {@link Set} of vertices reachable by traversing the path given by
 	 *         pathElements
 	 */
-	public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
-			PathElement... pathElements);
+	//public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
+	//		PathElement... pathElements);
 
 }

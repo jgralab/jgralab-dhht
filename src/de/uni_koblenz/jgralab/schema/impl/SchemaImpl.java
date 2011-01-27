@@ -70,6 +70,7 @@ import de.uni_koblenz.jgralab.codegenerator.EdgeCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.EnumCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.GraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.GraphFactoryGenerator;
+import de.uni_koblenz.jgralab.codegenerator.IncidenceCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
@@ -427,6 +428,12 @@ public class SchemaImpl implements Schema {
 			javaSources.addAll(codeGen.createJavaSources());
 
 		}
+		
+		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
+			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(incidenceClass,
+					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			javaSources.addAll(codeGen.createJavaSources());
+		}
 
 		// build records and enums
 		for (Domain domain : getRecordDomains()) {
@@ -509,6 +516,20 @@ public class SchemaImpl implements Schema {
 
 			codeGen.createFiles(pathPrefix);
 
+			if (progressFunction != null) {
+				schemaElements++;
+				currentCount++;
+				if (currentCount == interval) {
+					progressFunction.progress(schemaElements);
+					currentCount = 0;
+				}
+			}
+		}
+		
+		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
+			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(incidenceClass,
+					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			codeGen.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
 				currentCount++;
