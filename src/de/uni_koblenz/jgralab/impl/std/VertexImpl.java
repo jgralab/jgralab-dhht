@@ -80,12 +80,6 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public Vertex getPrevVertex() {
-		assert isValid();
-		return prevVertexInGraph;
-	}
-
-	@Override
 	public void setFirstIncidence(IncidenceImpl firstIncidence) {
 		firstIncidenceAtVertex = firstIncidence;
 	}
