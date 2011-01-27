@@ -39,6 +39,7 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -160,6 +161,19 @@ public final class GraphClassImpl extends
 			ec.addSuperClass(s);
 		}
 		return ec;
+	}
+
+	@Override
+	public BinaryEdgeClass createBinaryEdgeClass(String qualifiedName) {
+		String[] qn = SchemaImpl.splitQualifiedName(qualifiedName);
+		Package parent = ((SchemaImpl) getSchema())
+				.createPackageWithParents(qn[0]);
+		BinaryEdgeClassImpl ec = new BinaryEdgeClassImpl(qn[1], parent, this);
+		if (!ec.getQualifiedName().equals(EdgeClass.DEFAULTEDGECLASS_NAME)) {
+			EdgeClass s = getSchema().getDefaultEdgeClass();
+			ec.addSuperClass(s);
+		}
+		return (BinaryEdgeClass) ec;
 	}
 
 	@Override

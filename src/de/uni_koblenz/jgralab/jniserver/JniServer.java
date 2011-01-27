@@ -65,10 +65,10 @@ public class JniServer {
 	private static int keyGenerator;
 
 	/**
-	 * the {@code Map} holding the graphs created or loaded via the {@code
-	 * JGraLabFacade}
+	 * the {@code Map} holding the graphs created or loaded via the
+	 * {@code JGraLabFacade}
 	 */
-	private Map<Integer, Graph> graphs;
+	private final Map<Integer, Graph> graphs;
 
 	public JniServer() {
 		keyGenerator = 1;
@@ -155,8 +155,8 @@ public class JniServer {
 
 	public int createVertex(int graphId, String vertexClassName) {
 		Graph graph = graphs.get(graphId);
-		Class<? extends Vertex> m1Class = graph.getGraphClass().getVertexClass(
-				vertexClassName).getM1Class();
+		Class<? extends Vertex> m1Class = graph.getGraphClass()
+				.getVertexClass(vertexClassName).getM1Class();
 		return graph.createVertex(m1Class).getId();
 	}
 
@@ -260,11 +260,10 @@ public class JniServer {
 	public int createEdge(int graphId, String edgeClassName, int alphaId,
 			int omegaId) {
 		Graph graph = graphs.get(graphId);
-		Class<? extends Edge> m1Class = graph.getGraphClass().getEdgeClass(
-				edgeClassName).getM1Class();
+		Class<? extends Edge> m1Class = graph.getGraphClass()
+				.getEdgeClass(edgeClassName).getM1Class();
 		Edge e = graph.createEdge(m1Class);
-		
-		
+
 		return e.getId();
 	}
 
@@ -363,23 +362,22 @@ public class JniServer {
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
-	
 
-//	public int getAlpha(int graphId, int edgeId) {
-//		return graphs.get(graphId).getEdge(edgeId).getAlpha().getId();
-//	}
-//
-//	public int getOmega(int graphId, int edgeId) {
-//		return graphs.get(graphId).getEdge(edgeId).getOmega().getId();
-//	}
-//
-//	public int getThis(int graphId, int edgeId) {
-//		return graphs.get(graphId).getEdge(edgeId).getThis().getId();
-//	}
-//
-//	public int getThat(int graphId, int edgeId) {
-//		return graphs.get(graphId).getEdge(edgeId).getThat().getId();
-//	}
+	// public int getAlpha(int graphId, int edgeId) {
+	// return graphs.get(graphId).getEdge(edgeId).getAlpha().getId();
+	// }
+	//
+	// public int getOmega(int graphId, int edgeId) {
+	// return graphs.get(graphId).getEdge(edgeId).getOmega().getId();
+	// }
+	//
+	// public int getThis(int graphId, int edgeId) {
+	// return graphs.get(graphId).getEdge(edgeId).getThis().getId();
+	// }
+	//
+	// public int getThat(int graphId, int edgeId) {
+	// return graphs.get(graphId).getEdge(edgeId).getThat().getId();
+	// }
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
@@ -390,9 +388,8 @@ public class JniServer {
 
 	public int getFirstVertex(int graphId, String vertexClassName) {
 		Graph g = graphs.get(graphId);
-		Vertex v = (vertexClassName != null) ? g
-				.getFirstVertex((VertexClass) g.getSchema()
-						.getAttributedElementClass(vertexClassName)) : g
+		Vertex v = (vertexClassName != null) ? g.getFirstVertex((VertexClass) g
+				.getSchema().getAttributedElementClass(vertexClassName)) : g
 				.getFirstVertex();
 		return (v == null) ? 0 : v.getId();
 	}
@@ -409,42 +406,40 @@ public class JniServer {
 
 	public int getFirstEdgeInGraph(int graphId, String edgeClassName) {
 		Graph g = graphs.get(graphId);
-		Edge e = (edgeClassName != null) ? g
-				.getFirstEdge((EdgeClass) g.getSchema()
-						.getAttributedElementClass(edgeClassName)) : g
+		Edge e = (edgeClassName != null) ? g.getFirstEdge((EdgeClass) g
+				.getSchema().getAttributedElementClass(edgeClassName)) : g
 				.getFirstEdge();
 		return (e == null) ? 0 : e.getId();
 	}
 
 	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName) {
 		Graph g = graphs.get(graphId);
-		Edge e = (edgeClassName != null) ? g.getEdge(edgeId)
-				.getNextEdge(
-						((EdgeClass) g.getSchema().getAttributedElementClass(
-								edgeClassName))) : g.getEdge(edgeId)
-				.getNextEdge();
+		Edge e = (edgeClassName != null) ? g.getEdge(edgeId).getNextEdge(
+				((EdgeClass) g.getSchema().getAttributedElementClass(
+						edgeClassName))) : g.getEdge(edgeId).getNextEdge();
 		return (e == null) ? 0 : e.getId();
 	}
 
-//	public int getFirstEdge(int graphId, int vertexId, String edgeClassName) {
-//		Graph g = graphs.get(graphId);
-//		Edge e = (edgeClassName != null) ? g.getVertex(vertexId)
-//				.getFirstIncidence(
-//						(EdgeClass) g.getSchema().getAttributedElementClass(
-//								edgeClassName)) : g.getVertex(vertexId)
-//				.getFirstIncidence();
-//		return (e == null) ? 0 : e.getId();
-//	}
-//
-//	public int getNextEdge(int graphId, int edgeId, String edgeClassName) {
-//		Graph g = graphs.get(graphId);
-//		Edge e = (edgeClassName != null) ? g.getEdge(edgeId)
-//				.getNextIncidence(
-//						((EdgeClass) g.getSchema().getAttributedElementClass(
-//								edgeClassName))) : g.getEdge(edgeId)
-//				.getNextIncidence();
-//		return (e == null) ? 0 : e.getId();
-//	}
+	// public int getFirstEdge(int graphId, int vertexId, String edgeClassName)
+	// {
+	// Graph g = graphs.get(graphId);
+	// Edge e = (edgeClassName != null) ? g.getVertex(vertexId)
+	// .getFirstIncidence(
+	// (EdgeClass) g.getSchema().getAttributedElementClass(
+	// edgeClassName)) : g.getVertex(vertexId)
+	// .getFirstIncidence();
+	// return (e == null) ? 0 : e.getId();
+	// }
+	//
+	// public int getNextEdge(int graphId, int edgeId, String edgeClassName) {
+	// Graph g = graphs.get(graphId);
+	// Edge e = (edgeClassName != null) ? g.getEdge(edgeId)
+	// .getNextIncidence(
+	// ((EdgeClass) g.getSchema().getAttributedElementClass(
+	// edgeClassName))) : g.getEdge(edgeId)
+	// .getNextIncidence();
+	// return (e == null) ? 0 : e.getId();
+	// }
 
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
@@ -512,10 +507,10 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
 
-	private void setEnumAttribute(AttributedElement e, String attributeName,
-			Object value) {
+	private void setEnumAttribute(AttributedElement<?, ?> e,
+			String attributeName, Object value) {
 		try {
-			AttributedElementClass aec = e.getAttributedElementClass();
+			AttributedElementClass<?, ?> aec = e.getAttributedElementClass();
 			Attribute attr = aec.getAttribute(attributeName);
 			if (attr == null) {
 				throw new GraphException("Attribute " + attributeName
@@ -527,8 +522,7 @@ public class JniServer {
 						+ " is no EnumDomain.");
 			}
 			Class<?> attrType = Class.forName(domain.getSchema()
-					.getPackagePrefix()
-					+ "." + domain.getQualifiedName());
+					.getPackagePrefix() + "." + domain.getQualifiedName());
 			Object enumValue = attrType.getMethod("valueOf",
 					new Class[] { String.class }).invoke(null, value);
 			if (enumValue == null) {
@@ -551,13 +545,14 @@ public class JniServer {
 		}
 	}
 
-	private void setAttribute(AttributedElement e, String attributeName,
+	private void setAttribute(AttributedElement<?, ?> e, String attributeName,
 			Object value) {
 		e.setAttribute(attributeName, value);
 	}
 
-	private String getEnumAttribute(AttributedElement e, String attributeName) {
-		AttributedElementClass aec = e.getAttributedElementClass();
+	private String getEnumAttribute(AttributedElement<?, ?> e,
+			String attributeName) {
+		AttributedElementClass<?, ?> aec = e.getAttributedElementClass();
 		Attribute attr = aec.getAttribute(attributeName);
 		if (attr == null) {
 			throw new GraphException("Attribute " + attributeName
@@ -572,7 +567,7 @@ public class JniServer {
 
 	}
 
-	private Object getAttribute(AttributedElement e, String attributeName) {
+	private Object getAttribute(AttributedElement<?, ?> e, String attributeName) {
 		return e.getAttribute(attributeName);
 	}
 

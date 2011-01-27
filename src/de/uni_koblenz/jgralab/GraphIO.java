@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -41,14 +40,12 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +74,7 @@ import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.MapDomain;
 import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
@@ -87,7 +85,10 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
+import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
+import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
+import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
 
 /**
  * class for loading and storing schema and graphs in tg format
@@ -173,6 +174,8 @@ public class GraphIO {
 	 */
 	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
 
+	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
+
 	private final Map<String, Method> createMethods;
 
 	private int line; // line number
@@ -256,6 +259,7 @@ public class GraphIO {
 		graphClass = null;
 		vertexClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
 		edgeClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
+		incidenceClassMap = new TreeMap<IncidenceClass, GraphIO.IncidenceClassData>();
 		commentData = new HashMap<String, List<String>>();
 		stringPool = new HashMap<String, String>();
 		putBackChar = -1;
@@ -446,6 +450,9 @@ public class GraphIO {
 
 	private void writeIncidenceClassDefintion(Package pkg, IncidenceClass ic)
 			throws IOException {
+		if (ic.isAbstract()) {
+			write(" abstract");
+		}
 		space();
 		writeIdentifier(ic.getVertexClass().getQualifiedName(pkg));
 
@@ -1009,23 +1016,23 @@ public class GraphIO {
 		}
 	}
 
-	public static Schema loadSchemaFromDatabase(GraphDatabase graphDatabase,
-			String packagePrefix, String schemaName) throws GraphIOException {
-		String definition = graphDatabase.getSchemaDefinition(packagePrefix,
-				schemaName);
-		InputStream input = new ByteArrayInputStream(definition.getBytes());
-		return loadSchemaFromStream(input);
-	}
+	// public static Schema loadSchemaFromDatabase(GraphDatabase graphDatabase,
+	// String packagePrefix, String schemaName) throws GraphIOException {
+	// String definition = graphDatabase.getSchemaDefinition(packagePrefix,
+	// schemaName);
+	// InputStream input = new ByteArrayInputStream(definition.getBytes());
+	// return loadSchemaFromStream(input);
+	// }
 
-	public static Schema loadAndCommitSchemaFromDatabase(
-			GraphDatabase graphDatabase, String packagePrefix, String schemaName)
-			throws GraphIOException {
-		Schema schema = loadSchemaFromDatabase(graphDatabase, packagePrefix,
-				schemaName);
-		schema.commit("test",
-				new CodeGeneratorConfiguration().withDatabaseSupport());
-		return schema;
-	}
+	// public static Schema loadAndCommitSchemaFromDatabase(
+	// GraphDatabase graphDatabase, String packagePrefix, String schemaName)
+	// throws GraphIOException {
+	// Schema schema = loadSchemaFromDatabase(graphDatabase, packagePrefix,
+	// schemaName);
+	// schema.commit("test",
+	// new CodeGeneratorConfiguration().withDatabaseSupport());
+	// return schema;
+	// }
 
 	public static Schema loadSchemaFromStream(InputStream in)
 			throws GraphIOException {
@@ -1379,11 +1386,11 @@ public class GraphIO {
 	 *             if version number in file can not be processed
 	 */
 	private void header() throws GraphIOException {
-		match("TGraph");
+		match("DHHTGraph");
 		int version = matchInteger();
 		if (version != TGFILE_VERSION) {
-			throw new GraphIOException("Can't read TGFile version " + version
-					+ ". Expected version " + TGFILE_VERSION);
+			throw new GraphIOException("Can't read DHHTGFile version "
+					+ version + ". Expected version " + TGFILE_VERSION);
 		}
 		match(";");
 	}
@@ -1432,6 +1439,7 @@ public class GraphIO {
 		// test for correct syntax, because otherwise, the following
 		// sorting/creation methods probably can't work.
 		if (!(lookAhead.equals("") || lookAhead.equals("Graph"))) {
+			// TODO adapt for hierarchical graphs
 			throw new GraphIOException("symbol '" + lookAhead
 					+ "' not recognized in line " + line, null);
 		}
@@ -1462,7 +1470,7 @@ public class GraphIO {
 				throw new GraphIOException("Annotated element '" + e.getKey()
 						+ "' not found in schema " + schema.getQualifiedName());
 			}
-			NamedElement el = schema.getNamedElement(e.getKey());
+			NamedElementClass el = schema.getNamedElement(e.getKey());
 			if (el instanceof Domain
 					&& !(el instanceof EnumDomain || el instanceof RecordDomain)) {
 				throw new GraphIOException(
@@ -1575,7 +1583,9 @@ public class GraphIO {
 				|| lookAhead.equals("EnumDomain")
 				|| lookAhead.equals("abstract")
 				|| lookAhead.equals("VertexClass")
-				|| lookAhead.equals("EdgeClass") || lookAhead.equals("Comment")) {
+				|| lookAhead.equals("EdgeClass")
+				|| lookAhead.equals("BinaryEdgeClass")
+				|| lookAhead.equals("Comment")) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
 			} else if (lookAhead.equals("RecordDomain")) {
@@ -1713,6 +1723,19 @@ public class GraphIO {
 			match();
 			qn = matchQualifiedName(true);
 			hierarchy.add(toQNameString(qn));
+		}
+		return hierarchy;
+	}
+
+	private List<String> parseIncidenceHierarchy() throws GraphIOException {
+		List<String> hierarchy = new LinkedList<String>();
+		match(":");
+		String roleName = matchSimpleName(false);
+		hierarchy.add(roleName);
+		while (lookAhead.equals(",")) {
+			match();
+			roleName = matchSimpleName(false);
+			hierarchy.add(roleName);
 		}
 		return hierarchy;
 	}
@@ -1910,29 +1933,32 @@ public class GraphIO {
 				graphElementClassData.directSuperClasses = parseHierarchy();
 			}
 			vertexClassBuffer.get(gcName).add(graphElementClassData);
-		} else if (lookAhead.equals("EdgeClass")) {
+		} else if (lookAhead.equals("EdgeClass")
+				|| lookAhead.equals("BinaryEdgeClass")) {
+			if (lookAhead.equals("BinaryEdgeClass")) {
+				graphElementClassData.isBinaryEdge = true;
+			}
+
 			match();
 			String[] qn = matchQualifiedName(true);
 			graphElementClassData.packageName = qn[0];
 			graphElementClassData.simpleName = qn[1];
 			if (lookAhead.equals(":")) {
-				graphElementClassData.directSuperClasses = parseHierarchy();
+				graphElementClassData.directSuperClasses = parseIncidenceHierarchy();
 			}
-			match("from");
-			String[] fqn = matchQualifiedName(true);
-			graphElementClassData.fromVertexClassName = toQNameString(fqn);
-			graphElementClassData.fromMultiplicity = parseMultiplicity();
-			graphElementClassData.fromRoleName = parseRoleName();
-			graphElementClassData.redefinedFromRoles = parseRolenameRedefinitions();
-			graphElementClassData.fromAggregation = parseAggregation();
 
-			match("to");
-			String[] tqn = matchQualifiedName(true);
-			graphElementClassData.toVertexClassName = toQNameString(tqn);
-			graphElementClassData.toMultiplicity = parseMultiplicity();
-			graphElementClassData.toRoleName = parseRoleName();
-			graphElementClassData.redefinedToRoles = parseRolenameRedefinitions();
-			graphElementClassData.toAggregation = parseAggregation();
+			while (lookAhead.equals("from")) {
+				IncidenceClassData incidenceClassData = parseIncidenceClass(graphElementClassData);
+				graphElementClassData.fromIncidenceClasses
+						.add(incidenceClassData);
+			}
+
+			while (lookAhead.equals("to")) {
+				IncidenceClassData incidenceClassData = parseIncidenceClass(graphElementClassData);
+				graphElementClassData.toIncidenceClasses
+						.add(incidenceClassData);
+			}
+
 			edgeClassBuffer.get(gcName).add(graphElementClassData);
 		} else {
 			throw new SchemaException("Undefined keyword: " + lookAhead
@@ -1948,6 +1974,31 @@ public class GraphIO {
 			graphElementClassData.constraints = parseConstraints();
 		}
 		match(";");
+	}
+
+	private IncidenceClassData parseIncidenceClass(
+			GraphElementClassData graphElementClassData)
+			throws GraphIOException {
+		IncidenceClassData incidenceClassData = new IncidenceClassData();
+		incidenceClassData.edgeClassName = graphElementClassData
+				.getQualifiedName();
+		match();
+		if (lookAhead.equals("abstract")) {
+			incidenceClassData.isAbstract = true;
+			match();
+		}
+		String[] vqn = matchQualifiedName(true);
+		incidenceClassData.vertexClassName = toQNameString(vqn);
+		incidenceClassData.roleName = parseRoleName();
+		if (lookAhead.equals(":")) {
+			incidenceClassData.directSuperClasses = parseHierarchy();
+		}
+		incidenceClassData.multiplicityEdgesAtVertex = parseMultiplicity();
+		incidenceClassData.redefinedRolesAtVertex = parseRolenameRedefinitions();
+		incidenceClassData.multiplicityVerticesAtEdge = parseMultiplicity();
+		incidenceClassData.redefinedRolesAtEdge = parseRolenameRedefinitions();
+		incidenceClassData.incidenceType = parseIncidenceType();
+		return incidenceClassData;
 	}
 
 	private Set<Constraint> parseConstraints() throws GraphIOException {
@@ -1985,13 +2036,27 @@ public class GraphIO {
 
 	private EdgeClass createEdgeClass(GraphElementClassData ecd, GraphClass gc)
 			throws GraphIOException, SchemaException {
-		EdgeClass ec = gc.createEdgeClass(ecd.getQualifiedName(),
-				gc.getVertexClass(ecd.fromVertexClassName),
-				ecd.fromMultiplicity[0], ecd.fromMultiplicity[1],
-				ecd.fromRoleName, ecd.fromAggregation,
-				gc.getVertexClass(ecd.toVertexClassName),
-				ecd.toMultiplicity[0], ecd.toMultiplicity[1], ecd.toRoleName,
-				ecd.toAggregation);
+		EdgeClass ec = ecd.isBinaryEdge ? gc.createBinaryEdgeClass(ecd
+				.getQualifiedName()) : gc.createEdgeClass(ecd
+				.getQualifiedName());
+		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
+			incidenceClassMap.put(gc.createIncidenceClass(ec,
+					gc.getVertexClass(icd.vertexClassName), icd.roleName,
+					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
+					icd.multiplicityEdgesAtVertex[1],
+					icd.multiplicityVerticesAtEdge[0],
+					icd.multiplicityVerticesAtEdge[1],
+					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
+		}
+		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
+			incidenceClassMap.put(gc.createIncidenceClass(ec,
+					gc.getVertexClass(icd.vertexClassName), icd.roleName,
+					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
+					icd.multiplicityEdgesAtVertex[1],
+					icd.multiplicityVerticesAtEdge[0],
+					icd.multiplicityVerticesAtEdge[1],
+					Direction.EDGE_TO_VERTEX, icd.incidenceType), icd);
+		}
 
 		addAttributes(ecd.attributes, ec);
 
@@ -2078,23 +2143,19 @@ public class GraphIO {
 		return result;
 	}
 
-	private AggregationKind parseAggregation() throws GraphIOException {
-		if (!lookAhead.equals("aggregation")) {
-			return AggregationKind.NONE;
-		}
-		match();
-		if (lookAhead.equals("none")) {
+	private IncidenceType parseIncidenceType() throws GraphIOException {
+		if (lookAhead.equals("EDGE")) {
 			match();
-			return AggregationKind.NONE;
-		} else if (lookAhead.equals("shared")) {
+			return IncidenceType.EDGE;
+		} else if (lookAhead.equals("AGGREGATE")) {
 			match();
-			return AggregationKind.SHARED;
-		} else if (lookAhead.equals("composite")) {
+			return IncidenceType.AGGREGATION;
+		} else if (lookAhead.equals("COMPOSITE")) {
 			match();
-			return AggregationKind.COMPOSITE;
+			return IncidenceType.COMPOSITION;
 		} else {
 			throw new GraphIOException(
-					"invalid aggregation: expected none, shared, or composite, but found '"
+					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
 							+ lookAhead + "' in line " + line);
 		}
 	}
@@ -2197,7 +2258,7 @@ public class GraphIO {
 									"undefined VertexClass '" + superClassName
 											+ "'");
 						}
-						((VertexClass) aec).addSuperClass(superClass);
+						((VertexClassImpl) aec).addSuperClass(superClass);
 					}
 				}
 			}
@@ -2232,10 +2293,28 @@ public class GraphIO {
 						throw new GraphIOException("undefined EdgeClass '"
 								+ superClassName + "'");
 					}
-					ec.addSuperClass(superClass);
+					((EdgeClassImpl) ec).addSuperClass(superClass);
+					buildIncidenceClassHierarchie(ec,
+							superClass);
 				}
+
 				ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
 				ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
+			}
+		}
+	}
+
+	private void buildIncidenceClassHierarchie(EdgeClass ec,
+			EdgeClass superClass) {
+		for (IncidenceClass subIc : ec.getIncidenceClasses()) {
+			IncidenceClassData subIcd = incidenceClassMap.get(subIc);
+			for (IncidenceClass superIc : superClass.getIncidenceClasses()) {
+				if (subIc.getDirection() != superIc.getDirection()) {
+					continue;
+				}
+				if (subIcd.directSuperClasses.contains(superIc.getRolename())) {
+					((IncidenceClassImpl) subIc).addSuperClass(superIc);
+				}
 			}
 		}
 	}
@@ -3073,47 +3152,45 @@ public class GraphIO {
 	 * checks if from- and to-VertexClasses given in EdgeClass definitions exist
 	 */
 	private void checkFromToVertexClasses() throws GraphIOException {
-		boolean existingFromVertexClass;
-		boolean existingToVertexClass;
-
 		for (Entry<String, List<GraphElementClassData>> graphClassEdge : edgeClassBuffer
 				.entrySet()) {
 			for (GraphElementClassData ec : graphClassEdge.getValue()) {
-				existingFromVertexClass = false;
-				existingToVertexClass = false;
 
-				for (Entry<String, List<GraphElementClassData>> graphClassVertex : vertexClassBuffer
-						.entrySet()) {
-					for (GraphElementClassData vc : graphClassVertex.getValue()) {
-						if (ec.fromVertexClassName
-								.equals(vc.getQualifiedName())
-								|| ec.fromVertexClassName.equals("Vertex")) {
-							existingFromVertexClass = true;
-						}
-						if (ec.toVertexClassName.equals(vc.getQualifiedName())
-								|| ec.toVertexClassName.equals("Vertex")) {
-							existingToVertexClass = true;
-						}
-						if (existingFromVertexClass && existingToVertexClass) {
-							break;
-						}
-					}
-					if (existingFromVertexClass && existingToVertexClass) {
-						break;
+				for (IncidenceClassData icd : ec.fromIncidenceClasses) {
+					if (!checkExistanceOfVertexClass(icd)) {
+						throw new GraphIOException("FromVertexClass "
+								+ icd.vertexClassName + " at EdgeClass "
+								+ ec.getQualifiedName() + " does not exist.");
 					}
 				}
-				if (!existingFromVertexClass) {
-					throw new GraphIOException("FromVertexClass "
-							+ ec.fromVertexClassName + " at EdgeClass "
-							+ ec.getQualifiedName() + " + does not exist");
-				}
-				if (!existingToVertexClass) {
-					throw new GraphIOException("ToVertexClass "
-							+ ec.toVertexClassName + " at EdgeClass "
-							+ ec.getQualifiedName() + " does not exist");
+
+				for (IncidenceClassData icd : ec.toIncidenceClasses) {
+					if (!checkExistanceOfVertexClass(icd)) {
+						throw new GraphIOException("ToVertexClass "
+								+ icd.vertexClassName + " at EdgeClass "
+								+ ec.getQualifiedName() + " does not exist.");
+					}
 				}
 			}
 		}
+	}
+
+	private boolean checkExistanceOfVertexClass(IncidenceClassData icd) {
+		boolean existingVertexClass = false;
+		for (Entry<String, List<GraphElementClassData>> graphClassVertex : vertexClassBuffer
+				.entrySet()) {
+			for (GraphElementClassData vc : graphClassVertex.getValue()) {
+				if (icd.vertexClassName.equals(vc.getQualifiedName())
+						|| icd.vertexClassName.equals("Vertex")) {
+					existingVertexClass = true;
+					break;
+				}
+			}
+			if (existingVertexClass) {
+				break;
+			}
+		}
+		return existingVertexClass;
 	}
 
 	/**
@@ -3174,6 +3251,34 @@ public class GraphIO {
 	}
 
 	/**
+	 * IncidenceClassData contains the parsed data of an IncidenceClass. This
+	 * data is used to create an IncidenceClass.
+	 */
+	public class IncidenceClassData {
+
+		boolean isAbstract = false;
+
+		List<String> directSuperClasses = new LinkedList<String>();
+
+		String roleName = "";
+
+		String vertexClassName;
+
+		int[] multiplicityEdgesAtVertex = { 0, Integer.MAX_VALUE };
+
+		Set<String> redefinedRolesAtVertex = null;
+
+		String edgeClassName;
+
+		int[] multiplicityVerticesAtEdge = { 0, Integer.MAX_VALUE };
+
+		Set<String> redefinedRolesAtEdge = null;
+
+		IncidenceType incidenceType;
+
+	}
+
+	/**
 	 * GraphElementClassData contains the parsed data of a GraphElementClass.
 	 * This data is used to create a GraphElementClass.
 	 */
@@ -3187,61 +3292,48 @@ public class GraphIO {
 
 		boolean isAbstract = false;
 
+		boolean isBinaryEdge = false;
+
 		List<String> directSuperClasses = new LinkedList<String>();
 
-		String fromVertexClassName;
+		List<IncidenceClassData> fromIncidenceClasses = new LinkedList<IncidenceClassData>();
 
-		int[] fromMultiplicity = { 1, Integer.MAX_VALUE };
-
-		String fromRoleName = "";
-
-		Set<String> redefinedFromRoles = null;
-
-		AggregationKind fromAggregation;
-
-		String toVertexClassName;
-
-		int[] toMultiplicity = { 1, Integer.MAX_VALUE };
-
-		String toRoleName = "";
-
-		Set<String> redefinedToRoles = null;
-
-		AggregationKind toAggregation;
+		List<IncidenceClassData> toIncidenceClasses = new LinkedList<IncidenceClassData>();
 
 		List<AttributeData> attributes = new ArrayList<AttributeData>();
 
 		Set<Constraint> constraints = new HashSet<Constraint>(1);
 	}
 
-	public static Graph loadGraphFromDatabase(String id,
-			GraphDatabase graphDatabase) throws GraphDatabaseException {
-		if (graphDatabase != null) {
-			return graphDatabase.getGraph(id);
-		} else {
-			throw new GraphDatabaseException("No graph database given.");
-		}
-	}
+	// public static Graph loadGraphFromDatabase(String id,
+	// GraphDatabase graphDatabase) throws GraphDatabaseException {
+	// if (graphDatabase != null) {
+	// return graphDatabase.getGraph(id);
+	// } else {
+	// throw new GraphDatabaseException("No graph database given.");
+	// }
+	// }
 
-	public static void loadSchemaIntoGraphDatabase(String filePath,
-			GraphDatabase graphDatabase) throws IOException, GraphIOException,
-			SQLException {
-		String schemaDefinition = readFileAsString(filePath);
-		Schema schema = loadSchemaFromFile(filePath);
-		graphDatabase.insertSchema(schema, schemaDefinition);
-	}
+	// public static void loadSchemaIntoGraphDatabase(String filePath,
+	// GraphDatabase graphDatabase) throws IOException, GraphIOException,
+	// SQLException {
+	// String schemaDefinition = readFileAsString(filePath);
+	// Schema schema = loadSchemaFromFile(filePath);
+	// graphDatabase.insertSchema(schema, schemaDefinition);
+	// }
 
-	private static String readFileAsString(String filePath) throws IOException {
-		StringBuffer fileData = new StringBuffer(1024);
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
-		}
-		reader.close();
-		return fileData.toString();
-	}
+	// private static String readFileAsString(String filePath) throws
+	// IOException {
+	// StringBuffer fileData = new StringBuffer(1024);
+	// BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	// char[] buf = new char[1024];
+	// int numRead = 0;
+	// while ((numRead = reader.read(buf)) != -1) {
+	// String readData = String.valueOf(buf, 0, numRead);
+	// fileData.append(readData);
+	// buf = new char[1024];
+	// }
+	// reader.close();
+	// return fileData.toString();
+	// }
 }
