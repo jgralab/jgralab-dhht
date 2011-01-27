@@ -152,16 +152,13 @@ public class Tg2GXL extends Tg2Whatever {
 		out.println("<gxl xmlns:xlink=\"" + xlink + "\">");
 
 		if (printSchema) {
-
-			out
-					.println("<graph id=\""
+			out.println("<graph id=\""
 							+ uniqueGraphClassName
 							+ "Graph\" edgeids=\" true\" edgemode=\" directed\" hypergraph=\" false\">");
 			out.println("<type xlink:href=\"" + gxlMetaSchema
 					+ "#gxl-1.0\" xlink:type=\" simple\"/>");
 		} else {
-			out
-					.println("<graph id=\""
+			out.println("<graph id=\""
 							+ graph.getId()
 							+ "\" edgeids=\" true\" edgemode=\" directed\" hypergraph=\" false\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
@@ -188,7 +185,7 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		AttributedElementClass elemClass = v.getAttributedElementClass();
+		AttributedElementClass<?,?> elemClass = v.getAttributedElementClass();
 		if (printSchema && !(v instanceof Schema)) {
 
 			if (v instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
@@ -231,7 +228,7 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	protected int getEdgeIncidence(Edge e, Vertex v) {
 		int i = 0;
-		for (Edge e0 : v.incidences()) {
+		for (Edge e0 : v.getIncidences()) {
 			if ((e0 == e) && (e0.isNormal() == e.isNormal())) {
 				return i;
 			}

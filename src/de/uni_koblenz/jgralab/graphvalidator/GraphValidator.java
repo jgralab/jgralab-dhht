@@ -100,10 +100,11 @@ public class GraphValidator {
 	 *         and where {@link MultiplicityConstraintViolation} constraints
 	 *         where violated
 	 */
-	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(
-			EdgeClass ec) {
+	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(EdgeClass ec) {
 		SortedSet<MultiplicityConstraintViolation> brokenConstraints = new TreeSet<MultiplicityConstraintViolation>();
-
+        for ()
+		
+		
 		int toMin = ec.getTo().getMin();
 		int toMax = ec.getTo().getMax();
 		Set<AttributedElement> badOutgoing = new HashSet<AttributedElement>();

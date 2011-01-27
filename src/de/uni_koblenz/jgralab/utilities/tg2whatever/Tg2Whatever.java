@@ -218,7 +218,7 @@ public abstract class Tg2Whatever {
 
 	private void printEdges(PrintStream out) {
 		currentElementSequenceIndex = 0;
-		for (Edge e : graph.edges()) {
+		for (Edge e : graph.getEdges()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(e)) {
 				printEdge(out, e);
@@ -228,7 +228,7 @@ public abstract class Tg2Whatever {
 
 	private void printVertices(PrintStream out) {
 		currentElementSequenceIndex = 0;
-		for (Vertex v : graph.vertices()) {
+		for (Vertex v : graph.getVertices()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(v)) {
 				printVertex(out, v);
