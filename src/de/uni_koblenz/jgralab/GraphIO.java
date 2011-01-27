@@ -2294,8 +2294,7 @@ public class GraphIO {
 								+ superClassName + "'");
 					}
 					((EdgeClassImpl) ec).addSuperClass(superClass);
-					buildIncidenceClassHierarchie(ec,
-							superClass);
+					buildIncidenceClassHierarchie(ec, superClass);
 				}
 
 				ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
@@ -2316,6 +2315,9 @@ public class GraphIO {
 					((IncidenceClassImpl) subIc).addSuperClass(superIc);
 				}
 			}
+		}
+		for (EdgeClass supClass : superClass.getDirectSuperClasses()) {
+			buildIncidenceClassHierarchie(ec, supClass);
 		}
 	}
 
