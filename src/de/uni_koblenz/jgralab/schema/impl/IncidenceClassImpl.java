@@ -197,6 +197,17 @@ public class IncidenceClassImpl extends
 		((IncidenceClassImpl) superClass).directSubClasses.add(this);
 	}
 
+	public void addHiddenRolenameAtEdge(IncidenceClass ic) {
+		if ((ic == this) || (ic == null)) {
+			return;
+		}
+		hiddenEndsAtEdge.add(ic);
+	}
+
+	public void addHiddenRolenameAtVertex(IncidenceClass ic) {
+		hiddenEndsAtVertex.add(ic);
+	}
+
 	@Override
 	public Set<IncidenceClass> getAllSubClasses() {
 		Set<IncidenceClass> returnSet = new HashSet<IncidenceClass>();
