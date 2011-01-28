@@ -47,6 +47,7 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
@@ -186,7 +187,7 @@ public class Tg2GXL extends Tg2Whatever {
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
 		AttributedElementClass<?,?> elemClass = v.getMetaClass();
-		if (printSchema && !(v instanceof Schema)) {
+		if (printSchema && !(v instanceof  de.uni_koblenz.jgralab.grumlschema.structure.Schema)) {
 
 			if (v instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
 				out.println("<node id=\"" + v.getAttribute("qualifiedName")
@@ -588,5 +589,11 @@ public class Tg2GXL extends Tg2Whatever {
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	protected void printIncidence(PrintStream out, Incidence i) {
+		// TODO Auto-generated method stub
+		
 	}
 }
