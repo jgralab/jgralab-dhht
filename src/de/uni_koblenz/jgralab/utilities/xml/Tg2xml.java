@@ -121,7 +121,7 @@ public class Tg2xml extends GraphVisitor {
 		try {
 			writer.writeStartDocument("UTF-8", "1.0");
 
-			writer.writeStartElement(prefix, graph.getAttributedElementClass()
+			writer.writeStartElement(prefix, graph.getMetaClass()
 					.getQualifiedName(), namespaceURI);
 			writer.writeNamespace(prefix, namespaceURI);
 			writer.writeNamespace("xsi",
@@ -140,7 +140,7 @@ public class Tg2xml extends GraphVisitor {
 	@Override
 	protected void visitVertex(Vertex v) throws XMLStreamException {
 		// write vertex
-		writer.writeEmptyElement(v.getAttributedElementClass()
+		writer.writeEmptyElement(v.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_ID, GRUML_ID_PREFIX_VERTEX
 				+ v.getId());
@@ -166,7 +166,7 @@ public class Tg2xml extends GraphVisitor {
 	@Override
 	protected void visitEdge(Edge e) throws XMLStreamException {
 		IncidencePositionMark currentMark = incidencePositionMarker.getMark(e);
-		writer.writeEmptyElement(e.getAttributedElementClass()
+		writer.writeEmptyElement(e.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_FROM, GRUML_ID_PREFIX_VERTEX
 				+ e.getAlpha().getId());
@@ -212,7 +212,7 @@ public class Tg2xml extends GraphVisitor {
 	private void writeAttributes(AttributedElement element)
 			throws XMLStreamException {
 
-		for (Attribute currentAttribute : element.getAttributedElementClass()
+		for (Attribute currentAttribute : element.getMetaClass()
 				.getAttributeList()) {
 			String currentName = currentAttribute.getName();
 			try {

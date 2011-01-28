@@ -102,7 +102,7 @@ public abstract class DegreeFunction extends Greql2Function {
 				while (inc != null) {
 					if (((subgraph == null) || subgraph.isMarked(inc))
 							&& typeCol.acceptsType(inc
-									.getAttributedElementClass())) {
+									.getMetaClass())) {
 						count++;
 					}
 					inc = inc.getNextIncidence(direction);

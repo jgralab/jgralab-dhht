@@ -87,7 +87,7 @@ public class Type extends Greql2Function {
 		switch (checkArguments(arguments)) {
 		case 0:
 			return new JValueImpl(arguments[0].toAttributedElement()
-					.getAttributedElementClass());
+					.getMetaClass());
 		case 1:
 			return new JValueImpl(graph.getSchema().getAttributedElementClass(
 					arguments[0].toString()));

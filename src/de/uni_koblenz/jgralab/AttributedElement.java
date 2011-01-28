@@ -46,10 +46,6 @@ import de.uni_koblenz.jgralab.schema.AttributedElementClass;
  */
 public interface AttributedElement<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass, ConcreteInterface>> extends Comparable<ConcreteInterface>, TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 
-	/**
-	 * @return the corresponding m2-element to this m1-element
-	 */
-	public ConcreteAttributedElementClass getAttributedElementClass();
 
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException;

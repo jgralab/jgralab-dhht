@@ -210,7 +210,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-		for (Attribute attr : getAttributedElementClass().getAttributeList()) {
+		for (Attribute attr : getMetaClass().getAttributeList()) {
 			try {
 				if ((attr.getDefaultValueAsString() != null)
 						&& !attr.getDefaultValueAsString().isEmpty()) {
@@ -921,7 +921,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@Override
 	public GraphClass getGraphClass() {
-		return getAttributedElementClass();
+		return getMetaClass();
 	}
 
 	/*

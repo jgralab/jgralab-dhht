@@ -8826,9 +8826,9 @@ public class VertexTest extends InstanceTest {
 		Vertex v2 = g.createSuperNode();
 		commit(g);
 		createReadOnlyTransaction(g);
-		assertEquals(vertices[3], v0.getAttributedElementClass());
-		assertEquals(vertices[1], v1.getAttributedElementClass());
-		assertEquals(vertices[2], v2.getAttributedElementClass());
+		assertEquals(vertices[3], v0.getMetaClass());
+		assertEquals(vertices[1], v1.getMetaClass());
+		assertEquals(vertices[2], v2.getMetaClass());
 		commit(g);
 	}
 

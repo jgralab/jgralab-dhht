@@ -343,10 +343,10 @@ public class JValuePathSystem extends JValueImpl {
 		while (iter.hasNext()) {
 			Map.Entry<PathSystemKey, PathSystemEntry> entry = iter.next();
 			returnSet.add(new JValueImpl(entry.getKey().getVertex()
-					.getAttributedElementClass(), entry.getKey().getVertex()));
+					.getMetaClass(), entry.getKey().getVertex()));
 			Edge e = entry.getValue().getParentEdge();
 			if (e != null) {
-				returnSet.add(new JValueImpl(e.getAttributedElementClass(), e));
+				returnSet.add(new JValueImpl(e.getMetaClass(), e));
 			}
 		}
 		return returnSet;
@@ -363,7 +363,7 @@ public class JValuePathSystem extends JValueImpl {
 		while (iter.hasNext()) {
 			Map.Entry<PathSystemKey, PathSystemEntry> entry = iter.next();
 			returnSet.add(new JValueImpl(entry.getKey().getVertex()
-					.getAttributedElementClass(), entry.getKey().getVertex()));
+					.getMetaClass(), entry.getKey().getVertex()));
 		}
 		return returnSet;
 	}
@@ -380,7 +380,7 @@ public class JValuePathSystem extends JValueImpl {
 			Map.Entry<PathSystemKey, PathSystemEntry> entry = iter.next();
 			Edge e = entry.getValue().getParentEdge();
 			if (e != null) {
-				returnSet.add(new JValueImpl(e.getAttributedElementClass(), e));
+				returnSet.add(new JValueImpl(e.getMetaClass(), e));
 			}
 		}
 		return returnSet;
@@ -420,12 +420,12 @@ public class JValuePathSystem extends JValueImpl {
 				.entrySet().iterator();
 		while (iter.hasNext()) {
 			Map.Entry<PathSystemKey, PathSystemEntry> entry = iter.next();
-			if (entry.getValue().getParentEdge().getAttributedElementClass() == type) {
+			if (entry.getValue().getParentEdge().getMetaClass() == type) {
 				return true;
 			}
 			// TODO: Don't we need to check parentVertex, too?? Or is that
 			// the key?
-			if (entry.getKey().getVertex().getAttributedElementClass() == type) {
+			if (entry.getKey().getVertex().getMetaClass() == type) {
 				return true;
 			}
 		}
@@ -462,7 +462,7 @@ public class JValuePathSystem extends JValueImpl {
 				if ((entry.getKey().getVertex() == vertex)
 						&& ((typeCol == null) || (typeCol.acceptsType(entry
 								.getValue().getParentEdge()
-								.getAttributedElementClass())))) {
+								.getMetaClass())))) {
 					degree++;
 				}
 			}
@@ -473,7 +473,7 @@ public class JValuePathSystem extends JValueImpl {
 				if ((entry.getValue().getParentVertex() == vertex)
 						&& ((typeCol == null) || (typeCol.acceptsType(entry
 								.getValue().getParentEdge()
-								.getAttributedElementClass())))) {
+								.getMetaClass())))) {
 					degree++;
 				}
 			}
@@ -484,7 +484,7 @@ public class JValuePathSystem extends JValueImpl {
 				PathSystemEntry pe = entry.getValue();
 				if ((typeCol == null)
 						|| typeCol.acceptsType(pe.getParentEdge()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					if (pe.getParentVertex() == vertex) {
 						degree++;
 					}
@@ -526,7 +526,7 @@ public class JValuePathSystem extends JValueImpl {
 			PathSystemEntry pe = entry.getValue();
 			if ((typeCol == null)
 					|| typeCol.acceptsType(pe.getParentEdge()
-							.getAttributedElementClass())) {
+							.getMetaClass())) {
 				if (pe.getParentVertex() == vertex) {
 					degree++;
 				}

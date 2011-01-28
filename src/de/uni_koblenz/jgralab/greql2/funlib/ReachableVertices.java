@@ -165,7 +165,7 @@ public class ReachableVertices extends Greql2Function {
 					for (Edge e : vertex.incidences()) {
 						System.out.println("        "
 								+ (e.isNormal() ? "-->" : "<--")
-								+ e.getAttributedElementClass().getSimpleName()
+								+ e.getMetaClass().getSimpleName()
 								+ " " + e.getThatRole());
 					}
 					System.out

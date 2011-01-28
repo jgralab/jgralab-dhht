@@ -123,7 +123,7 @@ public class TypeIdEvaluator extends VertexEvaluator {
 	@Override
 	public String getLoggingName() {
 		StringBuilder name = new StringBuilder();
-		name.append(vertex.getAttributedElementClass().getQualifiedName());
+		name.append(vertex.getMetaClass().getQualifiedName());
 		if (vertex.is_type()) {
 			name.append("-type");
 		}

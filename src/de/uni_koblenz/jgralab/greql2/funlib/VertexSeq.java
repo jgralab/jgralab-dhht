@@ -112,7 +112,7 @@ public class VertexSeq extends Greql2Function {
 		case 1:
 			JValueTypeCollection tc = arguments[2].toJValueTypeCollection();
 			while (current != null) {
-				if (tc.acceptsType(current.getAttributedElementClass())) {
+				if (tc.acceptsType(current.getMetaClass())) {
 					vertices.add(new JValueImpl(current));
 				}
 				if (current == end) {

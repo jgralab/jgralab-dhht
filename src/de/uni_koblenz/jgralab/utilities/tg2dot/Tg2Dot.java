@@ -39,13 +39,19 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.utilities.tg2whatever.Tg2Whatever;
 
 public class Tg2Dot extends Tg2Whatever {
@@ -93,7 +99,7 @@ public class Tg2Dot extends Tg2Whatever {
 
 		out.println("node [shape=\"record\" " + "fontname=\"" + fontname
 				+ "\" " + "fontsize=\"" + fontsize + "\" color=\"#999999\"];");
-		out.println("edge [fontname=\"" + fontname + "\" fontsize=\""
+		out.println("edge [style=\"dashed\" fontname=\"" + fontname + "\" fontsize=\""
 				+ fontsize + "\" labelfontname=\"" + fontname
 				+ "\" labelfontsize=\"" + fontsize + "\" color=\"#999999\"];");
 	}
@@ -103,9 +109,15 @@ public class Tg2Dot extends Tg2Whatever {
 		out.println("}");
 	}
 
+	public void printBeforeEdges(PrintStream out) {
+		out.println("node [shape=\"diamond\" " + "fontname=\"" + fontname
+				+ "\" " + "fontsize=\"" + fontsize + "\" color=\"#999999\"];");
+	}
+	
+	
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		AttributedElementClass cls = v.getAttributedElementClass();
+		VertexClass cls = v.getMetaClass();
 		out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
 		if (cls.getAttributeCount() > 0) {
@@ -114,6 +126,19 @@ public class Tg2Dot extends Tg2Whatever {
 		}
 		out.println("}\"];");
 	}
+	
+	@Override
+	protected void printEdge(PrintStream out, Edge e) {
+		EdgeClass cls = e.getMetaClass();
+		out.print("e" + e.getId() + " [label=\"{{e" + e.getId() + "|"
+				+ cls.getUniqueName().replace('$', '.') + "}");
+		if (cls.getAttributeCount() > 0) {
+			out.print("|");
+			printAttributes(out, e);
+		}
+		out.println("}\"];");
+	}
+
 
 	@Override
 	protected String stringQuote(String s) {
@@ -169,7 +194,6 @@ public class Tg2Dot extends Tg2Whatever {
 			return reversedEdges;
 		}
 
-		@SuppressWarnings("unchecked")
 		Class<? extends Edge> ec = (Class<? extends Edge>) e.getM1Class();
 		Boolean reversed = revEdgeTypeCache.get(ec);
 		if (reversed != null) {
@@ -191,66 +215,53 @@ public class Tg2Dot extends Tg2Whatever {
 		return reversedEdges ^ rev;
 	}
 
+	
+	
 	@Override
-	protected void printEdge(PrintStream out, Edge e) {
-		boolean reversed = printEdgeReversed(e);
-		Vertex alpha = reversed ? e.getOmega() : e.getAlpha();
-		Vertex omega = reversed ? e.getAlpha() : e.getOmega();
-		out.print("v" + alpha.getId() + " -> v" + omega.getId() + " [");
+	protected void printIncidence(PrintStream out, Incidence i) {
+		boolean reversed = printEdgeReversed(i.getEdge());
 
-		EdgeClass cls = (EdgeClass) e.getAttributedElementClass();
+		//assume Vertex_TO_EDGE to be the direction to use
+		String startLabel = "v";
+		String endLabel = "e";
+		GraphElement<?,?,?> start = i.getVertex();
+		GraphElement<?,?,?> end = i.getEdge();
+		
+		
+		if (i.getDirection() == Direction.EDGE_TO_VERTEX  ^ reversed) {
+			start = reversed ? i.getVertex() : i.getEdge();
+			end = reversed ? i.getEdge() : i.getVertex();
+			startLabel = "e";
+			endLabel ="v";
+		}
+		
+		out.print(startLabel + start.getId() + " -> " + endLabel + end.getId() + " [");
+
+		IncidenceClass cls = (IncidenceClass) i.getMetaClass();
 		if (roleNames) {
-			String toRole = cls.getTo().getRolename();
-			if ((toRole != null) && (toRole.length() > 0)) {
-				out.print((reversed ? "tail" : "head") + "label=\""
-						+ stringQuote(toRole) + "\" ");
-			}
-			String fromRole = cls.getFrom().getRolename();
-			if ((fromRole != null) && (fromRole.length() > 0)) {
-				out.print((reversed ? "head" : "tail") + "label=\""
-						+ stringQuote(fromRole) + "\" ");
+			String role = cls.getRolename();
+			if ((role != null) && (role.length() > 0)) {
+				out.print("label=\"" + stringQuote(role) + "\" ");
 			}
 		}
 
 		out.print("dir=\"both\" ");
-		assert e.isNormal();
+
 		/*
 		 * The first 2 cases handle the case were the aggregation/composition
 		 * diamond is at the opposite side of the direction arrow.
 		 */
-		if (e.getOmegaSemantics() == AggregationKind.SHARED) {
-			if (reversed) {
+		if (cls.getIncidenceType() == IncidenceType.COMPOSITION) {
+			if (start==i.getVertex()) {
 				out.print("arrowhead=\"odiamond\" ");
 			} else {
 				out.print("arrowtail=\"odiamond\" ");
 			}
-		} else if (e.getOmegaSemantics() == AggregationKind.COMPOSITE) {
-			if (reversed) {
+		} else if (cls.getIncidenceType() == IncidenceType.AGGREGATION) {
+			if (start==i.getVertex()) {
 				out.print("arrowhead=\"diamond\" ");
 			} else {
 				out.print("arrowtail=\"diamond\" ");
-			}
-		}
-		/*
-		 * The next 2 cases handle the case were the aggregation/composition
-		 * diamond is at the same side as the direction arrow. Here, we print
-		 * only the diamond.
-		 */
-		else if (e.getAlphaSemantics() == AggregationKind.SHARED) {
-			if (reversed) {
-				out.print("arrowtail=\"odiamondnormal\" ");
-				out.print("arrowhead=\"none\" ");
-			} else {
-				out.print("arrowhead=\"odiamondnormal\" ");
-				out.print("arrowtail=\"none\" ");
-			}
-		} else if (e.getAlphaSemantics() == AggregationKind.COMPOSITE) {
-			if (reversed) {
-				out.print("arrowtail=\"diamondnormal\" ");
-				out.print("arrowhead=\"none\" ");
-			} else {
-				out.print("arrowhead=\"diamondnormal\" ");
-				out.print("arrowtail=\"none\" ");
 			}
 		}
 		/*
@@ -265,37 +276,18 @@ public class Tg2Dot extends Tg2Whatever {
 			}
 		}
 
-		out.print("label=\"e" + e.getId() + ": "
-				+ cls.getUniqueName().replace('$', '.'));
-
-		if (edgeAttributes && (cls.getAttributeCount() > 0)) {
-			out.print("\\l");
-			printAttributes(out, e);
-		}
 		out.print("\"");
 
 		if (printIncidenceNumbers) {
-			out.print(" taillabel=\"" + getIncidenceNumber(e, alpha) + "\"");
-			out.print(" headlabel=\""
-					+ getIncidenceNumber(e.getReversedEdge(), omega) + "\"");
+			out.print(" taillabel=\"" + getIncidenceNumber(i, end) + "\"");
+			out.print(" headlabel=\"" + getIncidenceNumber(i, start) + "\"");
 		}
 		out.println("];");
 
 	}
 
-	private int getIncidenceNumber(Edge e, Vertex v) {
-		int num = 1;
-		for (Edge inc : v.incidences()) {
-			if (inc == e) {
-				return num;
-			}
-			num++;
-		}
-		return -1;
-	}
-
-	private void printAttributes(PrintStream out, AttributedElement elem) {
-		AttributedElementClass cls = elem.getAttributedElementClass();
+	private void printAttributes(PrintStream out, AttributedElement<?,?> elem) {
+		AttributedElementClass<?,?> cls = elem.getMetaClass();
 		for (Attribute attr : cls.getAttributeList()) {
 			if (abbreviateEdgeAttributeNames && (elem instanceof Edge)) {
 				// sourcePosition => sP

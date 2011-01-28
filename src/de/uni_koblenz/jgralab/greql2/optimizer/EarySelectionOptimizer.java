@@ -638,8 +638,8 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			return true;
 		}
 
-		if (omega.getAttributedElementClass().getM1Class() == target
-				.getAttributedElementClass().getM1Class()) {
+		if (omega.getMetaClass().getM1Class() == target
+				.getMetaClass().getM1Class()) {
 			return false;
 		}
 
@@ -733,7 +733,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		}
 
 		Class<? extends Vertex> vertexClass = (Class<? extends Vertex>) origVertex
-				.getAttributedElementClass().getM1Class();
+				.getMetaClass().getM1Class();
 		Vertex topVertex = graph.createVertex(vertexClass);
 		copyAttributes(origVertex, topVertex);
 
@@ -750,7 +750,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			subVertex = copySubgraph(origEdge.getAlpha(), graph,
 					variablesToBeCopied, copiedVarMap);
 			Class<? extends Edge> edgeClass = (Class<? extends Edge>) origEdge
-					.getAttributedElementClass().getM1Class();
+					.getMetaClass().getM1Class();
 			graph.createEdge(edgeClass, subVertex, topVertex);
 			origEdge = origEdge.getNextIncidence(EdgeDirection.IN);
 		}
@@ -769,7 +769,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 *            <code>from</code>'s type.
 	 */
 	private void copyAttributes(AttributedElement from, AttributedElement to) {
-		for (Attribute attr : from.getAttributedElementClass()
+		for (Attribute attr : from.getMetaClass()
 				.getAttributeList()) {
 			to.setAttribute(attr.getName(), from.getAttribute(attr.getName()));
 		}

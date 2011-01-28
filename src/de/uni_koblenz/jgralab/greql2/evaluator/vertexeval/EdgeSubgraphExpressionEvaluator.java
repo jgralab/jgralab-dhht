@@ -66,7 +66,7 @@ public class EdgeSubgraphExpressionEvaluator extends
 		while (currentEdge != null) {
 			if ((subgraph == null) || (subgraph.isMarked(currentEdge))) {
 				AttributedElementClass edgeClass = currentEdge
-						.getAttributedElementClass();
+						.getMetaClass();
 				if (typeCollection.acceptsType(edgeClass)) {
 					subgraphAttr.mark(currentEdge);
 				}

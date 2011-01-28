@@ -208,7 +208,7 @@ public class JniServer {
 
 	public String getVertexClassName(int graphId, int vertexId) {
 		return graphs.get(graphId).getVertex(vertexId)
-				.getAttributedElementClass().getQualifiedName();
+				.getMetaClass().getQualifiedName();
 	}
 
 	public boolean getVertexBooleanAttribute(int graphId, int vertexId,
@@ -276,7 +276,7 @@ public class JniServer {
 	}
 
 	public String getEdgeClassName(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getAttributedElementClass()
+		return graphs.get(graphId).getEdge(edgeId).getMetaClass()
 				.getQualifiedName();
 	}
 
@@ -510,7 +510,7 @@ public class JniServer {
 	private void setEnumAttribute(AttributedElement<?, ?> e,
 			String attributeName, Object value) {
 		try {
-			AttributedElementClass<?, ?> aec = e.getAttributedElementClass();
+			AttributedElementClass<?, ?> aec = e.getMetaClass();
 			Attribute attr = aec.getAttribute(attributeName);
 			if (attr == null) {
 				throw new GraphException("Attribute " + attributeName
@@ -552,7 +552,7 @@ public class JniServer {
 
 	private String getEnumAttribute(AttributedElement<?, ?> e,
 			String attributeName) {
-		AttributedElementClass<?, ?> aec = e.getAttributedElementClass();
+		AttributedElementClass<?, ?> aec = e.getMetaClass();
 		Attribute attr = aec.getAttribute(attributeName);
 		if (attr == null) {
 			throw new GraphException("Attribute " + attributeName

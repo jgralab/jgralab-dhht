@@ -1559,7 +1559,7 @@ public class Rsa2Tg extends XmlProcessor {
 						"The XMI id "
 								+ xmiId
 								+ " must denonte an EdgeClass, but is "
-								+ ae.getAttributedElementClass()
+								+ ae.getMetaClass()
 										.getQualifiedName());
 			}
 
@@ -1732,7 +1732,7 @@ public class Rsa2Tg extends XmlProcessor {
 		StringBuilder sb = new StringBuilder();
 
 		de.uni_koblenz.jgralab.schema.AttributedElementClass aec = attributedElement
-				.getAttributedElementClass();
+				.getMetaClass();
 		sb.append(attributedElement);
 		sb.append(" { ");
 
@@ -2875,7 +2875,7 @@ public class Rsa2Tg extends XmlProcessor {
 							"Type attribute of association end (XMI id "
 									+ xmiId
 									+ ") must denote a VertexClass, but is "
-									+ ae.getAttributedElementClass()
+									+ ae.getMetaClass()
 											.getQualifiedName());
 				}
 				// VertexClass found
@@ -2914,7 +2914,7 @@ public class Rsa2Tg extends XmlProcessor {
 								"Assiocation attribute of association end (XMI id "
 										+ xmiId
 										+ ") must denote an EdgeClass, but is "
-										+ ae.getAttributedElementClass()
+										+ ae.getMetaClass()
 												.getQualifiedName());
 					}
 					// EdgeClass found
@@ -2965,7 +2965,7 @@ public class Rsa2Tg extends XmlProcessor {
 								"Type attribute of association end (XMI id "
 										+ xmiId
 										+ ") must denote a VertexClass, but is "
-										+ ae.getAttributedElementClass()
+										+ ae.getMetaClass()
 												.getQualifiedName());
 					}
 					inc.getFirstEndsAtIncidence().setOmega((VertexClass) ae);

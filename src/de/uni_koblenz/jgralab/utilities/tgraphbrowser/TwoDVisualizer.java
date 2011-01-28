@@ -268,7 +268,7 @@ public class TwoDVisualizer {
 				totalElements++;
 				if (v.isVertex()
 						&& state.selectedVertexClasses.get(v.toVertex()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					elementsToDisplay.add(v);
 					selectedElements++;
 				}
@@ -277,7 +277,7 @@ public class TwoDVisualizer {
 				totalElements++;
 				if (v.isEdge()
 						&& state.selectedEdgeClasses.get(v.toEdge()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					elementsToDisplay.add(new JValueImpl(v.toEdge()
 							.getNormalEdge()));
 					selectedElements++;
@@ -288,12 +288,12 @@ public class TwoDVisualizer {
 				totalElements++;
 				if (v.isVertex()
 						&& state.selectedVertexClasses.get(v.toVertex()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					elementsToDisplay.add(v);
 					selectedElements++;
 				} else if (v.isEdge()
 						&& state.selectedEdgeClasses.get(v.toEdge()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					elementsToDisplay.add(new JValueImpl(v.toEdge()
 							.getNormalEdge()));
 					selectedElements++;
@@ -518,21 +518,21 @@ public class TwoDVisualizer {
 		 */
 		@Override
 		protected void printEdge(PrintStream out, Edge e) {
-			if (!selectedEdgeClasses.get(e.getAttributedElementClass())) {
+			if (!selectedEdgeClasses.get(e.getMetaClass())) {
 				return;
 			}
 			Vertex alpha = e.getAlpha();
 			Vertex omega = e.getOmega();
 			// hide deselected vertices
-			if (!selectedVertexClasses.get(alpha.getAttributedElementClass())
+			if (!selectedVertexClasses.get(alpha.getMetaClass())
 					|| !selectedVertexClasses.get(omega
-							.getAttributedElementClass())) {
+							.getMetaClass())) {
 				return;
 			}
 
 			out.print("v" + alpha.getId() + " -> v" + omega.getId() + " [");
 
-			EdgeClass cls = (EdgeClass) e.getAttributedElementClass();
+			EdgeClass cls = (EdgeClass) e.getMetaClass();
 
 			out.print("dir=\"both\" ");
 			/*
@@ -613,7 +613,7 @@ public class TwoDVisualizer {
 		}
 
 		private void printAttributes(PrintStream out, AttributedElement elem) {
-			AttributedElementClass cls = elem.getAttributedElementClass();
+			AttributedElementClass cls = elem.getMetaClass();
 			StringBuilder value = new StringBuilder();
 			for (Attribute attr : cls.getAttributeList()) {
 				String current = attr.getName();
@@ -650,7 +650,7 @@ public class TwoDVisualizer {
 		 */
 		@Override
 		protected void printVertex(PrintStream out, Vertex v) {
-			AttributedElementClass cls = v.getAttributedElementClass();
+			AttributedElementClass cls = v.getMetaClass();
 			out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
 					+ cls.getUniqueName().replace('$', '.') + "}");
 			if (showAttributes && cls.getAttributeCount() > 0) {
@@ -673,7 +673,7 @@ public class TwoDVisualizer {
 			for (Edge e : v.incidences()) {
 				if (!elements.contains(new JValueImpl(e.getNormalEdge()))
 						&& selectedEdgeClasses.get(e.getNormalEdge()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					// mark this vertex that it has further edges
 					// print a new node, which is completely white
 					out.println("nv" + counter

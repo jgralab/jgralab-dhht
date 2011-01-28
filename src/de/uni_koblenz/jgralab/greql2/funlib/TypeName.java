@@ -89,7 +89,7 @@ public class TypeName extends Greql2Function {
 		switch (checkArguments(arguments)) {
 		case 0:
 			elem = arguments[0].toAttributedElement();
-			aec = elem.getAttributedElementClass();
+			aec = elem.getMetaClass();
 			break;
 		case 1:
 			aec = arguments[0].toAttributedElementClass();

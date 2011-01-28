@@ -552,4 +552,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public void putAfterAtEdge(Incidence i);
 
+
+
 }

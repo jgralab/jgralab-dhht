@@ -691,7 +691,7 @@ public class GraphIO {
 		space();
 		write("Graph " + toUtfString(graph.getId()) + " "
 				+ graph.getGraphVersion());
-		writeIdentifier(graph.getAttributedElementClass().getQualifiedName());
+		writeIdentifier(graph.getMetaClass().getQualifiedName());
 		int vCount = graph.getVCount();
 		int eCount = graph.getECount();
 		// with a GraphMarker, v/eCount have to be restricted to the marked
@@ -724,7 +724,7 @@ public class GraphIO {
 			}
 			vId = nextV.getId();
 			AttributedElementClass<?, ?> aec = nextV
-					.getAttributedElementClass();
+					.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
@@ -784,7 +784,7 @@ public class GraphIO {
 			}
 			eId = nextE.getId();
 			AttributedElementClass<?, ?> aec = nextE
-					.getAttributedElementClass();
+					.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {

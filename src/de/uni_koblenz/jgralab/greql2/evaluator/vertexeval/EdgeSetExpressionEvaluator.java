@@ -74,7 +74,7 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 		while (currentEdge != null) {
 			if ((subgraph == null) || (subgraph.isMarked(currentEdge))) {
 				AttributedElementClass edgeClass = currentEdge
-						.getAttributedElementClass();
+						.getMetaClass();
 				if (typeCollection.acceptsType(edgeClass)) {
 					resultSet.add(new JValueImpl(currentEdge));
 				}

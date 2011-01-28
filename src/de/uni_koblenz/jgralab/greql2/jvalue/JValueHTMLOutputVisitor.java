@@ -202,11 +202,11 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 		Vertex vertex = v.toVertex();
 		if (createElementLinks) {
 			storeln("<a href=\"v" + vertex.getId() + "\">v" + vertex.getId()
-					+ ": " + vertex.getAttributedElementClass().getUniqueName()
+					+ ": " + vertex.getMetaClass().getUniqueName()
 					+ "</a>");
 		} else {
 			storeln("v" + vertex.getId() + ": "
-					+ vertex.getAttributedElementClass().getUniqueName());
+					+ vertex.getMetaClass().getUniqueName());
 		}
 	}
 
@@ -215,10 +215,10 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 		Edge edge = e.toEdge();
 		if (createElementLinks) {
 			storeln("<a href=\"e" + edge.getId() + "\">e" + edge.getId() + ": "
-					+ edge.getAttributedElementClass().getUniqueName() + "</a>");
+					+ edge.getMetaClass().getUniqueName() + "</a>");
 		} else {
 			storeln("e" + edge.getId() + ": "
-					+ edge.getAttributedElementClass().getUniqueName());
+					+ edge.getMetaClass().getUniqueName());
 		}
 	}
 
@@ -296,10 +296,10 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 		Graph gr = g.toGraph();
 		if (createElementLinks) {
 			storeln("<a href=\"g" + gr.getId() + "\">" + gr.getId() + ": "
-					+ gr.getAttributedElementClass().getUniqueName() + "</a>");
+					+ gr.getMetaClass().getUniqueName() + "</a>");
 		} else {
 			storeln(gr.getId() + ": "
-					+ gr.getAttributedElementClass().getUniqueName());
+					+ gr.getMetaClass().getUniqueName());
 		}
 	}
 

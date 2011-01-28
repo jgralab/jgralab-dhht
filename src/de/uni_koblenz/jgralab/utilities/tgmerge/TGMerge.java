@@ -187,7 +187,7 @@ public class TGMerge {
 
 	private void copyAttributes(AttributedElement oldAttrElem,
 			AttributedElement newAttrElem) {
-		for (Attribute attr : oldAttrElem.getAttributedElementClass()
+		for (Attribute attr : oldAttrElem.getMetaClass()
 				.getAttributeList()) {
 			newAttrElem.setAttribute(attr.getName(),
 					oldAttrElem.getAttribute(attr.getName()));

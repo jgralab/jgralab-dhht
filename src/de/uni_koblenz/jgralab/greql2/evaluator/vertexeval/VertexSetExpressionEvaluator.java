@@ -83,7 +83,7 @@ public class VertexSetExpressionEvaluator extends ElementSetExpressionEvaluator 
 			if (subgraph == null) {
 				while (currentVertex != null) {
 					if (typeCollection.acceptsType(currentVertex
-							.getAttributedElementClass())) {
+							.getMetaClass())) {
 						JValueImpl j = new JValueImpl(currentVertex);
 						resultSet.add(j);
 					}
@@ -93,7 +93,7 @@ public class VertexSetExpressionEvaluator extends ElementSetExpressionEvaluator 
 				while (currentVertex != null) {
 					if (subgraph.isMarked(currentVertex)
 							&& typeCollection.acceptsType(currentVertex
-									.getAttributedElementClass())) {
+									.getMetaClass())) {
 						resultSet.add(new JValueImpl(currentVertex));
 					}
 					currentVertex = currentVertex.getNextVertex();

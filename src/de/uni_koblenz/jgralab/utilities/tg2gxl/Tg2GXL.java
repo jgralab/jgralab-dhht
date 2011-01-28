@@ -185,7 +185,7 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		AttributedElementClass<?,?> elemClass = v.getAttributedElementClass();
+		AttributedElementClass<?,?> elemClass = v.getMetaClass();
 		if (printSchema && !(v instanceof Schema)) {
 
 			if (v instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
@@ -250,7 +250,7 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
-		AttributedElementClass elemClass = e.getAttributedElementClass();
+		AttributedElementClass elemClass = e.getMetaClass();
 
 		if (printSchema
 				&& !(e instanceof de.uni_koblenz.jgralab.grumlschema.structure.DefinesGraphClass)
@@ -322,7 +322,7 @@ public class Tg2GXL extends Tg2Whatever {
 
 	private void printAttributes(PrintStream out, AttributedElement elem) {
 
-		for (Attribute attr : elem.getAttributedElementClass()
+		for (Attribute attr : elem.getMetaClass()
 				.getAttributeList()) {
 
 			out.println("<attr name=\"" + attr.getName() + "\">");

@@ -119,7 +119,7 @@ public class Describe extends Greql2Function {
 		}
 
 		JValueTuple tuple = new JValueTuple();
-		tuple.add(new JValueImpl(attrElem.getAttributedElementClass()
+		tuple.add(new JValueImpl(attrElem.getMetaClass()
 				.getQualifiedName()));
 		if (attrElem instanceof Graph) {
 			Graph g = (Graph) attrElem;
@@ -132,7 +132,7 @@ public class Describe extends Greql2Function {
 			tuple.add(new JValueImpl(ge.getId()));
 		}
 		JValueRecord attrRecord = new JValueRecord();
-		for (Attribute attr : attrElem.getAttributedElementClass()
+		for (Attribute attr : attrElem.getMetaClass()
 				.getAttributeList()) {
 
 			attrRecord.add(attr.getName(), JValueImpl.fromObject(attrElem

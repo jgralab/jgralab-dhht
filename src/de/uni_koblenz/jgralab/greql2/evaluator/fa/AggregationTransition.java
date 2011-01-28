@@ -247,7 +247,7 @@ public class AggregationTransition extends Transition {
 		}
 
 		// checks if a edgeTypeRestriction is set and if e has the right type
-		AttributedElementClass edgeClass = e.getAttributedElementClass();
+		AttributedElementClass edgeClass = e.getMetaClass();
 		if (!typeCollection.acceptsType(edgeClass)) {
 			return false;
 		}

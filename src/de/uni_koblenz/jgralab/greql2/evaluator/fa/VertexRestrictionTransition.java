@@ -150,7 +150,7 @@ public class VertexRestrictionTransition extends Transition {
 		// subgraph
 		// checks if a startVertexTypeRestriction is set and if v has the right
 		// type
-		AttributedElementClass vertexClass = v.getAttributedElementClass();
+		AttributedElementClass vertexClass = v.getMetaClass();
 		if (!typeCollection.acceptsType(vertexClass)) {
 			return false;
 		}

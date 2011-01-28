@@ -407,8 +407,8 @@ public class LoadTest extends InstanceTest {
 				fail();
 			}
 			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
 			v1 = v1.getNextVertex();
 			v2 = v2.getNextVertex();
 		}
@@ -425,8 +425,8 @@ public class LoadTest extends InstanceTest {
 				fail();
 			}
 			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
 			v1 = v1.getNextEdge();
 			v2 = v2.getNextEdge();
 		}
@@ -459,8 +459,8 @@ public class LoadTest extends InstanceTest {
 			Vertex v1 = g1.getVertex(i);
 			Vertex v2 = g2.getVertex(i);
 			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
 			v1.delete();
 			v2.delete();
 		}

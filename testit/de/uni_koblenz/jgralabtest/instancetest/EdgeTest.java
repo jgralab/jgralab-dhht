@@ -5136,9 +5136,9 @@ public class EdgeTest extends InstanceTest {
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertEquals(edges[0], e1.getAttributedElementClass());
-		assertEquals(edges[1], e2.getAttributedElementClass());
-		assertEquals(edges[2], e3.getAttributedElementClass());
+		assertEquals(edges[0], e1.getMetaClass());
+		assertEquals(edges[1], e2.getMetaClass());
+		assertEquals(edges[2], e3.getMetaClass());
 		commit(g);
 	}
 

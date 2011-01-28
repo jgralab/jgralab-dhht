@@ -86,13 +86,13 @@ public class Tg2Gdl extends Tg2Whatever {
 		out.print("label: \"");
 		if (ae instanceof Vertex) {
 			out.print("v" + ((Vertex) ae).getId() + " : "
-					+ ae.getAttributedElementClass().getSimpleName() + "\\n");
+					+ ae.getMetaClass().getSimpleName() + "\\n");
 		} else if (ae instanceof Edge) {
 			out.print("e" + ((Edge) ae).getId() + " : "
-					+ ae.getAttributedElementClass().getSimpleName() + "\\n");
+					+ ae.getMetaClass().getSimpleName() + "\\n");
 		}
 		boolean first = true;
-		for (Attribute attr : ae.getAttributedElementClass().getAttributeList()) {
+		for (Attribute attr : ae.getMetaClass().getAttributeList()) {
 			if (first) {
 				first = false;
 			} else {

@@ -41,8 +41,10 @@ import org.apache.commons.cli.Option;
 import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
@@ -196,7 +198,9 @@ public abstract class Tg2Whatever {
 		try {
 			PrintStream out = initializeOutputStream();
 			graphStart(out);
+			printBeforeVertices(out);
 			printVertices(out);
+			printBeforeEdges(out);
 			printEdges(out);
 			graphEnd(out);
 		} catch (FileNotFoundException e) {
@@ -204,6 +208,16 @@ public abstract class Tg2Whatever {
 					+ "' could not be created.");
 			System.exit(1);
 		}
+	}
+
+	private void printBeforeEdges(PrintStream out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void printBeforeVertices(PrintStream out) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private PrintStream initializeOutputStream() throws FileNotFoundException {
@@ -235,6 +249,33 @@ public abstract class Tg2Whatever {
 			}
 		}
 	}
+	
+
+	
+	protected void printIncidences(PrintStream out) {
+		for (Edge e : graph.getEdges()) {
+			if ((marker == null) || marker.isMarked(e)) {
+				for (Incidence i : e.getIncidences()) {
+					if ((marker == null) || marker.isMarked(i.getVertex())) {
+						printIncidence(out, i);	
+					}	
+				}
+			}
+		}
+	}
+	
+
+	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?> elem) {
+		int num = 1;
+		for (Incidence current : elem.getIncidences()) {
+			if (current == inc) {
+				return num;
+			}
+			num++;
+		}
+		return -1;
+	}
+
 
 	public int getCurrentElementSequenceIndex() {
 		return currentElementSequenceIndex;
@@ -307,7 +348,7 @@ public abstract class Tg2Whatever {
 	protected abstract void printVertex(PrintStream out, Vertex v);
 
 	/**
-	 * Prints a Edge to the provided output stream.
+	 * Prints an Edge to the provided output stream.
 	 * 
 	 * @param out
 	 *            PrintStream as output stream.
@@ -315,6 +356,16 @@ public abstract class Tg2Whatever {
 	 *            Edge, which should be printed.
 	 */
 	protected abstract void printEdge(PrintStream out, Edge e);
+	
+	/**
+	 * Prints an Incidence to the provided output stream
+	 * @param out
+	 * 			  PrintStream as output stream
+	 * @param i
+	 *            Incidence, which should be printed.
+	 */
+	protected abstract void printIncidence(PrintStream out, Incidence i);
+	
 
 	/**
 	 * Replaces characters in the given string by the escape sequences that are
@@ -459,4 +510,6 @@ public abstract class Tg2Whatever {
 		oh.addOption(shortenStrings);
 		return oh;
 	}
+
+
 }

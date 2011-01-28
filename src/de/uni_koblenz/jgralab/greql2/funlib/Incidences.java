@@ -148,7 +148,7 @@ public abstract class Incidences extends Greql2Function {
 		} else {
 			while (inc != null) {
 				if ((subgraph == null) || (subgraph.isMarked(inc))) {
-					if (typeCol.acceptsType(inc.getAttributedElementClass())) {
+					if (typeCol.acceptsType(inc.getMetaClass())) {
 						resultSet.add(new JValueImpl(inc));
 					}
 				}

@@ -118,19 +118,19 @@ public class HasType extends Greql2Function {
 
 		if (typeCollection != null) {
 			return new JValueImpl(typeCollection.acceptsType(elem
-					.getAttributedElementClass()), elem);
+					.getMetaClass()), elem);
 		}
 
 		if (aeClass != null) {
-			return new JValueImpl((elem.getAttributedElementClass() == aeClass)
-					|| elem.getAttributedElementClass().isSubClassOf(aeClass),
+			return new JValueImpl((elem.getMetaClass() == aeClass)
+					|| elem.getMetaClass().isSubClassOf(aeClass),
 					elem);
 		}
 
 		AttributedElementClass type = elem.getSchema()
 				.getAttributedElementClass(typeName);
-		return new JValueImpl((elem.getAttributedElementClass() == type)
-				|| elem.getAttributedElementClass().isSubClassOf(type), elem);
+		return new JValueImpl((elem.getMetaClass() == type)
+				|| elem.getMetaClass().isSubClassOf(type), elem);
 	}
 
 	@Override

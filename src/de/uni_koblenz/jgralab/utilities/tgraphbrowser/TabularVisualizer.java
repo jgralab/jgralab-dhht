@@ -70,13 +70,13 @@ public class TabularVisualizer {
 			if (jv.isVertex()) {
 				Vertex v = jv.toVertex();
 				if (state.selectedVertexClasses.get(v
-						.getAttributedElementClass())) {
+						.getMetaClass())) {
 					vertices.add(v);
 				}
 			} else {
 				Edge e = jv.toEdge();
 				if (state.selectedEdgeClasses
-						.get(e.getAttributedElementClass())) {
+						.get(e.getMetaClass())) {
 					edges.add(e);
 				}
 			}
@@ -212,7 +212,7 @@ public class TabularVisualizer {
 		if ((isVertex ? state.selectedVertexClasses : state.selectedEdgeClasses)
 				.get((isVertex ? state.getGraph().getVertex(idOfElement)
 						: state.getGraph().getEdge(idOfElement))
-						.getAttributedElementClass())) {
+						.getMetaClass())) {
 			// try to find element if it's type wasn't deselected
 			for (int i = 0; i < (isVertex ? state.verticesOfTableView
 					: state.edgesOfTableView).length; i++) {
@@ -286,13 +286,13 @@ public class TabularVisualizer {
 			if (!(isVertex ? state.selectedVertexClasses
 					: state.selectedEdgeClasses).get((isVertex ? state
 					.getGraph().getVertex(idOfElement) : state.getGraph()
-					.getEdge(idOfElement)).getAttributedElementClass())) {
+					.getEdge(idOfElement)).getMetaClass())) {
 				code.append(" because the type ")
 						.append(
 								(isVertex ? state.getGraph().getVertex(
 										idOfElement) : state.getGraph()
 										.getEdge(idOfElement))
-										.getAttributedElementClass()
+										.getMetaClass()
 										.getQualifiedName()).append(
 								" is deselected");
 			}
@@ -415,7 +415,7 @@ public class TabularVisualizer {
 	 * @return
 	 */
 	private String createElement(GraphElement currentElement) {
-		return currentElement.getAttributedElementClass().getUniqueName()
+		return currentElement.getMetaClass().getUniqueName()
 				+ "<sub>" + Math.abs(currentElement.getId()) + "</sub>";
 	}
 
@@ -451,7 +451,7 @@ public class TabularVisualizer {
 		code.append(inToolTip ? (var == null ? "currentTd" : var)
 				+ ".title = \"" : "");
 		boolean first = true;
-		for (Attribute attr : currentElement.getAttributedElementClass()
+		for (Attribute attr : currentElement.getMetaClass()
 				.getAttributeList()) {
 			if (!first) {
 				code
@@ -513,7 +513,7 @@ public class TabularVisualizer {
 		int numberOfEdges = 1;
 		boolean hasNoLeadingBr = false;
 		for (Edge e : currentVertex.incidences()) {
-			if (selectedEdgeClasses.get(e.getAttributedElementClass())) {
+			if (selectedEdgeClasses.get(e.getMetaClass())) {
 				// show all incidences whose type is selected
 				if ((numberOfEdges > (displayedPage - 1)
 						* NUMBER_OF_INCIDENCES_PER_PAGE)
@@ -549,7 +549,7 @@ public class TabularVisualizer {
 					code
 							.append("currentTd.appendChild(document.createTextNode(\"}\"+String.fromCharCode(160)));\n");
 					AttributedElementClass qualName = e.getThat()
-							.getAttributedElementClass();
+							.getMetaClass();
 					if (selectedVertexClasses.get(qualName)) {
 						// if the type of that is selected, show it as link
 						code
@@ -599,7 +599,7 @@ public class TabularVisualizer {
 	private void createIncidentVertices(StringBuilder code, Edge currentEdge,
 			HashMap<VertexClass, Boolean> selectedVertexClasses) {
 		AttributedElementClass qualName = currentEdge.getAlpha()
-				.getAttributedElementClass();
+				.getMetaClass();
 		// create alpha-vertex
 		if (selectedVertexClasses.get(qualName)) {
 			// if the type of alpha is selected, show it as link
@@ -626,7 +626,7 @@ public class TabularVisualizer {
 				.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
 		code.append("currentTd.appendChild(textNode);\n");
 		// create omega-vertex
-		qualName = currentEdge.getOmega().getAttributedElementClass();
+		qualName = currentEdge.getOmega().getMetaClass();
 		if (selectedVertexClasses.get(qualName)) {
 			// if the type of alpha is selected, show it as link
 			code.append("var aOmega = document.createElement(\"a\");\n");

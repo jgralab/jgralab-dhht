@@ -450,10 +450,10 @@ public class JValuePath extends JValueImpl {
 	 */
 	public JValueSet vertexTypes() {
 		JValueSet resultSet = new JValueSet();
-		resultSet.add(new JValueImpl(startVertex.getAttributedElementClass()));
+		resultSet.add(new JValueImpl(startVertex.getMetaClass()));
 		for (Edge e : edges) {
 			resultSet.add(new JValueImpl(e.getThat()
-					.getAttributedElementClass()));
+					.getMetaClass()));
 		}
 		return resultSet;
 	}
@@ -465,7 +465,7 @@ public class JValuePath extends JValueImpl {
 		JValueSet resultSet = new JValueSet();
 		for (Edge edge : edges) {
 			resultSet
-					.add(new JValueImpl(edge.getAttributedElementClass(), edge));
+					.add(new JValueImpl(edge.getMetaClass(), edge));
 		}
 		return resultSet;
 	}

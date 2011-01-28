@@ -451,7 +451,7 @@ public abstract class EdgeBaseImpl extends
 	public String toString() {
 		assert isValid();
 		return "+e" + id + ": "
-				+ getAttributedElementClass().getQualifiedName();
+				+ getMetaClass().getQualifiedName();
 	}
 
 	@Override

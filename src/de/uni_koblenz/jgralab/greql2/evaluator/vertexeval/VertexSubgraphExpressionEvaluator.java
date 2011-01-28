@@ -66,7 +66,7 @@ public class VertexSubgraphExpressionEvaluator extends
 			JValueTypeCollection typeCollection = getTypeCollection();
 			if ((subgraph == null) || (subgraph.isMarked(currentVertex))) {
 				AttributedElementClass vertexClass = currentVertex
-						.getAttributedElementClass();
+						.getMetaClass();
 				if (typeCollection.acceptsType(vertexClass)) {
 					subgraphAttr.mark(currentVertex);
 				}

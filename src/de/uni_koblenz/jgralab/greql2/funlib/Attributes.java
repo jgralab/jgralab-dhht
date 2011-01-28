@@ -94,7 +94,7 @@ public class Attributes extends Greql2Function {
 		switch (checkArguments(arguments)) {
 		case 0:
 			clazz = arguments[0].toAttributedElement()
-					.getAttributedElementClass();
+					.getMetaClass();
 			break;
 		case 1:
 			clazz = arguments[0].toAttributedElementClass();

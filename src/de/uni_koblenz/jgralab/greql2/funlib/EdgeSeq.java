@@ -110,7 +110,7 @@ public class EdgeSeq extends Greql2Function {
 		case 1:
 			JValueTypeCollection tc = (JValueTypeCollection) arguments[2];
 			while (current != null) {
-				if (tc.acceptsType(current.getAttributedElementClass())) {
+				if (tc.acceptsType(current.getMetaClass())) {
 					edges.add(new JValueImpl(current));
 				}
 				if (current == end) {

@@ -110,7 +110,7 @@ public class GraphValidatorTest {
 		n1.set_niceness(-17);
 
 		Set<ConstraintViolation> brokenConstraints = validator
-				.validateConstraints(n1.getAttributedElementClass());
+				.validateConstraints(n1.getMetaClass());
 
 		printBrokenConstraints(brokenConstraints);
 		// This one is fine, except that niceness should be between 0 and 20.

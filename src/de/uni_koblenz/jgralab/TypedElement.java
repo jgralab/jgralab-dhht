@@ -13,6 +13,12 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 * @return {@link Class}
 	 */
 	public abstract Class<? extends ConcreteInterface> getM1Class();
+	
+	/**
+	 * 
+	 * @return the MetaClass in the schema describing this typed element
+	 */
+	public ConcreteMetaClass getMetaClass();
 
 	public abstract GraphClass getGraphClass();
 

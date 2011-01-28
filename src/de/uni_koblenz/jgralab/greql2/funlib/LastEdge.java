@@ -90,7 +90,7 @@ public class LastEdge extends Greql2Function {
 			Edge current = graph.getLastEdge();
 			JValueTypeCollection tc = arguments[2].toJValueTypeCollection();
 			while (current != null) {
-				if (tc.acceptsType(current.getAttributedElementClass())) {
+				if (tc.acceptsType(current.getMetaClass())) {
 					return new JValueImpl(current);
 				}
 				current = current.getPrevEdge();

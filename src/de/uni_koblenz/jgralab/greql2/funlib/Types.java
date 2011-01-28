@@ -113,7 +113,7 @@ public class Types extends Greql2Function {
 									+ " doesn't contain attributed elements.");
 				}
 				resultSet.add(new JValueImpl(v.toAttributedElement()
-						.getAttributedElementClass(), v.toAttributedElement()));
+						.getMetaClass(), v.toAttributedElement()));
 			}
 			return resultSet;
 		case 2:

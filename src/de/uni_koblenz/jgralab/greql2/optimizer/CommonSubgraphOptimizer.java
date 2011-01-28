@@ -157,13 +157,13 @@ public class CommonSubgraphOptimizer extends OptimizerBase {
 		StringBuilder buf = new StringBuilder();
 		buf.append("{V");
 		buf.append(":");
-		buf.append(vertex.getAttributedElementClass().getQualifiedName());
+		buf.append(vertex.getMetaClass().getQualifiedName());
 		buf.append(computeAttributeHash(vertex));
 
 		// Compute the hashes of the children
 		for (Edge e : vertex.incidences(EdgeDirection.IN)) {
 			buf.append("{E:");
-			buf.append(e.getAttributedElementClass().getQualifiedName());
+			buf.append(e.getMetaClass().getQualifiedName());
 			buf.append("}");
 			buf.append(computeHashAndProcess((Greql2Vertex) e.getThat()));
 		}
@@ -205,7 +205,7 @@ public class CommonSubgraphOptimizer extends OptimizerBase {
 	private String computeAttributeHash(Greql2Vertex vertex) {
 		StringBuilder buf = new StringBuilder();
 		buf.append("(");
-		for (Attribute attr : vertex.getAttributedElementClass()
+		for (Attribute attr : vertex.getMetaClass()
 				.getAttributeList()) {
 			buf.append(attr.getName());
 			buf.append("=");
