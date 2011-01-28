@@ -2312,8 +2312,8 @@ public class GraphIO {
 				// }
 
 				// build redefinitions
-				ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
-				ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
+			//	ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
+			//	ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
 			}
 		}
 	}

@@ -14,7 +14,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * {@link IncidenceClass}es must have the direction
  * {@link Direction#EDGE_TO_VERTEX} and the other
  * {@link Direction#VERTEX_TO_EDGE}.
- * ¯
+ * 
  * @author ist@uni-koblenz.de
  * 
  */

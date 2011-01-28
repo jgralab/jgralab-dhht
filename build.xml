@@ -36,7 +36,8 @@
 	<property name="main" value="JGraLab" />
 	<property name="documentexcludes" value="de.uni_koblenz.jgralab.greql2.schema.*,de.uni_koblenz.jgralab.grumlschema.*" />
 	<property name="unjarexcludes" value="clover/**" />
-	<property name="test.suite" value="de.uni_koblenz.jgralabtest.RunTests" />
+	<property name="test.suite" value="de.uni_koblenz.jgralabtest.RunTests" />     
+
 	
 	<!-- import the common build file -->
 	<import file="../common/common.xml" />
@@ -81,8 +82,8 @@
 	<property name="core.includes" value="*.java graphmarker/** schema/** codegenerator/** impl/** jniserver/** trans/**" />
 
 	<property name="tgtools.src" value="${src.dir}/de/uni_koblenz/jgralab/utilities" />
-	<property name="tgtools.includes" value="tgschema2java/** ant/TgSchema2JavaTask.java ant/DeleteGeneratedSchemaTask.java tg2dot/** tg2whatever/**" />
-
+	<property name="tgtools.includes" value="tgschema2java/** ant/TgSchema2JavaTask.java  ant/DeleteGeneratedSchemaTask.java tg2whatever/** tg2dot/**" />
+  <!-- 	<property name="tgtools.includes" value="tgschema2java/** ant/TgSchema2JavaTask.java ant/DeleteGeneratedSchemaTask.java tg2dot/** tg2whatever/**" />     -->     
 	<property name="greql2.src" value="${src.dir}/de/uni_koblenz/jgralab/greql2" />
 
 	<property name="gruml.src" value="${src.dir}/de/uni_koblenz/jgralab/grumlschema/" />
@@ -109,7 +110,9 @@
 	</target>
 
 	<!-- compile -->
-	<target name="compile" depends="core,tgtools,greql2,graphvalidator,rsa,utilities,generatetestschemas" />
+ <!--  <target name="compile" depends="core,tgtools,greql2,graphvalidator,rsa,utilities,generatetestschemas" />        -->
+	<target name="compile" depends="core,tgtools" />
+	
 
 	<!-- jgralab -->
 	<!-- compiles jgralab basic sources -->

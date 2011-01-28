@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -153,9 +154,12 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 	@Override
 	public boolean isInternal() {
 		Schema s = getSchema();
-		return ((this == s.getDefaultEdgeClass())
-				|| (this == s.getDefaultGraphClass()) || (this == s
-				.getDefaultVertexClass()));
+		TypedElementClass<?,?> t = this;
+		return (   (t == s.getDefaultEdgeClass())
+				|| (t == s.getDefaultGraphClass()) 
+				|| (t == s.getDefaultVertexClass())
+				|| (t == s.getDefaultIncidenceClass(Direction.VERTEX_TO_EDGE) ) 
+				|| (t == s.getDefaultIncidenceClass(Direction.EDGE_TO_VERTEX) ) );
 	}
 
 	@Override

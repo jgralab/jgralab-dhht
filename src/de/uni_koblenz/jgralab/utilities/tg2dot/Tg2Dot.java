@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -224,15 +225,17 @@ public class Tg2Dot extends Tg2Whatever {
 		//assume Vertex_TO_EDGE to be the direction to use
 		String startLabel = "v";
 		String endLabel = "e";
-		GraphElement<?,?,?> start = i.getVertex();
-		GraphElement<?,?,?> end = i.getEdge();
-		
+		GraphElement<? extends GraphElementClass,? extends GraphElement,? extends GraphElement> start = null;
+		GraphElement<? extends GraphElementClass,? extends GraphElement,? extends GraphElement> end = null; 
 		
 		if (i.getDirection() == Direction.EDGE_TO_VERTEX  ^ reversed) {
-			start = reversed ? i.getVertex() : i.getEdge();
-			end = reversed ? i.getEdge() : i.getVertex();
+			start =  i.getEdge();
+			end =  i.getVertex();
 			startLabel = "e";
 			endLabel ="v";
+		} else {
+			start = i.getVertex();
+			end = i.getEdge();
 		}
 		
 		out.print(startLabel + start.getId() + " -> " + endLabel + end.getId() + " [");
