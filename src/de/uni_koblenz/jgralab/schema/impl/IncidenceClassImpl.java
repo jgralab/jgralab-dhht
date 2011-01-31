@@ -59,7 +59,6 @@ public class IncidenceClassImpl extends
 		super(edgeClass.getSimpleName() + "_" + ((rolename != null)&&(rolename.length()>0) ? rolename : "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size())), edgeClass
 				.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
-		this.isAbstract = isAbstract;
 		this.direction = direction;
 		this.edgeClass = edgeClass;
 		this.maxEdgesAtVertex = maxEdgesAtVertex;
@@ -76,13 +75,12 @@ public class IncidenceClassImpl extends
 		//	rolename = "";
 		}
 		this.vertexClass = vertexClass;
+		setAbstract(isAbstract);
 	}
 
 	private final Direction direction;
 
 	private IncidenceType incidenceType;
-
-	private boolean isAbstract = false;
 
 	private final EdgeClass edgeClass;
 
@@ -115,16 +113,7 @@ public class IncidenceClassImpl extends
 	 */
 	private Class<? extends Incidence> m1ImplementationClass;
 
-	/**
-	 * the immediate sub classes of this class
-	 */
-	protected HashSet<IncidenceClass> directSubClasses = new HashSet<IncidenceClass>();
-
-	/**
-	 * the immediate super classes of this class
-	 */
-	protected HashSet<IncidenceClass> directSuperClasses = new HashSet<IncidenceClass>();
-
+	
 	@Override
 	public GraphElementClass<?, ?> getOtherGraphElementClass(
 			GraphElementClass<?, ?> connectedGc) {
@@ -223,15 +212,6 @@ public class IncidenceClassImpl extends
 		return returnSet;
 	}
 
-	@Override
-	public Set<IncidenceClass> getDirectSubClasses() {
-		return directSubClasses;
-	}
-
-	@Override
-	public Set<IncidenceClass> getDirectSuperClasses() {
-		return directSuperClasses;
-	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -277,51 +257,6 @@ public class IncidenceClassImpl extends
 		return m1ImplementationClass;
 	}
 
-	@Override
-	public Set<IncidenceClass> getAllSuperClasses() {
-		HashSet<IncidenceClass> allSuperClasses = new HashSet<IncidenceClass>();
-		allSuperClasses.addAll(directSuperClasses);
-		for (IncidenceClass superClass : directSuperClasses) {
-			allSuperClasses.addAll(superClass.getAllSuperClasses());
-		}
-		return allSuperClasses;
-	}
-
-	@Override
-	public boolean isAbstract() {
-		return isAbstract;
-	}
-
-	@Override
-	public boolean isDirectSubClassOf(IncidenceClass anIncidenceClass) {
-		return directSuperClasses.contains(anIncidenceClass);
-	}
-
-	@Override
-	public boolean isDirectSuperClassOf(IncidenceClass anIncidenceClass) {
-		return (((IncidenceClassImpl) anIncidenceClass).directSuperClasses
-				.contains(this));
-	}
-
-	@Override
-	public boolean isSubClassOf(IncidenceClass anIncidenceClass) {
-		return getAllSuperClasses().contains(anIncidenceClass);
-	}
-
-	@Override
-	public boolean isSuperClassOf(IncidenceClass anIncidenceClass) {
-		return anIncidenceClass.getAllSuperClasses().contains(this);
-	}
-
-	@Override
-	public boolean isSuperClassOfOrEquals(IncidenceClass anIncidenceClass) {
-		return ((this == anIncidenceClass) || (isSuperClassOf(anIncidenceClass)));
-	}
-
-	@Override
-	public void setAbstract(boolean isAbstract) {
-		this.isAbstract = isAbstract;
-	}
 
 	@Override
 	public String getRolename() {

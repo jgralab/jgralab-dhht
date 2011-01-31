@@ -106,11 +106,6 @@ public final class GraphClassImpl extends
 					+ ec.getQualifiedName()
 					+ "' already used as vertex class name");
 		}
-		System.out.println("QualifiedName of EC: " + ec.getQualifiedName());
-		if (ec.getDefaultClass() != null) {
-	 	  System.out.println("QualifiedName of Default EC: " + ec.getDefaultClass().getQualifiedName());
-		  ec.compareTo(ec.getDefaultClass());
-		}
 		graphElementClasses.put(ec.getQualifiedName(), ec);
 		edgeClasses.put(ec.getQualifiedName(), ec);
 	}

@@ -249,6 +249,7 @@ public class GraphIO {
 	private final HashMap<String, String> stringPool;
 
 	private GraphIO() {
+		System.out.println("New GraphIO");
 		domains = new TreeMap<String, Domain>();
 		GECsearch = new HashMap<GraphElementClass<?, ?>, GraphClass>();
 		createMethods = new HashMap<String, Method>();
@@ -2040,7 +2041,6 @@ public class GraphIO {
 				.getQualifiedName()) : gc.createEdgeClass(ecd
 				.getQualifiedName());
 		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
-			System.out.println("Putting fromIncidenceClass: " + icd.roleName);
 			incidenceClassMap.put(gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
@@ -2050,16 +2050,17 @@ public class GraphIO {
 					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
-			System.out.println("Putting toIncidenceClass: " + icd.roleName);
-			incidenceClassMap.put(gc.createIncidenceClass(ec,
+			if (icd.roleName.equals("hiddenIncidenceClassAtEdge"))
+				System.out.println("Putting toIncidenceClass: " + icd.roleName);
+			IncidenceClass ic = gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
 					icd.multiplicityEdgesAtVertex[1],
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
-					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
+					Direction.VERTEX_TO_EDGE, icd.incidenceType);
+					incidenceClassMap.put(ic, icd);
 		}
-		System.out.println("Added IncienceClass");
 		addAttributes(ecd.attributes, ec);
 
 		for (Constraint constraint : ecd.constraints) {
@@ -2346,11 +2347,24 @@ public class GraphIO {
 	private void buildIncidenceClassHierarchy() throws GraphIOException {
 		for (EdgeClass ec : schema.getGraphClass().getEdgeClasses()) {
 			for (IncidenceClass ic : ec.getIncidenceClasses()) {
-			
+			System.out.println("Handling IncidenceClass " + ic.getRolename());
+			if (ic.getRolename().equals("hiddenIncidenceClassAtEdge")) {
+				System.out.println("Map contains hiddenIncidencenClassAtEdge: " + incidenceClassMap.containsKey(ic));
+				System.out.println("Size of icMap: " + incidenceClassMap.size());
+				for (IncidenceClass ic2 : incidenceClassMap.keySet()) {
+					System.out.println("Defore");
+					System.out.println(ic2);
+					System.out.println("After");
+				}
+			}
 				IncidenceClassData icd = incidenceClassMap.get(ic);
+				System.out.println("ICD Map: " + icd);
 				buildIncidenceClassHierarchy(ic, icd, ec);
 				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses.size()) {
 					// TODO throw exception
+					System.out.println(("In superclass size"));
+				} else {
+					System.out.println("Eslse");
 				}
 				// TODO implement redefined rolenames
 			}

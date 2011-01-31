@@ -368,7 +368,6 @@ public abstract class NamedElementClassImpl implements NamedElementClass {
 		uniqueName = simpleName;
 		((SchemaImpl) schema).addNamedElement(this);
 		comments = new ArrayList<String>();
-		System.out.println("QualifiedName of new class: " + qualifiedName);
 	}
 
 	/**
