@@ -255,17 +255,7 @@ public final class GraphClassImpl extends
 
 	@Override
 	public EdgeClass getEdgeClass(String qn) {
-		EdgeClass ec = edgeClasses.get(qn);
-		if (ec != null) {
-			return ec;
-		}
-		for (AttributedElementClass<?, ?> superclass : directSuperClasses) {
-			ec = ((GraphClass) superclass).getEdgeClass(qn);
-			if (ec != null) {
-				return ec;
-			}
-		}
-		return null;
+		return edgeClasses.get(qn);
 	}
 
 	@Override

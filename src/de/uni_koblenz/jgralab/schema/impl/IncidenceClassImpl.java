@@ -44,7 +44,6 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
@@ -164,34 +163,6 @@ public class IncidenceClassImpl extends
 		return minVerticesAtEdge;
 	}
 
-	/**
-	 * adds a superClass to this class
-	 * 
-	 * @param superClass
-	 *            the class to add as superclass
-	 */
-	public void addSuperClass(IncidenceClass superClass) {
-		checkIncidenceClassSpecialization(this, superClass);
-		if ((superClass == this) || (superClass == null)) {
-			return;
-		}
-		directSuperClasses.remove(getSchema().getDefaultIncidenceClass(
-				direction));
-
-		if (superClass.isSubClassOf(this)) {
-			for (IncidenceClass incidentClass : superClass.getAllSuperClasses()) {
-				System.out.println(incidentClass.getRolename());
-			}
-			System.out.println();
-			throw new InheritanceException(
-					"Cycle in class hierarchie for classes: " + getRolename()
-							+ " and " + superClass.getRolename());
-		}
-		directSuperClasses.add(superClass);
-		((IncidenceClassImpl) superClass).directSubClasses.add(this);
-	}
-
-	
 	
 	
 	public void addHiddenRolenameAtEdge(IncidenceClass ic) {
