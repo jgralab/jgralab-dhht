@@ -2040,6 +2040,7 @@ public class GraphIO {
 				.getQualifiedName()) : gc.createEdgeClass(ecd
 				.getQualifiedName());
 		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
+			System.out.println("Putting fromIncidenceClass: " + icd.roleName);
 			incidenceClassMap.put(gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
@@ -2049,6 +2050,7 @@ public class GraphIO {
 					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
+			System.out.println("Putting toIncidenceClass: " + icd.roleName);
 			incidenceClassMap.put(gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
@@ -2057,7 +2059,7 @@ public class GraphIO {
 					icd.multiplicityVerticesAtEdge[1],
 					Direction.EDGE_TO_VERTEX, icd.incidenceType), icd);
 		}
-
+		System.out.println("Added IncienceClass");
 		addAttributes(ecd.attributes, ec);
 
 		for (Constraint constraint : ecd.constraints) {

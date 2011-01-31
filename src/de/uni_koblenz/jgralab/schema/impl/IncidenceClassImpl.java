@@ -56,7 +56,7 @@ public class IncidenceClassImpl extends
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
-		super(edgeClass.getSimpleName() + "_" + rolename, edgeClass
+		super(edgeClass.getSimpleName() + "_" + ((rolename != null)&&(rolename.length()>0) ? rolename : "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size())), edgeClass
 				.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
 		this.isAbstract = isAbstract;

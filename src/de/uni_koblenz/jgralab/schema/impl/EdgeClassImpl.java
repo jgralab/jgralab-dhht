@@ -52,6 +52,7 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
 		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
 		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
 				DEFAULTEDGECLASS_NAME);
+		System.out.println("Created default edge class: " + ec.getQualifiedName());
 		// , 0,
 		// Integer.MAX_VALUE, "", AggregationKind.NONE,
 		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
