@@ -31,9 +31,6 @@
 
 package de.uni_koblenz.jgralab;
 
-import java.util.List;
-import java.util.Set;
-
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -61,7 +58,6 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 * @return {@link Vertex}
 	 */
 	public Vertex getNextVertex();
-
 
 	/**
 	 * Returns the previous {@link Vertex} in the sequence of all vertices in
@@ -257,8 +253,9 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            (acts as implicit GoalRestriction)
 	 * @return {@link List} of the reachable vertices
 	 */
-	//public <T extends Vertex> List<T> reachableVertices(String pathDescription,
-	//		Class<T> vertexType);
+	// public <T extends Vertex> List<T> reachableVertices(String
+	// pathDescription,
+	// Class<T> vertexType);
 
 	/**
 	 * Returns a {@link Set}&lt;<code>vertexType</code>&gt; over all vertices
@@ -272,7 +269,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 * @return {@link Set} of vertices reachable by traversing the path given by
 	 *         pathElements
 	 */
-	//public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
-	//		PathElement... pathElements);
+	// public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
+	// PathElement... pathElements);
 
 }
