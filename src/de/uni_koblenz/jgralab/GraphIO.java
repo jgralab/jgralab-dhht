@@ -723,8 +723,7 @@ public class GraphIO {
 				continue;
 			}
 			vId = nextV.getId();
-			AttributedElementClass<?, ?> aec = nextV
-					.getMetaClass();
+			AttributedElementClass<?, ?> aec = nextV.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
@@ -783,8 +782,7 @@ public class GraphIO {
 				continue;
 			}
 			eId = nextE.getId();
-			AttributedElementClass<?, ?> aec = nextE
-					.getMetaClass();
+			AttributedElementClass<?, ?> aec = nextE.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
@@ -2157,9 +2155,9 @@ public class GraphIO {
 			return IncidenceType.COMPOSITION;
 		} else {
 			return IncidenceType.EDGE;
-//			throw new GraphIOException(
-//					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
-//							+ lookAhead + "' in line " + line);
+			// throw new GraphIOException(
+			// "invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
+			// + lookAhead + "' in line " + line);
 		}
 	}
 
@@ -2315,8 +2313,8 @@ public class GraphIO {
 				// }
 
 				// build redefinitions
-			//	ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
-			//	ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
+				// ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
+				// ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
 			}
 		}
 	}
@@ -2348,11 +2346,8 @@ public class GraphIO {
 			for (IncidenceClass ic : ec.getIncidenceClasses()) {
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				buildIncidenceClassHierarchy(ic, icd, ec);
-				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
-						.size()) {
-					// TODO throw exception
-				}
-				// TODO implement redefined rolenames
+				assert ic.getDirectSuperClasses().size() == icd.directSuperClasses
+						.size();
 			}
 		}
 	}
@@ -2374,6 +2369,14 @@ public class GraphIO {
 							+ icOfEc.getVertexClass().getQualifiedName() + ".");
 				}
 				((IncidenceClassImpl) ic).addSuperClass(icOfEc);
+				// set redefined rolenames
+				if (icd.redefinedRolesAtEdge.contains(icOfEc.getRolename())) {
+					((IncidenceClassImpl) ic).addHiddenRolenameAtEdge(icOfEc);
+				}
+				if (icd.redefinedRolesAtVertex.contains(icOfEc.getRolename())) {
+					((IncidenceClassImpl) ic).addHiddenRolenameAtVertex(icOfEc);
+				}
+
 			}
 		}
 		for (EdgeClass superEc : ec.getDirectSuperClasses()) {
