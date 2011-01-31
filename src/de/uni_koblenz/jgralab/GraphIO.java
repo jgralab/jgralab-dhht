@@ -2287,7 +2287,6 @@ public class GraphIO {
 							+ aec.getM1Class().getSimpleName());
 				}
 				EdgeClass ec = (EdgeClass) aec;
-				// buildIncidenceClassHierarchie(ec, ec);
 				for (String superClassName : eData.directSuperClasses) {
 					superClass = (EdgeClass) GECsearch.get(aec)
 							.getGraphElementClass(superClassName);
@@ -2296,50 +2295,10 @@ public class GraphIO {
 								+ superClassName + "'");
 					}
 					((EdgeClassImpl) ec).addSuperClass(superClass);
-					// buildIncidenceClassHierarchie(ec, superClass);
 				}
-
-				// for (IncidenceClass ic : ec.getIncidenceClasses()) {
-				// // check the existence of all superclasses of an
-				// // Incidenceclass
-				// if (ic.getDirectSuperClasses().size() != incidenceClassMap
-				// .get(ic).directSuperClasses.size()) {
-				// throw new GraphIOException(
-				// "A direct superclass of IncidenceClass with rolename "
-				// + ic.getRolename() + " does not exist.");
-				// }
-				// // build redefinitions
-				// buildRedefinedRoles(ic);
-				// }
-
-				// build redefinitions
-				// ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
-				// ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
 			}
 		}
 	}
-
-	// private void buildRedefinedRoles(IncidenceClass ic) {
-	// IncidenceClassData subIcd = incidenceClassMap.get(ic);
-	// }
-	//
-	// private void buildIncidenceClassHierarchie(EdgeClass ec,
-	// EdgeClass superClass) {
-	// for (IncidenceClass subIc : ec.getIncidenceClasses()) {
-	// IncidenceClassData subIcd = incidenceClassMap.get(subIc);
-	// for (IncidenceClass superIc : superClass.getIncidenceClasses()) {
-	// if (subIc.getDirection() != superIc.getDirection()) {
-	// continue;
-	// }
-	// if (subIcd.directSuperClasses.contains(superIc.getRolename())) {
-	// ((IncidenceClassImpl) subIc).addSuperClass(superIc);
-	// }
-	// }
-	// }
-	// for (EdgeClass supClass : superClass.getDirectSuperClasses()) {
-	// buildIncidenceClassHierarchie(ec, supClass);
-	// }
-	// }
 
 	private void buildIncidenceClassHierarchy() throws GraphIOException {
 		for (EdgeClass ec : schema.getGraphClass().getEdgeClasses()) {
