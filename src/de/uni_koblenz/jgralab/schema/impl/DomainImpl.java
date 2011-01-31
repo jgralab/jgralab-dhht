@@ -34,7 +34,7 @@ package de.uni_koblenz.jgralab.schema.impl;
 import de.uni_koblenz.jgralab.schema.Domain;
 import de.uni_koblenz.jgralab.schema.Package;
 
-public abstract class DomainImpl extends NamedElementImpl implements Domain {
+public abstract class DomainImpl extends NamedElementClassImpl implements Domain {
 
 	protected DomainImpl(String simpleName, Package pkg) {
 		super(simpleName, pkg, pkg.getSchema());

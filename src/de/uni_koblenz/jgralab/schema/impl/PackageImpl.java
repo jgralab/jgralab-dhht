@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class PackageImpl extends NamedElementImpl implements Package {
+public final class PackageImpl extends NamedElementClassImpl implements Package {
 
 	private final Map<String, Domain> domains = new TreeMap<String, Domain>();
 

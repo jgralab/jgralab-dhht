@@ -556,10 +556,15 @@ public class IncidenceClassImpl extends
 		}
 	}
 
-	@Override
-	public String getQualifiedName() {
-		return edgeClass.getQualifiedName() + "_" + rolename;
-	}
+//	@Override
+//	public String getQualifiedName() {
+//		if (rolename != null) {
+//			return edgeClass.getQualifiedName() + "_" + rolename;
+//		} else {
+//			String role = "IC"+Integer.toString(edgeClass.getIncidenceClassesInTopologicalOrder().indexOf(this)); 
+//			return edgeClass.getQualifiedName() + role;
+//		}
+//	}
 
 	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(
 			GraphElementClass<?, ?> graphElementClass) {

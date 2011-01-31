@@ -1944,7 +1944,7 @@ public class GraphIO {
 			graphElementClassData.packageName = qn[0];
 			graphElementClassData.simpleName = qn[1];
 			if (lookAhead.equals(":")) {
-				graphElementClassData.directSuperClasses = parseIncidenceHierarchy();
+				graphElementClassData.directSuperClasses = parseHierarchy();
 			}
 
 			while (lookAhead.equals("from")) {
@@ -1991,7 +1991,7 @@ public class GraphIO {
 		incidenceClassData.vertexClassName = toQNameString(vqn);
 		incidenceClassData.roleName = parseRoleName();
 		if (lookAhead.equals(":")) {
-			incidenceClassData.directSuperClasses = parseHierarchy();
+			incidenceClassData.directSuperClasses = parseIncidenceHierarchy();
 		}
 		incidenceClassData.multiplicityEdgesAtVertex = parseMultiplicity();
 		incidenceClassData.redefinedRolesAtVertex = parseRolenameRedefinitions();
@@ -2154,9 +2154,10 @@ public class GraphIO {
 			match();
 			return IncidenceType.COMPOSITION;
 		} else {
-			throw new GraphIOException(
-					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
-							+ lookAhead + "' in line " + line);
+			return IncidenceType.EDGE;
+//			throw new GraphIOException(
+//					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
+//							+ lookAhead + "' in line " + line);
 		}
 	}
 

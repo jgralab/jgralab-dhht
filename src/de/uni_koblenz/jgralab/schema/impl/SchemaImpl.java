@@ -383,7 +383,7 @@ public class SchemaImpl implements Schema {
 		}
 		if (aecsWithSameSimpleName.size() >= 2) {
 			for (AttributedElementClass<?, ?> other : aecsWithSameSimpleName) {
-				((NamedElementImpl) other).changeUniqueName();
+				((NamedElementClassImpl) other).changeUniqueName();
 			}
 		}
 	}

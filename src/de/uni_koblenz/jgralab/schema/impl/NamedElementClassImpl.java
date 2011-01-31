@@ -46,7 +46,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public abstract class NamedElementImpl implements NamedElementClass {
+public abstract class NamedElementClassImpl implements NamedElementClass {
 
 	/**
 	 * The package containing this named element. <code>null</code> if this
@@ -235,7 +235,7 @@ public abstract class NamedElementImpl implements NamedElementClass {
 	 *             that has the exact same qualified name</li>
 	 *             </ul>
 	 */
-	protected NamedElementImpl(String simpleName, Package pkg, Schema schema) {
+	protected NamedElementClassImpl(String simpleName, Package pkg, Schema schema) {
 		/*
 		 * Every named element must be contained in a schema.
 		 */

@@ -12,19 +12,19 @@ EnumDomain structure.IncidenceType (EDGE, AGGREGATION, COMPOSITION);
 
 
 VertexClass Schema {name: String, packagePrefix: String};
-VertexClass Package: NamedElement ["A Package must either be default or subpackage, but not both" "import structure.*; forall p: V{Package} @ (inDegree{ContainsDefaultPackage}(p) + inDegree{ContainsSubPackage}(p)) = 1" "import structure.*; from p: V{Package} with (inDegree{ContainsDefaultPackage}(p) + inDegree{ContainsSubPackage}(p)) <> 1 reportSet p end"];
+VertexClass Package: NamedElementClass ["A Package must either be default or subpackage, but not both" "import structure.*; forall p: V{Package} @ (inDegree{ContainsDefaultPackage}(p) + inDegree{ContainsSubPackage}(p)) = 1" "import structure.*; from p: V{Package} with (inDegree{ContainsDefaultPackage}(p) + inDegree{ContainsSubPackage}(p)) <> 1 reportSet p end"];
 
 
 abstract VertexClass NamedElementClass {qualifiedName: String};
 VertexClass Comment {text: String};
-EdgeClass Annotates from Comment (0,*) role comment to NamedElement (1,1) role annotatedElement;
+EdgeClass Annotates from Comment role comment (0,*) (1,1) to NamedElementClass role annotatedElement (1,1) (1,1);
 VertexClass Constraint {message: String, predicateQuery: String, offendingElementsQuery: String};
 
-abstract VertexClass TypedElementClass : NamedElementClass {abstract : boolean};
+abstract VertexClass TypedElementClass : NamedElementClass {abstract : Boolean};
 abstract VertexClass AttributedElementClass: TypedElementClass;
 VertexClass GraphClass: AttributedElementClass ["There must be exactly one GraphClass." "count(V{structure.GraphClass}) = 1" "V{structure.GraphClass}"];
 abstract VertexClass GraphElementClass: AttributedElementClass {minKappa: Integer, maxKappa : Integer};
-EdgeClass MayBeNestedIn from GraphElementClass (0,*) role nestedElement to GraphElementClass (0,*) role nestingElement;
+EdgeClass MayBeNestedIn from GraphElementClass role nestedElement (0,*) (1,1) to GraphElementClass role nestingElement (0,*) (1,1);
 VertexClass VertexClass: GraphElementClass;
 VertexClass EdgeClass: GraphElementClass;
 
@@ -43,13 +43,13 @@ EdgeClass SpecializesIncidenceClass: SpecializesTypedElementClass from Incidence
 Comment structure.Attribute "The defaultValue is a string constant in TG syntax, compatible to the Domain of the Attribute.\ndefaultValue may be null (which means no default value is specified).";
 VertexClass Attribute {name: String, defaultValue: String};
 EdgeClass HasDomain from Attribute (0,*) (1,1) to domains.Domain role domain (1,1) (1,1);
-EdgeClass HasConstraint from AttributedElementClass role constrainedElement  (1,1) (1,1) to Constraint role constraint (0,*) (1,1) aggregation composite;
-EdgeClass HasAttribute from AttributedElementClass (1,1) (1,1) to Attribute role attribute (0,*) (1,1) aggregation composite;
-EdgeClass ContainsSubPackage from Package (0,1) (1,1) to Package role subpackage (0,*) (1,1) aggregation composite;
-EdgeClass ContainsDomain from Package (1,1) (1,1) to domains.Domain (0,*) (1,1) aggregation composite;
-EdgeClass ContainsGraphElementClass from Package (1,1) (1,1) to GraphElementClass (0,*) (1,1) aggregation composite;
-EdgeClass ContainsDefaultPackage from Schema (0,1) (1,1) to Package (1,1) (1,1) aggregation composite;
-EdgeClass DefinesGraphClass from Schema (1,1) (1,1) to GraphClass role graphClass (1,1) (1,1) aggregation composite;
+EdgeClass HasConstraint from AttributedElementClass role constrainedElement  (1,1) (1,1) to Constraint role constraint (0,*) (1,1) COMPOSITE;
+EdgeClass HasAttribute from AttributedElementClass (1,1) (1,1) to Attribute role attribute (0,*) (1,1) COMPOSITE;
+EdgeClass ContainsSubPackage from Package (0,1) (1,1) to Package role subpackage (0,*) (1,1) COMPOSITE;
+EdgeClass ContainsDomain from Package (1,1) (1,1) to domains.Domain (0,*) (1,1) COMPOSITE;
+EdgeClass ContainsGraphElementClass from Package (1,1) (1,1) to GraphElementClass (0,*) (1,1) COMPOSITE;
+EdgeClass ContainsDefaultPackage from Schema (0,1) (1,1) to Package (1,1) (1,1) COMPOSITE;
+EdgeClass DefinesGraphClass from Schema (1,1) (1,1) to GraphClass role graphClass (1,1) (1,1) COMPOSITE;
 
 
 Package domains;
@@ -62,12 +62,12 @@ VertexClass ListDomain: CollectionDomain;
 VertexClass LongDomain: BasicDomain;
 VertexClass MapDomain: Domain;
 VertexClass EnumDomain: Domain {enumConstants: List<String>};
-abstract VertexClass Domain: structure.NamedElement;
+abstract VertexClass Domain: structure.NamedElementClass;
 VertexClass DoubleDomain: BasicDomain;
 VertexClass BooleanDomain: BasicDomain;
 abstract VertexClass CollectionDomain: Domain;
 EdgeClass HasBaseDomain from CollectionDomain (0,*) (1,1) to Domain role basedomain (1,1) (1,1);
 EdgeClass HasValueDomain from MapDomain (0,*) (1,1) to Domain role valuedomain (1,1) (1,1);
 EdgeClass HasKeyDomain from MapDomain (0,*) (1,1) to Domain role keydomain (1,1) (1,1);
-EdgeClass HasRecordDomainComponent from RecordDomain (0,*) (1,1) to Domain role componentdomain (1,*)  (1,1)  aggregation shared {name: String};
+EdgeClass HasRecordDomainComponent from RecordDomain (0,*) (1,1) to Domain role componentdomain (1,*)  (1,1)  AGGREGATE {name: String};
 
