@@ -127,11 +127,12 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	
 	
 	@Override
-	public void addSuperClass(T superClass) {
-		checkDuplicateRolenames(superClass);
-		super.addSuperClass(superClass);
+	protected void  checkSpecialization(T superclass) {
+		super.checkSpecialization(superclass);
+		checkDuplicateRolenames(superclass);
 	}
-
+	
+	
 	private void checkDuplicateRolenames(T other) {
 		if ((other == null) || (other.equals(""))) {
 			return;

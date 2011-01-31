@@ -92,41 +92,20 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		addAttribute(new AttributeImpl(name, domain, this, defaultValueAsString));
 	}
 
-	/**
-	 * adds a superClass to this class
-	 * 
-	 * @param superClass
-	 *            the class to add as superclass
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addSuperClass(ConcreteMetaClass superClass) {
-		if ((superClass == this) || (superClass == null)) {
-			return;
-		}
-		directSuperClasses.remove(getSchema().getDefaultGraphClass());
-		directSuperClasses.remove(getSchema().getDefaultEdgeClass());
-		directSuperClasses.remove(getSchema().getDefaultVertexClass());
-
-		for (Attribute a : superClass.getAttributeList()) {
+	
+	protected void checkSpecialization(ConcreteMetaClass superclass) {
+		for (Attribute a : superclass.getAttributeList()) {
 			if (getOwnAttribute(a.getName()) != null) {
 				throw new InheritanceException("Cannot add "
-						+ superClass.getQualifiedName() + " as superclass of "
+						+ superclass.getQualifiedName() + " as superclass of "
 						+ getQualifiedName() + ", cause: Attribute "
 						+ a.getName() + " is declared in both classes");
 			}
 		}
-		if (superClass.isSubClassOf((ConcreteMetaClass) this)) {
-			for (ConcreteMetaClass attr : superClass.getAllSuperClasses()) {
-				System.out.println(attr.getQualifiedName());
-			}
-			throw new InheritanceException(
-					"Cycle in class hierarchie for classes: "
-							+ getQualifiedName() + " and "
-							+ superClass.getQualifiedName());
-		}
-		directSuperClasses.add(superClass);
-		((AttributedElementClassImpl) superClass).directSubClasses.add(this);
 	}
+	
+	
+
 
 	/**
 	 * @return a textual representation of all attributes the element holds

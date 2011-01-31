@@ -11,6 +11,7 @@ import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
+import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
@@ -181,5 +182,35 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 	public void setAbstract(boolean isAbstract) {
 		this.isAbstract = isAbstract;
 	}
+	
+	
+	protected abstract void checkSpecialization(ConcreteMetaClass superclass);
+	
+	/**
+	 * adds a superClass to this class
+	 * 
+	 * @param superClass
+	 *            the class to add as superclass
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void addSuperClass(ConcreteMetaClass superClass) {
+		if ((superClass == this) || (superClass == null)) {
+			return;
+		}
+		directSuperClasses.remove(getDefaultClass());
+
+		if (superClass.isSubClassOf((ConcreteMetaClass) this)) {
+			for (ConcreteMetaClass attr : superClass.getAllSuperClasses()) {
+				System.out.println(attr.getQualifiedName());
+			}
+			throw new InheritanceException(
+					"Cycle in class hierarchie for classes: "
+							+ getQualifiedName() + " and "
+							+ superClass.getQualifiedName());
+		}
+		directSuperClasses.add(superClass);
+		((TypedElementClassImpl)superClass).directSubClasses.add(this);
+	}
+	
 
 }

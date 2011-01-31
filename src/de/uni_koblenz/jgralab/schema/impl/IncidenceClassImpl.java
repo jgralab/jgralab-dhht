@@ -191,6 +191,9 @@ public class IncidenceClassImpl extends
 		((IncidenceClassImpl) superClass).directSubClasses.add(this);
 	}
 
+	
+	
+	
 	public void addHiddenRolenameAtEdge(IncidenceClass ic) {
 		if ((ic == this) || (ic == null)) {
 			return;
@@ -200,16 +203,6 @@ public class IncidenceClassImpl extends
 
 	public void addHiddenRolenameAtVertex(IncidenceClass ic) {
 		hiddenEndsAtVertex.add(ic);
-	}
-
-	@Override
-	public Set<IncidenceClass> getAllSubClasses() {
-		Set<IncidenceClass> returnSet = new HashSet<IncidenceClass>();
-		for (IncidenceClass subclass : directSubClasses) {
-			returnSet.add(subclass);
-			returnSet.addAll(subclass.getAllSubClasses());
-		}
-		return returnSet;
 	}
 
 
@@ -496,15 +489,6 @@ public class IncidenceClassImpl extends
 		}
 	}
 
-//	@Override
-//	public String getQualifiedName() {
-//		if (rolename != null) {
-//			return edgeClass.getQualifiedName() + "_" + rolename;
-//		} else {
-//			String role = "IC"+Integer.toString(edgeClass.getIncidenceClassesInTopologicalOrder().indexOf(this)); 
-//			return edgeClass.getQualifiedName() + role;
-//		}
-//	}
 
 	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(
 			GraphElementClass<?, ?> graphElementClass) {
@@ -544,6 +528,11 @@ public class IncidenceClassImpl extends
 	public boolean equals(Object o) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	protected void checkSpecialization(IncidenceClass superclass) {
+		checkIncidenceClassSpecialization(this, superclass);
 	}
 
 }
