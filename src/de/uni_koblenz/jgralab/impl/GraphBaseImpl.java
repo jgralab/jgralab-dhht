@@ -42,6 +42,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
@@ -56,6 +57,7 @@ import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -525,8 +527,21 @@ public abstract class GraphBaseImpl implements Graph {
 			Vertex omega) {
 		try {
 			T edge = (T) internalCreateEdge(cls);
-
-			// TODO: Add linking to vertices
+			IncidenceClass fromClass = null;
+			IncidenceClass toClass = null;
+			EdgeClass metaClass = edge.getMetaClass();
+			assert(metaClass.isBinary());
+			Set<IncidenceClass> incClasses = metaClass.getAllIncidenceClasses();
+			for (IncidenceClass ic : incClasses) {
+				if ((!ic.isAbstract()) && (ic.getDirection()==Direction.VERTEX_TO_EDGE)) {
+					fromClass = ic;
+				}
+				if ((!ic.isAbstract()) && (ic.getDirection()==Direction.EDGE_TO_VERTEX)) {
+					toClass = ic;
+				}
+			}
+			connect(fromClass.getM1Class(), alpha, edge);
+			connect(toClass.getM1Class(), omega, edge);
 			return edge;
 		} catch (Exception exception) {
 			if (exception instanceof GraphException) {

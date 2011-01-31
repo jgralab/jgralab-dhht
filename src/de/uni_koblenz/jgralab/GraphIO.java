@@ -2057,7 +2057,7 @@ public class GraphIO {
 					icd.multiplicityEdgesAtVertex[1],
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
-					Direction.EDGE_TO_VERTEX, icd.incidenceType), icd);
+					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		System.out.println("Added IncienceClass");
 		addAttributes(ecd.attributes, ec);

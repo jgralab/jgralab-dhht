@@ -68,7 +68,12 @@ public class IncidenceClassImpl extends
 		this.minVerticesAtEdge = minVerticesAtEdge;
 		this.rolename = rolename;
 		if (rolename == null) {
-			rolename = "";
+			rolename = "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size());
+		//	rolename = "";
+		}
+		if (rolename.length()==0) {
+			rolename = "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size());
+		//	rolename = "";
 		}
 		this.vertexClass = vertexClass;
 	}
