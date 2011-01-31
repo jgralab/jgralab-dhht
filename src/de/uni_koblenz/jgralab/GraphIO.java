@@ -259,7 +259,7 @@ public class GraphIO {
 		graphClass = null;
 		vertexClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
 		edgeClassBuffer = new TreeMap<String, List<GraphElementClassData>>();
-		incidenceClassMap = new TreeMap<IncidenceClass, GraphIO.IncidenceClassData>();
+		incidenceClassMap = new HashMap<IncidenceClass, GraphIO.IncidenceClassData>();
 		commentData = new HashMap<String, List<String>>();
 		stringPool = new HashMap<String, String>();
 		putBackChar = -1;
@@ -2346,10 +2346,10 @@ public class GraphIO {
 	private void buildIncidenceClassHierarchy() throws GraphIOException {
 		for (EdgeClass ec : schema.getGraphClass().getEdgeClasses()) {
 			for (IncidenceClass ic : ec.getIncidenceClasses()) {
+			
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				buildIncidenceClassHierarchy(ic, icd, ec);
-				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
-						.size()) {
+				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses.size()) {
 					// TODO throw exception
 				}
 				// TODO implement redefined rolenames

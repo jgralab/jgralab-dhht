@@ -29,8 +29,8 @@ VertexClass VertexClass: GraphElementClass;
 VertexClass EdgeClass: GraphElementClass;
 
 VertexClass IncidenceClass:TypedElementClass {direction: Direction, incidenceType: IncidenceType, maxEdgesAtVertex: Integer, minxEdgesAtVertex: Integer, minVerticesAtEdge: Integer, maxVerticesAtEdge: Integer, roleName : String};
-EdgeClass ConnectsToVertexClass from IncidenceClass role connectedIncidenceClass (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
-EdgeClass ConnectsToEdgeClass from IncidenceClass role connectedIncidenceClass  (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
+EdgeClass ConnectsToVertexClass from IncidenceClass  (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
+EdgeClass ConnectsToEdgeClass from IncidenceClass (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
 EdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass role hidingIncidenceClassAtVertex (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtVertex (0,*) (1,1);
 EdgeClass HidesIncidenceClassAtEdgeClass from IncidenceClass role hidingIncidenceClassAtEdge (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtEdge (0,*) (1,1);
 

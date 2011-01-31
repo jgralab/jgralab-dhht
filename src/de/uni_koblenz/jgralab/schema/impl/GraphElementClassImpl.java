@@ -114,7 +114,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 
 
 	public void addIncidenceClass(IncidenceClass incClass) {
-		if ((incClass.getRolename() != null) && hasIncidenceClass(incClass.getRolename()))
+		if ((incClass.getRolename() != null) && (incClass.getRolename() != "") && hasIncidenceClass(incClass.getRolename()))
 			throwSchemaExceptionRolenameUsedTwice(incClass);
 		incidenceClasses.add(incClass);
 	}
@@ -133,7 +133,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	}
 
 	private void checkDuplicateRolenames(T other) {
-		if (other == null) {
+		if ((other == null) || (other.equals(""))) {
 			return;
 		}
 		checkDuplicatedRolenamesAgainstAllIncidenceClasses(other.getAllIncidenceClasses());
@@ -141,7 +141,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 
 	private void checkDuplicatedRolenamesAgainstAllIncidenceClasses(Set<IncidenceClass> incidences) {
 		for (IncidenceClass incidence : incidences) {
-			if (hasIncidenceClass(incidence.getRolename())) {
+			if (incidence.getRolename()!=null && !incidence.getRolename().equals("") && hasIncidenceClass(incidence.getRolename())) {
 				throw new SchemaException("Rolename " + incidence.getRolename() + " duplicate at class " + this.getQualifiedName());
 			}
 		}
