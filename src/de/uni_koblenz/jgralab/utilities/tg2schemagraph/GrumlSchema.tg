@@ -29,27 +29,27 @@ VertexClass VertexClass: GraphElementClass;
 VertexClass EdgeClass: GraphElementClass;
 
 VertexClass IncidenceClass:TypedElementClass {direction: Direction, incidenceType: IncidenceType, maxEdgesAtVertex: Integer, minxEdgesAtVertex: Integer, minVerticesAtEdge: Integer, maxVerticesAtEdge: Integer, roleName : String};
-EdgeClass ConnectsToVertexClass from IncidenceClass (0,*) role connectedIncidenceClass to VertexClass (1,1) role connectedVertexClass;
-EdgeClass ConnectsToEdgeClass from IncidenceClass (0,*) role connectedIncidenceClass to EdgeClass (1,1) role connectedEdgeClass;
-EdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass (0,*) role hidingIncidenceClassAtVertex to IncidenceClass (0,*) role hiddenIncidenceClassAtVertex;
-EdgeClass HidesIncidenceClassAtEdgeClass from IncidenceClass (0,*) role hidingIncidenceClassAtEdge to IncidenceClass (0,*) role hiddenIncidenceClassAtEdge;
+EdgeClass ConnectsToVertexClass from IncidenceClass role connectedIncidenceClass (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
+EdgeClass ConnectsToEdgeClass from IncidenceClass role connectedIncidenceClass  (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
+EdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass role hidingIncidenceClassAtVertex (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtVertex (0,*) (1,1);
+EdgeClass HidesIncidenceClassAtEdgeClass from IncidenceClass role hidingIncidenceClassAtEdge (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtEdge (0,*) (1,1);
 
 
-abstract EdgeClass SpecializesTypedElementClass from TypedElementClass (0,*) role subclass to TypedElementClass (0,*) role superclass;
-EdgeClass SpecializesVertexClass: SpecializesTypedElementClass from VertexClass (0,*) to VertexClass (0,*);
-EdgeClass SpecializesEdgeClass: SpecializesTypedElementClass from EdgeClass (0,*) to EdgeClass (0,*);
-EdgeClass SpecializesIncidenceClass: SpecializesTypedElementClass from IncidenceClass (0,*) to IncidenceClass (0,*);
+abstract EdgeClass SpecializesTypedElementClass from TypedElementClass role subclass (0,*) (1,1) to TypedElementClass role superclass (0,*) (1,1);
+EdgeClass SpecializesVertexClass: SpecializesTypedElementClass from VertexClass (0,*) (1,1) to VertexClass (0,*) (1,1);
+EdgeClass SpecializesEdgeClass: SpecializesTypedElementClass from EdgeClass (0,*) (1,1) to EdgeClass (0,*) (1,1);
+EdgeClass SpecializesIncidenceClass: SpecializesTypedElementClass from IncidenceClass (0,*) (1,1) to IncidenceClass (0,*) (1,1);
 
 Comment structure.Attribute "The defaultValue is a string constant in TG syntax, compatible to the Domain of the Attribute.\ndefaultValue may be null (which means no default value is specified).";
 VertexClass Attribute {name: String, defaultValue: String};
-EdgeClass HasDomain from Attribute (0,*) to domains.Domain (1,1) role domain;
-EdgeClass HasConstraint from AttributedElementClass (1,1) role constrainedElement to Constraint (0,*) role constraint aggregation composite;
-EdgeClass HasAttribute from AttributedElementClass (1,1) to Attribute (0,*) role attribute aggregation composite;
-EdgeClass ContainsSubPackage from Package (0,1) to Package (0,*) role subpackage aggregation composite;
-EdgeClass ContainsDomain from Package (1,1) to domains.Domain (0,*) aggregation composite;
-EdgeClass ContainsGraphElementClass from Package (1,1) to GraphElementClass (0,*) aggregation composite;
-EdgeClass ContainsDefaultPackage from Schema (0,1) to Package (1,1) aggregation composite;
-EdgeClass DefinesGraphClass from Schema (1,1) to GraphClass (1,1) role graphClass aggregation composite;
+EdgeClass HasDomain from Attribute (0,*) (1,1) to domains.Domain role domain (1,1) (1,1);
+EdgeClass HasConstraint from AttributedElementClass role constrainedElement  (1,1) (1,1) to Constraint role constraint (0,*) (1,1) aggregation composite;
+EdgeClass HasAttribute from AttributedElementClass (1,1) (1,1) to Attribute role attribute (0,*) (1,1) aggregation composite;
+EdgeClass ContainsSubPackage from Package (0,1) (1,1) to Package role subpackage (0,*) (1,1) aggregation composite;
+EdgeClass ContainsDomain from Package (1,1) (1,1) to domains.Domain (0,*) (1,1) aggregation composite;
+EdgeClass ContainsGraphElementClass from Package (1,1) (1,1) to GraphElementClass (0,*) (1,1) aggregation composite;
+EdgeClass ContainsDefaultPackage from Schema (0,1) (1,1) to Package (1,1) (1,1) aggregation composite;
+EdgeClass DefinesGraphClass from Schema (1,1) (1,1) to GraphClass role graphClass (1,1) (1,1) aggregation composite;
 
 
 Package domains;
@@ -66,8 +66,8 @@ abstract VertexClass Domain: structure.NamedElement;
 VertexClass DoubleDomain: BasicDomain;
 VertexClass BooleanDomain: BasicDomain;
 abstract VertexClass CollectionDomain: Domain;
-EdgeClass HasBaseDomain from CollectionDomain (0,*) to Domain (1,1) role basedomain;
-EdgeClass HasValueDomain from MapDomain (0,*) to Domain (1,1) role valuedomain;
-EdgeClass HasKeyDomain from MapDomain (0,*) to Domain (1,1) role keydomain;
-EdgeClass HasRecordDomainComponent from RecordDomain (0,*) to Domain (1,*) role componentdomain aggregation shared {name: String};
+EdgeClass HasBaseDomain from CollectionDomain (0,*) (1,1) to Domain role basedomain (1,1) (1,1);
+EdgeClass HasValueDomain from MapDomain (0,*) (1,1) to Domain role valuedomain (1,1) (1,1);
+EdgeClass HasKeyDomain from MapDomain (0,*) (1,1) to Domain role keydomain (1,1) (1,1);
+EdgeClass HasRecordDomainComponent from RecordDomain (0,*) (1,1) to Domain role componentdomain (1,*)  (1,1)  aggregation shared {name: String};
 

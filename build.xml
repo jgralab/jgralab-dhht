@@ -95,7 +95,8 @@
 	<property name="rsa.includes" value="rsa/** tg2schemagraph/** common/**" />
 
 	<property name="utilities.src" value="${src.dir}/de/uni_koblenz/jgralab/utilities" />
-	<property name="utilities.includes" value="ant/** common/** converter/** greqlinterface/** jgralab2owl/** schemacompare/** tg2gdl/** tg2gxl/** tg2sidiff/** tgmerge/** tgraphbrowser/** xmi2tgschema/** xml/**" />
+	<property name="utilities.includes" value="ant/** common/** converter/** schemacompare/**" />           
+  <!--  	<property name="utilities.includes" value="ant/** common/** converter/** greqlinterface/** jgralab2owl/** schemacompare/** tg2gdl/** tg2gxl/** tg2sidiff/** tgmerge/** tgraphbrowser/** xmi2tgschema/** xml/**" />                                  --Y
 
 	<!-- The targets -->
 	<target name="build" depends="ist_utilities,clean,compile,jar"/>
@@ -111,7 +112,7 @@
 
 	<!-- compile -->
  <!--  <target name="compile" depends="core,tgtools,greql2,graphvalidator,rsa,utilities,generatetestschemas" />        -->
-	<target name="compile" depends="core,tgtools" />
+	<target name="compile" depends="core,tgtools,graphvalidator,utilities" />
 	
 
 	<!-- jgralab -->

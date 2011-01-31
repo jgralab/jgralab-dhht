@@ -225,8 +225,8 @@ public class Tg2Dot extends Tg2Whatever {
 		//assume Vertex_TO_EDGE to be the direction to use
 		String startLabel = "v";
 		String endLabel = "e";
-		GraphElement<? extends GraphElementClass,? extends GraphElement,? extends GraphElement> start = null;
-		GraphElement<? extends GraphElementClass,? extends GraphElement,? extends GraphElement> end = null; 
+		GraphElement<? extends GraphElementClass<?,?>,? extends GraphElement<?,?,?>,? extends GraphElement<?,?,?>> start = null;
+		GraphElement<? extends GraphElementClass<?,?>,? extends GraphElement<?,?,?>,? extends GraphElement<?,?,?>> end = null; 
 		
 		if (i.getDirection() == Direction.EDGE_TO_VERTEX  ^ reversed) {
 			start =  i.getEdge();
