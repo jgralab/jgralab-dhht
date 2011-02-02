@@ -566,7 +566,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						"\t#icType# #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(\"#icName#\",",
 						"\t\t#gcVariable#.getEdgeClass(#icEdgeClass#),",
 						"\t\t#gcVariable#.getVertexClass(#icVertexClass#),",
-						"\t#ecVariable#.setAbstract(#ecAbstract#);"));
+						"\t#icVariable#.setAbstract(#icAbstract#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {

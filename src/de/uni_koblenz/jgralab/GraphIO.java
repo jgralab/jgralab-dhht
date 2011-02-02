@@ -175,8 +175,6 @@ public class GraphIO {
 	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
 
 	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
-	
-	private IncidenceClass theIncidenceClass = null;
 
 	private final Map<String, Method> createMethods;
 
@@ -2060,11 +2058,6 @@ public class GraphIO {
 					icd.multiplicityVerticesAtEdge[1],
 					Direction.VERTEX_TO_EDGE, icd.incidenceType);
 					incidenceClassMap.put(ic, icd);
-				if (icd.roleName.equals("hiddenIncidenceClassAtEdge")) {
-					System.out.println("Putting toIncidenceClass: " + icd.roleName);
-					theIncidenceClass = ic;
-					System.out.println("The incidence class: " + theIncidenceClass);
-				}	
 		}
 		addAttributes(ecd.attributes, ec);
 
@@ -2352,17 +2345,6 @@ public class GraphIO {
 	private void buildIncidenceClassHierarchy() throws GraphIOException {
 		for (EdgeClass ec : schema.getGraphClass().getEdgeClasses()) {
 			for (IncidenceClass ic : ec.getIncidenceClasses()) {
-			System.out.println("Handling IncidenceClass " + ic.getRolename());
-			if (ic.getRolename().equals("hiddenIncidenceClassAtEdge")) {
-				System.out.println("Map contains hiddenIncidencenClassAtEdge: " + incidenceClassMap.containsKey(ic));
-				System.out.println("Size of icMap: " + incidenceClassMap.size());
-				System.out.println("The incidence class: " + theIncidenceClass);
-				for (IncidenceClass ic2 : incidenceClassMap.keySet()) {
-					System.out.println("Defore");
-					System.out.println(ic2);
-					System.out.println("After");
-				}
-			}
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				System.out.println("ICD Map: " + icd);
 				buildIncidenceClassHierarchy(ic, icd, ec);
