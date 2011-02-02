@@ -50,7 +50,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
-		addImports("#jgPackage#.#ownElementClass#");
+	//	addImports("#jgPackage#.Incidence");
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(#connectedVertexClass# vertex, #connectedEdgeClass# edge) {",
@@ -80,7 +80,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 				addImports("#jgImplDbPackage#.#baseClassName#");
 			}
 
-			rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
+			rootBlock.setVariable("baseClassName", "IncidenceImpl");
 		}
 
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {

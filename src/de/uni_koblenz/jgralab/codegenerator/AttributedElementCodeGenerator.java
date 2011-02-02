@@ -60,30 +60,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 			CodeGeneratorConfiguration config) {
 		super(attributedElementClass, schemaRootPackageName, attributedElementClass.getPackageName(),
 				config);
-		rootBlock.setVariable("ecName", aec.getSimpleName());
-		rootBlock.setVariable("qualifiedClassName", aec.getQualifiedName());
-		rootBlock.setVariable("schemaName", aec.getSchema().getName());
-		rootBlock.setVariable("schemaVariableName", aec.getVariableName());
-		rootBlock.setVariable("javaClassName", schemaRootPackageName + "."
-				+ aec.getQualifiedName());
-		rootBlock.setVariable("qualifiedImplClassName", schemaRootPackageName
-				+ ".impl." + (config.hasTransactionSupport() ? "trans" : "std")
-				+ aec.getQualifiedName() + "Impl");
-		rootBlock.setVariable("simpleClassName", aec.getSimpleName());
-		rootBlock.setVariable("simpleImplClassName", aec.getSimpleName()
-				+ "Impl");
-		rootBlock.setVariable("uniqueClassName", aec.getUniqueName());
-		rootBlock.setVariable("schemaPackageName", schemaRootPackageName);
-		rootBlock.setVariable("theGraph", "graph");
 
-		interfaces = new TreeSet<String>();
-		interfaces.add(aec.getQualifiedName());
-		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true"
-				: "false");
-		for (AttributedElementClass<?,?> superClass : attributedElementClass
-				.getDirectSuperClasses()) {
-			interfaces.add(superClass.getQualifiedName());
-		}
+
 	}
 
 	

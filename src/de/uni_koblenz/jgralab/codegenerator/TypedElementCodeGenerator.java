@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
@@ -20,6 +21,29 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 			String packageName, CodeGeneratorConfiguration config) {
 		super(schemaRootPackageName, packageName, config);
 		this.aec = metaClass;
+		rootBlock.setVariable("ecName", aec.getSimpleName());
+		rootBlock.setVariable("qualifiedClassName", aec.getQualifiedName());
+		rootBlock.setVariable("schemaName", aec.getSchema().getName());
+		rootBlock.setVariable("schemaVariableName", aec.getVariableName());
+		rootBlock.setVariable("javaClassName", schemaRootPackageName + "."
+				+ aec.getQualifiedName());
+		rootBlock.setVariable("qualifiedImplClassName", schemaRootPackageName
+				+ ".impl." + (config.hasTransactionSupport() ? "trans" : "std")
+				+ aec.getQualifiedName() + "Impl");
+		rootBlock.setVariable("simpleClassName", aec.getSimpleName());
+		rootBlock.setVariable("simpleImplClassName", aec.getSimpleName()
+				+ "Impl");
+		rootBlock.setVariable("uniqueClassName", aec.getUniqueName());
+		rootBlock.setVariable("schemaPackageName", schemaRootPackageName);
+		rootBlock.setVariable("theGraph", "graph");
+
+		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true"
+				: "false");
+		interfaces = new TreeSet<String>();
+		interfaces.add(aec.getQualifiedName());
+		for (TypedElementClass<?,?> superClass : aec.getDirectSuperClasses()) {
+			interfaces.add(superClass.getQualifiedName());
+		}
 	}
 
 	@Override
@@ -35,7 +59,6 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-	
 		code.setVariable("classOrInterface", currentCycle
 				.isStdOrSaveMemOrDbImplOrTransImpl() ? " class" : " interface");
 		code.setVariable("abstract", currentCycle
@@ -49,7 +72,6 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 						"extends",
 						currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " extends #baseClassName#"
 								: "");
-	
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
 			String delim = currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " implements "
