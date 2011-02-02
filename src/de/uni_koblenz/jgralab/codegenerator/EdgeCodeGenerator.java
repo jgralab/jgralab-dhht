@@ -44,8 +44,8 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
 	
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
-			String implementationName, CodeGeneratorConfiguration config) {
-		super(edgeClass, schemaPackageName, implementationName, config, false);
+			CodeGeneratorConfiguration config) {
+		super(edgeClass, schemaPackageName, config, false);
 		rootBlock.setVariable("baseClassName", "EdgeImpl");
 		rootBlock.setVariable("graphElementClass", "Edge");
 	}

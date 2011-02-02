@@ -137,7 +137,7 @@ public class SchemaImpl implements Schema {
 	}
 
 	// TODO Remove
-	private static final String GRAPH_IMPLEMENTATION_PACKAGE = "array";
+	//private static final String GRAPH_IMPLEMENTATION_PACKAGE = "array";
 
 	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE = { String.class,
 			int.class, int.class };
@@ -404,13 +404,13 @@ public class SchemaImpl implements Schema {
 
 		/* create code for graph */
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
-				graphClass, packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, name,
+				graphClass, packagePrefix, name,
 				config);
 		javaSources.addAll(graphCodeGenerator.createJavaSources());
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+					packagePrefix, config);
 			javaSources.addAll(codeGen.createJavaSources());
 		}
 
@@ -420,10 +420,10 @@ public class SchemaImpl implements Schema {
 			if (edgeClass.isBinary()) {
 				codeGen = new BinaryEdgeCodeGenerator(
 						(BinaryEdgeClass) edgeClass, packagePrefix,
-						GRAPH_IMPLEMENTATION_PACKAGE, config);
+						 config);
 			} else {
 				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
-						GRAPH_IMPLEMENTATION_PACKAGE, config);
+						config);
 			}
 			javaSources.addAll(codeGen.createJavaSources());
 
@@ -432,7 +432,7 @@ public class SchemaImpl implements Schema {
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
 			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
 					incidenceClass, packagePrefix,
-					GRAPH_IMPLEMENTATION_PACKAGE, config);
+					 config);
 			javaSources.addAll(codeGen.createJavaSources());
 		}
 
@@ -441,12 +441,12 @@ public class SchemaImpl implements Schema {
 			// also generate an abstract class for Records
 			CodeGenerator rcode = new RecordCodeGenerator(
 					(RecordDomain) domain, packagePrefix,
-					GRAPH_IMPLEMENTATION_PACKAGE, config);
+					config);
 			javaSources.addAll(rcode.createJavaSources());
 		}
 		for (Domain domain : getEnumDomains()) {
 			CodeGenerator ecode = new EnumCodeGenerator((EnumDomain) domain,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE);
+					packagePrefix);
 			javaSources.addAll(ecode.createJavaSources());
 		}
 
@@ -459,12 +459,12 @@ public class SchemaImpl implements Schema {
 
 		// generate schema class
 		CodeGenerator schemaCodeGenerator = new SchemaCodeGenerator(this,
-				packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+				packagePrefix, config);
 		javaSources.addAll(schemaCodeGenerator.createJavaSources());
 
 		// generate factory
 		CodeGenerator factoryCodeGenerator = new GraphFactoryGenerator(this,
-				packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+				packagePrefix, config);
 		javaSources.addAll(factoryCodeGenerator.createJavaSources());
 
 		// generate graph classes
@@ -485,13 +485,13 @@ public class SchemaImpl implements Schema {
 
 		/* create code for graph */
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
-				graphClass, packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, name,
+				graphClass, packagePrefix,  name,
 				config);
 		graphCodeGenerator.createFiles(pathPrefix);
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+					packagePrefix,  config);
 			codeGen.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -509,10 +509,10 @@ public class SchemaImpl implements Schema {
 			if (edgeClass.isBinary()) {
 				codeGen = new BinaryEdgeCodeGenerator(
 						(BinaryEdgeClass) edgeClass, packagePrefix,
-						GRAPH_IMPLEMENTATION_PACKAGE, config);
+						config);
 			} else {
 				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
-						GRAPH_IMPLEMENTATION_PACKAGE, config);
+						 config);
 			}
 
 			codeGen.createFiles(pathPrefix);
@@ -530,7 +530,7 @@ public class SchemaImpl implements Schema {
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
 			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
 					incidenceClass, packagePrefix,
-					GRAPH_IMPLEMENTATION_PACKAGE, config);
+					 config);
 			codeGen.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -547,7 +547,7 @@ public class SchemaImpl implements Schema {
 			// also generate an abstract class for Records
 			CodeGenerator rcode = new RecordCodeGenerator(
 					(RecordDomain) domain, packagePrefix,
-					GRAPH_IMPLEMENTATION_PACKAGE, config);
+					config);
 			rcode.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -560,7 +560,7 @@ public class SchemaImpl implements Schema {
 		}
 		for (Domain domain : getEnumDomains()) {
 			CodeGenerator ecode = new EnumCodeGenerator((EnumDomain) domain,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE);
+					packagePrefix);
 			ecode.createFiles(pathPrefix);
 		}
 		if (progressFunction != null) {
@@ -601,12 +601,12 @@ public class SchemaImpl implements Schema {
 
 		// generate schema class
 		CodeGenerator schemaCodeGenerator = new SchemaCodeGenerator(this,
-				packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+				packagePrefix, config);
 		schemaCodeGenerator.createFiles(pathPrefix);
 
 		// generate factory
 		CodeGenerator factoryCodeGenerator = new GraphFactoryGenerator(this,
-				packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+				packagePrefix,  config);
 		factoryCodeGenerator.createFiles(pathPrefix);
 
 		// generate graph class

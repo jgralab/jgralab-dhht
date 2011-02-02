@@ -47,8 +47,7 @@ public class EnumCodeGenerator extends CodeGenerator {
 	 * Creates a new EnumCodeGenerator which creates code for the given
 	 * enumDomain object
 	 */
-	public EnumCodeGenerator(EnumDomain enumDomain, String schemaPackageName,
-			String implementationName) {
+	public EnumCodeGenerator(EnumDomain enumDomain, String schemaPackageName) {
 		super(schemaPackageName, enumDomain.getPackageName(),
 				new CodeGeneratorConfiguration());
 		rootBlock.setVariable("simpleClassName", enumDomain.getSimpleName());

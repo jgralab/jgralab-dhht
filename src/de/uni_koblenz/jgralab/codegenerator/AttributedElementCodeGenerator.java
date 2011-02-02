@@ -56,7 +56,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	 */
 	protected AttributedElementCodeGenerator(
 			ConcreteMetaClass attributedElementClass,
-			String schemaRootPackageName, String implementationName,
+			String schemaRootPackageName,
 			CodeGeneratorConfiguration config) {
 		super(attributedElementClass, schemaRootPackageName, attributedElementClass.getPackageName(),
 				config);
@@ -86,18 +86,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		}
 		return code;
 	}
-	
-	/**
-	 * Returns the absolute name of the given AttributdelementClass. The name is
-	 * composed of the package-prefix of the schema the class belongs to and the
-	 * qualified name of the class
-	 * 
-	 * @param aec
-	 * @return
-	 */
-	protected String absoluteName(ConcreteMetaClass aec) {
-		return schemaRootPackageName + "." + aec.getQualifiedName();
-	}
+
 
 	/**
 	 * @return true if at least one own or inherited attribute has a default

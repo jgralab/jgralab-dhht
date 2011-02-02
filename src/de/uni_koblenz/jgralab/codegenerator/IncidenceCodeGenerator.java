@@ -10,8 +10,8 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 	
 	public IncidenceCodeGenerator(IncidenceClass metaClass, String schemaPackageName,
-			String implementationName, CodeGeneratorConfiguration config) {
-		super(metaClass,schemaPackageName, implementationName, config);
+			CodeGeneratorConfiguration config) {
+		super(metaClass,schemaPackageName, "", config);
 		rootBlock.setVariable("connectedVertexClass", metaClass.getVertexClass().getQualifiedName());
 		rootBlock.setVariable("connectedEdgeClass", metaClass.getEdgeClass().getQualifiedName());
 		rootBlock.setVariable("baseClassName", "IncidenceImpl");
@@ -140,7 +140,8 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	 */
 	private CodeBlock createNextMethod(IncidenceClass mc, boolean atVertex, boolean withTypeFlag) {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("mcQualifiedName",mc.getQualifiedName());
+		code.setVariable("mcQualifiedName", mc.getQualifiedName());
+		code.setVariable("mcFileName", absoluteName(mc));
 		code.setVariable("mcCamelName", camelCase(mc.getRolename()));
 		code.setVariable("formalParams", (withTypeFlag ? "boolean noSubClasses"	: ""));
 		code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses" : ""));
@@ -153,12 +154,12 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcQualifiedName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
 		}
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			code.add("@Override",
-					 "public #mcQualifiedName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
-					 "\treturn (#mcQualifiedName#)getNextIncidenceAt#connectedElement#(#mcQualifiedName#.class#actualParams#);",
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
+					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
 					 "}");
 		}
 		return code;

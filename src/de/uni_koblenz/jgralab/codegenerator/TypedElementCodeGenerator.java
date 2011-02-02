@@ -46,6 +46,18 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 			interfaces.add(superClass.getQualifiedName());
 		}
 	}
+	
+	/**
+	 * Returns the absolute name of the given AttributdelementClass. The name is
+	 * composed of the package-prefix of the schema the class belongs to and the
+	 * qualified name of the class
+	 * 
+	 * @param aec
+	 * @return
+	 */
+	protected String absoluteName(ConcreteMetaClass aec) {
+		return schemaRootPackageName + "." + aec.getQualifiedName();
+	}
 
 	@Override
 	protected CodeList createBody() {

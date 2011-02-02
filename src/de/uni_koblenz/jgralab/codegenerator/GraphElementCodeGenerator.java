@@ -13,8 +13,8 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	protected RolenameCodeGenerator<MetaClass> rolenameGenerator;
 	
 	public GraphElementCodeGenerator(MetaClass metaClass, String schemaPackageName,
-			String implementationName, CodeGeneratorConfiguration config, boolean createVertexClass) {
-		super(metaClass, schemaPackageName, implementationName, config);
+			CodeGeneratorConfiguration config, boolean createVertexClass) {
+		super(metaClass, schemaPackageName, config);
 		if (createVertexClass) {
 			rootBlock.setVariable("ownElementClass", "Vertex");	
 			rootBlock.setVariable("dualElementClass", "Edge");	

@@ -48,7 +48,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 	private final Schema schema;
 
 	public GraphFactoryGenerator(Schema schema, String schemaPackageName,
-			String implementationName, CodeGeneratorConfiguration config) {
+			CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
 		rootBlock.setVariable("className", schema.getName() + "Factory");

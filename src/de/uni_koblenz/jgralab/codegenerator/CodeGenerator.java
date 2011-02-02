@@ -278,20 +278,19 @@ public abstract class CodeGenerator {
 
 		File outputFile = null;
 		try {
-			System.out.println("Writing output file....");
 			outputFile = new File(dir.getAbsolutePath() + File.separator
 					+ fileName);
-			System.out.println("File: " + outputFile.toString());
 			BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile));
 			bw.write(rootBlock.getCode());
 			bw.close();
-			System.out.println("File exists: " + outputFile.exists());
-			System.out.println("...success");
 		} catch (IOException e) {
 			throw new GraphIOException("Unable to create file "
 					+ outputFile.getAbsolutePath(), e);
 		}
 	}
+	
+	
+
 
 	public void createFiles(String pathPrefix) throws GraphIOException {
 		// String className = rootBlock.getVariable("className");
@@ -343,6 +342,8 @@ public abstract class CodeGenerator {
 				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",
 						schemaImplPackage);
 			} else {
+				if (this instanceof IncidenceCodeGenerator)
+				System.out.println("Writing incidence interface " + simpleClassName);
 				writeCodeToFile(pathPrefix, simpleClassName + ".java",
 						schemaPackage);
 			}

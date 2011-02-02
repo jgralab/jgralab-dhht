@@ -50,9 +50,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClass> {
 
 	public GraphCodeGenerator(GraphClass graphClass, String schemaPackageName,
-			String implementationName, String schemaName,
-			CodeGeneratorConfiguration config) {
-		super(graphClass, schemaPackageName, implementationName, config);
+			String schemaName, CodeGeneratorConfiguration config) {
+		super(graphClass, schemaPackageName, config);
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");

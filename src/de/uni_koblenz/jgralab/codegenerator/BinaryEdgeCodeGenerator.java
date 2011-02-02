@@ -7,9 +7,9 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
 public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 
 	public BinaryEdgeCodeGenerator(BinaryEdgeClass edgeClass,
-			String schemaPackageName, String implementationName,
+			String schemaPackageName,
 			CodeGeneratorConfiguration config) {
-		super(edgeClass, schemaPackageName, implementationName, config);
+		super(edgeClass, schemaPackageName, config);
 		bec = edgeClass;
 	}
 	

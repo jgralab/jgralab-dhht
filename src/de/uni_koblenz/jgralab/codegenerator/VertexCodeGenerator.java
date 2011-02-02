@@ -42,9 +42,9 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> {
 
 	public VertexCodeGenerator(VertexClass vertexClass,
-			String schemaPackageName, String implementationName,
+			String schemaPackageName,
 			CodeGeneratorConfiguration config) {
-		super(vertexClass, schemaPackageName, implementationName, config, true);
+		super(vertexClass, schemaPackageName, config, true);
 		rootBlock.setVariable("baseClassName", "VertexImpl");
 		rootBlock.setVariable("graphElementClass", "Vertex");
 	}

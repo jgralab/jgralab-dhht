@@ -54,7 +54,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	 * recordDomain object
 	 */
 	public RecordCodeGenerator(RecordDomain recordDomain,
-			String schemaPackageName, String implementationName,
+			String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(schemaPackageName, recordDomain.getPackageName(), config);
 		rootBlock.setVariable("simpleClassName", recordDomain.getSimpleName());
