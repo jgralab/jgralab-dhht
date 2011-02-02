@@ -563,13 +563,13 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icVertexClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
-		code.setVariable("icRoleName", ic.getRolename());
+		code.setVariable("icRoleName", ic.getRolename() != null ? ic.getRolename() : "");
 		code.setVariable("dir", ic.getDirection().toString());
-		code.setVariable("incidenceType", ic.getRolename());
+		code.setVariable("incidenceType", ic.getIncidenceType().toString());
 		code.setVariable("minEdgesAtVertex", Integer.toString(ic.getMinEdgesAtVertex()));
-		code.setVariable("minVerticexAtEdge", Integer.toString(ic.getMinVerticesAtEdge()));
+		code.setVariable("minVerticesAtEdge", Integer.toString(ic.getMinVerticesAtEdge()));
 		code.setVariable("maxEdgesAtVertex", Integer.toString(ic.getMaxEdgesAtVertex()));
-		code.setVariable("maxVerticexAtEdge", Integer.toString(ic.getMaxVerticesAtEdge()));
+		code.setVariable("maxVerticesAtEdge", Integer.toString(ic.getMaxVerticesAtEdge()));
 		
 		code.addNoIndent(new CodeSnippet(
 						true,
@@ -577,8 +577,8 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 						"\tIncidenceClass #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(\"#icName#\",",
 						"\t\t#gcVariable#.getEdgeClass(#icEdgeClass#),",
 						"\t\t#gcVariable#.getVertexClass(#icVertexClass#),",
-						"\t\t#icRoleName#,#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
-						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,#incidenceType#);"));
+						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
+						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir,IncidenceType.#incidenceType#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
