@@ -506,4 +506,29 @@ public class IncidenceClassImpl extends
 		checkIncidenceClassSpecialization(this, superclass);
 	}
 
+	public static IncidenceClass createDefaulIncidenceClass(
+			SchemaImpl schema, Direction dir) {
+		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
+		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
+		assert schema.getDefaultEdgeClass() != null : "DefaultEdgeClass not yet been created!";
+		assert schema.getDefaultIncidenceClass(dir) == null : "DefaultIncidenceClass has already been created";
+		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(schema.getDefaultEdgeClass(), schema.getDefaultVertexClass(), "", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir, IncidenceType.EDGE);
+		return ic;
+	}
+	
+	static EdgeClass createDefaultEdgeClass(Schema schema) {
+		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
+		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
+		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
+		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
+				DEFAULTEDGECLASS_NAME);
+		System.out.println("Created default edge class: " + ec.getQualifiedName());
+		// , 0,
+		// Integer.MAX_VALUE, "", AggregationKind.NONE,
+		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
+		// AggregationKind.NONE);
+		ec.setAbstract(true);
+		return ec;
+	}
+
 }

@@ -42,13 +42,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 
-	/**
-	 * Returns the {@link VertexClass} of which this {@link Vertex} is an
-	 * instance of.
-	 * 
-	 * @return {@link VertexClass}
-	 */
-	public VertexClass getType();
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the

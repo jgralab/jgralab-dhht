@@ -115,13 +115,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public long getGraphVersion();// old
 
-	/**
-	 * Returns the {@link GraphClass} of which this {@link Graph} is an instance
-	 * of.
-	 * 
-	 * @return {@link GraphClass}
-	 */
-	public GraphClass getType();
 
 	/**
 	 * Checks if the vertex sequence of this has changed with respect to the

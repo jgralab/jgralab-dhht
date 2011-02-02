@@ -212,7 +212,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-		for (Attribute attr : getMetaClass().getAttributeList()) {
+		for (Attribute attr : getType().getAttributeList()) {
 			try {
 				if ((attr.getDefaultValueAsString() != null)
 						&& !attr.getDefaultValueAsString().isEmpty()) {
@@ -529,7 +529,7 @@ public abstract class GraphBaseImpl implements Graph {
 			T edge = (T) internalCreateEdge(cls);
 			IncidenceClass fromClass = null;
 			IncidenceClass toClass = null;
-			EdgeClass metaClass = edge.getMetaClass();
+			EdgeClass metaClass = edge.getType();
 			assert (metaClass.isBinary());
 			Set<IncidenceClass> incClasses = metaClass.getAllIncidenceClasses();
 			for (IncidenceClass ic : incClasses) {
@@ -938,7 +938,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@Override
 	public GraphClass getGraphClass() {
-		return getMetaClass();
+		return getType();
 	}
 
 	/*

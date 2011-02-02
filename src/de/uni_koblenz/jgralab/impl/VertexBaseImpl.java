@@ -430,7 +430,7 @@ public abstract class VertexBaseImpl extends
 	@Override
 	public String toString() {
 		assert isValid();
-		return "v" + id + ": " + getMetaClass().getQualifiedName();
+		return "v" + id + ": " + getType().getQualifiedName();
 	}
 
 	@Override

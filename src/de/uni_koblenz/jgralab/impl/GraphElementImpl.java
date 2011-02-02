@@ -101,7 +101,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public GraphClass getGraphClass() {
-		return (GraphClass) graph.getMetaClass();
+		return (GraphClass) graph.getType();
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-		for (Attribute attr : getMetaClass().getAttributeList()) {
+		for (Attribute attr : getType().getAttributeList()) {
 			if (attr.getDefaultValueAsString() == null) {
 				continue;
 			}

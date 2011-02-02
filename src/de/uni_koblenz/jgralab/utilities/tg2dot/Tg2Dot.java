@@ -118,7 +118,7 @@ public class Tg2Dot extends Tg2Whatever {
 	
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		VertexClass cls = v.getMetaClass();
+		VertexClass cls = v.getType();
 		out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
 		if (cls.getAttributeCount() > 0) {
@@ -130,7 +130,7 @@ public class Tg2Dot extends Tg2Whatever {
 	
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
-		EdgeClass cls = e.getMetaClass();
+		EdgeClass cls = e.getType();
 		out.print("e" + e.getId() + " [label=\"{{e" + e.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
 		if (cls.getAttributeCount() > 0) {
@@ -240,7 +240,7 @@ public class Tg2Dot extends Tg2Whatever {
 		
 		out.print(startLabel + start.getId() + " -> " + endLabel + end.getId() + " [");
 
-		IncidenceClass cls = (IncidenceClass) i.getMetaClass();
+		IncidenceClass cls = (IncidenceClass) i.getType();
 		if (roleNames) {
 			String role = cls.getRolename();
 			if ((role != null) && (role.length() > 0)) {
@@ -290,7 +290,7 @@ public class Tg2Dot extends Tg2Whatever {
 	}
 
 	private void printAttributes(PrintStream out, AttributedElement<?,?> elem) {
-		AttributedElementClass<?,?> cls = elem.getMetaClass();
+		AttributedElementClass<?,?> cls = elem.getType();
 		for (Attribute attr : cls.getAttributeList()) {
 			if (abbreviateEdgeAttributeNames && (elem instanceof Edge)) {
 				// sourcePosition => sP

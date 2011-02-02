@@ -343,7 +343,7 @@ public abstract class CodeGenerator {
 						schemaImplPackage);
 			} else {
 				if (this instanceof IncidenceCodeGenerator)
-				System.out.println("Writing incidence interface " + simpleClassName);
+				  System.out.println("Writing incidence interface " + simpleClassName);
 				writeCodeToFile(pathPrefix, simpleClassName + ".java",
 						schemaPackage);
 			}

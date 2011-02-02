@@ -11,9 +11,9 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	public IncidenceCodeGenerator(IncidenceClass metaClass, String schemaPackageName,
 			CodeGeneratorConfiguration config) {
-		super(metaClass,schemaPackageName, "", config);
-		rootBlock.setVariable("connectedVertexClass", metaClass.getVertexClass().getQualifiedName());
-		rootBlock.setVariable("connectedEdgeClass", metaClass.getEdgeClass().getQualifiedName());
+		super(metaClass,schemaPackageName, metaClass.getPackageName(), config);
+		rootBlock.setVariable("connectedVertexClass", absoluteName(metaClass.getVertexClass()));
+		rootBlock.setVariable("connectedEdgeClass", absoluteName(metaClass.getEdgeClass()));
 		rootBlock.setVariable("baseClassName", "IncidenceImpl");
 		rootBlock.setVariable("graphElementClass", "Incidence");
 		System.out.println("Create incidence class code " + metaClass.getFileName());

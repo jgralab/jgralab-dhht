@@ -3,7 +3,9 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ?>>
 		extends CodeGenerator {
@@ -52,11 +54,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	 * composed of the package-prefix of the schema the class belongs to and the
 	 * qualified name of the class
 	 * 
-	 * @param aec
+	 * @param ,Classmet
 	 * @return
 	 */
-	protected String absoluteName(ConcreteMetaClass aec) {
-		return schemaRootPackageName + "." + aec.getQualifiedName();
+	protected String absoluteName(TypedElementClass<?,?> metaClass) {
+		return schemaRootPackageName + "." +  metaClass.getQualifiedName();
 	}
 
 	@Override
@@ -136,6 +138,13 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 				"\treturn #javaClassName#.class;", "}");
 	}
 
+	
+	protected CodeBlock createGetM1ImplementationClassMethod() {
+		return new CodeSnippet(
+				true,
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1ImplementationClass() {",
+				"\treturn #javaImplClassName#.class;", "}");
+	}
 
 
 }

@@ -278,6 +278,7 @@ public final class GraphClassImpl extends
 				kind);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
+		incClass.addSuperClass(incClass.getDefaultClass());
 		return incClass;
 	}
 

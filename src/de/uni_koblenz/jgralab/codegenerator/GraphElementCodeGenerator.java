@@ -165,7 +165,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		} else {
 			s.add("@Override",
 			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) {");
-			s.add("\treturn getFirstIncidence(#incidenceClassName#.class#typeflagActualParam#);");
+			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
 			s.add("}");
 			
 		}
