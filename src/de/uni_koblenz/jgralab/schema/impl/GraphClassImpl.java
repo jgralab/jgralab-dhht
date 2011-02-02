@@ -38,7 +38,6 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -173,7 +172,7 @@ public final class GraphClassImpl extends
 			EdgeClass s = getSchema().getDefaultEdgeClass();
 			ec.addSuperClass(s);
 		}
-		return (BinaryEdgeClass) ec;
+		return ec;
 	}
 
 	@Override
@@ -279,7 +278,7 @@ public final class GraphClassImpl extends
 				kind);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
-		return incClass;
+		return null;
 	}
 
 	@Override

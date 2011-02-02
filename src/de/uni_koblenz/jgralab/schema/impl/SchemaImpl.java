@@ -428,10 +428,11 @@ public class SchemaImpl implements Schema {
 			javaSources.addAll(codeGen.createJavaSources());
 
 		}
-		
+
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
-			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(incidenceClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
+					incidenceClass, packagePrefix,
+					GRAPH_IMPLEMENTATION_PACKAGE, config);
 			javaSources.addAll(codeGen.createJavaSources());
 		}
 
@@ -525,10 +526,11 @@ public class SchemaImpl implements Schema {
 				}
 			}
 		}
-		
+
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
-			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(incidenceClass,
-					packagePrefix, GRAPH_IMPLEMENTATION_PACKAGE, config);
+			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
+					incidenceClass, packagePrefix,
+					GRAPH_IMPLEMENTATION_PACKAGE, config);
 			codeGen.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -1054,7 +1056,7 @@ public class SchemaImpl implements Schema {
 		Class<?> m1Class = getGraphClassImpl(implementationType);
 		for (Method m : m1Class.getMethods()) {
 			if (m.getName().equals(methodName)
-					&& (m.getParameterTypes().length == 3)) {
+					&& (m.getParameterTypes().length == 3/* TODO 2 not 3 */)) {
 				return m;
 			}
 		}

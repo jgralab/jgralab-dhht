@@ -450,8 +450,7 @@ public abstract class EdgeBaseImpl extends
 	@Override
 	public String toString() {
 		assert isValid();
-		return "+e" + id + ": "
-				+ getMetaClass().getQualifiedName();
+		return "+e" + id + ": " + getMetaClass().getQualifiedName();
 	}
 
 	@Override
@@ -912,19 +911,19 @@ public abstract class EdgeBaseImpl extends
 	protected abstract void setPrevEdgeInGraph(Edge prevEdge);
 
 	@Override
-	public void connect(String rolename, Vertex elemToConnect) {
-		connect(getIncidenceClassForRolename(rolename), elemToConnect);
+	public Incidence connect(String rolename, Vertex elemToConnect) {
+		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
 
 	@Override
-	public void connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
-		connect(incidenceClass.getM1Class(), elemToConnect);
+	public Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect);
 	}
 
 	@Override
-	public void connect(Class<? extends Incidence> incidenceClass,
+	public Incidence connect(Class<? extends Incidence> incidenceClass,
 			Vertex elemToConnect) {
-		getSchema().getGraphFactory().createIncidence(incidenceClass,
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
 				elemToConnect, this);
 	}
 

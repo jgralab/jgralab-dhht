@@ -197,11 +197,29 @@ public class GraphIO {
 
 	private int bufferSize;
 
-	private Vertex edgeIn[], edgeOut[];
-	private int[] firstIncidence;
-	private int[] nextIncidence;
+	/**
+	 * Stores the information about incidences at the edges.<br>
+	 * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
+	 * vertices at the edge with id i.
+	 */
+	private ArrayList<Vertex>[] incidencesAtEdge;
 
-	private int edgeOffset;
+	/**
+	 * Stores the information about incidences at the vertices.<br>
+	 * <code>incidencesAtVertex[i]</code> = the lambda sequence at the vertex
+	 * with id i.<br>
+	 * <code>incidencesAtVertex[i].get(j)[0]</code> = edge id of incident edge<br>
+	 * <code>incidencesAtVertex[i].get(j)[1]</code> = position of incidence at
+	 * lambda sequence of edge
+	 */
+	private ArrayList<Integer[]>[] incidencesAtVertex;
+
+	/**
+	 * Stores the information about incidences at the edges.<br>
+	 * <code>incidenceInstancesAtEdge[i]</code> = the lambda sequence of all
+	 * Incidences at the edge with id i.
+	 */
+	private Incidence[][] incidenceInstancesAtEdge;
 
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
@@ -241,7 +259,8 @@ public class GraphIO {
 
 	private final Object[] vertexDescTempObject = { 0 };
 
-	private final Object[] edgeDescTempObject = { 0, 0, 0 };
+	private final Object[] edgeDescTempObject = { 0 };
+
 	private ByteArrayOutputStream BAOut;
 
 	// stringPool allows re-use string values, saves memory if
@@ -724,8 +743,7 @@ public class GraphIO {
 				continue;
 			}
 			vId = nextV.getId();
-			AttributedElementClass<?, ?> aec = nextV
-					.getMetaClass();
+			AttributedElementClass<?, ?> aec = nextV.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
@@ -784,8 +802,7 @@ public class GraphIO {
 				continue;
 			}
 			eId = nextE.getId();
-			AttributedElementClass<?, ?> aec = nextE
-					.getMetaClass();
+			AttributedElementClass<?, ?> aec = nextE.getMetaClass();
 
 			Package currentPackage = aec.getPackage();
 			if (currentPackage != oldPackage) {
@@ -1348,10 +1365,8 @@ public class GraphIO {
 					(Class<?>[]) null);
 			io.schema = (Schema) instanceMethod.invoke(null, new Object[0]);
 			GraphBaseImpl loadedGraph = io.graph(pf, implementationType);
-			loadedGraph.internalLoadingCompleted(io.firstIncidence,
-					io.nextIncidence);
-			io.firstIncidence = null;
-			io.nextIncidence = null;
+			io.incidencesAtEdge = null;
+			io.incidencesAtVertex = null;
 			loadedGraph.loadingCompleted();
 			return loadedGraph;
 		} catch (ClassNotFoundException e) {
@@ -2050,6 +2065,9 @@ public class GraphIO {
 					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
+			if (icd.roleName.equals("hiddenIncidenceClassAtEdge")) {
+				System.out.println("Putting toIncidenceClass: " + icd.roleName);
+			}
 			IncidenceClass ic = gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
@@ -2057,7 +2075,7 @@ public class GraphIO {
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
 					Direction.VERTEX_TO_EDGE, icd.incidenceType);
-					incidenceClassMap.put(ic, icd);
+			incidenceClassMap.put(ic, icd);
 		}
 		addAttributes(ecd.attributes, ec);
 
@@ -2156,9 +2174,9 @@ public class GraphIO {
 			return IncidenceType.COMPOSITION;
 		} else {
 			return IncidenceType.EDGE;
-//			throw new GraphIOException(
-//					"invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
-//							+ lookAhead + "' in line " + line);
+			// throw new GraphIOException(
+			// "invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
+			// + lookAhead + "' in line " + line);
 		}
 	}
 
@@ -2314,8 +2332,8 @@ public class GraphIO {
 				// }
 
 				// build redefinitions
-			//	ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
-			//	ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
+				// ec.getFrom().addRedefinedRoles(eData.redefinedFromRoles);
+				// ec.getTo().addRedefinedRoles(eData.redefinedToRoles);
 			}
 		}
 	}
@@ -2345,10 +2363,25 @@ public class GraphIO {
 	private void buildIncidenceClassHierarchy() throws GraphIOException {
 		for (EdgeClass ec : schema.getGraphClass().getEdgeClasses()) {
 			for (IncidenceClass ic : ec.getIncidenceClasses()) {
+				System.out.println("Handling IncidenceClass "
+						+ ic.getRolename());
+				if (ic.getRolename().equals("hiddenIncidenceClassAtEdge")) {
+					System.out
+							.println("Map contains hiddenIncidencenClassAtEdge: "
+									+ incidenceClassMap.containsKey(ic));
+					System.out.println("Size of icMap: "
+							+ incidenceClassMap.size());
+					for (IncidenceClass ic2 : incidenceClassMap.keySet()) {
+						System.out.println("Before");
+						System.out.println(ic2);
+						System.out.println("After");
+					}
+				}
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				System.out.println("ICD Map: " + icd);
 				buildIncidenceClassHierarchy(ic, icd, ec);
-				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses.size()) {
+				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
+						.size()) {
 					// TODO throw exception
 					System.out.println(("In superclass size"));
 				} else {
@@ -2520,7 +2553,7 @@ public class GraphIO {
 	private final static boolean isSeparator(int c) {
 		return c == ';' || c == '<' || c == '>' || c == '(' || c == ')'
 				|| c == '{' || c == '}' || c == ':' || c == '[' || c == ']'
-				|| c == ',' || c == '=';
+				|| c == ',' || c == '=' || c == '-';
 	}
 
 	private final void skipWs() throws GraphIOException {
@@ -2740,6 +2773,7 @@ public class GraphIO {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	private GraphBaseImpl graph(ProgressFunction pf,
 			ImplementationType implementationType) throws GraphIOException {
 		currentPackageName = "";
@@ -2773,11 +2807,14 @@ public class GraphIO {
 		}
 
 		// adjust fields for incidences
-		edgeIn = new Vertex[maxE + 1];
-		edgeOut = new Vertex[maxE + 1];
-		firstIncidence = new int[maxV + 1];
-		nextIncidence = new int[2 * maxE + 1];
-		edgeOffset = maxE;
+		incidencesAtEdge = new ArrayList[maxE + 1];
+		incidencesAtVertex = new ArrayList[maxV + 1];
+		incidenceInstancesAtEdge = new Incidence[maxE + 1][];
+		// edgeIn = new Vertex[maxE + 1];
+		// edgeOut = new Vertex[maxE + 1];
+		// firstIncidence = new int[maxV + 1];
+		// nextIncidence = new int[2 * maxE + 1];
+		// edgeOffset = maxE;
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
@@ -2835,12 +2872,31 @@ public class GraphIO {
 			}
 		}
 
+		sortLambdaSequenceAtVertex(graph);
+
 		graph.setGraphVersion(graphVersion);
 		if (pf != null) {
 			pf.finished();
 		}
 		graph.setLoading(false);
 		return graph;
+	}
+
+	private void sortLambdaSequenceAtVertex(GraphBaseImpl graph) {
+		for (Vertex v : graph.getVertices()) {
+			Incidence firstUnsorted = v.getFirstIncidence();
+			for (Integer[] incArray : incidencesAtVertex[v.getId()]) {
+				if (incArray == null) {
+					continue;
+				}
+				Incidence current = incidenceInstancesAtEdge[incArray[0]][incArray[1]];
+				if (current == firstUnsorted) {
+					firstUnsorted = firstUnsorted.getNextIncidenceAtVertex();
+				} else {
+					current.putBeforeAtVertex(firstUnsorted);
+				}
+			}
+		}
 	}
 
 	public final double matchDouble() throws GraphIOException {
@@ -2892,13 +2948,11 @@ public class GraphIO {
 				createMethods.put(ecName, createMethod);
 			}
 			edgeDescTempObject[0] = eId;
-			edgeDescTempObject[1] = edgeOut[eId];
-			edgeDescTempObject[2] = edgeIn[eId];
 			edge = (Edge) createMethod.invoke(graph, edgeDescTempObject);
 		} catch (Exception e) {
-			throw new GraphIOException("can't create edge " + eId + " from "
-					+ edgeOut[eId] + " to " + edgeIn[eId], e);
+			throw new GraphIOException("Can't create edge " + eId + ".", e);
 		}
+		parseIncidences(edge);
 		edge.readAttributeValues(this);
 		match(";");
 	}
@@ -2930,30 +2984,77 @@ public class GraphIO {
 		}
 	}
 
-	private void parseIncidentEdges(Vertex v) throws GraphIOException {
-		int eId = 0;
-		int prevId = 0;
-		int vId = v.getId();
-		boolean first = true;
+	private void parseIncidences(Edge edge) throws GraphIOException {
+		int lambdaSeqPosAtEdge = 0;
+		int eId = edge.getId();
+		incidenceInstancesAtEdge[eId] = new Incidence[incidencesAtEdge[eId]
+				.size()];
 
 		match("<");
 		while (!lookAhead.equals(">")) {
-			prevId = eId;
+			lambdaSeqPosAtEdge++;
+			String currentRolename = matchSimpleName(false);
+			if (incidencesAtEdge[eId] == null
+					|| incidencesAtEdge[eId].size() < lambdaSeqPosAtEdge) {
+				throw new GraphIOException(
+						"There are more incidences defined at edge e" + eId
+								+ " than defined at the vertices.");
+			}
+			Vertex v = incidencesAtEdge[eId].get(lambdaSeqPosAtEdge);
+			incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge.connect(
+					currentRolename, v);
+		}
+		if (lambdaSeqPosAtEdge + 1 != incidencesAtEdge[eId].size()) {
+			throw new GraphIOException(
+					"There are more incidences defined at the vertices than defined at edge e"
+							+ eId + ".");
+		}
+	}
+
+	private void parseIncidentEdges(Vertex v) throws GraphIOException {
+		int vId = v.getId();
+		int eId = 0;
+		int lambdaSeqPosAtEdge = 0;
+		int lambdaSeqPosAtVertex = 0;
+
+		match("<");
+		while (!lookAhead.equals(">")) {
+			lambdaSeqPosAtVertex++;
 			eId = eId();
-			// if (firstEdgeAtVertex[vId] == 0) {
-			if (first) {
-				firstIncidence[vId] = eId;
-				first = false;
-			} else {
-				nextIncidence[edgeOffset + prevId] = eId;
+			match("-");
+			lambdaSeqPosAtEdge = matchInteger();
+			if (lambdaSeqPosAtEdge == 0) {
+				throw new GraphIOException("Invalid lambda sequenz position "
+						+ lambdaSeqPosAtEdge + ".");
 			}
-			if (eId < 0) {
-				edgeIn[-eId] = v;
-			} else {
-				edgeOut[eId] = v;
-			}
+
+			addToIncidenceList(incidencesAtVertex, vId, lambdaSeqPosAtVertex,
+					new Integer[] { eId, lambdaSeqPosAtEdge });
+			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge, v);
 		}
 		match();
+	}
+
+	private <V> void addToIncidenceList(
+			ArrayList<V>[] incidencesAtGraphElement, int graphElementId,
+			int posInLambdaSequence, V incidentElement) throws GraphIOException {
+		ArrayList<V> lambdaSequence = incidencesAtGraphElement[graphElementId];
+		if (lambdaSequence == null) {
+			lambdaSequence = new ArrayList<V>();
+			incidencesAtGraphElement[graphElementId] = lambdaSequence;
+		}
+		if (lambdaSequence.size() >= posInLambdaSequence
+				&& lambdaSequence.get(posInLambdaSequence) != null) {
+			throw new GraphIOException(
+					"There already exists an element in the lambda sequence at the position "
+							+ posInLambdaSequence + ". Concerning vertex is v"
+							+ graphElementId + ".");
+		}
+		for (int i = lambdaSequence.size(); i < posInLambdaSequence; i++) {
+			// fill missing entries until graphElementId with null
+			lambdaSequence.add(null);
+		}
+		lambdaSequence.add(posInLambdaSequence, incidentElement);
 	}
 
 	/**

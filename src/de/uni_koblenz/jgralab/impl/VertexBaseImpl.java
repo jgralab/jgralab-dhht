@@ -925,20 +925,20 @@ public abstract class VertexBaseImpl extends
 	// }
 
 	@Override
-	public void connect(String rolename, Edge elemToConnect) {
-		connect(getIncidenceClassForRolename(rolename), elemToConnect);
+	public Incidence connect(String rolename, Edge elemToConnect) {
+		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
 
 	@Override
-	public void connect(IncidenceClass incidenceClass, Edge elemToConnect) {
-		connect(incidenceClass.getM1Class(), elemToConnect);
+	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect);
 	}
 
 	@Override
-	public void connect(Class<? extends Incidence> incidenceClass,
+	public Incidence connect(Class<? extends Incidence> incidenceClass,
 			Edge elemToConnect) {
-		getSchema().getGraphFactory().createIncidence(incidenceClass, this,
-				elemToConnect);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+				this, elemToConnect);
 	}
 
 }
