@@ -2341,12 +2341,14 @@ public class GraphIO {
 				buildIncidenceClassHierarchy(ic, icd, ec);
 				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
 						.size()) {
-					// TODO throw exception
 					System.out.println(("In superclass size"));
+					throw new GraphIOException(
+							"The number of direct super classes of incidence class "
+									+ ic.getRolename()
+									+ " is not equal to the number of defined super classes in .dhhtg.");
 				} else {
 					System.out.println("Eslse");
 				}
-				// TODO implement redefined rolenames
 			}
 		}
 	}
