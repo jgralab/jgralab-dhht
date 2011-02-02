@@ -499,6 +499,13 @@ public interface TypedElementClass<ConcreteMetaClass extends TypedElementClass<C
 	 * @return the default class of type ConcreteMetaClass of the schema
 	 *         e.g., for an EdgeClass the DefaultEdgeClass is returned
 	 */
-	public abstract ConcreteMetaClass getDefaultClass();
+	public ConcreteMetaClass getDefaultClass();
+	
+	
+	/**
+	 * Adds the given class as superclass to this element
+	 * @param superClass
+	 */
+	public void addSuperClass(ConcreteMetaClass superClass);
 	
 }

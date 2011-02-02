@@ -128,7 +128,23 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
 			Vertex alpha, Vertex omega) {
 		try {
-			Edge e = edgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
+		//	Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
+		//	return e;
+			return null;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
+		try {
+			Edge e = edgeMap.get(edgeClass).newInstance(id, g);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {

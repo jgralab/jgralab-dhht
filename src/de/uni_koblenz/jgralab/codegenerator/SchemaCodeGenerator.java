@@ -226,71 +226,71 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
 				"}",
 				"",
-				// ---- database support -------
-				"/**",
-				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-				" *",
-				" * @param id Identifier of new graph",
-				" * @param graphDatabase Database which should contain graph",
-				" */",
-				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-				"}",
-				"/**",
-				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-				" *",
-				" * @param id Identifier of new graph",
-				" * @param vMax Maximum initial count of vertices that can be held in graph.",
-				" * @param eMax Maximum initial count of edges that can be held in graph.",
-				" * @param graphDatabase Database which should contain graph",
-				" */",
-				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, int vMax, int eMax, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id, vMax, eMax );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-				"}",
-				// ---- transaction support ----
-				"/**",
-				" * Creates a new #gcName# graph with transaction support with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
-				" *",
-				" * @param vMax initial vertex count",
-				" * @param eMax initial edge count",
-				"*/",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(int vMax, int eMax) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Creates a new #gcName# graph with transaction support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
-				" *",
-				" * @param id the id name of the new graph",
-				" * @param vMax initial vertex count",
-				" * @param eMax initial edge count",
-				" */",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(String id, int vMax, int eMax) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Creates a new #gcName# graph.",
-				"*/",
-				"public #gcName# create#gcCamelName#WithTransactionSupport() {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Creates a new #gcName# graph with the ID <code>id</code>.",
-				" *",
-				" * @param id the id name of the new graph",
-				" */",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(String id) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
+//				// ---- database support -------
+//				"/**",
+//				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
+//				" *",
+//				" * @param id Identifier of new graph",
+//				" * @param graphDatabase Database which should contain graph",
+//				" */",
+//				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, GraphDatabase graphDatabase) throws GraphDatabaseException{",
+//				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
+//						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
+//				"}",
+//				"/**",
+//				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
+//				" *",
+//				" * @param id Identifier of new graph",
+//				" * @param vMax Maximum initial count of vertices that can be held in graph.",
+//				" * @param eMax Maximum initial count of edges that can be held in graph.",
+//				" * @param graphDatabase Database which should contain graph",
+//				" */",
+//				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, int vMax, int eMax, GraphDatabase graphDatabase) throws GraphDatabaseException{",
+//				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id, vMax, eMax );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
+//						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
+//				"}",
+//				// ---- transaction support ----
+//				"/**",
+//				" * Creates a new #gcName# graph with transaction support with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+//				" *",
+//				" * @param vMax initial vertex count",
+//				" * @param eMax initial edge count",
+//				"*/",
+//				"public #gcName# create#gcCamelName#WithTransactionSupport(int vMax, int eMax) {",
+//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null, vMax, eMax);"
+//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+//				"}",
+//				"",
+//				"/**",
+//				" * Creates a new #gcName# graph with transaction support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+//				" *",
+//				" * @param id the id name of the new graph",
+//				" * @param vMax initial vertex count",
+//				" * @param eMax initial edge count",
+//				" */",
+//				"public #gcName# create#gcCamelName#WithTransactionSupport(String id, int vMax, int eMax) {",
+//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id, vMax, eMax);"
+//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+//				"}",
+//				"",
+//				"/**",
+//				" * Creates a new #gcName# graph.",
+//				"*/",
+//				"public #gcName# create#gcCamelName#WithTransactionSupport() {",
+//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null);"
+//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+//				"}",
+//				"",
+//				"/**",
+//				" * Creates a new #gcName# graph with the ID <code>id</code>.",
+//				" *",
+//				" * @param id the id name of the new graph",
+//				" */",
+//				"public #gcName# create#gcCamelName#WithTransactionSupport(String id) {",
+//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id);"
+//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+//				"}",
+//				"",
 				// ---- file handling methods ----
 				"/**",
 				" * Loads a #gcName# graph from the file <code>filename</code>.",
@@ -557,6 +557,9 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 	private CodeBlock createIncidenceClass(IncidenceClass ic) {
 		CodeList code = new CodeList();
 		addImports("#jgSchemaPackage#.IncidenceClass");
+		addImports("#jgSchemaPackage#.IncidenceType");
+		addImports("#jgPackage#.Direction");
+		
 		code.setVariable("icName", ic.getQualifiedName());
 		code.setVariable("schemaVariable", ic.getVariableName());
 		code.setVariable("icVariable", "ic");
@@ -574,11 +577,11 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
-						"\tIncidenceClass #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(\"#icName#\",",
-						"\t\t#gcVariable#.getEdgeClass(#icEdgeClass#),",
-						"\t\t#gcVariable#.getVertexClass(#icVertexClass#),",
+						"\tIncidenceClass #icVariable# = #gcVariable#.createIncidenceClass(",
+						"\t\t#gcVariable#.getEdgeClass(\"#icEdgeClass#\"),",
+						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
 						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
-						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir,IncidenceType.#incidenceType#);"));
+						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,IncidenceType.#incidenceType#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {

@@ -150,7 +150,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	private CodeBlock createFirstIncidenceMethod(IncidenceClass ic, boolean typeFlag) {
 		CodeSnippet s = new CodeSnippet();
 		s.setVariable("incidenceClassName", ic.getRolename());
-		s.setVariable("qualifiedIncidenceClassName", ic.getQualifiedName());
+		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
 		s.setVariable("typeflagFormalParam", typeFlag ? "boolean noSubtypes" : "");
 		s.setVariable("typeflagActualParam", typeFlag ? ", noSubtypes" : "");
 		if (currentCycle.isAbstract()) {
