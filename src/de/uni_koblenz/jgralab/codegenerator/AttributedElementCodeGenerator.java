@@ -72,7 +72,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 			code.add(createFields(aec.getAttributeList()));
 			//code.add(createConstructor());
 			code.add(createGetAttributedElementClassMethod());
-			code.add(createGetM1ClassMethod());
 			code.add(createGenericGetter(aec.getAttributeList()));
 			code.add(createGenericSetter(aec.getAttributeList()));
 			code.add(createGettersAndSetters(aec.getAttributeList()));

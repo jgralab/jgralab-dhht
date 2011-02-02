@@ -517,11 +517,17 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		block.setVariable("elemClassName", "Vertex");
 		block.setVariable("elemClassLowName", "vertex"); 
 		block.setVariable("elemClassPluralName", "Vertices");
+		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			addImports("#jgImplPackage#.VertexIterable");
+		}
 		code.add(block);
 		block = createIteratorMethods(gc.getEdgeClasses());
 		block.setVariable("elemClassName", "Edge");
 		block.setVariable("elemClassLowName", "edge"); 
 		block.setVariable("elemClassPluralName", "Edges");
+		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			addImports("#jgImplPackage#.EdgeIterable");
+		}
 		code.add(block);
 		return code;
 	}
@@ -531,9 +537,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		for (GraphElementClass<?,?> gec : set) {
 			if (gec.isInternal()) {
 				continue;
-			}
-			if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-				addImports("#jgImplPackage#.#elemClassName#Iterable");
 			}
 			code.addNoIndent(createIteratorMethods(gec));
 		}

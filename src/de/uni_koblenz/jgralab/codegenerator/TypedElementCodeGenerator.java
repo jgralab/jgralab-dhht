@@ -36,6 +36,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		rootBlock.setVariable("uniqueClassName", aec.getUniqueName());
 		rootBlock.setVariable("schemaPackageName", schemaRootPackageName);
 		rootBlock.setVariable("theGraph", "graph");
+		
 
 		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true"
 				: "false");
@@ -52,6 +53,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
+
 		}
 		return code;
 	}
@@ -118,7 +120,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetM1ClassMethod() {
 		return new CodeSnippet(
 				true,
-				"public final java.lang.Class<? extends #jgPackage#.AttributedElement> getM1Class() {",
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1Class() {",
 				"\treturn #javaClassName#.class;", "}");
 	}
 

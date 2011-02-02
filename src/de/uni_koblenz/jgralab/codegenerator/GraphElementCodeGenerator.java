@@ -130,7 +130,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 			boolean createMethod = (!currentCycle.isAbstract()) || incidenceDefinedForExactlyThisGraphElementClass || incidenceDefinedForVertexAsDirectSuperclass;
 
 			if (createMethod) {
-				addImports("#jgPackage#.EdgeDirection");
+				addImports("#jgPackage#.Direction");
 				if (config.hasTypeSpecificMethodsSupport()) {
 					if (ic.getRolename() != null && ic.getRolename().length()>0) {
 						code.addNoIndent(createFirstIncidenceMethod(ic, true));

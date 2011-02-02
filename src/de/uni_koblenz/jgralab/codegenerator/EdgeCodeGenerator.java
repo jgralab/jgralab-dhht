@@ -47,6 +47,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 			String implementationName, CodeGeneratorConfiguration config) {
 		super(edgeClass, schemaPackageName, implementationName, config, false);
 		rootBlock.setVariable("baseClassName", "EdgeImpl");
+		rootBlock.setVariable("graphElementClass", "Edge");
 	}
 
 
@@ -60,7 +61,9 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		code.add(createBinaryConstructor());
+		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			code.add(createBinaryConstructor());
+		}
 	}
 
 
