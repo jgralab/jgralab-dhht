@@ -278,7 +278,7 @@ public final class GraphClassImpl extends
 				kind);
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
-		return null;
+		return incClass;
 	}
 
 	@Override
