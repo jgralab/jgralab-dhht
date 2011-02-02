@@ -530,13 +530,15 @@ public abstract class GraphBaseImpl implements Graph {
 			IncidenceClass fromClass = null;
 			IncidenceClass toClass = null;
 			EdgeClass metaClass = edge.getMetaClass();
-			assert(metaClass.isBinary());
+			assert (metaClass.isBinary());
 			Set<IncidenceClass> incClasses = metaClass.getAllIncidenceClasses();
 			for (IncidenceClass ic : incClasses) {
-				if ((!ic.isAbstract()) && (ic.getDirection()==Direction.VERTEX_TO_EDGE)) {
+				if ((!ic.isAbstract())
+						&& (ic.getDirection() == Direction.VERTEX_TO_EDGE)) {
 					fromClass = ic;
 				}
-				if ((!ic.isAbstract()) && (ic.getDirection()==Direction.EDGE_TO_VERTEX)) {
+				if ((!ic.isAbstract())
+						&& (ic.getDirection() == Direction.EDGE_TO_VERTEX)) {
 					toClass = ic;
 				}
 			}
@@ -1277,32 +1279,6 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@Override
 	public void loadingCompleted() {
-	}
-
-	/**
-	 * Constructs incidence lists for all vertices after loading this graph.
-	 * 
-	 * @param firstIncidence
-	 *            array of edge ids of the first incidence
-	 * @param nextIncidence
-	 *            array of edge ids of subsequent edges
-	 */
-	public void internalLoadingCompleted(int[] firstIncidence,
-			int[] nextIncidence) {
-		throw new UnsupportedOperationException(
-				"Method internalLoadingCompleted not yet implemented");
-		// getFreeVertexList().reinitialize(getVertex());
-		// getFreeEdgeList().reinitialize(getEdge());
-		// for (int vId = 1; vId < getVertex().length; ++vId) {
-		// VertexBaseImpl v = getVertex()[vId];
-		// if (v != null) {
-		// int eId = firstIncidence[vId];
-		// while (eId != 0) {
-		// v.appendIncidenceToLambdaSeq(getEdge()[eId]);
-		// eId = nextIncidence[eMax + eId];
-		// }
-		// }
-		// }
 	}
 
 	/**
