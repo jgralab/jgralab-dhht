@@ -50,7 +50,8 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
 
-public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>,  OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> extends AttributedElement<OwnTypeClass, OwnType> {
+public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
+		extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
 	 * Returns the id of this {@link GraphElement}.
@@ -652,8 +653,9 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param elemToConnect
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
+	 * @return
 	 */
-	void connect(String rolename, DualType elemToConnect);
+	Incidence connect(String rolename, DualType elemToConnect);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -666,7 +668,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 */
-	void connect(IncidenceClass incidenceClass, DualType elemToConnect);
+	Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -679,6 +681,6 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 */
-	void connect(Class<? extends Incidence> incidenceClass,
+	Incidence connect(Class<? extends Incidence> incidenceClass,
 			DualType elemToConnect);
 }
