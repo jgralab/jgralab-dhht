@@ -77,6 +77,7 @@ public class CodeGeneratorConfiguration {
 
 	public static final CodeGeneratorConfiguration MINIMAL = new CodeGeneratorConfiguration()
 			.withoutTypeSpecificMethodSupport();
+	
 
 	/** toggles, if the classes for standard support should be created */
 	private boolean standardSupport = true;
@@ -125,6 +126,7 @@ public class CodeGeneratorConfiguration {
 		databaseSupport = false;
 	}
 
+	
 	public CodeGeneratorConfiguration withoutStandardSupport() {
 		standardSupport = false;
 		return this;

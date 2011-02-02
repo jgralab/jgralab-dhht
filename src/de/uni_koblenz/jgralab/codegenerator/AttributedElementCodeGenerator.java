@@ -92,7 +92,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		CodeList code = super.createBody();
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			code.add(createFields(aec.getAttributeList()));
-			code.add(createConstructor());
+			//code.add(createConstructor());
 			code.add(createGetAttributedElementClassMethod());
 			code.add(createGetM1ClassMethod());
 			code.add(createGenericGetter(aec.getAttributeList()));

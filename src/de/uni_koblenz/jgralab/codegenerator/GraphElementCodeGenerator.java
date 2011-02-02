@@ -132,9 +132,11 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 			if (createMethod) {
 				addImports("#jgPackage#.EdgeDirection");
 				if (config.hasTypeSpecificMethodsSupport()) {
-					code.addNoIndent(createFirstIncidenceMethod(ic, true));
-					if (config.hasMethodsForSubclassesSupport() && !ic.isAbstract()) {
-						code.addNoIndent(createFirstIncidenceMethod(ic, false));
+					if (ic.getRolename() != null && ic.getRolename().length()>0) {
+						code.addNoIndent(createFirstIncidenceMethod(ic, true));
+						if (config.hasMethodsForSubclassesSupport() && !ic.isAbstract()) {
+							code.addNoIndent(createFirstIncidenceMethod(ic, false));
+						}
 					}	
 				}
 			}

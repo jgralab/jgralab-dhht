@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.List;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -44,6 +45,7 @@ import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.ListDomain;
 import de.uni_koblenz.jgralab.schema.MapDomain;
 import de.uni_koblenz.jgralab.schema.NamedElementClass;
@@ -79,7 +81,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 			String implementationName, CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
-
+System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSupport());
 		rootBlock.setVariable("simpleClassName", schema.getName());
 		rootBlock.setVariable("simpleImplClassName", schema.getName());
 		rootBlock.setVariable("baseClassName", "SchemaImpl");
@@ -92,6 +94,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	protected CodeBlock createHeader() {
 		addImports("#jgSchemaImplPackage#.#baseClassName#");
 		addImports("#jgSchemaPackage#.VertexClass");
+		addImports("#jgSchemaPackage#.EdgeClass");
+	//	addImports("#jgImplPackage#.db.GraphDatabase");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
 				true,
@@ -130,9 +134,9 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	private CodeBlock createGraphFactoryMethod() {
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
-				"#jgImplDbPackage#.GraphDatabaseException",
-				"#jgImplDbPackage#.GraphDatabase",
 				"#jgPackage#.GraphIOException");
+		//				"#jgImplDbPackage#.GraphDatabaseException",
+	//	"#jgImplDbPackage#.GraphDatabase",
 		if (config.hasDatabaseSupport()) {
 			addImports("#jgPackage#.GraphException");
 		}
@@ -559,14 +563,22 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icVertexClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
+		code.setVariable("icRoleName", ic.getRolename());
+		code.setVariable("dir", ic.getDirection().toString());
+		code.setVariable("incidenceType", ic.getRolename());
+		code.setVariable("minEdgesAtVertex", Integer.toString(ic.getMinEdgesAtVertex()));
+		code.setVariable("minVerticexAtEdge", Integer.toString(ic.getMinVerticesAtEdge()));
+		code.setVariable("maxEdgesAtVertex", Integer.toString(ic.getMaxEdgesAtVertex()));
+		code.setVariable("maxVerticexAtEdge", Integer.toString(ic.getMaxVerticesAtEdge()));
 		
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
-						"\t#icType# #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(\"#icName#\",",
+						"\tIncidenceClass #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(\"#icName#\",",
 						"\t\t#gcVariable#.getEdgeClass(#icEdgeClass#),",
 						"\t\t#gcVariable#.getVertexClass(#icVertexClass#),",
-						"\t#icVariable#.setAbstract(#icAbstract#);"));
+						"\t\t#icRoleName#,#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
+						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,#incidenceType#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
@@ -635,7 +647,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	 */
 	private CodeBlock createGraphElementClass(GraphElementClass<?,?> gec, String typeName ) {
 		CodeList code = new CodeList();
-		code.setVariable("getName", gec.getQualifiedName());
+		code.setVariable("gecName", gec.getQualifiedName());
 		code.setVariable("gecVariable", "gec");
 		code.setVariable("gecType", typeName);
 		code.setVariable("schemaVariable", gec.getVariableName());
@@ -643,7 +655,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
-						"\t#gecType#Class #gecVariable# = #schemaVariable# = #gecVariable#.create#gecType#Class(\"#gecName#\");",
+						"\t#gecType#Class #gecVariable# = #schemaVariable# = gc.create#gecType#Class(\"#gecName#\");",
 						"\t#gecVariable#.setAbstract(#gecAbstract#);"));
 		for (GraphElementClass<?,?> superClass : gec.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
