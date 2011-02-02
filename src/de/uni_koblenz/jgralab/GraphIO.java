@@ -175,6 +175,8 @@ public class GraphIO {
 	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
 
 	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
+	
+	private IncidenceClass theIncidenceClass = null;
 
 	private final Map<String, Method> createMethods;
 
@@ -2050,8 +2052,6 @@ public class GraphIO {
 					Direction.VERTEX_TO_EDGE, icd.incidenceType), icd);
 		}
 		for (IncidenceClassData icd : ecd.toIncidenceClasses) {
-			if (icd.roleName.equals("hiddenIncidenceClassAtEdge"))
-				System.out.println("Putting toIncidenceClass: " + icd.roleName);
 			IncidenceClass ic = gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
 					icd.isAbstract, icd.multiplicityEdgesAtVertex[0],
@@ -2060,6 +2060,11 @@ public class GraphIO {
 					icd.multiplicityVerticesAtEdge[1],
 					Direction.VERTEX_TO_EDGE, icd.incidenceType);
 					incidenceClassMap.put(ic, icd);
+				if (icd.roleName.equals("hiddenIncidenceClassAtEdge")) {
+					System.out.println("Putting toIncidenceClass: " + icd.roleName);
+					theIncidenceClass = ic;
+					System.out.println("The incidence class: " + theIncidenceClass);
+				}	
 		}
 		addAttributes(ecd.attributes, ec);
 
@@ -2351,6 +2356,7 @@ public class GraphIO {
 			if (ic.getRolename().equals("hiddenIncidenceClassAtEdge")) {
 				System.out.println("Map contains hiddenIncidencenClassAtEdge: " + incidenceClassMap.containsKey(ic));
 				System.out.println("Size of icMap: " + incidenceClassMap.size());
+				System.out.println("The incidence class: " + theIncidenceClass);
 				for (IncidenceClass ic2 : incidenceClassMap.keySet()) {
 					System.out.println("Defore");
 					System.out.println(ic2);
