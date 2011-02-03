@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
@@ -25,7 +24,6 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 	
 	private CodeBlock createGetSemanticsMethod() {
 		CodeSnippet code = new CodeSnippet(true);
-		EdgeClass ec = (EdgeClass) aec;
 		String val = "NONE";
 
 		if ((bec.getToIncidenceClass().getIncidenceType() == IncidenceType.COMPOSITION)
@@ -44,7 +42,6 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 
 	private CodeBlock createGetAlphaSemanticsMethod() {
 		CodeSnippet code = new CodeSnippet(true);
-		EdgeClass ec = (EdgeClass) aec;
 		code.setVariable("semantics", bec.getFromIncidenceClass().getIncidenceType().toString());
 		code.add("@Override",
 				 "public de.uni_koblenz.jgralab.schema.AggregationKind getAlphaSemantics() {",

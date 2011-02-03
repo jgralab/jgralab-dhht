@@ -5,7 +5,6 @@ import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ?>>
 		extends CodeGenerator {

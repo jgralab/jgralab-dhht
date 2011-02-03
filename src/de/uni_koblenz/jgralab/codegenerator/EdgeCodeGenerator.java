@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.codegenerator;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
 
 /**

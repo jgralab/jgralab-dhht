@@ -148,24 +148,24 @@ public class RolenameCodeGenerator<MetaClass extends GraphElementClass<MetaClass
 	}
 	
 
-	private CodeBlock createRemoveAdjacenceSnippet(IncidenceClass incidentIncidenceClass, IncidenceClass adjacentIncidenceClass, boolean createClass) {
-		CodeSnippet code = (CodeSnippet) setVariables(new CodeSnippet(), incidentIncidenceClass);
-		code.setVariable("adjacentIncClassName", adjacentIncidenceClass.getRolename());
-		code.setVariable("adjacentElementClassName", adjacentIncidenceClass.getRolename());
-		if (!createClass) {
-			code.add("/**",
-					 " * removes the given vertex as <code>#rolename#</code> from this vertex, i.e. ",
-					 " * deletes the <code>#edgeClassName#</code> edge connections of this vertex with ",
-					 " * the given one.", " */",
-					 "public boolean remove_#adjacentIncClassName#_at_#rolename#(#adjacentElementClassName# element);");
-		} else {
-			code.add("@Override",
-					 "public boolean remove_#adjacentIncClassName#_at_#rolename#(#adjacentElementClassName# element) {",
-					 "\treturn false;",
-					 "}");
-		}
-		return code;
-	}
+//	private CodeBlock createRemoveAdjacenceSnippet(IncidenceClass incidentIncidenceClass, IncidenceClass adjacentIncidenceClass, boolean createClass) {
+//		CodeSnippet code = (CodeSnippet) setVariables(new CodeSnippet(), incidentIncidenceClass);
+//		code.setVariable("adjacentIncClassName", adjacentIncidenceClass.getRolename());
+//		code.setVariable("adjacentElementClassName", adjacentIncidenceClass.getRolename());
+//		if (!createClass) {
+//			code.add("/**",
+//					 " * removes the given vertex as <code>#rolename#</code> from this vertex, i.e. ",
+//					 " * deletes the <code>#edgeClassName#</code> edge connections of this vertex with ",
+//					 " * the given one.", " */",
+//					 "public boolean remove_#adjacentIncClassName#_at_#rolename#(#adjacentElementClassName# element);");
+//		} else {
+//			code.add("@Override",
+//					 "public boolean remove_#adjacentIncClassName#_at_#rolename#(#adjacentElementClassName# element) {",
+//					 "\treturn false;",
+//					 "}");
+//		}
+//		return code;
+//	}
 
 //	private CodeBlock createRemoveAllAdjacencesSnippet(IncidenceClass incidentIncidenceClass, IncidenceClass adjacentIncidenceClass, boolean createClass) {
 //		CodeSnippet code = (CodeSnippet) setVariables(new CodeSnippet(), incidentIncidenceClass);
