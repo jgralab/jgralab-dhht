@@ -404,7 +404,6 @@ public class TgSchema2Java {
 	 */
 	public void execute() {
 		int input;
-
 		try {
 			if (isExistingSchema(schema)) {
 				System.out.println("Schema already exists in " + commitPath);
@@ -418,13 +417,16 @@ public class TgSchema2Java {
 				}
 			}
 			if (overwrite) {
+				System.out.println("Comitting schema");
 				deleteFolder(commitPath + File.separator + schema.getPathName());
 				System.out.println("Committing schema "
 						+ schema.getQualifiedName());
+				
 				schema.commit(commitPath, config);
 				System.out.println("Schema " + schema.getQualifiedName()
 						+ " committed successfully");
 			}
+			System.out.println("Before compile");
 			if (compile) {
 				System.out.println("Compiling...");
 				compile();

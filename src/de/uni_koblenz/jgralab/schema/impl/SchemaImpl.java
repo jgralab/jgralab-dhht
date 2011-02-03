@@ -167,6 +167,8 @@ public class SchemaImpl implements Schema {
 	private boolean allowLowercaseEnumConstants = true;
 
 	private final EdgeClass defaultEdgeClass;
+	
+	private final BinaryEdgeClass defaultBinaryEdgeClass;
 
 	private final GraphClass defaultGraphClass;
 
@@ -287,6 +289,8 @@ public class SchemaImpl implements Schema {
 		// Creation of default GraphElementClasses
 		defaultVertexClass = VertexClassImpl.createDefaultVertexClass(this);
 		defaultEdgeClass = EdgeClassImpl.createDefaultEdgeClass(this);
+		defaultBinaryEdgeClass = BinaryEdgeClassImpl.createDefaultBinaryEdgeClass(this);
+		defaultBinaryEdgeClass.addSuperClass(defaultEdgeClass);
 		defaultEdgeToVertexIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.EDGE_TO_VERTEX);
 		defaultVertexToEdgeIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.VERTEX_TO_EDGE);
 		config = createDefaultConfig();
@@ -505,10 +509,8 @@ public class SchemaImpl implements Schema {
 				}
 			}
 		}
-
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
 			CodeGenerator codeGen;
-
 			if (edgeClass.isBinary()) {
 				codeGen = new BinaryEdgeCodeGenerator(
 						(BinaryEdgeClass) edgeClass, packagePrefix,
@@ -1025,6 +1027,7 @@ public class SchemaImpl implements Schema {
 		edgeClassSet.addAll(graphClass.getEdgeClasses());
 
 		topologicalOrderList.add(defaultEdgeClass);
+		topologicalOrderList.add(defaultBinaryEdgeClass);
 		// iteratively add classes from edgeClassSet,
 		// whose superclasses already are in topologicalOrderList,
 		// to topologicalOrderList
@@ -1345,6 +1348,11 @@ public class SchemaImpl implements Schema {
 			}
 		}
 		return incidenceClasses;
+	}
+
+	@Override
+	public BinaryEdgeClass getDefaultBinaryEdgeClass() {
+		return defaultBinaryEdgeClass;
 	}
 
 }

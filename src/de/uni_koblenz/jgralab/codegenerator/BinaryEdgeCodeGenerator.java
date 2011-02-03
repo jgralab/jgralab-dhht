@@ -30,10 +30,10 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 
 		if ((bec.getToIncidenceClass().getIncidenceType() == IncidenceType.COMPOSITION)
 				|| (bec.getFromIncidenceClass().getIncidenceType() == IncidenceType.COMPOSITION)) {
-			val = "COMPOSITE";
+			val = "COMPOSITION";
 		} else if ((bec.getToIncidenceClass().getIncidenceType() == IncidenceType.AGGREGATION)
 				|| (bec.getFromIncidenceClass().getIncidenceType() == IncidenceType.AGGREGATION)) {
-			val = "SHARED";
+			val = "AGGREGATION";
 		}
 		code.setVariable("semantics", val);
 		code.add("public de.uni_koblenz.jgralab.schema.IncidenceType getSemantics() {",

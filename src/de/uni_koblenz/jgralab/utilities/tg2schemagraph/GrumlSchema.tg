@@ -36,7 +36,7 @@ BinaryEdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass role hiding
 BinaryEdgeClass HidesIncidenceClassAtEdgeClass from IncidenceClass role hidingIncidenceClassAtEdge (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtEdge (0,*) (1,1);
 
 
-abstract EdgeClass SpecializesTypedElementClass from TypedElementClass role subclass (0,*) (1,1) to TypedElementClass role superclass (0,*) (1,1);
+abstract BinaryEdgeClass SpecializesTypedElementClass from TypedElementClass role subclass (0,*) (1,1) to TypedElementClass role superclass (0,*) (1,1);
 BinaryEdgeClass SpecializesVertexClass: SpecializesTypedElementClass from VertexClass (0,*) (1,1) to VertexClass (0,*) (1,1);
 BinaryEdgeClass SpecializesEdgeClass: SpecializesTypedElementClass from EdgeClass (0,*) (1,1) to EdgeClass (0,*) (1,1);
 BinaryEdgeClass SpecializesIncidenceClass: SpecializesTypedElementClass from IncidenceClass (0,*) (1,1) to IncidenceClass (0,*) (1,1);

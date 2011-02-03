@@ -168,10 +168,10 @@ public final class GraphClassImpl extends
 		Package parent = ((SchemaImpl) getSchema())
 				.createPackageWithParents(qn[0]);
 		BinaryEdgeClassImpl ec = new BinaryEdgeClassImpl(qn[1], parent, this);
-		if (!ec.getQualifiedName().equals(EdgeClass.DEFAULTEDGECLASS_NAME)) {
-			EdgeClass s = getSchema().getDefaultEdgeClass();
+		if (!ec.getQualifiedName().equals(BinaryEdgeClass.DEFAULTBINARYEDGECLASS_NAME)) {
+			EdgeClass s = getSchema().getDefaultBinaryEdgeClass();
 			ec.addSuperClass(s);
-		}
+		} 
 		return ec;
 	}
 

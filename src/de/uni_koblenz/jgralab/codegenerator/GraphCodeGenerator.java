@@ -87,12 +87,12 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 			rootBlock.setVariable("baseClassName", "GraphImpl");
 
-			addImports("java.util.List");
-			addImports("de.uni_koblenz.jgralab.Vertex");
-			addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValue");
-			addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueSet");
-			addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl");
-			addImports("de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator");
+		//	addImports("java.util.List");
+		//	addImports("de.uni_koblenz.jgralab.Vertex");
+		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValue");
+		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueSet");
+		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl");
+		//	addImports("de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator");
 
 			// for Vertex.reachableVertices()
 //			code.add(new CodeSnippet(

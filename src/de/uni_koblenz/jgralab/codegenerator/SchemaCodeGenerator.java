@@ -37,6 +37,7 @@ import java.util.Stack;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -543,8 +544,14 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		}
 		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
 			if (!ec.isInternal()) {
-				code.addNoIndent(new CodeSnippet("public final EdgeClass "
+				if (ec.isBinary()) {
+					addImports("#jgSchemaPackage#.BinaryEdgeClass");
+					code.addNoIndent(new CodeSnippet("public final BinaryEdgeClass "
 						+ ec.getVariableName() + ";"));
+				} else {
+					code.addNoIndent(new CodeSnippet("public final EdgeClass "
+							+ ec.getVariableName() + ";"));
+				}
 			}
 		}
 		for (IncidenceClass ic : schema.getIncidenceClassesInTopologicalOrder()) {
@@ -639,7 +646,11 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		CodeList code = new CodeList();
 		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
 			if (!ec.isInternal() && (ec.getGraphClass() == gc)) {
-				code.addNoIndent(createGraphElementClass(ec, "Edge"));
+				if (ec.isBinary()) {
+					code.addNoIndent(createGraphElementClass(ec, "BinaryEdge"));
+				} else {
+					code.addNoIndent(createGraphElementClass(ec, "Edge"));					
+				}
 			}
 		}
 		return code;

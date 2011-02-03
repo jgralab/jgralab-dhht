@@ -158,6 +158,7 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 		TypedElementClass<?,?> t = this;
 		return (   (t == s.getDefaultEdgeClass())
 				|| (t == s.getDefaultGraphClass()) 
+				|| (t == s.getDefaultBinaryEdgeClass()) 
 				|| (t == s.getDefaultVertexClass())
 				|| (t == s.getDefaultIncidenceClass(Direction.VERTEX_TO_EDGE) ) 
 				|| (t == s.getDefaultIncidenceClass(Direction.EDGE_TO_VERTEX) ) );
