@@ -2321,7 +2321,8 @@ public class GraphIO {
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				buildIncidenceClassHierarchy(ic, icd, ec);
 				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
-						.size()) {
+						.size() && !(ic.getDirectSuperClasses().size() == 1 && ic.getDirectSuperClasses().contains(ic.getDefaultClass()))) {
+					System.out.println("Superclasses");
 					throw new GraphIOException(
 							"The number of direct super classes of incidence class "
 									+ ic.getRolename()
