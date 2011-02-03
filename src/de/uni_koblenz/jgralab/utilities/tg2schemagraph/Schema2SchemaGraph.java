@@ -39,21 +39,30 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.greql2.funlib.HasAttribute;
 import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasBaseDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
+import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.impl.std.SchemaGraphImpl;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDefaultPackage;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.Direction;
 import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceType;
+import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
@@ -230,20 +239,20 @@ public class Schema2SchemaGraph {
 		// Creates all EdgeClasses
 		createEdgeClasses();
 
+		// Creates all IncidenceClasses
+		createIncidenceClasses();
+
 		// Creates all SpecializationEdges
 		createSpecializations();
+
+		// Creates all Redefines and Subsetts
+		createRedefinesAndSubsetts();
 
 		// Creates all Attributes
 		createAttributes();
 
 		// Creates all Constraints
 		createConstraints();
-
-		// Creates all IncidenceClasses
-		createIncidenceClasses();
-
-		// Creates all Redefines and Subsetts
-		createRedefinesAndSubsetts();
 
 		// Stores the schemaGraph object, so that it will not be lost after
 		// calling the tearDown Method.
@@ -358,7 +367,6 @@ public class Schema2SchemaGraph {
 		// Creates first the DefaultPackage
 		createDefaultPackage();
 
-		// TODO create comments of packages
 		// Creates all SubPackages of the defaultPackage
 		// This method creates recursively
 		createSubPackages(defaultPackage, gDefaultPackage);
@@ -853,6 +861,7 @@ public class Schema2SchemaGraph {
 				assert (link != null) : "FIXME! No link SpecializesEdgeClass has been created!";
 			}
 		}
+		// TODO IncidenceClass specialization
 	}
 
 	/**
@@ -979,48 +988,35 @@ public class Schema2SchemaGraph {
 		// Loop over all EdgeClass objects
 		for (Entry<de.uni_koblenz.jgralab.schema.EdgeClass, EdgeClass> entry : edgeClassMap
 				.entrySet()) {
-			// Creates From and To edge
-			createIncidenceClass(entry.getKey(), entry.getValue());
+			for (de.uni_koblenz.jgralab.schema.IncidenceClass xic : entry
+					.getKey().getIncidenceClasses()) {
+				createIncidenceClass(xic, entry.getValue(),
+						vertexClassMap.get(xic.getVertexClass()));
+			}
 		}
 	}
 
 	/**
-	 * Creates the From and To edge of an given EdgeClass.
+	 * Creates an incidence class.
 	 * 
-	 * @param edgeClass
-	 *            EdgeClass, of which all edges are created.
+	 * @param xIncidenceClass
+	 *            incidence class which should be represented
 	 * @param gEdgeClass
-	 *            EdgeClass, to which all edges are linked.
+	 * @param gVertexClass
 	 */
 	private void createIncidenceClass(
-			de.uni_koblenz.jgralab.schema.EdgeClass edgeClass,
-			EdgeClass gEdgeClass) {
-		assert (edgeClass != null) : "FIXME! EdgeClass is null!";
-		assert edgeClass.getFrom() != null : "FIXME! No from IncidenceClass defined!";
+			de.uni_koblenz.jgralab.schema.IncidenceClass xIncidenceClass,
+			EdgeClass gEdgeClass, VertexClass gVertexClass) {
+		assert (gEdgeClass != null) : "FIXME! EdgeClass is null!";
+		assert (gVertexClass != null) : "FIXME! VertexClass is null!";
+		assert (xIncidenceClass != null) : "FIXME! IncidenceClass is null!";
 
-		// Creates an from IncidenceClass
-		IncidenceClass gIncidenceClass = createIncidenceClass(edgeClass
-				.getFrom());
-
+		// Creates an IncidenceClass
+		IncidenceClass gIncidenceClass = createIncidenceClass(xIncidenceClass);
+		schemaGraph.createConnectsToEdgeClass(gIncidenceClass, gEdgeClass);
+		schemaGraph.createConnectsToVertexClass(gIncidenceClass, gVertexClass);
 		// Registers the new and old objects in the appropriate Map
-		incidenceClassMap.put(edgeClass.getFrom(), gIncidenceClass);
-		// Links the new object with its EdgeClass
-		ComesFrom from = schemaGraph.createComesFrom(gEdgeClass,
-				gIncidenceClass);
-
-		assert (from != null) : "FIXME! No link ComesFrom has been created!";
-
-		assert edgeClass.getTo() != null : "FIXME! No to IncidenceClass defined!";
-
-		// Creates an to IncidenceClass
-		gIncidenceClass = createIncidenceClass(edgeClass.getTo());
-
-		// Registers the new and old objects in the appropriate Map
-		incidenceClassMap.put(edgeClass.getTo(), gIncidenceClass);
-		// Links the new object with its to EdgeClass
-		GoesTo to = schemaGraph.createGoesTo(gEdgeClass, gIncidenceClass);
-
-		assert (to != null) : "FIXME! No link GoesTo has been created!";
+		incidenceClassMap.put(xIncidenceClass, gIncidenceClass);
 
 		assert (checkSchemaAndSchemaGraph());
 	}
@@ -1028,38 +1024,37 @@ public class Schema2SchemaGraph {
 	/**
 	 * Creates an IncidenceClass object
 	 * 
-	 * @param incidenceClass
+	 * @param xIncidenceClass
 	 *            IncidenceClass, of which a new corresponding object should be
 	 *            created.
 	 * @return new IncidenceClass object
 	 */
 	private IncidenceClass createIncidenceClass(
-			de.uni_koblenz.jgralab.schema.IncidenceClass incidenceClass) {
+			de.uni_koblenz.jgralab.schema.IncidenceClass xIncidenceClass) {
 
 		assert (checkSchemaAndSchemaGraph());
-		assert ((incidenceClass != null) && (incidenceClass
-				.getAggregationKind() != null)) : "FIXME! No AggregationKind for this IncidenceClass defined!";
-		assert ((incidenceClass != null) && (incidenceClass.getDirection() != null)) : "FIXME! No Direction for this IncidenceClass defined!";
+		assert ((xIncidenceClass != null) && (xIncidenceClass
+				.getIncidenceType() != null)) : "FIXME! No AggregationKind for this IncidenceClass defined!";
+		assert ((xIncidenceClass != null) && (xIncidenceClass.getDirection() != null)) : "FIXME! No Direction for this IncidenceClass defined!";
 
 		IncidenceClass gIncidenceClass = schemaGraph.createIncidenceClass();
 		assert (gIncidenceClass != null) : "FIXME! No IncidenceClass has been created!";
 
 		// Sets all general attributes of an IncidenceClass
-		gIncidenceClass.set_aggregation(AggregationKind.valueOf(incidenceClass
-				.getAggregationKind().toString()));
-		gIncidenceClass.set_max(incidenceClass.getMax());
-		gIncidenceClass.set_min(incidenceClass.getMin());
-		gIncidenceClass.set_roleName(incidenceClass.getRolename());
-
-		// Links the new object with its VertexClass
-		VertexClass vertexClass = vertexClassMap.get(incidenceClass
-				.getVertexClass());
-		assert (vertexClass != null) : "The to vertex class '"
-				+ incidenceClass.getVertexClass().getQualifiedName()
-				+ "' was not in vertexClassMap!";
-		EndsAt endsAt = schemaGraph.createEndsAt(gIncidenceClass, vertexClass);
-
-		assert (endsAt != null) : "FIXME! No link EndsAt has been created!";
+		gIncidenceClass.set_direction(Direction.valueOf(xIncidenceClass
+				.getDirection().toString()));
+		gIncidenceClass.set_incidenceType(IncidenceType.valueOf(xIncidenceClass
+				.getIncidenceType().toString()));
+		gIncidenceClass.set_abstract(xIncidenceClass.isAbstract());
+		gIncidenceClass.set_maxEdgesAtVertex(xIncidenceClass
+				.getMaxEdgesAtVertex());
+		gIncidenceClass.set_maxVerticesAtEdge(xIncidenceClass
+				.getMaxVerticesAtEdge());
+		gIncidenceClass.set_minEdgesAtVertex(xIncidenceClass
+				.getMinEdgesAtVertex());
+		gIncidenceClass.set_minVerticesAtEdge(xIncidenceClass
+				.getMinVerticesAtEdge());
+		gIncidenceClass.set_roleName(xIncidenceClass.getRolename());
 
 		return gIncidenceClass;
 	}
