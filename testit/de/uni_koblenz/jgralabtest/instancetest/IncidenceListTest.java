@@ -57,7 +57,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
 import de.uni_koblenz.jgralabtest.tools.RandomBufferGeneric;
 
 @RunWith(Parameterized.class)

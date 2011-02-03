@@ -282,6 +282,12 @@ public interface Schema extends Comparable<Schema> {
 	 *         the name "Edge"
 	 */
 	public EdgeClass getDefaultEdgeClass();
+	
+	/**
+	 * @return the default BinaryEdgeClass of the schema, that is the EdgeClass with
+	 *         the name "BinaryEdge"
+	 */
+	public BinaryEdgeClass getDefaultBinaryEdgeClass();
 
 	/**
 	 * @return the default GraphClass of the schema, that is the GraphClass with

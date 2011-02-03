@@ -48,7 +48,6 @@ import org.junit.runners.Parameterized.Parameters;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 @RunWith(Parameterized.class)
 public class EdgeListTest extends InstanceTest {

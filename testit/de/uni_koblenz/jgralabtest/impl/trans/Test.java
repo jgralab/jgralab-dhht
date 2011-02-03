@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.JGraLabSet;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-import de.uni_koblenz.jgralab.trans.Savepoint;
 
 public class Test {
 

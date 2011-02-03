@@ -37,15 +37,12 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 
 import org.apache.tools.ant.taskdefs.Exit;
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-import de.uni_koblenz.jgralab.trans.Savepoint;
-import de.uni_koblenz.jgralab.trans.Transaction;
 
 /**
  * Test cases for class SavepointImpl.

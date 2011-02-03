@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.taskdefs.Exit;
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,8 +50,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.Transaction;
 
 /**
  * 

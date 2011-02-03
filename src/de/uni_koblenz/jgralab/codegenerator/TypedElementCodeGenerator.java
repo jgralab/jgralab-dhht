@@ -75,7 +75,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 //			}
 			addImports("#usedJgImplPackage#.#baseClassName#");
 
-			rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
+		//	rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
 			//add valid incidences
 		}
 		CodeList code = new CodeList();
@@ -110,6 +110,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")
+							|| interfaceName.equals("BinaryEdge")
 							|| interfaceName.equals("Graph")
 							|| interfaceName.equals("Incidence")) {
 						buf.append(delim);

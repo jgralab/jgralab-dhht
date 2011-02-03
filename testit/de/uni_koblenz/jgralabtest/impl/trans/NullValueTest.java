@@ -50,7 +50,6 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 public class NullValueTest {
 

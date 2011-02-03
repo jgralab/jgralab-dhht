@@ -7,9 +7,10 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 
-	protected BinaryEdgeImpl(int anId, Graph graph, Vertex alpha, Vertex omega) {
+	protected BinaryEdgeImpl(int anId, Graph graph) {
 		super(anId, graph);
 	}
+	
 
 	@Override
 	public Vertex getAlpha() {
