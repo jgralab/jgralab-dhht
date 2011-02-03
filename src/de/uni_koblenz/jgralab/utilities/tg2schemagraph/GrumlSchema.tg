@@ -29,7 +29,7 @@ VertexClass VertexClass: GraphElementClass;
 VertexClass EdgeClass: GraphElementClass;
 VertexClass BinaryEdgeClass: EdgeClass;
 
-VertexClass IncidenceClass:TypedElementClass {direction: Direction, incidenceType: IncidenceType, maxEdgesAtVertex: Integer, minxEdgesAtVertex: Integer, minVerticesAtEdge: Integer, maxVerticesAtEdge: Integer, roleName : String};
+VertexClass IncidenceClass:TypedElementClass {direction: Direction, incidenceType: IncidenceType, maxEdgesAtVertex: Integer, minEdgesAtVertex: Integer, minVerticesAtEdge: Integer, maxVerticesAtEdge: Integer, roleName : String};
 BinaryEdgeClass ConnectsToVertexClass from IncidenceClass  (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
 BinaryEdgeClass ConnectsToEdgeClass from IncidenceClass (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
 BinaryEdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass role hidingIncidenceClassAtVertex (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtVertex (0,*) (1,1);
