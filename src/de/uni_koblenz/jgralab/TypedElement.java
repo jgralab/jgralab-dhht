@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public interface TypedElement<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>> {
 

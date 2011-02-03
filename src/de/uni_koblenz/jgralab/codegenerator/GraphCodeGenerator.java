@@ -34,9 +34,12 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -473,33 +476,38 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 		//TODO: For binary Edge constructor
 		
-//		if (gec instanceof EdgeClass) {
-//			EdgeClass ec = (EdgeClass) gec;
-//			String fromClass = ec.getFrom().getVertexClass().getQualifiedName();
-//			String toClass = ec.getTo().getVertexClass().getQualifiedName();
-//			if (fromClass.equals("Vertex")) {
-//				code.setVariable("fromClass", rootBlock
-//						.getVariable("jgPackage")
-//						+ "." + "Vertex");
-//			} else {
-//				code.setVariable("fromClass", schemaRootPackageName + "."
-//						+ fromClass);
-//			}
-//			if (toClass.equals("Vertex")) {
-//				code.setVariable("toClass", rootBlock.getVariable("jgPackage")
-//						+ "." + "Vertex");
-//			} else {
-//				code.setVariable("toClass", schemaRootPackageName + "."
-//						+ toClass);
-//			}
-//			code.setVariable("formalParams", (withId ? "int id, " : "")
-//					+ "#fromClass# alpha, #toClass# omega");
-//			code.setVariable("addActualParams", ", alpha, omega");
-//			code.setVariable("additionalParams", ", alpha, omega");
-//		} else {
+		if (gec instanceof BinaryEdgeClass) {
+			String fromClass = null;
+			String toClass = null;
+			for (IncidenceClass ic : gec.getAllIncidenceClasses()) {
+				if (!ic.isAbstract()) {
+					if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
+						toClass = ic.getVertexClass().getQualifiedName();
+					} else {
+						fromClass = ic.getVertexClass().getQualifiedName();
+					}
+				}
+			}
+			if (fromClass.equals("Vertex")) {
+				code.setVariable("fromClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
+			} else {
+				code.setVariable("fromClass", schemaRootPackageName + "." + fromClass);
+			}
+			if (toClass.equals("Vertex")) {
+				code.setVariable("toClass", rootBlock.getVariable("jgPackage")
+						+ "." + "Vertex");
+			} else {
+				code.setVariable("toClass", schemaRootPackageName + "."
+						+ toClass);
+			}
+			code.setVariable("formalParams", (withId ? "int id, " : "")
+					+ "#fromClass# alpha, #toClass# omega");
+			code.setVariable("addActualParams", ", alpha, omega");
+			code.setVariable("additionalParams", ", alpha, omega");
+		} else {
 			code.setVariable("formalParams", (withId ? "int id" : ""));
 			code.setVariable("addActualParams", "");
-//		}
+		}
 		code.setVariable("newActualParams", (withId ? "id" : "0"));
 		return code;
 		// TODO if isDbImpl() only write two create methods!
