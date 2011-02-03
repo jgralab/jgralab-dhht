@@ -38,19 +38,27 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.greql2.funlib.HasAttribute;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.CollectionDomain;
-import de.uni_koblenz.jgralab.schema.Constraint;
-import de.uni_koblenz.jgralab.schema.Domain;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.EnumDomain;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElementClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasBaseDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
+import de.uni_koblenz.jgralab.grumlschema.impl.std.SchemaGraphImpl;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDefaultPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * Converts a Schema to a SchemaGraph. This class is mend to be a reusable
@@ -101,7 +109,7 @@ public class Schema2SchemaGraph {
 	 * Map to reference a AttributedElementClass of a Schema to a
 	 * AttributedElementClass of a SchemaGraph.
 	 */
-	private Map<de.uni_koblenz.jgralab.schema.AttributedElementClass, AttributedElementClass> attributedElementClassMap;
+	private Map<de.uni_koblenz.jgralab.schema.AttributedElementClass<?, ?>, AttributedElementClass> attributedElementClassMap;
 
 	/**
 	 * Map to reference a VertexClass of a Schema to a VertexClass of a
@@ -138,12 +146,13 @@ public class Schema2SchemaGraph {
 	/**
 	 * SetUp method, which instantiates all necessary resources.
 	 */
+	@SuppressWarnings("rawtypes")
 	private void setUp() {
 
 		workInProgress = true;
 
 		packageMap = new HashMap<de.uni_koblenz.jgralab.schema.Package, Package>();
-		attributedElementClassMap = new HashMap<de.uni_koblenz.jgralab.schema.AttributedElementClass, AttributedElementClass>();
+		attributedElementClassMap = new HashMap<de.uni_koblenz.jgralab.schema.AttributedElementClass<?, ?>, AttributedElementClass>();
 		domainMap = new HashMap<de.uni_koblenz.jgralab.schema.Domain, Domain>();
 		vertexClassMap = new HashMap<de.uni_koblenz.jgralab.schema.VertexClass, VertexClass>();
 		edgeClassMap = new HashMap<de.uni_koblenz.jgralab.schema.EdgeClass, EdgeClass>();
@@ -349,6 +358,7 @@ public class Schema2SchemaGraph {
 		// Creates first the DefaultPackage
 		createDefaultPackage();
 
+		// TODO create comments of packages
 		// Creates all SubPackages of the defaultPackage
 		// This method creates recursively
 		createSubPackages(defaultPackage, gDefaultPackage);
@@ -554,10 +564,10 @@ public class Schema2SchemaGraph {
 		domainMap.put(domain, gDomain);
 
 		// Links this Domain with its key- and value domains
-		schemaGraph.createHasKeyDomain(gDomain, queryGDomain(domain
-				.getKeyDomain()));
-		schemaGraph.createHasValueDomain(gDomain, queryGDomain(domain
-				.getValueDomain()));
+		schemaGraph.createHasKeyDomain(gDomain,
+				queryGDomain(domain.getKeyDomain()));
+		schemaGraph.createHasValueDomain(gDomain,
+				queryGDomain(domain.getValueDomain()));
 		return gDomain;
 	}
 
@@ -597,8 +607,7 @@ public class Schema2SchemaGraph {
 
 		// A ListDomain or SetDomain is created.
 		CollectionDomain gDomain = (domain instanceof de.uni_koblenz.jgralab.schema.ListDomain) ? schemaGraph
-				.createListDomain()
-				: schemaGraph.createSetDomain();
+				.createListDomain() : schemaGraph.createSetDomain();
 		assert (gDomain != null) : "FIXME! No Domain has been created!";
 
 		// Registers this Domain in the Domain map. This is must be done, before
@@ -1072,8 +1081,8 @@ public class Schema2SchemaGraph {
 					IncidenceClass gRedefinedIncidence = incidenceClassMap
 							.get(redefinedIncidence);
 					assert gRedefinedIncidence != null : "FIXME! No redefined IncidenceClass created yet!";
-					Redefines link = schemaGraph.createRedefines(entry
-							.getValue(), gRedefinedIncidence);
+					Redefines link = schemaGraph.createRedefines(
+							entry.getValue(), gRedefinedIncidence);
 					assert (link != null) : "FIXME! No link RedefinesIncidenceClass has been created!";
 				}
 			}
@@ -1088,8 +1097,8 @@ public class Schema2SchemaGraph {
 						IncidenceClass gSubsettedIncidence = incidenceClassMap
 								.get(subsettedIncidence);
 						assert gSubsettedIncidence != null : "FIXME! No subsetted IncidenceClass created yet!";
-						Subsets link = schemaGraph.createSubsets(entry
-								.getValue(), gSubsettedIncidence);
+						Subsets link = schemaGraph.createSubsets(
+								entry.getValue(), gSubsettedIncidence);
 						assert (link != null) : "FIXME! No link SubsetsIncidenceClass has been created!";
 					}
 				}
