@@ -432,10 +432,11 @@ public class SchemaImpl implements Schema {
 		}
 
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
-			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
-					incidenceClass, packagePrefix,
-					 config);
-			javaSources.addAll(codeGen.createJavaSources());
+			if (!incidenceClass.isInternal()) {
+				IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
+					incidenceClass, packagePrefix,	 config);
+				javaSources.addAll(codeGen.createJavaSources());
+			}
 		}
 
 		// build records and enums
@@ -530,6 +531,7 @@ public class SchemaImpl implements Schema {
 		}
 
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
+			if (!incidenceClass.isInternal()) {
 			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
 					incidenceClass, packagePrefix,
 					 config);
@@ -541,6 +543,7 @@ public class SchemaImpl implements Schema {
 					progressFunction.progress(schemaElements);
 					currentCount = 0;
 				}
+			}
 			}
 		}
 

@@ -45,7 +45,8 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		interfaces = new TreeSet<String>();
 		interfaces.add(aec.getQualifiedName());
 		for (TypedElementClass<?,?> superClass : aec.getDirectSuperClasses()) {
-			interfaces.add(superClass.getQualifiedName());
+			if (!(IncidenceClass.class.isInstance(aec) && superClass.isInternal()))
+				interfaces.add(superClass.getQualifiedName());
 		}
 	}
 	
