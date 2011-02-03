@@ -81,7 +81,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Class} the next {@link Vertex} should have
 	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass);
+	public <T extends Vertex> T getNextVertex(Class<T> aM1VertexClass);
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the
@@ -109,7 +109,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            of a subclass of <code>aM1VertexClass</code> are returned
 	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(Class<? extends Vertex> aM1VertexClass,
+	public <T extends Vertex> T  getNextVertex(Class<T> aM1VertexClass,
 			boolean noSubclasses);
 
 	/**
@@ -138,7 +138,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getAlphaEdges(Class<? extends Edge> anEdgeClass);
+	public <T extends Edge> Iterable<T> getAlphaEdges(Class<T> anEdgeClass);
 
 	/**
 	 * Returns the sequence of all outgoing {@link Edge}s at this {@link Vertex}
@@ -166,7 +166,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getOmegaEdges(Class<? extends Edge> anEdgeClass);
+	public <T extends Edge> Iterable<T> getOmegaEdges(Class<T> anEdgeClass);
 
 	/**
 	 * Returns a sequence of all incident {@link Edge}s.
@@ -203,7 +203,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass);
+	public <T extends Edge> Iterable<T> getIncidentEdges(Class<T> anEdgeClass);
 
 	/**
 	 * Returns a sequence of all incident {@link Edge}s which are an instance of
@@ -230,7 +230,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Direction}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass,
+	public <T extends Edge> Iterable<T> getIncidentEdges(Class<T> anEdgeClass,
 			Direction direction);
 
 	/**

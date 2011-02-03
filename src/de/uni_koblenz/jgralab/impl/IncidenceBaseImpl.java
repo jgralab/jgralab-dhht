@@ -35,8 +35,10 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * Implementation of all methods of the interface {@link Incidence} which are
@@ -313,6 +315,16 @@ public abstract class IncidenceBaseImpl implements Incidence {
 			next = i.getNextIncidenceAtEdge();
 		}
 		return next != null;
+	}
+	
+	@Override
+	public GraphClass getGraphClass() {
+		return getVertex().getGraphClass();
+	}
+
+	@Override
+	public Schema getSchema() {
+		return getVertex().getSchema();
 	}
 
 }

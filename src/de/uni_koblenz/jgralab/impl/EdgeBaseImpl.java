@@ -101,9 +101,10 @@ public abstract class EdgeBaseImpl extends
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -111,11 +112,11 @@ public abstract class EdgeBaseImpl extends
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
-					return currentIncidence;
+					return (T) currentIncidence;
 				}
 			} else {
 				if (anIncidenceClass.isInstance(currentIncidence)) {
-					return currentIncidence;
+					return (T) currentIncidence;
 				}
 			}
 			currentIncidence = currentIncidence
@@ -137,10 +138,10 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass) {
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass) {
 		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(this, anIncidenceClass);
+		return new IncidenceIterableAtEdge<T>(this, anIncidenceClass);
 	}
 
 	@Override
@@ -151,10 +152,10 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass, Direction direction) {
 		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(this, anIncidenceClass,
+		return new IncidenceIterableAtEdge<T>(this, anIncidenceClass,
 				direction);
 	}
 
@@ -921,7 +922,7 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Incidence connect(Class<? extends Incidence> incidenceClass,
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 		return getSchema().getGraphFactory().createIncidence(incidenceClass,
 				elemToConnect, this);

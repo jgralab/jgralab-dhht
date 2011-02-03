@@ -507,5 +507,6 @@ public interface TypedElementClass<ConcreteMetaClass extends TypedElementClass<C
 	 * @param superClass
 	 */
 	public void addSuperClass(ConcreteMetaClass superClass);
+
 	
 }

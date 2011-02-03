@@ -824,7 +824,7 @@ public class GraphIO {
 					continue;
 				}
 				writeSpace();
-				write(i.getRole().getRolename());
+				write(i.getType().getRolename());
 				space();
 			}
 			write(">");

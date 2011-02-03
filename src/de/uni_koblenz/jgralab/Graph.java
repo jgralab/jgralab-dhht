@@ -478,8 +478,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *         from <code>startVertex</code> using the given
 	 *         <code>pathDescription</code>
 	 */
-	public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
-			String pathDescription, Class<T> vertexType);// old
+	//public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
+	//		String pathDescription, Class<T> vertexType);// old
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all vertices of this

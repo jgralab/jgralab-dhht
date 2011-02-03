@@ -2270,4 +2270,14 @@ public abstract class GraphBaseImpl implements Graph {
 		return graphElementId == 0;
 	}
 
+	
+	@Override
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
+		return vertex.connect(cls, edge);
+	}
+	
+
+	
+
 }

@@ -80,8 +80,10 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		}
 		CodeList code = new CodeList();
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
+	//		code.add(createGetM1ImplementationClassMethod());
 
 		}
 		return code;
@@ -140,7 +142,14 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		return null;
 	}
 	
-	
+	protected CodeBlock createGetTypeMethod() {
+		return new CodeSnippet(
+				true,
+				"public final #jgSchemaPackage#.#graphElementClass#Class getType() {",
+				"\treturn #schemaPackageName#.#schemaName#.instance().#schemaVariableName#;",
+				"}");
+	}
+
 	
 	protected CodeBlock createGetM1ClassMethod() {
 		return new CodeSnippet(

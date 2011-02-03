@@ -78,7 +78,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public Incidence createIncidence(Class<? extends Incidence> incidenceClass,
+	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
 			Vertex v, Edge e);
 
 	/**

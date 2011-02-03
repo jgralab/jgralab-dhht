@@ -101,9 +101,10 @@ public abstract class VertexBaseImpl extends
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -111,11 +112,11 @@ public abstract class VertexBaseImpl extends
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
-					return currentIncidence;
+					return (T) currentIncidence;
 				}
 			} else {
 				if (anIncidenceClass.isInstance(currentIncidence)) {
-					return currentIncidence;
+					return (T) currentIncidence;
 				}
 			}
 			currentIncidence = currentIncidence
@@ -137,10 +138,10 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass) {
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass) {
 		assert isValid();
-		return new IncidenceIterableAtVertex<Incidence>(this, anIncidenceClass);
+		return new IncidenceIterableAtVertex<T>(this, anIncidenceClass);
 	}
 
 	@Override
@@ -151,10 +152,10 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass, Direction direction) {
 		assert isValid();
-		return new IncidenceIterableAtVertex<Incidence>(this, anIncidenceClass,
+		return new IncidenceIterableAtVertex<T>(this, anIncidenceClass,
 				direction);
 	}
 
@@ -167,14 +168,15 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Vertex getNextVertex(Class<? extends Vertex> vertexClass) {
+	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass, false);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Vertex getNextVertex(Class<? extends Vertex> m1VertexClass,
+	public <T extends Vertex> T  getNextVertex(Class<T> m1VertexClass,
 			boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
@@ -182,11 +184,11 @@ public abstract class VertexBaseImpl extends
 		while (v != null) {
 			if (noSubclasses) {
 				if (m1VertexClass == v.getM1Class()) {
-					return v;
+					return (T) v;
 				}
 			} else {
 				if (m1VertexClass.isInstance(v)) {
-					return v;
+					return (T) v;
 				}
 			}
 			v = (VertexBaseImpl) v.getNextVertex();
@@ -220,8 +222,8 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Edge> getAlphaEdges(Class<? extends Edge> anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,
+	public <T extends Edge> Iterable<T> getAlphaEdges(Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(this, anEdgeClass,
 				Direction.EDGE_TO_VERTEX);
 	}
 
@@ -237,8 +239,8 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Edge> getOmegaEdges(Class<? extends Edge> anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass,
+	public <T extends Edge> Iterable<T>  getOmegaEdges(Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(this, anEdgeClass,
 				Direction.VERTEX_TO_EDGE);
 	}
 
@@ -258,8 +260,8 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass);
+	public <T extends Edge> Iterable<T>  getIncidentEdges(Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(this, anEdgeClass);
 	}
 
 	@Override
@@ -270,9 +272,9 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Edge> getIncidentEdges(Class<? extends Edge> anEdgeClass,
+	public <T extends Edge> Iterable<T>  getIncidentEdges(Class<T> anEdgeClass,
 			Direction direction) {
-		return new IncidentEdgeIterable<Edge>(this, anEdgeClass, direction);
+		return new IncidentEdgeIterable<T>(this, anEdgeClass, direction);
 	}
 
 	@Override
@@ -935,7 +937,7 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Incidence connect(Class<? extends Incidence> incidenceClass,
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect) {
 		return getSchema().getGraphFactory().createIncidence(incidenceClass,
 				this, elemToConnect);

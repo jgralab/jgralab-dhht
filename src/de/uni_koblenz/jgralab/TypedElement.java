@@ -22,12 +22,12 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 */
 	public ConcreteMetaClass getType();
 
-	public abstract GraphClass getGraphClass();
+	public GraphClass getGraphClass();
 
 	/**
 	 * @return the schema this AttributedElement belongs to
 	 */
-	public abstract Schema getSchema();
+	public Schema getSchema();
 	
 	/**
 	 * Returns the M1 implementation class for this IncidenceClass.
@@ -53,6 +53,6 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 *             <li>there are reflection exceptions</li>
 	 *             </ul>
 	 */
-	public Class<? extends Incidence> getM1ImplementationClass();
+	//public Class<? extends Incidence> getM1ImplementationClass();
 
 }

@@ -151,8 +151,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class} the {@link Incidence} class to search for
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass);
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -181,8 +181,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+	public <T extends Incidence> T  getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -215,8 +215,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+	public <T extends Incidence> T  getFirstIncidence(
+			Class<T> anIncidenceClass, boolean noSubclasses);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -255,8 +255,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
+	public <T extends Incidence> T  getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction,
 			boolean noSubclasses);
 
 	/**
@@ -295,8 +295,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass);
+	public <T extends Incidence> Iterable<T> getIncidences(Class<T> anIncidenceClass);
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -322,8 +321,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+	public <T extends Incidence> Iterable<T>  getIncidences(
+			Class<T> anIncidenceClass, Direction direction);
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -655,7 +654,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            connected
 	 * @return
 	 */
-	Incidence connect(String rolename, DualType elemToConnect);
+	public Incidence connect(String rolename, DualType elemToConnect);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -668,7 +667,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 */
-	Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect);
+	public Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -681,6 +680,6 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 */
-	Incidence connect(Class<? extends Incidence> incidenceClass,
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			DualType elemToConnect);
 }

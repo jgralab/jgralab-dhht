@@ -413,6 +413,7 @@ public abstract class GraphImpl extends
 		return record;
 	}
 
+
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
@@ -430,4 +431,7 @@ public abstract class GraphImpl extends
 	protected void addEdge(Edge newEdge) {
 		super.addEdge(newEdge);
 	}
+	
+
+	
 }

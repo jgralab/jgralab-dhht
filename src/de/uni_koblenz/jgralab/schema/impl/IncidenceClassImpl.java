@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -530,5 +531,7 @@ public class IncidenceClassImpl extends
 		ec.setAbstract(true);
 		return ec;
 	}
+	
+
 
 }

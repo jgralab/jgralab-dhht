@@ -549,6 +549,12 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 						+ ec.getVariableName() + ";"));
 			}
 		}
+		for (IncidenceClass ic : schema.getIncidenceClassesInTopologicalOrder()) {
+			if (!ic.isInternal()) {
+				code.addNoIndent(new CodeSnippet("public final IncidenceClass "
+						+ ic.getVariableName() + ";"));
+			}
+		}
 		return code;
 	}
 
@@ -568,6 +574,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
 		code.setVariable("icRoleName", ic.getRolename() != null ? ic.getRolename() : "");
 		code.setVariable("dir", ic.getDirection().toString());
+		code.setVariable("schemaVariable", ic.getVariableName());
 		code.setVariable("incidenceType", ic.getIncidenceType().toString());
 		code.setVariable("minEdgesAtVertex", Integer.toString(ic.getMinEdgesAtVertex()));
 		code.setVariable("minVerticesAtEdge", Integer.toString(ic.getMinVerticesAtEdge()));
@@ -577,7 +584,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
-						"\tIncidenceClass #icVariable# = #gcVariable#.createIncidenceClass(",
+						"\tIncidenceClass #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(",
 						"\t\t#gcVariable#.getEdgeClass(\"#icEdgeClass#\"),",
 						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
 						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",

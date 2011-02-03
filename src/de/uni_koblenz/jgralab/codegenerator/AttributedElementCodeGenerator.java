@@ -71,7 +71,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			code.add(createFields(aec.getAttributeList()));
 			//code.add(createConstructor());
-			code.add(createGetAttributedElementClassMethod());
 			code.add(createGenericGetter(aec.getAttributeList()));
 			code.add(createGenericSetter(aec.getAttributeList()));
 			code.add(createGettersAndSetters(aec.getAttributeList()));
@@ -101,13 +100,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return false;
 	}
 
-	protected CodeBlock createGetAttributedElementClassMethod() {
-		return new CodeSnippet(
-				true,
-				"public final #jgSchemaPackage#.AttributedElementClass getAttributedElementClass() {",
-				"\treturn #schemaPackageName#.#schemaName#.instance().#schemaVariableName#;",
-				"}");
-	}
+
 	
 	protected void addCheckValidityCode(CodeSnippet code) {
 		code.add("\tif (!isValid())",

@@ -178,10 +178,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Incidence createIncidence(Class<? extends Incidence> incidenceClass,
+	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
 			Vertex v, Edge e) {
 		try {
-			Incidence i = (Incidence) incidenceMap.get(incidenceClass).newInstance(v, e);
+			@SuppressWarnings("unchecked")
+			T i = (T) incidenceMap.get(incidenceClass).newInstance(v, e);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {

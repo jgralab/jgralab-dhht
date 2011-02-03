@@ -41,12 +41,6 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  */
 public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 
-	/**
-	 * Returns the role of this {@link Incidence}.
-	 * 
-	 * @return {@link IncidenceClass}
-	 */
-	public IncidenceClass getRole();
 
 	/**
 	 * Returns the direction of this {@link Incidence}.

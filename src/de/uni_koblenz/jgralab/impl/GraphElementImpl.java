@@ -201,8 +201,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass) {
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(anIncidenceClass, null, false);
@@ -218,8 +218,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(anIncidenceClass, direction, false);
@@ -235,8 +235,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+	public <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(anIncidenceClass, null, noSubclasses);
