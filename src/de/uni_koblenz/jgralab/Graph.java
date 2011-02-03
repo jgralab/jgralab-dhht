@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -59,26 +58,26 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public <T extends Vertex> T createVertex(Class<T> cls);// old
 
 	/**
-	 * Creates an edge of the specified class <code>cls</code> and adds the new edge
-	 * to this Graph.
+	 * Creates an edge of the specified class <code>cls</code> and adds the new
+	 * edge to this Graph.
 	 */
 	public <T extends Edge> T createEdge(Class<T> cls);
-	
-	
-	/** 
-	 * Connects the given vertex and the given edge by an incidence of class cls.
-	 * The direction of the connection is automatically determined by cls
+
+	/**
+	 * Connects the given vertex and the given edge by an incidence of class
+	 * cls. The direction of the connection is automatically determined by cls
+	 * 
 	 * @return the incidence created
 	 */
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge);
-	
-	/**
-	 * Creates an binary edge of the specified class <code>cls</code> and adds the new edge
-	 * to this Graph.
-	 */
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega);
-	
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge);
 
+	/**
+	 * Creates an binary edge of the specified class <code>cls</code> and adds
+	 * the new edge to this Graph.
+	 */
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega);
 
 	/**
 	 * Checks whether this graph is currently being loaded.
@@ -114,7 +113,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @see #isGraphModified(long)
 	 */
 	public long getGraphVersion();// old
-
 
 	/**
 	 * Checks if the vertex sequence of this has changed with respect to the
@@ -439,7 +437,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public Iterable<Edge> getEdges();
 
-	
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
 	 * have the specified <code>edgeClass</code> (including subclasses), in the
@@ -451,8 +448,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
 	public Iterable<Edge> getEdges(EdgeClass edgeClass);
-	
-	
+
 	/**
 	 * Returns an Iterable which iterates over all edges of this Graph which
 	 * have the specified <code>edgeClass</code> (including subclasses), in the
@@ -464,6 +460,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
 	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass);
+
 	/**
 	 * Returns the list of reachable vertices.
 	 * 
@@ -478,8 +475,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *         from <code>startVertex</code> using the given
 	 *         <code>pathDescription</code>
 	 */
-	//public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
-	//		String pathDescription, Class<T> vertexType);// old
+	// public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
+	// String pathDescription, Class<T> vertexType);// old
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all vertices of this
@@ -527,82 +524,82 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public void defragment();// old
 
-//	// ---- transaction support ----
-//	/**
-//	 * @return a read-write-<code>Transaction</code>
-//	 */
-//	public Transaction newTransaction();// old
-//
-//	/**
-//	 * @return a read-only-<code>Transaction</code>
-//	 */
-//	public Transaction newReadOnlyTransaction();// old
-//
-//	/**
-//	 * Sets the given <code>transaction</code> as the active
-//	 * <code>Transaction</code> for the current thread.
-//	 * 
-//	 * @param transaction
-//	 */
-//	public void setCurrentTransaction(Transaction transaction);// old
-//
-//	/**
-//	 * @return the currently active <code>Transaction</code> in the current
-//	 *         thread
-//	 */
-//	public Transaction getCurrentTransaction();// old
-//
-//	/**
-//	 * Delegates to {@link Graph#getCurrentTransaction()
-//	 * getCurrentTransaction()}.
-//	 * 
-//	 * @throws CommitFailedException
-//	 *             if commit fails
-//	 */
-//	public void commit() throws CommitFailedException;// old
-//
-//	/**
-//	 * Delegates to {@link Graph#getCurrentTransaction()
-//	 * getCurrentTransaction()}.
-//	 */
-//	public void abort();// old
-//
-//	/**
-//	 * Delegates to {@link Graph#getCurrentTransaction()
-//	 * getCurrentTransaction()}.
-//	 * 
-//	 * @return if there have been conflicts
-//	 */
-//	public boolean isInConflict();// old
-//
-//	/**
-//	 * Delegates to {@link Graph#getCurrentTransaction()
-//	 * getCurrentTransaction()}.
-//	 * 
-//	 * @return the defined <code>Savepoint</code>
-//	 */
-//	public Savepoint defineSavepoint();// old
-//
-//	/**
-//	 * Delegates to {@link Graph#getCurrentTransaction()
-//	 * getCurrentTransaction()}.
-//	 * 
-//	 * @param savepoint
-//	 *            the <code>Savepoint</code> to be restored.
-//	 * 
-//	 * @throws InvalidSavepointException
-//	 *             if {@link Savepoint#getGraph() <code>savepoint</code>
-//	 *             .getGraph()} != {@link Graph#getCurrentTransaction()
-//	 * 
-//	 */
-//	public void restoreSavepoint(Savepoint savepoint)
-//			throws InvalidSavepointException;// old
-//
-//	/**
-//	 * Tells whether this graph instance has standard support.
-//	 * 
-//	 * @return true if this graph instance has standard support
-//	 */
+	// // ---- transaction support ----
+	// /**
+	// * @return a read-write-<code>Transaction</code>
+	// */
+	// public Transaction newTransaction();// old
+	//
+	// /**
+	// * @return a read-only-<code>Transaction</code>
+	// */
+	// public Transaction newReadOnlyTransaction();// old
+	//
+	// /**
+	// * Sets the given <code>transaction</code> as the active
+	// * <code>Transaction</code> for the current thread.
+	// *
+	// * @param transaction
+	// */
+	// public void setCurrentTransaction(Transaction transaction);// old
+	//
+	// /**
+	// * @return the currently active <code>Transaction</code> in the current
+	// * thread
+	// */
+	// public Transaction getCurrentTransaction();// old
+	//
+	// /**
+	// * Delegates to {@link Graph#getCurrentTransaction()
+	// * getCurrentTransaction()}.
+	// *
+	// * @throws CommitFailedException
+	// * if commit fails
+	// */
+	// public void commit() throws CommitFailedException;// old
+	//
+	// /**
+	// * Delegates to {@link Graph#getCurrentTransaction()
+	// * getCurrentTransaction()}.
+	// */
+	// public void abort();// old
+	//
+	// /**
+	// * Delegates to {@link Graph#getCurrentTransaction()
+	// * getCurrentTransaction()}.
+	// *
+	// * @return if there have been conflicts
+	// */
+	// public boolean isInConflict();// old
+	//
+	// /**
+	// * Delegates to {@link Graph#getCurrentTransaction()
+	// * getCurrentTransaction()}.
+	// *
+	// * @return the defined <code>Savepoint</code>
+	// */
+	// public Savepoint defineSavepoint();// old
+	//
+	// /**
+	// * Delegates to {@link Graph#getCurrentTransaction()
+	// * getCurrentTransaction()}.
+	// *
+	// * @param savepoint
+	// * the <code>Savepoint</code> to be restored.
+	// *
+	// * @throws InvalidSavepointException
+	// * if {@link Savepoint#getGraph() <code>savepoint</code>
+	// * .getGraph()} != {@link Graph#getCurrentTransaction()
+	// *
+	// */
+	// public void restoreSavepoint(Savepoint savepoint)
+	// throws InvalidSavepointException;// old
+	//
+	// /**
+	// * Tells whether this graph instance has standard support.
+	// *
+	// * @return true if this graph instance has standard support
+	// */
 
 	public boolean hasStandardSupport();// old
 

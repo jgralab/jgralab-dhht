@@ -39,7 +39,6 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -56,8 +55,15 @@ public class IncidenceClassImpl extends
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
-		super(edgeClass.getSimpleName() + "_" + ((rolename != null)&&(rolename.length()>0) ? rolename : "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size())), edgeClass
-				.getPackage(), edgeClass.getSchema());
+		super(edgeClass.getSimpleName()
+				+ "_"
+				+ ((rolename != null) && (rolename.length() > 0) ? rolename
+						: "IC_"
+								+ edgeClass.getSimpleName()
+								+ "_"
+								+ Integer.toString(edgeClass
+										.getIncidenceClasses().size())),
+				edgeClass.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
 		this.direction = direction;
 		this.edgeClass = edgeClass;
@@ -67,12 +73,14 @@ public class IncidenceClassImpl extends
 		this.minVerticesAtEdge = minVerticesAtEdge;
 		this.rolename = rolename;
 		if (rolename == null) {
-			rolename = "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size());
-		//	rolename = "";
+			rolename = "IC_" + edgeClass.getSimpleName() + "_"
+					+ Integer.toString(edgeClass.getIncidenceClasses().size());
+			// rolename = "";
 		}
-		if (rolename.length()==0) {
-			rolename = "IC_"+edgeClass.getSimpleName()+"_"+Integer.toString(edgeClass.getIncidenceClasses().size());
-		//	rolename = "";
+		if (rolename.length() == 0) {
+			rolename = "IC_" + edgeClass.getSimpleName() + "_"
+					+ Integer.toString(edgeClass.getIncidenceClasses().size());
+			// rolename = "";
 		}
 		this.vertexClass = vertexClass;
 		setAbstract(isAbstract);
@@ -113,7 +121,6 @@ public class IncidenceClassImpl extends
 	 */
 	private Class<? extends Incidence> m1ImplementationClass;
 
-	
 	@Override
 	public GraphElementClass<?, ?> getOtherGraphElementClass(
 			GraphElementClass<?, ?> connectedGc) {
@@ -164,8 +171,6 @@ public class IncidenceClassImpl extends
 		return minVerticesAtEdge;
 	}
 
-	
-	
 	public void addHiddenRolenameAtEdge(IncidenceClass ic) {
 		if ((ic == this) || (ic == null)) {
 			return;
@@ -176,7 +181,6 @@ public class IncidenceClassImpl extends
 	public void addHiddenRolenameAtVertex(IncidenceClass ic) {
 		hiddenEndsAtVertex.add(ic);
 	}
-
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -221,7 +225,6 @@ public class IncidenceClassImpl extends
 		}
 		return m1ImplementationClass;
 	}
-
 
 	@Override
 	public String getRolename() {
@@ -461,7 +464,6 @@ public class IncidenceClassImpl extends
 		}
 	}
 
-
 	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(
 			GraphElementClass<?, ?> graphElementClass) {
 		if (graphElementClass instanceof VertexClass) {
@@ -507,23 +509,27 @@ public class IncidenceClassImpl extends
 		checkIncidenceClassSpecialization(this, superclass);
 	}
 
-	public static IncidenceClass createDefaulIncidenceClass(
-			SchemaImpl schema, Direction dir) {
+	public static IncidenceClass createDefaulIncidenceClass(SchemaImpl schema,
+			Direction dir) {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
 		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
 		assert schema.getDefaultEdgeClass() != null : "DefaultEdgeClass not yet been created!";
 		assert schema.getDefaultIncidenceClass(dir) == null : "DefaultIncidenceClass has already been created";
-		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(schema.getDefaultEdgeClass(), schema.getDefaultVertexClass(), "", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir, IncidenceType.EDGE);
+		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(
+				schema.getDefaultEdgeClass(), schema.getDefaultVertexClass(),
+				"", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir,
+				IncidenceType.EDGE);
 		return ic;
 	}
-	
+
 	static EdgeClass createDefaultEdgeClass(Schema schema) {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
 		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
 		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
 		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
 				DEFAULTEDGECLASS_NAME);
-		System.out.println("Created default edge class: " + ec.getQualifiedName());
+		System.out.println("Created default edge class: "
+				+ ec.getQualifiedName());
 		// , 0,
 		// Integer.MAX_VALUE, "", AggregationKind.NONE,
 		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
@@ -531,7 +537,5 @@ public class IncidenceClassImpl extends
 		ec.setAbstract(true);
 		return ec;
 	}
-	
-
 
 }
