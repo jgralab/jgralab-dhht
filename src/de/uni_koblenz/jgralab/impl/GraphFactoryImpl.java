@@ -32,8 +32,11 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
@@ -59,6 +62,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	// Maps for standard support.
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMap;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMap;
+	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMap;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMap;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMap;
 	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMap;
@@ -97,6 +101,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	private void createMapsForStandardSupport() {
 		graphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		edgeMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		binaryEdgeMap = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
 		vertexMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
@@ -125,12 +130,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	// --- Methods for option STDIMPL
 	// ---------------------------------------------------
 
+	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
 			Vertex alpha, Vertex omega) {
 		try {
-		//	Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
-		//	return e;
-			return null;
+			Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
+			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
 				throw new GraphException(ex.getCause().getLocalizedMessage(),
@@ -242,14 +247,24 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setEdgeImplementationClass(Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { int.class, Graph.class, Vertex.class,
-						Vertex.class };
+				Class<?>[] params = { int.class, Graph.class};
 				edgeMap.put(originalClass,
 						implementationClass.getConstructor(params));
+				
+				List<Class<?>> interfaces = new ArrayList<Class<?>>();
+				for (Class<?> c : originalClass.getInterfaces())
+					interfaces.add(c);
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class, Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass.getConstructor(binaryParams);
+					binaryEdgeMap.put((Class<? extends BinaryEdge>) originalClass, binaryConstructor);
+				}
+				
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"

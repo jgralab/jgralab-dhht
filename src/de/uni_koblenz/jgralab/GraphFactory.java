@@ -86,6 +86,12 @@ public interface GraphFactory {
 	 * an instance of a subclass of the specified edgeClass.
 	 */
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g);
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega);
 
 	public void setGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
