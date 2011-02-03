@@ -106,6 +106,8 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 
 	
 	private CodeBlock createGetIncidenceClassForRolenameMethod() {
+		addImports("#jgSchemaPackage#.exception.SchemaException");
+		addImports("#jgSchemaPackage#.IncidenceClass");
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("@Override");
@@ -121,10 +123,8 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 				code.addNoIndent(snippet);
 			}	
 		}
-		addImports("#jgSchemaPackage#.SchemaException");
 		snippet = new CodeSnippet();
 		snippet.add("\tthrow new SchemaException(\"There is no incidence class with rolename \"+rolename+\"at this element!\");");
-		snippet.add("\t}");
 		snippet.add("}");
 		code.addNoIndent(snippet);
 

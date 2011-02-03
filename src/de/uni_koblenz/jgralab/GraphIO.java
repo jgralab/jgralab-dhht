@@ -2070,7 +2070,7 @@ public class GraphIO {
 					icd.multiplicityEdgesAtVertex[1],
 					icd.multiplicityVerticesAtEdge[0],
 					icd.multiplicityVerticesAtEdge[1],
-					Direction.VERTEX_TO_EDGE, icd.incidenceType);
+					Direction.EDGE_TO_VERTEX, icd.incidenceType);
 			incidenceClassMap.put(ic, icd);
 		}
 		addAttributes(ecd.attributes, ec);
