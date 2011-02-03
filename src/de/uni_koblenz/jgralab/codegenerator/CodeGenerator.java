@@ -188,18 +188,12 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgTransPackage", "de.uni_koblenz.jgralab.trans");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
-		rootBlock.setVariable("jgImplStdPackage",
-				"de.uni_koblenz.jgralab.impl.std");
-		rootBlock.setVariable("jgImplSaveMemPackage",
-				"de.uni_koblenz.jgralab.impl.savemem");
-		rootBlock.setVariable("jgImplTransPackage",
-				"de.uni_koblenz.jgralab.impl.trans");
-		rootBlock.setVariable("jgImplDbPackage",
-				"de.uni_koblenz.jgralab.impl.db");
-		rootBlock.setVariable("jgSchemaPackage",
-				"de.uni_koblenz.jgralab.schema");
-		rootBlock.setVariable("jgSchemaImplPackage",
-				"de.uni_koblenz.jgralab.schema.impl");
+		rootBlock.setVariable("jgImplStdPackage","de.uni_koblenz.jgralab.impl.std");
+		rootBlock.setVariable("jgImplSaveMemPackage","de.uni_koblenz.jgralab.impl.savemem");
+		rootBlock.setVariable("jgImplTransPackage",	"de.uni_koblenz.jgralab.impl.trans");
+		rootBlock.setVariable("jgImplDbPackage","de.uni_koblenz.jgralab.impl.db");
+		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
+		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
 
 		if ((packageName != null) && !packageName.equals("")) {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."
@@ -380,15 +374,19 @@ public abstract class CodeGenerator {
 				break;
 			case STDIMPL:
 				code.add("package #schemaImplStdPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplStdPackage"));
 				break;
 			case SAVEMEMIMPL:
 				code.add("package #schemaImplSaveMemPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplSaveMemPackage"));
 				break;
 			case TRANSIMPL:
 				code.add("package #schemaImplTransPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplTransPackage"));
 				break;
 			case DBIMPL:
 				code.add("package #schemaImplDbPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplDbPackage"));
 				break;
 			case CLASSONLY:
 				code.add("package #schemaPackage#;");

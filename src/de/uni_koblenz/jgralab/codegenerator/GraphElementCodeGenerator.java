@@ -87,20 +87,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			if (currentCycle.isStdImpl()) {
-				addImports("#jgImplStdPackage#.#baseClassName#");
-			} else if (currentCycle.isSaveMemImpl()) {
-				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-			} else if (currentCycle.isTransImpl()) {
-				addImports("#jgImplTransPackage#.#baseClassName#");
-			} else if (currentCycle.isDbImpl()) {
-				addImports("#jgImplDbPackage#.#baseClassName#");
-			}
 
-			rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
-			//add valid incidences
-		}
 
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());

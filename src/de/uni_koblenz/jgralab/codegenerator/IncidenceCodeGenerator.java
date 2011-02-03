@@ -16,7 +16,9 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		rootBlock.setVariable("connectedEdgeClass", absoluteName(metaClass.getEdgeClass()));
 		rootBlock.setVariable("baseClassName", "IncidenceImpl");
 		rootBlock.setVariable("graphElementClass", "Incidence");
-		System.out.println("Create incidence class code " + metaClass.getFileName());
+		rootBlock.setVariable("ownElementClass", "Incidence");
+	//	System.out.println("Create incidence class code " + metaClass.getFileName());
+		interfaces.add("Incidence");
 	}
 
 	
@@ -52,11 +54,13 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
-	//	addImports("#jgPackage#.Incidence");
+
+		addImports("#usedJgImplPackage#.VertexImpl");
+		addImports("#usedJgImplPackage#.EdgeImpl");
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(#connectedVertexClass# vertex, #connectedEdgeClass# edge) {",
-						"\tsuper(vertex, edge);"));
+						"\tsuper((VertexImpl)vertex, (EdgeImpl)edge);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;
@@ -71,19 +75,19 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-			if (currentCycle.isStdImpl()) {
-				addImports("#jgImplStdPackage#.#baseClassName#");
-			} else if (currentCycle.isSaveMemImpl()) {
-				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-			} else if (currentCycle.isTransImpl()) {
-				addImports("#jgImplTransPackage#.#baseClassName#");
-			} else if (currentCycle.isDbImpl()) {
-				addImports("#jgImplDbPackage#.#baseClassName#");
-			}
-
-			rootBlock.setVariable("baseClassName", "IncidenceImpl");
-		}
+//		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+//			if (currentCycle.isStdImpl()) {
+//				addImports("#jgImplStdPackage#.#baseClassName#");
+//			} else if (currentCycle.isSaveMemImpl()) {
+//				addImports("#jgImplSaveMemPackage#.#baseClassName#");
+//			} else if (currentCycle.isTransImpl()) {
+//				addImports("#jgImplTransPackage#.#baseClassName#");
+//			} else if (currentCycle.isDbImpl()) {
+//				addImports("#jgImplDbPackage#.#baseClassName#");
+//			}
+//
+//			rootBlock.setVariable("baseClassName", "IncidenceImpl");
+//		}
 
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());

@@ -287,6 +287,8 @@ public class SchemaImpl implements Schema {
 		// Creation of default GraphElementClasses
 		defaultVertexClass = VertexClassImpl.createDefaultVertexClass(this);
 		defaultEdgeClass = EdgeClassImpl.createDefaultEdgeClass(this);
+		defaultEdgeToVertexIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.EDGE_TO_VERTEX);
+		defaultVertexToEdgeIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.VERTEX_TO_EDGE);
 		config = createDefaultConfig();
 	}
 

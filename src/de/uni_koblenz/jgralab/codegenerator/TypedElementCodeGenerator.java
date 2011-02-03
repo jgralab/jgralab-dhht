@@ -63,6 +63,21 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
+		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+//			if (currentCycle.isStdImpl()) {
+//				addImports("#jgImplStdPackage#.#baseClassName#");
+//			} else if (currentCycle.isSaveMemImpl()) {
+//				addImports("#jgImplSaveMemPackage#.#baseClassName#");
+//			} else if (currentCycle.isTransImpl()) {
+//				addImports("#jgImplTransPackage#.#baseClassName#");
+//			} else if (currentCycle.isDbImpl()) {
+//				addImports("#jgImplDbPackage#.#baseClassName#");
+//			}
+			addImports("#usedJgImplPackage#.#baseClassName#");
+
+			rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
+			//add valid incidences
+		}
 		CodeList code = new CodeList();
 		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 			code.add(createConstructor());
@@ -77,17 +92,13 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("classOrInterface", currentCycle
 				.isStdOrSaveMemOrDbImplOrTransImpl() ? " class" : " interface");
-		code.setVariable("abstract", currentCycle
-				.isStdOrSaveMemOrDbImplOrTransImpl()
-				&& aec.isAbstract() ? " abstract" : "");
-		code.setVariable("impl", currentCycle
-				.isStdOrSaveMemOrDbImplOrTransImpl()
-				&& !aec.isAbstract() ? "Impl" : "");
+		code.setVariable("abstract", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+				                       && aec.isAbstract() ? " abstract" : "");
+		code.setVariable("impl", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+				                    && !aec.isAbstract() ? "Impl" : "");
 		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
-		code.setVariable(
-						"extends",
-						currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " extends #baseClassName#"
-								: "");
+		code.setVariable("extends",	currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? 
+				                    " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
 			String delim = currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " implements "
