@@ -69,7 +69,6 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 @RunWith(Parameterized.class)
 public class VertexTest extends InstanceTest {

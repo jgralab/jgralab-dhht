@@ -3,9 +3,6 @@ package de.uni_koblenz.jgralabtest.instancetest;
 import static org.junit.Assert.fail;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.impl.db.DatabasePersistableGraph;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class GraphDatabaseHandler {

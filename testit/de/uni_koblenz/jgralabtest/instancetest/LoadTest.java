@@ -56,7 +56,6 @@ import de.uni_koblenz.jgralab.impl.FreeIndexList;
 import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 @RunWith(Parameterized.class)
 public class LoadTest extends InstanceTest {

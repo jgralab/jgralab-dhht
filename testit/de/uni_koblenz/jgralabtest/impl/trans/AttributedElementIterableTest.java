@@ -35,6 +35,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ConcurrentModificationException;
 
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +43,6 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.trans.AttributedElementIterable;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.Transaction;
 
 //import junit.framework.JUnit4TestAdapter;
 

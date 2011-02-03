@@ -38,14 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-import de.uni_koblenz.jgralab.trans.Savepoint;
-import de.uni_koblenz.jgralab.trans.Transaction;
 
 public class UndoTest {
 
