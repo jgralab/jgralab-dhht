@@ -326,5 +326,32 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	public Schema getSchema() {
 		return getVertex().getSchema();
 	}
+	
+	@Override
+	public IncidenceType getThisSemantics() {
+		if (getEdge().isBinary()) {
+			return this.getType().getIncidenceType();
+		} else {
+			throw new UnsupportedOperationException("getThisSemantics() may be called only for incidences of binary edges");
+		}
+	}
+	
+	@Override
+	public IncidenceType getThatSemantics() {
+		if (getEdge().isBinary()) {
+			return getThatIncidence().getType().getIncidenceType();
+		} else {
+			throw new UnsupportedOperationException("getThatSemantics() may be called only for incidences of binary edges");
+		}
+	}
+
+	public Incidence getThatIncidence() {
+		if (getEdge().isBinary()) {
+			return getEdge().getFirstIncidence() == this ? getEdge().getFirstIncidence() : getEdge().getLastIncidence();
+		} else {
+			throw new UnsupportedOperationException("getThatIncidence() may be called only for incidences of binary edges");
+		}
+	}
+
 
 }

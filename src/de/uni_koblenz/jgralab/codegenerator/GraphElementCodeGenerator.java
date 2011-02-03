@@ -87,8 +87,9 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-
-
+		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			code.add(createGetIncidenceClassForRolenameMethod());
+		}	
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 			code.add(createFirstIncidenceMethods());
@@ -103,6 +104,33 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		return code;
 	}
 
+	
+	private CodeBlock createGetIncidenceClassForRolenameMethod() {
+		CodeList code = new CodeList();
+		CodeSnippet snippet = new CodeSnippet();
+		snippet.add("@Override");
+		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) {");
+		code.addNoIndent(snippet);
+		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
+			if (ic.getRolename() != null && ic.getRolename().length() > 0) {
+				snippet = new CodeSnippet();
+				snippet.setVariable("rolename", ic.getRolename());
+				snippet.setVariable("schemaVariable", ic.getVariableName());
+				snippet.add("\tif (rolename.equals(\"#rolename#\"))");
+				snippet.add("\t\t return #schemaPackageName#.#schemaName#.instance().#schemaVariable#;");
+				code.addNoIndent(snippet);
+			}	
+		}
+		addImports("#jgSchemaPackage#.SchemaException");
+		snippet = new CodeSnippet();
+		snippet.add("\tthrow new SchemaException(\"There is no incidence class with rolename \"+rolename+\"at this element!\");");
+		snippet.add("\t}");
+		snippet.add("}");
+		code.addNoIndent(snippet);
+
+		
+		return code;
+	}
 	
 
 	private CodeBlock createFirstIncidenceMethods() {

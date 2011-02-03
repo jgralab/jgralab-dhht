@@ -627,7 +627,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return <code>true</code> iff <code>graphElement</code> may start at this
 	 *         {@link GraphElement}
 	 */
-	public boolean isValidAlpha(DualType graphElement);
+	//public boolean isValidAlpha(DualType graphElement);
 
 	/**
 	 * Tests if the <code>DualType</code> <code>graphElement</code> may end at
@@ -639,7 +639,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return <code>true</code> iff <code>graphElement</code> may end at this
 	 *         {@link GraphElement}
 	 */
-	public boolean isValidOmega(DualType graphElement);
+	//public boolean isValidOmega(DualType graphElement);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
