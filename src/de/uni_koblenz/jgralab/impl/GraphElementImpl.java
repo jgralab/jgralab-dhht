@@ -79,6 +79,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	private long incidenceListVersion = 0;
 
 	/**
+	 * The kappa value, which represents the highest level in which this
+	 * {@link GraphElement} is visible.
+	 */
+	private final int kappa = 0; // TODO determine default value
+
+	private GraphElementImpl<?, ?, ?> parent;
+
+	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
 	 */
 	protected GraphBaseImpl graph;
@@ -95,13 +103,40 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
+	public GraphElement<?, ?, ?> getParent() {
+		return parent;
+	}
+
+	@Override
+	public Graph getSubordinateGraph() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getKappa() {
+		return kappa;
+	}
+
+	@Override
+	public boolean isVisible(int kappa) {
+		return this.kappa >= kappa;
+	}
+
+	@Override
+	public boolean containsElement(GraphElement<?, ?, ?> element) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
 	public Graph getGraph() {
 		return graph;
 	}
 
 	@Override
 	public GraphClass getGraphClass() {
-		return (GraphClass) graph.getType();
+		return graph.getType();
 	}
 
 	@Override
@@ -196,87 +231,172 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass.getM1Class(), null, false);
+		return getFirstIncidence(graph, anIncidenceClass.getM1Class(), null,
+				false);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass) {
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass, null, false);
+		return getFirstIncidence(graph, anIncidenceClass, null, false);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction) {
 		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
-				false);
+		return getFirstIncidence(graph, anIncidenceClass.getM1Class(),
+				direction, false);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass, direction, false);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction) {
+		return getFirstIncidence(graph, anIncidenceClass, direction, false);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass.getM1Class(), null,
+		return getFirstIncidence(graph, anIncidenceClass.getM1Class(), null,
 				noSubclasses);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(anIncidenceClass, null, noSubclasses);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			boolean noSubclasses) {
+		return getFirstIncidence(graph, anIncidenceClass, null, noSubclasses);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
+		return getFirstIncidence(graph, anIncidenceClass.getM1Class(),
+				direction, noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass) {
+		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(anIncidenceClass.getM1Class(), direction,
+		return getFirstIncidence(traversalContext,
+				anIncidenceClass.getM1Class(), null, false);
+	}
+
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext, anIncidenceClass, null,
+				false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext,
+				anIncidenceClass.getM1Class(), direction, false);
+	}
+
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, Direction direction) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext, anIncidenceClass, direction,
+				false);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext,
+				anIncidenceClass.getM1Class(), null, noSubclasses);
+	}
+
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext, anIncidenceClass, null,
 				noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction,
+			boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext,
+				anIncidenceClass.getM1Class(), direction, noSubclasses);
 	}
 
 	@Override
 	public int getDegree(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(ic, false);
+		return getDegree(graph, ic, false);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(ic, false);
+		return getDegree(graph, ic, false);
 	}
 
 	@Override
 	public int getDegree(IncidenceClass ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(ic, direction, false);
+		return getDegree(graph, ic, direction, false);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(ic, direction, false);
+		return getDegree(graph, ic, direction, false);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(ic, false);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(traversalContext, ic, false);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			Direction direction) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(traversalContext, ic, direction, false);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			Direction direction) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(traversalContext, ic, direction, false);
 	}
 
 	/**
