@@ -42,7 +42,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 
-
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
 	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
@@ -123,6 +122,89 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 			boolean noSubclasses);
 
 	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Graph traversalContext);
+
+	/**
+	 * Returns the previous {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
+	 * the sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Edge}
+	 */
+	public Edge getPreviousEdge(Graph traversalContext);
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anEdgeClass
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass);
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Graph traversalContext,
+			Class<? extends Edge> aM1EdgeClass);
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anEdgeClass
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>anEdgeClass</code> are returned
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass,
+			boolean noSubclasses);
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>aM1EdgeClass</code> are returned
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Graph traversalContext,
+			Class<? extends Edge> aM1EdgeClass, boolean noSubclasses);
+
+	/**
 	 * Returns a sequence of all start vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
@@ -151,6 +233,41 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 			Class<? extends Vertex> aVertexClass);
 
 	/**
+	 * Returns a sequence of all start vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext);
+
+	/**
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass);
+
+	/**
 	 * Returns a sequence of all end vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
@@ -176,6 +293,41 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getOmegaVertices(
+			Class<? extends Vertex> aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
+			VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
 			Class<? extends Vertex> aVertexClass);
 
 	/**
@@ -242,6 +394,86 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass, Direction direction);
+
+	/**
+	 * Returns a sequence of all incident vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext);
+
+	/**
+	 * Returns a sequence of all incident vertices which are connected via an
+	 * {@link Incidence} of direction <code>dir</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param dir
+	 *            {Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Direction dir);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass, Direction direction);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
 			Class<? extends Vertex> aVertexClass, Direction direction);
 
 	/**
