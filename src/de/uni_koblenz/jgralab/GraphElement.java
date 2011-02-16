@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab;
 
 import java.util.List;
 
+import de.uni_koblenz.jgralab.impl.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -76,6 +77,51 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Graph} containing this {@link GraphElement}
 	 */
 	public Graph getGraph();
+
+	/**
+	 * Returns the {@link GraphElement} in which this {@link GraphElement} is
+	 * nested. If such a {@link GraphElement} does not exist, <code>null</code>
+	 * is returned.
+	 * 
+	 * @return {@link GraphElement}
+	 */
+	public GraphElement<?, ?, ?> getParent();
+
+	/**
+	 * Returns a {@link Graph} which contains all elements which are nested in
+	 * this {@link GraphElement}.
+	 * 
+	 * @return {@link Graph}
+	 */
+	public Graph getSubordinateGraph();
+
+	/**
+	 * Returns the kappa value of this {@link GraphElement}.
+	 * 
+	 * @see {@link GraphElementImpl#kappa}
+	 * @return int
+	 */
+	public int getKappa();
+
+	/**
+	 * Checks if this {@link GraphElement} is visible at a kappa value of
+	 * <code>kappa</code>.
+	 * 
+	 * @param kappa
+	 *            int
+	 * @return boolean <code>true</code> if this GraphElement is visible
+	 */
+	public boolean isVisible(int kappa);
+
+	/**
+	 * Checks if this {@link GraphElement} contains <code>element</code>.
+	 * 
+	 * @param element
+	 *            {@link GraphElement}
+	 * @return boolean <code>true</code> if <code>element</code> is contained in
+	 *         this {@link GraphElement}
+	 */
+	public boolean containsElement(GraphElement<?, ?, ?> element);
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
@@ -151,8 +197,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class} the {@link Incidence} class to search for
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -181,8 +226,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T  getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -215,8 +260,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T  getFirstIncidence(
-			Class<T> anIncidenceClass, boolean noSubclasses);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			boolean noSubclasses);
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -255,9 +300,214 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T  getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction,
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction, boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
+	 * an {@link Incidence} does not exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext);
+
+	/**
+	 * Returns the first {@link Incidence} of this {@link GraphElement} with
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param direction
+	 *            {@link Direction} of connected {@link Incidence}s.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction);
+
+	/**
+	 * Get the first {@link Incidence} which has one of the aggregation
+	 * semantics given by <code>incidentTypes</code> at either this
+	 * {@link Incidence} (<code>thisIncidence == true</code>) or that
+	 * {@link Incidence} (<code>thisIncidence == false</code>). If there are no
+	 * <code>incidentTypes</code> given, it simply returns the first
+	 * {@link Incidence}. If such an {@link Incidence} does not exist,
+	 * <code>null</code> is returned.<br/>
+	 * <br/>
+	 * For example, this returns the first {@link Incidence} to a parent
+	 * {@link GraphElement} in the containment hierarchy.
+	 * 
+	 * <pre>
+	 * ge.getFirstIncidence(true, IncidenceType.AGGREGATION, IncidenceType.COMPOSITION)
+	 * </pre>
+	 * 
+	 * And this returns the first {@link Incidence} to a child
+	 * {@link GraphElement} in the containment hierarchy.
+	 * 
+	 * <pre>
+	 * v.getFirstIncidence(false, IncidenceType.AGGREGATION, IncidenceType.COMPOSITION)
+	 * </pre>
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param thisIncidence
+	 *            boolean if true, <code>incidentTypes</code> has to match the
+	 *            {@link Incidence} at this {@link GraphElement}, else it has to
+	 *            match the opposite {@link Incidence}
+	 * @param incidentTypes
+	 *            {@link IncidenceType}...
+	 * 
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			boolean thisIncidence, IncidenceType... incidentTypes);
+
+	/**
+	 * Returns the first incidence in lambda-seq where the corresponding
+	 * {@link IncidenceClass} is of class <code>anIncidenceClass</code>. If such
+	 * an {@link Incidence} does not exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If such an
+	 * {@link Incidence} does not exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the {@link Incidence} class to search for
+	 * @return {@link Incidence}
+	 */
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
+	 * direction is <code>direction</code>. If such an {@link Incidence} does
+	 * not exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}s.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code> and the
+	 * direction is <code>direction</code>. If such an {@link Incidence} does
+	 * not exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}s.
+	 * @return {@link Incidence}
+	 */
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, Direction direction);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}s.
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction,
 			boolean noSubclasses);
+
+	/**
+	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
+	 * {@link Incidence} is of class <code>anIncidenceClass</code>. If
+	 * <code>noSubclasses</code> is set to <code>true</code> the
+	 * {@link Incidence} must not be an instance of a subclass of
+	 * <code>anIncidenceClass</code>. The {@link Incidence} must have the
+	 * direction <code>direction</code>. If such an {@link Incidence} does not
+	 * exist, <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} to search for
+	 * @param direction
+	 *            {@link Direction} of the {@link Incidence}s.
+	 * @param noSubclasses
+	 *            boolean
+	 * @return {@link Incidence}
+	 */
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses);
 
 	/**
 	 * Returns the last {@link Incidence} of this {@link GraphElement}.
@@ -265,6 +515,15 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public Incidence getLastIncidence();
+
+	/**
+	 * Returns the last {@link Incidence} of this {@link GraphElement}.
+	 * 
+	 * @param traversalContext
+	 *            {@Link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getLastIncidence(Graph traversalContext);
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -295,7 +554,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public <T extends Incidence> Iterable<T> getIncidences(Class<T> anIncidenceClass);
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass);
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -321,7 +581,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public <T extends Incidence> Iterable<T>  getIncidences(
+	public <T extends Incidence> Iterable<T> getIncidences(
 			Class<T> anIncidenceClass, Direction direction);
 
 	/**
@@ -339,6 +599,96 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
 			Direction direction);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement}.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(Graph traversalContext);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s.
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			Direction direction);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Graph traversalContext, Class<T> anIncidenceClass);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass}
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			IncidenceClass anIncidenceClass);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code> and is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s.
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Graph traversalContext, Class<T> anIncidenceClass,
+			Direction direction);
+
+	/**
+	 * Returns an {@link Iterable} over all {@link Incidence}s at this
+	 * {@link GraphElement} which have the direction specified by
+	 * <code>direction</code> and is an instance of
+	 * <code>anIncidenceClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction} specifies the direction of the requested
+	 *            {@link Incidence}s.
+	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
+	 */
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction);
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -475,6 +825,164 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 			boolean noSubClasses);
 
 	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} .
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return int
+	 */
+	public int getDegree(Graph traversalContext);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         connected to this GraphElement
+	 */
+	public int getDegree(Graph traversalContext, Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, IncidenceClass ic);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link Class}
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link Class}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s which are an instance of
+	 *         <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			Direction direction);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			Direction direction, boolean noSubClasses);
+
+	/**
+	 * Returns the number of connected {@link Incidence}s to this
+	 * {@link GraphElement} which have the {@link Direction} specified by
+	 * <code>direction</code> and are a subclass of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @param noSubClasses
+	 *            boolean if set to <code>true</code>, subclasses of
+	 *            <code>ic</code> are not counted
+	 * @return int number of {@link Incidence}s of desired direction which are
+	 *         an instance of <code>ic</code>
+	 */
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			Direction direction, boolean noSubClasses);
+
+	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is before
 	 * <code>g</code> in the sequence of incident {@link GraphElement}s.
 	 * 
@@ -535,6 +1043,37 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public List<? extends OwnType> adjacences(IncidenceClass ic);
 
 	/**
+	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
+	 * this {@link GraphElement}. The connected <code>DualType</code> object is
+	 * connected to this {@link GraphElement} via an {@link IncidenceClass} of
+	 * name <code>role</code>.
+	 * 
+	 * @see GraphElement
+	 * @param traversalConext
+	 *            {@link Graph}
+	 * @param role
+	 *            {@link String}
+	 * @return {@link List} of <code>OwnType</code> objects
+	 */
+	public List<? extends OwnType> adjacences(Graph traversalConext, String role);
+
+	/**
+	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
+	 * this {@link GraphElement}. The connected <code>DualType</code> object is
+	 * connected to this {@link GraphElement} via an {@link Incidence} of type
+	 * <code>ic</code>.
+	 * 
+	 * @see GraphElement
+	 * @param traversalConext
+	 *            {@link Graph}
+	 * @param ic
+	 *            {@link IncidenceClass}
+	 * @return {@link List} of <code>OwnType</code> objects
+	 */
+	public List<? extends OwnType> adjacences(Graph traversalConext,
+			IncidenceClass ic);
+
+	/**
 	 * Creates and returns a new instance of <code>DualType</code> connected to
 	 * <code>this</code> and <code>other</code> via instances of
 	 * {@link IncidenceClass}es which correspond to <code>incidentRole</code>
@@ -570,6 +1109,45 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 			IncidenceClass adjacentIc, OwnType other);
 
 	/**
+	 * Creates and returns a new instance of <code>DualType</code> connected to
+	 * <code>this</code> and <code>other</code> via instances of
+	 * {@link IncidenceClass}es which correspond to <code>incidentRole</code>
+	 * and <code>adjacentRole</code>.
+	 * 
+	 * @see #addAdjacence(IncidenceClass, IncidenceClass, Object)
+	 * @see #getIncidenceClassForRolename(String)
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param incidentRole
+	 *            {@link String}
+	 * @param adjacentRole
+	 *            {@link String}
+	 * @param other
+	 *            <code>OwnType</code>
+	 * @return <code>DualType</code>
+	 */
+	public DualType addAdjacence(Graph traversalContext, String incidentRole,
+			String adjacentRole, OwnType other);
+
+	/**
+	 * Creates and returns a new <code>DualType</code> instance, which is
+	 * connected to <code>this</code> via an instance of <code>incidentIc</code>
+	 * and to <code>other</code> via an instance of <code>adjacentIc</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param incidentIc
+	 *            {@link IncidenceClass}
+	 * @param adjacentIc
+	 *            {@link IncidenceClass}
+	 * @param other
+	 *            <code>OwnType</code>
+	 * @return <code>DualType</code>
+	 */
+	public DualType addAdjacence(Graph traversalContext,
+			IncidenceClass incidentIc, IncidenceClass adjacentIc, OwnType other);
+
+	/**
 	 * TODO
 	 * 
 	 * @param role
@@ -588,6 +1166,25 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	/**
 	 * TODO
 	 * 
+	 * @param traversalContext
+	 * @param role
+	 * @return
+	 */
+	public List<OwnType> removeAdjacences(Graph traversalContext, String role);
+
+	/**
+	 * TODO
+	 * 
+	 * @param traversalContext
+	 * @param ic
+	 * @return
+	 */
+	public List<OwnType> removeAdjacences(Graph traversalContext,
+			IncidenceClass ic);
+
+	/**
+	 * TODO
+	 * 
 	 * @param role
 	 * @param other
 	 */
@@ -600,6 +1197,26 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param other
 	 */
 	public void removeAdjacence(IncidenceClass ic, OwnType other);
+
+	/**
+	 * TODO
+	 * 
+	 * @param traversalContext
+	 * @param role
+	 * @param other
+	 */
+	public void removeAdjacence(Graph traversalContext, String role,
+			OwnType other);
+
+	/**
+	 * TODO
+	 * 
+	 * @param traversalContext
+	 * @param ic
+	 * @param other
+	 */
+	public void removeAdjacence(Graph traversalContext, IncidenceClass ic,
+			OwnType other);
 
 	/**
 	 * Returns the {@link IncidenceClass} corresponding to <code>rolename</code>
@@ -627,7 +1244,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return <code>true</code> iff <code>graphElement</code> may start at this
 	 *         {@link GraphElement}
 	 */
-	//public boolean isValidAlpha(DualType graphElement);
+	// public boolean isValidAlpha(DualType graphElement);
 
 	/**
 	 * Tests if the <code>DualType</code> <code>graphElement</code> may end at
@@ -639,7 +1256,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return <code>true</code> iff <code>graphElement</code> may end at this
 	 *         {@link GraphElement}
 	 */
-	//public boolean isValidOmega(DualType graphElement);
+	// public boolean isValidOmega(DualType graphElement);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -667,7 +1284,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 */
-	public Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect);
+	public Incidence connect(IncidenceClass incidenceClass,
+			DualType elemToConnect);
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
