@@ -41,7 +41,6 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  */
 public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 
-
 	/**
 	 * Returns the direction of this {@link Incidence}.
 	 * 
@@ -221,6 +220,180 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
+	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
+	 * {@link Incidence} is the last {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			Direction direction);
+
+	/**
+	 * Gets the next {@link Incidence} at the current {@link Edge}, which has
+	 * one of <code>incidenceTypes</code> aggregation semantics at this (
+	 * <code>thisIncidence == true</code>) or that (
+	 * <code>thisIncidence == false</code>) side.
+	 * 
+	 * If no <code>incidenceType</code> is given, it simply returns the first
+	 * {@link Incidence} .
+	 * 
+	 * @see GraphElement#getFirstIncidence(boolean, IncidenceType...)
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param thisIncidence
+	 *            if true, <code>incidenceTypes</code> has to match the
+	 *            incidence at the current vertex, else it has to match the
+	 *            incidence at the opposite vertex
+	 * @param incidenceTypes
+	 *            the acceptable incidence types
+	 * @return {@link Incidence} the next incident edge at the current
+	 *         {@link Edge}, which has one of <code>incidenceTypes</code>
+	 *         aggregation semantics at this (
+	 *         <code>thisIncidence == true</code>) or that (
+	 *         <code>thisIncidence == false</code>) side.
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			boolean thisIncidence, IncidenceType... incidenceTypes);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			IncidenceClass anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction,
+			boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtEdge()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses);
+
+	/**
+	 * Returns the next {@link Incidence} in the sequence of all
 	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
 	 * {@link Incidence} is the last {@link Incidence} in the sequence,
 	 * <code>null</code> is returned.
@@ -369,6 +542,179 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 			boolean noSubclasses);
 
 	/**
+	 * Returns the next {@link Incidence} in the sequence of all
+	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
+	 * {@link Incidence} is the last {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			Direction direction);
+
+	/**
+	 * Gets the next {@link Incidence} at the current {@link Vertex}, which has
+	 * one of <code>incidenceTypes</code> aggregation semantics at this (
+	 * <code>thisIncidence == true</code>) or that (
+	 * <code>thisIncidence == false</code>) side.
+	 * 
+	 * If no <code>incidenceType</code> is given, it simply returns the first
+	 * {@link Incidence} .
+	 * 
+	 * @see GraphElement#getFirstIncidence(boolean, IncidenceType...)
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param thisIncidence
+	 *            if true, <code>incidenceTypes</code> has to match the
+	 *            incidence at the current vertex, else it has to match the
+	 *            incidence at the opposite vertex
+	 * @param incidenceTypes
+	 *            the acceptable incidence types
+	 * @return {@link Incidence} the next incident edge at the current
+	 *         {@link Vertex}, which has one of <code>incidenceTypes</code>
+	 *         aggregation semantics at this (
+	 *         <code>thisIncidence == true</code>) or that (
+	 *         <code>thisIncidence == false</code>) side.
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			boolean thisIncidence, IncidenceType... incidenceTypes);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			IncidenceClass anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, Direction direction);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link IncidenceClass} the next incidence should be an
+	 *            instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction,
+			boolean noSubclasses);
+
+	/**
+	 * @see #getNextIncidenceAtVertex()
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anIncidenceClass
+	 *            {@link Class} the next incidence should be an instance of
+	 * @param direction
+	 *            {@link Direction} the direction the next incidence should
+	 *            have.
+	 * @param noSubclasses
+	 *            boolean if <code>true</code> the next {@link Incidence} must
+	 *            not be an instance of an subclass of
+	 *            <code>anIncidenceClass</code>
+	 * @return {@link Incidence}
+	 */
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
+			Class<? extends Incidence> anIncidenceClass, Direction direction,
+			boolean noSubclasses);
+
+	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
 	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
 	 * {@link Incidence} is the first {@link Incidence} in the sequence,
@@ -377,6 +723,18 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getPreviousIncidenceAtEdge();
+
+	/**
+	 * Returns the previous {@link Incidence} in the sequence of all
+	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
+	 * {@link Incidence} is the first {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext);
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
@@ -389,6 +747,18 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getPreviousIncidenceAtVertex();
 
 	/**
+	 * Returns the previous {@link Incidence} in the sequence of all
+	 * {@link Incidence}s connected to {@link Incidence#getVertex()}. If this
+	 * {@link Incidence} is the first {@link Incidence} in the sequence,
+	 * <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Incidence}
+	 */
+	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext);
+
+	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
 	 * {@link Incidence#getVertex()} via an {@link Incidence} of the same
 	 * direction as this {@link Incidence} has.
@@ -399,12 +769,34 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 
 	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
+	 * {@link Incidence#getVertex()} via an {@link Incidence} of the same
+	 * direction as this {@link Incidence} has.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getTheseEdges(Graph traversalContext);
+
+	/**
+	 * Returns the sequence of all {@link Edge}s which are connected to
 	 * {@link Incidence#getVertex()} via an {@link Incidence} of the reverted
 	 * direction as this {@link Incidence} has.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
 	public Iterable<Edge> getThoseEdges();
+
+	/**
+	 * Returns the sequence of all {@link Edge}s which are connected to
+	 * {@link Incidence#getVertex()} via an {@link Incidence} of the reverted
+	 * direction as this {@link Incidence} has.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Edge}&gt;
+	 */
+	public Iterable<Edge> getThoseEdges(Graph traversalContext);
 
 	/**
 	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}.
@@ -425,6 +817,17 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Iterable<Vertex> getTheseVertices();
 
 	/**
+	 * Returns a sequence of all vertices, which are connected to
+	 * {@link Incidence#getEdge()} via an {@link Incidence} of the same
+	 * direction as this one.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getTheseVertices(Graph traversalContext);
+
+	/**
 	 * Returns the {@link Vertex} which is at the other end of a binary
 	 * {@link Edge}.
 	 * 
@@ -442,6 +845,17 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getThoseVertices();
+
+	/**
+	 * Returns a sequence of all vertices, which are connected to
+	 * {@link Incidence#getEdge()} via an {@link Incidence} of the reverted
+	 * direction as this one.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getThoseVertices(Graph traversalContext);
 
 	/**
 	 * Returns the m1-class of this {@link Incidence}.
@@ -545,7 +959,5 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Incidence}
 	 */
 	public void putAfterAtEdge(Incidence i);
-
-
 
 }
