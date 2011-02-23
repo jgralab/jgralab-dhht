@@ -45,6 +45,7 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -208,6 +209,11 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	protected GraphBaseImpl(String id, GraphClass cls) {
 		this(id, cls, 1000, 1000);
+	}
+
+	@Override
+	public GraphElement<?, ?, ?> getContainingElement() {
+		return null;
 	}
 
 	@Override
@@ -2270,14 +2276,10 @@ public abstract class GraphBaseImpl implements Graph {
 		return graphElementId == 0;
 	}
 
-	
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
-	
-
-	
 
 }

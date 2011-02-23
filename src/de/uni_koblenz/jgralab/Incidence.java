@@ -70,6 +70,16 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Vertex getVertex();
 
 	/**
+	 * Checks if this {@link Incidence} is visible at a kappa value of
+	 * <code>kappa</code>.
+	 * 
+	 * @param kappa
+	 *            int
+	 * @return boolean <code>getEdge().isVisible(kappa)</code>
+	 */
+	public boolean isVisible(int kappa);
+
+	/**
 	 * Returns the next {@link Incidence} in the sequence of all
 	 * {@link Incidence}s connected to {@link Incidence#getEdge()}. If this
 	 * {@link Incidence} is the last {@link Incidence} in the sequence,

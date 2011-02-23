@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -64,6 +65,7 @@ public abstract class SubordinateGraphImpl extends
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
 	private EdgeBaseImpl lastEdge;
+	private GraphElement<?, ?, ?> containingElement;
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -84,6 +86,11 @@ public abstract class SubordinateGraphImpl extends
 	 * of a composition "parent".
 	 */
 	private List<VertexBaseImpl> deleteVertexList;
+
+	@Override
+	public GraphElement<?, ?, ?> getContainingElement() {
+		return containingElement;
+	}
 
 	@Override
 	protected VertexBaseImpl[] getVertex() {

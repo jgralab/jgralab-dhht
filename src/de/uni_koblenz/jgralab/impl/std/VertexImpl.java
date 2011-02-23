@@ -49,23 +49,31 @@ public abstract class VertexImpl extends
 	private IncidenceImpl lastIncidenceAtVertex;
 
 	@Override
-	public Incidence getFirstIncidence() {
-		return firstIncidenceAtVertex;
+	public Incidence getFirstIncidence(Graph traversalContext) {
+		Incidence firstIncidence = getFirstIncidence();
+		if (firstIncidence == null) {
+			return firstIncidence;
+		} else if (firstIncidence.isVisible(traversalContext
+				.getContainingElement().getKappa())) /* TODO */{
+			return firstIncidence;
+		} else {
+			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Vertex getNextVertex() {
+	public Vertex getNextVertex(Graph traversalContext) {
 		assert isValid();
 		return nextVertexInGraph;
 	}
 
 	@Override
-	public Vertex getPreviousVertex() {
+	public Vertex getPreviousVertex(Graph traversalContext) {
 		return prevVertexInGraph;
 	}
 
 	@Override
-	public Incidence getLastIncidence() {
+	public Incidence getLastIncidence(Graph traversalContext) {
 		return lastIncidenceAtVertex;
 	}
 
@@ -110,7 +118,9 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Graph getSubordinateGraph() {
-		// TODO Auto-generated method stub
-		return null;
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);
 	}
 }

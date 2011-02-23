@@ -51,6 +51,14 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {
 
+	public Graph getTraversalContext();
+
+	/**
+	 * @return {@link GraphElement} which contains this {@link Graph} or
+	 *         <code>null</code> if it is the complete {@link Graph}
+	 */
+	public GraphElement<?, ?, ?> getContainingElement();
+
 	/**
 	 * Creates a vertex the specified class <code>cls</code> and adds the new
 	 * vertex to this Graph.

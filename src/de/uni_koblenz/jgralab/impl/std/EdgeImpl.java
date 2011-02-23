@@ -154,8 +154,10 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 
 	@Override
 	public Graph getSubordinateGraph() {
-		// TODO Auto-generated method stub
-		return null;
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);
 	}
 
 }

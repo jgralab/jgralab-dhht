@@ -91,6 +91,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphBaseImpl graph;
 
+	protected Graph subOrdinateGraph;
+
 	/**
 	 * Creates a new {@link GraphElement} which belongs to <code>graph</code>.
 	 * 
@@ -120,10 +122,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public boolean containsElement(GraphElement<?, ?, ?> element) {
 		for (GraphElement<?, ?, ?> el = element; el.getParent() != null
-				&& el.isVisible(kappa - 1); el = el.getParent()) {
-			// the condition isVisible(kappa-1) is used, because an element
-			// which has the same kappa value like this element can't be
-			// contained in this element
+				&& getKappa() > el.getKappa(); el = el.getParent()) {
 			if (el.getParent() == this) {
 				return true;
 			}
@@ -233,50 +232,53 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph, anIncidenceClass.getM1Class(), null,
-				false);
+		return getFirstIncidence(graph.getTraversalContext(),
+				anIncidenceClass.getM1Class(), null, false);
 	}
 
 	@Override
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph, anIncidenceClass, null, false);
+		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+				null, false);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph, anIncidenceClass.getM1Class(),
+		return getFirstIncidence(graph.getTraversalContext(),
+				anIncidenceClass.getM1Class(), direction, false);
+	}
+
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction) {
+		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
 				direction, false);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction) {
-		return getFirstIncidence(graph, anIncidenceClass, direction, false);
-	}
-
-	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph, anIncidenceClass.getM1Class(), null,
-				noSubclasses);
+		return getFirstIncidence(graph.getTraversalContext(),
+				anIncidenceClass.getM1Class(), null, noSubclasses);
 	}
 
 	@Override
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			boolean noSubclasses) {
-		return getFirstIncidence(graph, anIncidenceClass, null, noSubclasses);
+		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+				null, noSubclasses);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph, anIncidenceClass.getM1Class(),
-				direction, noSubclasses);
+		return getFirstIncidence(graph.getTraversalContext(),
+				anIncidenceClass.getM1Class(), direction, noSubclasses);
 	}
 
 	@Override
@@ -347,28 +349,28 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public int getDegree(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph, ic, false);
+		return getDegree(graph.getTraversalContext(), ic, false);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph, ic, false);
+		return getDegree(graph.getTraversalContext(), ic, false);
 	}
 
 	@Override
 	public int getDegree(IncidenceClass ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph, ic, direction, false);
+		return getDegree(graph.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph, ic, direction, false);
+		return getDegree(graph.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
