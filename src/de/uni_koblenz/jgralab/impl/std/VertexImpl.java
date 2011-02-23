@@ -49,24 +49,55 @@ public abstract class VertexImpl extends
 	private IncidenceImpl lastIncidenceAtVertex;
 
 	@Override
-	public Incidence getFirstIncidence() {
-		return firstIncidenceAtVertex;
+	public Incidence getFirstIncidence(Graph traversalContext) {
+		Incidence firstIncidence = firstIncidenceAtVertex;
+		if (firstIncidence == null) {
+			return firstIncidence;
+		} else if (traversalContext.getContainingElement().containsElement(
+				firstIncidence.getEdge())) {
+			return firstIncidence;
+		} else {
+			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Vertex getNextVertex() {
+	public Vertex getNextVertex(Graph traversalContext) {
 		assert isValid();
-		return nextVertexInGraph;
+		if (nextVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				nextVertexInGraph)) {
+			return nextVertexInGraph;
+		} else {
+			return nextVertexInGraph.getNextVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Vertex getPreviousVertex() {
-		return prevVertexInGraph;
+	public Vertex getPreviousVertex(Graph traversalContext) {
+		assert isValid();
+		if (prevVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				prevVertexInGraph)) {
+			return prevVertexInGraph;
+		} else {
+			return prevVertexInGraph.getPreviousVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Incidence getLastIncidence() {
-		return lastIncidenceAtVertex;
+	public Incidence getLastIncidence(Graph traversalContext) {
+		Incidence lastIncidence = lastIncidenceAtVertex;
+		if (lastIncidence == null) {
+			return lastIncidence;
+		} else if (traversalContext.getContainingElement().containsElement(
+				lastIncidence.getEdge())) {
+			return lastIncidence;
+		} else {
+			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
@@ -106,5 +137,13 @@ public abstract class VertexImpl extends
 	protected void setId(int id) {
 		assert id >= 0;
 		this.id = id;
+	}
+
+	@Override
+	public Graph getSubordinateGraph() {
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);// TODO
 	}
 }

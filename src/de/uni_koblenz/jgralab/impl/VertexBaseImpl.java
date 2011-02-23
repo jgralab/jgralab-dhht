@@ -71,7 +71,37 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
+	public Incidence getFirstIncidence() {
+		return getFirstIncidence(graph.getTraversalContext());
+	}
+
+	@Override
 	public Incidence getFirstIncidence(Direction direction) {
+		assert isValid();
+		return getFirstIncidence(graph.getTraversalContext(), direction);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes) {
+		assert isValid();
+		return getFirstIncidence(graph.getTraversalContext(), thisIncidence,
+				incidentTypes);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+				direction, noSubclasses);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction) {
 		assert isValid();
 		Incidence i = getFirstIncidence();
 		while ((i != null) && direction != null && direction != Direction.BOTH
@@ -82,8 +112,8 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Incidence getFirstIncidence(boolean thisIncidence,
-			IncidenceType... incidentTypes) {
+	public Incidence getFirstIncidence(Graph traversalContext,
+			boolean thisIncidence, IncidenceType... incidentTypes) {
 		assert isValid();
 		Incidence i = getFirstIncidence();
 		if (incidentTypes.length == 0) {
@@ -103,9 +133,8 @@ public abstract class VertexBaseImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		Incidence currentIncidence = getFirstIncidence(direction);
@@ -168,7 +197,57 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
+	public Incidence getLastIncidence() {
+		return getLastIncidence(graph.getTraversalContext());
+	}
+
+	@Override
+	public Vertex getPreviousVertex() {
+		return getPreviousVertex(graph.getTraversalContext());
+	}
+
+	@Override
+	public Vertex getNextVertex() {
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext());
+	}
+
+	@Override
 	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), vertexClass, false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass,
+			boolean noSubclasses) {
+		assert m1VertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), m1VertexClass,
+				noSubclasses);
+	}
+
+	@Override
+	public Vertex getNextVertex(VertexClass vertexClass) {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(),
+				vertexClass.getM1Class(), false);
+	}
+
+	@Override
+	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(),
+				vertexClass.getM1Class(), noSubclasses);
+	}
+
+	@Override
+	public <T extends Vertex> T getNextVertex(Graph traversalContext,
+			Class<T> vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass, false);
@@ -176,8 +255,8 @@ public abstract class VertexBaseImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Vertex> T  getNextVertex(Class<T> m1VertexClass,
-			boolean noSubclasses) {
+	public <T extends Vertex> T getNextVertex(Graph traversalContext,
+			Class<T> m1VertexClass, boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
 		VertexBaseImpl v = (VertexBaseImpl) getNextVertex();
@@ -197,14 +276,15 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public Vertex getNextVertex(VertexClass vertexClass) {
+	public Vertex getNextVertex(Graph traversalContext, VertexClass vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass.getM1Class(), false);
 	}
 
 	@Override
-	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) {
+	public Vertex getNextVertex(Graph traversalContext,
+			VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass.getM1Class(), noSubclasses);
@@ -239,7 +319,7 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public <T extends Edge> Iterable<T>  getOmegaEdges(Class<T> anEdgeClass) {
+	public <T extends Edge> Iterable<T> getOmegaEdges(Class<T> anEdgeClass) {
 		return new IncidentEdgeIterable<T>(this, anEdgeClass,
 				Direction.VERTEX_TO_EDGE);
 	}
@@ -260,7 +340,7 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public <T extends Edge> Iterable<T>  getIncidentEdges(Class<T> anEdgeClass) {
+	public <T extends Edge> Iterable<T> getIncidentEdges(Class<T> anEdgeClass) {
 		return new IncidentEdgeIterable<T>(this, anEdgeClass);
 	}
 
@@ -272,7 +352,7 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public <T extends Edge> Iterable<T>  getIncidentEdges(Class<T> anEdgeClass,
+	public <T extends Edge> Iterable<T> getIncidentEdges(Class<T> anEdgeClass,
 			Direction direction) {
 		return new IncidentEdgeIterable<T>(this, anEdgeClass, direction);
 	}
@@ -350,55 +430,26 @@ public abstract class VertexBaseImpl extends
 
 	@Override
 	public int getDegree() {
-		int d = 0;
-		Incidence i = getFirstIncidence();
-		while (i != null) {
-			d++;
-			i = i.getNextIncidenceAtVertex();
-		}
-		return d;
+		return getDegree(graph.getTraversalContext());
 	}
 
 	@Override
 	public int getDegree(Direction direction) {
-		if (direction == null) {
-			return getDegree();
-		}
-		int d = 0;
-		Incidence i = getFirstIncidence();
-		while (i != null) {
-			if (direction == Direction.BOTH || i.getDirection() == direction) {
-				d++;
-			}
-			i = i.getNextIncidenceAtVertex();
-		}
-		return d;
+		return getDegree(graph.getTraversalContext(), direction);
 	}
 
 	@Override
 	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(ic, noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtVertex(ic, noSubClasses);
-		}
-		return degree;
+		return getDegree(graph.getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(ic, noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtVertex(ic, noSubClasses);
-		}
-		return degree;
+		return getDegree(graph.getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
@@ -406,13 +457,8 @@ public abstract class VertexBaseImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtVertex(ic, direction, noSubClasses);
-		}
-		return degree;
+		return getDegree(graph.getTraversalContext(), ic, direction,
+				noSubClasses);
 	}
 
 	@Override
@@ -420,11 +466,93 @@ public abstract class VertexBaseImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
+		return getDegree(graph.getTraversalContext(), ic, direction,
+				noSubClasses);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext) {
+		int d = 0;
+		Incidence i = getFirstIncidence(traversalContext);
+		while (i != null) {
+			d++;
+			i = i.getNextIncidenceAtVertex(traversalContext);
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Direction direction) {
+		if (direction == null) {
+			return getDegree(traversalContext);
+		}
+		int d = 0;
+		Incidence i = getFirstIncidence(traversalContext);
+		while (i != null) {
+			if (direction == Direction.BOTH || i.getDirection() == direction) {
+				d++;
+			}
+			i = i.getNextIncidenceAtVertex(traversalContext);
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
 		int degree = 0;
-		Incidence i = getFirstIncidence(ic, direction, noSubClasses);
+		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
 		while (i != null) {
 			++degree;
-			i = i.getNextIncidenceAtVertex(ic, direction, noSubClasses);
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			Direction direction, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
+					noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			Direction direction, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
+					noSubClasses);
 		}
 		return degree;
 	}
@@ -775,11 +903,25 @@ public abstract class VertexBaseImpl extends
 
 	@Override
 	public List<? extends Vertex> adjacences(String role) {
-		return adjacences(getIncidenceClassForRolename(role));
+		return adjacences(graph.getTraversalContext(),
+				getIncidenceClassForRolename(role));
 	}
 
 	@Override
 	public List<? extends Vertex> adjacences(IncidenceClass ic) {
+		assert ic != null;
+		assert isValid();
+		return adjacences(graph.getTraversalContext(), ic);
+	}
+
+	@Override
+	public List<? extends Vertex> adjacences(Graph traversalContext, String role) {
+		return adjacences(getIncidenceClassForRolename(role));
+	}
+
+	@Override
+	public List<? extends Vertex> adjacences(Graph traversalContext,
+			IncidenceClass ic) {// TODO
 		assert ic != null;
 		assert isValid();
 		List<Vertex> adjacences = new ArrayList<Vertex>();

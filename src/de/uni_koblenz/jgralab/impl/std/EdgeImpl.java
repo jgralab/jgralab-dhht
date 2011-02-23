@@ -152,4 +152,12 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 		return new IncidentVertexIterable<Vertex>(this, direction);
 	}
 
+	@Override
+	public Graph getSubordinateGraph() {
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);// TODO
+	}
+
 }
