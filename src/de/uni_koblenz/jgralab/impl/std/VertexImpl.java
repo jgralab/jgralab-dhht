@@ -50,11 +50,11 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = getFirstIncidence();
+		Incidence firstIncidence = firstIncidenceAtVertex;
 		if (firstIncidence == null) {
 			return firstIncidence;
-		} else if (firstIncidence.isVisible(traversalContext
-				.getContainingElement().getKappa())) /* TODO */{
+		} else if (traversalContext.getContainingElement().containsElement(
+				firstIncidence.getEdge())) {
 			return firstIncidence;
 		} else {
 			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
