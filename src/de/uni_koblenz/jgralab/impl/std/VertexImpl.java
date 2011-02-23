@@ -64,17 +64,40 @@ public abstract class VertexImpl extends
 	@Override
 	public Vertex getNextVertex(Graph traversalContext) {
 		assert isValid();
-		return nextVertexInGraph;
+		if (nextVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				nextVertexInGraph)) {
+			return nextVertexInGraph;
+		} else {
+			return nextVertexInGraph.getNextVertex(traversalContext);
+		}
 	}
 
 	@Override
 	public Vertex getPreviousVertex(Graph traversalContext) {
-		return prevVertexInGraph;
+		assert isValid();
+		if (prevVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				prevVertexInGraph)) {
+			return prevVertexInGraph;
+		} else {
+			return prevVertexInGraph.getPreviousVertex(traversalContext);
+		}
 	}
 
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) {
-		return lastIncidenceAtVertex;
+		Incidence lastIncidence = lastIncidenceAtVertex;
+		if (lastIncidence == null) {
+			return lastIncidence;
+		} else if (traversalContext.getContainingElement().containsElement(
+				lastIncidence.getEdge())) {
+			return lastIncidence;
+		} else {
+			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
@@ -121,6 +144,6 @@ public abstract class VertexImpl extends
 		if (subOrdinateGraph != null) {
 			return subOrdinateGraph;
 		}
-		return new SubordinateGraphImpl(this);
+		return new SubordinateGraphImpl(this);// TODO
 	}
 }

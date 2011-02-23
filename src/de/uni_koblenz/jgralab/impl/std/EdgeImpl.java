@@ -157,7 +157,7 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 		if (subOrdinateGraph != null) {
 			return subOrdinateGraph;
 		}
-		return new SubordinateGraphImpl(this);
+		return new SubordinateGraphImpl(this);// TODO
 	}
 
 }
