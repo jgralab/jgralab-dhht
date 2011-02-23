@@ -108,12 +108,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Graph getSubordinateGraph() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public int getKappa() {
 		return kappa;
 	}
@@ -125,7 +119,15 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public boolean containsElement(GraphElement<?, ?, ?> element) {
-		// TODO Auto-generated method stub
+		for (GraphElement<?, ?, ?> el = element; el.getParent() != null
+				&& el.isVisible(kappa - 1); el = el.getParent()) {
+			// the condition isVisible(kappa-1) is used, because an element
+			// which has the same kappa value like this element can't be
+			// contained in this element
+			if (el.getParent() == this) {
+				return true;
+			}
+		}
 		return false;
 	}
 

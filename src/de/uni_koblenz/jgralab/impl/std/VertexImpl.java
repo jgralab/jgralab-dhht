@@ -107,4 +107,10 @@ public abstract class VertexImpl extends
 		assert id >= 0;
 		this.id = id;
 	}
+
+	@Override
+	public Graph getSubordinateGraph() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
