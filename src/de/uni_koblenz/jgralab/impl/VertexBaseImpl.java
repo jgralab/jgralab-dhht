@@ -89,7 +89,6 @@ public abstract class VertexBaseImpl extends
 				incidentTypes);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			Direction direction, boolean noSubclasses) {
@@ -197,6 +196,53 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(traversalContext, this);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(traversalContext, this,
+				direction);
+	}
+
+	@Override
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Graph traversalContext, Class<T> anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<T>(traversalContext, this,
+				anIncidenceClass);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			IncidenceClass anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(traversalContext, this,
+				anIncidenceClass.getM1Class());
+	}
+
+	@Override
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Graph traversalContext, Class<T> anIncidenceClass,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<T>(traversalContext, this,
+				anIncidenceClass, direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			IncidenceClass anIncidenceClass, Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtVertex<Incidence>(traversalContext, this,
+				anIncidenceClass.getM1Class(), direction);
+	}
+
+	@Override
 	public Incidence getLastIncidence() {
 		return getLastIncidence(graph.getTraversalContext());
 	}
@@ -219,7 +265,6 @@ public abstract class VertexBaseImpl extends
 		return getNextVertex(graph.getTraversalContext(), vertexClass, false);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass,
 			boolean noSubclasses) {
@@ -308,6 +353,26 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
+	public Iterable<Edge> getAlphaEdges(Graph traversalContext) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public Iterable<Edge> getAlphaEdges(Graph traversalContext,
+			EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				anEdgeClass.getM1Class(), Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
+	public <T extends Edge> Iterable<T> getAlphaEdges(Graph traversalContext,
+			Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass,
+				Direction.EDGE_TO_VERTEX);
+	}
+
+	@Override
 	public Iterable<Edge> getOmegaEdges() {
 		return new IncidentEdgeIterable<Edge>(this, Direction.VERTEX_TO_EDGE);
 	}
@@ -321,6 +386,26 @@ public abstract class VertexBaseImpl extends
 	@Override
 	public <T extends Edge> Iterable<T> getOmegaEdges(Class<T> anEdgeClass) {
 		return new IncidentEdgeIterable<T>(this, anEdgeClass,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges(Graph traversalContext) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Edge> getOmegaEdges(Graph traversalContext,
+			EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				anEdgeClass.getM1Class(), Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public <T extends Edge> Iterable<T> getOmegaEdges(Graph traversalContext,
+			Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass,
 				Direction.VERTEX_TO_EDGE);
 	}
 
@@ -355,6 +440,44 @@ public abstract class VertexBaseImpl extends
 	public <T extends Edge> Iterable<T> getIncidentEdges(Class<T> anEdgeClass,
 			Direction direction) {
 		return new IncidentEdgeIterable<T>(this, anEdgeClass, direction);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Graph traversalContext) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Graph traversalContext,
+			Direction direction) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this, direction);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Graph traversalContext,
+			EdgeClass anEdgeClass) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				anEdgeClass.getM1Class());
+	}
+
+	@Override
+	public <T extends Edge> Iterable<T> getIncidentEdges(
+			Graph traversalContext, Class<T> anEdgeClass) {
+		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass);
+	}
+
+	@Override
+	public Iterable<Edge> getIncidentEdges(Graph traversalContext,
+			EdgeClass anEdgeClass, Direction direction) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				anEdgeClass.getM1Class(), direction);
+	}
+
+	@Override
+	public <T extends Edge> Iterable<T> getIncidentEdges(
+			Graph traversalContext, Class<T> anEdgeClass, Direction direction) {
+		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass,
+				direction);
 	}
 
 	@Override
@@ -581,7 +704,6 @@ public abstract class VertexBaseImpl extends
 	@Override
 	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
-		// TODO adapt to hierarchical graphs
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
 		assert target.getThis() == moved.getThis();
@@ -640,7 +762,6 @@ public abstract class VertexBaseImpl extends
 	@Override
 	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
-		// TODO adapt to hierarchical graphs
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
 		assert target.getThis() == moved.getThis();
@@ -921,15 +1042,15 @@ public abstract class VertexBaseImpl extends
 
 	@Override
 	public List<? extends Vertex> adjacences(Graph traversalContext,
-			IncidenceClass ic) {// TODO
+			IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
 		List<Vertex> adjacences = new ArrayList<Vertex>();
 		Class<? extends Edge> ec = ic.getEdgeClass().getM1Class();
 		Direction dir = ic.getDirection();
-		for (Edge e : getIncidentEdges(ec, dir)) {
-			for (Vertex v : e
-					.getIncidentVertices(dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+		for (Edge e : getIncidentEdges(traversalContext, ec, dir)) {
+			for (Vertex v : e.getIncidentVertices(traversalContext,
+					dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
 							: Direction.EDGE_TO_VERTEX)) {
 				adjacences.add(v);
 			}
