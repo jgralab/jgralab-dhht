@@ -70,10 +70,13 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 		 */
 		protected long edgeListVersion;
 
+		protected Graph traversalContext;
+
 		@SuppressWarnings("unchecked")
-		EdgeIterator(Graph g, Class<? extends Edge> ec) {
+		EdgeIterator(Graph traversalContext, Graph g, Class<? extends Edge> ec) {
 			graph = g;
 			this.ec = ec;
+			this.traversalContext = traversalContext;
 			edgeListVersion = g.getEdgeListVersion();
 			current = (E) (ec == null ? graph.getFirstEdge() : graph
 					.getFirstEdge(ec));
@@ -89,8 +92,8 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 				throw new NoSuchElementException();
 			}
 			E result = current;
-			current = (E) (ec == null ? current.getNextEdge() : current
-					.getNextEdge(ec));
+			current = (E) (ec == null ? current.getNextEdge(traversalContext)
+					: current.getNextEdge(traversalContext, ec));
 			return result;
 		}
 
@@ -108,12 +111,22 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 	private EdgeIterator iter;
 
 	public EdgeIterable(Graph g) {
-		this(g, null);
+		this(g.getTraversalContext(), g, null);
 	}
 
 	public EdgeIterable(Graph g, Class<? extends Edge> ec) {
 		assert g != null;
-		iter = new EdgeIterator(g, ec);
+		iter = new EdgeIterator(g.getTraversalContext(), g, ec);
+	}
+
+	public EdgeIterable(Graph traversalContext, Graph g) {
+		this(traversalContext, g, null);
+	}
+
+	public EdgeIterable(Graph traversalContext, Graph g,
+			Class<? extends Edge> ec) {
+		assert g != null;
+		iter = new EdgeIterator(traversalContext, g, ec);
 	}
 
 	public Iterator<E> iterator() {

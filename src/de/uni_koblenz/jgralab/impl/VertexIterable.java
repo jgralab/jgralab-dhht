@@ -85,18 +85,24 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		 */
 		protected long vertexListVersion;
 
+		protected Graph traversalContext;
+
 		/**
 		 * Creates a new {@link VertexIterator} for the given {@link Graph}
 		 * <code>graph</code>.
 		 * 
+		 * @param traversalContext
+		 *            {@link Graph}
 		 * @param graph
 		 *            {@link Graph}
 		 */
 		@SuppressWarnings("unchecked")
-		VertexIterator(Graph graph, Class<? extends Vertex> vc) {
+		VertexIterator(Graph traversalContext, Graph graph,
+				Class<? extends Vertex> vc) {
 			this.graph = graph;
 			this.vc = vc;
 			vertexListVersion = graph.getVertexListVersion();
+			this.traversalContext = traversalContext;
 			current = (V) (vc == null ? graph.getFirstVertex() : graph
 					.getFirstVertex(vc));
 		}
@@ -112,8 +118,8 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 				throw new NoSuchElementException();
 			}
 			V result = current;
-			current = (V) (vc == null ? current.getNextVertex() : current
-					.getNextVertex(vc));
+			current = (V) (vc == null ? current.getNextVertex(traversalContext)
+					: current.getNextVertex(traversalContext, vc));
 			return result;
 		}
 
@@ -155,7 +161,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 *            {@link Graph}
 	 */
 	public VertexIterable(Graph graph) {
-		this(graph, null);
+		this(graph.getTraversalContext(), graph, null);
 	}
 
 	/**
@@ -169,7 +175,37 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 */
 	public VertexIterable(Graph g, Class<? extends Vertex> vc) {
 		assert g != null;
-		iter = new VertexIterator(g, vc);
+		iter = new VertexIterator(g.getTraversalContext(), g, vc);
+	}
+
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param graph
+	 *            {@link Graph}
+	 */
+	public VertexIterable(Graph traversalContext, Graph graph) {
+		this(traversalContext, graph, null);
+	}
+
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code> which are an instance of <code>vc</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param graph
+	 *            {@link Graph}
+	 * @param vc
+	 *            {@link Class}
+	 */
+	public VertexIterable(Graph traversalContext, Graph g,
+			Class<? extends Vertex> vc) {
+		assert g != null;
+		iter = new VertexIterator(traversalContext, g, vc);
 	}
 
 	@Override
