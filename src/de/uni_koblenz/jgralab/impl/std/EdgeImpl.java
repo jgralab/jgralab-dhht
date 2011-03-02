@@ -34,8 +34,6 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -53,24 +51,57 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	protected IncidenceImpl lastIncidenceAtEdge;
 
 	@Override
-	public Incidence getFirstIncidence() {
-		return firstIncidenceAtEdge;
+	public Incidence getFirstIncidence(Graph traversalContext) {
+		Incidence firstIncidence = firstIncidenceAtEdge;
+		if (firstIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return firstIncidence;
+		}
 	}
 
 	@Override
-	public Edge getNextEdge() {
+	public Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
-		return nextEdgeInGraph;
+		Edge nextEdge = nextEdgeInGraph;
+		if (nextEdge == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return nextEdge;
+		}
 	}
 
 	@Override
-	public Edge getPreviousEdge() {
-		return prevEdgeInGraph;
+	public Edge getPreviousEdge(Graph traversalContext) {
+		assert isValid();
+		Edge previousEdge = prevEdgeInGraph;
+		if (previousEdge == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return previousEdge;
+		}
 	}
 
 	@Override
-	public Incidence getLastIncidence() {
-		return lastIncidenceAtEdge;
+	public Incidence getLastIncidence(Graph traversalContext) {
+		Incidence lastIncidence = lastIncidenceAtEdge;
+		if (lastIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return lastIncidence;
+		}
 	}
 
 	@Override
@@ -86,12 +117,6 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	@Override
 	protected void setPreviousEdge(Edge prevEdge) {
 		prevEdgeInGraph = (EdgeImpl) prevEdge;
-	}
-
-	@Override
-	public Edge getPrevEdge() {
-		assert isValid();
-		return prevEdgeInGraph;
 	}
 
 	@Override
@@ -145,11 +170,6 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	@Override
 	public boolean isBinary() {
 		return false;
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Direction direction) {
-		return new IncidentVertexIterable<Vertex>(this, direction);
 	}
 
 	@Override
