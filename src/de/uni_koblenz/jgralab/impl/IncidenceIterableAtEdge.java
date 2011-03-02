@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 
 /**
@@ -24,7 +25,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Edge}
 	 */
 	public IncidenceIterableAtEdge(Edge edge) {
-		this(edge, null, null);
+		this(edge.getGraph().getTraversalContext(), edge, null, null);
 	}
 
 	/**
@@ -37,7 +38,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Edge edge, Direction direction) {
-		this(edge, null, direction);
+		this(edge.getGraph().getTraversalContext(), edge, null, direction);
 	}
 
 	/**
@@ -51,7 +52,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            that class or subclasses
 	 */
 	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic) {
-		this(edge, ic, null);
+		this(edge.getGraph().getTraversalContext(), edge, ic, null);
 	}
 
 	/**
@@ -70,7 +71,76 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic,
 			Direction direction) {
 		assert edge != null && edge.isValid();
-		iter = new IncidenceIteratorAtEdge(edge, ic, direction);
+		iter = new IncidenceIteratorAtEdge(edge.getGraph()
+				.getTraversalContext(), edge, ic, direction);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all {@link Incidence} of {@link Edge}
+	 * <code>edge</code> .
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param edge
+	 *            {@link Edge}
+	 */
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge) {
+		this(traversalContext, edge, null, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all {@link Incidence}s of {@link Edge}
+	 * <code>edge</code> with the specified <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param edge
+	 *            {@link Edge}
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
+			Direction direction) {
+		this(traversalContext, edge, null, direction);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all {@link Incidence}s of {@link Edge}
+	 * <code>edge</code> which are instances of <code>ic</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param edge
+	 *            {@link Edge}
+	 * @param ic
+	 *            {@link Class} returned {@link Incidence}s are restricted to
+	 *            that class or subclasses
+	 */
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
+			Class<? extends Incidence> ic) {
+		this(traversalContext, edge, ic, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all {@link Incidence}s of {@link Edge}
+	 * <code>edge</code> which are instances of <code>ic</code> and with the
+	 * specified <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param edge
+	 *            {@link Edge}
+	 * @param ic
+	 *            {@link Class} returned {@link Incidence}s are restricted to
+	 *            that class or subclasses
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
+			Class<? extends Incidence> ic, Direction direction) {
+		assert edge != null && edge.isValid();
+		iter = new IncidenceIteratorAtEdge(traversalContext, edge, ic,
+				direction);
 	}
 
 	/**
@@ -85,6 +155,8 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 		/**
 		 * Creates an Iterator over the {@link Incidence}s of <code>edge</code>.
 		 * 
+		 * @param traversalContext
+		 *            {@link Graph}
 		 * @param edge
 		 *            {@link Edge} which {@link Incidence}s should be iterated.
 		 * @param ic
@@ -92,9 +164,9 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
-		public IncidenceIteratorAtEdge(Edge edge,
+		public IncidenceIteratorAtEdge(Graph traversalContext, Edge edge,
 				Class<? extends Incidence> ic, Direction dir) {
-			super(edge, ic, dir);
+			super(traversalContext, edge, ic, dir);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -105,8 +177,9 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 				throw new NoSuchElementException();
 			}
 			I result = current;
-			current = (I) ((ic == null) ? current.getNextIncidenceAtEdge(dir)
-					: current.getNextIncidenceAtEdge(ic, dir));
+			current = (I) ((ic == null) ? current.getNextIncidenceAtEdge(
+					traversalContext, dir) : current.getNextIncidenceAtEdge(
+					traversalContext, ic, dir));
 			return result;
 		}
 

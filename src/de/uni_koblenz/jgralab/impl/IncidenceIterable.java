@@ -35,6 +35,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -77,6 +78,8 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 */
 		protected Direction dir;
 
+		protected Graph traversalContext;
+
 		/**
 		 * The version of the incidence list of the {@link GraphElement} at the
 		 * beginning of the iteration. This information is used to check if the
@@ -90,6 +93,8 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 * Creates an Iterator over the {@link Incidence}s of
 		 * <code>graphElement</code>.
 		 * 
+		 * @param traversalContext
+		 *            {@link Graph}
 		 * @param graphElement
 		 *            {@link GraphElement} which {@link Incidence}s should be
 		 *            iterated.
@@ -99,11 +104,14 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		@SuppressWarnings("unchecked")
-		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
+		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(
+				Graph traversalContext,
+				GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;
+			this.traversalContext = traversalContext;
 			incidenceListVersion = ((GraphElementImpl<OwnTypeClass, OwnType, DualType>) graphElement)
 					.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
