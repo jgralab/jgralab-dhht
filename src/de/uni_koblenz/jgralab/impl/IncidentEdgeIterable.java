@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
@@ -26,7 +27,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            {@link Vertex}
 	 */
 	public IncidentEdgeIterable(Vertex vertex) {
-		this(vertex, null, null);
+		this(vertex.getGraph().getTraversalContext(), vertex, null, null);
 	}
 
 	/**
@@ -39,7 +40,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            {@link Direction}
 	 */
 	public IncidentEdgeIterable(Vertex vertex, Direction direction) {
-		this(vertex, null, direction);
+		this(vertex.getGraph().getTraversalContext(), vertex, null, direction);
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            class or subclasses
 	 */
 	public IncidentEdgeIterable(Vertex vertex, Class<? extends Edge> ec) {
-		this(vertex, ec, null);
+		this(vertex.getGraph().getTraversalContext(), vertex, ec, null);
 	}
 
 	/**
@@ -72,7 +73,75 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	public IncidentEdgeIterable(Vertex vertex, Class<? extends Edge> ec,
 			Direction direction) {
 		assert vertex != null && vertex.isValid();
-		iter = new IncidentEdgeIterator(vertex, ec, direction);
+		iter = new IncidentEdgeIterator(
+				vertex.getGraph().getTraversalContext(), vertex, ec, direction);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Edge}s of
+	 * <code>vertex</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param vertex
+	 *            {@link Vertex}
+	 */
+	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex) {
+		this(traversalContext, vertex, null, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Edge}s of
+	 * <code>vertex</code> with the specified <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param vertex
+	 *            {@link Vertex}
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex,
+			Direction direction) {
+		this(traversalContext, vertex, null, direction);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Edge}s of
+	 * <code>vertex</code> which are instances of <code>ec</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param vertex
+	 *            {@link Vertex}
+	 * @param ec
+	 *            {@link Class} returned {@link Edge}s are restricted to that
+	 *            class or subclasses
+	 */
+	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex,
+			Class<? extends Edge> ec) {
+		this(traversalContext, vertex, ec, null);
+	}
+
+	/**
+	 * Creates an {@link Iterable} for all incident {@link Edge}s of
+	 * <code>vertex</code> which are instances of <code>ec</code> and with the
+	 * specified <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param vertex
+	 *            {@link Vertex}
+	 * @param ec
+	 *            {@link Class} returned {@link Edge}s are restricted to that
+	 *            class or subclasses
+	 * @param direction
+	 *            {@link Direction}
+	 */
+	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex,
+			Class<? extends Edge> ec, Direction direction) {
+		assert vertex != null && vertex.isValid();
+		iter = new IncidentEdgeIterator(traversalContext, vertex, ec, direction);
 	}
 
 	/**
@@ -88,6 +157,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 		 * Creates an Iterator over the incident {@link GraphElements}s of
 		 * <code>vertex</code>.
 		 * 
+		 * @param traversalContext
+		 *            {@link Graph}
 		 * @param vertex
 		 *            {@link Vertex} which {@link Incidence}s should be
 		 *            iterated.
@@ -96,9 +167,9 @@ public class IncidentEdgeIterable<E extends Edge> extends
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
-		public IncidentEdgeIterator(Vertex vertex, Class<? extends Edge> ec,
-				Direction dir) {
-			super(vertex, ec, dir);
+		public IncidentEdgeIterator(Graph traversalContext, Vertex vertex,
+				Class<? extends Edge> ec, Direction dir) {
+			super(traversalContext, vertex, ec, dir);
 			if (ec != null && current.getEdge().getM1Class().isInstance(ec)) {
 				setCurrentToNextIncidentGraphElement();
 			}
@@ -120,7 +191,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 		protected void setCurrentToNextIncidentGraphElement() {
 			while (current != null
 					&& !current.getEdge().getM1Class().isInstance(gc)) {
-				current = current.getNextIncidenceAtVertex(dir);
+				current = current.getNextIncidenceAtVertex(traversalContext,
+						dir);
 			}
 		}
 

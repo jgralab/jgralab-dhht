@@ -36,6 +36,7 @@ import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -93,10 +94,14 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 */
 		protected long incidenceListVersion;
 
+		protected Graph traversalContext;
+
 		/**
 		 * Creates an {@link Iterator} over the {@link Incidence}s of
 		 * <code>graphElement</code>.
 		 * 
+		 * @param traversalContext
+		 *            {@link Graph}
 		 * @param graphElement
 		 *            {@link GraphElement} which {@link Incidence}s should be
 		 *            iterated.
@@ -105,11 +110,13 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
-		public IncidentGraphElementIterator(GraphElement<?, ?, ?> graphElement,
+		public IncidentGraphElementIterator(Graph traversalContext,
+				GraphElement<?, ?, ?> graphElement,
 				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir) {
 			this.graphElement = graphElement;
 			this.gc = gc;
 			this.dir = dir;
+			this.traversalContext = traversalContext;
 			incidenceListVersion = ((GraphElementImpl<?, ?, ?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
