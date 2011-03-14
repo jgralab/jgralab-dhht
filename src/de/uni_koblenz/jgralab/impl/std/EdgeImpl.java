@@ -69,8 +69,7 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 		Edge nextEdge = nextEdgeInGraph;
 		if (nextEdge == null
 				|| !traversalContext.getContainingElement().containsElement(
-						this)) {
-			// all incidences belong to the same graph like this edge
+						nextEdge)) {
 			return null;
 		} else {
 			return nextEdge;
@@ -83,7 +82,7 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 		Edge previousEdge = prevEdgeInGraph;
 		if (previousEdge == null
 				|| !traversalContext.getContainingElement().containsElement(
-						this)) {
+						previousEdge)) {
 			// all incidences belong to the same graph like this edge
 			return null;
 		} else {
