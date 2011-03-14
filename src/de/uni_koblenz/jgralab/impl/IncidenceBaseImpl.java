@@ -62,6 +62,11 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	}
 
 	@Override
+	public Incidence getNextIncidenceAtEdge() {
+		return getNextIncidenceAtEdge(getGraph().getTraversalContext());
+	}
+
+	@Override
 	public Incidence getNextIncidenceAtEdge(Direction direction) {
 		Incidence i = getNextIncidenceAtEdge();
 		while ((i != null) && direction != null && direction != Direction.BOTH
@@ -159,6 +164,16 @@ public abstract class IncidenceBaseImpl implements Incidence {
 					.getNextIncidenceAtEdge(direction);
 		}
 		return null;
+	}
+
+	@Override
+	public Incidence getPreviousIncidenceAtEdge() {
+		return getPreviousIncidenceAtEdge(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Incidence getNextIncidenceAtVertex() {
+		return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 	}
 
 	@Override
@@ -262,6 +277,41 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	}
 
 	@Override
+	public Incidence getPreviousIncidenceAtVertex() {
+		return getPreviousIncidenceAtVertex(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Iterable<Edge> getThoseEdges() {
+		return getThoseEdges(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Iterable<Edge> getTheseEdges() {
+		return getTheseEdges(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Vertex getThis() {
+		return getThis(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Iterable<Vertex> getTheseVertices() {
+		return getTheseVertices(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Vertex getThat() {
+		return getThat(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Iterable<Vertex> getThoseVertices() {
+		return getThoseVertices(getGraph().getTraversalContext());
+	}
+
+	@Override
 	public boolean isBeforeAtVertex(Incidence i) {
 		assert i != null;
 		assert getGraph() == i.getGraph();
@@ -316,7 +366,7 @@ public abstract class IncidenceBaseImpl implements Incidence {
 		}
 		return next != null;
 	}
-	
+
 	@Override
 	public GraphClass getGraphClass() {
 		return getVertex().getGraphClass();
@@ -326,32 +376,35 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	public Schema getSchema() {
 		return getVertex().getSchema();
 	}
-	
+
 	@Override
 	public IncidenceType getThisSemantics() {
 		if (getEdge().isBinary()) {
 			return this.getType().getIncidenceType();
 		} else {
-			throw new UnsupportedOperationException("getThisSemantics() may be called only for incidences of binary edges");
+			throw new UnsupportedOperationException(
+					"getThisSemantics() may be called only for incidences of binary edges");
 		}
 	}
-	
+
 	@Override
 	public IncidenceType getThatSemantics() {
 		if (getEdge().isBinary()) {
 			return getThatIncidence().getType().getIncidenceType();
 		} else {
-			throw new UnsupportedOperationException("getThatSemantics() may be called only for incidences of binary edges");
+			throw new UnsupportedOperationException(
+					"getThatSemantics() may be called only for incidences of binary edges");
 		}
 	}
 
 	public Incidence getThatIncidence() {
 		if (getEdge().isBinary()) {
-			return getEdge().getFirstIncidence() == this ? getEdge().getFirstIncidence() : getEdge().getLastIncidence();
+			return getEdge().getFirstIncidence() == this ? getEdge()
+					.getFirstIncidence() : getEdge().getLastIncidence();
 		} else {
-			throw new UnsupportedOperationException("getThatIncidence() may be called only for incidences of binary edges");
+			throw new UnsupportedOperationException(
+					"getThatIncidence() may be called only for incidences of binary edges");
 		}
 	}
-
 
 }

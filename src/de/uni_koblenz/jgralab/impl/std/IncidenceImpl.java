@@ -157,66 +157,115 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtEdge() {
-		return nextIncidenceAtEdge;
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext) {
+		Incidence nextIncidence = nextIncidenceAtEdge;
+		if (nextIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						getEdge())) {
+			// all incidences belong to the same graph like the edge
+			return null;
+		} else {
+			return nextIncidence;
+		}
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtVertex() {
-		return nextIncidenceAtVertex;
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext) {
+		Incidence nextIncidence = nextIncidenceAtVertex;
+		if (nextIncidence == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				nextIncidence.getEdge())) {
+			return nextIncidence;
+		} else {
+			return nextIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtEdge() {
-		return previousIncidenceAtEdge;
+	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
+		Incidence previousIncidence = previousIncidenceAtEdge;
+		if (previousIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						getEdge())) {
+			// all incidences belong to the same graph like the edge
+			return null;
+		} else {
+			return previousIncidence;
+		}
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtVertex() {
-		return previousIncidenceAtVertex;
+	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
+		Incidence previousIncidence = previousIncidenceAtVertex;
+		if (previousIncidence == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				previousIncidence.getEdge())) {
+			return previousIncidence;
+		} else {
+			return previousIncidence
+					.getPreviousIncidenceAtVertex(traversalContext);
+		}
 	}
 
 	@Override
-	public Iterable<Edge> getTheseEdges() {
-		return incidentVertex.getIncidentEdges(direction);
+	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
+		return incidentVertex.getIncidentEdges(traversalContext, direction,
+				this);
 	}
 
 	@Override
-	public Iterable<Edge> getThoseEdges() {
+	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
 		return incidentVertex
-				.getIncidentEdges(direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-						: Direction.EDGE_TO_VERTEX);
+				.getIncidentEdges(
+						traversalContext,
+						direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+								: Direction.EDGE_TO_VERTEX, this);
 	}
 
 	@Override
-	public Vertex getThis() {
-		if (incidentEdge.isBinary()) {
+	public Vertex getThis(Graph traversalContext) {
+		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
+		} else if (getGraph().getTraversalContext().getContainingElement()
+				.containsElement(incidentVertex)) {
+			return incidentVertex;
+		} else {
+			return null;
 		}
-		return incidentVertex;
 	}
 
 	@Override
-	public Iterable<Vertex> getTheseVertices() {
-		return incidentEdge.getIncidentVertices(direction);
+	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
+		return incidentEdge.getIncidentVertices(traversalContext, direction,
+				this);
 	}
 
 	@Override
-	public Vertex getThat() {
+	public Vertex getThat(Graph traversalContext) {
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
 		}
-		return (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge).getOmega()
-				: ((BinaryEdge) incidentEdge).getAlpha();
+		Vertex vertex = (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge)
+				.getOmega() : ((BinaryEdge) incidentEdge).getAlpha();
+		if (getGraph().getTraversalContext().getContainingElement()
+				.containsElement(vertex)) {
+			return vertex;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
-	public Iterable<Vertex> getThoseVertices() {
+	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
 		return incidentEdge
-				.getIncidentVertices(direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-						: Direction.EDGE_TO_VERTEX);
+				.getIncidentVertices(
+						traversalContext,
+						direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+								: Direction.EDGE_TO_VERTEX, this);
 	}
 
 	@Override
