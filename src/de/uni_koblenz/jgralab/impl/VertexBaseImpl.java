@@ -453,6 +453,12 @@ public abstract class VertexBaseImpl extends
 		return new IncidentEdgeIterable<Edge>(traversalContext, this, direction);
 	}
 
+	public Iterable<Edge> getIncidentEdges(Graph traversalContext,
+			Direction direction, Incidence ignoredIncidence) {
+		return new IncidentEdgeIterable<Edge>(traversalContext, this,
+				direction, ignoredIncidence);
+	}
+
 	@Override
 	public Iterable<Edge> getIncidentEdges(Graph traversalContext,
 			EdgeClass anEdgeClass) {

@@ -466,6 +466,12 @@ public abstract class EdgeBaseImpl extends
 				direction);
 	}
 
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Direction direction, Incidence ignoredIncidence) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				direction, ignoredIncidence);
+	}
+
 	@Override
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
 			VertexClass aVertexClass) {

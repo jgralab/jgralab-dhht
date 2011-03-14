@@ -70,6 +70,11 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		protected Incidence current = null;
 
 		/**
+		 * This incidence is ignored during iteration.
+		 */
+		protected Incidence ignoredIncidence = null;
+
+		/**
 		 * {@link GraphElement} which incident {@link GraphElement}s are
 		 * iterated.
 		 */
@@ -112,11 +117,13 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 */
 		public IncidentGraphElementIterator(Graph traversalContext,
 				GraphElement<?, ?, ?> graphElement,
-				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir) {
+				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir,
+				Incidence ignoredIncidence) {
 			this.graphElement = graphElement;
 			this.gc = gc;
 			this.dir = dir;
 			this.traversalContext = traversalContext;
+			this.ignoredIncidence = ignoredIncidence;
 			incidenceListVersion = ((GraphElementImpl<?, ?, ?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
