@@ -28,7 +28,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Edge}
 	 */
 	public IncidentVertexIterable(Edge edge) {
-		this(edge.getGraph().getTraversalContext(), edge, null, null, null);
+		this(edge.getGraph().getTraversalContext(), edge, null, null);
 	}
 
 	/**
@@ -42,23 +42,6 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 */
 	public IncidentVertexIterable(Edge edge, Direction direction) {
 		this(edge.getGraph().getTraversalContext(), edge, null, direction);
-	}
-
-	/**
-	 * Creates an {@link Iterable} for all incident {@link Vertex} of
-	 * <code>edge</code> with the specified <code>direction</code>.
-	 * 
-	 * @param edge
-	 *            {@link Edge}
-	 * @param direction
-	 *            {@link Direction}
-	 * @param ignoredIncidence
-	 *            {@link Incidence} which is ignored during iteration
-	 */
-	public IncidentVertexIterable(Edge edge, Direction direction,
-			Incidence ignoredIncidence) {
-		this(edge.getGraph().getTraversalContext(), edge, null, direction,
-				ignoredIncidence);
 	}
 
 	/**
@@ -92,8 +75,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 			Direction direction) {
 		assert edge != null && edge.isValid();
 		iter = new IncidentVertexIterator(
-				edge.getGraph().getTraversalContext(), edge, vc, direction,
-				null);
+				edge.getGraph().getTraversalContext(), edge, vc, direction);
 	}
 
 	/**
@@ -106,7 +88,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Edge}
 	 */
 	public IncidentVertexIterable(Graph traversalContext, Edge edge) {
-		this(traversalContext, edge, null, null, null);
+		this(traversalContext, edge, null, null);
 	}
 
 	/**
@@ -123,24 +105,6 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
 			Direction direction) {
 		this(traversalContext, edge, null, direction);
-	}
-
-	/**
-	 * Creates an {@link Iterable} for all incident {@link Vertex} of
-	 * <code>edge</code> with the specified <code>direction</code>.
-	 * 
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param edge
-	 *            {@link Edge}
-	 * @param direction
-	 *            {@link Direction}
-	 * @param ignoredIncidence
-	 *            {@link Incidence} which is ignored during iteration
-	 */
-	public IncidentVertexIterable(Graph traversalContext, Edge edge,
-			Direction direction, Incidence ignoredIncidence) {
-		this(traversalContext, edge, null, direction, ignoredIncidence);
 	}
 
 	/**
@@ -178,33 +142,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
 			Class<? extends Vertex> vc, Direction direction) {
 		assert edge != null && edge.isValid();
-		iter = new IncidentVertexIterator(traversalContext, edge, vc,
-				direction, null);
-	}
-
-	/**
-	 * Creates an {@link Iterable} for all incident {@link Vertex} of
-	 * <code>edge</code> which are instances of <code>vc</code> and with the
-	 * specified <code>direction</code>.
-	 * 
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param edge
-	 *            {@link Edge}
-	 * @param vc
-	 *            {@link Class} returned {@link Vertex} are restricted to that
-	 *            class or subclasses
-	 * @param direction
-	 *            {@link Direction}
-	 * @param ignoredIncidence
-	 *            {@link Incidence} which is ignored during iteration
-	 */
-	public IncidentVertexIterable(Graph traversalContext, Edge edge,
-			Class<? extends Vertex> vc, Direction direction,
-			Incidence ignoredIncidence) {
-		assert edge != null && edge.isValid();
-		iter = new IncidentVertexIterator(traversalContext, edge, vc,
-				direction, ignoredIncidence);
+		iter = new IncidentVertexIterator(traversalContext, edge, vc, direction);
 	}
 
 	/**
@@ -228,13 +166,10 @@ public class IncidentVertexIterable<V extends Vertex> extends
 		 *            {@link Class} only instances of this class are returned.
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
-		 * @param ignoredIncidence
-		 *            {@link Incidence} which is ignored during iteration
 		 */
 		public IncidentVertexIterator(Graph traversalContext, Edge edge,
-				Class<? extends Vertex> vc, Direction dir,
-				Incidence ignoredIncidence) {
-			super(traversalContext, edge, vc, dir, ignoredIncidence);
+				Class<? extends Vertex> vc, Direction dir) {
+			super(traversalContext, edge, vc, dir);
 			if (vc != null && current.getVertex().getM1Class().isInstance(vc)) {
 				setCurrentToNextIncidentGraphElement();
 			}
@@ -255,8 +190,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 		@Override
 		protected void setCurrentToNextIncidentGraphElement() {
 			while (current != null
-					&& !current.getVertex().getM1Class().isInstance(gc)
-					&& current == ignoredIncidence) {
+					&& !current.getVertex().getM1Class().isInstance(gc)) {
 				current = current.getNextIncidenceAtEdge(traversalContext, dir);
 			}
 		}
