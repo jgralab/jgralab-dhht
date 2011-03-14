@@ -211,12 +211,16 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
+		assert getGraph().getTraversalContext().getContainingElement()
+				.containsElement(incidentVertex);
 		return incidentVertex.getIncidentEdges(traversalContext, direction,
 				this);
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
+		assert getGraph().getTraversalContext().getContainingElement()
+				.containsElement(incidentVertex);
 		return incidentVertex
 				.getIncidentEdges(
 						traversalContext,
@@ -239,6 +243,8 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
+		assert getGraph().getTraversalContext().getContainingElement()
+				.containsElement(incidentEdge);
 		return incidentEdge.getIncidentVertices(traversalContext, direction,
 				this);
 	}
@@ -261,6 +267,8 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
+		assert getGraph().getTraversalContext().getContainingElement()
+				.containsElement(incidentEdge);
 		return incidentEdge
 				.getIncidentVertices(
 						traversalContext,
