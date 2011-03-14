@@ -808,6 +808,17 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Vertex getThis();
 
 	/**
+	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Vertex}
+	 * @throws UnsupportedOpperationException
+	 *             if {@link Incidence#getEdge()} is not binary.
+	 */
+	public Vertex getThis(Graph traversalContext);
+
+	/**
 	 * Returns a sequence of all vertices, which are connected to
 	 * {@link Incidence#getEdge()} via an {@link Incidence} of the same
 	 * direction as this one.
@@ -836,6 +847,18 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
 	public Vertex getThat();
+
+	/**
+	 * Returns the {@link Vertex} which is at the other end of a binary
+	 * {@link Edge}.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Vertex}
+	 * @throws UnsupportedOpperationException
+	 *             if {@link Incidence#getEdge()} is not binary.
+	 */
+	public Vertex getThat(Graph traversalContext);
 
 	/**
 	 * Returns a sequence of all vertices, which are connected to
