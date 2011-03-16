@@ -82,7 +82,10 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * The kappa value, which represents the highest level in which this
 	 * {@link GraphElement} is visible.
 	 */
-	private int kappa = 0; // TODO determine default value
+	private int kappa = DEFAULT_KAPPA_VALUE;
+
+	// TODO determine default value
+	private static final int DEFAULT_KAPPA_VALUE = Integer.MAX_VALUE;
 
 	private GraphElementImpl<?, ?, ?> parent;
 
@@ -479,14 +482,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public void addSubordinateElement(Vertex appendix) {
 		appendix.putAfter(getSubordinateGraph().getLastVertex());
-		((GraphElementImpl<?, ?, ?>) appendix).setKappa(getKappa() + 1);
+		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
 	}
 
 	@Override
 	public void addSubordinateElement(Edge appendix) {
 		appendix.putAfter(getSubordinateGraph().getLastEdge());
-		((GraphElementImpl<?, ?, ?>) appendix).setKappa(getKappa() + 1);
+		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
 	}
 
@@ -503,7 +506,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	/**
-	 * Sets {@link #kappa} to <code>kappa</code>.
+	 * Sets {@link #kappa} only of this {@link GraphElement} to
+	 * <code>kappa</code>.
 	 * 
 	 * @param kappa
 	 *            <b>int</b>
@@ -512,5 +516,25 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
 		this.kappa = kappa;
+	}
+
+	/**
+	 * Sets the {@link #kappa} value to <code>kappa</code> and adapts the kappa
+	 * values of all child {@link GraphElement}s of this {@link GraphElement}.
+	 * 
+	 * @param kappa
+	 *            <b>int</b>
+	 */
+	private void setAllKappas(int kappa) {
+		int kappaDifference = getKappa() - kappa;
+		setKappa(kappa);
+		for (Vertex v : getSubordinateGraph().getVertices()) {
+			((GraphElementImpl<?, ?, ?>) v).setKappa(v.getKappa()
+					- kappaDifference);
+		}
+		for (Edge e : getSubordinateGraph().getEdges()) {
+			((GraphElementImpl<?, ?, ?>) e).setKappa(e.getKappa()
+					- kappaDifference);
+		}
 	}
 }
