@@ -82,7 +82,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * The kappa value, which represents the highest level in which this
 	 * {@link GraphElement} is visible.
 	 */
-	private final int kappa = 0; // TODO determine default value
+	private int kappa = 0; // TODO determine default value
 
 	private GraphElementImpl<?, ?, ?> parent;
 
@@ -475,4 +475,42 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            order.
 	 */
 	public abstract void sortIncidences(Comparator<Incidence> comp);
+
+	@Override
+	public void addSubordinateElement(Vertex appendix) {
+		appendix.putAfter(getSubordinateGraph().getLastVertex());
+		((GraphElementImpl<?, ?, ?>) appendix).setKappa(getKappa() + 1);
+		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+	}
+
+	@Override
+	public void addSubordinateElement(Edge appendix) {
+		appendix.putAfter(getSubordinateGraph().getLastEdge());
+		((GraphElementImpl<?, ?, ?>) appendix).setKappa(getKappa() + 1);
+		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+	}
+
+	/**
+	 * Sets {@link #parent} to <code>parent</code>.
+	 * 
+	 * @param parent
+	 *            {@link GraphElementImpl}
+	 */
+	private void setParent(GraphElementImpl<?, ?, ?> parent) {
+		assert parent != null;
+		assert getType().getAllowedSigmaClasses().contains(parent.getType());
+		this.parent = parent;
+	}
+
+	/**
+	 * Sets {@link #kappa} to <code>kappa</code>.
+	 * 
+	 * @param kappa
+	 *            <b>int</b>
+	 */
+	public void setKappa(int kappa) {
+		assert getType().getAllowedMaxKappa() >= kappa
+				&& getType().getAllowedMinKappa() <= kappa;
+		this.kappa = kappa;
+	}
 }

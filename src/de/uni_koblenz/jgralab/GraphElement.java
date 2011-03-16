@@ -1300,4 +1300,22 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			DualType elemToConnect);
+
+	/**
+	 * Adds <code>appendix</code> to the subordinate graph of this
+	 * {@link GraphElement}.
+	 * 
+	 * @param appendix
+	 *            {@link Vertex}
+	 */
+	public void addSubordinateElement(Vertex appendix);
+
+	/**
+	 * Adds <code>appendix</code> to the subordinate graph of this
+	 * {@link GraphElement}.
+	 * 
+	 * @param appendix
+	 *            {@link Edge}
+	 */
+	public void addSubordinateElement(Edge appendix);
 }
