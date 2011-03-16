@@ -31,10 +31,13 @@
 package de.uni_koblenz.jgralab.impl.std;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -83,6 +86,12 @@ public abstract class GraphImpl extends
 	 * of a composition "parent".
 	 */
 	private List<VertexBaseImpl> deleteVertexList;
+
+	/**
+	 * Stores the traversal context of each {@link Thread} working on this
+	 * {@link Graph}.
+	 */
+	private HashMap<Thread, Stack<Graph>> traversalContext;
 
 	@Override
 	protected VertexBaseImpl[] getVertex() {
@@ -219,59 +228,100 @@ public abstract class GraphImpl extends
 		super(id, cls);
 	}
 
-//	@Override
-//	public void abort() {
-//		throw new UnsupportedOperationException(
-//				"Abort is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public void commit() {
-//		throw new UnsupportedOperationException(
-//				"Commit is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public Transaction newReadOnlyTransaction() {
-//		throw new UnsupportedOperationException(
-//				"Creation of read-only-transactions is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public Transaction newTransaction() {
-//		throw new UnsupportedOperationException(
-//				"Creation of read-write-transactions is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public Savepoint defineSavepoint() {
-//		throw new UnsupportedOperationException(
-//				"Definition of save-points is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public Transaction getCurrentTransaction() {
-//		throw new UnsupportedOperationException(
-//				"Transactions are not supported for this graph.");
-//	}
-//
-//	@Override
-//	public void restoreSavepoint(Savepoint savepoint) {
-//		throw new UnsupportedOperationException(
-//				"Definition of save-points is not supported for this graph.");
-//	}
-//
-//	@Override
-//	public void setCurrentTransaction(Transaction transaction) {
-//		throw new UnsupportedOperationException(
-//				"Transactions are not supported for this graph.");
-//	}
-//
-//	@Override
-//	public boolean isInConflict() {
-//		throw new UnsupportedOperationException(
-//				"Transactions are not supported for this graph.");
-//	}
+	// @Override
+	// public void abort() {
+	// throw new UnsupportedOperationException(
+	// "Abort is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public void commit() {
+	// throw new UnsupportedOperationException(
+	// "Commit is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public Transaction newReadOnlyTransaction() {
+	// throw new UnsupportedOperationException(
+	// "Creation of read-only-transactions is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public Transaction newTransaction() {
+	// throw new UnsupportedOperationException(
+	// "Creation of read-write-transactions is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public Savepoint defineSavepoint() {
+	// throw new UnsupportedOperationException(
+	// "Definition of save-points is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public Transaction getCurrentTransaction() {
+	// throw new UnsupportedOperationException(
+	// "Transactions are not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public void restoreSavepoint(Savepoint savepoint) {
+	// throw new UnsupportedOperationException(
+	// "Definition of save-points is not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public void setCurrentTransaction(Transaction transaction) {
+	// throw new UnsupportedOperationException(
+	// "Transactions are not supported for this graph.");
+	// }
+	//
+	// @Override
+	// public boolean isInConflict() {
+	// throw new UnsupportedOperationException(
+	// "Transactions are not supported for this graph.");
+	// }
+
+	@Override
+	public void setTraversalContext(Graph traversalContext) {
+		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		if (stack == null) {
+			stack = new Stack<Graph>();
+			this.traversalContext.put(Thread.currentThread(), stack);
+		}
+		stack.add(traversalContext);
+	}
+
+	@Override
+	public Graph getTraversalContext() {
+		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		if (stack == null || stack.isEmpty()) {
+			return this;
+		} else {
+			return stack.peek();
+		}
+	}
+
+	@Override
+	public void useAsTraversalContext() {
+		setTraversalContext(this);
+	}
+
+	@Override
+	public void releaseTraversalContext() {
+		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		if (stack != null) {
+			stack.pop();
+			if (stack.isEmpty()) {
+				traversalContext.remove(Thread.currentThread());
+			}
+		}
+	}
+
+	@Override
+	public Graph getCompleteGraph() {
+		return this;
+	}
 
 	@Override
 	protected int allocateVertexIndex(int currentId) {
@@ -332,9 +382,9 @@ public abstract class GraphImpl extends
 	public final boolean hasSavememSupport() {
 		return false;
 	}
-	
+
 	@Override
-	public final boolean hasDatabaseSupport(){
+	public final boolean hasDatabaseSupport() {
 		return false;
 	}
 
@@ -413,7 +463,6 @@ public abstract class GraphImpl extends
 		return record;
 	}
 
-
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
@@ -431,7 +480,5 @@ public abstract class GraphImpl extends
 	protected void addEdge(Edge newEdge) {
 		super.addEdge(newEdge);
 	}
-	
 
-	
 }

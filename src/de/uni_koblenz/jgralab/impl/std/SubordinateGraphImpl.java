@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -66,6 +67,7 @@ public abstract class SubordinateGraphImpl extends
 	private EdgeBaseImpl firstEdge;
 	private EdgeBaseImpl lastEdge;
 	private GraphElement<?, ?, ?> containingElement;
+	private Graph completeGraph;
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -280,6 +282,11 @@ public abstract class SubordinateGraphImpl extends
 	// throw new UnsupportedOperationException(
 	// "Transactions are not supported for this graph.");
 	// }
+
+	@Override
+	public Graph getCompleteGraph() {
+		return completeGraph;
+	}
 
 	@Override
 	protected int allocateVertexIndex(int currentId) {

@@ -225,7 +225,6 @@ public abstract class GraphBaseImpl implements Graph {
 					internalSetDefaultValue(attr);
 				}
 			} catch (GraphIOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -276,6 +275,26 @@ public abstract class GraphBaseImpl implements Graph {
 		setFirstEdge(null);
 		setLastEdge(null);
 		setECount(0);
+	}
+
+	@Override
+	public void setTraversalContext(Graph traversalContext) {
+		getCompleteGraph().setTraversalContext(traversalContext);
+	}
+
+	@Override
+	public Graph getTraversalContext() {
+		return getCompleteGraph().getTraversalContext();
+	}
+
+	@Override
+	public void useAsTraversalContext() {
+		getCompleteGraph().useAsTraversalContext();
+	}
+
+	@Override
+	public void releaseTraversalContext() {
+		getCompleteGraph().releaseTraversalContext();
 	}
 
 	/**
