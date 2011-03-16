@@ -59,6 +59,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public GraphElement<?, ?, ?> getContainingElement();
 
 	/**
+	 * TODO check with distributed graphs (there exists already a method with
+	 * this name
+	 * 
 	 * @return {@link Graph} the complete {@link Graph}
 	 */
 	public Graph getCompleteGraph();

@@ -70,6 +70,20 @@ public class SubordinateGraphImpl extends
 	private final GraphElement<?, ?, ?> containingElement;
 
 	/**
+	 * Holds the version of the vertex sequence. For every modification (e.g.
+	 * adding/deleting a vertex or changing the vertex sequence) this version
+	 * number is increased by 1. It is set to 0 when the graph is loaded.
+	 */
+	private long vertexListVersion;
+
+	/**
+	 * Holds the version of the edge sequence. For every modification (e.g.
+	 * adding/deleting an edge or changing the edge sequence) this version
+	 * number is increased by 1. It is set to 0 when the graph is loaded.
+	 */
+	private long edgeListVersion;
+
+	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
 	 * of a composition "parent".
 	 */

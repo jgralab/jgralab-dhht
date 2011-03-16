@@ -297,6 +297,11 @@ public abstract class GraphBaseImpl implements Graph {
 		getCompleteGraph().releaseTraversalContext();
 	}
 
+	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
+			GraphElement<?, ?, ?> child) {
+
+	}
+
 	/**
 	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
 	 * otherwise the edges current id is used if possible. Should only be used

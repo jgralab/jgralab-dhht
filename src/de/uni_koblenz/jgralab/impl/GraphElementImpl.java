@@ -481,6 +481,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Vertex appendix) {
+		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastVertex());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
@@ -488,6 +489,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Edge appendix) {
+		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastEdge());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
@@ -536,5 +538,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			((GraphElementImpl<?, ?, ?>) e).setKappa(e.getKappa()
 					- kappaDifference);
 		}
+	}
+
+	/**
+	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
+	 */
+	boolean isSubordinateGraphObjectAlreadyCreated() {
+		return subOrdinateGraph != null;
 	}
 }
