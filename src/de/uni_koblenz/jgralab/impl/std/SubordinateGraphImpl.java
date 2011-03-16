@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
@@ -51,12 +53,11 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 
 /**
  * The implementation of a <code>SubordninateGraph</code> accessing attributes
- * without versioning. TODO just copied from GraphImpl to use it in other
- * classes
+ * without versioning.
  * 
- * @author Jose Monte(monte@uni-koblenz.de)
+ * @author ist@uni-koblenz.de
  */
-public abstract class SubordinateGraphImpl extends
+public class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
 	private VertexBaseImpl[] vertex;
 	private int vCount;
@@ -66,22 +67,7 @@ public abstract class SubordinateGraphImpl extends
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
 	private EdgeBaseImpl lastEdge;
-	private GraphElement<?, ?, ?> containingElement;
-	private Graph completeGraph;
-
-	/**
-	 * Holds the version of the vertex sequence. For every modification (e.g.
-	 * adding/deleting a vertex or changing the vertex sequence) this version
-	 * number is increased by 1. It is set to 0 when the graph is loaded.
-	 */
-	private long vertexListVersion;
-
-	/**
-	 * Holds the version of the edge sequence. For every modification (e.g.
-	 * adding/deleting an edge or changing the edge sequence) this version
-	 * number is increased by 1. It is set to 0 when the graph is loaded.
-	 */
-	private long edgeListVersion;
+	private final GraphElement<?, ?, ?> containingElement;
 
 	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
@@ -96,137 +82,152 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	protected VertexBaseImpl[] getVertex() {
+		// TODO
 		return vertex;
 	}
 
 	@Override
 	public int getVCount() {
+		// TODO
 		return vCount;
 	}
 
 	@Override
 	protected EdgeBaseImpl[] getEdge() {
+		// TODO
 		return edge;
 	}
 
 	@Override
 	public int getECount() {
+		// TODO
 		return eCount;
 	}
 
 	@Override
 	public Vertex getFirstVertex() {
+		// TODO
 		return firstVertex;
 	}
 
 	@Override
 	public Vertex getLastVertex() {
+		// TODO
 		return lastVertex;
 	}
 
 	@Override
 	public Edge getFirstEdge() {
+		// TODO
 		return firstEdge;
 	}
 
 	@Override
 	public Edge getLastEdge() {
+		// TODO
 		return lastEdge;
 	}
 
 	@Override
 	protected FreeIndexList getFreeVertexList() {
+		// TODO
 		return freeVertexList;
 	}
 
 	@Override
 	protected FreeIndexList getFreeEdgeList() {
+		// TODO
 		return freeEdgeList;
 	}
 
 	@Override
 	protected void setVertex(VertexBaseImpl[] vertex) {
+		// TODO
 		this.vertex = vertex;
 	}
 
 	@Override
 	protected void setVCount(int count) {
+		// TODO
 		vCount = count;
 	}
 
 	@Override
 	protected void setEdge(EdgeBaseImpl[] edge) {
+		// TODO
 		this.edge = edge;
 	}
 
 	@Override
 	protected void setECount(int count) {
+		// TODO
 		eCount = count;
 	}
 
 	@Override
 	protected void setFirstVertex(VertexBaseImpl firstVertex) {
+		// TODO
 		this.firstVertex = firstVertex;
 	}
 
 	@Override
 	protected void setLastVertex(VertexBaseImpl lastVertex) {
+		// TODO
 		this.lastVertex = lastVertex;
 	}
 
 	@Override
 	protected void setFirstEdge(EdgeBaseImpl firstEdge) {
+		// TODO
 		this.firstEdge = firstEdge;
 	}
 
 	@Override
 	protected void setLastEdge(EdgeBaseImpl lastEdge) {
+		// TODO
 		this.lastEdge = lastEdge;
 	}
 
 	@Override
 	protected List<VertexBaseImpl> getDeleteVertexList() {
+		// TODO
 		return deleteVertexList;
 	}
 
 	@Override
 	protected void setDeleteVertexList(List<VertexBaseImpl> deleteVertexList) {
+		// TODO
 		this.deleteVertexList = deleteVertexList;
 	}
 
 	@Override
 	protected void setVertexListVersion(long vertexListVersion) {
-		this.vertexListVersion = vertexListVersion;
 	}
 
 	@Override
 	public long getVertexListVersion() {
-		return vertexListVersion;
+		return containingElement.getGraph().getVertexListVersion();
 	}
 
 	@Override
 	protected void setEdgeListVersion(long edgeListVersion) {
-		this.edgeListVersion = edgeListVersion;
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		return edgeListVersion;
+		return containingElement.getGraph().getEdgeListVersion();
 	}
 
 	/**
+	 * TODO GraphClass = containingElement.getType()
 	 * 
-	 * @param id
-	 * @param cls
-	 * @param max
-	 * @param max2
+	 * @param containingElement
+	 *            {@link GraphElement} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(String id, GraphClass cls, int max, int max2) {
-		super(id, cls, max, max2);
-	}
-
-	protected SubordinateGraphImpl(String id, GraphClass cls) {
-		super(id, cls);
+	protected SubordinateGraphImpl(GraphElement<?, ?, ?> containingElement) {
+		super(containingElement.getGraph().getId(), containingElement
+				.getGraph().getType());
+		this.containingElement = containingElement;
 	}
 
 	// @Override
@@ -285,11 +286,12 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public Graph getCompleteGraph() {
-		return completeGraph;
+		return containingElement.getGraph();
 	}
 
 	@Override
 	protected int allocateVertexIndex(int currentId) {
+		// TODO
 		int vId = freeVertexList.allocateIndex();
 		if (vId == 0) {
 			expandVertexArray(getExpandedVertexCount());
@@ -300,6 +302,7 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	protected int allocateEdgeIndex(int currentId) {
+		// TODO
 		int eId = freeEdgeList.allocateIndex();
 		if (eId == 0) {
 			expandEdgeArray(getExpandedEdgeCount());
@@ -315,135 +318,183 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	protected void freeEdgeIndex(int index) {
+		// TODO
 		freeEdgeList.freeIndex(index);
 	}
 
 	@Override
 	protected void freeVertexIndex(int index) {
+		// TODO
 		freeVertexList.freeIndex(index);
 	}
 
 	@Override
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
-
+		// TODO
 	}
 
 	@Override
 	protected void edgeAfterDeleted(Edge edgeToBeDeleted) {
-
+		// TODO
 	}
 
 	@Override
 	public final boolean hasStandardSupport() {
-		return true;
+		return containingElement.getGraph().hasStandardSupport();
 	}
 
 	@Override
 	public final boolean hasTransactionSupport() {
-		return false;
+		return containingElement.getGraph().hasTransactionSupport();
 	}
 
 	@Override
 	public final boolean hasSavememSupport() {
-		return false;
+		return containingElement.getGraph().hasSavememSupport();
 	}
 
 	@Override
 	public final boolean hasDatabaseSupport() {
-		return false;
+		return containingElement.getGraph().hasDatabaseSupport();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList() {
-		return new JGraLabListImpl<T>();
+		return containingElement.getGraph().createList();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return new JGraLabListImpl<T>(collection);
+		return containingElement.getGraph().createList(collection);
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return new JGraLabListImpl<T>(initialCapacity);
+		return containingElement.getGraph().createList(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		return new JGraLabSetImpl<T>();
+		return containingElement.getGraph().createSet();
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return new JGraLabSetImpl<T>(collection);
+		return containingElement.getGraph().createSet(collection);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return new JGraLabSetImpl<T>(initialCapacity);
+		return containingElement.getGraph().createSet(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
+		return containingElement.getGraph().createSet(initialCapacity,
+				loadFactor);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		return new JGraLabMapImpl<K, V>();
+		return containingElement.getGraph().createMap();
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return new JGraLabMapImpl<K, V>(map);
+		return containingElement.getGraph().createMap(map);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return new JGraLabMapImpl<K, V>(initialCapacity);
+		return containingElement.getGraph().createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		return new JGraLabMapImpl<K, V>(initialCapacity, loadFactor);
+		return containingElement.getGraph().createMap(initialCapacity,
+				loadFactor);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, this);
-		try {
-			record.readComponentValues(io);
-		} catch (GraphIOException e) {
-			e.printStackTrace();
-		}
-		return record;
+		return containingElement.getGraph().createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, this);
-		record.setComponentValues(fields);
-		return record;
+		return containingElement.getGraph().createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		T record = graphFactory.createRecord(recordClass, this);
-		record.setComponentValues(components);
-		return record;
+		return containingElement.getGraph().createRecord(recordClass,
+				components);
 	}
 
 	@Override
 	protected void addVertex(Vertex newVertex) {
+		// TODO Auto-generated method stub
 		super.addVertex(newVertex);
 	}
 
 	@Override
 	protected void addEdge(Edge newEdge) {
+		// TODO Auto-generated method stub
 		super.addEdge(newEdge);
+	}
+
+	@Override
+	public Graph getView(int kappa) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void readAttributeValueFromString(String attributeName, String value)
+			throws GraphIOException, NoSuchAttributeException {
+		readAttributeValueFromString(attributeName, value);
+	}
+
+	@Override
+	public String writeAttributeValueToString(String attributeName)
+			throws IOException, GraphIOException, NoSuchAttributeException {
+		return containingElement.getGraph().writeAttributeValueToString(
+				attributeName);
+	}
+
+	@Override
+	public void writeAttributeValues(GraphIO io) throws IOException,
+			GraphIOException {
+		containingElement.getGraph().writeAttributeValues(io);
+	}
+
+	@Override
+	public void readAttributeValues(GraphIO io) throws GraphIOException {
+		containingElement.getGraph().readAttributeValues(io);
+	}
+
+	@Override
+	public Object getAttribute(String name) throws NoSuchAttributeException {
+		return containingElement.getGraph().getAttribute(name);
+	}
+
+	@Override
+	public void setAttribute(String name, Object data)
+			throws NoSuchAttributeException {
+		containingElement.getGraph().setAttribute(name, data);
+	}
+
+	@Override
+	public Class<? extends Graph> getM1Class() {
+		return containingElement.getGraph().getM1Class();
+	}
+
+	@Override
+	public GraphClass getType() {
+		return containingElement.getGraph().getType();
 	}
 
 }
