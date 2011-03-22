@@ -505,5 +505,6 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 
 		((EdgeImpl) getEdge()).incidenceListModified();
 	}
+	
 
 }

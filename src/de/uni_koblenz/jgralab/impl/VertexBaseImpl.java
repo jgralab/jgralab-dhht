@@ -687,9 +687,7 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public int compareTo(Vertex a) {
-		assert a instanceof Vertex;
-		Vertex v = a;
+	public int compareTo(Vertex v) {
 		assert isValid() && v.isValid();
 		assert getGraph() == v.getGraph();
 		return getId() - v.getId();
@@ -1023,25 +1021,25 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public List<? extends Vertex> adjacences(String role) {
-		return adjacences(graph.getTraversalContext(),
+	public List<? extends Vertex> getAdjacences(String role) {
+		return getAdjacences(graph.getTraversalContext(),
 				getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public List<? extends Vertex> adjacences(IncidenceClass ic) {
+	public List<? extends Vertex> getAdjacences(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return adjacences(graph.getTraversalContext(), ic);
+		return getAdjacences(graph.getTraversalContext(), ic);
 	}
 
 	@Override
-	public List<? extends Vertex> adjacences(Graph traversalContext, String role) {
-		return adjacences(getIncidenceClassForRolename(role));
+	public List<? extends Vertex> getAdjacences(Graph traversalContext, String role) {
+		return getAdjacences(getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public List<? extends Vertex> adjacences(Graph traversalContext,
+	public List<? extends Vertex> getAdjacences(Graph traversalContext,
 			IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();

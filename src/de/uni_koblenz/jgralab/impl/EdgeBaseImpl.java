@@ -715,10 +715,8 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public int compareTo(Edge a) {
-		assert a != null;
-		assert a instanceof Edge;
-		Edge e = a;
+	public int compareTo(Edge e) {
+		assert e != null;
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
@@ -1051,23 +1049,23 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public List<? extends Edge> adjacences(String role) {
-		return adjacences(getGraph().getTraversalContext(),
+	public List<? extends Edge> getAdjacences(String role) {
+		return getAdjacences(getGraph().getTraversalContext(),
 				getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public List<? extends Edge> adjacences(IncidenceClass ic) {
-		return adjacences(getGraph().getTraversalContext(), ic);
+	public List<? extends Edge> getAdjacences(IncidenceClass ic) {
+		return getAdjacences(getGraph().getTraversalContext(), ic);
 	}
 
 	@Override
-	public List<? extends Edge> adjacences(Graph traversalContext, String role) {
-		return adjacences(traversalContext, getIncidenceClassForRolename(role));
+	public List<? extends Edge> getAdjacences(Graph traversalContext, String role) {
+		return getAdjacences(traversalContext, getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public List<? extends Edge> adjacences(Graph traversalContext,
+	public List<? extends Edge> getAdjacences(Graph traversalContext,
 			IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();

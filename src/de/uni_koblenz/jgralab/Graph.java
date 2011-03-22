@@ -888,4 +888,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *         <code>GraphStructureChangedListener</code>s
 	 */
 	public int getGraphStructureChangedListenerCount();
+
+	/**
+	 * @return the next free incidence id
+	 */
+	int getNextIncidenceID();
 }

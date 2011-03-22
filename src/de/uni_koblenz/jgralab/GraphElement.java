@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.Remote;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.impl.GraphElementImpl;
@@ -1027,7 +1028,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> adjacences(String role);
+	public List<? extends OwnType> getAdjacences(String role);
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1040,7 +1041,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> adjacences(IncidenceClass ic);
+	public List<? extends OwnType> getAdjacences(IncidenceClass ic);
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1055,7 +1056,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> adjacences(Graph traversalConext, String role);
+	public List<? extends OwnType> getAdjacences(Graph traversalConext, String role);
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1070,7 +1071,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> adjacences(Graph traversalConext,
+	public List<? extends OwnType> getAdjacences(Graph traversalConext,
 			IncidenceClass ic);
 
 	/**
@@ -1109,43 +1110,20 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 			IncidenceClass adjacentIc, OwnType other);
 
 	/**
-	 * Creates and returns a new instance of <code>DualType</code> connected to
-	 * <code>this</code> and <code>other</code> via instances of
-	 * {@link IncidenceClass}es which correspond to <code>incidentRole</code>
-	 * and <code>adjacentRole</code>.
-	 * 
-	 * @see #addAdjacence(IncidenceClass, IncidenceClass, Object)
-	 * @see #getIncidenceClassForRolename(String)
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param incidentRole
-	 *            {@link String}
-	 * @param adjacentRole
-	 *            {@link String}
-	 * @param other
-	 *            <code>OwnType</code>
-	 * @return <code>DualType</code>
+	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * the above method should add the newly created element to the subgraph both
+	 * connected elements belong to
 	 */
-	public DualType addAdjacence(Graph traversalContext, String incidentRole,
-			String adjacentRole, OwnType other);
+	//public DualType addAdjacence(Graph traversalContext, String incidentRole,
+	//		String adjacentRole, OwnType other);
 
 	/**
-	 * Creates and returns a new <code>DualType</code> instance, which is
-	 * connected to <code>this</code> via an instance of <code>incidentIc</code>
-	 * and to <code>other</code> via an instance of <code>adjacentIc</code>.
-	 * 
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param incidentIc
-	 *            {@link IncidenceClass}
-	 * @param adjacentIc
-	 *            {@link IncidenceClass}
-	 * @param other
-	 *            <code>OwnType</code>
-	 * @return <code>DualType</code>
+	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * the above method should add the newly created element to the subgraph both
+	 * connected elements belong to
 	 */
-	public DualType addAdjacence(Graph traversalContext,
-			IncidenceClass incidentIc, IncidenceClass adjacentIc, OwnType other);
+	//public DualType addAdjacence(Graph traversalContext,
+	//		IncidenceClass incidentIc, IncidenceClass adjacentIc, OwnType other);
 
 	/**
 	 * TODO
@@ -1163,24 +1141,17 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public List<OwnType> removeAdjacences(IncidenceClass ic);
 
+	
 	/**
-	 * TODO
-	 * 
-	 * @param traversalContext
-	 * @param role
-	 * @return
+	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
 	 */
-	public List<OwnType> removeAdjacences(Graph traversalContext, String role);
+	//public List<OwnType> removeAdjacences(Graph traversalContext, String role);
 
 	/**
-	 * TODO
-	 * 
-	 * @param traversalContext
-	 * @param ic
-	 * @return
+     * Manipulation operations are not sensitive for a subgraph but affect the complete graph
 	 */
-	public List<OwnType> removeAdjacences(Graph traversalContext,
-			IncidenceClass ic);
+	//public List<OwnType> removeAdjacences(Graph traversalContext,
+	//		IncidenceClass ic);
 
 	/**
 	 * TODO
@@ -1199,24 +1170,19 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public void removeAdjacence(IncidenceClass ic, OwnType other);
 
 	/**
-	 * TODO
-	 * 
-	 * @param traversalContext
-	 * @param role
-	 * @param other
+	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
 	 */
-	public void removeAdjacence(Graph traversalContext, String role,
-			OwnType other);
+	//public void removeAdjacence(Graph traversalContext, String role, OwnType other);
 
 	/**
-	 * TODO
+	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
 	 * 
 	 * @param traversalContext
 	 * @param ic
 	 * @param other
 	 */
-	public void removeAdjacence(Graph traversalContext, IncidenceClass ic,
-			OwnType other);
+	//public void removeAdjacence(Graph traversalContext, IncidenceClass ic,
+	//		OwnType other);
 
 	/**
 	 * Returns the {@link IncidenceClass} corresponding to <code>rolename</code>

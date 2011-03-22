@@ -79,6 +79,12 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	private String id;
 
+	/** TODO (Daniel B.): Implement incidence ids analogical to Vertex and Edge ids */
+	
+	
+	
+	
+
 	/**
 	 * The schema this graph belongs to
 	 */

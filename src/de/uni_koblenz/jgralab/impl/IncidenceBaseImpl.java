@@ -59,8 +59,22 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	 *            {@link Edge}
 	 */
 	protected IncidenceBaseImpl(Vertex v, Edge e) {
-		super();
+		id = v.getGraph().getNextIncidenceID();
 	}
+	
+	protected int id;
+	
+	@Override
+	public int getId() {
+		return id;
+	}
+	
+	@Override
+	public int compareTo(Incidence i) {
+		assert getGraph() == i.getGraph();
+		return getId() - i.getId();
+	}
+
 
 	@Override
 	public Incidence getNextIncidenceAtEdge() {

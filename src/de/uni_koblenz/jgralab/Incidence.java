@@ -983,4 +983,9 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public void putAfterAtEdge(Incidence i);
 
+	/**
+	 * @return the ID of this incidence which is unique in the graph
+	 */
+	public int getId();
+
 }
