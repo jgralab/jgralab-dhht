@@ -118,7 +118,7 @@ public class AttributedElementIterableTest {
 			Iterable<Vertex> vertices = motorwayMap.vertices();
 			assertTrue(vertices instanceof AttributedElementIterable<?>);
 			for (Vertex vertex : vertices) {
-				motorwayMap.getVertex(N).delete();
+				motorwayMap.getVertexObject(N).delete();
 				vertex.getId();
 			}
 			fail();
@@ -182,7 +182,7 @@ public class AttributedElementIterableTest {
 			Iterable<Edge> edges = motorwayMap.edges();
 			assertTrue(edges instanceof AttributedElementIterable<?>);
 			for (Edge edge : edges) {
-				motorwayMap.getEdge(N).delete();
+				motorwayMap.getEdgeObject(N).delete();
 				edge.getId();
 			}
 			fail();
@@ -228,7 +228,7 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableNoChange() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Iterable<Edge> incidences = motorwayMap.getVertex(1).incidences();
+			Iterable<Edge> incidences = motorwayMap.getVertexObject(1).incidences();
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
 				edge.getId();
@@ -246,7 +246,7 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableChange() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
+			Vertex v1 = motorwayMap.getVertexObject(1);
 			Iterable<Edge> incidences = v1.incidences();
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
@@ -272,7 +272,7 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableInvalidTransaction() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
+			Vertex v1 = motorwayMap.getVertexObject(1);
 			Iterable<Edge> incidences = v1.incidences();
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
 			assertTrue(incidences instanceof AttributedElementIterable<?>);

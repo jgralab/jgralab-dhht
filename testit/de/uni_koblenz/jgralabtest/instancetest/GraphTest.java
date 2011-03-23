@@ -127,7 +127,7 @@ public class GraphTest extends InstanceTest {
 			fail("Implementation " + implementationType
 					+ " not yet supported by this test.");
 		}
-		graphIdsInUse.add(out.getId());
+		graphIdsInUse.add(out.getCompleteGraphUid());
 		return out;
 	}
 
@@ -2502,7 +2502,7 @@ public class GraphTest extends InstanceTest {
 
 		// SubLink e10 = graph2.createEdge(SubLink.class, v9, v6);
 		createReadOnlyTransaction(g1);
-		int id = e12.getId();
+		int id = e12.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2512,11 +2512,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e12.isValid());
 		assertFalse(g1.containsEdge(e12));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e1.getId();
+		id = e1.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2526,11 +2526,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e1.isValid());
 		assertFalse(g1.containsEdge(e1));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e2.getId();
+		id = e2.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2540,11 +2540,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e2.isValid());
 		assertFalse(g1.containsEdge(e2));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e7.getId();
+		id = e7.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2554,11 +2554,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e7.isValid());
 		assertFalse(g1.containsEdge(e7));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e3.getId();
+		id = e3.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2568,11 +2568,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e3.isValid());
 		assertFalse(g1.containsEdge(e3));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e9.getId();
+		id = e9.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2582,11 +2582,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e9.isValid());
 		assertFalse(g1.containsEdge(e9));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e4.getId();
+		id = e4.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2596,11 +2596,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e4.isValid());
 		assertFalse(g1.containsEdge(e4));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e10.getId();
+		id = e10.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2610,11 +2610,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e10.isValid());
 		assertFalse(g1.containsEdge(e10));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e5.getId();
+		id = e5.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2624,11 +2624,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e5.isValid());
 		assertFalse(g1.containsEdge(e5));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e8.getId();
+		id = e8.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2638,11 +2638,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e8.isValid());
 		assertFalse(g1.containsEdge(e8));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e11.getId();
+		id = e11.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2652,11 +2652,11 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e11.isValid());
 		assertFalse(g1.containsEdge(e11));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e6.getId();
+		id = e6.getCompleteGraphUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2666,7 +2666,7 @@ public class GraphTest extends InstanceTest {
 		createReadOnlyTransaction(g1);
 		assertFalse(e6.isValid());
 		assertFalse(g1.containsEdge(e6));
-		assertEquals(null, g1.getEdge(id));
+		assertEquals(null, g1.getEdgeObject(id));
 		commit(g1);
 		// border cases
 
@@ -5154,31 +5154,31 @@ public class GraphTest extends InstanceTest {
 		// border cases
 		createReadOnlyTransaction(g1);
 		createReadOnlyTransaction(g2);
-		assertEquals(v1, g1.getVertex(1));
-		assertEquals(v16, g2.getVertex(1));
-		assertEquals(null, g1.getVertex(42));
-		assertEquals(null, g1.getVertex(33));
-		assertEquals(null, g2.getVertex(4));
+		assertEquals(v1, g1.getVertexObject(1));
+		assertEquals(v16, g2.getVertexObject(1));
+		assertEquals(null, g1.getVertexObject(42));
+		assertEquals(null, g1.getVertexObject(33));
+		assertEquals(null, g2.getVertexObject(4));
 		// 1000 is the highest possible value
-		assertEquals(null, g1.getVertex(1000));
+		assertEquals(null, g1.getVertexObject(1000));
 
 		// normal cases
-		assertEquals(v2, g1.getVertex(2));
-		assertEquals(v3, g1.getVertex(3));
-		assertEquals(v4, g1.getVertex(4));
-		assertEquals(v5, g1.getVertex(5));
-		assertEquals(v6, g1.getVertex(6));
-		assertEquals(v7, g1.getVertex(7));
-		assertEquals(v8, g1.getVertex(8));
-		assertEquals(v9, g1.getVertex(9));
-		assertEquals(v10, g1.getVertex(10));
-		assertEquals(v11, g1.getVertex(11));
-		assertEquals(v12, g1.getVertex(12));
-		assertEquals(v13, g1.getVertex(13));
-		assertEquals(v14, g1.getVertex(14));
-		assertEquals(v15, g1.getVertex(15));
-		assertEquals(v17, g2.getVertex(2));
-		assertEquals(v18, g2.getVertex(3));
+		assertEquals(v2, g1.getVertexObject(2));
+		assertEquals(v3, g1.getVertexObject(3));
+		assertEquals(v4, g1.getVertexObject(4));
+		assertEquals(v5, g1.getVertexObject(5));
+		assertEquals(v6, g1.getVertexObject(6));
+		assertEquals(v7, g1.getVertexObject(7));
+		assertEquals(v8, g1.getVertexObject(8));
+		assertEquals(v9, g1.getVertexObject(9));
+		assertEquals(v10, g1.getVertexObject(10));
+		assertEquals(v11, g1.getVertexObject(11));
+		assertEquals(v12, g1.getVertexObject(12));
+		assertEquals(v13, g1.getVertexObject(13));
+		assertEquals(v14, g1.getVertexObject(14));
+		assertEquals(v15, g1.getVertexObject(15));
+		assertEquals(v17, g2.getVertexObject(2));
+		assertEquals(v18, g2.getVertexObject(3));
 		commit(g2);
 		commit(g1);
 
@@ -5202,33 +5202,33 @@ public class GraphTest extends InstanceTest {
 
 		// border cases
 		createReadOnlyTransaction(g1);
-		assertEquals(null, g1.getEdge(42));
-		assertEquals(null, g1.getEdge(-42));
-		assertEquals(e1, g1.getEdge(1));
-		assertEquals(null, g1.getEdge(1000));
-		assertEquals(null, g1.getEdge(-1000));
+		assertEquals(null, g1.getEdgeObject(42));
+		assertEquals(null, g1.getEdgeObject(-42));
+		assertEquals(e1, g1.getEdgeObject(1));
+		assertEquals(null, g1.getEdgeObject(1000));
+		assertEquals(null, g1.getEdgeObject(-1000));
 		commit(g1);
 
 		// normal cases
 		createReadOnlyTransaction(g1);
-		assertEquals(e2, g1.getEdge(2));
-		assertEquals(e2.getReversedEdge(), g1.getEdge(-2));
-		assertEquals(e3, g1.getEdge(3));
-		assertEquals(e3.getReversedEdge(), g1.getEdge(-3));
-		assertEquals(e4, g1.getEdge(4));
-		assertEquals(e4.getReversedEdge(), g1.getEdge(-4));
-		assertEquals(e5, g1.getEdge(5));
-		assertEquals(e5.getReversedEdge(), g1.getEdge(-5));
-		assertEquals(e6, g1.getEdge(6));
-		assertEquals(e6.getReversedEdge(), g1.getEdge(-6));
-		assertEquals(e7, g1.getEdge(7));
-		assertEquals(e7.getReversedEdge(), g1.getEdge(-7));
-		assertEquals(e8, g1.getEdge(8));
-		assertEquals(e8.getReversedEdge(), g1.getEdge(-8));
-		assertEquals(e9, g1.getEdge(9));
-		assertEquals(e9.getReversedEdge(), g1.getEdge(-9));
-		assertEquals(e10, g1.getEdge(10));
-		assertEquals(e10.getReversedEdge(), g1.getEdge(-10));
+		assertEquals(e2, g1.getEdgeObject(2));
+		assertEquals(e2.getReversedEdge(), g1.getEdgeObject(-2));
+		assertEquals(e3, g1.getEdgeObject(3));
+		assertEquals(e3.getReversedEdge(), g1.getEdgeObject(-3));
+		assertEquals(e4, g1.getEdgeObject(4));
+		assertEquals(e4.getReversedEdge(), g1.getEdgeObject(-4));
+		assertEquals(e5, g1.getEdgeObject(5));
+		assertEquals(e5.getReversedEdge(), g1.getEdgeObject(-5));
+		assertEquals(e6, g1.getEdgeObject(6));
+		assertEquals(e6.getReversedEdge(), g1.getEdgeObject(-6));
+		assertEquals(e7, g1.getEdgeObject(7));
+		assertEquals(e7.getReversedEdge(), g1.getEdgeObject(-7));
+		assertEquals(e8, g1.getEdgeObject(8));
+		assertEquals(e8.getReversedEdge(), g1.getEdgeObject(-8));
+		assertEquals(e9, g1.getEdgeObject(9));
+		assertEquals(e9.getReversedEdge(), g1.getEdgeObject(-9));
+		assertEquals(e10, g1.getEdgeObject(10));
+		assertEquals(e10.getReversedEdge(), g1.getEdgeObject(-10));
 		commit(g1);
 	}
 
@@ -5365,7 +5365,7 @@ public class GraphTest extends InstanceTest {
 			break;
 		case DATABASE:
 			g3 = dbHandler.createMinimalGraphWithDatabaseSupport("GraphTest");
-			this.graphIdsInUse.add(g3.getId());
+			this.graphIdsInUse.add(g3.getCompleteGraphUid());
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -5733,99 +5733,99 @@ public class GraphTest extends InstanceTest {
 	@Test
 	public void testSetId() throws CommitFailedException {
 		createTransaction(g1);
-		g1.setId("alpha");
+		g1.setUid("alpha");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("alpha", g1.getId());
+		assertEquals("alpha", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("1265");
+		g1.setUid("1265");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("1265", g1.getId());
+		assertEquals("1265", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("007");
+		g1.setUid("007");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("007", g1.getId());
+		assertEquals("007", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("r2d2");
+		g1.setUid("r2d2");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("r2d2", g1.getId());
+		assertEquals("r2d2", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("answer:42");
+		g1.setUid("answer:42");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("answer:42", g1.getId());
+		assertEquals("answer:42", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("1506");
+		g1.setUid("1506");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("1506", g1.getId());
+		assertEquals("1506", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("june15");
+		g1.setUid("june15");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("june15", g1.getId());
+		assertEquals("june15", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("bang");
+		g1.setUid("bang");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("bang", g1.getId());
+		assertEquals("bang", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("22now");
+		g1.setUid("22now");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("22now", g1.getId());
+		assertEquals("22now", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("hjkutzbv");
+		g1.setUid("hjkutzbv");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("hjkutzbv", g1.getId());
+		assertEquals("hjkutzbv", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("54rdcg9");
+		g1.setUid("54rdcg9");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("54rdcg9", g1.getId());
+		assertEquals("54rdcg9", g1.getCompleteGraphUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId(".k,oibt");
+		g1.setUid(".k,oibt");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals(".k,oibt", g1.getId());
+		assertEquals(".k,oibt", g1.getCompleteGraphUid());
 		commit(g1);
 
 		System.out.println("Done testing setId.");
@@ -6304,22 +6304,22 @@ public class GraphTest extends InstanceTest {
 			}
 			// test if all ids from 1 to 20 have been assigned in correct order
 			for (int i = 0; i < 20; i++) {
-				assertEquals(vertices[i], g.getVertex(i + 1));
+				assertEquals(vertices[i], g.getVertexObject(i + 1));
 			}
 
 			// delete vertices from id 11 to 15
 			for (int i = 11; i <= 15; i++) {
-				g.getVertex(i).delete();
+				g.getVertexObject(i).delete();
 			}
 			// defragment the graph
 			g.defragment();
 			// check if the maximum id is 15
 			assertEquals(15, g.getVCount());
 			for (int i = 1; i <= 15; i++) {
-				assertNotNull(g.getVertex(i));
+				assertNotNull(g.getVertexObject(i));
 			}
 			for (int i = 16; i <= 20; i++) {
-				assertNull(g.getVertex(i));
+				assertNull(g.getVertexObject(i));
 			}
 
 			// do the same for edges
@@ -6333,17 +6333,17 @@ public class GraphTest extends InstanceTest {
 
 			// create links (resulting graph is a ring)
 			for (int i = 0; i < 20; i++) {
-				links[i] = g.createLink((Node) g.getVertex(i + 1), (Node) g
-						.getVertex(i % 20 + 1));
+				links[i] = g.createLink((Node) g.getVertexObject(i + 1), (Node) g
+						.getVertexObject(i % 20 + 1));
 			}
 			// test if all ids from 1 to 20 have been assigned in correct order
 			for (int i = 0; i < 20; i++) {
-				assertEquals(links[i], g.getEdge(i + 1));
+				assertEquals(links[i], g.getEdgeObject(i + 1));
 			}
 
 			// delete edges from id 11 to 15
 			for (int i = 11; i <= 15; i++) {
-				g.getEdge(i).delete();
+				g.getEdgeObject(i).delete();
 			}
 
 			// defragment the graph
@@ -6351,10 +6351,10 @@ public class GraphTest extends InstanceTest {
 			// check if the maximum id is 15
 			assertEquals(15, g.getECount());
 			for (int i = 1; i <= 15; i++) {
-				assertNotNull(g.getEdge(i));
+				assertNotNull(g.getEdgeObject(i));
 			}
 			for (int i = 16; i <= 20; i++) {
-				assertNull(g.getEdge(i));
+				assertNull(g.getEdgeObject(i));
 			}
 
 		}
@@ -6371,10 +6371,10 @@ public class GraphTest extends InstanceTest {
 	public void testGetVertexBorderCase() throws CommitFailedException {
 		MinimalGraph g = createMinimalGraph();
 		createReadOnlyTransaction(g);
-		assertNull(g.getVertex(1));
-		assertNull(g.getVertex(g.getMaxVCount()));
-		assertNull(g.getVertex(g.getMaxVCount() + 1));
-		assertNull(g.getVertex(g.getMaxVCount() + 1000));
+		assertNull(g.getVertexObject(1));
+		assertNull(g.getVertexObject(g.getMaxVCount()));
+		assertNull(g.getVertexObject(g.getMaxVCount() + 1));
+		assertNull(g.getVertexObject(g.getMaxVCount() + 1000));
 		commit(g);
 	}
 
@@ -6388,14 +6388,14 @@ public class GraphTest extends InstanceTest {
 	public void testGetEdgeBorderCase() throws CommitFailedException {
 		MinimalGraph g = createMinimalGraph();
 		createReadOnlyTransaction(g);
-		assertNull(g.getEdge(1));
-		assertNull(g.getEdge(g.getMaxECount()));
-		assertNull(g.getEdge(g.getMaxECount() + 1));
-		assertNull(g.getEdge(g.getMaxECount() + 1000));
-		assertNull(g.getEdge(-1));
-		assertNull(g.getEdge(-g.getMaxECount()));
-		assertNull(g.getEdge(-g.getMaxECount() - 1));
-		assertNull(g.getEdge(-g.getMaxECount() - 1000));
+		assertNull(g.getEdgeObject(1));
+		assertNull(g.getEdgeObject(g.getMaxECount()));
+		assertNull(g.getEdgeObject(g.getMaxECount() + 1));
+		assertNull(g.getEdgeObject(g.getMaxECount() + 1000));
+		assertNull(g.getEdgeObject(-1));
+		assertNull(g.getEdgeObject(-g.getMaxECount()));
+		assertNull(g.getEdgeObject(-g.getMaxECount() - 1));
+		assertNull(g.getEdgeObject(-g.getMaxECount() - 1000));
 		commit(g);
 	}
 

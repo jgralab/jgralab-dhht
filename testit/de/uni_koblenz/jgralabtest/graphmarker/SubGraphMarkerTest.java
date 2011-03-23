@@ -106,8 +106,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 		for (int i = 1; i <= EDGE_COUNT; i++) {
 			int alphaID = rng.nextInt(VERTEX_COUNT) + 1;
 			int omegaID = rng.nextInt(VERTEX_COUNT) + 1;
-			links[i - 1] = g.createLink((Node) g.getVertex(alphaID), (Node) g
-					.getVertex(omegaID));
+			links[i - 1] = g.createLink((Node) g.getVertexObject(alphaID), (Node) g
+					.getVertexObject(omegaID));
 		}
 
 		commit(g);

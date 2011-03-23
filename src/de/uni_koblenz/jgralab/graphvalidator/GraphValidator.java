@@ -34,6 +34,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,10 +48,6 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.exception.Greql2Exception;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -102,7 +99,7 @@ public class GraphValidator {
 	 *         and where {@link MultiplicityConstraintViolation} constraints
 	 *         where violated
 	 */
-	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(IncidenceClass ic) {
+	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(IncidenceClass ic) throws RemoteException {
 		SortedSet<MultiplicityConstraintViolation> brokenConstraints = new TreeSet<MultiplicityConstraintViolation>();
 
 		Set<Vertex> badEdgesAtVertex = new HashSet<Vertex>();
@@ -146,7 +143,7 @@ public class GraphValidator {
 	 * @return a set of {@link ConstraintViolation} objects, one for each
 	 *         violation, sorted by their type
 	 */
-	public SortedSet<ConstraintViolation> validate() {
+	public SortedSet<ConstraintViolation> validate() throws RemoteException {
 		SortedSet<ConstraintViolation> brokenConstraints = new TreeSet<ConstraintViolation>();
 
 		// Check if all multiplicities are correct
@@ -275,7 +272,7 @@ public class GraphValidator {
 			bw.append("<title>");
 			bw.append("Validation Report for the "
 					+ graph.getM1Class().getSimpleName() + " with id "
-					+ graph.getId() + ".");
+					+ graph.getCompleteGraphUid() + ".");
 			bw.append("</title>");
 			bw.append("</head>");
 

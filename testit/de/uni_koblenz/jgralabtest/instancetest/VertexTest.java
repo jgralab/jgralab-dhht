@@ -491,8 +491,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			expectedInOut[start]--;
@@ -623,8 +623,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -814,8 +814,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -965,8 +965,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -1141,8 +1141,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -1367,8 +1367,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -1617,8 +1617,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -1919,8 +1919,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -2220,8 +2220,8 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
-			Edge e = g.getEdge(i);
+		for (int i = g.getFirstEdge().getCompleteGraphUid(); i < g.getECount(); i++) {
+			Edge e = g.getEdgeObject(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
 			if (e instanceof SubLink) {
@@ -8910,7 +8910,7 @@ public class VertexTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) v0.getId()).toString())) {
+			if (parts[0].equals(((Integer) v0.getCompleteGraphUid()).toString())) {
 				break;
 			}
 			commit(g);
@@ -8984,7 +8984,7 @@ public class VertexTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) v0.getId()).toString())) {
+			if (parts[0].equals(((Integer) v0.getCompleteGraphUid()).toString())) {
 				break;
 			}
 			commit(g);

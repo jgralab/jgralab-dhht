@@ -43,11 +43,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSet;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueType;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -88,10 +83,10 @@ public class TwoDVisualizer {
 		// set currentVertex or currentEdge to the current element
 		if (currentElement.isVertex()) {
 			code.append("current").append("Vertex = \"").append(
-					currentElement.toVertex().getId()).append("\";\n");
+					currentElement.toVertex().getPartialGraphId()).append("\";\n");
 		} else if (currentElement.isEdge()) {
 			code.append("current").append("Edge = \"").append(
-					currentElement.toEdge().getId()).append("\";\n");
+					currentElement.toEdge().getPartialGraphId()).append("\";\n");
 		}
 		// calculate environment
 		JValueSet elementsToDisplay = new JValueSet();

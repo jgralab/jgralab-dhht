@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.utilities.tg2dot;
 
 import java.io.PrintStream;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -85,9 +86,13 @@ public class Tg2Dot extends Tg2Whatever {
 	 */
 	@Override
 	public void graphStart(PrintStream out) {
-		out.println("digraph \"" + graph.getId() + "\"");
-		out.println("{");
-
+		try {
+			out.println("digraph \"" + graph.getCompleteGraphUid() + "\"");
+			out.println("{");
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
+		
 		// Set the ranksep
 		if (ranksepEqually) {
 			out.println("ranksep=\"" + ranksep + " equally\";");
@@ -118,6 +123,7 @@ public class Tg2Dot extends Tg2Whatever {
 	
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
+		try {
 		VertexClass cls = v.getType();
 		out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
@@ -126,10 +132,14 @@ public class Tg2Dot extends Tg2Whatever {
 			printAttributes(out, v);
 		}
 		out.println("}\"];");
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
+		try {
 		EdgeClass cls = e.getType();
 		out.print("e" + e.getId() + " [label=\"{{e" + e.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
@@ -138,6 +148,9 @@ public class Tg2Dot extends Tg2Whatever {
 			printAttributes(out, e);
 		}
 		out.println("}\"];");
+		} catch (RemoteException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 
@@ -191,6 +204,7 @@ public class Tg2Dot extends Tg2Whatever {
 	}
 
 	private boolean printEdgeReversed(Edge e) {
+		try {
 		if (reversedEdgeTypes == null) {
 			return reversedEdges;
 		}
@@ -214,12 +228,16 @@ public class Tg2Dot extends Tg2Whatever {
 		}
 		revEdgeTypeCache.put(ec, rev);
 		return reversedEdges ^ rev;
+		} catch (RemoteException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 	
 	
 	@Override
 	protected void printIncidence(PrintStream out, Incidence i) {
+		try {
 		boolean reversed = printEdgeReversed(i.getEdge());
 
 		//assume Vertex_TO_EDGE to be the direction to use
@@ -286,10 +304,13 @@ public class Tg2Dot extends Tg2Whatever {
 			out.print(" headlabel=\"" + getIncidenceNumber(i, start) + "\"");
 		}
 		out.println("];");
-
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void printAttributes(PrintStream out, AttributedElement<?,?> elem) {
+		try {
 		AttributedElementClass<?,?> cls = elem.getType();
 		for (Attribute attr : cls.getAttributeList()) {
 			if (abbreviateEdgeAttributeNames && (elem instanceof Edge)) {
@@ -314,6 +335,9 @@ public class Tg2Dot extends Tg2Whatever {
 				attributeString = '"' + attributeString + '"';
 			}
 			out.print(" = " + stringQuote(attributeString) + "\\l");
+		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

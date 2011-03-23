@@ -122,9 +122,9 @@ public class TGMerge {
 	}
 
 	public Graph merge() {
-		log.fine("TargetGraph is '" + targetGraph.getId() + "'.");
+		log.fine("TargetGraph is '" + targetGraph.getCompleteGraphUid() + "'.");
 		for (Graph g : additionalGraphs) {
-			log.fine("Merging graph '" + g.getId() + "'...");
+			log.fine("Merging graph '" + g.getCompleteGraphUid() + "'...");
 			copyVertices(g);
 			copyEdges(g);
 			sortIncidences();

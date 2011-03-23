@@ -51,9 +51,8 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
-import de.uni_koblenz.jgralab.impl.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.FreeIndexList;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -478,7 +477,7 @@ public class LoadTest extends InstanceTest {
 	private FreeIndexList getFreeIndexListOfVertices(Graph graph,
 			boolean getVertexList) {
 		try {
-			Field f = GraphBaseImpl.class
+			Field f = CompleteGraphImpl.class
 					.getDeclaredField(getVertexList ? "freeVertexList"
 							: "freeEdgeList");
 			f.setAccessible(true);
@@ -622,14 +621,14 @@ public class LoadTest extends InstanceTest {
 		// delete every second vertex
 		for (int i = 1; i < 15; i = i + 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(15).delete();
+		g.getVertexObject(15).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 9, 23, 16, 3, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -664,14 +663,14 @@ public class LoadTest extends InstanceTest {
 		}
 		// delete the vertices
 		createTransaction(g);
-		g.getVertex(1).delete();
+		g.getVertexObject(1).delete();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		for (int i = 4; i <= 17; i = i + 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createReadOnlyTransaction(g);
@@ -711,7 +710,7 @@ public class LoadTest extends InstanceTest {
 		// delete every second vertex
 		createTransaction(g);
 		for (int i = 2; i < 17; i = i + 2) {
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -770,7 +769,7 @@ public class LoadTest extends InstanceTest {
 		// runs[0]==-2
 		createTransaction(g);
 		for (int i = 2; i < 17; i = i + 2) {
-			g.getVertex(i + 1).delete();
+			g.getVertexObject(i + 1).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -779,7 +778,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the first vertex. Runs must be enlarged.
 		createTransaction(g);
-		g.getVertex(1).delete();
+		g.getVertexObject(1).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 9, 32, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -811,7 +810,7 @@ public class LoadTest extends InstanceTest {
 		// delete odd vertices to fill runs
 		createTransaction(g);
 		for (int i = 0; i < 14; i = i + 2) {
-			g.getVertex(i + 1).delete();
+			g.getVertexObject(i + 1).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -820,7 +819,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the last vertex. runs[runs.length-1]==0
 		createTransaction(g);
-		g.getVertex(15).delete();
+		g.getVertexObject(15).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 8, 16, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -853,7 +852,7 @@ public class LoadTest extends InstanceTest {
 		createTransaction(g);
 		for (int i = 0; i < 16; i = i + 2) {
 			if (i != 4) {
-				g.getVertex(i + 1).delete();
+				g.getVertexObject(i + 1).delete();
 			}
 		}
 		commit(g);
@@ -863,7 +862,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the last vertex. runs[runs.length-1]==0
 		createTransaction(g);
-		g.getVertex(5).delete();
+		g.getVertexObject(5).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 8, 16, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -895,13 +894,13 @@ public class LoadTest extends InstanceTest {
 		g.createA();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 3, 1, 16, -1, 1, -2);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(3).delete();
+		g.getVertexObject(3).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 2, 2, 16, -1, 2, -1);
@@ -929,13 +928,13 @@ public class LoadTest extends InstanceTest {
 		g.createA();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 2, 1, 16, -1, 1, -1);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(3).delete();
+		g.getVertexObject(3).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 1, 2, 16, -1, 2);
@@ -961,7 +960,7 @@ public class LoadTest extends InstanceTest {
 		}
 		for (int i = 15; i > 0; i = i - 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createReadOnlyTransaction(g);
@@ -969,7 +968,7 @@ public class LoadTest extends InstanceTest {
 				1, -1, 1, -1, 1, -2);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(17).delete();
+		g.getVertexObject(17).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 9, 32, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,

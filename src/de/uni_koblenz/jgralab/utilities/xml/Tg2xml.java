@@ -129,7 +129,7 @@ public class Tg2xml extends GraphVisitor {
 			writer.writeAttribute("xsi:schemaLocation", namespaceURI + " "
 					+ schemaLocation);
 			writer.writeAttribute(GRUML_ATTRIBUTE_ID, GRUML_ID_PREFIX_GRAPH
-					+ graph.getId());
+					+ graph.getCompleteGraphUid());
 			writeAttributes(graph);
 
 		} catch (XMLStreamException e) {
@@ -169,11 +169,11 @@ public class Tg2xml extends GraphVisitor {
 		writer.writeEmptyElement(e.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_FROM, GRUML_ID_PREFIX_VERTEX
-				+ e.getAlpha().getId());
+				+ e.getAlpha().getCompleteGraphUid());
 		writer.writeAttribute(GRUML_ATTRIBUTE_FSEQ, Integer
 				.toString(currentMark.fseq));
 		writer.writeAttribute(GRUML_ATTRIBUTE_TO, GRUML_ID_PREFIX_VERTEX
-				+ e.getOmega().getId());
+				+ e.getOmega().getCompleteGraphUid());
 		writer.writeAttribute(GRUML_ATTRIBUTE_TSEQ, Integer
 				.toString(currentMark.tseq));
 		writeAttributes(e);

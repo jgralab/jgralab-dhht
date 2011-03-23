@@ -271,7 +271,7 @@ public class RoleNameTest extends InstanceTest {
 			Edge e = null;
 			while (e == null) {
 				int random = rand.nextInt(graph.getECount()) + 1;
-				e = graph.getEdge(random);
+				e = graph.getEdgeObject(random);
 			}
 			v1Inci.remove(e);
 			v2Inci.remove(e);

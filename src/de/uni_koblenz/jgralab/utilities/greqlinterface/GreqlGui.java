@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -66,9 +67,6 @@ import de.uni_koblenz.jgralab.GraphIO.TGFilenameFilter;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.WorkInProgress;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueHTMLOutputVisitor;
 
 @WorkInProgress(description = "insufficcient result presentation, simplistic hacked GUI, no load/save functionality, ...", responsibleDevelopers = "horn")
 public class GreqlGui extends JFrame {
@@ -182,8 +180,12 @@ public class GreqlGui extends JFrame {
 									JOptionPane.ERROR_MESSAGE);
 							statusLabel.setText("Couldn't load graph :-(");
 						} else {
-							statusLabel.setText("Graph '" + graph.getId()
-									+ "' loaded.");
+							try {
+								statusLabel.setText("Graph '" + graph.getCompleteGraphUid()
+										+ "' loaded.");
+							} catch (RemoteException e) {
+								throw new RuntimeException(e);
+							}
 						}
 						fileSelectionButton.setEnabled(true);
 						evalQueryButton.setEnabled(graph != null);
