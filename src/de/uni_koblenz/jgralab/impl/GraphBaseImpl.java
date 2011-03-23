@@ -896,8 +896,8 @@ public abstract class GraphBaseImpl implements Graph {
 	 * 
 	 * @see de.uni_koblenz.jgralab.Graph#getECount()
 	 */
-	@Override
-	abstract public int getECount();
+	//@Override
+	//abstract public int getECount();
 
 	/*
 	 * (non-Javadoc)
@@ -925,7 +925,7 @@ public abstract class GraphBaseImpl implements Graph {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#getFirstEdgeInGraph()
+	 * @see de.uni_koblenz.jgralab.Graph#getFirstEdge()
 	 */
 	@Override
 	abstract public Edge getFirstEdge();
@@ -933,7 +933,7 @@ public abstract class GraphBaseImpl implements Graph {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#getLastEdgeInGraph()
+	 * @see de.uni_koblenz.jgralab.Graph#getLastEdge()
 	 */
 	@Override
 	abstract public Edge getLastEdge();
@@ -1798,14 +1798,11 @@ public abstract class GraphBaseImpl implements Graph {
 					assert eId >= 1;
 					EdgeBaseImpl e = getEdgeArray()[eId];
 					getEdgeArray()[eId] = null;
-					// ReversedEdgeImpl r = getRevEdge()[eId];
-					// getRevEdge()[eId] = null;
 					getFreeEdgeList().freeIndex(eId);
 					int newId = allocateEdgeIndex(eId);
 					assert newId < eId;
 					e.setId(newId);
 					getEdgeArray()[newId] = e;
-					// getRevEdge()[newId] = r;
 					--eId;
 				}
 			}
@@ -1821,8 +1818,36 @@ public abstract class GraphBaseImpl implements Graph {
 			System.gc();
 		}
 		
-		//TODO: Defragment Incidence Array
-		throw new RuntimeException("Defragment IncidenceArray");
+		if (getICount() < iMax) {
+			if (getICount() > 0) {
+				int iId = iMax;
+				while (getFreeEdgeList().isFragmented()) {
+					while ((iId >= 1) && (getIncidenceArray()[iId] == null)) {
+						--iId;
+					}
+					assert iId >= 1;
+					IncidenceBaseImpl i = getIncidenceArray()[iId];
+					getIncidenceArray()[iId] = null;
+					getFreeIncidenceList().freeIndex(iId);
+					int newId = allocateIncidenceIndex(iId);
+					assert newId < iId;
+					i.setId(newId);
+					getIncidenceArray()[newId] = i;
+					// getRevEdge()[newId] = r;
+					--iId;
+				}
+			}
+			int newIMax = getICount() == 0 ? 1 : getICount();
+			if (newIMax != iMax) {
+				iMax = newIMax;
+				IncidenceBaseImpl[] newIncidence = new IncidenceBaseImpl[iMax + 1];
+				System.arraycopy(getIncidenceArray(), 0, newIncidence, 0, newIncidence.length);
+				setIncidenceArray(newIncidence);
+				System.gc();
+			}
+			graphModified();
+			System.gc();
+		}
 		
 	}
 
@@ -2499,5 +2524,7 @@ public abstract class GraphBaseImpl implements Graph {
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
+
+	protected abstract void setICount(int count); 
 
 }

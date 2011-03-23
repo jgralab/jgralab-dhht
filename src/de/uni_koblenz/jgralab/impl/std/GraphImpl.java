@@ -64,6 +64,7 @@ public abstract class GraphImpl extends
 	private EdgeBaseImpl[] edgeArray;
 	private int eCount;
 	private IncidenceBaseImpl[] incidenceArray;
+	private int iCount;
 	private VertexBaseImpl firstVertex;
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
@@ -113,6 +114,11 @@ public abstract class GraphImpl extends
 	@Override
 	public int getECount() {
 		return eCount;
+	}
+	
+	@Override
+	public int getICount() {
+		return iCount;
 	}
 	
 	@Override
@@ -174,6 +180,12 @@ public abstract class GraphImpl extends
 		eCount = count;
 	}
 
+	@Override
+	protected void setICount(int count) {
+		iCount = count;
+	}
+
+	
 	@Override
 	protected void setFirstVertex(VertexBaseImpl firstVertex) {
 		this.firstVertex = firstVertex;
