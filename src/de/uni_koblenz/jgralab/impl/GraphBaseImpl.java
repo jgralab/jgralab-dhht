@@ -474,7 +474,7 @@ public abstract class GraphBaseImpl implements Graph {
 			if (!canAddGraphElement(iId)) {
 				throw new GraphException("can not add an incidence with iId " + iId);
 			}
-			iId = allocateVertexIndex(iId);
+			iId = allocateIncidenceIndex(iId);
 			assert iId != 0;
 			i.setId(iId);
 		}
@@ -531,7 +531,6 @@ public abstract class GraphBaseImpl implements Graph {
 	 * 
 	 * @see de.uni_koblenz.jgralab.Graph#getExpandedVertexCount()
 	 */
-	@Override
 	public int getExpandedVertexCount() {
 		return computeNewSize(vMax);
 	}
@@ -554,9 +553,13 @@ public abstract class GraphBaseImpl implements Graph {
 	 * 
 	 * @see de.uni_koblenz.jgralab.Graph#getExpandedEdgeCount()
 	 */
-	@Override
 	public int getExpandedEdgeCount() {
 		return computeNewSize(eMax);
+	}
+	
+
+	protected int getExpandedIncidenceCount() {
+		return computeNewSize(iMax);
 	}
 
 	/*
@@ -1856,6 +1859,14 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            needed for transaction support
 	 */
 	abstract protected int allocateEdgeIndex(int currentId);
+	
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	abstract protected int allocateIncidenceIndex(int currentId);
 
 	/**
 	 * 

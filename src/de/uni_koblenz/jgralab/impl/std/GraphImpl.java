@@ -353,11 +353,18 @@ public abstract class GraphImpl extends
 		}
 		return eId;
 	}
+	
+	@Override
+	protected int allocateIncidenceIndex(int currentId) {
+		int iId = freeIncidenceList.allocateIndex();
+		if (iId == 0) {
+			expandIncidenceArray(getExpandedIncidenceCount());
+			iId = freeIncidenceList.allocateIndex();
+		}
+		return iId;
+	}
 
-	/*
-	 * @Override protected void freeIndex(FreeIndexList freeIndexList, int
-	 * index) { freeIndexList.freeIndex(index); }
-	 */
+
 
 	@Override
 	protected void freeEdgeIndex(int index) {
