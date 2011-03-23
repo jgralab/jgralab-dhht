@@ -70,6 +70,8 @@ public interface GraphFactory {
 	 * 
 	 * @param incidenceClass
 	 *            {@link Class}
+	 * @param id           
+	 *            the id of this incidence  
 	 * @param v
 	 *            {@link Vertex} to which the created {@link Incidence} is
 	 *            connected
@@ -78,7 +80,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
+	public <T extends Incidence> T createIncidence(Class<T> incidenceClass, int id,
 			Vertex v, Edge e);
 
 	/**

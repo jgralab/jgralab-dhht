@@ -119,7 +119,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	abstract protected VertexBaseImpl[] getVertexArray();
 
-	abstract protected void setVertex(VertexBaseImpl[] vertex);
+	abstract protected void setVertexArray(VertexBaseImpl[] vertex);
 
 	/**
 	 * free index list for vertices
@@ -174,7 +174,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	abstract protected EdgeBaseImpl[] getEdgeArray();
 
-	abstract protected void setEdge(EdgeBaseImpl[] edge);
+	abstract protected void setEdgeArray(EdgeBaseImpl[] edge);
 
 	/**
 	 * free index list for edges
@@ -206,12 +206,15 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	
 	// ------------- INCIDENCE LIST VARIABLES -------------
+	
+	private int iMax;
+	
 	/**
 	 * indexed with vertex-id, holds the actual vertex-object itself
 	 */
 	abstract protected IncidenceBaseImpl[] getIncidenceArray();
 
-	abstract protected void setIncidence(IncidenceBaseImpl[] incidence);
+	abstract protected void setIncidenceArray(IncidenceBaseImpl[] incidence);
 
 	/**
 	 * free index list for vertices
@@ -434,6 +437,52 @@ public abstract class GraphBaseImpl implements Graph {
 	protected void internalVertexAdded(VertexBaseImpl v) {
 		notifyVertexAdded(v);
 	}
+	
+	protected void internalIncidenceAdded(IncidenceBaseImpl i) {
+		notifyIncidenceAdded(i);
+	}
+	
+	/*
+	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is set,
+	 * otherwise the incidence's current id is used if possible. Should only be used
+	 * by m1-Graphs derived from Graph. To create a new Incidence as user, use the
+	 * appropriate <code>connect(...)</code>-methods from the GraphElements
+	 * 
+	 * @param newIncidence the Incidence to add
+	 * 
+	 * @throws GraphException if a incidence with the same id already exists
+	 */
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceBaseImpl i = (IncidenceBaseImpl) newIncidence;
+
+		int iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+				if (iId > iMax) {
+					throw new GraphException("vertex id " + iId
+							+ " is bigger than vSize");
+				}
+			} else {
+				throw new GraphException("can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId " + iId);
+			}
+			iId = allocateVertexIndex(iId);
+			assert iId != 0;
+			i.setId(iId);
+		}
+
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
 
 	/**
 	 * Appends the edge e to the global edge sequence of this graph.
@@ -572,6 +621,18 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	private final boolean containsVertexId(int vId) {
 		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
+	}
+	
+	/**
+	 * Checks if the incidence id iId is valid and if there is an such an 
+	 * incidence in this graph.
+	 * 
+	 * @param iId
+	 *            a incidence id
+	 * @return true if this graph contains an incidence with id iId
+	 */
+	private final boolean containsIncidenceId(int iId) {
+		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
 	}
 
 	/**
@@ -759,7 +820,7 @@ public abstract class GraphBaseImpl implements Graph {
 		if (getEdgeArray() != null) {
 			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
 		}
-		setEdge(e);
+		setEdgeArray(e);
 
 		if (getFreeEdgeList() == null) {
 			setFreeEdgeList(new FreeIndexList(newSize));
@@ -792,9 +853,39 @@ public abstract class GraphBaseImpl implements Graph {
 		} else {
 			getFreeVertexList().expandBy(newSize - vMax);
 		}
-		setVertex(expandedArray);
+		setVertexArray(expandedArray);
 		vMax = newSize;
 		notifyMaxVertexCountIncreased(newSize);
+	}
+	
+	/**
+	 * Changes the size of the incidence array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the incidence array
+	 */
+	protected void expandIncidenceArray(int newSize) {
+		if (newSize <= iMax) {
+			throw new GraphException("newSize must > iSize: iSize=" + iMax
+					+ ", newSize=" + newSize);
+		}
+		IncidenceBaseImpl[] expandedArray = new IncidenceBaseImpl[newSize + 1];
+		if (getIncidenceArray() != null) {
+			System.arraycopy(getIncidenceArray(), 0, expandedArray, 0,
+					getIncidenceArray().length);
+		}
+		if (getFreeIncidenceList() == null) {
+			setFreeIncidenceList(new FreeIndexList(newSize));
+		} else {
+			getFreeIncidenceList().expandBy(newSize - vMax);
+		}
+		setIncidenceArray(expandedArray);
+		iMax = newSize;
+		notifyMaxIncidenceCountIncreased(newSize);
+	}
+
+	private void setFreeIncidenceList(FreeIndexList freeIndexList) {
+		this.freeIncidenceList = freeIndexList;
 	}
 
 	/*
@@ -1688,7 +1779,7 @@ public abstract class GraphBaseImpl implements Graph {
 				vMax = newVMax;
 				VertexBaseImpl[] newVertex = new VertexBaseImpl[vMax + 1];
 				System.arraycopy(getVertexArray(), 0, newVertex, 0, newVertex.length);
-				setVertex(newVertex);
+				setVertexArray(newVertex);
 			}
 			graphModified();
 			System.gc();
@@ -1720,12 +1811,16 @@ public abstract class GraphBaseImpl implements Graph {
 				eMax = newEMax;
 				EdgeBaseImpl[] newEdge = new EdgeBaseImpl[eMax + 1];
 				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
-				setEdge(newEdge);
+				setEdgeArray(newEdge);
 				System.gc();
 			}
 			graphModified();
 			System.gc();
 		}
+		
+		//TODO: Defragment Incidence Array
+		throw new RuntimeException("Defragment IncidenceArray");
+		
 	}
 
 	// access to <code>FreeIndexList</code>s with these functions
@@ -2202,6 +2297,35 @@ public abstract class GraphBaseImpl implements Graph {
 			graphStructureChangedListeners.get(i).vertexAdded(v);
 		}
 	}
+	
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the given incidence <code>i</code> has been created. All invalid
+	 * <code>WeakReference</code>s are deleted automatically from the internal
+	 * listener list.
+	 * 
+	 * @param i
+	 *            the incidence that has been created.
+	 */
+	protected void notifyIncidenceAdded(Incidence i) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.incidenceAdded(i);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int j = 0; j < n; j++) {
+			graphStructureChangedListeners.get(j).incidenceAdded(i);
+		}
+	}
 
 	/**
 	 * Notifies all registered <code>GraphStructureChangedListener</code> that
@@ -2322,6 +2446,38 @@ public abstract class GraphBaseImpl implements Graph {
 					newValue);
 		}
 	}
+	
+	
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum incidence count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum incidence count.
+	 */
+	protected void notifyMaxIncidenceCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxIncidenceCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxIncidenceCountIncreased(
+					newValue);
+		}
+	}
+	
 
 	protected boolean canAddGraphElement(int graphElementId) {
 		return graphElementId == 0;

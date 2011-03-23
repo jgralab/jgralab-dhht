@@ -155,7 +155,7 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected void setVertex(VertexBaseImpl[] vertex) {
+	protected void setVertexArray(VertexBaseImpl[] vertex) {
 		// TODO
 		this.vertex = vertex;
 	}
@@ -167,7 +167,7 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected void setEdge(EdgeBaseImpl[] edge) {
+	protected void setEdgeArray(EdgeBaseImpl[] edge) {
 		// TODO
 		this.edge = edge;
 	}

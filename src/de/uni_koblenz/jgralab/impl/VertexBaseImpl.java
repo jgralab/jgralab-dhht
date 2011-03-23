@@ -1198,9 +1198,10 @@ public abstract class VertexBaseImpl extends
 	}
 
 	@Override
-	public <T extends Incidence> T connect(Class<T> incidenceClass,
+	public <T extends Incidence> T connect(Class<T> incidenceClass, 
 			Edge elemToConnect) {
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+		int id = graph.getNextIncidenceID();
+		return getSchema().getGraphFactory().createIncidence(incidenceClass, id,
 				this, elemToConnect);
 	}
 

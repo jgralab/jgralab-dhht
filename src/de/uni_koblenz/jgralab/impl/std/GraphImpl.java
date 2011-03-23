@@ -121,7 +121,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void setIncidence(IncidenceBaseImpl[] incidenceArray) {
+	protected void setIncidenceArray(IncidenceBaseImpl[] incidenceArray) {
 		this.incidenceArray = incidenceArray;
 	}
 
@@ -155,7 +155,7 @@ public abstract class GraphImpl extends
 
 
 	@Override
-	protected void setVertex(VertexBaseImpl[] vertex) {
+	protected void setVertexArray(VertexBaseImpl[] vertex) {
 		this.vertexArray = vertex;
 	}
 
@@ -165,7 +165,7 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected void setEdge(EdgeBaseImpl[] edge) {
+	protected void setEdgeArray(EdgeBaseImpl[] edge) {
 		this.edgeArray = edge;
 	}
 

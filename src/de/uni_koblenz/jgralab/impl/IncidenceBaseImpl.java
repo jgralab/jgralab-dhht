@@ -58,8 +58,8 @@ public abstract class IncidenceBaseImpl implements Incidence {
 	 * @param e
 	 *            {@link Edge}
 	 */
-	protected IncidenceBaseImpl(Vertex v, Edge e) {
-		id = v.getGraph().getNextIncidenceID();
+	protected IncidenceBaseImpl(int id, Vertex v, Edge e) {
+		this.id = id;
 	}
 	
 	protected int id;
@@ -594,6 +594,10 @@ public abstract class IncidenceBaseImpl implements Incidence {
 			throw new UnsupportedOperationException(
 					"getThatIncidence() may be called only for incidences of binary edges");
 		}
+	}
+
+	public void setId(int iId) {
+		this.id = iId;
 	}
 
 }
