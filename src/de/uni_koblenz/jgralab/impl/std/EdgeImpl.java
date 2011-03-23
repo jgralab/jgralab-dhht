@@ -30,6 +30,8 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -146,7 +148,7 @@ public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl 
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected EdgeImpl(int anId, Graph graph) {
+	protected EdgeImpl(int anId, Graph graph) throws RemoteException {
 		super(anId, graph);
 		((GraphImpl) graph).addEdge(this);
 	}

@@ -30,6 +30,8 @@
  */
 package de.uni_koblenz.jgralab.impl.std;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -128,7 +130,7 @@ public abstract class VertexImpl extends
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected VertexImpl(int id, Graph graph) {
+	protected VertexImpl(int id, Graph graph) throws RemoteException {
 		super(id, graph);
 		((GraphImpl) graph).addVertex(this);
 	}
