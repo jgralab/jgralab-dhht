@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +59,11 @@ public abstract class EdgeBaseImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6297447377016245955L;
+
+	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
 	 * @param id
@@ -65,7 +71,7 @@ public abstract class EdgeBaseImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected EdgeBaseImpl(int anId, Graph graph) {
+	protected EdgeBaseImpl(int anId, Graph graph) throws RemoteException {
 		super(graph);
 		setId(anId);
 	}

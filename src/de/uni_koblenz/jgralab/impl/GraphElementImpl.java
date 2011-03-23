@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Comparator;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -41,7 +43,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.std.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -63,7 +64,12 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  */
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
-		implements GraphElement<OwnTypeClass, OwnType, DualType> {
+    extends UnicastRemoteObject implements GraphElement<OwnTypeClass, OwnType, DualType>  {
+
+	/**
+	 * Generated Serual Version UID
+	 */
+	private static final long serialVersionUID = 1245169302974416890L;
 
 	/**
 	 * The id of this {@link GraphElement}.
@@ -103,7 +109,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected GraphElementImpl(Graph graph) {
+	protected GraphElementImpl(Graph graph) throws RemoteException {
 		assert graph != null;
 		this.graph = (GraphBaseImpl) graph;
 	}
@@ -111,21 +117,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public GraphElement<?, ?, ?> getParent() {
 		return parent;
-	}
-
-	/**
-	 * @param parent
-	 * @return <code>true</code> if this is a direct or indirect child of
-	 *         <code>parent</code>
-	 */
-	public boolean isChildOf(GraphElement<?, ?, ?> parent) {
-		if (getParent() == null || getKappa() >= parent.getKappa()) {
-			return false;
-		} else if (getParent() == parent) {
-			return true;
-		} else {
-			return ((GraphElementImpl<?, ?, ?>) getParent()).isChildOf(parent);
-		}
 	}
 
 	@Override
@@ -497,18 +488,18 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Vertex appendix) {
+		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastVertex());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
-		((GraphElementImpl<?, ?, ?>) appendix).updateSubordinateGraphs();
 	}
 
 	@Override
 	public void addSubordinateElement(Edge appendix) {
+		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastEdge());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
-		((GraphElementImpl<?, ?, ?>) appendix).updateSubordinateGraphs();
 	}
 
 	/**
@@ -559,22 +550,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
 	 */
-	private boolean isSubordinateGraphObjectAlreadyCreated() {
+	boolean isSubordinateGraphObjectAlreadyCreated() {
 		return subOrdinateGraph != null;
-	}
-
-	/**
-	 * Updates the {@link SubordinateGraphImpl} of this GraphElement and its
-	 * parents.
-	 */
-	private void updateSubordinateGraphs() {
-		if (isSubordinateGraphObjectAlreadyCreated()) {
-			// TODO
-		} else {
-			GraphElementImpl<?, ?, ?> parent = (GraphElementImpl<?, ?, ?>) getParent();
-			if (parent != null) {
-				parent.updateSubordinateGraphs();
-			}
-		}
 	}
 }

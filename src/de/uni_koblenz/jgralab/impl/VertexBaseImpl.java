@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +59,11 @@ public abstract class VertexBaseImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3588328684461421331L;
+
+	/**
 	 * Creates a new {@link Vertex} instance.
 	 * 
 	 * @param id
@@ -65,7 +71,7 @@ public abstract class VertexBaseImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected VertexBaseImpl(int id, Graph graph) {
+	protected VertexBaseImpl(int id, Graph graph)  throws RemoteException  {
 		super(graph);
 		this.id = id;
 	}
