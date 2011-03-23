@@ -99,4 +99,8 @@ public interface GraphStructureChangedListener {
 	 *            the new value of <code>maxECount</code>.
 	 */
 	public void maxEdgeCountIncreased(int newValue);
+
+	public void incidenceAdded(Incidence i);
+
+	public void maxIncidenceCountIncreased(int newValue);
 }

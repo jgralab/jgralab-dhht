@@ -427,14 +427,14 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the new maximum number of vertices
 	 */
-	public int getExpandedVertexCount();
+	//public int getExpandedVertexCount();
 
 	/**
 	 * Computes the new maximum number of edges when expansion is needed.
 	 * 
 	 * @return the new maximum number of edges
 	 */
-	public int getExpandedEdgeCount();
+	//public int getExpandedEdgeCount();
 
 	/**
 	 * The maximum number of edges that can be stored in the graph before the
@@ -889,8 +889,10 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getGraphStructureChangedListenerCount();
 
+
 	/**
-	 * @return the next free incidence id
+	 * @return the number of incidences in this graph
 	 */
-	int getNextIncidenceID();
+	int getICount();
+
 }

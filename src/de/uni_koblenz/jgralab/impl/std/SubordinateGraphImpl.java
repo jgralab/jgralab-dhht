@@ -410,12 +410,6 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getNextIncidenceID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public boolean isLoading() {
 		return containingElement.getGraph().isLoading();
 	}
@@ -460,16 +454,6 @@ public class SubordinateGraphImpl extends
 	@Override
 	public int getMaxVCount() {
 		return containingElement.getGraph().getMaxVCount();
-	}
-
-	@Override
-	public int getExpandedVertexCount() {
-		return containingElement.getGraph().getExpandedVertexCount();
-	}
-
-	@Override
-	public int getExpandedEdgeCount() {
-		return containingElement.getGraph().getExpandedEdgeCount();
 	}
 
 	@Override
@@ -519,6 +503,12 @@ public class SubordinateGraphImpl extends
 		T vertex = super.createVertex(cls);
 		containingElement.addSubordinateElement(vertex);
 		return vertex;
+	}
+
+	@Override
+	public int getICount() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

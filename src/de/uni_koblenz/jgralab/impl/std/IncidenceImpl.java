@@ -27,8 +27,8 @@ public abstract class IncidenceImpl extends IncidenceBaseImpl {
 	 * @param e
 	 *            {@link Edge}
 	 */
-	protected IncidenceImpl(VertexImpl v, EdgeImpl e) {
-		super(v, e);
+	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e) {
+		super(id, v, e);
 		setIncidentEdge(e);
 		setIncidentVertex(v);
 
