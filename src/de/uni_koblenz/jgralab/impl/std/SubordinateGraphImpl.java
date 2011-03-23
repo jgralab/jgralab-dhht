@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -398,17 +399,20 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public Class<? extends Graph> getM1Class() {
-		return containingElement.getGraph().getM1Class();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public GraphClass getType() {
-		return containingElement.getGraph().getType();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public int getNextIncidenceID() {
-		return containingElement.getGraph().getNextIncidenceID();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
@@ -493,6 +497,28 @@ public class SubordinateGraphImpl extends
 	@Override
 	public Schema getSchema() {
 		return containingElement.getGraph().getSchema();
+	}
+
+	@Override
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega) {
+		T edge = super.createEdge(cls, alpha, omega);
+		containingElement.addSubordinateElement(edge);
+		return edge;
+	}
+
+	@Override
+	public <T extends Edge> T createEdge(Class<T> cls) {
+		T edge = super.createEdge(cls);
+		containingElement.addSubordinateElement(edge);
+		return edge;
+	}
+
+	@Override
+	public <T extends Vertex> T createVertex(Class<T> cls) {
+		T vertex = super.createVertex(cls);
+		containingElement.addSubordinateElement(vertex);
+		return vertex;
 	}
 
 }
