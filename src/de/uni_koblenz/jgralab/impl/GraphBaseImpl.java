@@ -1425,6 +1425,4 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 		return vertex.connect(cls, edge);
 	}
 
-	protected abstract void setICount(int count);
-
 }

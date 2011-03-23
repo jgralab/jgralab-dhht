@@ -184,7 +184,11 @@ public abstract class GraphBaseBaseImpl implements Graph {
 		setFirstEdge(null);
 		setLastEdge(null);
 		setECount(0);
+
+		setICount(0);
 	}
+
+	protected abstract void setICount(int count);
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
