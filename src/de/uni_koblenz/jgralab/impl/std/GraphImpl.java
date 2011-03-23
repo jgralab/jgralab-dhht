@@ -47,6 +47,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
 import de.uni_koblenz.jgralab.impl.FreeIndexList;
+import de.uni_koblenz.jgralab.impl.IncidenceBaseImpl;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
@@ -54,14 +55,15 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
  * The implementation of a <code>Graph</code> accessing attributes without
  * versioning.
  * 
- * @author Jose Monte(monte@uni-koblenz.de)
+ * @author ist@uni-koblenz.de
  */
 public abstract class GraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
-	private VertexBaseImpl[] vertex;
+	private VertexBaseImpl[] vertexArray;
 	private int vCount;
-	private EdgeBaseImpl[] edge;
+	private EdgeBaseImpl[] edgeArray;
 	private int eCount;
+	private IncidenceBaseImpl[] incidenceArray;
 	private VertexBaseImpl firstVertex;
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
@@ -94,8 +96,8 @@ public abstract class GraphImpl extends
 	private HashMap<Thread, Stack<Graph>> traversalContext;
 
 	@Override
-	protected VertexBaseImpl[] getVertex() {
-		return vertex;
+	protected VertexBaseImpl[] getVertexArray() {
+		return vertexArray;
 	}
 
 	@Override
@@ -104,14 +106,32 @@ public abstract class GraphImpl extends
 	}
 
 	@Override
-	protected EdgeBaseImpl[] getEdge() {
-		return edge;
+	protected EdgeBaseImpl[] getEdgeArray() {
+		return edgeArray;
 	}
 
 	@Override
 	public int getECount() {
 		return eCount;
 	}
+	
+	@Override
+	protected IncidenceBaseImpl[] getIncidenceArray() {
+		return incidenceArray;
+	}
+
+	@Override
+	protected void setIncidence(IncidenceBaseImpl[] incidenceArray) {
+		this.incidenceArray = incidenceArray;
+	}
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+
+	abstract protected FreeIndexList getFreeIncidenceList();
+
 
 	@Override
 	public Vertex getFirstVertex() {
@@ -133,19 +153,10 @@ public abstract class GraphImpl extends
 		return lastEdge;
 	}
 
-	@Override
-	protected FreeIndexList getFreeVertexList() {
-		return freeVertexList;
-	}
-
-	@Override
-	protected FreeIndexList getFreeEdgeList() {
-		return freeEdgeList;
-	}
 
 	@Override
 	protected void setVertex(VertexBaseImpl[] vertex) {
-		this.vertex = vertex;
+		this.vertexArray = vertex;
 	}
 
 	@Override
@@ -155,7 +166,7 @@ public abstract class GraphImpl extends
 
 	@Override
 	protected void setEdge(EdgeBaseImpl[] edge) {
-		this.edge = edge;
+		this.edgeArray = edge;
 	}
 
 	@Override

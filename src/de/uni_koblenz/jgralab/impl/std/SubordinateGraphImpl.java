@@ -95,7 +95,7 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected VertexBaseImpl[] getVertex() {
+	protected VertexBaseImpl[] getVertexArray() {
 		// TODO
 		return vertex;
 	}
@@ -107,7 +107,7 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected EdgeBaseImpl[] getEdge() {
+	protected EdgeBaseImpl[] getEdgeArray() {
 		// TODO
 		return edge;
 	}

@@ -79,12 +79,6 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	private String id;
 
-	/** TODO (Daniel B.): Implement incidence ids analogical to Vertex and Edge ids */
-	
-	
-	
-	
-
 	/**
 	 * The schema this graph belongs to
 	 */
@@ -123,7 +117,7 @@ public abstract class GraphBaseImpl implements Graph {
 	/**
 	 * indexed with vertex-id, holds the actual vertex-object itself
 	 */
-	abstract protected VertexBaseImpl[] getVertex();
+	abstract protected VertexBaseImpl[] getVertexArray();
 
 	abstract protected void setVertex(VertexBaseImpl[] vertex);
 
@@ -132,7 +126,9 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	protected FreeIndexList freeVertexList;
 
-	abstract protected FreeIndexList getFreeVertexList();
+	protected FreeIndexList getFreeVertexList() {
+		return freeVertexList;
+	}
 
 	/**
 	 * holds the id of the first vertex in Vseq
@@ -176,7 +172,7 @@ public abstract class GraphBaseImpl implements Graph {
 	/**
 	 * indexed with edge-id, holds the actual edge-object itself
 	 */
-	abstract protected EdgeBaseImpl[] getEdge();
+	abstract protected EdgeBaseImpl[] getEdgeArray();
 
 	abstract protected void setEdge(EdgeBaseImpl[] edge);
 
@@ -185,7 +181,9 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	protected FreeIndexList freeEdgeList;
 
-	abstract protected FreeIndexList getFreeEdgeList();
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
 
 	/**
 	 * holds the id of the first edge in Eseq
@@ -204,6 +202,29 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            Version to set.
 	 */
 	abstract protected void setEdgeListVersion(long edgeListVersion);
+	
+	
+	
+	// ------------- INCIDENCE LIST VARIABLES -------------
+	/**
+	 * indexed with vertex-id, holds the actual vertex-object itself
+	 */
+	abstract protected IncidenceBaseImpl[] getIncidenceArray();
+
+	abstract protected void setIncidence(IncidenceBaseImpl[] incidence);
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+
+
+
+	
 
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -421,7 +442,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            an edge
 	 */
 	protected void appendEdgeToESeq(EdgeBaseImpl e) {
-		getEdge()[e.id] = e;
+		getEdgeArray()[e.id] = e;
 		setECount(getECount() + 1);
 		if (getFirstEdge() == null) {
 			setFirstEdge(e);
@@ -442,7 +463,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            a vertex
 	 */
 	protected void appendVertexToVSeq(VertexBaseImpl v) {
-		getVertex()[v.id] = v;
+		getVertexArray()[v.id] = v;
 		setVCount(getVCount() + 1);
 		if (getFirstVertex() == null) {
 			setFirstVertex(v);
@@ -524,7 +545,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return true if this graph contains an edge with id eId
 	 */
 	private final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (getEdge()[eId] != null);
+		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
 	}
 
 	/*
@@ -535,7 +556,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@Override
 	public boolean containsVertex(Vertex v) {
-		VertexBaseImpl[] vertex = getVertex();
+		VertexBaseImpl[] vertex = getVertexArray();
 		return (v != null) && (v.getGraph() == this)
 				&& containsVertexId(((VertexBaseImpl) v).id)
 				&& (vertex[((VertexBaseImpl) v).id] == v);
@@ -550,7 +571,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return true if this graph contains a vertex with id vId
 	 */
 	private final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (getVertex()[vId] != null);
+		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
 	}
 
 	/**
@@ -735,8 +756,8 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 
 		EdgeBaseImpl[] e = new EdgeBaseImpl[newSize + 1];
-		if (getEdge() != null) {
-			System.arraycopy(getEdge(), 0, e, 0, getEdge().length);
+		if (getEdgeArray() != null) {
+			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
 		}
 		setEdge(e);
 
@@ -762,9 +783,9 @@ public abstract class GraphBaseImpl implements Graph {
 					+ ", newSize=" + newSize);
 		}
 		VertexBaseImpl[] expandedArray = new VertexBaseImpl[newSize + 1];
-		if (getVertex() != null) {
-			System.arraycopy(getVertex(), 0, expandedArray, 0,
-					getVertex().length);
+		if (getVertexArray() != null) {
+			System.arraycopy(getVertexArray(), 0, expandedArray, 0,
+					getVertexArray().length);
 		}
 		if (getFreeVertexList() == null) {
 			setFreeVertexList(new FreeIndexList(newSize));
@@ -793,7 +814,7 @@ public abstract class GraphBaseImpl implements Graph {
 	public Edge getEdge(int eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
 		try {
-			return getEdge()[eId];
+			return getEdgeArray()[eId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
@@ -1044,7 +1065,7 @@ public abstract class GraphBaseImpl implements Graph {
 	public Vertex getVertex(int vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
 		try {
-			return getVertex()[vId];
+			return getVertexArray()[vId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
@@ -1209,7 +1230,7 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
 		freeVertexIndex(v.getId());
-		getVertex()[v.getId()] = null;
+		getVertexArray()[v.getId()] = null;
 		if (!hasSavememSupport()) {
 			v.setPrevVertex(null);
 		}
@@ -1230,7 +1251,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 		// freeIndex(getFreeEdgeList(), e.getId());
 		freeEdgeIndex(e.getId());
-		getEdge()[e.getId()] = null;
+		getEdgeArray()[e.getId()] = null;
 		if (!hasSavememSupport()) {
 			e.setPreviousEdge(null);
 		}
@@ -1648,17 +1669,17 @@ public abstract class GraphBaseImpl implements Graph {
 			if (getVCount() > 0) {
 				int vId = vMax;
 				while (getFreeVertexList().isFragmented()) {
-					while ((vId >= 1) && (getVertex()[vId] == null)) {
+					while ((vId >= 1) && (getVertexArray()[vId] == null)) {
 						--vId;
 					}
 					assert vId >= 1;
-					VertexBaseImpl v = getVertex()[vId];
-					getVertex()[vId] = null;
+					VertexBaseImpl v = getVertexArray()[vId];
+					getVertexArray()[vId] = null;
 					getFreeVertexList().freeIndex(vId);
 					int newId = allocateVertexIndex(vId);
 					assert newId < vId;
 					v.setId(newId);
-					getVertex()[newId] = v;
+					getVertexArray()[newId] = v;
 					--vId;
 				}
 			}
@@ -1666,7 +1687,7 @@ public abstract class GraphBaseImpl implements Graph {
 			if (newVMax != vMax) {
 				vMax = newVMax;
 				VertexBaseImpl[] newVertex = new VertexBaseImpl[vMax + 1];
-				System.arraycopy(getVertex(), 0, newVertex, 0, newVertex.length);
+				System.arraycopy(getVertexArray(), 0, newVertex, 0, newVertex.length);
 				setVertex(newVertex);
 			}
 			graphModified();
@@ -1677,19 +1698,19 @@ public abstract class GraphBaseImpl implements Graph {
 			if (getECount() > 0) {
 				int eId = eMax;
 				while (getFreeEdgeList().isFragmented()) {
-					while ((eId >= 1) && (getEdge()[eId] == null)) {
+					while ((eId >= 1) && (getEdgeArray()[eId] == null)) {
 						--eId;
 					}
 					assert eId >= 1;
-					EdgeBaseImpl e = getEdge()[eId];
-					getEdge()[eId] = null;
+					EdgeBaseImpl e = getEdgeArray()[eId];
+					getEdgeArray()[eId] = null;
 					// ReversedEdgeImpl r = getRevEdge()[eId];
 					// getRevEdge()[eId] = null;
 					getFreeEdgeList().freeIndex(eId);
 					int newId = allocateEdgeIndex(eId);
 					assert newId < eId;
 					e.setId(newId);
-					getEdge()[newId] = e;
+					getEdgeArray()[newId] = e;
 					// getRevEdge()[newId] = r;
 					--eId;
 				}
@@ -1698,7 +1719,7 @@ public abstract class GraphBaseImpl implements Graph {
 			if (newEMax != eMax) {
 				eMax = newEMax;
 				EdgeBaseImpl[] newEdge = new EdgeBaseImpl[eMax + 1];
-				System.arraycopy(getEdge(), 0, newEdge, 0, newEdge.length);
+				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
 				setEdge(newEdge);
 				System.gc();
 			}
