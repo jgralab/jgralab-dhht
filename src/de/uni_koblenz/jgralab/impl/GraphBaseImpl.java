@@ -67,11 +67,6 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	private String id;
 
 	/**
-	 * TODO (Daniel B.): Implement incidence ids analogical to Vertex and Edge
-	 * ids
-	 */
-
-	/**
 	 * The schema this graph belongs to
 	 */
 	private final Schema schema;
@@ -90,16 +85,18 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	/**
 	 * indexed with vertex-id, holds the actual vertex-object itself
 	 */
-	abstract protected VertexBaseImpl[] getVertex();
+	abstract protected VertexBaseImpl[] getVertexArray();
 
-	abstract protected void setVertex(VertexBaseImpl[] vertex);
+	abstract protected void setVertexArray(VertexBaseImpl[] vertex);
 
 	/**
 	 * free index list for vertices
 	 */
 	protected FreeIndexList freeVertexList;
 
-	abstract protected FreeIndexList getFreeVertexList();
+	protected FreeIndexList getFreeVertexList() {
+		return freeVertexList;
+	}
 
 	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
@@ -120,16 +117,38 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	/**
 	 * indexed with edge-id, holds the actual edge-object itself
 	 */
-	abstract protected EdgeBaseImpl[] getEdge();
+	abstract protected EdgeBaseImpl[] getEdgeArray();
 
-	abstract protected void setEdge(EdgeBaseImpl[] edge);
+	abstract protected void setEdgeArray(EdgeBaseImpl[] edge);
 
 	/**
 	 * free index list for edges
 	 */
 	protected FreeIndexList freeEdgeList;
 
-	abstract protected FreeIndexList getFreeEdgeList();
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
+
+	// ------------- INCIDENCE LIST VARIABLES -------------
+
+	private int iMax;
+
+	/**
+	 * indexed with vertex-id, holds the actual vertex-object itself
+	 */
+	abstract protected IncidenceBaseImpl[] getIncidenceArray();
+
+	abstract protected void setIncidenceArray(IncidenceBaseImpl[] incidence);
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
 
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -278,6 +297,55 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 		notifyVertexAdded(v);
 	}
 
+	protected void internalIncidenceAdded(IncidenceBaseImpl i) {
+		notifyIncidenceAdded(i);
+	}
+
+	/*
+	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is
+	 * set, otherwise the incidence's current id is used if possible. Should
+	 * only be used by m1-Graphs derived from Graph. To create a new Incidence
+	 * as user, use the appropriate <code>connect(...)</code>-methods from the
+	 * GraphElements
+	 * 
+	 * @param newIncidence the Incidence to add
+	 * 
+	 * @throws GraphException if a incidence with the same id already exists
+	 */
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceBaseImpl i = (IncidenceBaseImpl) newIncidence;
+
+		int iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+				if (iId > iMax) {
+					throw new GraphException("vertex id " + iId
+							+ " is bigger than vSize");
+				}
+			} else {
+				throw new GraphException(
+						"can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId "
+						+ iId);
+			}
+			iId = allocateIncidenceIndex(iId);
+			assert iId != 0;
+			i.setId(iId);
+		}
+
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
+
 	/**
 	 * Appends the edge e to the global edge sequence of this graph.
 	 * 
@@ -285,7 +353,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 *            an edge
 	 */
 	protected void appendEdgeToESeq(EdgeBaseImpl e) {
-		getEdge()[e.id] = e;
+		getEdgeArray()[e.id] = e;
 		setECount(getECount() + 1);
 		if (getFirstEdge() == null) {
 			setFirstEdge(e);
@@ -306,7 +374,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 *            a vertex
 	 */
 	protected void appendVertexToVSeq(VertexBaseImpl v) {
-		getVertex()[v.id] = v;
+		getVertexArray()[v.id] = v;
 		setVCount(getVCount() + 1);
 		if (getFirstVertex() == null) {
 			setFirstVertex(v);
@@ -325,7 +393,6 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 * 
 	 * @see de.uni_koblenz.jgralab.Graph#getExpandedVertexCount()
 	 */
-	@Override
 	public int getExpandedVertexCount() {
 		return computeNewSize(vMax);
 	}
@@ -348,9 +415,12 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 * 
 	 * @see de.uni_koblenz.jgralab.Graph#getExpandedEdgeCount()
 	 */
-	@Override
 	public int getExpandedEdgeCount() {
 		return computeNewSize(eMax);
+	}
+
+	protected int getExpandedIncidenceCount() {
+		return computeNewSize(iMax);
 	}
 
 	/*
@@ -374,7 +444,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 * @return true if this graph contains an edge with id eId
 	 */
 	private final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (getEdge()[eId] != null);
+		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
 	}
 
 	/*
@@ -385,7 +455,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 */
 	@Override
 	public boolean containsVertex(Vertex v) {
-		VertexBaseImpl[] vertex = getVertex();
+		VertexBaseImpl[] vertex = getVertexArray();
 		return (v != null) && (v.getGraph() == this)
 				&& containsVertexId(((VertexBaseImpl) v).id)
 				&& (vertex[((VertexBaseImpl) v).id] == v);
@@ -400,7 +470,19 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 * @return true if this graph contains a vertex with id vId
 	 */
 	private final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (getVertex()[vId] != null);
+		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
+	}
+
+	/**
+	 * Checks if the incidence id iId is valid and if there is an such an
+	 * incidence in this graph.
+	 * 
+	 * @param iId
+	 *            a incidence id
+	 * @return true if this graph contains an incidence with id iId
+	 */
+	private final boolean containsIncidenceId(int iId) {
+		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
 	}
 
 	/*
@@ -460,10 +542,10 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 		}
 
 		EdgeBaseImpl[] e = new EdgeBaseImpl[newSize + 1];
-		if (getEdge() != null) {
-			System.arraycopy(getEdge(), 0, e, 0, getEdge().length);
+		if (getEdgeArray() != null) {
+			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
 		}
-		setEdge(e);
+		setEdgeArray(e);
 
 		if (getFreeEdgeList() == null) {
 			setFreeEdgeList(new FreeIndexList(newSize));
@@ -487,25 +569,55 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 					+ ", newSize=" + newSize);
 		}
 		VertexBaseImpl[] expandedArray = new VertexBaseImpl[newSize + 1];
-		if (getVertex() != null) {
-			System.arraycopy(getVertex(), 0, expandedArray, 0,
-					getVertex().length);
+		if (getVertexArray() != null) {
+			System.arraycopy(getVertexArray(), 0, expandedArray, 0,
+					getVertexArray().length);
 		}
 		if (getFreeVertexList() == null) {
 			setFreeVertexList(new FreeIndexList(newSize));
 		} else {
 			getFreeVertexList().expandBy(newSize - vMax);
 		}
-		setVertex(expandedArray);
+		setVertexArray(expandedArray);
 		vMax = newSize;
 		notifyMaxVertexCountIncreased(newSize);
+	}
+
+	/**
+	 * Changes the size of the incidence array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the incidence array
+	 */
+	protected void expandIncidenceArray(int newSize) {
+		if (newSize <= iMax) {
+			throw new GraphException("newSize must > iSize: iSize=" + iMax
+					+ ", newSize=" + newSize);
+		}
+		IncidenceBaseImpl[] expandedArray = new IncidenceBaseImpl[newSize + 1];
+		if (getIncidenceArray() != null) {
+			System.arraycopy(getIncidenceArray(), 0, expandedArray, 0,
+					getIncidenceArray().length);
+		}
+		if (getFreeIncidenceList() == null) {
+			setFreeIncidenceList(new FreeIndexList(newSize));
+		} else {
+			getFreeIncidenceList().expandBy(newSize - vMax);
+		}
+		setIncidenceArray(expandedArray);
+		iMax = newSize;
+		notifyMaxIncidenceCountIncreased(newSize);
+	}
+
+	private void setFreeIncidenceList(FreeIndexList freeIndexList) {
+		this.freeIncidenceList = freeIndexList;
 	}
 
 	@Override
 	public Edge getEdge(int eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
 		try {
-			return getEdge()[eId];
+			return getEdgeArray()[eId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
@@ -560,7 +672,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	public Vertex getVertex(int vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
 		try {
-			return getVertex()[vId];
+			return getVertexArray()[vId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
@@ -707,7 +819,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
 		freeVertexIndex(v.getId());
-		getVertex()[v.getId()] = null;
+		getVertexArray()[v.getId()] = null;
 		if (!hasSavememSupport()) {
 			v.setPrevVertex(null);
 		}
@@ -728,7 +840,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 
 		// freeIndex(getFreeEdgeList(), e.getId());
 		freeEdgeIndex(e.getId());
-		getEdge()[e.getId()] = null;
+		getEdgeArray()[e.getId()] = null;
 		if (!hasSavememSupport()) {
 			e.setPreviousEdge(null);
 		}
@@ -1064,17 +1176,17 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 			if (getVCount() > 0) {
 				int vId = vMax;
 				while (getFreeVertexList().isFragmented()) {
-					while ((vId >= 1) && (getVertex()[vId] == null)) {
+					while ((vId >= 1) && (getVertexArray()[vId] == null)) {
 						--vId;
 					}
 					assert vId >= 1;
-					VertexBaseImpl v = getVertex()[vId];
-					getVertex()[vId] = null;
+					VertexBaseImpl v = getVertexArray()[vId];
+					getVertexArray()[vId] = null;
 					getFreeVertexList().freeIndex(vId);
 					int newId = allocateVertexIndex(vId);
 					assert newId < vId;
 					v.setId(newId);
-					getVertex()[newId] = v;
+					getVertexArray()[newId] = v;
 					--vId;
 				}
 			}
@@ -1082,8 +1194,9 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 			if (newVMax != vMax) {
 				vMax = newVMax;
 				VertexBaseImpl[] newVertex = new VertexBaseImpl[vMax + 1];
-				System.arraycopy(getVertex(), 0, newVertex, 0, newVertex.length);
-				setVertex(newVertex);
+				System.arraycopy(getVertexArray(), 0, newVertex, 0,
+						newVertex.length);
+				setVertexArray(newVertex);
 			}
 			graphModified();
 			System.gc();
@@ -1093,20 +1206,17 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 			if (getECount() > 0) {
 				int eId = eMax;
 				while (getFreeEdgeList().isFragmented()) {
-					while ((eId >= 1) && (getEdge()[eId] == null)) {
+					while ((eId >= 1) && (getEdgeArray()[eId] == null)) {
 						--eId;
 					}
 					assert eId >= 1;
-					EdgeBaseImpl e = getEdge()[eId];
-					getEdge()[eId] = null;
-					// ReversedEdgeImpl r = getRevEdge()[eId];
-					// getRevEdge()[eId] = null;
+					EdgeBaseImpl e = getEdgeArray()[eId];
+					getEdgeArray()[eId] = null;
 					getFreeEdgeList().freeIndex(eId);
 					int newId = allocateEdgeIndex(eId);
 					assert newId < eId;
 					e.setId(newId);
-					getEdge()[newId] = e;
-					// getRevEdge()[newId] = r;
+					getEdgeArray()[newId] = e;
 					--eId;
 				}
 			}
@@ -1114,8 +1224,40 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 			if (newEMax != eMax) {
 				eMax = newEMax;
 				EdgeBaseImpl[] newEdge = new EdgeBaseImpl[eMax + 1];
-				System.arraycopy(getEdge(), 0, newEdge, 0, newEdge.length);
-				setEdge(newEdge);
+				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
+				setEdgeArray(newEdge);
+				System.gc();
+			}
+			graphModified();
+			System.gc();
+		}
+
+		if (getICount() < iMax) {
+			if (getICount() > 0) {
+				int iId = iMax;
+				while (getFreeEdgeList().isFragmented()) {
+					while ((iId >= 1) && (getIncidenceArray()[iId] == null)) {
+						--iId;
+					}
+					assert iId >= 1;
+					IncidenceBaseImpl i = getIncidenceArray()[iId];
+					getIncidenceArray()[iId] = null;
+					getFreeIncidenceList().freeIndex(iId);
+					int newId = allocateIncidenceIndex(iId);
+					assert newId < iId;
+					i.setId(newId);
+					getIncidenceArray()[newId] = i;
+					// getRevEdge()[newId] = r;
+					--iId;
+				}
+			}
+			int newIMax = getICount() == 0 ? 1 : getICount();
+			if (newIMax != iMax) {
+				iMax = newIMax;
+				IncidenceBaseImpl[] newIncidence = new IncidenceBaseImpl[iMax + 1];
+				System.arraycopy(getIncidenceArray(), 0, newIncidence, 0,
+						newIncidence.length);
+				setIncidenceArray(newIncidence);
 				System.gc();
 			}
 			graphModified();
@@ -1156,6 +1298,14 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 	 *            needed for transaction support
 	 */
 	abstract protected int allocateEdgeIndex(int currentId);
+
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	abstract protected int allocateIncidenceIndex(int currentId);
 
 	/**
 	 * 
@@ -1235,6 +1385,36 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 		}
 	}
 
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum incidence count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum incidence count.
+	 */
+	protected void notifyMaxIncidenceCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxIncidenceCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxIncidenceCountIncreased(
+					newValue);
+		}
+	}
+
 	protected boolean canAddGraphElement(int graphElementId) {
 		return graphElementId == 0;
 	}
@@ -1244,5 +1424,7 @@ public abstract class GraphBaseImpl extends GraphBaseBaseImpl {
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
+
+	protected abstract void setICount(int count);
 
 }

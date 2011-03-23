@@ -939,6 +939,35 @@ public abstract class GraphBaseBaseImpl implements Graph {
 
 	/**
 	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the given incidence <code>i</code> has been created. All invalid
+	 * <code>WeakReference</code>s are deleted automatically from the internal
+	 * listener list.
+	 * 
+	 * @param i
+	 *            the incidence that has been created.
+	 */
+	protected void notifyIncidenceAdded(Incidence i) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.incidenceAdded(i);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int j = 0; j < n; j++) {
+			graphStructureChangedListeners.get(j).incidenceAdded(i);
+		}
+	}
+
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
 	 * the given edge <code>e</code> is about to be deleted. All invalid
 	 * <code>WeakReference</code>s are deleted automatically from the internal
 	 * listener list.

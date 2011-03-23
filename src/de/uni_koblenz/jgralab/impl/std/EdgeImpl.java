@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * The implementation of an {@link Edge} accessing attributes without
  * versioning.
  * 
- * @author Jose Monte(monte@uni-koblenz.de)
+ * @author ist@uni-koblenz.de
  */
 public abstract class EdgeImpl extends de.uni_koblenz.jgralab.impl.EdgeBaseImpl {
 	// global edge sequence

@@ -88,9 +88,9 @@ public class Sum extends Greql2Function {
 
 		JValueCollection col = arguments[0].toCollection();
 		double sum = 0;
-		for (JValue v : col) {
-			if (v.isNumber()) {
-				sum += v.toDouble();
+		for (JValue curVal : col) {
+			if (curVal.isNumber()) {
+				sum += curVal.toNumber().doubleValue();
 			} else {
 				throw new EvaluateException(
 						"Cannot sum up values of a collection that doesn't contain numbers.");
