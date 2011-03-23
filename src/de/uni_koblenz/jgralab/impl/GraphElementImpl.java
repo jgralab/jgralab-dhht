@@ -64,7 +64,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  */
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
-    extends UnicastRemoteObject implements GraphElement<OwnTypeClass, OwnType, DualType>  {
+		extends UnicastRemoteObject implements
+		GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**
 	 * Generated Serual Version UID
@@ -552,5 +553,21 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	boolean isSubordinateGraphObjectAlreadyCreated() {
 		return subOrdinateGraph != null;
+	}
+
+	/**
+	 * @param parent
+	 *            {@link GraphElement}
+	 * @return <code>true</code> if this GraphElement is a direct or indirect
+	 *         child of <code>parent</code>.
+	 */
+	public boolean isChildOf(GraphElement<?, ?, ?> parent) {
+		if (getParent() == null || getKappa() >= parent.getKappa()) {
+			return false;
+		} else if (getParent() == parent) {
+			return true;
+		} else {
+			return ((GraphElementImpl<?, ?, ?>) getParent()).isChildOf(parent);
+		}
 	}
 }
