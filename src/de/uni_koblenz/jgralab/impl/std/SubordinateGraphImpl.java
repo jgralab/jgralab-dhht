@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -46,6 +47,7 @@ import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
+import de.uni_koblenz.jgralab.impl.GraphElementImpl;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -64,7 +66,7 @@ public class SubordinateGraphImpl extends
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
 	private EdgeBaseImpl lastEdge;
-	private final GraphElement<?, ?, ?> containingElement;
+	private GraphElement<?, ?, ?> containingElement;
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -87,7 +89,6 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public int getVCount() {
-		// TODO
 		return vCount;
 	}
 
@@ -167,7 +168,7 @@ public class SubordinateGraphImpl extends
 	}
 
 	/**
-	 * TODO GraphClass = containingElement.getType()
+	 * TODO GraphClass == containingElement.getType()?
 	 * 
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
@@ -175,7 +176,83 @@ public class SubordinateGraphImpl extends
 	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getId(), containingVertex.getGraph()
 				.getType());
-		containingElement = containingVertex;
+		initializeCommonFields(containingVertex);
+
+		// initialize vertices
+		for (Vertex current = containingVertex.getNextVertex(); current != null
+				&& ((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement); current.getNextVertex()) {
+			if (getFirstVertex() == null) {
+				setFirstVertex((VertexBaseImpl) current);
+			}
+			setLastVertex((VertexBaseImpl) current);
+			setVCount(getVCount() + 1);
+		}
+
+		// initialize edges
+		Edge current = containingVertex.getGraph().getFirstEdge();
+		while (current != null
+				&& !((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement)) {
+			current = current.getNextEdge();
+		}
+		if (current != null) {
+			setFirstEdge((EdgeBaseImpl) current);
+			do {
+				setLastEdge((EdgeBaseImpl) current);
+				setECount(getECount() + 1);
+				current = current.getNextEdge();
+			} while (current != null
+					&& ((GraphElementImpl<?, ?, ?>) current)
+							.isChildOf(containingElement));
+		}
+	}
+
+	/**
+	 * TODO GraphClass == containingElement.getType()?
+	 * 
+	 * @param containingEdge
+	 *            {@link Edge} which contains this subordinate graph
+	 */
+	protected SubordinateGraphImpl(Edge containingEdge) {
+		super(containingEdge.getGraph().getId(), containingEdge.getGraph()
+				.getType());
+		initializeCommonFields(containingEdge);
+
+		// initialize edges
+		for (Edge current = containingEdge.getNextEdge(); current != null
+				&& ((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement); current.getNextEdge()) {
+			if (getFirstEdge() == null) {
+				setFirstEdge((EdgeBaseImpl) current);
+			}
+			setLastEdge((EdgeBaseImpl) current);
+			setECount(getECount() + 1);
+		}
+
+		// initialize vertices
+		Vertex current = containingEdge.getGraph().getFirstVertex();
+		while (current != null
+				&& !((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement)) {
+			current = current.getNextVertex();
+		}
+		if (current != null) {
+			setFirstVertex((VertexBaseImpl) current);
+			do {
+				setLastVertex((VertexBaseImpl) current);
+				setVCount(getVCount() + 1);
+				current = current.getNextVertex();
+			} while (current != null
+					&& ((GraphElementImpl<?, ?, ?>) current)
+							.isChildOf(containingElement));
+		}
+	}
+
+	private void initializeCommonFields(GraphElement<?, ?, ?> containingElement) {
+		this.containingElement = containingElement;
+		edgeListVersion = containingElement.getGraph().getEdgeListVersion();
+		vertexListVersion = containingElement.getGraph().getVertexListVersion();
 	}
 
 	@Override
@@ -322,12 +399,14 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public Class<? extends Graph> getM1Class() {
-		return containingElement.getGraph().getM1Class();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public GraphClass getType() {
-		return containingElement.getGraph().getType();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -402,6 +481,28 @@ public class SubordinateGraphImpl extends
 	@Override
 	public Schema getSchema() {
 		return containingElement.getGraph().getSchema();
+	}
+
+	@Override
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega) {
+		T edge = super.createEdge(cls, alpha, omega);
+		containingElement.addSubordinateElement(edge);
+		return edge;
+	}
+
+	@Override
+	public <T extends Edge> T createEdge(Class<T> cls) {
+		T edge = super.createEdge(cls);
+		containingElement.addSubordinateElement(edge);
+		return edge;
+	}
+
+	@Override
+	public <T extends Vertex> T createVertex(Class<T> cls) {
+		T vertex = super.createVertex(cls);
+		containingElement.addSubordinateElement(vertex);
+		return vertex;
 	}
 
 	@Override

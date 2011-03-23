@@ -113,6 +113,21 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return parent;
 	}
 
+	/**
+	 * @param parent
+	 * @return <code>true</code> if this is a direct or indirect child of
+	 *         <code>parent</code>
+	 */
+	public boolean isChildOf(GraphElement<?, ?, ?> parent) {
+		if (getParent() == null || getKappa() >= parent.getKappa()) {
+			return false;
+		} else if (getParent() == parent) {
+			return true;
+		} else {
+			return ((GraphElementImpl<?, ?, ?>) getParent()).isChildOf(parent);
+		}
+	}
+
 	@Override
 	public int getKappa() {
 		return kappa;
