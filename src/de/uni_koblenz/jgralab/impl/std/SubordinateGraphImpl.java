@@ -38,6 +38,7 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -62,6 +63,7 @@ public class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseBaseImpl {
 	private int vCount;
 	private int eCount;
+	private int iCount;
 	private VertexBaseImpl firstVertex;
 	private VertexBaseImpl lastVertex;
 	private EdgeBaseImpl firstEdge;
@@ -125,6 +127,11 @@ public class SubordinateGraphImpl extends
 	@Override
 	protected void setECount(int count) {
 		eCount = count;
+	}
+
+	@Override
+	protected void setICount(int count) {
+		iCount = count;
 	}
 
 	@Override
@@ -201,6 +208,7 @@ public class SubordinateGraphImpl extends
 			do {
 				setLastEdge((EdgeBaseImpl) current);
 				setECount(getECount() + 1);
+				setICount(getICount() + current.getDegree());
 				current = current.getNextEdge();
 			} while (current != null
 					&& ((GraphElementImpl<?, ?, ?>) current)
@@ -228,6 +236,7 @@ public class SubordinateGraphImpl extends
 			}
 			setLastEdge((EdgeBaseImpl) current);
 			setECount(getECount() + 1);
+			setICount(getICount() + current.getDegree());
 		}
 
 		// initialize vertices
@@ -411,12 +420,12 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public boolean isLoading() {
-		return containingElement.getGraph().isLoading();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void loadingCompleted() {
-		containingElement.getGraph().loadingCompleted();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -433,32 +442,54 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public void deleteVertex(Vertex v) {
-		containingElement.getGraph().deleteVertex(v);
+		if (containsVertex(v)) {
+			containingElement.getGraph().deleteVertex(v);
+		} else {
+			throw new GraphException("The subordinate graph of "
+					+ getContainingElement().getId()
+					+ " does not contain vertex " + v.getId() + ".");
+		}
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
-		containingElement.getGraph().deleteEdge(e);
+		if (containsEdge(e)) {
+			containingElement.getGraph().deleteEdge(e);
+		} else {
+			throw new GraphException("The subordinate graph of "
+					+ getContainingElement().getId()
+					+ " does not contain edge " + e.getId() + ".");
+		}
 	}
 
 	@Override
 	public Vertex getVertex(int id) {
-		return containingElement.getGraph().getVertex(id);
+		Vertex v = containingElement.getGraph().getVertex(id);
+		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
+			return v;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public Edge getEdge(int id) {
-		return containingElement.getGraph().getEdge(id);
+		Edge e = containingElement.getGraph().getEdge(id);
+		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
+			return e;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public int getMaxVCount() {
-		return containingElement.getGraph().getMaxVCount();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int getMaxECount() {
-		return containingElement.getGraph().getMaxECount();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -474,8 +505,7 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public void defragment() {
-		// TODO adapt to subgraph or UnsupportedOperationException
-		containingElement.getGraph().defragment();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -507,8 +537,7 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public int getICount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return iCount;
 	}
 
 }

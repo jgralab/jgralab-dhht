@@ -70,11 +70,6 @@ public abstract class GraphBaseBaseImpl implements Graph {
 	// ------------- GRAPH VARIABLES -------------
 
 	/**
-	 * TODO (Daniel B.): Implement incidence ids analogical to Vertex and Edge
-	 * ids
-	 */
-
-	/**
 	 * The GraphFactory that was used to create this graph. This factory will be
 	 * used to create vertices and edges in this graph.
 	 */
@@ -189,7 +184,11 @@ public abstract class GraphBaseBaseImpl implements Graph {
 		setFirstEdge(null);
 		setLastEdge(null);
 		setECount(0);
+
+		setICount(0);
 	}
+
+	protected abstract void setICount(int count);
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
