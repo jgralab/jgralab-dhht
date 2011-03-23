@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -57,7 +58,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	private final BitSetVertexMarker vertexGraphMarker;
 	private long version;
 
-	public SubGraphMarker(Graph graph) {
+	public SubGraphMarker(Graph graph) throws RemoteException {
 		super(graph);
 		edgeGraphMarker = new BitSetEdgeMarker(graph);
 		vertexGraphMarker = new BitSetVertexMarker(graph);
@@ -75,7 +76,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public boolean isMarked(GraphElement<?, ?, ?> graphElement) {
+	public boolean isMarked(GraphElement<?, ?, ?> graphElement) throws RemoteException {
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.isMarked((Edge) graphElement);
 		} else {
@@ -89,7 +90,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public boolean removeMark(GraphElement<?, ?, ?> graphElement) {
+	public boolean removeMark(GraphElement<?, ?, ?> graphElement) throws RemoteException {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.removeMark((Edge) graphElement);
@@ -107,7 +108,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	 *            the edge to unmark
 	 * @return false if the given edge has already been unmarked.
 	 */
-	public boolean removeMark(Edge e) {
+	public boolean removeMark(Edge e) throws RemoteException {
 		version++;
 		return edgeGraphMarker.removeMark(e);
 	}
@@ -121,7 +122,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	 *            the vertex to unmark
 	 * @return false if the given vertex has already been unmarked.
 	 */
-	public boolean removeMark(Vertex v) {
+	public boolean removeMark(Vertex v) throws RemoteException {
 		version++;
 		return vertexGraphMarker.removeMark(v);
 	}
@@ -134,7 +135,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	 * @return false if the given <code>graphElement</code> has already been
 	 *         marked.
 	 */
-	public boolean mark(GraphElement<?, ?, ?> graphElement) {
+	public boolean mark(GraphElement<?, ?, ?> graphElement) throws RemoteException {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.mark((Edge) graphElement);
@@ -152,7 +153,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	 *            the edge to mark
 	 * @return false if the given edge has already been marked.
 	 */
-	public boolean mark(Edge e) {
+	public boolean mark(Edge e) throws RemoteException {
 		version++;
 		return edgeGraphMarker.mark(e);
 	}
@@ -166,18 +167,18 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	 *            the vertex to mark
 	 * @return false if the given vertex has already been marked.
 	 */
-	public boolean mark(Vertex v) {
+	public boolean mark(Vertex v) throws RemoteException {
 		version++;
 		return vertexGraphMarker.mark(v);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		edgeGraphMarker.edgeDeleted(e);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 		vertexGraphMarker.vertexDeleted(v);
 	}
 

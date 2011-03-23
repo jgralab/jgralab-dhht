@@ -77,7 +77,7 @@ public class JValueXMLLoader extends XmlProcessor implements JValueXMLConstants 
 	public JValueXMLLoader(Graph... graphs) {
 		id2GraphMap = new HashMap<String, Graph>(graphs.length);
 		for (Graph g : graphs) {
-			id2GraphMap.put(g.getId(), g);
+			id2GraphMap.put(g.getUid(), g);
 		}
 
 		schemaName2Schema = new HashMap<String, Schema>(graphs.length);
@@ -242,7 +242,7 @@ public class JValueXMLLoader extends XmlProcessor implements JValueXMLConstants 
 			Edge e = g.getEdge(id);
 			if (e == null) {
 				throw new JValueLoadException("There's no edge with id '" + id
-						+ "' in graph '" + g.getId() + "'.", null);
+						+ "' in graph '" + g.getUid() + "'.", null);
 			}
 			val = new JValueImpl(e);
 			// ---------------------------------------------------------------
@@ -312,7 +312,7 @@ public class JValueXMLLoader extends XmlProcessor implements JValueXMLConstants 
 			Vertex v = g.getVertex(id);
 			if (v == null) {
 				throw new JValueLoadException("There's no vertex with id '"
-						+ id + "' in graph '" + g.getId() + "'.", null);
+						+ id + "' in graph '" + g.getUid() + "'.", null);
 			}
 			val = new JValueImpl(v);
 			// ---------------------------------------------------------------

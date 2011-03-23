@@ -78,8 +78,6 @@ public enum Direction {
 			return VERTEX_TO_EDGE;
 		} else if (direction.equals("BOTH")) {
 			return BOTH;
-		} else if (direction.equals("BOTH")) {
-			return Direction.BOTH;
 		} else {
 			throw new Exception("Could not determine direction from string.");
 		}

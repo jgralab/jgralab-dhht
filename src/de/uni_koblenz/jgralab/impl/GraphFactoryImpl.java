@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.reflect.Constructor;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +40,15 @@ import java.util.List;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
+import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
+import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**
@@ -56,85 +61,105 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  */
 public abstract class GraphFactoryImpl implements GraphFactory {
 
-	// FIXME Remove redundancies! Why is this all in one class anyway? Because
-	// it seems to be a factory pattern!?!
+	/* maps for in-memory storage */
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMapForMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMapForMemBasedImpl;
+	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForMemBasedImpl;
+	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForMemBasedImpl;
+	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForMemBasedImpl;
+	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForMemBasedImpl;
 
-	// Maps for standard support.
-	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMap;
-	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMap;
-	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMap;
-	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMap;
-	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMap;
+	/* maps for disk-based storage */
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForDiskBasedImpl;
+	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForDiskBasedImpl;
+	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForDiskBasedImpl;
+
+	/* maps for proxy elements */
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMapForProxies;
+	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForProxies;
+	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForProxies;
+	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForProxies;
+	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForProxies;
+
 	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMap;
 
-//	// Maps for database support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphDatabaseMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeDatabaseMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexDatabaseMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceDatabaseMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordDatabaseMap;
-//
-//	// Maps for transaction support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphTransactionMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeTransactionMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexTransactionMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceTransactionMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordTransactionMap;
-//
-//	// Maps for savemem support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphSavememMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeSavememMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexSavememMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends  Incidence>> incidenceSavememMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordSavememMap;
+	/*
+	 * maps elements to their constructors needed to reload the element from the
+	 * disk
+	 */
+	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForDiskStorageReloading;
+	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForDiskStorageReloading;
+	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForDiskStorageReloading;
 
 	/**
 	 * Creates and initializes a new <code>GraphFactoryImpl</code>.
 	 */
 	protected GraphFactoryImpl() {
 		this.createMapsForStandardSupport();
-//		this.createMapsForDatabaseSupport();
-//		this.createMapsForTransactionSupport();
-//		this.createMapsForSaveMemSupport();
 	}
 
 	private void createMapsForStandardSupport() {
-		graphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-		edgeMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-		binaryEdgeMap = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
-		vertexMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		graphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		viewGraphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialGraphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialSubordinateGraphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		edgeMapForMemBasedImpl = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		binaryEdgeMapForMemBasedImpl = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
+		vertexMapForMemBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForMemBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+
+		graphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		viewGraphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialGraphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialSubordinateGraphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		edgeMapForDiskBasedImpl = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		binaryEdgeMapForDiskBasedImpl = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
+		vertexMapForDiskBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForDiskBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+
+		graphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		viewGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialSubordinateGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		edgeMapForProxies = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		binaryEdgeMapForProxies = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
+		vertexMapForProxies = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForProxies = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+
+		edgeMapForDiskStorageReloading = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		vertexMapForDiskStorageReloading = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForDiskStorageReloading = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
-
-//	private void createMapsForDatabaseSupport() {
-//		this.graphDatabaseMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		this.edgeDatabaseMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		this.vertexDatabaseMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		this.recordDatabaseMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-//
-//	private void createMapsForTransactionSupport() {
-//		graphTransactionMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		edgeTransactionMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		vertexTransactionMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		recordTransactionMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-//
-//	private void createMapsForSaveMemSupport() {
-//		graphSavememMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		edgeSavememMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		vertexSavememMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		recordSavememMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-
-	// --- Methods for option STDIMPL
-	// ---------------------------------------------------
 
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
 			Vertex alpha, Vertex omega) {
 		try {
-			Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
+			Edge e = binaryEdgeMapForMemBasedImpl.get(edgeClass).newInstance(
+					id, g, alpha, omega);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -145,11 +170,85 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ edgeClass.getCanonicalName(), ex);
 		}
 	}
-	
+
+	@Override
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass,
+			int id, Graph g, Vertex alpha, Vertex omega) {
+		try {
+			Edge e = binaryEdgeMapForDiskBasedImpl.get(edgeClass).newInstance(
+					id, g, alpha, omega);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Edge reloadEdge(Class<? extends Edge> edgeClass, int id, Graph g,
+			EdgeContainer container) {
+		try {
+			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
+					id, container, g);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
+
+		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		// cg.backgroundStorage.freeMem();
 		try {
-			Edge e = edgeMap.get(edgeClass).newInstance(id, g);
+			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, int id, Graph g) {
+
+		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		// cg.backgroundStorage.freeMem();
+		try {
+			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass,
+			int id, Graph g) {
+
+		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		// cg.backgroundStorage.freeMem();
+		try {
+			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, g);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -164,7 +263,20 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public Graph createGraph(Class<? extends Graph> graphClass, String id,
 			int vMax, int eMax) {
 		try {
-			Graph g = graphMap.get(graphClass).newInstance(id, vMax, eMax);
+			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
+					vMax, eMax);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException("Cannot create graph of class "
+					+ graphClass.getCanonicalName(), ex);
+		}
+	}
+
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass,
+			String id, int vMax, int eMax) {
+		try {
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id,
+					vMax, eMax);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -174,7 +286,20 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	public Graph createGraph(Class<? extends Graph> graphClass, String id) {
 		try {
-			Graph g = graphMap.get(graphClass).newInstance(id, 1000, 1000);
+			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
+					1000, 1000);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException("Cannot create graph of class "
+					+ graphClass.getCanonicalName(), ex);
+		}
+	}
+
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass,
+			String id) {
+		try {
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id,
+					1000, 1000);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -187,7 +312,45 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			int id, Vertex v, Edge e) {
 		try {
 			@SuppressWarnings("unchecked")
-			T i = (T) incidenceMap.get(incidenceClass).newInstance(id, v, e);
+			T i = (T) incidenceMapForMemBasedImpl.get(incidenceClass)
+					.newInstance(id, v, e);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException(
+					"Cannot create incidence of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public <T extends Incidence> T createIncidenceDiskBasedStorage(
+			Class<T> incidenceClass, int id, Vertex v, Edge e) {
+		try {
+			@SuppressWarnings("unchecked")
+			T i = (T) incidenceMapForDiskBasedImpl.get(incidenceClass)
+					.newInstance(id, v, e);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException(
+					"Cannot create incidence of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Incidence reloadIncidence(Class<? extends Incidence> incidenceClass,
+			int id, IncidenceContainer container) {
+		try {
+			Incidence i = incidenceMapForDiskStorageReloading.get(
+					incidenceClass).newInstance(id, container);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -202,8 +365,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
 			Graph g) {
+		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		// cg.backgroundStorage.freeMem();
 		try {
-			Vertex v = vertexMap.get(vertexClass).newInstance(id, g);
+			Vertex v = vertexMapForMemBasedImpl.get(vertexClass).newInstance(
+					id, g);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -215,13 +381,49 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	public Vertex createVertexDiskBasedStorage(
+			Class<? extends Vertex> vertexClass, int id, Graph g) {
+		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		// cg.backgroundStorage.freeMem();
+		try {
+			Vertex v = vertexMapForDiskBasedImpl.get(vertexClass).newInstance(
+					id, g);
+			return v;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create vertex of class "
+					+ vertexClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id,
+			Graph g, VertexContainer container) {
+		try {
+			Vertex v = vertexMapForDiskStorageReloading.get(vertexClass)
+					.newInstance(id, container, g);
+			return v;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot reload vertex of class "
+					+ vertexClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
 	public void setGraphImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends Graph> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphMap.put(originalClass,
+				graphMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
@@ -231,17 +433,93 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	@Override
+	public void setGraphImplementationClassForDiskBasedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends Graph> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { String.class, int.class, int.class };
+				graphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
 	public void setVertexImplementationClass(
 			Class<? extends Vertex> originalClass,
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				vertexMap.put(originalClass,
+				vertexMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
+				Class<?>[] paramsDisk = { int.class, VertexContainer.class,
+						Graph.class };
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for vertexclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	@Override
+	public void setVertexImplementationClassForDiskBasedStorage(
+			Class<? extends Vertex> originalClass,
+			Class<? extends Vertex> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Graph.class };
+				vertexMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramsDisk = { int.class, VertexContainer.class,
+						Graph.class };
+				vertexMapForDiskStorageReloading.put(originalClass,
+						implementationClass.getConstructor(paramsDisk));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for vertexclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	public void setIncidenceImplementationClass(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Vertex.class, Edge.class };
+				incidenceMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for incidenceclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	public void setIncidenceImplementationClassForDiskBasedStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Vertex.class, Edge.class };
+				incidenceMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramsDisk = { int.class, IncidenceContainer.class };
+				incidenceMapForDiskStorageReloading.put(originalClass,
+						implementationClass.getConstructor(paramsDisk));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for incidenceclass"
 								+ implementationClass, ex);
 			}
 		}
@@ -252,19 +530,60 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { int.class, Graph.class};
-				edgeMap.put(originalClass,
+				Class<?>[] params = { int.class, Graph.class };
+				edgeMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				
+
 				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces())
+				for (Class<?> c : originalClass.getInterfaces()) {
 					interfaces.add(c);
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class, Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass.getConstructor(binaryParams);
-					binaryEdgeMap.put((Class<? extends BinaryEdge>) originalClass, binaryConstructor);
 				}
-				
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class,
+							Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
+							.getConstructor(binaryParams);
+					binaryEdgeMapForMemBasedImpl.put(
+							(Class<? extends BinaryEdge>) originalClass,
+							binaryConstructor);
+				}
+
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for edgeclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setEdgeImplementationClassForDiskBasedStorage(
+			Class<? extends Edge> originalClass,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Graph.class };
+				edgeMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramsDisk = { int.class, EdgeContainer.class,
+						Graph.class };
+				edgeMapForDiskStorageReloading.put(originalClass,
+						implementationClass.getConstructor(paramsDisk));
+
+				List<Class<?>> interfaces = new ArrayList<Class<?>>();
+				for (Class<?> c : originalClass.getInterfaces()) {
+					interfaces.add(c);
+				}
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class,
+							Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
+							.getConstructor(binaryParams);
+					binaryEdgeMapForMemBasedImpl.put(
+							(Class<? extends BinaryEdge>) originalClass,
+							binaryConstructor);
+				}
+
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -302,446 +621,6 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ recordDomain.getCanonicalName(), ex);
 		}
 	}
-
-//	// -------------------------------------------------------------------------
-//	// Methods for the TRANSIMPL option.
-//	// -------------------------------------------------------------------------
-//
-//	@Override
-//	public Graph createGraphWithDatabaseSupport(
-//			Class<? extends Graph> graphClass, GraphDatabase graphDatabase,
-//			String id) {
-//		try {
-//			return graphDatabaseMap.get(graphClass).newInstance(id, 1000, 1000,
-//					graphDatabase);
-//		} catch (Exception exception) {
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), exception);
-//		}
-//	}
-//
-//	@Override
-//	public Graph createGraphWithDatabaseSupport(
-//			Class<? extends Graph> graphClass, GraphDatabase graphDatabase,
-//			String id, int vMax, int eMax) {
-//		try {
-//			return graphDatabaseMap.get(graphClass).newInstance(id, vMax, eMax,
-//					graphDatabase);
-//		} catch (Exception exception) {
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), exception);
-//		}
-//	}
-//
-//	@Override
-//	public Edge createEdgeWithDatabaseSupport(Class<? extends Edge> edgeClass,
-//			int id, Graph graph, Vertex alpha, Vertex omega) {
-//		try {
-//			return edgeDatabaseMap.get(edgeClass).newInstance(id, graph, alpha,
-//					omega);
-//		} catch (Exception exception) {
-//			if (exception.getCause() instanceof GraphException) {
-//				throw new GraphException(exception.getCause()
-//						.getLocalizedMessage());
-//			} else {
-//				throw new M1ClassAccessException("Cannot create edge of class "
-//						+ edgeClass.getCanonicalName(), exception);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public Vertex createVertexWithDatabaseSupport(
-//			Class<? extends Vertex> vertexClass, int id, Graph graph) {
-//		try {
-//			Constructor<? extends Vertex> constructor = vertexDatabaseMap
-//					.get(vertexClass);
-//			return constructor.newInstance(id, graph);
-//		} catch (Exception exception) {
-//			if (exception.getCause() instanceof GraphException) {
-//				throw new GraphException(exception.getCause()
-//						.getLocalizedMessage());
-//			} else {
-//				throw new M1ClassAccessException(
-//						"Cannot create vertex of class "
-//								+ vertexClass.getCanonicalName(), exception);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void setGraphDatabaseImplementationClass(
-//			Class<? extends Graph> originalClass,
-//			Class<? extends Graph> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { String.class, int.class, int.class,
-//						GraphDatabase.class };
-//				graphDatabaseMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException exception) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for graphclass "
-//								+ implementationClass.getName(), exception);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void setVertexDatabaseImplementationClass(
-//			Class<? extends Vertex> originalClass,
-//			Class<? extends Vertex> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class };
-//				vertexDatabaseMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException exception) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for vertex class"
-//								+ implementationClass, exception);
-//			}
-//		}
-//	}
-//
-//	@Override
-//	public void setEdgeDatabaseImplementationClass(
-//			Class<? extends Edge> originalClass,
-//			Class<? extends Edge> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class, Vertex.class,
-//						Vertex.class };
-//				edgeDatabaseMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException exception) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for edge class"
-//								+ implementationClass, exception);
-//			}
-//		}
-//	}
-//
-//	public void setRecordDatabaseImplementationClass(
-//			Class<? extends Record> m1Class,
-//			Class<? extends Record> implementationClass) {
-//		if (isSuperclassOrEqual(m1Class, implementationClass)) {
-//			try {
-//				Class<?>[] params = { Graph.class };
-//				recordMap.put(m1Class,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for record"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	public <T extends Record> T createRecordWithDatabaseSupport(
-//			Class<T> recordDomain, Graph g) {
-//		try {
-//			T r = (T) recordMap.get(recordDomain).newInstance(g);
-//			return r;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create record of class "
-//					+ recordDomain.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	// --- Methods for option TRANSIMPL
-//	// -------------------------------------------------
-//
-//	public Edge createEdgeWithTransactionSupport(
-//			Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha,
-//			Vertex omega) {
-//		try {
-//			Edge e = edgeTransactionMap.get(edgeClass).newInstance(id, g,
-//					alpha, omega);
-//			e.initializeAttributesWithDefaultValues();
-//			return e;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create edge of class "
-//					+ edgeClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public Graph createGraphWithTransactionSupport(
-//			Class<? extends Graph> graphClass, String id, int vMax, int eMax) {
-//		try {
-//			Graph g = graphTransactionMap.get(graphClass).newInstance(id, vMax,
-//					eMax);
-//			return g;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public Graph createGraphWithTransactionSupport(
-//			Class<? extends Graph> graphClass, String id) {
-//		try {
-//			Graph g = graphTransactionMap.get(graphClass).newInstance(id, 1000,
-//					1000);
-//			return g;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public Vertex createVertexWithTransactionSupport(
-//			Class<? extends Vertex> vertexClass, int id, Graph g) {
-//		try {
-//			Vertex v = vertexTransactionMap.get(vertexClass).newInstance(id, g);
-//			return v;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create vertex of class "
-//					+ vertexClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	public <T extends Record> T createRecordWithTransactionSupport(
-//			Class<T> recordDomain, Graph g) {
-//		try {
-//			T r = (T) recordTransactionMap.get(recordDomain).newInstance(g);
-//			return r;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create vertex of class "
-//					+ recordDomain.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public void setGraphTransactionImplementationClass(
-//			Class<? extends Graph> originalClass,
-//			Class<? extends Graph> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { String.class, int.class, int.class };
-//				graphTransactionMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate transaction constructor for graphclass "
-//								+ implementationClass.getName(), ex);
-//			}
-//		}
-//	}
-//
-//	public void setVertexTransactionImplementationClass(
-//			Class<? extends Vertex> originalClass,
-//			Class<? extends Vertex> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class };
-//				vertexTransactionMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate transaction constructor for vertexclass"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	public void setEdgeTransactionImplementationClass(
-//			Class<? extends Edge> originalClass,
-//			Class<? extends Edge> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class, Vertex.class,
-//						Vertex.class };
-//				edgeTransactionMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate transaction constructor for edgeclass"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	public void setRecordTransactionImplementationClass(
-//			Class<? extends Record> m1Class,
-//			Class<? extends Record> implementationClass) {
-//		if (isSuperclassOrEqual(m1Class, implementationClass)) {
-//			try {
-//				Class<?>[] params = { Graph.class };
-//				recordTransactionMap.put(m1Class,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for record"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	// -------------------------------------------------------------------------
-//	// Methods for the SAVEMEMIMPL option.
-//	// FIXME This is currently a clone STDIMPL methods with changed maps.
-//
-//	public Edge createEdgeWithSavememSupport(Class<? extends Edge> edgeClass,
-//			int id, Graph g, Vertex alpha, Vertex omega) {
-//		try {
-//			return edgeSavememMap.get(edgeClass).newInstance(id, g, alpha,
-//					omega);
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			} else {
-//				throw new M1ClassAccessException("Cannot create edge of class "
-//						+ edgeClass.getCanonicalName(), ex);
-//			}
-//		}
-//	}
-//
-//	public Graph createGraphWithSavememSupport(
-//			Class<? extends Graph> graphClass, String id, int vMax, int eMax) {
-//		try {
-//			Graph g = graphSavememMap.get(graphClass).newInstance(id, vMax,
-//					eMax);
-//			return g;
-//		} catch (Exception ex) {
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public Graph createGraphWithSavememSupport(
-//			Class<? extends Graph> graphClass, String id) {
-//		try {
-//			Graph g = graphSavememMap.get(graphClass).newInstance(id, 1000,
-//					1000);
-//			return g;
-//		} catch (Exception ex) {
-//			throw new M1ClassAccessException("Cannot create graph of class "
-//					+ graphClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public Vertex createVertexWithSavememSupport(
-//			Class<? extends Vertex> vertexClass, int id, Graph g) {
-//		try {
-//			Vertex v = vertexSavememMap.get(vertexClass).newInstance(id, g);
-//			return v;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create vertex of class "
-//					+ vertexClass.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	public <T extends Record> T createRecordWithSavememSupport(
-//			Class<T> recordDomain, Graph g) {
-//		try {
-//			T r = (T) recordSavememMap.get(recordDomain).newInstance(g);
-//			return r;
-//		} catch (Exception ex) {
-//			if (ex.getCause() instanceof GraphException) {
-//				throw new GraphException(ex.getCause().getLocalizedMessage(),
-//						ex);
-//			}
-//			throw new M1ClassAccessException("Cannot create vertex of class "
-//					+ recordDomain.getCanonicalName(), ex);
-//		}
-//	}
-//
-//	public void setGraphSavememImplementationClass(
-//			Class<? extends Graph> originalClass,
-//			Class<? extends Graph> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { String.class, int.class, int.class };
-//				graphSavememMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for graphclass "
-//								+ implementationClass.getName(), ex);
-//			}
-//		}
-//	}
-//
-//	public void setVertexSavememImplementationClass(
-//			Class<? extends Vertex> originalClass,
-//			Class<? extends Vertex> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class };
-//				vertexSavememMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for vertexclass"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	public void setEdgeSavememImplementationClass(
-//			Class<? extends Edge> originalClass,
-//			Class<? extends Edge> implementationClass) {
-//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-//			try {
-//				Class<?>[] params = { int.class, Graph.class, Vertex.class,
-//						Vertex.class };
-//				edgeSavememMap.put(originalClass,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for edgeclass"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
-//
-//	public void setRecordSavememImplementationClass(
-//			Class<? extends Record> m1Class,
-//			Class<? extends Record> implementationClass) {
-//		if (isSuperclassOrEqual(m1Class, implementationClass)) {
-//			try {
-//				Class<?>[] params = { Graph.class };
-//				recordSavememMap.put(m1Class,
-//						implementationClass.getConstructor(params));
-//			} catch (NoSuchMethodException ex) {
-//				throw new M1ClassAccessException(
-//						"Unable to locate default constructor for record"
-//								+ implementationClass, ex);
-//			}
-//		}
-//	}
 
 	// -------------------------------------------------------------------------
 	// Helper methods.
@@ -788,6 +667,298 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl createViewGraph(
+			Graph viewGraph, int level) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = viewGraph.getM1Class();
+			de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl) viewGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(viewGraph, level);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ viewGraph.getGraphClass().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraphDiskBasedStorage(
+			Graph viewGraph, int level) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = viewGraph.getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl) viewGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(viewGraph, level);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ viewGraph.getGraphClass().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
+			Vertex vertex) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
+			Vertex vertex) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
+			Edge vertex) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
+			Edge vertex) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl createPartialGraph(
+			Graph completeGraph) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = completeGraph.getM1Class();
+			de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl) partialGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(completeGraph);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ completeGraph.getGraphClass().getUniqueName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl createPartialGraphDiskBasedStorage(
+			Graph completeGraph) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = completeGraph.getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl) partialGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(completeGraph);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ completeGraph.getGraphClass().getUniqueName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl createPartialSubordinateGraph(
+			GraphElement<?, ?, ?> elem) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl) partialSubordinateGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(elem);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ elem.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl createPartialSubordinateGraphDiskBasedStorage(
+			GraphElement<?, ?, ?> elem) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl) partialSubordinateGraphMapForMemBasedImpl
+					.get(graphClass).newInstance(elem);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ elem.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public void setSubordinateGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { Vertex.class };
+				subordinateGraphForVertexMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramse = { Edge.class };
+				subordinateGraphForEdgeMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(paramse));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setSubordinateGraphImplementationClassForDiskBasedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { Vertex.class };
+				subordinateGraphForVertexMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramse = { Edge.class };
+				subordinateGraphForEdgeMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(paramse));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setViewGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { originalClass, int.class };
+				viewGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setViewGraphImplementationClassForDiskBasedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { originalClass, int.class };
+				viewGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setPartialGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { Graph.class, int.class };
+				partialGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setPartialGraphImplementationClassForDiskBasedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { Graph.class, int.class };
+				partialGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setPartialSubordinateGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { GraphElement.class, int.class };
+				partialSubordinateGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+
+	@Override
+	public void setPartialSubordinateGraphImplementationClassForDiskBasedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { GraphElement.class, int.class };
+				partialSubordinateGraphMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
 	}
 
 }

@@ -41,7 +41,6 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralab.greql2.funlib.Intersection;
 
 public class TempAttributeTest extends TestCase {
 

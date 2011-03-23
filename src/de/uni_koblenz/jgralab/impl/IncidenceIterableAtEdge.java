@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -24,7 +25,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param edge
 	 *            {@link Edge}
 	 */
-	public IncidenceIterableAtEdge(Edge edge) {
+	public IncidenceIterableAtEdge(Edge edge) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, null, null);
 	}
 
@@ -37,7 +38,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
-	public IncidenceIterableAtEdge(Edge edge, Direction direction) {
+	public IncidenceIterableAtEdge(Edge edge, Direction direction) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, null, direction);
 	}
 
@@ -51,7 +52,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Class} returned {@link Incidence}s are restricted to
 	 *            that class or subclasses
 	 */
-	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic) {
+	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, ic, null);
 	}
 
@@ -69,7 +70,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		assert edge != null && edge.isValid();
 		iter = new IncidenceIteratorAtEdge(edge.getGraph()
 				.getTraversalContext(), edge, ic, direction);
@@ -84,7 +85,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param edge
 	 *            {@link Edge}
 	 */
-	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge) {
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge) throws RemoteException {
 		this(traversalContext, edge, null, null);
 	}
 
@@ -100,7 +101,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		this(traversalContext, edge, null, direction);
 	}
 
@@ -117,7 +118,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            that class or subclasses
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Class<? extends Incidence> ic) {
+			Class<? extends Incidence> ic) throws RemoteException {
 		this(traversalContext, edge, ic, null);
 	}
 
@@ -137,7 +138,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Class<? extends Incidence> ic, Direction direction) {
+			Class<? extends Incidence> ic, Direction direction) throws RemoteException {
 		assert edge != null && edge.isValid();
 		iter = new IncidenceIteratorAtEdge(traversalContext, edge, ic,
 				direction);
@@ -165,7 +166,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		public IncidenceIteratorAtEdge(Graph traversalContext, Edge edge,
-				Class<? extends Incidence> ic, Direction dir) {
+				Class<? extends Incidence> ic, Direction dir) throws RemoteException {
 			super(traversalContext, edge, ic, dir);
 		}
 
@@ -177,9 +178,13 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 				throw new NoSuchElementException();
 			}
 			I result = current;
-			current = (I) ((ic == null) ? current.getNextIncidenceAtEdge(
-					traversalContext, dir) : current.getNextIncidenceAtEdge(
-					traversalContext, ic, dir));
+			try {
+				current = (I) ((ic == null) ? current.getNextIncidenceAtEdge(
+						traversalContext, dir) : current.getNextIncidenceAtEdge(
+						traversalContext, ic, dir));
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return result;
 		}
 

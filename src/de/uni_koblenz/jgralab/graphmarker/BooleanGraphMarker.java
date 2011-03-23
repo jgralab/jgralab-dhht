@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.HashSet;
 
 import de.uni_koblenz.jgralab.AttributedElement;
@@ -56,7 +57,7 @@ public class BooleanGraphMarker extends
 	 * creates a new boolean graph marker
 	 * 
 	 */
-	public BooleanGraphMarker(Graph g) {
+	public BooleanGraphMarker(Graph g) throws RemoteException {
 		super(g);
 		markedElements = new HashSet<AttributedElement<?, ?>>();
 	}
@@ -70,7 +71,7 @@ public class BooleanGraphMarker extends
 	 * @return true if this GraphMarker marks the given element, false otherwise
 	 */
 	@Override
-	public final boolean isMarked(AttributedElement<?, ?> elem) {
+	public final boolean isMarked(AttributedElement<?, ?> elem) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return markedElements.contains(elem);
@@ -84,7 +85,7 @@ public class BooleanGraphMarker extends
 	 * @return true if the element has been marked successfull, false if this
 	 *         element is already marked by this GraphMarker
 	 */
-	public final boolean mark(AttributedElement<?, ?> elem) {
+	public final boolean mark(AttributedElement<?, ?> elem) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -101,7 +102,7 @@ public class BooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(AttributedElement<?, ?> elem) {
+	public final boolean removeMark(AttributedElement<?, ?> elem) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return markedElements.remove(elem);

@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.jniserver;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -153,103 +154,105 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
 
-	public int createVertex(int graphId, String vertexClassName) {
+	public int createVertex(int graphId, String vertexClassName)
+			throws RemoteException {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Vertex> m1Class = graph.getGraphClass()
 				.getVertexClass(vertexClassName).getM1Class();
 		return graph.createVertex(m1Class).getId();
 	}
 
-	public void deleteVertex(int graphId, int vertexId) {
+	public void deleteVertex(int graphId, int vertexId) throws RemoteException {
 		graphs.get(graphId).getVertex(vertexId).delete();
 	}
 
 	public void setVertexAttribute(int graphId, int vertexId,
-			String attributeName, boolean value) {
+			String attributeName, boolean value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
 	public void setVertexAttribute(int graphId, int vertexId,
-			String attributeName, int value) {
+			String attributeName, int value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
 	public void setVertexAttribute(int graphId, int vertexId,
-			String attributeName, long value) {
+			String attributeName, long value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
 	public void setVertexAttribute(int graphId, int vertexId,
-			String attributeName, double value) {
+			String attributeName, double value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
 	public void setVertexAttribute(int graphId, int vertexId,
-			String attributeName, String value) {
+			String attributeName, String value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
 	public void setVertexEnumAttribute(int graphId, int vertexId,
-			String attributeName, String value) {
+			String attributeName, String value) throws RemoteException {
 		setEnumAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName, value);
 	}
 
 	public void setVertexListAttribute(int graphId, int vertexId,
-			String attributeName, List<?> value) {
+			String attributeName, List<?> value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getVertex(vertexId), attributeName,
 				value);
 	}
 
-	public String getVertexClassName(int graphId, int vertexId) {
-		return graphs.get(graphId).getVertex(vertexId)
-				.getType().getQualifiedName();
+	public String getVertexClassName(int graphId, int vertexId)
+			throws RemoteException {
+		return graphs.get(graphId).getVertex(vertexId).getType()
+				.getQualifiedName();
 	}
 
 	public boolean getVertexBooleanAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Boolean) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
 
 	public int getVertexIntegerAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Integer) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
 
 	public long getVertexLongAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Long) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
 
 	public double getVertexDoubleAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Double) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
 
 	public String getVertexStringAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (String) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 
 	}
 
 	public String getVertexEnumAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return getEnumAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
 
 	public List<?> getVertexListAttribute(int graphId, int vertexId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (List<?>) getAttribute(graphs.get(graphId).getVertex(vertexId),
 				attributeName);
 	}
@@ -258,7 +261,7 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 
 	public int createEdge(int graphId, String edgeClassName, int alphaId,
-			int omegaId) {
+			int omegaId) throws RemoteException {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Edge> m1Class = graph.getGraphClass()
 				.getEdgeClass(edgeClassName).getM1Class();
@@ -267,95 +270,95 @@ public class JniServer {
 		return e.getId();
 	}
 
-	public void deleteEdge(int graphId, int edgeId) {
+	public void deleteEdge(int graphId, int edgeId) throws RemoteException {
 		graphs.get(graphId).getEdge(edgeId).delete();
 	}
 
-	public Edge getEdge(int graphId, int edgeId) {
+	public Edge getEdge(int graphId, int edgeId) throws RemoteException {
 		return graphs.get(graphId).getEdge(edgeId);
 	}
 
-	public String getEdgeClassName(int graphId, int edgeId) {
-		return graphs.get(graphId).getEdge(edgeId).getType()
-				.getQualifiedName();
+	public String getEdgeClassName(int graphId, int edgeId)
+			throws RemoteException {
+		return graphs.get(graphId).getEdge(edgeId).getType().getQualifiedName();
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
-			boolean value) {
+			boolean value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
-			int value) {
+			int value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
-			long value) {
+			long value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
-			double value) {
+			double value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
-			String value) {
+			String value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public void setEdgeEnumAttribute(int graphId, int edgeId,
-			String attributeName, String value) {
+			String attributeName, String value) throws RemoteException {
 		setEnumAttribute(graphs.get(graphId).getEdge(edgeId), attributeName,
 				value);
 	}
 
 	public void setEdgeListAttribute(int graphId, int edgeId,
-			String attributeName, List<?> value) {
+			String attributeName, List<?> value) throws RemoteException {
 		setAttribute(graphs.get(graphId).getEdge(edgeId), attributeName, value);
 	}
 
 	public boolean getEdgeBooleanAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Boolean) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 	}
 
 	public int getEdgeIntegerAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Integer) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 
 	}
 
 	public long getEdgeLongAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Long) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 	}
 
 	public double getEdgeDoubleAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (Double) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 	}
 
 	public String getEdgeStringAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (String) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 
 	}
 
 	public String getEdgeEnumAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return getEnumAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 	}
 
 	public List<?> getEdgeListAttribute(int graphId, int edgeId,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		return (List<?>) getAttribute(graphs.get(graphId).getEdge(edgeId),
 				attributeName);
 	}
@@ -382,11 +385,12 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
 
-	public Vertex getVertex(int graphId, int vertexId) {
+	public Vertex getVertex(int graphId, int vertexId) throws RemoteException {
 		return graphs.get(graphId).getVertex(vertexId);
 	}
 
-	public int getFirstVertex(int graphId, String vertexClassName) {
+	public int getFirstVertex(int graphId, String vertexClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Vertex v = (vertexClassName != null) ? g.getFirstVertex((VertexClass) g
 				.getSchema().getAttributedElementClass(vertexClassName)) : g
@@ -394,7 +398,8 @@ public class JniServer {
 		return (v == null) ? 0 : v.getId();
 	}
 
-	public int getNextVertex(int graphId, int vertexId, String vertexClassName) {
+	public int getNextVertex(int graphId, int vertexId, String vertexClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Vertex v = (vertexClassName != null) ? g.getVertex(vertexId)
 				.getNextVertex(
@@ -404,7 +409,8 @@ public class JniServer {
 		return (v == null) ? 0 : v.getId();
 	}
 
-	public int getFirstEdgeInGraph(int graphId, String edgeClassName) {
+	public int getFirstEdgeInGraph(int graphId, String edgeClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Edge e = (edgeClassName != null) ? g.getFirstEdge((EdgeClass) g
 				.getSchema().getAttributedElementClass(edgeClassName)) : g
@@ -412,7 +418,8 @@ public class JniServer {
 		return (e == null) ? 0 : e.getId();
 	}
 
-	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName) {
+	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Edge e = (edgeClassName != null) ? g.getEdge(edgeId).getNextEdge(
 				((EdgeClass) g.getSchema().getAttributedElementClass(
@@ -508,7 +515,7 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 
 	private void setEnumAttribute(AttributedElement<?, ?> e,
-			String attributeName, Object value) {
+			String attributeName, Object value) throws RemoteException {
 		try {
 			AttributedElementClass<?, ?> aec = e.getType();
 			Attribute attr = aec.getAttribute(attributeName);
@@ -547,11 +554,15 @@ public class JniServer {
 
 	private void setAttribute(AttributedElement<?, ?> e, String attributeName,
 			Object value) {
-		e.setAttribute(attributeName, value);
+		try {
+			e.setAttribute(attributeName, value);
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 	private String getEnumAttribute(AttributedElement<?, ?> e,
-			String attributeName) {
+			String attributeName) throws RemoteException {
 		AttributedElementClass<?, ?> aec = e.getType();
 		Attribute attr = aec.getAttribute(attributeName);
 		if (attr == null) {
@@ -568,7 +579,11 @@ public class JniServer {
 	}
 
 	private Object getAttribute(AttributedElement<?, ?> e, String attributeName) {
-		return e.getAttribute(attributeName);
+		try {
+			return e.getAttribute(attributeName);
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 }

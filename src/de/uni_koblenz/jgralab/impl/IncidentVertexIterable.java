@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -27,7 +28,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 * @param edge
 	 *            {@link Edge}
 	 */
-	public IncidentVertexIterable(Edge edge) {
+	public IncidentVertexIterable(Edge edge) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, null, null);
 	}
 
@@ -40,7 +41,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
-	public IncidentVertexIterable(Edge edge, Direction direction) {
+	public IncidentVertexIterable(Edge edge, Direction direction) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, null, direction);
 	}
 
@@ -54,7 +55,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Class} returned {@link Vertex} are restricted to that
 	 *            class or subclasses
 	 */
-	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc) {
+	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc) throws RemoteException {
 		this(edge.getGraph().getTraversalContext(), edge, vc, null);
 	}
 
@@ -71,8 +72,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
-	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc,
-			Direction direction) {
+	public IncidentVertexIterable(Edge edge, Class<? extends Vertex> vc, Direction direction) throws RemoteException {
 		assert edge != null && edge.isValid();
 		iter = new IncidentVertexIterator(
 				edge.getGraph().getTraversalContext(), edge, vc, direction);
@@ -86,8 +86,9 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Graph}
 	 * @param edge
 	 *            {@link Edge}
+	 * @throws RemoteException 
 	 */
-	public IncidentVertexIterable(Graph traversalContext, Edge edge) {
+	public IncidentVertexIterable(Graph traversalContext, Edge edge) throws RemoteException {
 		this(traversalContext, edge, null, null);
 	}
 
@@ -103,7 +104,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Direction}
 	 */
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		this(traversalContext, edge, null, direction);
 	}
 
@@ -120,7 +121,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            class or subclasses
 	 */
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
-			Class<? extends Vertex> vc) {
+			Class<? extends Vertex> vc) throws RemoteException {
 		this(traversalContext, edge, vc, null);
 	}
 
@@ -140,7 +141,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Direction}
 	 */
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
-			Class<? extends Vertex> vc, Direction direction) {
+			Class<? extends Vertex> vc, Direction direction) throws RemoteException {
 		assert edge != null && edge.isValid();
 		iter = new IncidentVertexIterator(traversalContext, edge, vc, direction);
 	}
@@ -168,7 +169,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		public IncidentVertexIterator(Graph traversalContext, Edge edge,
-				Class<? extends Vertex> vc, Direction dir) {
+				Class<? extends Vertex> vc, Direction dir) throws RemoteException {
 			super(traversalContext, edge, vc, dir);
 			if (vc != null && current.getVertex().getM1Class().isInstance(vc)) {
 				setCurrentToNextIncidentGraphElement();
@@ -182,13 +183,22 @@ public class IncidentVertexIterable<V extends Vertex> extends
 			if (current == null) {
 				throw new NoSuchElementException();
 			}
-			V result = (V) current.getVertex();
-			setCurrentToNextIncidentGraphElement();
+			V result;
+			try {
+				result = (V) current.getVertex();
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+			try {
+				setCurrentToNextIncidentGraphElement();
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return result;
 		}
 
 		@Override
-		protected void setCurrentToNextIncidentGraphElement() {
+		protected void setCurrentToNextIncidentGraphElement() throws RemoteException {
 			while (current != null
 					&& !current.getVertex().getM1Class().isInstance(gc)) {
 				current = current.getNextIncidenceAtEdge(traversalContext, dir);

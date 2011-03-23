@@ -48,6 +48,8 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		extends TypedElementClassImpl<ConcreteMetaClass, ConcreteInterface>
 		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
+
+	
 	/**
 	 * a list of attributes which belongs to the m2 element
 	 * (edgeclass/vertexclass/graphclass). Only the own attributes of this class

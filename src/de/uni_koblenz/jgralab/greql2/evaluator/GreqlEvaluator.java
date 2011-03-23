@@ -270,7 +270,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized JValueSet getVertexIndex(Graph graph,
 			String queryPart) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getId());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
 		if (ref == null) {
 			return null;
 		}
@@ -292,7 +292,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized void addVertexIndex(Graph graph,
 			String queryPart, JValueSet vertexSet) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getId());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
 		GraphIndex index = null;
 
 		if (ref != null) {
@@ -305,7 +305,7 @@ public class GreqlEvaluator {
 
 		if (index == null) {
 			index = new GraphIndex(graph);
-			graphIndizes.put(graph.getId(),
+			graphIndizes.put(graph.getUid(),
 					new SoftReference<GraphIndex>(index));
 		}
 		index.addVertexSet(queryPart, vertexSet);

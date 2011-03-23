@@ -38,6 +38,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,13 +52,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueMap;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValuePath;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValuePathSystem;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 
 public class GreqlServer extends Thread {
@@ -151,7 +145,7 @@ public class GreqlServer extends Thread {
 		}
 	}
 
-	private void saveAsDot(JValue val, String dotFileName) {
+	private void saveAsDot(JValue val, String dotFileName) throws RemoteException {
 		Graph g = eval.getDatagraph();
 		BooleanGraphMarker marker = new BooleanGraphMarker(g);
 		markResultElements(val, marker);
@@ -171,7 +165,7 @@ public class GreqlServer extends Thread {
 		//Tg2Dot.printGraphAsDot(marker, false, dotFileName);
 	}
 
-	private void markResultElements(JValue val, BooleanGraphMarker marker) {
+	private void markResultElements(JValue val, BooleanGraphMarker marker) throws RemoteException {
 		if (val.isCollection()) {
 			JValueCollection coll = val.toCollection();
 			for (JValue v : coll) {

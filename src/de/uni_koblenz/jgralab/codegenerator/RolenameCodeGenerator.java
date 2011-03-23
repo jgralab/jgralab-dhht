@@ -108,10 +108,10 @@ public class RolenameCodeGenerator<MetaClass extends GraphElementClass<MetaClass
 					 " * removes the given <code>element</code> as <code>#rolename#</code> from this element, i.e. ",
 					 " * deletes the <code>#incClassName#</code> incidence connecting this and <code>element</code>.",
 					 " */",
-					 "public boolean remove_#rolename#(#definingIncidentElementClassName# element);");
+					 "public boolean remove_#rolename#(#definingIncidentElementClassName# element) throws java.rmi.RemoteException;");
 		} else {
 			code.add("@Override",
-					 "public boolean remove_#rolename#(#definingIncidentElementClassName# element) {",
+					 "public boolean remove_#rolename#(#definingIncidentElementClassName# element) throws java.rmi.RemoteException {",
 					   "\tboolean elementRemoved = false;",
 					   "\t#incClassName# inc = (#incClassName#) getFirstIncidence(#incClassName#.class, #dir#);",
 					   "\twhile (inc != null) {",
@@ -137,10 +137,10 @@ public class RolenameCodeGenerator<MetaClass extends GraphElementClass<MetaClass
 					 " * adds an incidence of the given vertex as <code>#rolename#</code> from this vertex, i.e. ",
 					 " * deletes the <code>#edgeClassName#</code> edge connections of this vertex with ",
 					 " * the given one.", " */",
-					 "public void add_#rolename#(#definingIncidentElementClassName# element);");
+					 "public void add_#rolename#(#definingIncidentElementClassName# element) throws java.rmi.RemoteException;");
 		} else {
 			code.add("@Override",
-					 "public void add_#rolename#(#definingIncidentElementClassName# element) {",
+					 "public void add_#rolename#(#definingIncidentElementClassName# element) throws java.rmi.RemoteException {",
 					   "\t#incClassName# inc = (#incClassName#) connect(#incClassName#.class, this, #element#);",
 					"}");
 		}

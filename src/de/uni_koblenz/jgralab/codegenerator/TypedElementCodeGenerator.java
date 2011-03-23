@@ -9,6 +9,8 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ?>>
 		extends CodeGenerator {
 
+
+	
 	/**
 	 * all the interfaces of the class which are being implemented
 	 */
@@ -32,8 +34,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 				+ ".impl." + (config.hasTransactionSupport() ? "trans" : "std")
 				+ aec.getQualifiedName() + "Impl");
 		rootBlock.setVariable("simpleClassName", aec.getSimpleName());
-		rootBlock.setVariable("simpleImplClassName", aec.getSimpleName()
-				+ "Impl");
+		rootBlock.setVariable("simpleImplClassName", aec.getSimpleName() + "Impl");
 		rootBlock.setVariable("uniqueClassName", aec.getUniqueName());
 		rootBlock.setVariable("schemaPackageName", schemaRootPackageName);
 		rootBlock.setVariable("theGraph", "graph");
@@ -63,23 +64,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-//			if (currentCycle.isStdImpl()) {
-//				addImports("#jgImplStdPackage#.#baseClassName#");
-//			} else if (currentCycle.isSaveMemImpl()) {
-//				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-//			} else if (currentCycle.isTransImpl()) {
-//				addImports("#jgImplTransPackage#.#baseClassName#");
-//			} else if (currentCycle.isDbImpl()) {
-//				addImports("#jgImplDbPackage#.#baseClassName#");
-//			}
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
-
-		//	rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
-			//add valid incidences
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
@@ -92,21 +81,17 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("classOrInterface", currentCycle
-				.isStdOrSaveMemOrDbImplOrTransImpl() ? " class" : " interface");
-		code.setVariable("abstract", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
-				                       && aec.isAbstract() ? " abstract" : "");
-		code.setVariable("impl", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
-				                    && !aec.isAbstract() ? "Impl" : "");
-		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? 
-				                    " extends #baseClassName#" : "");
+		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() ? " class" : " interface");
+		code.setVariable("interfaceOrImplClass", currentCycle.isMemOrDiskImpl() ? rootBlock.getVariable("simpleImplClassName") 
+																: rootBlock.getVariable("simpleClassName"));
+		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
+		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
+		code.setVariable("extends",	currentCycle.isMemOrDiskImpl() ?  " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " implements "
-					: " extends ";
+			String delim = currentCycle.isMemOrDiskImpl() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+				if (currentCycle.isMemOrDiskImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")
@@ -146,7 +131,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetTypeMethod() {
 		return new CodeSnippet(
 				true,
-				"public final #jgSchemaPackage#.#graphElementClass#Class getType() {",
+				"public final #jgSchemaPackage#.#graphElementClass#Class getType() throws java.rmi.RemoteException {",
 				"\treturn #schemaPackageName#.#schemaName#.instance().#schemaVariableName#;",
 				"}");
 	}
@@ -155,7 +140,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetM1ClassMethod() {
 		return new CodeSnippet(
 				true,
-				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1Class() {",
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1Class() throws java.rmi.RemoteException {",
 				"\treturn #javaClassName#.class;", "}");
 	}
 
@@ -163,7 +148,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetM1ImplementationClassMethod() {
 		return new CodeSnippet(
 				true,
-				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1ImplementationClass() {",
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1ImplementationClass() throws java.rmi.RemoteException {",
 				"\treturn #javaImplClassName#.class;", "}");
 	}
 

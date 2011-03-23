@@ -133,7 +133,7 @@ public class Level2LogReader extends Level2LoggingBase implements
 	public Level2LogReader(File logDirectory, Graph g) {
 		this();
 
-		dataGraphId = g.getId();
+		dataGraphId = g.getUid();
 		schemaName = g.getSchema().getQualifiedName();
 
 		loggerDirectory = logDirectory;

@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -73,7 +74,7 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 		protected Graph traversalContext;
 
 		@SuppressWarnings("unchecked")
-		EdgeIterator(Graph traversalContext, Graph g, Class<? extends Edge> ec) {
+		EdgeIterator(Graph traversalContext, Graph g, Class<? extends Edge> ec) throws RemoteException {
 			graph = g;
 			this.ec = ec;
 			this.traversalContext = traversalContext;
@@ -84,17 +85,21 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 
 		@SuppressWarnings("unchecked")
 		public E next() {
-			if (graph.isEdgeListModified(edgeListVersion)) {
-				throw new ConcurrentModificationException(
-						"The edge list of the graph has been modified - the iterator is not longer valid");
+			try {
+				if (graph.isEdgeListModified(edgeListVersion)) {
+					throw new ConcurrentModificationException(
+							"The edge list of the graph has been modified - the iterator is not longer valid");
+				}
+				if (current == null) {
+					throw new NoSuchElementException();
+				}
+				E result = current;
+				current = (E) (ec == null ? current.getNextEdge(traversalContext)
+						: current.getNextEdge(traversalContext, ec));
+				return result;
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
 			}
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			E result = current;
-			current = (E) (ec == null ? current.getNextEdge(traversalContext)
-					: current.getNextEdge(traversalContext, ec));
-			return result;
 		}
 
 		public boolean hasNext() {
@@ -110,21 +115,21 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 
 	private EdgeIterator iter;
 
-	public EdgeIterable(Graph g) {
+	public EdgeIterable(Graph g) throws RemoteException {
 		this(g.getTraversalContext(), g, null);
 	}
 
-	public EdgeIterable(Graph g, Class<? extends Edge> ec) {
+	public EdgeIterable(Graph g, Class<? extends Edge> ec) throws RemoteException {
 		assert g != null;
 		iter = new EdgeIterator(g.getTraversalContext(), g, ec);
 	}
 
-	public EdgeIterable(Graph traversalContext, Graph g) {
+	public EdgeIterable(Graph traversalContext, Graph g) throws RemoteException {
 		this(traversalContext, g, null);
 	}
 
 	public EdgeIterable(Graph traversalContext, Graph g,
-			Class<? extends Edge> ec) {
+			Class<? extends Edge> ec) throws RemoteException {
 		assert g != null;
 		iter = new EdgeIterator(traversalContext, g, ec);
 	}

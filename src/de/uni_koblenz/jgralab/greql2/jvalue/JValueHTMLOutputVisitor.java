@@ -236,7 +236,7 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 		}
 		if (n.getBrowsingInfo() instanceof Graph) {
 			Graph g = (Graph) n.getBrowsingInfo();
-			storeln("<a href=\"g" + g.getId() + "\">");
+			storeln("<a href=\"g" + g.getUid() + "\">");
 		}
 	}
 
@@ -295,10 +295,10 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 	public void visitGraph(JValue g) {
 		Graph gr = g.toGraph();
 		if (createElementLinks) {
-			storeln("<a href=\"g" + gr.getId() + "\">" + gr.getId() + ": "
+			storeln("<a href=\"g" + gr.getUid() + "\">" + gr.getUid() + ": "
 					+ gr.getMetaClass().getUniqueName() + "</a>");
 		} else {
-			storeln(gr.getId() + ": "
+			storeln(gr.getUid() + ": "
 					+ gr.getMetaClass().getUniqueName());
 		}
 	}
@@ -355,7 +355,7 @@ public class JValueHTMLOutputVisitor extends JValueDefaultVisitor {
 				+ "</style>\n");
 		storeln("</head><body><table>");
 		if (dataGraph != null) {
-			storeln("<tr><td>Graph id: </td><td>" + dataGraph.getId()
+			storeln("<tr><td>Graph id: </td><td>" + dataGraph.getUid()
 					+ "</td></tr>");
 		}
 		storeln("<tr><td>Result size: </td><td>");

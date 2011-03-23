@@ -28,63 +28,55 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.std;
+package de.uni_koblenz.jgralab;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import de.uni_koblenz.jgralab.JGraLabCloneable;
-import de.uni_koblenz.jgralab.JGraLabMap;
+import java.rmi.RemoteException;
 
 /**
+ * This class provides an adapter for the
+ * <code>GraphStructureChangedListener</code>.
  * 
- * @author
+ * @author ist@uni-koblenz.de
  * 
- * @param <K>
- * @param <V>
  */
-public class JGraLabMapImpl<K, V> extends HashMap<K, V> implements
-		JGraLabMap<K, V> {
+public abstract class GraphStructureChangedAdapterWithAutoRemove implements
+		GraphStructureChangedListenerWithAutoRemove {
 
-	private static final long serialVersionUID = 7484092853864016267L;
-
-	public JGraLabMapImpl(Map<? extends K, ? extends V> map) {
-		super(map);
-	}
-
-	public JGraLabMapImpl(int initialCapacity) {
-		super(initialCapacity);
-	}
-
-	public JGraLabMapImpl() {
-		super();
-	}
-
-	public JGraLabMapImpl(int initialCapacity, float loadFactor) {
-		super(initialCapacity, loadFactor);
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
-	public JGraLabMapImpl<K, V> clone() {
-		JGraLabMapImpl<K, V> copy = new JGraLabMapImpl<K, V>();
-		for (java.util.Map.Entry<K, V> entry : entrySet()) {
-			K keyClone = null;
-			V valueClone = null;
-			// clone key
-			if (entry.getKey() instanceof JGraLabCloneable) {
-				keyClone = (K) ((JGraLabCloneable) entry.getKey()).clone();
-			} else {
-				keyClone = entry.getKey();
-			}
-			// clone value
-			if (entry.getValue() instanceof JGraLabCloneable) {
-				valueClone = (V) ((JGraLabCloneable) entry.getValue()).clone();
-			} else {
-				valueClone = entry.getValue();
-			}
-			copy.put(keyClone, valueClone);
-		}
-		return copy;
+	public void edgeAdded(Edge e) throws RemoteException {
 	}
+
+	@Override
+	public void edgeDeleted(Edge e) throws RemoteException {
+	}
+
+	@Override
+	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) throws RemoteException {
+	}
+
+	@Override
+	public void vertexAdded(Vertex v) throws RemoteException {
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v) throws RemoteException {
+	}
+	
+
+	@Override
+	public void incidenceAdded(Incidence i) throws RemoteException {
+	}
+	
+	@Override
+	public void incidenceDeleted(Incidence i) throws RemoteException {
+	}
+
+	@Override
+	public void maxIncidenceCountIncreased(int newValue) throws RemoteException {
+	}
+
 }

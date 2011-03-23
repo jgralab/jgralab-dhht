@@ -57,7 +57,7 @@ public class ConditionalExpression extends Formula {
 
 	@Override
 	public String toString() {
-		return "(v" + condition.getId() + ") ? " + trueFormula + " : "
+		return "(v" + condition.getUid() + ") ? " + trueFormula + " : "
 				+ falseFormula + ";";
 	}
 

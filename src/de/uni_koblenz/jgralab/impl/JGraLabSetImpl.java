@@ -28,11 +28,51 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
+package de.uni_koblenz.jgralab.impl;
+
+import java.util.Collection;
+import java.util.HashSet;
+
+import de.uni_koblenz.jgralab.JGraLabCloneable;
+import de.uni_koblenz.jgralab.JGraLabSet;
 
 /**
- * This package contains the standard implementation classes without versioning.
  * 
- * @author ist@uni-koblenz.de
+ * @author
+ * 
+ * @param <E>
  */
-package de.uni_koblenz.jgralab.impl.std;
+public class JGraLabSetImpl<E> extends HashSet<E> implements JGraLabSet<E> {
 
+	private static final long serialVersionUID = 5890950480302617008L;
+
+	public JGraLabSetImpl(Collection<? extends E> collection) {
+		super(collection);
+	}
+
+	public JGraLabSetImpl(int initialCapacity) {
+		super(initialCapacity);
+	}
+
+	public JGraLabSetImpl() {
+		super();
+	}
+
+	public JGraLabSetImpl(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public JGraLabSetImpl<E> clone() {
+		JGraLabSetImpl<E> copy = new JGraLabSetImpl<E>();
+		for (E element : this) {
+			if (element instanceof JGraLabCloneable) {
+				copy.add((E) ((JGraLabCloneable) element).clone());
+			} else {
+				copy.add(element);
+			}
+		}
+		return copy;
+	}
+}

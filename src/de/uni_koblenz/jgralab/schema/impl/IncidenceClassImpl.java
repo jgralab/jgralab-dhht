@@ -30,21 +30,18 @@
  */
 package de.uni_koblenz.jgralab.schema.impl;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
 public class IncidenceClassImpl extends
@@ -182,49 +179,6 @@ public class IncidenceClassImpl extends
 		hiddenEndsAtVertex.add(ic);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public Class<? extends Incidence> getM1Class() {
-		if (m1Class == null) {
-			String m1ClassName = getQualifiedName();
-			try {
-				m1Class = (Class<? extends Incidence>) Class
-						.forName(m1ClassName, true, M1ClassManager
-								.instance(getSchema().getQualifiedName()));
-			} catch (ClassNotFoundException e) {
-				throw new M1ClassAccessException(
-						"Can't load M1 class for IncidenceClass '"
-								+ getQualifiedName() + "'", e);
-			}
-		}
-		return m1Class;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Class<? extends Incidence> getM1ImplementationClass() {
-		if (isAbstract()) {
-			throw new M1ClassAccessException(
-					"Can't get M1 implementation class. IncidenceClass '"
-							+ getQualifiedName() + "' is abstract!");
-		}
-		if (m1ImplementationClass == null) {
-			try {
-				Field f = getM1Class().getField("IMPLEMENTATION_CLASS");
-				m1ImplementationClass = (Class<? extends Incidence>) f
-						.get(m1Class);
-			} catch (SecurityException e) {
-				throw new M1ClassAccessException(e);
-			} catch (NoSuchFieldException e) {
-				throw new M1ClassAccessException(e);
-			} catch (IllegalArgumentException e) {
-				throw new M1ClassAccessException(e);
-			} catch (IllegalAccessException e) {
-				throw new M1ClassAccessException(e);
-			}
-		}
-		return m1ImplementationClass;
-	}
 
 	@Override
 	public String getRolename() {

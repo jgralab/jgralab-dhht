@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.schema.impl;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeBlock;
-import de.uni_koblenz.jgralab.codegenerator.CodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.CodeSnippet;
 import de.uni_koblenz.jgralab.schema.LongDomain;
 import de.uni_koblenz.jgralab.schema.Package;
@@ -57,8 +56,8 @@ public final class LongDomainImpl extends BasicDomainImpl implements LongDomain 
 
 	@Override
 	public CodeBlock getReadMethod(String schemaPrefix, String variableName,
-			String graphIoVariableName) {
-		return new CodeSnippet(variableName + " = " + graphIoVariableName
+			String graphIoVariableName, String attributeContainer) {
+		return new CodeSnippet(attributeContainer + variableName + " = " + graphIoVariableName
 				+ ".matchLong();");
 	}
 
@@ -69,43 +68,9 @@ public final class LongDomainImpl extends BasicDomainImpl implements LongDomain 
 
 	@Override
 	public CodeBlock getWriteMethod(String schemaRootPackagePrefix,
-			String variableName, String graphIoVariableName) {
+			String variableName, String graphIoVariableName, String attributeContainer) {
 		return new CodeSnippet(graphIoVariableName + ".writeLong("
-				+ variableName + ");");
-	}
-
-	@Override
-	public CodeBlock getTransactionReadMethod(String schemaPrefix,
-			String variableName, String graphIoVariableName) {
-		return new CodeSnippet(
-				getJavaAttributeImplementationTypeName(schemaPrefix) + " "
-						+ variableName + " = " + graphIoVariableName
-						+ ".matchLong();");
-	}
-
-	@Override
-	public CodeBlock getTransactionWriteMethod(String schemaRootPackagePrefix,
-			String variableName, String graphIoVariableName) {
-		return getWriteMethod(schemaRootPackagePrefix, "get"
-				+ CodeGenerator.camelCase(variableName) + "()",
-				graphIoVariableName);
-	}
-
-	@Override
-	public String getTransactionJavaAttributeImplementationTypeName(
-			String schemaRootPackagePrefix) {
-		return "Long";
-	}
-
-	@Override
-	public String getTransactionJavaClassName(String schemaRootPackagePrefix) {
-		return getJavaClassName(schemaRootPackagePrefix);
-	}
-
-	@Override
-	public String getVersionedClass(String schemaRootPackagePrefix) {
-		return "de.uni_koblenz.jgralab.impl.trans.VersionedReferenceImpl<"
-				+ getTransactionJavaClassName(schemaRootPackagePrefix) + ">";
+				+ attributeContainer + variableName + ");");
 	}
 
 	@Override

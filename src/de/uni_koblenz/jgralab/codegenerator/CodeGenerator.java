@@ -58,24 +58,14 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, STDIMPL, DBIMPL, TRANSIMPL, SAVEMEMIMPL, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISKBASED, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
-			if (config.hasStandardSupport()) {
-				out.add(STDIMPL);
-			}
-			if (config.hasTransactionSupport()) {
-				out.add(TRANSIMPL);
-			}
-			if (config.hasSavememSupport()) {
-				out.add(SAVEMEMIMPL);
-			}
-			if (config.hasDatabaseSupport()) {
-				out.add(DBIMPL);
-			}
+			out.add(MEMORYBASED);
+			out.add(DISKBASED);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -84,35 +74,27 @@ public abstract class CodeGenerator {
 		 * 
 		 * @return
 		 */
-		protected boolean isStdImpl() {
-			return this == STDIMPL;
+		protected boolean isMembasedImpl() {
+			return this == MEMORYBASED;
 		}
-
-		/**
-		 * 
-		 * @return Returns true if support for memory saving impl classes is
-		 *         enabled, otherwise false.
-		 */
-		protected boolean isSaveMemImpl() {
-			return this == SAVEMEMIMPL;
-		}
-
-		/**
-		 * 
-		 * @return Returns true if support for database impl classes is enabled,
-		 *         otherwise false.
-		 */
-		protected boolean isDbImpl() {
-			return this == DBIMPL;
-		}
-
+		
 		/**
 		 * 
 		 * @return
 		 */
-		protected boolean isTransImpl() {
-			return this == TRANSIMPL;
+		protected boolean isDiskbasedImpl() {
+			return this == DISKBASED;
 		}
+		
+		
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isMemOrDiskImpl() {
+			return this == DISKBASED || this == MEMORYBASED;
+		}
+
 
 		/**
 		 * 
@@ -130,14 +112,6 @@ public abstract class CodeGenerator {
 			return this == CLASSONLY;
 		}
 
-		/**
-		 * 
-		 * @return
-		 */
-		protected boolean isStdOrSaveMemOrDbImplOrTransImpl() {
-			return (this == STDIMPL) || (this == SAVEMEMIMPL)
-					|| (this == TRANSIMPL) || (this == DBIMPL);
-		}
 	}
 
 	private final List<GenerationCycle> cycles;
@@ -183,47 +157,30 @@ public abstract class CodeGenerator {
 			CodeGeneratorConfiguration config) {
 		this.schemaRootPackageName = schemaRootPackageName;
 		this.config = config;
-
 		rootBlock = new CodeList(null);
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
-		rootBlock.setVariable("jgTransPackage", "de.uni_koblenz.jgralab.trans");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
-		rootBlock.setVariable("jgImplStdPackage","de.uni_koblenz.jgralab.impl.std");
-		rootBlock.setVariable("jgImplSaveMemPackage","de.uni_koblenz.jgralab.impl.savemem");
-		rootBlock.setVariable("jgImplTransPackage",	"de.uni_koblenz.jgralab.impl.trans");
-		rootBlock.setVariable("jgImplDbPackage","de.uni_koblenz.jgralab.impl.db");
+		rootBlock.setVariable("jgDiskImplPackage", "de.uni_koblenz.jgralab.impl.disk");
+		rootBlock.setVariable("jgMemImplPackage", "de.uni_koblenz.jgralab.impl.mem");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
 		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
+		
 
 		if ((packageName != null) && !packageName.equals("")) {
-			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."
-					+ packageName);
-			// schema implementation packages (standard, savemem and for
-			// transaction)
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std." + packageName);
-			rootBlock.setVariable("schemaImplSaveMemPackage",
-					schemaRootPackageName + ".impl.savemem." + packageName);
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans." + packageName);
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db." + packageName);
+			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."	+ packageName);
+			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem." + packageName);
+			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std");
-			rootBlock.setVariable("schemaImplSaveMemPackage",
-					schemaRootPackageName + ".impl.savemem");
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans");
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db");
+			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem");
+			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
 		rootBlock.setVariable("isImplementationClassOnly", "false");
 		rootBlock.setVariable("isAbstractClass", "false");
 
 		imports = new ImportCodeSnippet();
+		addImports("java.rmi.RemoteException");
 		cycles = GenerationCycle.filter(config);
 	}
 
@@ -290,8 +247,7 @@ public abstract class CodeGenerator {
 		// String className = rootBlock.getVariable("className");
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
-		String simpleImplClassName = rootBlock
-				.getVariable("simpleImplClassName");
+		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -303,38 +259,17 @@ public abstract class CodeGenerator {
 		while (currentCycle != null) {
 			createCode();
 			if (currentCycle.isAbstract()) {
-				logger.finer("Creating interface for class: "
-								+ simpleClassName);
-				logger.finer("Writing file to: " + pathPrefix + "/"
-						+ schemaPackage);
+				logger.finer("Creating interface for class: "+ simpleClassName);
+				logger.finer("Writing file to: " + pathPrefix + "/"	+ schemaPackage);
 			}
-			if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-				if (currentCycle.isStdImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplStdPackage");
-					logger
-							.finer(" - schemaImplStdPackage="
-									+ schemaImplPackage);
+			if (currentCycle.isMemOrDiskImpl()) {
+				if (currentCycle.isMembasedImpl()) {
+					schemaImplPackage = rootBlock.getVariable("schemaMemImplPackage");
+				} else {
+					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
 				}
-				if (currentCycle.isSaveMemImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplSaveMemPackage");
-					logger.finer(" - schemaImplSaveMemPackage="
-							+ schemaImplPackage);
-				}
-				if (currentCycle.isTransImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplTransPackage");
-					logger.finer(" - schemaImplTransPackage="
-							+ schemaImplPackage);
-				}
-				if (currentCycle.isDbImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplDbPackage");
-					logger.finer(" - schemaImplDbPackage=" + schemaImplPackage);
-				}
-				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",
-						schemaImplPackage);
+				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
+				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
 			} else {
 				writeCodeToFile(pathPrefix, simpleClassName + ".java",
 						schemaPackage);
@@ -370,21 +305,13 @@ public abstract class CodeGenerator {
 			case ABSTRACT:
 				code.add("package #schemaPackage#;");
 				break;
-			case STDIMPL:
-				code.add("package #schemaImplStdPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplStdPackage"));
+			case MEMORYBASED:
+				code.add("package #schemaMemImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
 				break;
-			case SAVEMEMIMPL:
-				code.add("package #schemaImplSaveMemPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplSaveMemPackage"));
-				break;
-			case TRANSIMPL:
-				code.add("package #schemaImplTransPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplTransPackage"));
-				break;
-			case DBIMPL:
-				code.add("package #schemaImplDbPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplDbPackage"));
+			case DISKBASED:
+				code.add("package #schemaDiskImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskImplPackage"));
 				break;
 			case CLASSONLY:
 				code.add("package #schemaPackage#;");
@@ -428,18 +355,15 @@ public abstract class CodeGenerator {
 	public Vector<JavaSourceFromString> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(
-				2);
+		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-				javaSources.add(new JavaSourceFromString(implClassName,
-						rootBlock.getCode()));
+			if (currentCycle.isMemOrDiskImpl()) {
+				javaSources.add(new JavaSourceFromString(implClassName,	rootBlock.getCode()));
 			} else {
-				javaSources.add(new JavaSourceFromString(className, rootBlock
-						.getCode()));
+				javaSources.add(new JavaSourceFromString(className, rootBlock.getCode()));
 			}
 			currentCycle = getNextCycle();
 		}
@@ -452,7 +376,7 @@ public abstract class CodeGenerator {
 	 * 
 	 * @return The next matching {@link GenerationCycle}.
 	 */
-	private GenerationCycle getNextCycle() {
+	protected GenerationCycle getNextCycle() {
 		// end of generation cycle
 		if (cycleCount >= cycles.size()) {
 			// cycleCount = 0;

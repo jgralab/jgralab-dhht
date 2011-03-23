@@ -1,13 +1,15 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 
+import java.util.Set;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
-public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?>> extends AttributedElementCodeGenerator<MetaClass> {
+public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?>> extends AttributedElementCodeGenerator<MetaClass> {
 
 
 	protected RolenameCodeGenerator<MetaClass> rolenameGenerator;
@@ -58,10 +60,13 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
+		addImports("java.rmi.RemoteException");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) {",
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) throws java.io.IOException {",
 						"\tsuper(id, g);"));
+		if (currentCycle.isDiskbasedImpl())
+			code.addNoIndent(new CodeSnippet("\tattributeContainer = new InnerAttributeContainer();"));
 		if (hasDefaultAttributeValues()) {
 			code.addNoIndent(new CodeSnippet("\tinitializeAttributesWithDefaultValues();"));
 		}
@@ -70,6 +75,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		return code;
 	}
 	
+
 	
 	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
 		CodeSnippet snippet = new CodeSnippet();
@@ -87,9 +93,21 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isDiskbasedImpl()) {
 			code.add(createGetIncidenceClassForRolenameMethod());
+			code.add(createLoadAttributeContainer());
+			code.add(createWriteAttributesMethod(aec.getAttributeList(), "attributeContainer."));
+			code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), "attributeContainer."));
+			code.add(createReadAttributesMethod(aec.getAttributeList(), "attributeContainer."));
+			code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), "attributeContainer."));
 		}	
+		if (currentCycle.isMembasedImpl()) {
+			code.add(createGetIncidenceClassForRolenameMethod());
+			code.add(createWriteAttributesMethod(aec.getAttributeList(), ""));
+			code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), ""));
+			code.add(createReadAttributesMethod(aec.getAttributeList(), ""));
+			code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), ""));
+		}
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 			code.add(createFirstIncidenceMethods());
@@ -103,7 +121,88 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 
 		return code;
 	}
+	
+	
+	protected abstract CodeBlock createLoadAttributeContainer();
 
+	
+	protected CodeBlock createFields(Set<Attribute> attrSet) {
+		CodeList code = new CodeList();
+		if (currentCycle.isDiskbasedImpl())
+			code.add(new CodeSnippet("class InnerAttributeContainer extends #jgDiskImplPackage#.AttributeContainer {"));
+		for (Attribute attr : attrSet) {
+			code.add(createField(attr));
+		}
+		if (currentCycle.isDiskbasedImpl()) {
+			code.add(new CodeSnippet("}"));
+			code.add(new CodeSnippet("InnerAttributeContainer attributeContainer = null;"));
+			code.add(new CodeSnippet("public InnerAttributeContainer getAttributeContainer() {",
+										"\treturn attributeContainer;",
+									 "}"));
+		}	
+		return code;
+	}
+	
+
+	protected CodeBlock createGetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("isOrGet",
+				attr.getDomain().getJavaClassName(schemaRootPackageName)
+						.equals("Boolean") ? "is" : "get");
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public #type# #isOrGet#_#name#() throws java.rmi.RemoteException;");
+			break;
+		case MEMORYBASED:
+			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+					 "\treturn _#name#;",
+					 "}");
+			break;
+		case DISKBASED:
+			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+					 "\tif (attributeContainer == null) {",
+					 "\t\tattributeContainer = loadAttributeContainer();",
+					 "\t}",
+					 "\treturn attributeContainer._#name#;",
+					 "}");
+			break;
+		}
+		return code;
+	}
+
+	protected CodeBlock createSetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("dname", attr.getDomain().getSimpleName());
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException;");
+			break;
+		case MEMORYBASED:
+			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
+					 "\t_#name# = _#name#;", 
+					 "\tgraphModified();", "}");
+			break;
+		case DISKBASED:
+			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
+					 "\tif (attributeContainer == null) {",
+					 "\t\tattributeContainer = loadAttributeContainer();",
+					 "\t}",
+					 "\tattributeContainer._#name# = _#name#;", 
+					 "\tgraphModified();", "}");
+			break;
+		}
+		return code;
+	}
+	
+	
 	
 	private CodeBlock createGetIncidenceClassForRolenameMethod() {
 		addImports("#jgSchemaPackage#.exception.SchemaException");
@@ -111,7 +210,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("@Override");
-		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) {");
+		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) throws java.rmi.RemoteException {");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
 			if (ic.getRolename() != null && ic.getRolename().length() > 0) {
@@ -176,10 +275,10 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 				s.add(" * @param noSubclass if set to true, only incidence of class #incidenceClassName# but not of subclasses will be returned");
 			}
 			s.add("*/",
-				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#);"); 	
+				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException;"); 	
 		} else {
 			s.add("@Override",
-			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) {");
+			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException {");
 			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
 			s.add("}");
 			
@@ -240,11 +339,11 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#);");
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("@Override",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) {",
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",
 					 "}");
 		}

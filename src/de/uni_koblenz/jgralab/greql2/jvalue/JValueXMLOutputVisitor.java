@@ -94,7 +94,7 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 
 			writer.writeStartElement(JVALUE);
 			if (graph != null) {
-				writer.writeAttribute(ATTR_GRAPH_ID, graph.getId());
+				writer.writeAttribute(ATTR_GRAPH_ID, graph.getUid());
 			}
 		} catch (XMLStreamException e) {
 			e.printStackTrace();
@@ -151,10 +151,10 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 					: ATTR_VERTEX_LINK, Integer.toString(ge.getId()));
 			if (ge.getGraph() != graph) {
 				writer.writeAttribute(ATTR_GRAPH_LINK, String.valueOf(ge
-						.getGraph().getId()));
+						.getGraph().getUid()));
 			}
 		} else {
-			writer.writeAttribute(ATTR_GRAPH_LINK, ((Graph) bi).getId());
+			writer.writeAttribute(ATTR_GRAPH_LINK, ((Graph) bi).getUid());
 		}
 	}
 
@@ -228,7 +228,7 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 			writer.writeAttribute(ATTR_ID, Integer.toString(edge.getId()));
 			if (edge.getGraph() != graph) {
 				writer.writeAttribute(ATTR_GRAPH_ID, String.valueOf(edge
-						.getGraph().getId()));
+						.getGraph().getUid()));
 			}
 			if (edge != e.getBrowsingInfo()) {
 				writeBrowsingInfo(e);
@@ -271,7 +271,7 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 		Graph graph = g.toGraph();
 		try {
 			writer.writeEmptyElement(GRAPH);
-			writer.writeAttribute(ATTR_GRAPH_ID, graph.getId());
+			writer.writeAttribute(ATTR_GRAPH_ID, graph.getUid());
 			if (graph != g.getBrowsingInfo()) {
 				writeBrowsingInfo(g);
 			}
@@ -456,7 +456,7 @@ public class JValueXMLOutputVisitor extends JValueDefaultVisitor implements
 			writer.writeAttribute(ATTR_ID, String.valueOf(vertex.getId()));
 			if (vertex.getGraph() != graph) {
 				writer.writeAttribute(ATTR_GRAPH_ID, String.valueOf(vertex
-						.getGraph().getId()));
+						.getGraph().getUid()));
 			}
 			if (vertex != v.getBrowsingInfo()) {
 				writeBrowsingInfo(v);

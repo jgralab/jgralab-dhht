@@ -35,9 +35,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
-
 public class ThisLiteralTest extends GenericTests {
 
 	@Test

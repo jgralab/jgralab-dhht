@@ -37,12 +37,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2Impl;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
 
 /**

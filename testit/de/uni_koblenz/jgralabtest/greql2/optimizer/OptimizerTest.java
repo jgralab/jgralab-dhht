@@ -35,21 +35,6 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.optimizer.CommonSubgraphOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.ConditionalExpressionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.EarySelectionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.MergeSimpleDeclarationsOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerBase;
-import de.uni_koblenz.jgralab.greql2.optimizer.PathExistenceOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.PathExistenceToDirectedPathExpressionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.VariableDeclarationOrderOptimizer;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
 

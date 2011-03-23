@@ -250,7 +250,7 @@ public class VariableDeclarationOrderUnit implements
 
 		// If there can be no decision made on costs and cardinality, then the
 		// variable with the lower ID should come first.
-		if (variable.getId() < o.getVariable().getId()) {
+		if (variable.getUid() < o.getVariable().getUid()) {
 			return -1;
 		} else {
 			return 1;

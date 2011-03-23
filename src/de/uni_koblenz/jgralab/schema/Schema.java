@@ -282,10 +282,10 @@ public interface Schema extends Comparable<Schema> {
 	 *         the name "Edge"
 	 */
 	public EdgeClass getDefaultEdgeClass();
-	
+
 	/**
-	 * @return the default BinaryEdgeClass of the schema, that is the EdgeClass with
-	 *         the name "BinaryEdge"
+	 * @return the default BinaryEdgeClass of the schema, that is the EdgeClass
+	 *         with the name "BinaryEdge"
 	 */
 	public BinaryEdgeClass getDefaultBinaryEdgeClass();
 
@@ -477,5 +477,11 @@ public interface Schema extends Comparable<Schema> {
 	public IncidenceClass getDefaultIncidenceClass(Direction dir);
 
 	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
+
+	public Integer getClassId(TypedElementClass<?, ?> schemaClass);
+
+	public Class<?> getM1ClassForId(Integer id);
+
+	public TypedElementClass<?, ?> getTypeForId(Integer id);
 
 }

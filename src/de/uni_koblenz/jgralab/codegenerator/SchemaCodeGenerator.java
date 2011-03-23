@@ -37,7 +37,6 @@ import java.util.Stack;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -80,7 +79,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 			 CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
-System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSupport());
+		addImports("java.rmi.RemoteException");
 		rootBlock.setVariable("simpleClassName", schema.getName());
 		rootBlock.setVariable("simpleImplClassName", schema.getName());
 		rootBlock.setVariable("baseClassName", "SchemaImpl");
@@ -94,7 +93,6 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		addImports("#jgSchemaImplPackage#.#baseClassName#");
 		addImports("#jgSchemaPackage#.VertexClass");
 		addImports("#jgSchemaPackage#.EdgeClass");
-	//	addImports("#jgImplPackage#.db.GraphDatabase");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
 				true,
@@ -134,8 +132,6 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
 				"#jgPackage#.GraphIOException");
-		//				"#jgImplDbPackage#.GraphDatabaseException",
-	//	"#jgImplDbPackage#.GraphDatabase",
 		if (config.hasDatabaseSupport()) {
 			addImports("#jgPackage#.GraphException");
 		}
@@ -183,14 +179,13 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 				"}",
 				"",
 				// ---- savemem support ----
-				// TODO Currently redirect to STD methods. Extension needed?
 				"/**",
 				" * Creates a new #gcName# graph with savemem support with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
 				" *",
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				"*/",
-				"public #gcName# create#gcCamelName#WithSavememSupport(int vMax, int eMax) {",
+				"public #gcName# create#gcCamelName#DiskBasedStorage(int vMax, int eMax) {",
 				((config.hasSavememSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithSavememSupport(#gcCamelName#.class, null, vMax, eMax);"
 						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
 				"}",
@@ -202,17 +197,15 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				" */",
-				"public #gcName# create#gcCamelName#WithSavememSupport(String id, int vMax, int eMax) {",
-				((config.hasSavememSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithSavememSupport(#gcCamelName#.class, id, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
+				"public #gcName# create#gcCamelName#DiskBasedStorage(String id, int vMax, int eMax) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, id, vMax, eMax);"	,
 				"}",
 				"",
 				"/**",
 				" * Creates a new #gcName# graph.",
 				"*/",
-				"public #gcName# create#gcCamelName#WithSavememSupport() {",
-				((config.hasSavememSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithSavememSupport(#gcCamelName#.class, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
+				"public #gcName# create#gcCamelName#DiskBasedStorage() {",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, null);",
 				"}",
 				"",
 				"/**",
@@ -220,76 +213,11 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 				" *",
 				" * @param id the id name of the new graph",
 				" */",
-				"public #gcName# create#gcCamelName#WithSavememSupport(String id) {",
-				((config.hasSavememSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithSavememSupport(#gcCamelName#.class, id);"
-						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
+				"public #gcName# create#gcCamelName#DiskBasedStorage(String id) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, id);",
 				"}",
 				"",
-//				// ---- database support -------
-//				"/**",
-//				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-//				" *",
-//				" * @param id Identifier of new graph",
-//				" * @param graphDatabase Database which should contain graph",
-//				" */",
-//				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-//				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-//						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-//				"}",
-//				"/**",
-//				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-//				" *",
-//				" * @param id Identifier of new graph",
-//				" * @param vMax Maximum initial count of vertices that can be held in graph.",
-//				" * @param eMax Maximum initial count of edges that can be held in graph.",
-//				" * @param graphDatabase Database which should contain graph",
-//				" */",
-//				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, int vMax, int eMax, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-//				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id, vMax, eMax );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-//						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-//				"}",
-//				// ---- transaction support ----
-//				"/**",
-//				" * Creates a new #gcName# graph with transaction support with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
-//				" *",
-//				" * @param vMax initial vertex count",
-//				" * @param eMax initial edge count",
-//				"*/",
-//				"public #gcName# create#gcCamelName#WithTransactionSupport(int vMax, int eMax) {",
-//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null, vMax, eMax);"
-//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-//				"}",
-//				"",
-//				"/**",
-//				" * Creates a new #gcName# graph with transaction support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
-//				" *",
-//				" * @param id the id name of the new graph",
-//				" * @param vMax initial vertex count",
-//				" * @param eMax initial edge count",
-//				" */",
-//				"public #gcName# create#gcCamelName#WithTransactionSupport(String id, int vMax, int eMax) {",
-//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id, vMax, eMax);"
-//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-//				"}",
-//				"",
-//				"/**",
-//				" * Creates a new #gcName# graph.",
-//				"*/",
-//				"public #gcName# create#gcCamelName#WithTransactionSupport() {",
-//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null);"
-//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-//				"}",
-//				"",
-//				"/**",
-//				" * Creates a new #gcName# graph with the ID <code>id</code>.",
-//				" *",
-//				" * @param id the id name of the new graph",
-//				" */",
-//				"public #gcName# create#gcCamelName#WithTransactionSupport(String id) {",
-//				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id);"
-//						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-//				"}",
-//				"",
+
 				// ---- file handling methods ----
 				"/**",
 				" * Loads a #gcName# graph from the file <code>filename</code>.",
@@ -575,7 +503,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.setVariable("schemaVariable", ic.getVariableName());
 		code.setVariable("icVariable", "ic");
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
-		code.setVariable("icVertexClass", ic.getEdgeClass().getQualifiedName());
+		code.setVariable("icVertexClass", ic.getVertexClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
 		code.setVariable("icRoleName", ic.getRolename() != null ? ic.getRolename() : "");
 		code.setVariable("dir", ic.getDirection().toString());
@@ -697,7 +625,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		for (Attribute attr : aec.getOwnAttributeList()) {
 			CodeSnippet s = new CodeSnippet(
 					false,
-					"#aecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
+					"#gecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
 			s.setVariable("attrName", attr.getName());
 			s.setVariable("domainName", attr.getDomain().getQualifiedName());
 			s.setVariable("aecName", aec.getQualifiedName());

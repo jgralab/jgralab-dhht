@@ -57,7 +57,7 @@ public class NonConstantTerm extends Formula {
 
 	@Override
 	public String toString() {
-		return "v" + expression.getId();
+		return "v" + expression.getUid();
 	}
 
 	@Override

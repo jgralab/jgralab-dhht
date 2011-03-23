@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -98,7 +99,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		 */
 		@SuppressWarnings("unchecked")
 		VertexIterator(Graph traversalContext, Graph graph,
-				Class<? extends Vertex> vc) {
+				Class<? extends Vertex> vc) throws RemoteException {
 			this.graph = graph;
 			this.vc = vc;
 			vertexListVersion = graph.getVertexListVersion();
@@ -110,17 +111,21 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public V next() {
-			if (graph.isVertexListModified(vertexListVersion)) {
-				throw new ConcurrentModificationException(
-						"The vertex list of the graph has been modified - the iterator is not longer valid");
+			try {
+				if (graph.isVertexListModified(vertexListVersion)) {
+					throw new ConcurrentModificationException(
+							"The vertex list of the graph has been modified - the iterator is not longer valid");
+				}
+				if (current == null) {
+					throw new NoSuchElementException();
+				}
+				V result = current;
+				current = (V) (vc == null ? current.getNextVertex(traversalContext)
+						: current.getNextVertex(traversalContext, vc));
+				return result;
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
 			}
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			V result = current;
-			current = (V) (vc == null ? current.getNextVertex(traversalContext)
-					: current.getNextVertex(traversalContext, vc));
-			return result;
 		}
 
 		@Override
@@ -134,7 +139,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		 * 
 		 * @throws ConcurrentModificationException
 		 */
-		protected void checkConcurrentModification() {
+		protected void checkConcurrentModification() throws RemoteException {
 			if (graph.isVertexListModified(vertexListVersion)) {
 				throw new ConcurrentModificationException(
 						"The vertex list of the graph has been modified - the iterator is not longer valid");
@@ -160,7 +165,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	public VertexIterable(Graph graph) {
+	public VertexIterable(Graph graph) throws RemoteException {
 		this(graph.getTraversalContext(), graph, null);
 	}
 
@@ -173,7 +178,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param vc
 	 *            {@link Class}
 	 */
-	public VertexIterable(Graph g, Class<? extends Vertex> vc) {
+	public VertexIterable(Graph g, Class<? extends Vertex> vc) throws RemoteException {
 		assert g != null;
 		iter = new VertexIterator(g.getTraversalContext(), g, vc);
 	}
@@ -187,7 +192,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	public VertexIterable(Graph traversalContext, Graph graph) {
+	public VertexIterable(Graph traversalContext, Graph graph) throws RemoteException {
 		this(traversalContext, graph, null);
 	}
 
@@ -203,7 +208,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 *            {@link Class}
 	 */
 	public VertexIterable(Graph traversalContext, Graph g,
-			Class<? extends Vertex> vc) {
+			Class<? extends Vertex> vc) throws RemoteException {
 		assert g != null;
 		iter = new VertexIterator(traversalContext, g, vc);
 	}

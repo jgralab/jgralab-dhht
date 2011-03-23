@@ -30,17 +30,19 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRevome;
+import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRemove;
 import de.uni_koblenz.jgralab.Vertex;
 
 public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> extends
-		GraphStructureChangedAdapterWithAutoRevome {
+		GraphStructureChangedAdapterWithAutoRemove {
 	protected final Graph graph;
 
-	protected AbstractGraphMarker(Graph graph) {
+	protected AbstractGraphMarker(Graph graph) throws RemoteException {
 		this.graph = graph;
 		// register the graph marker at the graph
 		graph.addGraphStructureChangedListener(this);
@@ -53,7 +55,7 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	 *            the graph element to check.
 	 * @return true if the given <code>graphElement</code> is marked.
 	 */
-	public abstract boolean isMarked(T graphElement);
+	public abstract boolean isMarked(T graphElement) throws RemoteException;
 
 	/**
 	 * Unmarks the given <code>graphElement</code>.
@@ -62,44 +64,45 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	 *            the graph element to unmark.
 	 * @return false if the given <code>graphElement</code> has already been
 	 *         unmarked.
+	 * @throws RemoteException 
 	 */
-	public abstract boolean removeMark(T graphElement);
+	public abstract boolean removeMark(T graphElement) throws RemoteException;
 
 	/**
 	 * Returns the number of marked graph elements.
 	 * 
 	 * @return the number of marked graph elements.
 	 */
-	public abstract int size();
+	public abstract int size() throws RemoteException;
 
 	/**
 	 * Checks if this graph marker is empty.
 	 * 
 	 * @return true if this graph marker is empty.
 	 */
-	public abstract boolean isEmpty();
+	public abstract boolean isEmpty() throws RemoteException;
 
 	/**
 	 * Unmarks all marked graph elements.
 	 */
-	public abstract void clear();
+	public abstract void clear() throws RemoteException;
 
-	public Graph getGraph() {
+	public Graph getGraph() throws RemoteException {
 		return graph;
 	}
 
-	public abstract Iterable<T> getMarkedElements();
+	public abstract Iterable<T> getMarkedElements() throws RemoteException;
 
 	@Override
-	public abstract void edgeDeleted(Edge e);
+	public abstract void edgeDeleted(Edge e) throws RemoteException;
 
 	@Override
-	public abstract void maxEdgeCountIncreased(int newValue);
+	public abstract void maxEdgeCountIncreased(int newValue) throws RemoteException;
 
 	@Override
-	public abstract void maxVertexCountIncreased(int newValue);
+	public abstract void maxVertexCountIncreased(int newValue) throws RemoteException;
 
 	@Override
-	public abstract void vertexDeleted(Vertex v);
+	public abstract void vertexDeleted(Vertex v) throws RemoteException;
 
 }

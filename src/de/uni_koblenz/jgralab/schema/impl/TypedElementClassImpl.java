@@ -45,6 +45,12 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 	 * subclass of this
 	 */
 	private Class<? extends ConcreteInterface> m1ImplementationClass;
+	
+	/**
+	 * The id of this class unique in the schema
+	 */
+	private int id;
+	
 
 	public TypedElementClassImpl(String simpleName, Package pkg, Schema schema) {
 		super(simpleName, pkg, schema);
@@ -213,5 +219,14 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 		((TypedElementClassImpl)superClass).directSubClasses.add(this);
 	}
 	
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		assert getSchema().getTypeForId(id) == this;
+		this.id = id;
+	}
 
 }

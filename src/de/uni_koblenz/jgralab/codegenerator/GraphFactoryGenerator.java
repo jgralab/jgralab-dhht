@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -93,11 +94,16 @@ public class GraphFactoryGenerator extends CodeGenerator {
 
 		GraphClass graphClass = schema.getGraphClass();
 		code.add(createFillTableForGraph(graphClass));
+		code.add(createFillTableForSubordinateGraph(graphClass));
+		code.add(createFillTableForViewGraph(graphClass));
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			code.add(createFillTableForVertex(vertexClass));
 		}
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
 			code.add(createFillTableForEdge(edgeClass));
+			for (IncidenceClass incClass : edgeClass.getIncidenceClasses()) {
+				code.add(createFillTableForIncidence(incClass));
+			}
 		}
 		for (RecordDomain recordDomain : schema.getRecordDomains()) {
 			code.add(createFillTableForRecord(recordDomain));
@@ -117,32 +123,48 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "."
 				+ graphClass.getQualifiedName());
-		code.setVariable("graphImplName", schemaRootPackageName + ".impl.std."
-				+ graphClass.getQualifiedName());
-		code.setVariable("graphTransactionImplName", schemaRootPackageName
-				+ ".impl.trans." + graphClass.getQualifiedName());
-		code.setVariable("graphDatabaseImplName", schemaRootPackageName
-				+ ".impl.db." + graphClass.getQualifiedName());
-		code.setVariable("graphSaveMemImplName", schemaRootPackageName
-				+ ".impl.savemem." + graphClass.getQualifiedName());
-
+		code.setVariable("graphImplName", graphClass.getSimpleName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
-			if (config.hasStandardSupport()) {
-				code.add("setGraphImplementationClass(#graphName#.class, #graphImplName#Impl.class);");
-			}
-			if (config.hasTransactionSupport()) {
-				code.add("setGraphTransactionImplementationClass(#graphName#.class, #graphTransactionImplName#Impl.class);");
-			}
-			if (config.hasDatabaseSupport()) {
-				code.add("setGraphDatabaseImplementationClass(#graphName#.class, #graphDatabaseImplName#Impl.class);");
-			}
-			if (config.hasSavememSupport()) {
-				code.add("setGraphSavememImplementationClass(#graphName#.class, #graphSaveMemImplName#Impl.class);");
-			}
+			code.add("setGraphImplementationClass(#graphName#.class, #schemaMemImplPackage#.#graphImplName#Impl.class);");
+			code.add("setGraphImplementationClassForDiskBasedStorage(#graphName#.class, #schemaDiskImplPackage#.#graphImplName#Impl.class);");
 		}
 		return code;
 	}
+	
+	protected CodeBlock createFillTableForSubordinateGraph(GraphClass graphClass) {
+		if (graphClass.isAbstract()) {
+			return null;
+		}
+
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
+		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		if (!graphClass.isAbstract()) {
+			code.add("/* code for graph #graphName# */");
+			code.add("/* TODO: Uncomment line 145 of GraphFactoryGenerator */");
+			code.add("// setSubordinateGraphImplementationClass(#graphName#.class, #graphImplName#SubordinateImpl.class); ");
+		}
+		return code;
+	}
+
+	
+	protected CodeBlock createFillTableForViewGraph(GraphClass graphClass) {
+		if (graphClass.isAbstract()) {
+			return null;
+		}
+
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
+		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		if (!graphClass.isAbstract()) {
+			code.add("/* code for graph #graphName# */");
+			code.add("/* TODO: Uncomment line 162 of GraphFactoryGenerator */");
+			code.add("//setViewGraphImplementationClass(#graphName#.class, #graphImplName#ViewImpl.class);");
+		}
+		return code;
+	}
+
 
 	protected CodeBlock createFillTableForVertex(VertexClass vertexClass) {
 		if (vertexClass.isAbstract()) {
@@ -150,30 +172,12 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		}
 
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("vertexName", schemaRootPackageName + "."
-				+ vertexClass.getQualifiedName());
-		code.setVariable("vertexImplName", schemaRootPackageName + ".impl.std."
-				+ vertexClass.getQualifiedName());
-		code.setVariable("vertexTransactionImplName", schemaRootPackageName
-				+ ".impl.trans." + vertexClass.getQualifiedName());
-		code.setVariable("vertexDatabaseImplName", schemaRootPackageName
-				+ ".impl.db." + vertexClass.getQualifiedName());
-		code.setVariable("vertexSaveMemImplName", schemaRootPackageName
-				+ ".impl.savemem." + vertexClass.getQualifiedName());
-
+		code.setVariable("vertexName", schemaRootPackageName + "."	+ vertexClass.getQualifiedName());
+		code.setVariable("vertexMemImplName", schemaRootPackageName + ".impl.mem." 	+ vertexClass.getQualifiedName());
+		code.setVariable("vertexDiskImplName", schemaRootPackageName + ".impl.disk." 	+ vertexClass.getQualifiedName());
 		if (!vertexClass.isAbstract()) {
-			if (config.hasStandardSupport()) {
-				code.add("setVertexImplementationClass(#vertexName#.class, #vertexImplName#Impl.class);");
-			}
-			if (config.hasTransactionSupport()) {
-				code.add("setVertexTransactionImplementationClass(#vertexName#.class, #vertexTransactionImplName#Impl.class);");
-			}
-			if (config.hasDatabaseSupport()) {
-				code.add("setVertexDatabaseImplementationClass(#vertexName#.class, #vertexDatabaseImplName#Impl.class);");
-			}
-			if (config.hasSavememSupport()) {
-				code.add("setVertexSavememImplementationClass(#vertexName#.class, #vertexSaveMemImplName#Impl.class);");
-			}
+			code.add("setVertexImplementationClass(#vertexName#.class, #vertexMemImplName#Impl.class);");
+			code.add("setVertexImplementationClassForDiskBasedStorage(#vertexName#.class, #vertexDiskImplName#Impl.class);");
 		}
 		return code;
 	}
@@ -183,51 +187,34 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("recordName", schemaRootPackageName + "."
 				+ recordDomain.getQualifiedName());
-		code.setVariable("recordImplName", schemaRootPackageName + ".impl.std."
+		code.setVariable("recordImplName", schemaRootPackageName + ".impl."
 				+ recordDomain.getQualifiedName());
-		code.setVariable("recordTransactionImplName", schemaRootPackageName
-				+ ".impl.trans." + recordDomain.getQualifiedName());
-		code.setVariable("recordSaveMemImplName", schemaRootPackageName
-				+ ".impl.savemem." + recordDomain.getQualifiedName());
-
-		if (config.hasStandardSupport()) {
-			code.add("setRecordImplementationClass(#recordName#.class, #recordImplName#Impl.class);");
-		}
-		if (config.hasTransactionSupport()) {
-			code.add("setRecordTransactionImplementationClass(#recordName#.class, #recordTransactionImplName#Impl.class);");
-		}
-		if (config.hasSavememSupport()) {
-			code.add("setRecordSavememImplementationClass(#recordName#.class, #recordSaveMemImplName#Impl.class);");
-		}
+		code.add("setRecordImplementationClass(#recordName#.class, #recordImplName#Impl.class);");
 		return code;
 	}
 
 	protected CodeBlock createFillTableForEdge(EdgeClass edgeClass) {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("edgeName", schemaRootPackageName + "."
-				+ edgeClass.getQualifiedName());
-		code.setVariable("edgeImplName", schemaRootPackageName + ".impl.std."
-				+ edgeClass.getQualifiedName());
-		code.setVariable("edgeTransactionImplName", schemaRootPackageName
-				+ ".impl.trans." + edgeClass.getQualifiedName());
-		code.setVariable("edgeDatabaseImplName", schemaRootPackageName
-				+ ".impl.db." + edgeClass.getQualifiedName());
-		code.setVariable("edgeSaveMemImplName", schemaRootPackageName
-				+ ".impl.savemem." + edgeClass.getQualifiedName());
+		code.setVariable("edgeName", schemaRootPackageName + "." + edgeClass.getQualifiedName());
+		code.setVariable("edgeMemImplName", schemaRootPackageName + ".impl.mem." + edgeClass.getQualifiedName());
+		code.setVariable("edgeDiskImplName", schemaRootPackageName + ".impl.disk." + edgeClass.getQualifiedName());
 
 		if (!edgeClass.isAbstract()) {
-			if (config.hasStandardSupport()) {
-				code.add("setEdgeImplementationClass(#edgeName#.class, #edgeImplName#Impl.class);");
-			}
-			if (config.hasTransactionSupport()) {
-				code.add("setEdgeTransactionImplementationClass(#edgeName#.class, #edgeTransactionImplName#Impl.class);");
-			}
-			if (config.hasDatabaseSupport()) {
-				code.add("setEdgeDatabaseImplementationClass(#edgeName#.class, #edgeDatabaseImplName#Impl.class);");
-			}
-			if (config.hasSavememSupport()) {
-				code.add("setEdgeSavememImplementationClass(#edgeName#.class, #edgeSaveMemImplName#Impl.class);");
-			}
+			code.add("setEdgeImplementationClass(#edgeName#.class, #edgeMemImplName#Impl.class);");
+			code.add("setEdgeImplementationClassForDiskBasedStorage(#edgeName#.class, #edgeDiskImplName#Impl.class);");
+		}
+		return code;
+	}
+	
+	protected CodeBlock createFillTableForIncidence(IncidenceClass incClass) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("incName", schemaRootPackageName + "." + incClass.getQualifiedName());
+		code.setVariable("incMemImplName", schemaRootPackageName + ".impl.mem." + incClass.getQualifiedName());
+		code.setVariable("incDiskImplName", schemaRootPackageName + ".impl.disk." + incClass.getQualifiedName());
+
+		if (!incClass.isAbstract()) {
+			code.add("setIncidenceImplementationClass(#incName#.class, #incMemImplName#Impl.class);");
+			code.add("setIncidenceImplementationClassForDiskBasedStorage(#incName#.class, #incDiskImplName#Impl.class);");
 		}
 		return code;
 	}

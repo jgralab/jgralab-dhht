@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -49,7 +51,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * 
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge();
+	public Edge getNextEdge() throws RemoteException;
+
 
 	/**
 	 * Returns the previous {@link Edge} in the sequence of all edges in the
@@ -58,17 +61,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * 
 	 * @return {@link Edge}
 	 */
-	@Deprecated
-	public Edge getPrevEdge();
-
-	/**
-	 * Returns the previous {@link Edge} in the sequence of all edges in the
-	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
-	 * the sequence <code>null</code> is returned.
-	 * 
-	 * @return {@link Edge}
-	 */
-	public Edge getPreviousEdge();
+	public Edge getPreviousEdge() throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -79,7 +72,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link EdgeClass} the next {@link Edge} should have
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass);
+	public Edge getNextEdge(EdgeClass anEdgeClass) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -90,7 +83,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Class} the next {@link Edge} should have
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass);
+	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -104,7 +97,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            of a subclass of <code>anEdgeClass</code> are returned
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses);
+	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -119,7 +112,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -130,7 +123,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Graph}
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Graph traversalContext);
+	public Edge getNextEdge(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the previous {@link Edge} in the sequence of all edges in the
@@ -141,7 +134,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Graph}
 	 * @return {@link Edge}
 	 */
-	public Edge getPreviousEdge(Graph traversalContext);
+	public Edge getPreviousEdge(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -154,7 +147,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link EdgeClass} the next {@link Edge} should have
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass);
+	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -168,7 +161,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge(Graph traversalContext,
-			Class<? extends Edge> aM1EdgeClass);
+			Class<? extends Edge> aM1EdgeClass) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -185,7 +178,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Edge} in the sequence of all edges in the
@@ -202,14 +195,14 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge(Graph traversalContext,
-			Class<? extends Edge> aM1EdgeClass, boolean noSubclasses);
+			Class<? extends Edge> aM1EdgeClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getAlphaVertices();
+	public Iterable<Vertex> getAlphaVertices() throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices which are an instance of
@@ -219,7 +212,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link VertexClass}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass);
+	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices which are an instance of
@@ -230,7 +223,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getAlphaVertices(
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices.
@@ -239,7 +232,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getAlphaVertices(Graph traversalContext);
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices which are an instance of
@@ -252,7 +245,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			VertexClass aVertexClass);
+			VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all start vertices which are an instance of
@@ -263,16 +256,17 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @param aVertexClass
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 * @throws RemoteException 
 	 */
 	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getOmegaVertices();
+	public Iterable<Vertex> getOmegaVertices() throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices which are an instance of
@@ -282,7 +276,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link VertexClass}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass);
+	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices which are an instance of
@@ -293,7 +287,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getOmegaVertices(
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices.
@@ -302,7 +296,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getOmegaVertices(Graph traversalContext);
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices which are an instance of
@@ -315,7 +309,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
-			VertexClass aVertexClass);
+			VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all end vertices which are an instance of
@@ -328,14 +322,14 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices.
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices();
+	public Iterable<Vertex> getIncidentVertices() throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are connected via an
@@ -345,7 +339,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {Direction}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(Direction dir);
+	public Iterable<Vertex> getIncidentVertices(Direction dir) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -355,7 +349,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link VertexClass}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass);
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -366,7 +360,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -380,7 +374,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -394,7 +388,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass, Direction direction);
+			Class<? extends Vertex> aVertexClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices.
@@ -403,7 +397,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext);
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are connected via an
@@ -416,7 +410,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Direction dir);
+			Direction dir) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -429,7 +423,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			VertexClass aVertexClass);
+			VertexClass aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -442,7 +436,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass);
+			Class<? extends Vertex> aVertexClass) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -458,7 +452,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			VertexClass aVertexClass, Direction direction);
+			VertexClass aVertexClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -474,7 +468,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass, Direction direction);
+			Class<? extends Vertex> aVertexClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Tests if this edge is a binary one (i.e., its edge class has only two
@@ -483,6 +477,6 @@ public interface Edge extends GraphElement<EdgeClass, Edge, Vertex> {
 	 * 
 	 * @return true for binary edges, false otherwise
 	 */
-	public boolean isBinary();
+	public boolean isBinary() throws RemoteException;
 
 }

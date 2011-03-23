@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 
@@ -69,11 +70,12 @@ extends TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 	 * @throws NoSuchAttributeException
 	 *             if the attribute <code>name</code> does not exist at this
 	 *             {@link AttributedElement}
+	 * @throws RemoteException 
 	 */
-	public Object getAttribute(String name) throws NoSuchAttributeException;
+	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException;
 
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException;
+			throws NoSuchAttributeException, RemoteException;
 
 	void initializeAttributesWithDefaultValues();
 }

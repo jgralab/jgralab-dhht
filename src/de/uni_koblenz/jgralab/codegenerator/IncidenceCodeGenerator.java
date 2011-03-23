@@ -57,12 +57,24 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 		addImports("#usedJgImplPackage#.VertexImpl");
 		addImports("#usedJgImplPackage#.EdgeImpl");
+		addImports("#jgPackage#.Edge");
+		addImports("#jgPackage#.Vertex");
+		addImports("#jgPackage#.Direction");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(#connectedVertexClass# vertex, #connectedEdgeClass# edge) {",
-						"\tsuper((VertexImpl)vertex, (EdgeImpl)edge);"));
+						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
+		code.setVariable("dir", aec.getDirection().toString());
+		if (currentCycle.isDiskbasedImpl()) {
+			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
+			code.addNoIndent(new CodeSnippet(
+				true,
+				"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.IncidenceContainer storage) throws java.io.IOException {",
+				"\tsuper(id, storage);",
+				"}"));
+		}
 		return code;
 	}
 
@@ -158,11 +170,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("@Override",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
 					 "}");
 		}

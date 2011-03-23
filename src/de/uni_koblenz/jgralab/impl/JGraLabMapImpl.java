@@ -28,49 +28,63 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.db;
+package de.uni_koblenz.jgralab.impl;
 
-import static junit.framework.Assert.fail;
-import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphIO;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class ImplTest {
+import de.uni_koblenz.jgralab.JGraLabCloneable;
+import de.uni_koblenz.jgralab.JGraLabMap;
 
-	protected String url = "postgresql://localhost:5432/graphdatabase_test/";
-	protected String userName = "postgres";
-	protected String password = "energizer";
+/**
+ * 
+ * @author
+ * 
+ * @param <K>
+ * @param <V>
+ */
+public class JGraLabMapImpl<K, V> extends HashMap<K, V> implements
+		JGraLabMap<K, V> {
 
-	protected VertexTestGraph vertexTestGraph;
+	private static final long serialVersionUID = 7484092853864016267L;
 
-	protected VertexTestGraph createVertexTestGraphWithDatabaseSupport(
-			String id, int vMax, int eMax) {
-		try {
-			GraphDatabase database = GraphDatabase.openGraphDatabase(url,
-					userName, password);
-			if (!database.contains(VertexTestSchema.instance())) {
-				GraphIO.loadSchemaIntoGraphDatabase(
-						"testit/testschemas/VertexTestSchema.tg", database);
-			}
-			return VertexTestSchema.instance()
-					.createVertexTestGraphWithDatabaseSupport(id, vMax, eMax,
-							database);
-		} catch (Exception exception) {
-			exception.printStackTrace();
-			fail("Could not create test graph in database.");
-			return null;
-		}
+	public JGraLabMapImpl(Map<? extends K, ? extends V> map) {
+		super(map);
 	}
 
-	protected void cleanDatabaseOfTestGraph(Graph graph) {
-		try {
-			GraphDatabase database = GraphDatabase.openGraphDatabase(url,
-					userName, password);
-			if (database.containsGraph(graph.getId())) {
-				database.delete((DatabasePersistableGraph) graph);
+	public JGraLabMapImpl(int initialCapacity) {
+		super(initialCapacity);
+	}
+
+	public JGraLabMapImpl() {
+		super();
+	}
+
+	public JGraLabMapImpl(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public JGraLabMapImpl<K, V> clone() {
+		JGraLabMapImpl<K, V> copy = new JGraLabMapImpl<K, V>();
+		for (java.util.Map.Entry<K, V> entry : entrySet()) {
+			K keyClone = null;
+			V valueClone = null;
+			// clone key
+			if (entry.getKey() instanceof JGraLabCloneable) {
+				keyClone = (K) ((JGraLabCloneable) entry.getKey()).clone();
+			} else {
+				keyClone = entry.getKey();
 			}
-		} catch (GraphDatabaseException exception) {
-			exception.printStackTrace();
-			fail("Could not delete test graph from database.");
+			// clone value
+			if (entry.getValue() instanceof JGraLabCloneable) {
+				valueClone = (V) ((JGraLabCloneable) entry.getValue()).clone();
+			} else {
+				valueClone = entry.getValue();
+			}
+			copy.put(keyClone, valueClone);
 		}
+		return copy;
 	}
 }

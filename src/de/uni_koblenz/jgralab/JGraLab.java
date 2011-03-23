@@ -58,7 +58,7 @@ public class JGraLab {
 	//
 	// to use this information inside the text place $rev for the revision
 	// information and $bid for the build id
-	private static final String version = "Dimetrodon";
+	private static final String version = "DHHT";
 	private static final String[] versionInfo = {
 			"JGraLab - The Java graph laboratory", "  Version : $ver",
 			"  $rev", "  Build ID: $bid" };
