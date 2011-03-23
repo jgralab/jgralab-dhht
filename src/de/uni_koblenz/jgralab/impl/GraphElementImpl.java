@@ -41,6 +41,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
+import de.uni_koblenz.jgralab.impl.std.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -481,18 +482,18 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Vertex appendix) {
-		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastVertex());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+		((GraphElementImpl<?, ?, ?>) appendix).updateSubordinateGraphs();
 	}
 
 	@Override
 	public void addSubordinateElement(Edge appendix) {
-		// TODO use moveto.....
 		appendix.putAfter(getSubordinateGraph().getLastEdge());
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
 		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+		((GraphElementImpl<?, ?, ?>) appendix).updateSubordinateGraphs();
 	}
 
 	/**
@@ -543,7 +544,22 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
 	 */
-	boolean isSubordinateGraphObjectAlreadyCreated() {
+	private boolean isSubordinateGraphObjectAlreadyCreated() {
 		return subOrdinateGraph != null;
+	}
+
+	/**
+	 * Updates the {@link SubordinateGraphImpl} of this GraphElement and its
+	 * parents.
+	 */
+	private void updateSubordinateGraphs() {
+		if (isSubordinateGraphObjectAlreadyCreated()) {
+			// TODO
+		} else {
+			GraphElementImpl<?, ?, ?> parent = (GraphElementImpl<?, ?, ?>) getParent();
+			if (parent != null) {
+				parent.updateSubordinateGraphs();
+			}
+		}
 	}
 }

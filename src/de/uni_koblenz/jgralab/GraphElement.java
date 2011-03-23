@@ -992,6 +992,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public boolean isBefore(OwnType g);
 
 	/**
+	 * TODO This method does not check, if this {@link GraphElement} is moved
+	 * into a subordinate graph.<br>
 	 * Puts this {@link GraphElement} immediately before <code>g</code> in the
 	 * sequence of incident {@link GraphElement}s.
 	 * 
@@ -1009,6 +1011,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public boolean isAfter(OwnType g);
 
 	/**
+	 * TODO This method does not check, if this {@link GraphElement} is moved
+	 * into a subordinate graph.<br>
 	 * Puts this {@link GraphElement} immediately after <code>g</code> in the
 	 * sequence of incident {@link GraphElement}s.
 	 * 

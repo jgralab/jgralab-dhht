@@ -32,7 +32,6 @@ package de.uni_koblenz.jgralab.impl.std;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
@@ -47,9 +46,9 @@ import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
-import de.uni_koblenz.jgralab.impl.FreeIndexList;
 import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * The implementation of a <code>SubordninateGraph</code> accessing attributes
@@ -58,10 +57,8 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
  * @author ist@uni-koblenz.de
  */
 public class SubordinateGraphImpl extends
-		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
-	private VertexBaseImpl[] vertex;
+		de.uni_koblenz.jgralab.impl.GraphBaseBaseImpl {
 	private int vCount;
-	private EdgeBaseImpl[] edge;
 	private int eCount;
 	private VertexBaseImpl firstVertex;
 	private VertexBaseImpl lastVertex;
@@ -83,273 +80,106 @@ public class SubordinateGraphImpl extends
 	 */
 	private long edgeListVersion;
 
-	/**
-	 * List of vertices to be deleted by a cascading delete caused by deletion
-	 * of a composition "parent".
-	 */
-	private List<VertexBaseImpl> deleteVertexList;
-
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
 		return containingElement;
 	}
 
 	@Override
-	protected VertexBaseImpl[] getVertex() {
-		// TODO
-		return vertex;
-	}
-
-	@Override
 	public int getVCount() {
-		// TODO
 		return vCount;
 	}
 
 	@Override
-	protected EdgeBaseImpl[] getEdge() {
-		// TODO
-		return edge;
-	}
-
-	@Override
 	public int getECount() {
-		// TODO
 		return eCount;
 	}
 
 	@Override
 	public Vertex getFirstVertex() {
-		// TODO
 		return firstVertex;
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		// TODO
 		return lastVertex;
 	}
 
 	@Override
 	public Edge getFirstEdge() {
-		// TODO
 		return firstEdge;
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		// TODO
 		return lastEdge;
 	}
 
 	@Override
-	protected FreeIndexList getFreeVertexList() {
-		// TODO
-		return freeVertexList;
-	}
-
-	@Override
-	protected FreeIndexList getFreeEdgeList() {
-		// TODO
-		return freeEdgeList;
-	}
-
-	@Override
-	protected void setVertex(VertexBaseImpl[] vertex) {
-		// TODO
-		this.vertex = vertex;
-	}
-
-	@Override
 	protected void setVCount(int count) {
-		// TODO
 		vCount = count;
 	}
 
 	@Override
-	protected void setEdge(EdgeBaseImpl[] edge) {
-		// TODO
-		this.edge = edge;
-	}
-
-	@Override
 	protected void setECount(int count) {
-		// TODO
 		eCount = count;
 	}
 
 	@Override
 	protected void setFirstVertex(VertexBaseImpl firstVertex) {
-		// TODO
 		this.firstVertex = firstVertex;
 	}
 
 	@Override
 	protected void setLastVertex(VertexBaseImpl lastVertex) {
-		// TODO
 		this.lastVertex = lastVertex;
 	}
 
 	@Override
 	protected void setFirstEdge(EdgeBaseImpl firstEdge) {
-		// TODO
 		this.firstEdge = firstEdge;
 	}
 
 	@Override
 	protected void setLastEdge(EdgeBaseImpl lastEdge) {
-		// TODO
 		this.lastEdge = lastEdge;
 	}
 
 	@Override
-	protected List<VertexBaseImpl> getDeleteVertexList() {
-		// TODO
-		return deleteVertexList;
-	}
-
-	@Override
-	protected void setDeleteVertexList(List<VertexBaseImpl> deleteVertexList) {
-		// TODO
-		this.deleteVertexList = deleteVertexList;
-	}
-
-	@Override
 	protected void setVertexListVersion(long vertexListVersion) {
+		this.vertexListVersion = vertexListVersion;
 	}
 
 	@Override
 	public long getVertexListVersion() {
-		return containingElement.getGraph().getVertexListVersion();
+		return vertexListVersion;
 	}
 
 	@Override
 	protected void setEdgeListVersion(long edgeListVersion) {
+		this.edgeListVersion = edgeListVersion;
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		return containingElement.getGraph().getEdgeListVersion();
+		return edgeListVersion;
 	}
 
 	/**
 	 * TODO GraphClass = containingElement.getType()
 	 * 
-	 * @param containingElement
-	 *            {@link GraphElement} which contains this subordinate graph
+	 * @param containingVertex
+	 *            {@link Vertex} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(GraphElement<?, ?, ?> containingElement) {
-		super(containingElement.getGraph().getId(), containingElement
-				.getGraph().getType());
-		this.containingElement = containingElement;
+	protected SubordinateGraphImpl(Vertex containingVertex) {
+		super(containingVertex.getGraph().getId(), containingVertex.getGraph()
+				.getType());
+		containingElement = containingVertex;
 	}
-
-	// @Override
-	// public void abort() {
-	// throw new UnsupportedOperationException(
-	// "Abort is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public void commit() {
-	// throw new UnsupportedOperationException(
-	// "Commit is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public Transaction newReadOnlyTransaction() {
-	// throw new UnsupportedOperationException(
-	// "Creation of read-only-transactions is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public Transaction newTransaction() {
-	// throw new UnsupportedOperationException(
-	// "Creation of read-write-transactions is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public Savepoint defineSavepoint() {
-	// throw new UnsupportedOperationException(
-	// "Definition of save-points is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public Transaction getCurrentTransaction() {
-	// throw new UnsupportedOperationException(
-	// "Transactions are not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public void restoreSavepoint(Savepoint savepoint) {
-	// throw new UnsupportedOperationException(
-	// "Definition of save-points is not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public void setCurrentTransaction(Transaction transaction) {
-	// throw new UnsupportedOperationException(
-	// "Transactions are not supported for this graph.");
-	// }
-	//
-	// @Override
-	// public boolean isInConflict() {
-	// throw new UnsupportedOperationException(
-	// "Transactions are not supported for this graph.");
-	// }
 
 	@Override
 	public Graph getCompleteGraph() {
 		return containingElement.getGraph();
-	}
-
-	@Override
-	protected int allocateVertexIndex(int currentId) {
-		// TODO
-		int vId = freeVertexList.allocateIndex();
-		if (vId == 0) {
-			expandVertexArray(getExpandedVertexCount());
-			vId = freeVertexList.allocateIndex();
-		}
-		return vId;
-	}
-
-	@Override
-	protected int allocateEdgeIndex(int currentId) {
-		// TODO
-		int eId = freeEdgeList.allocateIndex();
-		if (eId == 0) {
-			expandEdgeArray(getExpandedEdgeCount());
-			eId = freeEdgeList.allocateIndex();
-		}
-		return eId;
-	}
-
-	/*
-	 * @Override protected void freeIndex(FreeIndexList freeIndexList, int
-	 * index) { freeIndexList.freeIndex(index); }
-	 */
-
-	@Override
-	protected void freeEdgeIndex(int index) {
-		// TODO
-		freeEdgeList.freeIndex(index);
-	}
-
-	@Override
-	protected void freeVertexIndex(int index) {
-		// TODO
-		freeVertexList.freeIndex(index);
-	}
-
-	@Override
-	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
-		// TODO
-	}
-
-	@Override
-	protected void edgeAfterDeleted(Edge edgeToBeDeleted) {
-		// TODO
 	}
 
 	@Override
@@ -449,18 +279,6 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected void addVertex(Vertex newVertex) {
-		// TODO Auto-generated method stub
-		super.addVertex(newVertex);
-	}
-
-	@Override
-	protected void addEdge(Edge newEdge) {
-		// TODO Auto-generated method stub
-		super.addEdge(newEdge);
-	}
-
-	@Override
 	public Graph getView(int kappa) {
 		// TODO Auto-generated method stub
 		return null;
@@ -509,6 +327,95 @@ public class SubordinateGraphImpl extends
 	@Override
 	public GraphClass getType() {
 		return containingElement.getGraph().getType();
+	}
+
+	@Override
+	public int getNextIncidenceID() {
+		return containingElement.getGraph().getNextIncidenceID();
+	}
+
+	@Override
+	public boolean isLoading() {
+		return containingElement.getGraph().isLoading();
+	}
+
+	@Override
+	public void loadingCompleted() {
+		containingElement.getGraph().loadingCompleted();
+	}
+
+	@Override
+	public boolean containsVertex(Vertex v) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean containsEdge(Edge e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void deleteVertex(Vertex v) {
+		containingElement.getGraph().deleteVertex(v);
+	}
+
+	@Override
+	public void deleteEdge(Edge e) {
+		containingElement.getGraph().deleteEdge(e);
+	}
+
+	@Override
+	public Vertex getVertex(int id) {
+		return containingElement.getGraph().getVertex(id);
+	}
+
+	@Override
+	public Edge getEdge(int id) {
+		return containingElement.getGraph().getEdge(id);
+	}
+
+	@Override
+	public int getMaxVCount() {
+		return containingElement.getGraph().getMaxVCount();
+	}
+
+	@Override
+	public int getExpandedVertexCount() {
+		return containingElement.getGraph().getExpandedVertexCount();
+	}
+
+	@Override
+	public int getExpandedEdgeCount() {
+		return containingElement.getGraph().getExpandedEdgeCount();
+	}
+
+	@Override
+	public int getMaxECount() {
+		return containingElement.getGraph().getMaxECount();
+	}
+
+	@Override
+	public String getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setId(String id) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void defragment() {
+		// TODO adapt to subgraph or UnsupportedOperationException
+		containingElement.getGraph().defragment();
+	}
+
+	@Override
+	public Schema getSchema() {
+		return containingElement.getGraph().getSchema();
 	}
 
 }
