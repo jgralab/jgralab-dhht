@@ -380,30 +380,29 @@ public class SubordinateGraphImpl extends
 	@Override
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
-		return containingElement.getGraph().writeAttributeValueToString(
-				attributeName);
+		return containingElement.writeAttributeValueToString(attributeName);
 	}
 
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
-		containingElement.getGraph().writeAttributeValues(io);
+		containingElement.writeAttributeValues(io);
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		containingElement.getGraph().readAttributeValues(io);
+		containingElement.readAttributeValues(io);
 	}
 
 	@Override
 	public Object getAttribute(String name) throws NoSuchAttributeException {
-		return containingElement.getGraph().getAttribute(name);
+		return containingElement.getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException {
-		containingElement.getGraph().setAttribute(name, data);
+		containingElement.setAttribute(name, data);
 	}
 
 	@Override
@@ -430,14 +429,14 @@ public class SubordinateGraphImpl extends
 
 	@Override
 	public boolean containsVertex(Vertex v) {
-		// TODO Auto-generated method stub
-		return false;
+		return ((GraphElementImpl<?, ?, ?>) v)
+				.isChildOf(getContainingElement());
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		// TODO Auto-generated method stub
-		return false;
+		return ((GraphElementImpl<?, ?, ?>) e)
+				.isChildOf(getContainingElement());
 	}
 
 	@Override
