@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab;
 
-import java.rmi.Remote;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.impl.GraphElementImpl;
@@ -1056,7 +1055,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> getAdjacences(Graph traversalConext, String role);
+	public List<? extends OwnType> getAdjacences(Graph traversalConext,
+			String role);
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1110,20 +1110,20 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 			IncidenceClass adjacentIc, OwnType other);
 
 	/**
-	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
-	 * the above method should add the newly created element to the subgraph both
-	 * connected elements belong to
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph the above method should add the newly created element to
+	 * the subgraph both connected elements belong to
 	 */
-	//public DualType addAdjacence(Graph traversalContext, String incidentRole,
-	//		String adjacentRole, OwnType other);
+	// public DualType addAdjacence(Graph traversalContext, String incidentRole,
+	// String adjacentRole, OwnType other);
 
 	/**
-	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
-	 * the above method should add the newly created element to the subgraph both
-	 * connected elements belong to
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph the above method should add the newly created element to
+	 * the subgraph both connected elements belong to
 	 */
-	//public DualType addAdjacence(Graph traversalContext,
-	//		IncidenceClass incidentIc, IncidenceClass adjacentIc, OwnType other);
+	// public DualType addAdjacence(Graph traversalContext,
+	// IncidenceClass incidentIc, IncidenceClass adjacentIc, OwnType other);
 
 	/**
 	 * TODO
@@ -1141,17 +1141,19 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public List<OwnType> removeAdjacences(IncidenceClass ic);
 
-	
 	/**
-	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph
 	 */
-	//public List<OwnType> removeAdjacences(Graph traversalContext, String role);
+	// public List<OwnType> removeAdjacences(Graph traversalContext, String
+	// role);
 
 	/**
-     * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph
 	 */
-	//public List<OwnType> removeAdjacences(Graph traversalContext,
-	//		IncidenceClass ic);
+	// public List<OwnType> removeAdjacences(Graph traversalContext,
+	// IncidenceClass ic);
 
 	/**
 	 * TODO
@@ -1170,19 +1172,22 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public void removeAdjacence(IncidenceClass ic, OwnType other);
 
 	/**
-	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph
 	 */
-	//public void removeAdjacence(Graph traversalContext, String role, OwnType other);
+	// public void removeAdjacence(Graph traversalContext, String role, OwnType
+	// other);
 
 	/**
-	 * Manipulation operations are not sensitive for a subgraph but affect the complete graph
+	 * Manipulation operations are not sensitive for a subgraph but affect the
+	 * complete graph
 	 * 
 	 * @param traversalContext
 	 * @param ic
 	 * @param other
 	 */
-	//public void removeAdjacence(Graph traversalContext, IncidenceClass ic,
-	//		OwnType other);
+	// public void removeAdjacence(Graph traversalContext, IncidenceClass ic,
+	// OwnType other);
 
 	/**
 	 * Returns the {@link IncidenceClass} corresponding to <code>rolename</code>
