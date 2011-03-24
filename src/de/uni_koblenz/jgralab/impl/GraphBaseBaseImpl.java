@@ -68,7 +68,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class GraphBaseBaseImpl implements Graph {
 
 	// ------------- GRAPH VARIABLES -------------
-
 	/**
 	 * The GraphFactory that was used to create this graph. This factory will be
 	 * used to create vertices and edges in this graph.
@@ -184,11 +183,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 		setFirstEdge(null);
 		setLastEdge(null);
 		setECount(0);
-
-		setICount(0);
 	}
-
-	protected abstract void setICount(int count);
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {

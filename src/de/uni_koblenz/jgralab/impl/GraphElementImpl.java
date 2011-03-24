@@ -100,7 +100,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
 	 */
-	protected GraphBaseImpl graph;
+	protected GraphImpl graph;
 
 	protected Graph subOrdinateGraph;
 
@@ -112,7 +112,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphElementImpl(Graph graph) throws RemoteException {
 		assert graph != null;
-		this.graph = (GraphBaseImpl) graph;
+		this.graph = (GraphImpl) graph;
 	}
 
 	@Override
