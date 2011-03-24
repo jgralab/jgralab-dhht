@@ -75,13 +75,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public Graph getView(int kappa); // TODO
 
-	/**
-	 * Sets <code>traversalContext</code> as the traversal context.
-	 * 
-	 * @param traversalContext
-	 *            {@link Graph}
-	 */
-	public void setTraversalContext(Graph traversalContext);
+    //method should not be used directly
+	//public void setTraversalContext(Graph traversalContext);
 
 	/**
 	 * @return {@link Graph} the current traversal context. It is not removed
@@ -422,19 +417,12 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getMaxVCount();
 
+	
 	/**
-	 * Computes the new maximum number of vertices when expansion is needed.
-	 * 
-	 * @return the new maximum number of vertices
+	 * @return the number of incidences in this graph
 	 */
-	//public int getExpandedVertexCount();
-
-	/**
-	 * Computes the new maximum number of edges when expansion is needed.
-	 * 
-	 * @return the new maximum number of edges
-	 */
-	//public int getExpandedEdgeCount();
+	int getICount();
+	
 
 	/**
 	 * The maximum number of edges that can be stored in the graph before the
@@ -571,106 +559,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * <b>Attention:</b> Not supported within when using transactions!
 	 */
 	public void defragment();
-
-	// // ---- transaction support ----
-	// /**
-	// * @return a read-write-<code>Transaction</code>
-	// */
-	// public Transaction newTransaction();// old
-	//
-	// /**
-	// * @return a read-only-<code>Transaction</code>
-	// */
-	// public Transaction newReadOnlyTransaction();// old
-	//
-	// /**
-	// * Sets the given <code>transaction</code> as the active
-	// * <code>Transaction</code> for the current thread.
-	// *
-	// * @param transaction
-	// */
-	// public void setCurrentTransaction(Transaction transaction);// old
-	//
-	// /**
-	// * @return the currently active <code>Transaction</code> in the current
-	// * thread
-	// */
-	// public Transaction getCurrentTransaction();// old
-	//
-	// /**
-	// * Delegates to {@link Graph#getCurrentTransaction()
-	// * getCurrentTransaction()}.
-	// *
-	// * @throws CommitFailedException
-	// * if commit fails
-	// */
-	// public void commit() throws CommitFailedException;// old
-	//
-	// /**
-	// * Delegates to {@link Graph#getCurrentTransaction()
-	// * getCurrentTransaction()}.
-	// */
-	// public void abort();// old
-	//
-	// /**
-	// * Delegates to {@link Graph#getCurrentTransaction()
-	// * getCurrentTransaction()}.
-	// *
-	// * @return if there have been conflicts
-	// */
-	// public boolean isInConflict();// old
-	//
-	// /**
-	// * Delegates to {@link Graph#getCurrentTransaction()
-	// * getCurrentTransaction()}.
-	// *
-	// * @return the defined <code>Savepoint</code>
-	// */
-	// public Savepoint defineSavepoint();// old
-	//
-	// /**
-	// * Delegates to {@link Graph#getCurrentTransaction()
-	// * getCurrentTransaction()}.
-	// *
-	// * @param savepoint
-	// * the <code>Savepoint</code> to be restored.
-	// *
-	// * @throws InvalidSavepointException
-	// * if {@link Savepoint#getGraph() <code>savepoint</code>
-	// * .getGraph()} != {@link Graph#getCurrentTransaction()
-	// *
-	// */
-	// public void restoreSavepoint(Savepoint savepoint)
-	// throws InvalidSavepointException;// old
-	//
-	// /**
-	// * Tells whether this graph instance has standard support.
-	// *
-	// * @return true if this graph instance has standard support
-	// */
-
-	public boolean hasStandardSupport();
-
-	/**
-	 * Tells whether this graph instance supports transactions.
-	 * 
-	 * @return true if this graph instance supports transactions.
-	 */
-	public boolean hasTransactionSupport();
-
-	/**
-	 * Tells whether this graph instance supports savemem.
-	 * 
-	 * @return true if this graph instance supports savemem.
-	 */
-	public boolean hasSavememSupport();
-
-	/**
-	 * Tells whether this graph instance has database support.
-	 * 
-	 * @return true if this graph instance has database support.
-	 */
-	public boolean hasDatabaseSupport();
 
 	/**
 	 * 
@@ -890,9 +778,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public int getGraphStructureChangedListenerCount();
 
 
-	/**
-	 * @return the number of incidences in this graph
-	 */
-	int getICount();
+
 
 }

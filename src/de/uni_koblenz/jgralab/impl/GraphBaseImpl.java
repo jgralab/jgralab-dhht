@@ -185,9 +185,14 @@ public abstract class GraphBaseImpl implements Graph {
 		setECount(0);
 	}
 
-	@Override
-	public void setTraversalContext(Graph traversalContext) {
-		getCompleteGraph().setTraversalContext(traversalContext);
+	/*
+	 * Sets <code>traversalContext</code> as the traversal context.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 */
+	protected void setTraversalContext(Graph traversalContext) {
+		((GraphBaseImpl)getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
@@ -197,7 +202,8 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void useAsTraversalContext() {
-		getCompleteGraph().useAsTraversalContext();
+		((GraphBaseImpl)getCompleteGraph()).setTraversalContext(this);
+	//	getCompleteGraph().useAsTraversalContext();
 	}
 
 	@Override
