@@ -12,7 +12,6 @@ import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
-import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
