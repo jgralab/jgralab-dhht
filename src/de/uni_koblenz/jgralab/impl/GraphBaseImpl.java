@@ -51,11 +51,13 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -82,6 +84,12 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	private long graphVersion;
 
+	
+	// ------------- PARTIAL GRAPH VARIABLES ------------
+	
+	protected List<PartialGraphImpl> partialGraphs = null;
+	
+	
 	// ------------- VERTEX LIST VARIABLES -------------
 
 	/**
@@ -1031,5 +1039,28 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	protected abstract void setICount(int count);
+	
+	/**
+	 * Adds a partial graph on the given host to the sequence
+	 * of partial graphs and returns a local proxy  
+	 * @param hostname name of the host running the remote JGraLab instance
+	 * @return
+	 */
+	protected Graph createPartialGraph(String hostname) {
+		JGraLabServer remote = JGraLabServerImpl.getLocalInstance().getRemoteInstance(hostname);
+		Schema s = remote.getSchema(getSchema().getQualifiedName());
+		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(this);
+		
+		if (partialGraphs == null) {
+			partialGraphs = new ArrayList<PartialGraphImpl>();
+			partialGraphs.add(partialGraph);
+		}
+		
+		return partialGraph;
+	}
+	
+	public List<PartialGraphImpl> getPartialGraphs() {
+		//build list of partial graphs and their partial graphs
+	}
 
 }

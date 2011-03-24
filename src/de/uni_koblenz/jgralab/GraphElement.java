@@ -1293,4 +1293,5 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Edge}
 	 */
 	public void addSubordinateElement(Edge appendix);
+
 }

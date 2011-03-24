@@ -71,7 +71,7 @@ public abstract class ViewGraphImpl implements Graph {
 	public ViewGraphImpl getView(int level) {
 		if (level < lowestVisibleKappaLevel)
 			level = lowestVisibleKappaLevel;
-		return ((GraphBaseImpl)getCompleteGraph()).graphFactory.createViewGraph(this.getM1Class(), this, level);
+		return ((GraphBaseImpl)getCompleteGraph()).graphFactory.createViewGraph(this, level);
 	}
 
 	@Override

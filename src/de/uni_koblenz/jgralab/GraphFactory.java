@@ -76,7 +76,15 @@ public interface GraphFactory {
 	public SubordinateGraphImpl createSubordinateGraph(GraphElement elem);
 	
 	/**
-	 * creates a Partial-Graph object for the specified class. The returned object may
+	 * creates a PartialSubordinate-Graph object for the specified class. The returned object may
+	 * be an instance of a subclass of the specified graphClass.
+	 * @param elem
+	 * @return
+	 */
+	public SubordinateGraphImpl createPartialSubordinateGraph(GraphElement elem);
+	
+	/**
+	 * creates a Partial-Graph object for the specified remote graph. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 * @param compelteGraph
 	 * @return
@@ -134,6 +142,14 @@ public interface GraphFactory {
 	public void setViewGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends ViewGraphImpl> implementationClass);
+	
+	void setPartialGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends ViewGraphImpl> implementationClass);
+	
+	void setPartialSubordinateGraphImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends ViewGraphImpl> implementationClass);
 
 	public void setVertexImplementationClass(
 			Class<? extends Vertex> vertexM1Class,
@@ -156,5 +172,6 @@ public interface GraphFactory {
 	 */
 	public void setRecordImplementationClass(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
+
 
 }
