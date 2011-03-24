@@ -100,7 +100,29 @@ public interface GraphStructureChangedListener {
 	 */
 	public void maxEdgeCountIncreased(int newValue);
 
+	/**
+	 * This method is called after the maximum incidence count has been increased to
+	 * <code>newValue</code>.
+	 * 
+	 * @param newValue
+	 *            the new value of <code>maxECount</code>.
+	 */
+	public void maxIncidenceCountIncreased(int newValue);
+
+	/**
+	 * This method is called after the Incidence <code>i</code> has been added to the
+	 * graph.
+	 * 
+	 * @param i
+	 *            the incidence that has been added.
+	 */
 	public void incidenceAdded(Incidence i);
 
-	public void maxIncidenceCountIncreased(int newValue);
+	/**
+	 * This method is called before the Incidence <code>i</code> is deleted.
+	 * 
+	 * @param i
+	 *            the incidence that is about to be deleted.
+	 */
+	void incidenceDeleted(Incidence i);
 }

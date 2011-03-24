@@ -63,5 +63,18 @@ public abstract class GraphStructureChangedAdapterWithAutoRemove implements
 	@Override
 	public void vertexDeleted(Vertex v) {
 	}
+	
+
+	@Override
+	public void incidenceAdded(Incidence i) {
+	}
+	
+	@Override
+	public void incidenceDeleted(Incidence i) {
+	}
+
+	@Override
+	public void maxIncidenceCountIncreased(int newValue) {
+	}
 
 }
