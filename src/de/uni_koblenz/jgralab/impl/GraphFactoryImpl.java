@@ -56,8 +56,6 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  */
 public abstract class GraphFactoryImpl implements GraphFactory {
 
-	// FIXME Remove redundancies! Why is this all in one class anyway? Because
-	// it seems to be a factory pattern!?!
 
 	// Maps for standard support.
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMap;
@@ -67,35 +65,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMap;
 	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMap;
 
-//	// Maps for database support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphDatabaseMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeDatabaseMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexDatabaseMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceDatabaseMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordDatabaseMap;
-//
-//	// Maps for transaction support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphTransactionMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeTransactionMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexTransactionMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceTransactionMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordTransactionMap;
-//
-//	// Maps for savemem support.
-//	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphSavememMap;
-//	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeSavememMap;
-//	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexSavememMap;
-//	protected HashMap<Class<? extends Incidence>, Constructor<? extends  Incidence>> incidenceSavememMap;
-//	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordSavememMap;
-
 	/**
 	 * Creates and initializes a new <code>GraphFactoryImpl</code>.
 	 */
 	protected GraphFactoryImpl() {
 		this.createMapsForStandardSupport();
-//		this.createMapsForDatabaseSupport();
-//		this.createMapsForTransactionSupport();
-//		this.createMapsForSaveMemSupport();
 	}
 
 	private void createMapsForStandardSupport() {
@@ -106,29 +80,6 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
 
-//	private void createMapsForDatabaseSupport() {
-//		this.graphDatabaseMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		this.edgeDatabaseMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		this.vertexDatabaseMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		this.recordDatabaseMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-//
-//	private void createMapsForTransactionSupport() {
-//		graphTransactionMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		edgeTransactionMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		vertexTransactionMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		recordTransactionMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-//
-//	private void createMapsForSaveMemSupport() {
-//		graphSavememMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		edgeSavememMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		vertexSavememMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		recordSavememMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
-//	}
-
-	// --- Methods for option STDIMPL
-	// ---------------------------------------------------
 
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,

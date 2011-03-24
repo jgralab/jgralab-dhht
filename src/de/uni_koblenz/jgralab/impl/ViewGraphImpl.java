@@ -35,7 +35,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  *
  */
-public abstract class ViewGraph implements Graph {
+public abstract class ViewGraphImpl implements Graph {
 
 	/**
 	 * the lowest kappa level of the elements which should be visible
@@ -58,7 +58,7 @@ public abstract class ViewGraph implements Graph {
 	 * @param lowestVisibleKappaLevel
 	 * 						the loweset kappa level of visible elements
 	 */
-	public ViewGraph(Graph viewedGraph, int lowestVisibleKappaLevel) {
+	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
 	}
@@ -68,10 +68,10 @@ public abstract class ViewGraph implements Graph {
 	 * avoid multi-delegation and unnecessary overhead
 	 */
 	@Override
-	public ViewGraph getView(int level) {
+	public ViewGraphImpl getView(int level) {
 		if (level < lowestVisibleKappaLevel)
 			level = lowestVisibleKappaLevel;
-		return new ViewGraph(viewedGraph, level);
+		return ((GraphBaseImpl)getCompleteGraph()).graphFactory.createViewGraph(this.getM1Class(), this, level);
 	}
 
 	@Override

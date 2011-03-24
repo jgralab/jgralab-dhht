@@ -33,7 +33,7 @@ public abstract class PartialGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getView(int kappa) {
-		return new ViewGraph(this, kappa);
+		return new ViewGraphImpl(this, kappa);
 	}
 
 	@Override
