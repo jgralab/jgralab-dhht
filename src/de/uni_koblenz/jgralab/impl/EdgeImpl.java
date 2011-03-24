@@ -42,10 +42,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.std.EdgeImpl;
-import de.uni_koblenz.jgralab.impl.std.GraphImpl;
-import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.std.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -57,7 +53,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeBaseImpl extends
+public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 	// global edge sequence
@@ -80,7 +76,7 @@ public abstract class EdgeBaseImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected EdgeBaseImpl(int anId, Graph graph) throws RemoteException {
+	protected EdgeImpl(int anId, Graph graph) throws RemoteException {
 		super(graph);
 		setId(anId);
 		((GraphImpl) graph).addEdge(this);
@@ -106,7 +102,7 @@ public abstract class EdgeBaseImpl extends
 		v.connect(adjacentIc, other);
 
 		incidenceListModified();
-		((EdgeBaseImpl) other).incidenceListModified();
+		((EdgeImpl) other).incidenceListModified();
 		graph.edgeListModified();
 		return v;
 	}
@@ -718,7 +714,7 @@ public abstract class EdgeBaseImpl extends
 			Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
-		EdgeBaseImpl e = (EdgeBaseImpl) getNextEdge(traversalContext);
+		EdgeImpl e = (EdgeImpl) getNextEdge(traversalContext);
 		while (e != null) {
 			if (noSubclasses) {
 				if (m1EdgeClass == e.getM1Class()) {
@@ -729,7 +725,7 @@ public abstract class EdgeBaseImpl extends
 					return e;
 				}
 			}
-			e = (EdgeBaseImpl) e.getNextEdge(traversalContext);
+			e = (EdgeImpl) e.getNextEdge(traversalContext);
 		}
 		return null;
 	}
@@ -830,9 +826,9 @@ public abstract class EdgeBaseImpl extends
 		if (this == e) {
 			return false;
 		}
-		EdgeBaseImpl next = (EdgeBaseImpl) e.getNextEdge();
+		EdgeImpl next = (EdgeImpl) e.getNextEdge();
 		while ((next != null) && (next != this)) {
-			next = (EdgeBaseImpl) next.getNextEdge();
+			next = (EdgeImpl) next.getNextEdge();
 		}
 		return next != null;
 	}
@@ -879,7 +875,7 @@ public abstract class EdgeBaseImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeAfterInGraph((EdgeBaseImpl) e, this);
+		graph.putEdgeAfterInGraph((EdgeImpl) e, this);
 	}
 
 	@Override
@@ -890,7 +886,7 @@ public abstract class EdgeBaseImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeBeforeInGraph((EdgeBaseImpl) e, this);
+		graph.putEdgeBeforeInGraph((EdgeImpl) e, this);
 	}
 
 	@Override

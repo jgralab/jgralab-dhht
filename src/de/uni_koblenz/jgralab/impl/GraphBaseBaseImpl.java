@@ -92,12 +92,12 @@ public abstract class GraphBaseBaseImpl implements Graph {
 	/**
 	 * holds the id of the first vertex in Vseq
 	 */
-	abstract protected void setFirstVertex(VertexBaseImpl firstVertex);
+	abstract protected void setFirstVertex(VertexImpl firstVertex);
 
 	/**
 	 * holds the id of the last vertex in Vseq
 	 */
-	abstract protected void setLastVertex(VertexBaseImpl lastVertex);
+	abstract protected void setLastVertex(VertexImpl lastVertex);
 
 	/**
 	 * Sets version of VSeq if it is different than previous version.
@@ -117,12 +117,12 @@ public abstract class GraphBaseBaseImpl implements Graph {
 	/**
 	 * holds the id of the first edge in Eseq
 	 */
-	abstract protected void setFirstEdge(EdgeBaseImpl firstEdge);
+	abstract protected void setFirstEdge(EdgeImpl firstEdge);
 
 	/**
 	 * holds the id of the last edge in Eseq
 	 */
-	abstract protected void setLastEdge(EdgeBaseImpl lastEdge);
+	abstract protected void setLastEdge(EdgeImpl lastEdge);
 
 	/**
 	 * Sets version of ESeq.
@@ -512,17 +512,17 @@ public abstract class GraphBaseBaseImpl implements Graph {
 			return;
 		}
 		class VertexList {
-			VertexBaseImpl first;
-			VertexBaseImpl last;
+			VertexImpl first;
+			VertexImpl last;
 
-			public void add(VertexBaseImpl v) {
+			public void add(VertexImpl v) {
 				if (first == null) {
 					first = v;
 					assert (last == null);
 					last = v;
 				} else {
 					if (!hasSavememSupport()) {
-						v.setPrevVertex(last);
+						v.setPreviousVertex(last);
 					}
 					last.setNextVertex(v);
 					last = v;
@@ -530,11 +530,11 @@ public abstract class GraphBaseBaseImpl implements Graph {
 				v.setNextVertex(null);
 			}
 
-			public VertexBaseImpl remove() {
+			public VertexImpl remove() {
 				if (first == null) {
 					throw new NoSuchElementException();
 				}
-				VertexBaseImpl out;
+				VertexImpl out;
 				if (first == last) {
 					out = first;
 					first = null;
@@ -542,9 +542,9 @@ public abstract class GraphBaseBaseImpl implements Graph {
 					return out;
 				}
 				out = first;
-				first = (VertexBaseImpl) out.getNextVertex();
+				first = (VertexImpl) out.getNextVertex();
 				if (!hasSavememSupport()) {
-					first.setPrevVertex(null);
+					first.setPreviousVertex(null);
 				}
 				return out;
 			}
@@ -561,14 +561,14 @@ public abstract class GraphBaseBaseImpl implements Graph {
 		VertexList out = a;
 
 		// split
-		VertexBaseImpl last;
+		VertexImpl last;
 		VertexList l = new VertexList();
-		l.first = (VertexBaseImpl) getFirstVertex();
-		l.last = (VertexBaseImpl) getLastVertex();
+		l.first = (VertexImpl) getFirstVertex();
+		l.last = (VertexImpl) getLastVertex();
 
 		out.add(last = l.remove());
 		while (!l.isEmpty()) {
-			VertexBaseImpl current = l.remove();
+			VertexImpl current = l.remove();
 			if (comp.compare(current, last) < 0) {
 				out = (out == a) ? b : a;
 			}
@@ -620,7 +620,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 
 			// copy rest of A
 			while (!a.isEmpty()) {
-				VertexBaseImpl current = a.remove();
+				VertexImpl current = a.remove();
 				if (comp.compare(current, last) < 0) {
 					out = (out == c) ? d : c;
 				}
@@ -630,7 +630,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 
 			// copy rest of B
 			while (!b.isEmpty()) {
-				VertexBaseImpl current = b.remove();
+				VertexImpl current = b.remove();
 				if (comp.compare(current, last) < 0) {
 					out = (out == c) ? d : c;
 				}
@@ -653,10 +653,10 @@ public abstract class GraphBaseBaseImpl implements Graph {
 			return;
 		}
 		class EdgeList {
-			EdgeBaseImpl first;
-			EdgeBaseImpl last;
+			EdgeImpl first;
+			EdgeImpl last;
 
-			public void add(EdgeBaseImpl e) {
+			public void add(EdgeImpl e) {
 				if (first == null) {
 					first = e;
 					assert (last == null);
@@ -671,11 +671,11 @@ public abstract class GraphBaseBaseImpl implements Graph {
 				e.setNextEdge(null);
 			}
 
-			public EdgeBaseImpl remove() {
+			public EdgeImpl remove() {
 				if (first == null) {
 					throw new NoSuchElementException();
 				}
-				EdgeBaseImpl out;
+				EdgeImpl out;
 				if (first == last) {
 					out = first;
 					first = null;
@@ -683,7 +683,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 					return out;
 				}
 				out = first;
-				first = (EdgeBaseImpl) out.getNextEdge();
+				first = (EdgeImpl) out.getNextEdge();
 				if (!hasSavememSupport()) {
 					first.setPreviousEdge(null);
 				}
@@ -702,14 +702,14 @@ public abstract class GraphBaseBaseImpl implements Graph {
 		EdgeList out = a;
 
 		// split
-		EdgeBaseImpl last;
+		EdgeImpl last;
 		EdgeList l = new EdgeList();
-		l.first = (EdgeBaseImpl) getFirstEdge();
-		l.last = (EdgeBaseImpl) getLastEdge();
+		l.first = (EdgeImpl) getFirstEdge();
+		l.last = (EdgeImpl) getLastEdge();
 
 		out.add(last = l.remove());
 		while (!l.isEmpty()) {
-			EdgeBaseImpl current = l.remove();
+			EdgeImpl current = l.remove();
 			if (comp.compare(current, last) < 0) {
 				out = (out == a) ? b : a;
 			}
@@ -761,7 +761,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 
 			// copy rest of A
 			while (!a.isEmpty()) {
-				EdgeBaseImpl current = a.remove();
+				EdgeImpl current = a.remove();
 				if (comp.compare(current, last) < 0) {
 					out = (out == c) ? d : c;
 				}
@@ -771,7 +771,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 
 			// copy rest of B
 			while (!b.isEmpty()) {
-				EdgeBaseImpl current = b.remove();
+				EdgeImpl current = b.remove();
 				if (comp.compare(current, last) < 0) {
 					out = (out == c) ? d : c;
 				}
@@ -1023,5 +1023,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
+
+	protected abstract void setICount(int count);
 
 }

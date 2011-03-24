@@ -28,7 +28,7 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.std;
+package de.uni_koblenz.jgralab.impl;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -47,9 +47,6 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.EdgeBaseImpl;
-import de.uni_koblenz.jgralab.impl.GraphElementImpl;
-import de.uni_koblenz.jgralab.impl.VertexBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -64,10 +61,10 @@ public class SubordinateGraphImpl extends
 	private int vCount;
 	private int eCount;
 	private int iCount;
-	private VertexBaseImpl firstVertex;
-	private VertexBaseImpl lastVertex;
-	private EdgeBaseImpl firstEdge;
-	private EdgeBaseImpl lastEdge;
+	private VertexImpl firstVertex;
+	private VertexImpl lastVertex;
+	private EdgeImpl firstEdge;
+	private EdgeImpl lastEdge;
 	private GraphElement<?, ?, ?> containingElement;
 
 	/**
@@ -135,22 +132,22 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	protected void setFirstVertex(VertexBaseImpl firstVertex) {
+	protected void setFirstVertex(VertexImpl firstVertex) {
 		this.firstVertex = firstVertex;
 	}
 
 	@Override
-	protected void setLastVertex(VertexBaseImpl lastVertex) {
+	protected void setLastVertex(VertexImpl lastVertex) {
 		this.lastVertex = lastVertex;
 	}
 
 	@Override
-	protected void setFirstEdge(EdgeBaseImpl firstEdge) {
+	protected void setFirstEdge(EdgeImpl firstEdge) {
 		this.firstEdge = firstEdge;
 	}
 
 	@Override
-	protected void setLastEdge(EdgeBaseImpl lastEdge) {
+	protected void setLastEdge(EdgeImpl lastEdge) {
 		this.lastEdge = lastEdge;
 	}
 
@@ -190,9 +187,9 @@ public class SubordinateGraphImpl extends
 				&& ((GraphElementImpl<?, ?, ?>) current)
 						.isChildOf(containingElement); current.getNextVertex()) {
 			if (getFirstVertex() == null) {
-				setFirstVertex((VertexBaseImpl) current);
+				setFirstVertex((VertexImpl) current);
 			}
-			setLastVertex((VertexBaseImpl) current);
+			setLastVertex((VertexImpl) current);
 			setVCount(getVCount() + 1);
 		}
 
@@ -204,9 +201,9 @@ public class SubordinateGraphImpl extends
 			current = current.getNextEdge();
 		}
 		if (current != null) {
-			setFirstEdge((EdgeBaseImpl) current);
+			setFirstEdge((EdgeImpl) current);
 			do {
-				setLastEdge((EdgeBaseImpl) current);
+				setLastEdge((EdgeImpl) current);
 				setECount(getECount() + 1);
 				setICount(getICount() + current.getDegree());
 				current = current.getNextEdge();
@@ -232,9 +229,9 @@ public class SubordinateGraphImpl extends
 				&& ((GraphElementImpl<?, ?, ?>) current)
 						.isChildOf(containingElement); current.getNextEdge()) {
 			if (getFirstEdge() == null) {
-				setFirstEdge((EdgeBaseImpl) current);
+				setFirstEdge((EdgeImpl) current);
 			}
-			setLastEdge((EdgeBaseImpl) current);
+			setLastEdge((EdgeImpl) current);
 			setECount(getECount() + 1);
 			setICount(getICount() + current.getDegree());
 		}
@@ -247,9 +244,9 @@ public class SubordinateGraphImpl extends
 			current = current.getNextVertex();
 		}
 		if (current != null) {
-			setFirstVertex((VertexBaseImpl) current);
+			setFirstVertex((VertexImpl) current);
 			do {
-				setLastVertex((VertexBaseImpl) current);
+				setLastVertex((VertexImpl) current);
 				setVCount(getVCount() + 1);
 				current = current.getNextVertex();
 			} while (current != null

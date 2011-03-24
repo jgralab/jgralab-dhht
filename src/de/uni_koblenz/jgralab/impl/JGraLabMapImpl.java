@@ -28,49 +28,62 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.std;
+package de.uni_koblenz.jgralab.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uni_koblenz.jgralab.JGraLabCloneable;
+import de.uni_koblenz.jgralab.JGraLabMap;
 
 /**
  * 
  * @author
  * 
- * @param <E>
+ * @param <K>
+ * @param <V>
  */
-public class JGraLabListImpl<E> extends ArrayList<E> implements
-		de.uni_koblenz.jgralab.JGraLabList<E> {
+public class JGraLabMapImpl<K, V> extends HashMap<K, V> implements
+		JGraLabMap<K, V> {
 
-	public JGraLabListImpl(int initialCapacity) {
+	private static final long serialVersionUID = 7484092853864016267L;
+
+	public JGraLabMapImpl(Map<? extends K, ? extends V> map) {
+		super(map);
+	}
+
+	public JGraLabMapImpl(int initialCapacity) {
 		super(initialCapacity);
 	}
 
-	public JGraLabListImpl(Collection<? extends E> collection) {
-		super(collection);
-	}
-
-	public JGraLabListImpl() {
+	public JGraLabMapImpl() {
 		super();
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	public JGraLabMapImpl(int initialCapacity, float loadFactor) {
+		super(initialCapacity, loadFactor);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JGraLabListImpl<E> clone() {
-		JGraLabListImpl<E> copy = new JGraLabListImpl<E>();
-		for (E element : this) {
-			if (element instanceof JGraLabCloneable) {
-				copy.add((E) ((JGraLabCloneable) element).clone());
+	public JGraLabMapImpl<K, V> clone() {
+		JGraLabMapImpl<K, V> copy = new JGraLabMapImpl<K, V>();
+		for (java.util.Map.Entry<K, V> entry : entrySet()) {
+			K keyClone = null;
+			V valueClone = null;
+			// clone key
+			if (entry.getKey() instanceof JGraLabCloneable) {
+				keyClone = (K) ((JGraLabCloneable) entry.getKey()).clone();
 			} else {
-				copy.add(element);
+				keyClone = entry.getKey();
 			}
+			// clone value
+			if (entry.getValue() instanceof JGraLabCloneable) {
+				valueClone = (V) ((JGraLabCloneable) entry.getValue()).clone();
+			} else {
+				valueClone = entry.getValue();
+			}
+			copy.put(keyClone, valueClone);
 		}
 		return copy;
 	}

@@ -42,8 +42,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.std.VertexImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -55,9 +53,114 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class VertexBaseImpl extends
+public abstract class VertexImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
+	private VertexImpl nextVertexInGraph;
+	private VertexImpl prevVertexInGraph;
+	private IncidenceImpl firstIncidenceAtVertex;
+	private IncidenceImpl lastIncidenceAtVertex;
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext) {
+		Incidence firstIncidence = firstIncidenceAtVertex;
+		if (firstIncidence == null) {
+			return firstIncidence;
+		} else if (traversalContext.getContainingElement().containsElement(
+				firstIncidence.getEdge())) {
+			return firstIncidence;
+		} else {
+			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
+	}
+
+	@Override
+	public Vertex getNextVertex(Graph traversalContext) {
+		assert isValid();
+		if (nextVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				nextVertexInGraph)) {
+			return nextVertexInGraph;
+		} else {
+			return nextVertexInGraph.getNextVertex(traversalContext);
+		}
+	}
+
+	@Override
+	public Vertex getPreviousVertex(Graph traversalContext) {
+		assert isValid();
+		if (prevVertexInGraph == null) {
+			return null;
+		} else if (traversalContext.getContainingElement().containsElement(
+				prevVertexInGraph)) {
+			return prevVertexInGraph;
+		} else {
+			return prevVertexInGraph.getPreviousVertex(traversalContext);
+		}
+	}
+
+	@Override
+	public Incidence getLastIncidence(Graph traversalContext) {
+		Incidence lastIncidence = lastIncidenceAtVertex;
+		if (lastIncidence == null) {
+			return lastIncidence;
+		} else if (traversalContext.getContainingElement().containsElement(
+				lastIncidence.getEdge())) {
+			return lastIncidence;
+		} else {
+			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
+		}
+	}
+
+	/**
+	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
+	 * all vertices in the graph.
+	 * 
+	 * @param nextVertex
+	 *            {@link Vertex}which should be put after this {@link Vertex}
+	 */
+	protected void setNextVertex(Vertex nextVertex) {
+		nextVertexInGraph = (VertexImpl) nextVertex;
+	}
+
+
+	/**
+	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
+	 * of all vertices in the graph.
+	 * 
+	 * @param prevVertex
+	 *            {@link Vertex}which should be put before this {@link Vertex}
+	 */
+	protected void setPreviousVertex(Vertex prevVertex) {
+		prevVertexInGraph = (VertexImpl) prevVertex;
+	}
+
+	@Override
+	public void setFirstIncidence(IncidenceImpl firstIncidence) {
+		firstIncidenceAtVertex = firstIncidence;
+	}
+
+	@Override
+	public void setLastIncidence(IncidenceImpl lastIncidence) {
+		lastIncidenceAtVertex = lastIncidence;
+	}
+
+
+	@Override
+	protected void setId(int id) {
+		assert id >= 0;
+		this.id = id;
+	}
+
+	@Override
+	public Graph getSubordinateGraph() {
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);// TODO
+	}
+	
 	/**
 	 * 
 	 */
@@ -71,9 +174,10 @@ public abstract class VertexBaseImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected VertexBaseImpl(int id, Graph graph)  throws RemoteException  {
+	protected VertexImpl(int id, Graph graph)  throws RemoteException  {
 		super(graph);
 		this.id = id;
+		((GraphImpl) graph).addVertex(this);
 	}
 
 	@Override
@@ -310,7 +414,7 @@ public abstract class VertexBaseImpl extends
 			Class<T> m1VertexClass, boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
-		VertexBaseImpl v = (VertexBaseImpl) getNextVertex();
+		VertexImpl v = (VertexImpl) getNextVertex();
 		while (v != null) {
 			if (noSubclasses) {
 				if (m1VertexClass == v.getM1Class()) {
@@ -321,7 +425,7 @@ public abstract class VertexBaseImpl extends
 					return (T) v;
 				}
 			}
-			v = (VertexBaseImpl) v.getNextVertex();
+			v = (VertexImpl) v.getNextVertex();
 		}
 		return null;
 	}
@@ -512,7 +616,7 @@ public abstract class VertexBaseImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		graph.putVertexBefore((VertexBaseImpl) v, this);
+		graph.putVertexBefore((VertexImpl) v, this);
 	}
 
 	@Override
@@ -523,9 +627,9 @@ public abstract class VertexBaseImpl extends
 		if (this == v) {
 			return false;
 		}
-		VertexBaseImpl next = (VertexBaseImpl) v.getNextVertex();
+		VertexImpl next = (VertexImpl) v.getNextVertex();
 		while ((next != null) && (next != this)) {
-			next = (VertexBaseImpl) next.getNextVertex();
+			next = (VertexImpl) next.getNextVertex();
 		}
 		return next != null;
 	}
@@ -536,26 +640,10 @@ public abstract class VertexBaseImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		graph.putVertexAfter((VertexBaseImpl) v, this);
+		graph.putVertexAfter((VertexImpl) v, this);
 	}
 
-	/**
-	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
-	 * all vertices in the graph.
-	 * 
-	 * @param nextVertex
-	 *            {@link Vertex}which should be put after this {@link Vertex}
-	 */
-	protected abstract void setNextVertex(Vertex nextVertex);
 
-	/**
-	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
-	 * of all vertices in the graph.
-	 * 
-	 * @param prevVertex
-	 *            {@link Vertex}which should be put before this {@link Vertex}
-	 */
-	protected abstract void setPrevVertex(Vertex prevVertex);
 
 	@Override
 	public int getDegree() {
@@ -1088,7 +1176,7 @@ public abstract class VertexBaseImpl extends
 		e.connect(adjacentIc, other);
 
 		incidenceListModified();
-		((VertexBaseImpl) other).incidenceListModified();
+		((VertexImpl) other).incidenceListModified();
 		graph.edgeListModified();
 		return e;
 	}

@@ -28,13 +28,12 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.std;
+package de.uni_koblenz.jgralab.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 import de.uni_koblenz.jgralab.JGraLabCloneable;
-import de.uni_koblenz.jgralab.JGraLabSet;
 
 /**
  * 
@@ -42,30 +41,30 @@ import de.uni_koblenz.jgralab.JGraLabSet;
  * 
  * @param <E>
  */
-public class JGraLabSetImpl<E> extends HashSet<E> implements JGraLabSet<E> {
+public class JGraLabListImpl<E> extends ArrayList<E> implements
+		de.uni_koblenz.jgralab.JGraLabList<E> {
 
-	private static final long serialVersionUID = 5890950480302617008L;
-
-	public JGraLabSetImpl(Collection<? extends E> collection) {
-		super(collection);
-	}
-
-	public JGraLabSetImpl(int initialCapacity) {
+	public JGraLabListImpl(int initialCapacity) {
 		super(initialCapacity);
 	}
 
-	public JGraLabSetImpl() {
+	public JGraLabListImpl(Collection<? extends E> collection) {
+		super(collection);
+	}
+
+	public JGraLabListImpl() {
 		super();
 	}
 
-	public JGraLabSetImpl(int initialCapacity, float loadFactor) {
-		super(initialCapacity, loadFactor);
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JGraLabSetImpl<E> clone() {
-		JGraLabSetImpl<E> copy = new JGraLabSetImpl<E>();
+	public JGraLabListImpl<E> clone() {
+		JGraLabListImpl<E> copy = new JGraLabListImpl<E>();
 		for (E element : this) {
 			if (element instanceof JGraLabCloneable) {
 				copy.add((E) ((JGraLabCloneable) element).clone());

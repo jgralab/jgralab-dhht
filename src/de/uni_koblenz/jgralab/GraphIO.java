@@ -64,7 +64,7 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.GraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -1363,7 +1363,7 @@ public class GraphIO {
 			Method instanceMethod = schemaClass.getMethod("instance",
 					(Class<?>[]) null);
 			io.schema = (Schema) instanceMethod.invoke(null, new Object[0]);
-			GraphBaseImpl loadedGraph = io.graph(pf, implementationType);
+			GraphImpl loadedGraph = io.graph(pf, implementationType);
 			io.incidencesAtEdge = null;
 			io.incidencesAtVertex = null;
 			loadedGraph.loadingCompleted();
@@ -2721,7 +2721,7 @@ public class GraphIO {
 	}
 
 	@SuppressWarnings("unchecked")
-	private GraphBaseImpl graph(ProgressFunction pf,
+	private GraphImpl graph(ProgressFunction pf,
 			ImplementationType implementationType) throws GraphIOException {
 		currentPackageName = "";
 		match("Graph");
@@ -2768,9 +2768,9 @@ public class GraphIO {
 			pf.init(vCount + eCount);
 			interval = pf.getUpdateInterval();
 		}
-		GraphBaseImpl graph = null;
+		GraphImpl graph = null;
 		try {
-			graph = (GraphBaseImpl) schema.getGraphCreateMethod(
+			graph = (GraphImpl) schema.getGraphCreateMethod(
 					implementationType).invoke(null,
 					new Object[] { graphId, maxV, maxE });
 		} catch (Exception e) {
@@ -2829,7 +2829,7 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void sortLambdaSequenceAtVertex(GraphBaseImpl graph) {
+	private void sortLambdaSequenceAtVertex(GraphImpl graph) {
 		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();
 			for (Integer[] incArray : incidencesAtVertex[v.getId()]) {
