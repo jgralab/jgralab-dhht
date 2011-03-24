@@ -36,6 +36,7 @@ import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
@@ -125,5 +126,6 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 
 		};
 	}
+
 
 }
