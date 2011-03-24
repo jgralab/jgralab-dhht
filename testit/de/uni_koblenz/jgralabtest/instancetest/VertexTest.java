@@ -491,7 +491,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -623,7 +623,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -814,7 +814,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -965,7 +965,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -1141,7 +1141,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -1367,7 +1367,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -1617,7 +1617,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -1919,7 +1919,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -2220,7 +2220,7 @@ public class VertexTest extends InstanceTest {
 		numbers.put(nodes[1], 1);
 		numbers.put(nodes[2], 2);
 		createTransaction(g);
-		for (int i = g.getFirstEdge().getId(); i < g.getECount(); i++) {
+		for (int i = g.getFirstEdge().getUid(); i < g.getECount(); i++) {
 			Edge e = g.getEdge(i);
 			int start = numbers.get(e.getAlpha());
 			int end = numbers.get(e.getOmega());
@@ -8910,7 +8910,7 @@ public class VertexTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) v0.getId()).toString())) {
+			if (parts[0].equals(((Integer) v0.getUid()).toString())) {
 				break;
 			}
 			commit(g);
@@ -8984,7 +8984,7 @@ public class VertexTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) v0.getId()).toString())) {
+			if (parts[0].equals(((Integer) v0.getUid()).toString())) {
 				break;
 			}
 			commit(g);

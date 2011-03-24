@@ -65,7 +65,7 @@ public abstract class ImplTest {
 		try {
 			GraphDatabase database = GraphDatabase.openGraphDatabase(url,
 					userName, password);
-			if (database.containsGraph(graph.getId())) {
+			if (database.containsGraph(graph.getUid())) {
 				database.delete((DatabasePersistableGraph) graph);
 			}
 		} catch (GraphDatabaseException exception) {

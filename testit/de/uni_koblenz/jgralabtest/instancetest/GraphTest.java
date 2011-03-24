@@ -127,7 +127,7 @@ public class GraphTest extends InstanceTest {
 			fail("Implementation " + implementationType
 					+ " not yet supported by this test.");
 		}
-		graphIdsInUse.add(out.getId());
+		graphIdsInUse.add(out.getUid());
 		return out;
 	}
 
@@ -2502,7 +2502,7 @@ public class GraphTest extends InstanceTest {
 
 		// SubLink e10 = graph2.createEdge(SubLink.class, v9, v6);
 		createReadOnlyTransaction(g1);
-		int id = e12.getId();
+		int id = e12.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2516,7 +2516,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e1.getId();
+		id = e1.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2530,7 +2530,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e2.getId();
+		id = e2.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2544,7 +2544,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e7.getId();
+		id = e7.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2558,7 +2558,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e3.getId();
+		id = e3.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2572,7 +2572,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e9.getId();
+		id = e9.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2586,7 +2586,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e4.getId();
+		id = e4.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2600,7 +2600,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e10.getId();
+		id = e10.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2614,7 +2614,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e5.getId();
+		id = e5.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2628,7 +2628,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e8.getId();
+		id = e8.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2642,7 +2642,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e11.getId();
+		id = e11.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -2656,7 +2656,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		id = e6.getId();
+		id = e6.getUid();
 		commit(g1);
 
 		createTransaction(g1);
@@ -5365,7 +5365,7 @@ public class GraphTest extends InstanceTest {
 			break;
 		case DATABASE:
 			g3 = dbHandler.createMinimalGraphWithDatabaseSupport("GraphTest");
-			this.graphIdsInUse.add(g3.getId());
+			this.graphIdsInUse.add(g3.getUid());
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -5733,99 +5733,99 @@ public class GraphTest extends InstanceTest {
 	@Test
 	public void testSetId() throws CommitFailedException {
 		createTransaction(g1);
-		g1.setId("alpha");
+		g1.setUid("alpha");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("alpha", g1.getId());
+		assertEquals("alpha", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("1265");
+		g1.setUid("1265");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("1265", g1.getId());
+		assertEquals("1265", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("007");
+		g1.setUid("007");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("007", g1.getId());
+		assertEquals("007", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("r2d2");
+		g1.setUid("r2d2");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("r2d2", g1.getId());
+		assertEquals("r2d2", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("answer:42");
+		g1.setUid("answer:42");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("answer:42", g1.getId());
+		assertEquals("answer:42", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("1506");
+		g1.setUid("1506");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("1506", g1.getId());
+		assertEquals("1506", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("june15");
+		g1.setUid("june15");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("june15", g1.getId());
+		assertEquals("june15", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("bang");
+		g1.setUid("bang");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("bang", g1.getId());
+		assertEquals("bang", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("22now");
+		g1.setUid("22now");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("22now", g1.getId());
+		assertEquals("22now", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("hjkutzbv");
+		g1.setUid("hjkutzbv");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("hjkutzbv", g1.getId());
+		assertEquals("hjkutzbv", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId("54rdcg9");
+		g1.setUid("54rdcg9");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals("54rdcg9", g1.getId());
+		assertEquals("54rdcg9", g1.getUid());
 		commit(g1);
 
 		createTransaction(g1);
-		g1.setId(".k,oibt");
+		g1.setUid(".k,oibt");
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
-		assertEquals(".k,oibt", g1.getId());
+		assertEquals(".k,oibt", g1.getUid());
 		commit(g1);
 
 		System.out.println("Done testing setId.");

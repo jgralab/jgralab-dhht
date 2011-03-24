@@ -169,7 +169,7 @@ public class DefaultOptimizer extends OptimizerBase {
 
 	@SuppressWarnings("unused")
 	private void printCosts(GreqlEvaluator eval, Greql2 syntaxgraph) {
-		logger.fine("Optimizer: Optimizing " + syntaxgraph.getId() + ".\n"
+		logger.fine("Optimizer: Optimizing " + syntaxgraph.getUid() + ".\n"
 				+ "This syntaxgraph has " + syntaxgraph.getECount()
 				+ " edges and " + syntaxgraph.getVCount() + " vertexes.");
 		GraphMarker<VertexEvaluator> marker = eval

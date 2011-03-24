@@ -783,11 +783,6 @@ public abstract class EdgeImpl extends
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
-	@Override
-	public Edge getPrevEdge() {
-		assert isValid();
-		return getPreviousEdge();
-	}
 
 	@Override
 	public Edge getPreviousEdge() {

@@ -110,10 +110,10 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 			while (isSimpleDeclOf != null) {
 				SimpleDeclaration sDecl = (SimpleDeclaration) isSimpleDeclOf
 						.getAlpha();
-				String key = decl.getId()
+				String key = decl.getUid()
 						+ "-"
 						+ sDecl.getFirstIsTypeExprOfIncidence(EdgeDirection.IN)
-								.getAlpha().getId();
+								.getAlpha().getUid();
 				if (mergableSDMap.containsKey(key)) {
 					// We've found another SimpleDeclaration with the same type
 					// expression under the current Declaration, thus we add it

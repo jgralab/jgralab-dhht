@@ -182,7 +182,7 @@ public class GreqlGui extends JFrame {
 									JOptionPane.ERROR_MESSAGE);
 							statusLabel.setText("Couldn't load graph :-(");
 						} else {
-							statusLabel.setText("Graph '" + graph.getId()
+							statusLabel.setText("Graph '" + graph.getUid()
 									+ "' loaded.");
 						}
 						fileSelectionButton.setEnabled(true);

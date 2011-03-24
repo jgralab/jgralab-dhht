@@ -361,7 +361,7 @@ public class EdgeListTest extends InstanceTest {
 
 		int i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getId());
+			assertEquals(currentEdge.getId(), links[i++].getUid());
 		}
 
 		Comparator<Edge> comp = new Comparator<Edge>() {
@@ -377,7 +377,7 @@ public class EdgeListTest extends InstanceTest {
 
 		i = EDGE_COUNT;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i--].getId());
+			assertEquals(currentEdge.getId(), links[i--].getUid());
 		}
 
 		comp = new Comparator<Edge>() {
@@ -393,7 +393,7 @@ public class EdgeListTest extends InstanceTest {
 
 		i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getId());
+			assertEquals(currentEdge.getId(), links[i++].getUid());
 		}
 		commit(g);
 

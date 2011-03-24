@@ -275,7 +275,7 @@ public class GraphValidator {
 			bw.append("<title>");
 			bw.append("Validation Report for the "
 					+ graph.getM1Class().getSimpleName() + " with id "
-					+ graph.getId() + ".");
+					+ graph.getUid() + ".");
 			bw.append("</title>");
 			bw.append("</head>");
 

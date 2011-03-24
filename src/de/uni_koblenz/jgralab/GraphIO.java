@@ -708,7 +708,7 @@ public class GraphIO {
 		}
 
 		space();
-		write("Graph " + toUtfString(graph.getId()) + " "
+		write("Graph " + toUtfString(graph.getUid()) + " "
 				+ graph.getGraphVersion());
 		writeIdentifier(graph.getType().getQualifiedName());
 		int vCount = graph.getVCount();

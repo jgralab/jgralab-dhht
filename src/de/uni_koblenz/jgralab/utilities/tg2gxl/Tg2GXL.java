@@ -161,7 +161,7 @@ public class Tg2GXL extends Tg2Whatever {
 					+ "#gxl-1.0\" xlink:type=\" simple\"/>");
 		} else {
 			out.println("<graph id=\""
-							+ graph.getId()
+							+ graph.getUid()
 							+ "\" edgeids=\" true\" edgemode=\" directed\" hypergraph=\" false\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ graph.getGraphClass().getQualifiedName()
@@ -257,8 +257,8 @@ public class Tg2GXL extends Tg2Whatever {
 		if (printSchema
 				&& !(e instanceof de.uni_koblenz.jgralab.grumlschema.structure.DefinesGraphClass)
 				&& !(e instanceof HasRecordDomainComponent)) {
-			String thisVertex = "v:" + e.getThis().getId();
-			String thatVertex = "v:" + e.getThat().getId();
+			String thisVertex = "v:" + e.getThis().getUid();
+			String thatVertex = "v:" + e.getThat().getUid();
 
 			if (e.getThis() instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
 				thisVertex = ((de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) e
@@ -284,8 +284,8 @@ public class Tg2GXL extends Tg2Whatever {
 			int toOrder = getEdgeIncidence(e.getReversedEdge(), e.getThat());
 			int fromOrder = getEdgeIncidence(e, e.getThis());
 			out.println("<edge id=\"e:" + e.getId() + "\" to=\"v:"
-					+ e.getThat().getId() + "\" from=\"v:"
-					+ e.getThis().getId() + "\" toorder=\" " + toOrder
+					+ e.getThat().getUid() + "\" from=\"v:"
+					+ e.getThis().getUid() + "\" toorder=\" " + toOrder
 					+ "\" fromorder=\" " + fromOrder + "\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ elemClass.getQualifiedName()

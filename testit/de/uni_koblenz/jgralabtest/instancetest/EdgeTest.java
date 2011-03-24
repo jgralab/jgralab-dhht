@@ -4372,7 +4372,7 @@ public class EdgeTest extends InstanceTest {
 			createReadOnlyTransaction(g);
 			int edgeId = rand.nextInt(g.getECount()) + 1;
 			Edge e = g.getEdge(edgeId);
-			int oldAlphaId = e.getAlpha().getId();
+			int oldAlphaId = e.getAlpha().getUid();
 			int newAlphaId = rand.nextInt(3) + 1;
 			Vertex newAlpha = g.getVertex(newAlphaId);
 			commit(g);
@@ -4644,7 +4644,7 @@ public class EdgeTest extends InstanceTest {
 			createReadOnlyTransaction(g);
 			int edgeId = rand.nextInt(g.getECount()) + 1;
 			Edge e = g.getEdge(edgeId);
-			int oldOmegaId = e.getOmega().getId();
+			int oldOmegaId = e.getOmega().getUid();
 			int newOmegaId = rand.nextInt(3) + 1;
 			Vertex newOmega = g.getVertex(newOmegaId);
 			commit(g);
@@ -5236,7 +5236,7 @@ public class EdgeTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) e1.getId()).toString())
+			if (parts[0].equals(((Integer) e1.getUid()).toString())
 					&& parts[1].equals(e1.getClass().getName())) {
 				commit(g);
 				break;
@@ -5318,7 +5318,7 @@ public class EdgeTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) e1.getId()).toString())
+			if (parts[0].equals(((Integer) e1.getUid()).toString())
 					&& parts[1].equals(e1.getClass().getName())) {
 				commit(g);
 				break;

@@ -325,7 +325,7 @@ public class VertexListTest extends InstanceTest {
 
 		int i = 1;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i++].getId());
+			assertEquals(currentNode.getId(), nodes[i++].getUid());
 		}
 
 		Comparator<Vertex> comp = new Comparator<Vertex>() {
@@ -341,7 +341,7 @@ public class VertexListTest extends InstanceTest {
 
 		i = VERTEX_COUNT;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i--].getId());
+			assertEquals(currentNode.getId(), nodes[i--].getUid());
 		}
 
 		comp = new Comparator<Vertex>() {
@@ -357,7 +357,7 @@ public class VertexListTest extends InstanceTest {
 
 		i = 1;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i++].getId());
+			assertEquals(currentNode.getId(), nodes[i++].getUid());
 		}
 		commit(g);
 

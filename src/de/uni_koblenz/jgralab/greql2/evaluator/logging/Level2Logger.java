@@ -108,7 +108,7 @@ public class Level2Logger extends Level2LoggingBase implements EvaluationLogger 
 		loggerDirectory = logDirectory;
 		if (dataGraph != null) {
 			schemaName = dataGraph.getSchema().getQualifiedName();
-			dataGraphId = dataGraph.getId();
+			dataGraphId = dataGraph.getUid();
 		}
 		this.loggingType = loggingType;
 

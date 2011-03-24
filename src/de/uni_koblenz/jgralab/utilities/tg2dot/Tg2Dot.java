@@ -85,7 +85,7 @@ public class Tg2Dot extends Tg2Whatever {
 	 */
 	@Override
 	public void graphStart(PrintStream out) {
-		out.println("digraph \"" + graph.getId() + "\"");
+		out.println("digraph \"" + graph.getUid() + "\"");
 		out.println("{");
 
 		// Set the ranksep

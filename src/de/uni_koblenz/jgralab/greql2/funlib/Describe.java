@@ -124,7 +124,7 @@ public class Describe extends Greql2Function {
 		if (attrElem instanceof Graph) {
 			Graph g = (Graph) attrElem;
 			JValueRecord idRecord = new JValueRecord();
-			idRecord.add("id", new JValueImpl(g.getId()));
+			idRecord.add("id", new JValueImpl(g.getUid()));
 			idRecord.add("version", new JValueImpl(g.getGraphVersion()));
 			tuple.add(idRecord);
 		} else {

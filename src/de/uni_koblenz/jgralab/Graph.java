@@ -419,12 +419,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	
 	/**
-	 * @return the number of incidences in this graph
-	 */
-	int getICount();
-	
-
-	/**
 	 * The maximum number of edges that can be stored in the graph before the
 	 * internal array structures are expanded.
 	 * 
@@ -445,6 +439,12 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the number of edges
 	 */
 	public int getECount();
+	
+	/**
+	 * @return the number of incidences in this graph
+	 */
+	public int getICount();
+	
 
 	/**
 	 * Returns the <code>id</code> of this Graph. JGraLab assigns a 128 bit
@@ -453,7 +453,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the id of this graph
 	 */
-	public String getId();
+	public String getUid();
 
 	/**
 	 * Sets the <code>id</code> of this Graph.
@@ -463,7 +463,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param id
 	 *            the new id
 	 */
-	public void setId(String id);
+	//Method should be used internally only
+	//public void setId(String id);
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this

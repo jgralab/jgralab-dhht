@@ -144,14 +144,14 @@ public class CommonSubgraphOptimizer extends OptimizerBase {
 	 */
 	private String computeHashAndProcess(Greql2Vertex vertex) {
 		if (reverseSubgraphMap.containsKey(vertex)) {
-			return "{V" + vertex.getId() + "}";
+			return "{V" + vertex.getUid() + "}";
 		}
 
 		if (vertex instanceof Variable) {
 			// Variables are merged by the parser before. If there are more
 			// variables with equal names left, they may not be merged because
 			// they have different scopes.
-			return "{V" + vertex.getId() + "}";
+			return "{V" + vertex.getUid() + "}";
 		}
 
 		StringBuilder buf = new StringBuilder();
@@ -175,7 +175,7 @@ public class CommonSubgraphOptimizer extends OptimizerBase {
 
 		if (subgraphMap.containsKey(hash)) {
 			Greql2Vertex higherVertex = subgraphMap.get(hash);
-			if (lowerVertex.getId() > higherVertex.getId()) {
+			if (lowerVertex.getUid() > higherVertex.getUid()) {
 				// swap them so that the higher vertex gets merged into the
 				// lower one.
 				Greql2Vertex tmp = lowerVertex;
@@ -191,7 +191,7 @@ public class CommonSubgraphOptimizer extends OptimizerBase {
 		subgraphMap.put(hash, lowerVertex);
 		reverseSubgraphMap.put(lowerVertex, hash);
 
-		return "{V" + lowerVertex.getId() + "}";
+		return "{V" + lowerVertex.getUid() + "}";
 	}
 
 	/**

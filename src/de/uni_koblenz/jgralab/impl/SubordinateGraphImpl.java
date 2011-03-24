@@ -178,7 +178,7 @@ public class SubordinateGraphImpl extends
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
 	protected SubordinateGraphImpl(Vertex containingVertex) {
-		super(containingVertex.getGraph().getId(), containingVertex.getGraph()
+		super(containingVertex.getGraph().getUid(), containingVertex.getGraph()
 				.getType());
 		initializeCommonFields(containingVertex);
 
@@ -220,7 +220,7 @@ public class SubordinateGraphImpl extends
 	 *            {@link Edge} which contains this subordinate graph
 	 */
 	protected SubordinateGraphImpl(Edge containingEdge) {
-		super(containingEdge.getGraph().getId(), containingEdge.getGraph()
+		super(containingEdge.getGraph().getUid(), containingEdge.getGraph()
 				.getType());
 		initializeCommonFields(containingEdge);
 
@@ -469,15 +469,10 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getUid() {
+		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void setId(String id) {
-		// TODO Auto-generated method stub
-	}
 
 	@Override
 	public void defragment() {

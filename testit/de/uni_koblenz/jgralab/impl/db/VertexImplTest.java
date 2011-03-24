@@ -75,7 +75,7 @@ public class VertexImplTest extends ImplTest {
 	@Test
 	public void deleteVertex() {
 		A aVertex = this.vertexTestGraph.getFirstA();
-		int deletedVertexId = aVertex.getId();
+		int deletedVertexId = aVertex.getUid();
 		aVertex.delete();
 
 		assertNull(this.vertexTestGraph.getVertex(deletedVertexId));
@@ -90,7 +90,7 @@ public class VertexImplTest extends ImplTest {
 		aVertex.delete();
 
 		assertNull(aVertex.getGraph());
-		assertEquals(aVertex.getId(), 0);
+		assertEquals(aVertex.getUid(), 0);
 	}
 
 	private final int N = 3;

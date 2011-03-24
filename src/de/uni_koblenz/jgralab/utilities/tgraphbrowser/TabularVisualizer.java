@@ -555,7 +555,7 @@ public class TabularVisualizer {
 						code
 								.append("var aThat = document.createElement(\"a\");\n");
 						code.append("aThat.href = \"javascript:showElement('v")
-								.append(e.getThat().getId()).append("');\";\n");
+								.append(e.getThat().getUid()).append("');\";\n");
 					} else {
 						code
 								.append("var aThat = document.createElement(\"span\");\n");
@@ -605,7 +605,7 @@ public class TabularVisualizer {
 			// if the type of alpha is selected, show it as link
 			code.append("var aAlpha = document.createElement(\"a\");\n");
 			code.append("aAlpha.href = \"javascript:showElement('v").append(
-					currentEdge.getAlpha().getId()).append("');\";\n");
+					currentEdge.getAlpha().getUid()).append("');\";\n");
 		} else {
 			code.append("var aAlpha = document.createElement(\"span\");\n");
 		}
@@ -631,7 +631,7 @@ public class TabularVisualizer {
 			// if the type of alpha is selected, show it as link
 			code.append("var aOmega = document.createElement(\"a\");\n");
 			code.append("aOmega.href = \"javascript:showElement('v").append(
-					currentEdge.getOmega().getId()).append("');\";\n");
+					currentEdge.getOmega().getUid()).append("');\";\n");
 		} else {
 			code.append("var aOmega = document.createElement(\"span\");\n");
 		}
