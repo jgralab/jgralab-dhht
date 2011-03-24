@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab;
 
 import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
+import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
 
@@ -81,7 +82,7 @@ public interface GraphFactory {
 	 * @param elem
 	 * @return
 	 */
-	public SubordinateGraphImpl createPartialSubordinateGraph(GraphElement elem);
+	public PartialSubordinateGraphImpl createPartialSubordinateGraph(GraphElement elem);
 	
 	/**
 	 * creates a Partial-Graph object for the specified remote graph. The returned object may

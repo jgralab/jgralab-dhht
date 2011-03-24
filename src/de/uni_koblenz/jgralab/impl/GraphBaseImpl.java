@@ -1059,8 +1059,17 @@ public abstract class GraphBaseImpl implements Graph {
 		return partialGraph;
 	}
 	
+	/**
+	 * 
+	 * @return the list of partial graphs directly and indirectly contained in this graph
+	 */
 	public List<PartialGraphImpl> getPartialGraphs() {
-		//build list of partial graphs and their partial graphs
+		LinkedList<PartialGraphImpl> list = new LinkedList<PartialGraphImpl>();
+		for (PartialGraphImpl p : partialGraphs) {
+			list.add(p);
+			list.addAll(p.getPartialGraphs());
+		}
+		return list;
 	}
 
 }
