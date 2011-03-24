@@ -65,7 +65,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphBaseBaseImpl implements Graph {
+public abstract class GraphBaseImpl implements Graph {
 
 	// ------------- GRAPH VARIABLES -------------
 	/**
@@ -169,7 +169,7 @@ public abstract class GraphBaseBaseImpl implements Graph {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected GraphBaseBaseImpl(String id, GraphClass cls) {
+	protected GraphBaseImpl(String id, GraphClass cls) {
 
 		graphFactory = cls.getSchema().getGraphFactory();
 		// needed for initialization of graphVersion with transactions

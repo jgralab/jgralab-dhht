@@ -53,7 +53,7 @@ import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.impl.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.GraphImpl;
+import de.uni_koblenz.jgralab.impl.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -478,7 +478,7 @@ public class LoadTest extends InstanceTest {
 	private FreeIndexList getFreeIndexListOfVertices(Graph graph,
 			boolean getVertexList) {
 		try {
-			Field f = GraphImpl.class
+			Field f = CompleteGraphImpl.class
 					.getDeclaredField(getVertexList ? "freeVertexList"
 							: "freeEdgeList");
 			f.setAccessible(true);

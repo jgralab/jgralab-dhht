@@ -66,7 +66,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphImpl extends GraphBaseBaseImpl {
+public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	// ------------- GRAPH VARIABLES -------------
 
@@ -172,7 +172,7 @@ public abstract class GraphImpl extends GraphBaseBaseImpl {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected GraphImpl(String id, GraphClass cls) {
+	protected CompleteGraphImpl(String id, GraphClass cls) {
 		this(id, cls, 1000, 1000);
 	}
 
@@ -186,7 +186,7 @@ public abstract class GraphImpl extends GraphBaseBaseImpl {
 	 * @param eMax
 	 *            initial maximum number of edges
 	 */
-	protected GraphImpl(String id, GraphClass cls, int vMax, int eMax) {
+	protected CompleteGraphImpl(String id, GraphClass cls, int vMax, int eMax) {
 		super(id, cls);
 		if (vMax < 1) {
 			throw new GraphException("vMax must not be less than 1", null);

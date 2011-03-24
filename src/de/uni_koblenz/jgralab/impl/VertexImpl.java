@@ -177,7 +177,7 @@ public abstract class VertexImpl extends
 	protected VertexImpl(int id, Graph graph)  throws RemoteException  {
 		super(graph);
 		this.id = id;
-		((GraphImpl) graph).addVertex(this);
+		((CompleteGraphImpl) graph).addVertex(this);
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public abstract class EdgeImpl extends
 	protected EdgeImpl(int anId, Graph graph) throws RemoteException {
 		super(graph);
 		setId(anId);
-		((GraphImpl) graph).addEdge(this);
+		((CompleteGraphImpl) graph).addEdge(this);
 	}
 	
 

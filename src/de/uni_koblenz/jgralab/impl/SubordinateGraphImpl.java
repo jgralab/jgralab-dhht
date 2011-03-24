@@ -57,7 +57,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public class SubordinateGraphImpl extends
-		de.uni_koblenz.jgralab.impl.GraphBaseBaseImpl {
+		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
 	private int vCount;
 	private int eCount;
 	private int iCount;
