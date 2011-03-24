@@ -43,7 +43,9 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.std.EdgeImpl;
+import de.uni_koblenz.jgralab.impl.std.GraphImpl;
 import de.uni_koblenz.jgralab.impl.std.IncidenceImpl;
+import de.uni_koblenz.jgralab.impl.std.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -57,6 +59,13 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class EdgeBaseImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
+
+	// global edge sequence
+	protected EdgeImpl nextEdgeInGraph;
+	protected EdgeImpl prevEdgeInGraph;
+
+	protected IncidenceImpl firstIncidenceAtEdge;
+	protected IncidenceImpl lastIncidenceAtEdge;
 
 	/**
 	 * 
@@ -74,17 +83,302 @@ public abstract class EdgeBaseImpl extends
 	protected EdgeBaseImpl(int anId, Graph graph) throws RemoteException {
 		super(graph);
 		setId(anId);
+		((GraphImpl) graph).addEdge(this);
+	}
+	
+
+	@Override
+	public Vertex addAdjacence(IncidenceClass incidentIc,
+			IncidenceClass adjacentIc, Edge other) {
+		assert incidentIc != null;
+		assert adjacentIc != null;
+		assert isValid();
+		assert other.isValid();
+		assert getGraph() == other.getGraph();
+
+		VertexClass entry = incidentIc.getVertexClass();
+		Class<? extends Vertex> vc = entry.getM1Class();
+
+		assert adjacentIc.getVertexClass() == entry;
+
+		Vertex v = getGraph().createVertex(vc);
+		connect(incidentIc, v);
+		v.connect(adjacentIc, other);
+
+		incidenceListModified();
+		((EdgeBaseImpl) other).incidenceListModified();
+		graph.edgeListModified();
+		return v;
+	}
+
+	@Override
+	public Vertex addAdjacence(String incidentRole, String adjacentRole,
+			Edge other) {
+		return addAdjacence(getIncidenceClassForRolename(incidentRole),
+				getIncidenceClassForRolename(adjacentRole), other);
+	}
+
+	@Override
+	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
+		assert i != null;
+		assert i.getEdge() != this;
+		i.setIncidentEdge((EdgeImpl) this);
+		i.setNextIncidenceAtEdge(null);
+		if (getFirstIncidence() == null) {
+			setFirstIncidence(i);
+		}
+		if (getLastIncidence() != null) {
+			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtEdge(i);
+			if (!graph.hasSavememSupport()) {
+				i.setPreviousIncidenceAtEdge((IncidenceImpl) getLastIncidence());
+			}
+		}
+		setLastIncidence(i);
+		incidenceListModified();
+	}
+
+	@Override
+	public int compareTo(Edge e) {
+		assert e != null;
+		assert isValid();
+		assert e.isValid();
+		assert getGraph() == e.getGraph();
+
+		return getId() - e.getId();
+	}
+
+	@Override
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
+			Vertex elemToConnect) {
+		int id = graph.allocateIncidenceIndex(0);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass, id,
+				elemToConnect, this);
+	}
+
+	@Override
+	public Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect);
+	}
+
+	@Override
+	public Incidence connect(String rolename, Vertex elemToConnect) {
+		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
+	}
+
+	@Override
+	public void delete() {
+		assert isValid() : this + " is not valid!";
+		graph.deleteEdge(this);
+	}
+
+
+
+	@Override
+	public List<? extends Edge> getAdjacences(Graph traversalContext,
+			IncidenceClass ic) {
+		assert ic != null;
+		assert isValid();
+		List<Edge> adjacences = new ArrayList<Edge>();
+		Class<? extends Vertex> vc = ic.getVertexClass().getM1Class();
+		Direction dir = ic.getDirection();
+		for (Vertex v : getIncidentVertices(traversalContext, vc, dir)) {
+			for (Edge e : v.getIncidentEdges(traversalContext,
+					dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+							: Direction.EDGE_TO_VERTEX)) {
+				adjacences.add(e);
+			}
+		}
+		return adjacences;
+	}
+
+	@Override
+	public List<? extends Edge> getAdjacences(Graph traversalContext, String role) {
+		return getAdjacences(traversalContext, getIncidenceClassForRolename(role));
+	}
+
+	@Override
+	public List<? extends Edge> getAdjacences(IncidenceClass ic) {
+		return getAdjacences(getGraph().getTraversalContext(), ic);
+	}
+
+	@Override
+	public List<? extends Edge> getAdjacences(String role) {
+		return getAdjacences(getGraph().getTraversalContext(),
+				getIncidenceClassForRolename(role));
+	}
+
+	
+	@Override
+	public Iterable<Vertex> getAlphaVertices() {
+		return new IncidentVertexIterable<Vertex>(this,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass, Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
+	}
+
+	@Override
+	public int getDegree() {
+		return getDegree(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
+	}
+
+	@Override
+	public int getDegree(Class<? extends Incidence> ic, Direction direction,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(getGraph().getTraversalContext(), ic, direction,
+				noSubClasses);
+	}
+
+	@Override
+	public int getDegree(Direction direction) {
+		return getDegree(getGraph().getTraversalContext(), direction);
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext) {
+		int d = 0;
+		Incidence i = getFirstIncidence(traversalContext);
+		while (i != null) {
+			d++;
+			i = i.getNextIncidenceAtEdge(traversalContext);
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(traversalContext, ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+			Direction direction, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(traversalContext, ic, direction,
+					noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, Direction direction) {
+		if (direction == null) {
+			return getDegree();
+		}
+		int d = 0;
+		Incidence i = getFirstIncidence(traversalContext);
+		while (i != null) {
+			if (direction == Direction.BOTH || i.getDirection() == direction) {
+				d++;
+			}
+			i = i.getNextIncidenceAtEdge(traversalContext);
+		}
+		return d;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(traversalContext, ic, noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(Graph traversalContext, IncidenceClass ic,
+			Direction direction, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		int degree = 0;
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
+		while (i != null) {
+			++degree;
+			i = i.getNextIncidenceAtEdge(traversalContext, ic, direction,
+					noSubClasses);
+		}
+		return degree;
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
+	}
+
+	@Override
+	public int getDegree(IncidenceClass ic, Direction direction,
+			boolean noSubClasses) {
+		assert ic != null;
+		assert isValid();
+		return getDegree(getGraph().getTraversalContext(), ic, direction,
+				noSubClasses);
 	}
 
 	@Override
 	public Incidence getFirstIncidence() {
 		return getFirstIncidence(getGraph().getTraversalContext());
-	}
-
-	@Override
-	public Incidence getFirstIncidence(Direction direction) {
-		assert isValid();
-		return getFirstIncidence(getGraph().getTraversalContext(), direction);
 	}
 
 	@Override
@@ -105,15 +399,22 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
-			Direction direction) {
+	public Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
-		Incidence i = getFirstIncidence(traversalContext);
-		while ((i != null) && direction != null && direction != Direction.BOTH
-				&& i.getDirection() != direction) {
-			i = i.getNextIncidenceAtEdge(traversalContext);
+		return getFirstIncidence(getGraph().getTraversalContext(), direction);
+	}
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext) {
+		Incidence firstIncidence = firstIncidenceAtEdge;
+		if (firstIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return firstIncidence;
 		}
-		return i;
 	}
 
 	@Override
@@ -161,20 +462,21 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Incidence getLastIncidence() {
-		return getLastIncidence(getGraph().getTraversalContext());
+	public Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction) {
+		assert isValid();
+		Incidence i = getFirstIncidence(traversalContext);
+		while ((i != null) && direction != null && direction != Direction.BOTH
+				&& i.getDirection() != direction) {
+			i = i.getNextIncidenceAtEdge(traversalContext);
+		}
+		return i;
 	}
 
 	@Override
 	public Iterable<Incidence> getIncidences() {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this);
-	}
-
-	@Override
-	public Iterable<Incidence> getIncidences(Direction direction) {
-		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(this, direction);
 	}
 
 	@Override
@@ -185,13 +487,6 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
-		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(this,
-				anIncidenceClass.getM1Class());
-	}
-
-	@Override
 	public <T extends Incidence> Iterable<T> getIncidences(
 			Class<T> anIncidenceClass, Direction direction) {
 		assert isValid();
@@ -199,11 +494,9 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
-			Direction direction) {
+	public Iterable<Incidence> getIncidences(Direction direction) {
 		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(this,
-				anIncidenceClass.getM1Class(), direction);
+		return new IncidenceIterableAtEdge<Incidence>(this, direction);
 	}
 
 	@Override
@@ -213,27 +506,11 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Iterable<Incidence> getIncidences(Graph traversalContext,
-			Direction direction) {
-		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
-				direction);
-	}
-
-	@Override
 	public <T extends Incidence> Iterable<T> getIncidences(
 			Graph traversalContext, Class<T> anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(traversalContext, this,
 				anIncidenceClass);
-	}
-
-	@Override
-	public Iterable<Incidence> getIncidences(Graph traversalContext,
-			IncidenceClass anIncidenceClass) {
-		assert isValid();
-		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
-				anIncidenceClass.getM1Class());
 	}
 
 	@Override
@@ -247,10 +524,134 @@ public abstract class EdgeBaseImpl extends
 
 	@Override
 	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
+				direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
+			IncidenceClass anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
+				anIncidenceClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
 				anIncidenceClass.getM1Class(), direction);
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this,
+				anIncidenceClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
+			Direction direction) {
+		assert isValid();
+		return new IncidenceIterableAtEdge<Incidence>(this,
+				anIncidenceClass.getM1Class(), direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices() {
+		return new IncidentVertexIterable<Vertex>(this);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(
+			Class<? extends Vertex> aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this, aVertexClass, direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this, direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass, direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Direction direction) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+				aVertexClass.getM1Class(), direction);
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class());
+	}
+
+	@Override
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
+			Direction direction) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), direction);
+	}
+
+	@Override
+	public Incidence getLastIncidence() {
+		return getLastIncidence(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Incidence getLastIncidence(Graph traversalContext) {
+		Incidence lastIncidence = lastIncidenceAtEdge;
+		if (lastIncidence == null
+				|| !traversalContext.getContainingElement().containsElement(
+						this)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return lastIncidence;
+		}
 	}
 
 	@Override
@@ -289,6 +690,19 @@ public abstract class EdgeBaseImpl extends
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext(),
 				edgeClass.getM1Class(), noSubclasses);
+	}
+
+	@Override
+	public Edge getNextEdge(Graph traversalContext) {
+		assert isValid();
+		Edge nextEdge = nextEdgeInGraph;
+		if (nextEdge == null
+				|| !traversalContext.getContainingElement().containsElement(
+						nextEdge)) {
+			return null;
+		} else {
+			return nextEdge;
+		}
 	}
 
 	@Override
@@ -337,65 +751,9 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public Edge getPreviousEdge() {
-		return getPreviousEdge(getGraph().getTraversalContext());
-	}
-
-	@Override
-	public Edge getPrevEdge() {
-		assert isValid();
-		return getPreviousEdge();
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices() {
-		return new IncidentVertexIterable<Vertex>(this,
-				Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this,
-				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices(
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
-				Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices(Graph traversalContext) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			VertexClass aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
-	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass, Direction.VERTEX_TO_EDGE);
-	}
-
-	@Override
 	public Iterable<Vertex> getOmegaVertices() {
 		return new IncidentVertexIterable<Vertex>(this,
 				Direction.EDGE_TO_VERTEX);
-	}
-
-	@Override
-	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this,
-				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
@@ -413,122 +771,55 @@ public abstract class EdgeBaseImpl extends
 
 	@Override
 	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
-			VertexClass aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
-	}
-
-	@Override
-	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
 			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
-	public Iterable<Vertex> getIncidentVertices() {
-		return new IncidentVertexIterable<Vertex>(this);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Direction direction) {
-		return new IncidentVertexIterable<Vertex>(this, direction);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this,
-				aVertexClass.getM1Class());
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
-			Direction direction) {
-		return new IncidentVertexIterable<Vertex>(this,
-				aVertexClass.getM1Class(), direction);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass, Direction direction) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass, direction);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Direction direction) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				direction);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
 			VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass.getM1Class());
+				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass);
+	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) {
+		return new IncidentVertexIterable<Vertex>(this,
+				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			VertexClass aVertexClass, Direction direction) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass.getM1Class(), direction);
-	}
-
-	@Override
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass, Direction direction) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
-				aVertexClass, direction);
-	}
-
-	@Override
-	public boolean isValid() {
-		return graph.containsEdge(this);
-	}
-
-	@Override
-	public boolean isBefore(Edge e) {
-		assert e != null;
-		assert getGraph() == e.getGraph();
-		assert isValid() && e.isValid();
-		if (this == e) {
-			return false;
-		}
-		Edge prev = e.getPreviousEdge();
-		while ((prev != null) && (prev != this)) {
-			prev = e.getPreviousEdge();
-		}
-		return prev != null;
-	}
-
-	@Override
-	public void putBefore(Edge e) {
-		assert e != null;
-		assert e != this;
+	public Edge getPrevEdge() {
 		assert isValid();
-		assert e.isValid();
-		assert getGraph() == e.getGraph();
-		assert isValid() && e.isValid();
-		graph.putEdgeBeforeInGraph((EdgeBaseImpl) e, this);
+		return getPreviousEdge();
+	}
+
+	@Override
+	public Edge getPreviousEdge() {
+		return getPreviousEdge(getGraph().getTraversalContext());
+	}
+
+	@Override
+	public Edge getPreviousEdge(Graph traversalContext) {
+		assert isValid();
+		Edge previousEdge = prevEdgeInGraph;
+		if (previousEdge == null
+				|| !traversalContext.getContainingElement().containsElement(
+						previousEdge)) {
+			// all incidences belong to the same graph like this edge
+			return null;
+		} else {
+			return previousEdge;
+		}
+	}
+
+	@Override
+	public Graph getSubordinateGraph() {
+		if (subOrdinateGraph != null) {
+			return subOrdinateGraph;
+		}
+		return new SubordinateGraphImpl(this);// TODO
 	}
 
 	@Override
@@ -547,6 +838,40 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
+	public boolean isBefore(Edge e) {
+		assert e != null;
+		assert getGraph() == e.getGraph();
+		assert isValid() && e.isValid();
+		if (this == e) {
+			return false;
+		}
+		Edge prev = e.getPreviousEdge();
+		while ((prev != null) && (prev != this)) {
+			prev = e.getPreviousEdge();
+		}
+		return prev != null;
+	}
+
+	/**
+	 * Checks if this {@link Edge} is a binary edge. An edge is called binary,
+	 * if {@link Edge#getType()} is connected to exactly two {@link VertexClass}
+	 * es by a multiplicity of 1. One of the two {@link Incidence}s must have
+	 * the direction {@link Direction#EDGE_TO_VERTEX} and the other
+	 * {@link Direction#VERTEX_TO_EDGE}.
+	 * 
+	 * @return boolean <code>true</code> if this {@link Edge} is a binary edge.
+	 */
+	@Override
+	public boolean isBinary() {
+		return false;
+	}
+
+	@Override
+	public boolean isValid() {
+		return graph.containsEdge(this);
+	}
+
+	@Override
 	public void putAfter(Edge e) {
 		assert e != null;
 		assert e != this;
@@ -557,183 +882,15 @@ public abstract class EdgeBaseImpl extends
 		graph.putEdgeAfterInGraph((EdgeBaseImpl) e, this);
 	}
 
-	/**
-	 * Puts <code>nextEdge</code> after this {@link Edge} in the sequence of all
-	 * edges in the graph.
-	 * 
-	 * @param nextEdge
-	 *            {@link Edge} which should be put after this {@link Edge}
-	 */
-	protected abstract void setNextEdge(Edge nextEdge);
-
-	/**
-	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
-	 * all edges in the graph.
-	 * 
-	 * @param prevEdge
-	 *            {@link Edge} which should be put before this {@link Edge}
-	 */
-	protected abstract void setPreviousEdge(Edge prevEdge);
-
-	/**
-	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
-	 * all edges in the graph.
-	 * 
-	 * @param prevEdge
-	 *            {@link Edge} which should be put before this {@link Edge}
-	 */
-	@Deprecated
-	protected abstract void setPrevEdge(Edge prevEdge);
-
 	@Override
-	public int getDegree() {
-		return getDegree(getGraph().getTraversalContext());
-	}
-
-	@Override
-	public int getDegree(Direction direction) {
-		return getDegree(getGraph().getTraversalContext(), direction);
-	}
-
-	@Override
-	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
-	}
-
-	@Override
-	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
-	}
-
-	@Override
-	public int getDegree(IncidenceClass ic, Direction direction,
-			boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, direction,
-				noSubClasses);
-	}
-
-	@Override
-	public int getDegree(Class<? extends Incidence> ic, Direction direction,
-			boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, direction,
-				noSubClasses);
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext) {
-		int d = 0;
-		Incidence i = getFirstIncidence(traversalContext);
-		while (i != null) {
-			d++;
-			i = i.getNextIncidenceAtEdge(traversalContext);
-		}
-		return d;
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext, Direction direction) {
-		if (direction == null) {
-			return getDegree();
-		}
-		int d = 0;
-		Incidence i = getFirstIncidence(traversalContext);
-		while (i != null) {
-			if (direction == Direction.BOTH || i.getDirection() == direction) {
-				d++;
-			}
-			i = i.getNextIncidenceAtEdge(traversalContext);
-		}
-		return d;
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext, IncidenceClass ic,
-			boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtEdge(traversalContext, ic, noSubClasses);
-		}
-		return degree;
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtEdge(traversalContext, ic, noSubClasses);
-		}
-		return degree;
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction, boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction,
-				noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtEdge(traversalContext, ic, direction,
-					noSubClasses);
-		}
-		return degree;
-	}
-
-	@Override
-	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			Direction direction, boolean noSubClasses) {
-		assert ic != null;
-		assert isValid();
-		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction,
-				noSubClasses);
-		while (i != null) {
-			++degree;
-			i = i.getNextIncidenceAtEdge(traversalContext, ic, direction,
-					noSubClasses);
-		}
-		return degree;
-	}
-
-	@Override
-	public String toString() {
-		assert isValid();
-		return "+e" + id + ": " + getType().getQualifiedName();
-	}
-
-	@Override
-	public int compareTo(Edge e) {
+	public void putBefore(Edge e) {
 		assert e != null;
+		assert e != this;
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-
-		return getId() - e.getId();
-	}
-
-	@Override
-	public void delete() {
-		assert isValid() : this + " is not valid!";
-		graph.deleteEdge(this);
+		assert isValid() && e.isValid();
+		graph.putEdgeBeforeInGraph((EdgeBaseImpl) e, this);
 	}
 
 	@Override
@@ -853,22 +1010,57 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
-		assert i != null;
-		assert i.getEdge() != this;
-		i.setIncidentEdge((EdgeImpl) this);
-		i.setNextIncidenceAtEdge(null);
-		if (getFirstIncidence() == null) {
-			setFirstIncidence(i);
-		}
-		if (getLastIncidence() != null) {
-			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtEdge(i);
-			if (!graph.hasSavememSupport()) {
-				i.setPreviousIncidenceAtEdge((IncidenceImpl) getLastIncidence());
-			}
-		}
-		setLastIncidence(i);
-		incidenceListModified();
+	public void removeAdjacence(IncidenceClass ic, Edge other) {
+		// TODO (graph and incidencelists modified)
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		// assert other.isValid();
+		// assert getGraph() == other.getGraph();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// if (e.getThat() == other) {
+		// deleteList.add(e);
+		// }
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
+	}
+
+	@Override
+	public void removeAdjacence(String role, Edge other) {
+		removeAdjacence(getIncidenceClassForRolename(role), other);
+	}
+
+	@Override
+	public List<Edge> removeAdjacences(IncidenceClass ic) {
+		// TODO (graph and incidencelists modified)
+		return null;
+		// assert (role != null) && (role.length() > 0);
+		// assert isValid();
+		//
+		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
+		// Class<? extends Edge> ec = entry.getM1Class();
+		// List<Vertex> adjacences = new ArrayList<Vertex>();
+		// List<Edge> deleteList = new ArrayList<Edge>();
+		// Direction dir = entry.getDirection();
+		// for (Edge e : incidences(ec, dir)) {
+		// deleteList.add(e);
+		// adjacences.add(e.getThat());
+		// }
+		// for (Edge e : deleteList) {
+		// e.delete();
+		// }
+		// return adjacences;
+	}
+
+	@Override
+	public List<Edge> removeAdjacences(String role) {
+		return removeAdjacences(getIncidenceClassForRolename(role));
 	}
 
 	@Override
@@ -914,6 +1106,47 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
+	public void setFirstIncidence(IncidenceImpl firstIncidence) {
+		firstIncidenceAtEdge = firstIncidence;
+	}
+
+	@Override
+	protected void setId(int id) {
+		assert id >= 0;
+		this.id = id;
+	}
+
+	@Override
+	public void setLastIncidence(IncidenceImpl lastIncidence) {
+		lastIncidenceAtEdge = lastIncidence;
+	}
+
+	/**
+	 * Puts <code>nextEdge</code> after this {@link Edge} in the sequence of all
+	 * edges in the graph.
+	 * 
+	 * @param nextEdge
+	 *            {@link Edge} which should be put after this {@link Edge}
+	 */
+	protected void setNextEdge(Edge nextEdge) {
+		nextEdgeInGraph = (EdgeImpl) nextEdge;
+	}
+
+
+	/**
+	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
+	 * all edges in the graph.
+	 * 
+	 * @param prevEdge
+	 *            {@link Edge} which should be put before this {@link Edge}
+	 */
+	protected void setPreviousEdge(Edge prevEdge) {
+		prevEdgeInGraph = (EdgeImpl) prevEdge;
+	}
+
+
+
+	@Override
 	public void sortIncidences(Comparator<Incidence> comp) {
 		assert isValid();
 
@@ -940,6 +1173,11 @@ public abstract class EdgeBaseImpl extends
 				i.setNextIncidenceAtEdge(null);
 			}
 
+			public boolean isEmpty() {
+				assert ((first == null) == (last == null));
+				return first == null;
+			}
+
 			public IncidenceImpl remove() {
 				if (first == null) {
 					throw new NoSuchElementException();
@@ -957,11 +1195,6 @@ public abstract class EdgeBaseImpl extends
 					first.setPreviousIncidenceAtEdge(null);
 				}
 				return out;
-			}
-
-			public boolean isEmpty() {
-				assert ((first == null) == (last == null));
-				return first == null;
 			}
 
 		}
@@ -1055,152 +1288,9 @@ public abstract class EdgeBaseImpl extends
 	}
 
 	@Override
-	public List<? extends Edge> getAdjacences(String role) {
-		return getAdjacences(getGraph().getTraversalContext(),
-				getIncidenceClassForRolename(role));
-	}
-
-	@Override
-	public List<? extends Edge> getAdjacences(IncidenceClass ic) {
-		return getAdjacences(getGraph().getTraversalContext(), ic);
-	}
-
-	@Override
-	public List<? extends Edge> getAdjacences(Graph traversalContext, String role) {
-		return getAdjacences(traversalContext, getIncidenceClassForRolename(role));
-	}
-
-	@Override
-	public List<? extends Edge> getAdjacences(Graph traversalContext,
-			IncidenceClass ic) {
-		assert ic != null;
+	public String toString() {
 		assert isValid();
-		List<Edge> adjacences = new ArrayList<Edge>();
-		Class<? extends Vertex> vc = ic.getVertexClass().getM1Class();
-		Direction dir = ic.getDirection();
-		for (Vertex v : getIncidentVertices(traversalContext, vc, dir)) {
-			for (Edge e : v.getIncidentEdges(traversalContext,
-					dir == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-							: Direction.EDGE_TO_VERTEX)) {
-				adjacences.add(e);
-			}
-		}
-		return adjacences;
-	}
-
-	@Override
-	public Vertex addAdjacence(String incidentRole, String adjacentRole,
-			Edge other) {
-		return addAdjacence(getIncidenceClassForRolename(incidentRole),
-				getIncidenceClassForRolename(adjacentRole), other);
-	}
-
-	@Override
-	public Vertex addAdjacence(IncidenceClass incidentIc,
-			IncidenceClass adjacentIc, Edge other) {
-		assert incidentIc != null;
-		assert adjacentIc != null;
-		assert isValid();
-		assert other.isValid();
-		assert getGraph() == other.getGraph();
-
-		VertexClass entry = incidentIc.getVertexClass();
-		Class<? extends Vertex> vc = entry.getM1Class();
-
-		assert adjacentIc.getVertexClass() == entry;
-
-		Vertex v = getGraph().createVertex(vc);
-		connect(incidentIc, v);
-		v.connect(adjacentIc, other);
-
-		incidenceListModified();
-		((EdgeBaseImpl) other).incidenceListModified();
-		graph.edgeListModified();
-		return v;
-	}
-
-	@Override
-	public List<Edge> removeAdjacences(String role) {
-		return removeAdjacences(getIncidenceClassForRolename(role));
-	}
-
-	@Override
-	public List<Edge> removeAdjacences(IncidenceClass ic) {
-		// TODO (graph and incidencelists modified)
-		return null;
-		// assert (role != null) && (role.length() > 0);
-		// assert isValid();
-		//
-		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		// Class<? extends Edge> ec = entry.getM1Class();
-		// List<Vertex> adjacences = new ArrayList<Vertex>();
-		// List<Edge> deleteList = new ArrayList<Edge>();
-		// Direction dir = entry.getDirection();
-		// for (Edge e : incidences(ec, dir)) {
-		// deleteList.add(e);
-		// adjacences.add(e.getThat());
-		// }
-		// for (Edge e : deleteList) {
-		// e.delete();
-		// }
-		// return adjacences;
-	}
-
-	@Override
-	public void removeAdjacence(String role, Edge other) {
-		removeAdjacence(getIncidenceClassForRolename(role), other);
-	}
-
-	@Override
-	public void removeAdjacence(IncidenceClass ic, Edge other) {
-		// TODO (graph and incidencelists modified)
-		// assert (role != null) && (role.length() > 0);
-		// assert isValid();
-		// assert other.isValid();
-		// assert getGraph() == other.getGraph();
-		//
-		// DirectedM1EdgeClass entry = getEdgeForRolename(role);
-		// Class<? extends Edge> ec = entry.getM1Class();
-		// List<Edge> deleteList = new ArrayList<Edge>();
-		// Direction dir = entry.getDirection();
-		// for (Edge e : incidences(ec, dir)) {
-		// if (e.getThat() == other) {
-		// deleteList.add(e);
-		// }
-		// }
-		// for (Edge e : deleteList) {
-		// e.delete();
-		// }
-	}
-
-	/**
-	 * @see #setNextEdge(Edge)
-	 */
-	@Deprecated
-	protected abstract void setNextEdgeInGraph(Edge nextEdge);
-
-	/**
-	 * @see #setPreviousEdge(Edge)
-	 */
-	@Deprecated
-	protected abstract void setPrevEdgeInGraph(Edge prevEdge);
-
-	@Override
-	public Incidence connect(String rolename, Vertex elemToConnect) {
-		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
-	}
-
-	@Override
-	public Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
-		return connect(incidenceClass.getM1Class(), elemToConnect);
-	}
-
-	@Override
-	public <T extends Incidence> T connect(Class<T> incidenceClass,
-			Vertex elemToConnect) {
-		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass, id,
-				elemToConnect, this);
+		return "+e" + id + ": " + getType().getQualifiedName();
 	}
 
 }
