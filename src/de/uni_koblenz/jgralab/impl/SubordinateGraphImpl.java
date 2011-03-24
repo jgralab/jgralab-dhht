@@ -267,26 +267,6 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public final boolean hasStandardSupport() {
-		return containingElement.getGraph().hasStandardSupport();
-	}
-
-	@Override
-	public final boolean hasTransactionSupport() {
-		return containingElement.getGraph().hasTransactionSupport();
-	}
-
-	@Override
-	public final boolean hasSavememSupport() {
-		return containingElement.getGraph().hasSavememSupport();
-	}
-
-	@Override
-	public final boolean hasDatabaseSupport() {
-		return containingElement.getGraph().hasDatabaseSupport();
-	}
-
-	@Override
 	public <T> JGraLabList<T> createList() {
 		return containingElement.getGraph().createList();
 	}

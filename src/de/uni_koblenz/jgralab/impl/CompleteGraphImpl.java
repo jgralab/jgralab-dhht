@@ -407,9 +407,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 		if (getLastEdge() != null) {
 			((EdgeImpl) getLastEdge()).setNextEdge(e);
-			if (!hasSavememSupport()) {
-				e.setPreviousEdge(getLastEdge());
-			}
+			e.setPreviousEdge(getLastEdge());
 		}
 		setLastEdge(e);
 	}
@@ -428,9 +426,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 		if (getLastVertex() != null) {
 			((VertexImpl) getLastVertex()).setNextVertex(v);
-			if (!hasSavememSupport()) {
-				v.setPreviousVertex(getLastVertex());
-			}
+			v.setPreviousVertex(getLastVertex());
 		}
 		setLastVertex(v);
 	}
@@ -1030,29 +1026,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return vertexListVersion;
 	}
 
-
-
-	@Override
-	public final boolean hasDatabaseSupport() {
-		return false;
-	}
-
-	@Override
-	public final boolean hasSavememSupport() {
-		return false;
-	}
-
-	
-	@Override
-	public final boolean hasStandardSupport() {
-		return true;
-	}
-
-	@Override
-	public final boolean hasTransactionSupport() {
-		return false;
-	}
-
 	/**
 	 * Deletes the edge from the internal structures of this graph.
 	 * 
@@ -1359,19 +1332,15 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		// remove moved edge from eSeq
 		if (movedEdge == getFirstEdge()) {
 			setFirstEdge((EdgeImpl) movedEdge.getNextEdge());
-			if (!hasSavememSupport()) {
-				((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(null);
-			}
+			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(null);
 		} else if (movedEdge == getLastEdge()) {
 			setLastEdge((EdgeImpl) movedEdge.getPreviousEdge());
 			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(null);
 		} else {
 			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(movedEdge
 					.getNextEdge());
-			if (!hasSavememSupport()) {
-				((EdgeImpl) movedEdge.getNextEdge())
+			((EdgeImpl) movedEdge.getNextEdge())
 						.setPreviousEdge(movedEdge.getPreviousEdge());
-			}
 		}
 
 		// insert moved edge in eSeq immediately after target
@@ -1379,15 +1348,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			setLastEdge(movedEdge);
 			movedEdge.setNextEdge(null);
 		} else {
-			if (!hasSavememSupport()) {
-				((EdgeImpl) targetEdge.getNextEdge())
+			((EdgeImpl) targetEdge.getNextEdge())
 						.setPreviousEdge(movedEdge);
-			}
 			movedEdge.setNextEdge(targetEdge.getNextEdge());
 		}
-		if (!hasSavememSupport()) {
-			movedEdge.setPreviousEdge(targetEdge);
-		}
+		movedEdge.setPreviousEdge(targetEdge);
 		targetEdge.setNextEdge(movedEdge);
 		edgeListModified();
 	}
@@ -1421,21 +1386,15 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		// insert moved edge in eSeq immediately before target
 		if (targetEdge == getFirstEdge()) {
 			setFirstEdge(movedEdge);
-			if (!hasSavememSupport()) {
-				movedEdge.setPreviousEdge(null);
-			}
+			movedEdge.setPreviousEdge(null);
 		} else {
 			EdgeImpl previousEdge = ((EdgeImpl) targetEdge
 					.getPreviousEdge());
 			previousEdge.setNextEdge(movedEdge);
-			if (!hasSavememSupport()) {
-				movedEdge.setPreviousEdge(previousEdge);
-			}
+			movedEdge.setPreviousEdge(previousEdge);
 		}
 		movedEdge.setNextEdge(targetEdge);
-		if (!hasSavememSupport()) {
-			targetEdge.setPreviousEdge(movedEdge);
-		}
+		targetEdge.setPreviousEdge(movedEdge);
 		edgeListModified();
 	}
 
@@ -1468,11 +1427,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			VertexImpl newFirstVertex = (VertexImpl) movedVertex
 					.getNextVertex();
 			setFirstVertex(newFirstVertex);
-			if (!hasSavememSupport()) {
-				newFirstVertex.setPreviousVertex(null);
-				// ((VertexImpl)
-				// movedVertex.getNextVertex()).setPrevVertex(null);
-			}
+			newFirstVertex.setPreviousVertex(null);
 		} else if (movedVertex == getLastVertex()) {
 			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
 			((VertexImpl) movedVertex.getPreviousVertex())
@@ -1480,10 +1435,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		} else {
 			((VertexImpl) movedVertex.getPreviousVertex())
 					.setNextVertex(movedVertex.getNextVertex());
-			if (!hasSavememSupport()) {
-				((VertexImpl) movedVertex.getNextVertex())
-						.setPreviousVertex(movedVertex.getPreviousVertex());
-			}
+			((VertexImpl) movedVertex.getNextVertex())
+					.setPreviousVertex(movedVertex.getPreviousVertex());
 		}
 
 		// insert moved vertex in vSeq immediately after target
@@ -1491,15 +1444,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			setLastVertex(movedVertex);
 			movedVertex.setNextVertex(null);
 		} else {
-			if (!hasSavememSupport()) {
-				((VertexImpl) targetVertex.getNextVertex())
+			((VertexImpl) targetVertex.getNextVertex())
 						.setPreviousVertex(movedVertex);
-			}
 			movedVertex.setNextVertex(targetVertex.getNextVertex());
 		}
-		if (!hasSavememSupport()) {
-			movedVertex.setPreviousVertex(targetVertex);
-		}
+		movedVertex.setPreviousVertex(targetVertex);
 		targetVertex.setNextVertex(movedVertex);
 		vertexListModified();
 	}
@@ -1531,10 +1480,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		// remove moved vertex from vSeq
 		if (movedVertex == getFirstVertex()) {
 			setFirstVertex((VertexImpl) movedVertex.getNextVertex());
-			if (!hasSavememSupport()) {
-				((VertexImpl) movedVertex.getNextVertex())
+			((VertexImpl) movedVertex.getNextVertex())
 						.setPreviousVertex(null);
-			}
 		} else if (movedVertex == getLastVertex()) {
 			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
 			((VertexImpl) movedVertex.getPreviousVertex())
@@ -1542,30 +1489,22 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		} else {
 			((VertexImpl) movedVertex.getPreviousVertex())
 					.setNextVertex(movedVertex.getNextVertex());
-			if (!hasSavememSupport()) {
-				((VertexImpl) movedVertex.getNextVertex())
+			((VertexImpl) movedVertex.getNextVertex())
 						.setPreviousVertex(movedVertex.getPreviousVertex());
-			}
 		}
 
 		// insert moved vertex in vSeq immediately before target
 		if (targetVertex == getFirstVertex()) {
 			setFirstVertex(movedVertex);
-			if (!hasSavememSupport()) {
-				movedVertex.setPreviousVertex(null);
-			}
+			movedVertex.setPreviousVertex(null);
 		} else {
 			VertexImpl previousVertex = (VertexImpl) targetVertex
 					.getPreviousVertex();
 			previousVertex.setNextVertex(movedVertex);
-			if (!hasSavememSupport()) {
-				movedVertex.setPreviousVertex(previousVertex);
-			}
+			movedVertex.setPreviousVertex(previousVertex);
 		}
 		movedVertex.setNextVertex(targetVertex);
-		if (!hasSavememSupport()) {
-			targetVertex.setPreviousVertex(movedVertex);
-		}
+		targetVertex.setPreviousVertex(movedVertex);
 		vertexListModified();
 	}
 
@@ -1593,9 +1532,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		// freeIndex(getFreeEdgeList(), e.getId());
 		freeEdgeIndex(e.getId());
 		getEdgeArray()[e.getId()] = null;
-		if (!hasSavememSupport()) {
-			e.setPreviousEdge(null);
-		}
+		e.setPreviousEdge(null);
 		e.setNextEdge(null);
 		e.setId(0);
 		setECount(getECount() - 1);
@@ -1608,9 +1545,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			// delete at head of edge list
 			setFirstEdge((EdgeImpl) e.getNextEdge());
 			if (getFirstEdge() != null) {
-				if (!hasSavememSupport()) {
-					((EdgeImpl) getFirstEdge()).setPreviousEdge(null);
-				}
+				((EdgeImpl) getFirstEdge()).setPreviousEdge(null);
 			}
 			if (e == getLastEdge()) {
 				// this edge was the only one...
@@ -1625,10 +1560,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		} else {
 			// delete somewhere in the middle
 			((EdgeImpl) e.getPreviousEdge()).setNextEdge(e.getNextEdge());
-			if (!hasSavememSupport()) {
-				((EdgeImpl) e.getNextEdge()).setPreviousEdge(e
+			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e
 						.getPreviousEdge());
-			}
 		}
 	}
 
@@ -1644,9 +1577,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			// delete at head of vertex list
 			setFirstVertex((VertexImpl) v.getNextVertex());
 			if (getFirstVertex() != null) {
-				if (!hasSavememSupport()) {
-					((VertexImpl) getFirstVertex()).setPreviousVertex(null);
-				}
+				((VertexImpl) getFirstVertex()).setPreviousVertex(null);
 			}
 			if (v == getLastVertex()) {
 				// this vertex was the only one...
@@ -1662,17 +1593,13 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			// delete somewhere in the middle
 			((VertexImpl) v.getPreviousVertex()).setNextVertex(v
 					.getNextVertex());
-			if (!hasSavememSupport()) {
-				((VertexImpl) v.getNextVertex()).setPreviousVertex(v
+			((VertexImpl) v.getNextVertex()).setPreviousVertex(v
 						.getPreviousVertex());
-			}
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
 		freeVertexIndex(v.getId());
 		getVertexArray()[v.getId()] = null;
-		if (!hasSavememSupport()) {
-			v.setPreviousVertex(null);
-		}
+		v.setPreviousVertex(null);
 		v.setNextVertex(null);
 		v.setId(0);
 		setVCount(getVCount() - 1);

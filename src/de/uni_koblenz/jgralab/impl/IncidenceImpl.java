@@ -75,10 +75,8 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) v.getLastIncidence())
 					.setNextIncidenceAtVertex(this);
-			if (!getGraph().hasSavememSupport()) {
 				setPreviousIncidenceAtVertex((IncidenceImpl) v
 						.getLastIncidence());
-			}
 			v.setLastIncidence(this);
 		}
 
@@ -92,10 +90,8 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) e.getLastIncidence())
 					.setNextIncidenceAtVertex(this);
-			if (!getGraph().hasSavememSupport()) {
 				setPreviousIncidenceAtVertex((IncidenceImpl) e
 						.getLastIncidence());
-			}
 			e.setLastIncidence(this);
 		}
 
@@ -327,10 +323,8 @@ public abstract class IncidenceImpl implements Incidence {
 		if (this == getVertex().getFirstIncidence()) {
 			((VertexImpl) getVertex())
 					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
-			if (!getGraph().hasSavememSupport()) {
 				((IncidenceImpl) getNextIncidenceAtVertex())
 						.setPreviousIncidenceAtVertex(null);
-			}
 		} else if (this == getVertex().getLastIncidence()) {
 			((VertexImpl) getVertex())
 					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
@@ -339,31 +333,23 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) getPreviousIncidenceAtVertex())
 					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
-			if (!getGraph().hasSavememSupport()) {
 				((IncidenceImpl) getNextIncidenceAtVertex())
 						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
-			}
 		}
 
 		// insert moved incidence in the sequence of incidences at the vertex
 		// immediately before i
 		if (i == getVertex().getFirstIncidence()) {
 			((VertexImpl) getVertex()).setFirstIncidence(this);
-			if (!getGraph().hasSavememSupport()) {
-				setPreviousIncidenceAtVertex(null);
-			}
+			setPreviousIncidenceAtVertex(null);
 		} else {
 			IncidenceImpl previousIncidence = (IncidenceImpl) i
 					.getPreviousIncidenceAtVertex();
 			previousIncidence.setNextIncidenceAtVertex(this);
-			if (!getGraph().hasSavememSupport()) {
-				setPreviousIncidenceAtVertex(previousIncidence);
-			}
+			setPreviousIncidenceAtVertex(previousIncidence);
 		}
 		setNextIncidenceAtVertex((IncidenceImpl) i);
-		if (!getGraph().hasSavememSupport()) {
-			((IncidenceImpl) i).setPreviousIncidenceAtVertex(this);
-		}
+		((IncidenceImpl) i).setPreviousIncidenceAtVertex(this);
 
 		((VertexImpl) getVertex()).incidenceListModified();
 	}
@@ -386,10 +372,8 @@ public abstract class IncidenceImpl implements Incidence {
 		if (this == getVertex().getFirstIncidence()) {
 			((VertexImpl) getVertex())
 					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
-			if (!getGraph().hasSavememSupport()) {
 				((IncidenceImpl) getNextIncidenceAtVertex())
 						.setPreviousIncidenceAtVertex(null);
-			}
 		} else if (this == getVertex().getLastIncidence()) {
 			((VertexImpl) getVertex())
 					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
@@ -398,10 +382,8 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) getPreviousIncidenceAtVertex())
 					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
-			if (!getGraph().hasSavememSupport()) {
 				((IncidenceImpl) getNextIncidenceAtVertex())
 						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
-			}
 		}
 
 		// insert moved incidence in the sequence of incidences at the vertex
@@ -413,14 +395,10 @@ public abstract class IncidenceImpl implements Incidence {
 			IncidenceImpl nxtIncidence = (IncidenceImpl) i
 					.getNextIncidenceAtVertex();
 			setNextIncidenceAtVertex(nxtIncidence);
-			if (!getGraph().hasSavememSupport()) {
-				nxtIncidence.setPreviousIncidenceAtVertex(this);
-			}
+			nxtIncidence.setPreviousIncidenceAtVertex(this);
 		}
 		((IncidenceImpl) i).setNextIncidenceAtVertex(this);
-		if (!getGraph().hasSavememSupport()) {
-			setPreviousIncidenceAtVertex((IncidenceImpl) i);
-		}
+		setPreviousIncidenceAtVertex((IncidenceImpl) i);
 
 		((VertexImpl) getVertex()).incidenceListModified();
 	}
@@ -443,10 +421,8 @@ public abstract class IncidenceImpl implements Incidence {
 		if (this == getEdge().getFirstIncidence()) {
 			((EdgeImpl) getEdge())
 					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
-			if (!getGraph().hasSavememSupport()) {
-				((IncidenceImpl) getNextIncidenceAtEdge())
+			((IncidenceImpl) getNextIncidenceAtEdge())
 						.setPreviousIncidenceAtEdge(null);
-			}
 		} else if (this == getEdge().getLastIncidence()) {
 			((EdgeImpl) getEdge())
 					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
@@ -455,32 +431,23 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) getPreviousIncidenceAtEdge())
 					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
-			if (!getGraph().hasSavememSupport()) {
-				((IncidenceImpl) getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
-			}
+			((IncidenceImpl) getNextIncidenceAtEdge())
+					.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
 		}
 
 		// insert moved incidence in the sequence of incidences at the vertex
 		// immediately before i
 		if (i == getEdge().getFirstIncidence()) {
 			((EdgeImpl) getEdge()).setFirstIncidence(this);
-			if (!getGraph().hasSavememSupport()) {
-				setPreviousIncidenceAtEdge(null);
-			}
+			setPreviousIncidenceAtEdge(null);
 		} else {
 			IncidenceImpl previousIncidence = (IncidenceImpl) i
 					.getPreviousIncidenceAtEdge();
 			previousIncidence.setNextIncidenceAtEdge(this);
-			if (!getGraph().hasSavememSupport()) {
-				setPreviousIncidenceAtEdge(previousIncidence);
-			}
+			setPreviousIncidenceAtEdge(previousIncidence);
 		}
 		setNextIncidenceAtEdge((IncidenceImpl) i);
-		if (!getGraph().hasSavememSupport()) {
-			((IncidenceImpl) i).setPreviousIncidenceAtEdge(this);
-		}
-
+		((IncidenceImpl) i).setPreviousIncidenceAtEdge(this);
 		((EdgeImpl) getEdge()).incidenceListModified();
 	}
 
@@ -502,10 +469,8 @@ public abstract class IncidenceImpl implements Incidence {
 		if (this == getEdge().getFirstIncidence()) {
 			((EdgeImpl) getEdge())
 					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
-			if (!getGraph().hasSavememSupport()) {
-				((IncidenceImpl) getNextIncidenceAtEdge())
+			((IncidenceImpl) getNextIncidenceAtEdge())
 						.setPreviousIncidenceAtEdge(null);
-			}
 		} else if (this == getEdge().getLastIncidence()) {
 			((EdgeImpl) getEdge())
 					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
@@ -514,10 +479,8 @@ public abstract class IncidenceImpl implements Incidence {
 		} else {
 			((IncidenceImpl) getPreviousIncidenceAtEdge())
 					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
-			if (!getGraph().hasSavememSupport()) {
-				((IncidenceImpl) getNextIncidenceAtEdge())
+			((IncidenceImpl) getNextIncidenceAtEdge())
 						.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
-			}
 		}
 
 		// insert moved incidence in the sequence of incidences at the vertex
@@ -529,14 +492,10 @@ public abstract class IncidenceImpl implements Incidence {
 			IncidenceImpl nxtIncidence = (IncidenceImpl) i
 					.getNextIncidenceAtEdge();
 			setNextIncidenceAtEdge(nxtIncidence);
-			if (!getGraph().hasSavememSupport()) {
-				nxtIncidence.setPreviousIncidenceAtEdge(this);
-			}
+			nxtIncidence.setPreviousIncidenceAtEdge(this);
 		}
 		((IncidenceImpl) i).setNextIncidenceAtEdge(this);
-		if (!getGraph().hasSavememSupport()) {
-			setPreviousIncidenceAtEdge((IncidenceImpl) i);
-		}
+		setPreviousIncidenceAtEdge((IncidenceImpl) i);
 
 		((EdgeImpl) getEdge()).incidenceListModified();
 	}

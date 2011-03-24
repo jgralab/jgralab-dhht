@@ -521,9 +521,9 @@ public abstract class GraphBaseImpl implements Graph {
 					assert (last == null);
 					last = v;
 				} else {
-					if (!hasSavememSupport()) {
+				//	if (!hasSavememSupport()) {
 						v.setPreviousVertex(last);
-					}
+				//	}
 					last.setNextVertex(v);
 					last = v;
 				}
@@ -543,9 +543,9 @@ public abstract class GraphBaseImpl implements Graph {
 				}
 				out = first;
 				first = (VertexImpl) out.getNextVertex();
-				if (!hasSavememSupport()) {
+			//	if (!hasSavememSupport()) {
 					first.setPreviousVertex(null);
-				}
+			//	}
 				return out;
 			}
 
@@ -662,9 +662,9 @@ public abstract class GraphBaseImpl implements Graph {
 					assert (last == null);
 					last = e;
 				} else {
-					if (!hasSavememSupport()) {
+			//		if (!hasSavememSupport()) {
 						e.setPreviousEdge(last);
-					}
+			//		}
 					last.setNextEdge(e);
 					last = e;
 				}
@@ -684,9 +684,9 @@ public abstract class GraphBaseImpl implements Graph {
 				}
 				out = first;
 				first = (EdgeImpl) out.getNextEdge();
-				if (!hasSavememSupport()) {
+			//	if (!hasSavememSupport()) {
 					first.setPreviousEdge(null);
-				}
+			//	}
 				return out;
 			}
 
