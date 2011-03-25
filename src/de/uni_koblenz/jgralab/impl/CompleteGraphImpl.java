@@ -31,14 +31,10 @@
 
 package de.uni_koblenz.jgralab.impl;
 
-import java.lang.ref.WeakReference;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -46,19 +42,10 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.GraphFactory;
-import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.JGraLabList;
-import de.uni_koblenz.jgralab.JGraLabMap;
-import de.uni_koblenz.jgralab.JGraLabSet;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
-import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * Implementation of interface {@link Graph} with doubly linked lists realizing
@@ -87,6 +74,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * {@link Graph}.
 	 */
 	private HashMap<Thread, Stack<Graph>> traversalContext;
+	
+
+	@Override
+	public void useAsTraversalContext() {
+		setTraversalContext(this);
+	}
 
 
 	/**
@@ -99,7 +92,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 */
 	protected CompleteGraphImpl(String id, GraphClass cls) {
 		this(id, cls, 1000, 1000);
-		graphFactory = cls.getSchema().getGraphFactory();
 	}
 
 
@@ -122,7 +114,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		if (eMax < 1) {
 			throw new GraphException("eMax must not be less than 1", null);
 		}
-
+		graphFactory = cls.getSchema().getGraphFactory();
+		
 		expandVertexArray(vMax);
 		setDeleteVertexList(new LinkedList<VertexImpl>());
 
@@ -137,31 +130,29 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		return vertex.connect(cls, edge);
 	}
 
-	/*
-	 *TODO: Should return true, if e is part of this graph or
-	 * any of its partial graphs
-	 */
+
 	@Override
 	public boolean containsEdge(Edge e) {
-		return (e != null) && (e.getGraph() == this)
-				&& containsEdgeId(((EdgeImpl) e).id);
+		if (containsEdgeLocally(e))
+			return true;
+		return e.getContainingGraph().isPartOfGraph(this) && e.getContainingGraph().containsEdge(e);
 	}
 
 
-
-	/*
-	 * TODO: Should return true, if v is part of this graph or
-	 * any of its partial graphs
-	 */
 	@Override
 	public boolean containsVertex(Vertex v) {
-		VertexImpl[] vertex = getVertexArray();
-		return (v != null) && (v.getGraph() == this)
-				&& containsVertexId(((VertexImpl) v).id)
-				&& (vertex[((VertexImpl) v).id] == v);
+		if (containsVertexLocally(v))
+			return true;
+		return v.getContainingGraph().isPartOfGraph(this)  && v.getContainingGraph().containsVertex(v);
+	}
+	
+	public boolean containsVertexLocally(Vertex v) {
+		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
 	}
 
-
+	public boolean containsEdgeLocally(Edge e) {
+		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
+	}
 
 
 
@@ -218,6 +209,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	public CompleteGraphImpl getCompleteGraph() {
 		return this;
 	}
+	
 	
 	protected List<VertexImpl> getDeleteVertexList() {
 		return deleteVertexList;
@@ -731,10 +723,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 
 
-	@Override
-	public void useAsTraversalContext() {
-		setTraversalContext(this);
-	}
 
 	/**
 	 * Callback function for triggered actions just after the vertex

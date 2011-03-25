@@ -158,7 +158,7 @@ public abstract class VertexImpl extends
 		if (subOrdinateGraph != null) {
 			return subOrdinateGraph;
 		}
-		return new SubordinateGraphImpl(this);// TODO
+		return getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 	}
 	
 	/**

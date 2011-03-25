@@ -31,21 +31,26 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Comparator;
+import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -569,4 +574,30 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			return ((GraphElementImpl<?, ?, ?>) getParent()).isChildOf(parent);
 		}
 	}
+
+	@Override
+	public int getGlobalId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
+	@Override
+	public Graph getLocalGraph() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Graph getContainingGraph() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	
+
+
+
+
 }

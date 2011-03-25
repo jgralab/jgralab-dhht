@@ -166,7 +166,6 @@ public abstract class EdgeImpl extends
 	}
 
 
-
 	@Override
 	public List<? extends Edge> getAdjacences(Graph traversalContext,
 			IncidenceClass ic) {
@@ -808,7 +807,7 @@ public abstract class EdgeImpl extends
 		if (subOrdinateGraph != null) {
 			return subOrdinateGraph;
 		}
-		return new SubordinateGraphImpl(this);// TODO
+		return getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 	}
 
 	@Override

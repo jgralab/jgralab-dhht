@@ -57,7 +57,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  */
-public class SubordinateGraphImpl extends
+public abstract class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
 
 	private GraphElement<?, ?, ?> containingElement;
@@ -70,20 +70,24 @@ public class SubordinateGraphImpl extends
 	private int eCount;
 	
 	private int iCount;
+	
+	//those variables should not be kept in each subgraph but only in the partial ones and the toplevel
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
 	 * adding/deleting a vertex or changing the vertex sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	private long vertexListVersion;
+	//private long vertexListVersion;
 
 	/**
 	 * Holds the version of the edge sequence. For every modification (e.g.
 	 * adding/deleting an edge or changing the edge sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	private long edgeListVersion;
+	//private long edgeListVersion;
+	
+	
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -115,25 +119,15 @@ public class SubordinateGraphImpl extends
 		iCount = count;
 	}
 
-
-	@Override
-	protected void setVertexListVersion(long vertexListVersion) {
-		this.vertexListVersion = vertexListVersion;
-	}
-
 	@Override
 	public long getVertexListVersion() {
-		return vertexListVersion;
+		return getSuperordinateGraph().getVertexListVersion();
 	}
 
-	@Override
-	protected void setEdgeListVersion(long edgeListVersion) {
-		this.edgeListVersion = edgeListVersion;
-	}
 
 	@Override
 	public long getEdgeListVersion() {
-		return edgeListVersion;
+		return getSuperordinateGraph().getEdgeListVersion();
 	}
 
 	/**
@@ -222,8 +216,6 @@ public class SubordinateGraphImpl extends
 
 	private void initializeCommonFields(GraphElement<?, ?, ?> containingElement) {
 		this.containingElement = containingElement;
-		edgeListVersion = containingElement.getGraph().getEdgeListVersion();
-		vertexListVersion = containingElement.getGraph().getVertexListVersion();
 	}
 
 
@@ -345,17 +337,6 @@ public class SubordinateGraphImpl extends
 		containingElement.setAttribute(name, data);
 	}
 
-	@Override
-	public Class<? extends Graph> getM1Class() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public GraphClass getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public boolean isLoading() {
@@ -519,6 +500,30 @@ public class SubordinateGraphImpl extends
 		return getSuperordinateGraph().getGraphVersion();
 	}
 
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		return other == getSuperordinateGraph() || getSuperordinateGraph().isPartOfGraph(other);
+	}
 
+
+	@Override
+	public boolean containsVertexLocally(Vertex v) {
+		return getSuperordinateGraph().containsVertexLocally(v);
+	}
+
+	@Override
+	public boolean containsEdgeLocally(Edge e) {
+		return getSuperordinateGraph().containsEdgeLocally(e);
+	}
+
+	//TODO: Check if these methods should return the type of the vertex or edge the
+	//subordinate graph is embedded in
+	public GraphClass getGraphClass() {
+		return getSuperordinateGraph().getGraphClass();
+	}
 	
+	
+	public Class<? extends Graph> getM1Class() {
+		return getSuperordinateGraph().getM1Class();
+	}
 }

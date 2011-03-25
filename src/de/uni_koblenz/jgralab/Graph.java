@@ -92,10 +92,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return {@link Graph} which contains all {@link GraphElement}s
 	 *         <code>ge</code> where <code>ge.isVisible(kappa)==true</code>.
 	 */
-	public Graph getView(int kappa); // TODO
-
-    //method should not be used directly
-	//public void setTraversalContext(Graph traversalContext);
+	public Graph getView(int kappa); 
 
 	/**
 	 * @return {@link Graph} the current traversal context. It is not removed
@@ -799,6 +796,12 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	public GraphFactory getGraphFactory();
 
+	/**
+	 * @return true if this graph is a part of <code>other</code>
+	 * either directly as a subordinate or partial one or indirectly
+	 * by its parent
+	 */
+	public boolean isPartOfGraph(Graph other);
 
 
 

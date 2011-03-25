@@ -55,11 +55,20 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 		extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
-	 * Returns the id of this {@link GraphElement}.
+	 * Returns the local id of this {@link GraphElement}.
 	 * 
 	 * @return int the id of this {@link GraphElement}.
 	 */
 	public int getId();
+	
+	/**
+	 * Returns the global id of this {@link GraphElement} as a combination of the partial graph id the 
+	 * element belongs to and its local id in that graph
+	 * 
+	 * @return int the global id of this {@link GraphElement}.
+	 */
+	public int getGlobalId();	
+	
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present
@@ -72,11 +81,27 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	public boolean isValid();
 
 	/**
-	 * Returns the graph containing this {@link GraphElement}.
+	 * Returns the graph containing this {@link GraphElement}. 
+	 * TODO: This method should be sensitive to the current traversal context
 	 * 
 	 * @return {@link Graph} containing this {@link GraphElement}
 	 */
 	public Graph getGraph();
+	
+	/**
+	 * Returns the local partial graph this element belongs to either
+	 * directly or as a member of a subordinate graph
+	 * TODO: Needs to be implemented
+	 * @return
+	 */
+	public Graph getLocalGraph();
+	
+	/**
+	 * Returns the graph directly containing this graph elements, e.g. the
+	 * subordinate or partial one  
+	 * @return
+	 */
+	public Graph getContainingGraph();
 
 	/**
 	 * Returns the {@link GraphElement} in which this {@link GraphElement} is

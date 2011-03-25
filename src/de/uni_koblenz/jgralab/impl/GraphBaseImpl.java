@@ -132,7 +132,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param vertexListVersion
 	 *            Version of VSeq.
 	 */
-	abstract protected void setVertexListVersion(long vertexListVersion);
+	//abstract protected void setVertexListVersion(long vertexListVersion);
 
 	// ------------- EDGE LIST VARIABLES -------------
 	
@@ -174,7 +174,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param edgeListVersion
 	 *            Version to set.
 	 */
-	abstract protected void setEdgeListVersion(long edgeListVersion);
+	//abstract protected void setEdgeListVersion(long edgeListVersion);
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -1077,4 +1077,18 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return the complete top-level DHHTGraph 
 	 */
 	public abstract GraphBaseImpl getCompleteGraph();
+	
+	
+	/**
+	 * checks if the vertex v is contained directly in this graph,
+	 * ant not as a member of one of its partial graphs
+	 */
+	public abstract boolean containsVertexLocally(Vertex v);
+	
+	/**
+	 * checks if the edge e is contained directly in this graph,
+	 * ant not as a member of one of its partial graphs
+	 */
+	public abstract boolean containsEdgeLocally(Edge e);
+	
 }
