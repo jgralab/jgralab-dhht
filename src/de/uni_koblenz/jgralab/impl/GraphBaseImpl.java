@@ -69,6 +69,24 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class GraphBaseImpl implements Graph {
 	
+	static final int PARTIAL_GRAPH_MASK = 0xff000000; 
+	
+	static final int LOCAL_ELEMENT_MASK = 0xffffffff ^ PARTIAL_GRAPH_MASK;
+	
+	public static final int getLocalId(int graphElementId) {
+		return graphElementId & LOCAL_ELEMENT_MASK;
+	}
+	
+	public static final int getPartialGraphId(int graphElementId) {
+		return graphElementId & PARTIAL_GRAPH_MASK;
+	}
+	
+	public static final int getGlobalId(int partialGraphId, int localElementId) {
+		assert getPartialGraphId(localElementId) == 0;
+		return partialGraphId & localElementId;
+	}
+	
+	
 	// ------------- PARTIAL GRAPH VARIABLES ------------
 	
 	protected List<PartialGraphImpl> partialGraphs = null;
@@ -196,11 +214,6 @@ public abstract class GraphBaseImpl implements Graph {
 	 *            the GraphClass of this Graph
 	 */
 	protected GraphBaseImpl(String id, GraphClass cls) {
-
-		// needed for initialization of graphVersion with transactions
-		graphVersion = -1;
-		setGraphVersion(0);
-
 		setFirstVertex(null);
 		setLastVertex(null);
 		setVCount(0);
@@ -210,8 +223,6 @@ public abstract class GraphBaseImpl implements Graph {
 		setECount(0);
 	}
 
-	
-	protected abstract GraphFactory getGraphFactory();
 	
 	/*
 	 * Sets <code>traversalContext</code> as the traversal context.
@@ -439,10 +450,6 @@ public abstract class GraphBaseImpl implements Graph {
 		return getType();
 	}
 
-	@Override
-	public long getGraphVersion() {
-		return graphVersion;
-	}
 
 	@Override
 	abstract public int getVCount();

@@ -51,6 +51,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {
+	
+
 
 	/**
 	 * @return {@link GraphElement} which contains this {@link Graph} or

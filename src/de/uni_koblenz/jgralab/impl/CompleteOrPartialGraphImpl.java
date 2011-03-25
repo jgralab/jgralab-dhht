@@ -26,6 +26,8 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	protected CompleteOrPartialGraphImpl(String id, GraphClass cls) {
 		super(id, cls);
 		schema = cls.getSchema();
+		graphVersion = -1;
+		setGraphVersion(0);
 	}
 
 	// ------------- GRAPH VARIABLES -------------
@@ -47,6 +49,12 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * the tg-file.
 	 */
 	protected long graphVersion;
+	
+	@Override
+	public long getGraphVersion() {
+		return graphVersion;
+	}
+
 	
 	/**
 	 * The schema this graph belongs to
