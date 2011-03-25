@@ -11,6 +11,8 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
  * @author dbildh
  * 
  * TODO: Implement class according to combined functionality of Partial and subordinate graph
+ * 
+ * Implement creation method in GraphElement to create a subordinate graph on another host
  *
  */
 public abstract class PartialSubordinateGraphImpl extends PartialGraphImpl {

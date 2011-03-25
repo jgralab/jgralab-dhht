@@ -46,7 +46,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
@@ -1030,21 +1029,17 @@ public abstract class GraphBaseImpl implements Graph {
 
 	protected abstract void setICount(int count);
 	
-	/**
-	 * Adds a partial graph on the given host to the sequence
-	 * of partial graphs and returns a local proxy  
-	 * @param hostname name of the host running the remote JGraLab instance
-	 * @return
-	 */
-	protected Graph createPartialGraph(String hostname) {
+
+    @Override
+	public Graph createPartialGraph(String hostname) {
 		JGraLabServer remote = JGraLabServerImpl.getLocalInstance().getRemoteInstance(hostname);
 		Schema s = remote.getSchema(getSchema().getQualifiedName());
 		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(this);
 		
 		if (partialGraphs == null) {
 			partialGraphs = new ArrayList<PartialGraphImpl>();
-			partialGraphs.add(partialGraph);
 		}
+		partialGraphs.add(partialGraph);
 		
 		return partialGraph;
 	}

@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.impl.Over;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -808,6 +809,14 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getId();
 
+	
+	/**
+	 * Adds a partial graph on the given host to the sequence
+	 * of partial graphs and returns a local proxy  
+	 * @param hostname name of the host running the remote JGraLab instance
+	 * @return a local proxy object for the created partial graph
+	 */
+	public Graph createPartialGraph(String hostname);
 
 
 }
