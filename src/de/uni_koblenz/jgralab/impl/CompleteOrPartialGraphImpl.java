@@ -6,6 +6,7 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -17,24 +18,56 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
-	
-	/* holds the graph this partial graph belongs to */
-	protected Graph completeGraph;
-	
-	boolean loading = false;
+public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
-	protected PartialGraphImpl(String id, GraphClass cls, Graph completeGraph) {
+	protected CompleteOrPartialGraphImpl(String id, GraphClass cls) {
 		super(id, cls);
-		this.completeGraph = completeGraph;
+	}
+
+	// ------------- GRAPH VARIABLES -------------
+	/**
+	 * The GraphFactory that was used to create this graph. This factory will be
+	 * used to create vertices and edges in this graph.
+	 */
+	protected GraphFactory graphFactory;
+
+	/**
+	 * Holds the version of the graph, for every modification (e.g. adding a
+	 * vertex or edge or changing the vertex or edge sequence or changing of an
+	 * attribute value), this version number is increased by 1, It is saved in
+	 * the tg-file.
+	 */
+	protected long graphVersion;
+	
+	/**
+	 * The schema this graph belongs to
+	 */
+	private final Schema schema = null;
+
+	/**
+	 * Indicates if this graph is currently loading.
+	 */
+	private boolean loading;
+	
+	public GraphFactory getGraphFactory() {
+		return graphFactory;
+	}
+	
+
+	@Override
+	public Graph getView(int kappa) {
+		return graphFactory.createViewGraph(this, kappa);
 	}
 
 	@Override
-	public Graph getCompleteGraph() {
-		return completeGraph;
+	public boolean isLoading() {
+		return loading;
 	}
 
-
+	@Override
+	public void loadingCompleted() {
+		loading = false;
+	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {
@@ -51,13 +84,13 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public void deleteVertex(Vertex v) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -99,7 +132,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public void defragment() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -193,7 +226,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -207,13 +240,13 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -226,7 +259,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -250,49 +283,25 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	protected void setVCount(int count) {
 		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	protected void setFirstVertex(VertexImpl firstVertex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setLastVertex(VertexImpl lastVertex) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	protected void setVertexListVersion(long vertexListVersion) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	protected void setECount(int count) {
 		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	protected void setEdgeListVersion(long edgeListVersion) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -305,30 +314,6 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public long getEdgeListVersion() {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public Edge getFirstEdge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Edge getLastEdge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vertex getFirstVertex() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vertex getLastVertex() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -346,9 +331,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	protected void setICount(int count) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
-	
 
 }

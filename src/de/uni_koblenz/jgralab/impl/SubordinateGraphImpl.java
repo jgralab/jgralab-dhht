@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -58,14 +59,17 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
-	private int vCount;
-	private int eCount;
-	private int iCount;
-	private VertexImpl firstVertex;
-	private VertexImpl lastVertex;
-	private EdgeImpl firstEdge;
-	private EdgeImpl lastEdge;
+
 	private GraphElement<?, ?, ?> containingElement;
+	
+	//TODO: Check if the respective methods are really 
+	//      needed in the graph interface and how to ensure, that
+	//      the variables reflect the number of elements in the subgraphs
+	private int vCount;
+	
+	private int eCount;
+	
+	private int iCount;
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -97,26 +101,6 @@ public class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Vertex getFirstVertex() {
-		return firstVertex;
-	}
-
-	@Override
-	public Vertex getLastVertex() {
-		return lastVertex;
-	}
-
-	@Override
-	public Edge getFirstEdge() {
-		return firstEdge;
-	}
-
-	@Override
-	public Edge getLastEdge() {
-		return lastEdge;
-	}
-
-	@Override
 	protected void setVCount(int count) {
 		vCount = count;
 	}
@@ -131,25 +115,6 @@ public class SubordinateGraphImpl extends
 		iCount = count;
 	}
 
-	@Override
-	protected void setFirstVertex(VertexImpl firstVertex) {
-		this.firstVertex = firstVertex;
-	}
-
-	@Override
-	protected void setLastVertex(VertexImpl lastVertex) {
-		this.lastVertex = lastVertex;
-	}
-
-	@Override
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		this.firstEdge = firstEdge;
-	}
-
-	@Override
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		this.lastEdge = lastEdge;
-	}
 
 	@Override
 	protected void setVertexListVersion(long vertexListVersion) {
@@ -509,6 +474,11 @@ public class SubordinateGraphImpl extends
 	@Override
 	public int getICount() {
 		return iCount;
+	}
+
+	@Override
+	public GraphFactory getGraphFactory() {
+		return getCompleteGraph().getGraphFactory();
 	}
 
 }

@@ -46,6 +46,7 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
@@ -66,24 +67,15 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class CompleteGraphImpl extends GraphBaseImpl {
+public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	// ------------- GRAPH VARIABLES -------------
-
+	
 	/**
 	 * the unique id of the graph in the schema
 	 */
 	private String uid;
 
-	/**
-	 * The schema this graph belongs to
-	 */
-	private final Schema schema;
-
-	/**
-	 * Indicates if this graph is currently loading.
-	 */
-	private boolean loading;
 
 	// ------------- VERTEX LIST VARIABLES -------------
 	/**
@@ -92,60 +84,143 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected int vMax;
 
 	/**
+	 * current number of vertices
+	 */
+	private int vCount;
+	
+	/**
 	 * free index list for vertices
 	 */
 	protected FreeIndexList freeVertexList;
-
+	
 	/**
-	 * maximum number of edges
+	 * array of vertices
 	 */
-	protected int eMax;
-
-	// ------------- EDGE LIST VARIABLES -------------
-
-	/**
-	 * free index list for edges
-	 */
-	protected FreeIndexList freeEdgeList;
-
-
-	private int iMax;
-
 	private VertexImpl[] vertexArray;
-
-	// ------------- INCIDENCE LIST VARIABLES -------------
-
-	private int vCount;
-
-	private EdgeImpl[] edgeArray;
-
-	private int eCount;
-
-	private IncidenceImpl[] incidenceArray;
-
-	private int iCount;
 
 	private VertexImpl firstVertex;
 
 	private VertexImpl lastVertex;
-
-	private EdgeImpl firstEdge;
-
-	private EdgeImpl lastEdge;
-
+	
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
 	 * adding/deleting a vertex or changing the vertex sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
 	private long vertexListVersion;
+	
+	
+	// ------------- EDGE LIST VARIABLES -------------
 
+	
+	/**
+	 * maximum number of edges
+	 */
+	protected int eMax;
+	
+	/**
+	 * current number of edges
+	 */
+	protected int eCount;
+	
+	/**
+	 * free index list for edges
+	 */
+	protected FreeIndexList freeEdgeList;
+
+	/**
+	 * array of edges
+	 */
+	private EdgeImpl[] edgeArray;
+	
+	private EdgeImpl firstEdge;
+
+	private EdgeImpl lastEdge;
+	
 	/**
 	 * Holds the version of the edge sequence. For every modification (e.g.
 	 * adding/deleting an edge or changing the edge sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
 	private long edgeListVersion;
+
+	
+	// ------------- INCIDENCE LIST VARIABLES -------------
+
+
+	/**
+	 * maximal number of incidences
+	 */
+	private int iMax;
+
+	/**
+	 * current number of incidences
+	 */
+	private int iCount;
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+	
+	/**
+	 * array of incidences
+	 */
+	private IncidenceImpl[] incidenceArray;
+
+
+
+	
+	/**
+	 * Use to allocate a <code>Edge</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateEdgeIndex(int currentId) {
+		int eId = freeEdgeList.allocateIndex();
+		if (eId == 0) {
+			expandEdgeArray(getExpandedEdgeCount());
+			eId = freeEdgeList.allocateIndex();
+		}
+		return eId;
+	}
+
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateIncidenceIndex(int currentId) {
+		int iId = freeIncidenceList.allocateIndex();
+		if (iId == 0) {
+			expandIncidenceArray(getExpandedIncidenceCount());
+			iId = freeIncidenceList.allocateIndex();
+		}
+		return iId;
+	}
+
+	/**
+	 * Use to allocate a <code>Vertex</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateVertexIndex(int currentId) {
+		int vId = freeVertexList.allocateIndex();
+		if (vId == 0) {
+			expandVertexArray(getExpandedVertexCount());
+			vId = freeVertexList.allocateIndex();
+		}
+		return vId;
+	}
+	
+	
+	
+	
+
+
 
 	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
@@ -159,10 +234,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	private HashMap<Thread, Stack<Graph>> traversalContext;
 
-	/**
-	 * free index list for vertices
-	 */
-	protected FreeIndexList freeIncidenceList;
+
 
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -174,8 +246,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected CompleteGraphImpl(String id, GraphClass cls) {
 		this(id, cls, 1000, 1000);
+		graphFactory = cls.getSchema().getGraphFactory();
 	}
 
+
+	
 	/**
 	 * @param id
 	 *            this Graph's id
@@ -348,50 +423,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	/**
-	 * Use to allocate a <code>Edge</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
-	 */
-	protected int allocateEdgeIndex(int currentId) {
-		int eId = freeEdgeList.allocateIndex();
-		if (eId == 0) {
-			expandEdgeArray(getExpandedEdgeCount());
-			eId = freeEdgeList.allocateIndex();
-		}
-		return eId;
-	}
 
-	/**
-	 * Use to allocate a <code>Incidence</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
-	 */
-	protected int allocateIncidenceIndex(int currentId) {
-		int iId = freeIncidenceList.allocateIndex();
-		if (iId == 0) {
-			expandIncidenceArray(getExpandedIncidenceCount());
-			iId = freeIncidenceList.allocateIndex();
-		}
-		return iId;
-	}
-
-	/**
-	 * Use to allocate a <code>Vertex</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
-	 */
-	protected int allocateVertexIndex(int currentId) {
-		int vId = freeVertexList.allocateIndex();
-		if (vId == 0) {
-			expandVertexArray(getExpandedVertexCount());
-			vId = freeVertexList.allocateIndex();
-		}
-		return vId;
-	}
 
 	/**
 	 * Appends the edge e to the global edge sequence of this graph.

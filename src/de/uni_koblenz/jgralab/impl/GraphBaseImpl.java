@@ -68,22 +68,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class GraphBaseImpl implements Graph {
-
-	// ------------- GRAPH VARIABLES -------------
-	/**
-	 * The GraphFactory that was used to create this graph. This factory will be
-	 * used to create vertices and edges in this graph.
-	 */
-	protected GraphFactory graphFactory;
-
-	/**
-	 * Holds the version of the graph, for every modification (e.g. adding a
-	 * vertex or edge or changing the vertex or edge sequence or changing of an
-	 * attribute value), this version number is increased by 1, It is saved in
-	 * the tg-file.
-	 */
-	private long graphVersion;
-
 	
 	// ------------- PARTIAL GRAPH VARIABLES ------------
 	
@@ -91,21 +75,38 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	
 	// ------------- VERTEX LIST VARIABLES -------------
+	
+	private VertexImpl firstVertex;
+	private VertexImpl lastVertex;
 
 	/**
 	 * number of vertices in the graph
 	 */
 	abstract protected void setVCount(int count);
+	
+	@Override
+	public Vertex getFirstVertex() {
+		return firstVertex;
+	}
+	
+	@Override
+	public Vertex getLastVertex() {
+		return lastVertex;
+	}
 
 	/**
 	 * holds the id of the first vertex in Vseq
 	 */
-	abstract protected void setFirstVertex(VertexImpl firstVertex);
+	protected void setFirstVertex(VertexImpl firstVertex) {
+		this.firstVertex = firstVertex;
+	}
 
 	/**
 	 * holds the id of the last vertex in Vseq
 	 */
-	abstract protected void setLastVertex(VertexImpl lastVertex);
+	protected void setLastVertex(VertexImpl lastVertex) {
+		this.lastVertex = lastVertex;
+	}
 
 	/**
 	 * Sets version of VSeq if it is different than previous version.
@@ -116,21 +117,38 @@ public abstract class GraphBaseImpl implements Graph {
 	abstract protected void setVertexListVersion(long vertexListVersion);
 
 	// ------------- EDGE LIST VARIABLES -------------
+	
+	private EdgeImpl firstEdge;
+	private EdgeImpl lastEdge;
 
 	/**
 	 * number of edges in the graph
 	 */
 	abstract protected void setECount(int count);
+	
+	@Override
+	public Edge getFirstEdge() {
+		return firstEdge;
+	}
+
+	@Override
+	public Edge getLastEdge() {
+		return lastEdge;
+	}
 
 	/**
 	 * holds the id of the first edge in Eseq
 	 */
-	abstract protected void setFirstEdge(EdgeImpl firstEdge);
+	protected void setFirstEdge(EdgeImpl firstEdge) {
+		this.firstEdge = firstEdge;
+	}
 
 	/**
 	 * holds the id of the last edge in Eseq
 	 */
-	abstract protected void setLastEdge(EdgeImpl lastEdge);
+	protected void setLastEdge(EdgeImpl lastEdge) {
+		this.lastEdge = lastEdge;
+	}
 
 	/**
 	 * Sets version of ESeq.
@@ -179,7 +197,6 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	protected GraphBaseImpl(String id, GraphClass cls) {
 
-		graphFactory = cls.getSchema().getGraphFactory();
 		// needed for initialization of graphVersion with transactions
 		graphVersion = -1;
 		setGraphVersion(0);
@@ -193,6 +210,9 @@ public abstract class GraphBaseImpl implements Graph {
 		setECount(0);
 	}
 
+	
+	protected abstract GraphFactory getGraphFactory();
+	
 	/*
 	 * Sets <code>traversalContext</code> as the traversal context.
 	 * 
@@ -296,7 +316,7 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
-		return graphFactory.createEdge(cls, 0, this);
+		return getGraphFactory().createEdge(cls, 0, this);
 	}
 
 	/**
@@ -318,7 +338,7 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	protected Vertex internalCreateVertex(Class<? extends Vertex> cls) {
-		return graphFactory.createVertex(cls, 0, this);
+		return getGraphFactory().createVertex(cls, 0, this);
 	}
 
 	/**
@@ -336,12 +356,6 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	abstract public long getEdgeListVersion();
-
-	@Override
-	abstract public Edge getFirstEdge();
-
-	@Override
-	abstract public Edge getLastEdge();
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
@@ -381,11 +395,6 @@ public abstract class GraphBaseImpl implements Graph {
 		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
 
-	@Override
-	abstract public Vertex getFirstVertex();
-
-	@Override
-	abstract public Vertex getLastVertex();
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {

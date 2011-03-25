@@ -778,6 +778,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getGraphStructureChangedListenerCount();
 
+	public GraphFactory getGraphFactory();
+
 
 
 
