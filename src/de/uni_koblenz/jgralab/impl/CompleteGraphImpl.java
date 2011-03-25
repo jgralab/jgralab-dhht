@@ -130,195 +130,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		expandEdgeArray(eMax);
 	}
 
-	/**
-	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
-	 * otherwise the edges current id is used if possible. Should only be used
-	 * by m1-Graphs derived from Graph. To create a new Edge as user, use the
-	 * appropriate methods from the derived Graphs like
-	 * <code>createStreet(...)</code>
-	 * 
-	 * @param newEdge
-	 *            Edge to add
-	 * @throws GraphException
-	 *             an edge with same id already exists in graph, id of edge
-	 *             greater than possible count of edges in graph
-	 */
-	protected void addEdge(Edge newEdge) {
-		assert newEdge != null;
-		assert (newEdge.getSchema() == schema) : "The schemas of newEdge and this graph don't match!";
-		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
-
-		EdgeImpl e = (EdgeImpl) newEdge;
-
-		int eId = e.getId();
-		if (isLoading()) {
-			if (eId > 0) {
-				// the given edge already has an id, try to use it
-				if (containsEdgeId(eId)) {
-					throw new GraphException("edge with id " + e.getId()
-							+ " already exists");
-				}
-				if (eId > eMax) {
-					throw new GraphException("edge id " + e.getId()
-							+ " is bigger than eSize");
-				}
-			} else {
-				throw new GraphException("can not load an edge with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(eId)) {
-				throw new GraphException("can not add an edge with id " + eId);
-			}
-			eId = allocateEdgeIndex(eId);
-			assert eId != 0;
-			e.setId(eId);
-		}
-
-		appendEdgeToESeq(e);
-
-		if (!isLoading()) {
-			edgeListModified();
-			internalEdgeAdded(e);
-		}
-	}
-
-	/*
-	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is
-	 * set, otherwise the incidence's current id is used if possible. Should
-	 * only be used by m1-Graphs derived from Graph. To create a new Incidence
-	 * as user, use the appropriate <code>connect(...)</code>-methods from the
-	 * GraphElements
-	 * 
-	 * @param newIncidence the Incidence to add
-	 * 
-	 * @throws GraphException if a incidence with the same id already exists
-	 */
-	protected void addIncidence(Incidence newIncidence) {
-		IncidenceImpl i = (IncidenceImpl) newIncidence;
-
-		int iId = i.getId();
-		if (isLoading()) {
-			if (iId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsIncidenceId(iId)) {
-					throw new GraphException("incidence with id " + iId
-							+ " already exists");
-				}
-				if (iId > iMax) {
-					throw new GraphException("vertex id " + iId
-							+ " is bigger than vSize");
-				}
-			} else {
-				throw new GraphException(
-						"can not load an incidence with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(iId)) {
-				throw new GraphException("can not add an incidence with iId "
-						+ iId);
-			}
-			iId = allocateIncidenceIndex(iId);
-			assert iId != 0;
-			i.setId(iId);
-		}
-
-		if (!isLoading()) {
-			internalIncidenceAdded(i);
-		}
-	}
-
-	/**
-	 * Adds a vertex to this graph. If the vertex' id is 0, a valid id is set,
-	 * otherwise the vertex' current id is used if possible. Should only be used
-	 * by m1-Graphs derived from Graph. To create a new Vertex as user, use the
-	 * appropriate methods from the derived Graphs like
-	 * <code>createStreet(...)</code>
-	 * 
-	 * @param newVertex
-	 *            the Vertex to add
-	 * 
-	 * @throws GraphException
-	 *             if a vertex with the same id already exists
-	 */
-	protected void addVertex(Vertex newVertex) {
-		VertexImpl v = (VertexImpl) newVertex;
-
-		int vId = v.getId();
-		if (isLoading()) {
-			if (vId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsVertexId(vId)) {
-					throw new GraphException("vertex with id " + vId
-							+ " already exists");
-				}
-				if (vId > vMax) {
-					throw new GraphException("vertex id " + vId
-							+ " is bigger than vSize");
-				}
-			} else {
-				throw new GraphException("can not load a vertex with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(vId)) {
-				throw new GraphException("can not add a vertex with vId " + vId);
-			}
-			vId = allocateVertexIndex(vId);
-			assert vId != 0;
-			v.setId(vId);
-		}
-
-		appendVertexToVSeq(v);
-
-		if (!isLoading()) {
-			vertexListModified();
-			internalVertexAdded(v);
-		}
-	}
-
-
-
-	/**
-	 * Appends the edge e to the global edge sequence of this graph.
-	 * 
-	 * @param e
-	 *            an edge
-	 */
-	protected void appendEdgeToESeq(EdgeImpl e) {
-		getEdgeArray()[e.id] = e;
-		setECount(getECount() + 1);
-		if (getFirstEdge() == null) {
-			setFirstEdge(e);
-		}
-		if (getLastEdge() != null) {
-			((EdgeImpl) getLastEdge()).setNextEdge(e);
-			e.setPreviousEdge(getLastEdge());
-		}
-		setLastEdge(e);
-	}
-
-	/**
-	 * Appends the vertex v to the global vertex sequence of this graph.
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	protected void appendVertexToVSeq(VertexImpl v) {
-		getVertexArray()[v.id] = v;
-		setVCount(getVCount() + 1);
-		if (getFirstVertex() == null) {
-			setFirstVertex(v);
-		}
-		if (getLastVertex() != null) {
-			((VertexImpl) getLastVertex()).setNextVertex(v);
-			v.setPreviousVertex(getLastVertex());
-		}
-		setLastVertex(v);
-	}
-
-	protected boolean canAddGraphElement(int graphElementId) {
-		return graphElementId == 0;
-	}
-
 
 
 	@Override
@@ -339,35 +150,11 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 				&& containsEdgeId(((EdgeImpl) e).id);
 	}
 
-	/**
-	 * Checks if the edge id eId is valid and if there is an such an edge in
-	 * this graph.
-	 * 
-	 * @param eId
-	 *            an edge id
-	 * @return true if this graph contains an edge with id eId
-	 */
-	private final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
-	}
 
-	/**
-	 * Checks if the incidence id iId is valid and if there is an such an
-	 * incidence in this graph.
-	 * 
-	 * @param iId
-	 *            a incidence id
-	 * @return true if this graph contains an incidence with id iId
-	 */
-	private final boolean containsIncidenceId(int iId) {
-		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
-	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Graph#containsVertex(de.uni_koblenz.jgralab.Vertex
+	 * TODO: Should return true, if v is part of this graph or
+	 * any of its partial graphs
 	 */
 	@Override
 	public boolean containsVertex(Vertex v) {
@@ -377,17 +164,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 				&& (vertex[((VertexImpl) v).id] == v);
 	}
 
-	/**
-	 * Checks if the vertex id evd is valid and if there is an such a vertex in
-	 * this graph.
-	 * 
-	 * @param vId
-	 *            a vertex id
-	 * @return true if this graph contains a vertex with id vId
-	 */
-	private final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
-	}
+
 
 
 
