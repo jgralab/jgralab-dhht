@@ -48,9 +48,10 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
- * Implementation of interface {@link Graph} with doubly linked lists realizing
- * eSeq, vSeq and lambdaSeq, while ensuring efficient direct access to vertices
- * and edges by id via {@link Vertex} and {@link Edge} arrays.
+ * Implementation of the complete, possibly distributed DHHTGraph
+ * 
+ * TODO:
+ * 
  * 
  * @author ist@uni-koblenz.de
  */

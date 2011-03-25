@@ -21,6 +21,12 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
+
+/**
+ * Base class for complete and partial graph
+ * @author dbildh
+ *
+ */
 public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
 	protected CompleteOrPartialGraphImpl(GraphClass cls) {

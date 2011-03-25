@@ -17,6 +17,17 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
+/**
+ * Implements a partial Graph as member of a distributed complete one
+ * 
+ * TODO:
+ * - Implement add and delete edge/vertex operations with correct linking on 
+ *   next/previous vertex in global graph
+ * -   
+ * 
+ * @author dbildh
+ *
+ */
 public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	
 	/* holds the graph this partial graph belongs to */

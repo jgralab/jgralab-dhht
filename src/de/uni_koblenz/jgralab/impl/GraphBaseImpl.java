@@ -61,9 +61,10 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
- * Implementation of interface {@link Graph} with doubly linked lists realizing
- * eSeq, vSeq and lambdaSeq, while ensuring efficient direct access to vertices
- * and edges by id via {@link Vertex} and {@link Edge} arrays.
+ * Base class for all graph implementations
+ * 
+ * TODO
+ *  - Implement connect operation between elements of different partial graphs
  * 
  * @author ist@uni-koblenz.de
  */
