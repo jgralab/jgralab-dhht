@@ -23,14 +23,22 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
-	protected CompleteOrPartialGraphImpl(String id, GraphClass cls) {
-		super(id, cls);
+	protected CompleteOrPartialGraphImpl(GraphClass cls) {
+		super(cls);
 		schema = cls.getSchema();
 		graphVersion = -1;
 		setGraphVersion(0);
 	}
 
+
 	// ------------- GRAPH VARIABLES -------------
+	
+	/**
+	 * The id of this complete or partial graph identifying it in the complete graph  
+	 */
+	protected int id;
+	
+	
 	/**
 	 * The GraphFactory that was used to create this graph. This factory will be
 	 * used to create vertices and edges in this graph.
@@ -70,7 +78,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	/**
 	 * The schema this graph belongs to
 	 */
-	private final Schema schema;
+	protected final Schema schema;
 	
 	@Override
 	public Schema getSchema() {
@@ -223,6 +231,13 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		return vId;
 	}
 	
+	public boolean containsVertexLocally(Vertex v) {
+		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
+	}
+
+	public boolean containsEdgeLocally(Edge e) {
+		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
+	}
 	
 	/**
 	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
@@ -485,7 +500,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		this.vertexArray = vertex;
 	}
 
-	@Override
+
 	protected void setVertexListVersion(long vertexListVersion) {
 		this.vertexListVersion = vertexListVersion;
 	}
@@ -514,7 +529,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		this.edgeArray = edge;
 	}
 
-	@Override
+
 	protected void setEdgeListVersion(long edgeListVersion) {
 		this.edgeListVersion = edgeListVersion;
 	}

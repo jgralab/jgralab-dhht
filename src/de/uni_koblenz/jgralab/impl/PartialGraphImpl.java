@@ -25,13 +25,14 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	boolean loading = false;
 
-	protected PartialGraphImpl(String id, GraphClass cls, GraphBaseImpl completeGraph) {
-		super(id, cls);
+	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph) {
+		super(cls);
 		this.completeGraph = completeGraph;
+		id = ((CompleteGraphImpl)completeGraph.getCompleteGraph()).allocateFreePartialGraphId();
 	}
 
 	@Override
-	public Graph getCompleteGraph() {
+	public GraphBaseImpl getCompleteGraph() {
 		return completeGraph;
 	}
 	
@@ -98,7 +99,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public void deleteVertex(Vertex v) {
-		
+		//TODO
 	}
 
 	@Override
@@ -118,8 +119,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public Schema getSchema() {
-		// TODO Auto-generated method stub
-		return null;
+		return schema;
 	}
 
 

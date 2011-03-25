@@ -577,8 +577,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public int getGlobalId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return GraphBaseImpl.getGlobalId(getLocalGraph().getId(), id);
 	}
 
 	

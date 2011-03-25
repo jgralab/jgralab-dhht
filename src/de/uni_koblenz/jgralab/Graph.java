@@ -803,6 +803,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public boolean isPartOfGraph(Graph other);
 
+	/**
+	 * @returns the ID of this partial or complete graph. 
+	 */
+	public int getId();
+
 
 
 }

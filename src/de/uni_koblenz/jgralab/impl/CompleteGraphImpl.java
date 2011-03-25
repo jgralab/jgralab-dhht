@@ -106,8 +106,9 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param eMax
 	 *            initial maximum number of edges
 	 */
-	protected CompleteGraphImpl(String id, GraphClass cls, int vMax, int eMax) {
-		super(id, cls);
+	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) {
+		super(cls);
+		this.uid = uid;
 		if (vMax < 1) {
 			throw new GraphException("vMax must not be less than 1", null);
 		}
@@ -115,6 +116,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			throw new GraphException("eMax must not be less than 1", null);
 		}
 		graphFactory = cls.getSchema().getGraphFactory();
+		id = GraphBaseImpl.PARTIAL_GRAPH_MASK;
+		partialGraphIds = new LinkedList<Integer>();
+		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK+1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
+			partialGraphIds.add(i);
+		}
+		
 		
 		expandVertexArray(vMax);
 		setDeleteVertexList(new LinkedList<VertexImpl>());
@@ -122,6 +129,22 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		expandEdgeArray(eMax);
 	}
 
+	/**
+	 * 
+	 */
+	private List<Integer> partialGraphIds = null;
+	
+	public int allocateFreePartialGraphId() {
+		if (partialGraphIds.isEmpty())
+			throw new GraphException("No free partial graph ID available");
+		return partialGraphIds.remove(0);
+	}
+	
+	/** should be called by all delete partial graph operations */
+	public void internalDeletePartialGraph(PartialGraphImpl graph) {
+		partialGraphIds.add(graph.getId());
+	}
+	
 
 
 	@Override
@@ -129,31 +152,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
-
-
-	@Override
-	public boolean containsEdge(Edge e) {
-		if (containsEdgeLocally(e))
-			return true;
-		return e.getContainingGraph().isPartOfGraph(this) && e.getContainingGraph().containsEdge(e);
-	}
-
-
-	@Override
-	public boolean containsVertex(Vertex v) {
-		if (containsVertexLocally(v))
-			return true;
-		return v.getContainingGraph().isPartOfGraph(this)  && v.getContainingGraph().containsVertex(v);
-	}
-	
-	public boolean containsVertexLocally(Vertex v) {
-		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
-	}
-
-	public boolean containsEdgeLocally(Edge e) {
-		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
-	}
-
 
 
 	/*

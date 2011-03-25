@@ -72,7 +72,7 @@ public abstract class GraphBaseImpl implements Graph {
 	static final int PARTIAL_GRAPH_MASK = 0xff000000; 
 	
 	static final int LOCAL_ELEMENT_MASK = 0xffffffff ^ PARTIAL_GRAPH_MASK;
-	
+		
 	public static final int getLocalId(int graphElementId) {
 		return graphElementId & LOCAL_ELEMENT_MASK;
 	}
@@ -213,7 +213,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected GraphBaseImpl(String id, GraphClass cls) {
+	protected GraphBaseImpl(GraphClass cls) {
 		setFirstVertex(null);
 		setLastVertex(null);
 		setVCount(0);
@@ -1061,7 +1061,20 @@ public abstract class GraphBaseImpl implements Graph {
 		return list;
 	}
 
-	
+	@Override
+	public boolean containsEdge(Edge e) {
+		if (containsEdgeLocally(e))
+			return true;
+		return e.getContainingGraph().isPartOfGraph(this) && e.getContainingGraph().containsEdge(e);
+	}
+
+
+	@Override
+	public boolean containsVertex(Vertex v) {
+		if (containsVertexLocally(v))
+			return true;
+		return v.getContainingGraph().isPartOfGraph(this)  && v.getContainingGraph().containsVertex(v);
+	}
 	
 	/**
 	 * @return the distributed graph this graph belongs to
