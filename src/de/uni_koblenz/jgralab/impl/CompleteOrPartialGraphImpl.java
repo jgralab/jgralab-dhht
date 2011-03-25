@@ -54,6 +54,17 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	public long getGraphVersion() {
 		return graphVersion;
 	}
+	
+	/**
+	 * Sets the version counter of this graph. Should only be called immediately
+	 * after loading and in graphModified.
+	 * 
+	 * @param graphVersion
+	 *            new version value
+	 */
+	public void setGraphVersion(long graphVersion) {
+		this.graphVersion = graphVersion;
+	}
 
 	
 	/**
@@ -103,7 +114,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * adding/deleting a vertex or changing the vertex sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	private long vertexListVersion;
+	protected long vertexListVersion;
 	
 	
 	// ------------- EDGE LIST VARIABLES -------------
@@ -138,7 +149,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * adding/deleting an edge or changing the edge sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	private long edgeListVersion;
+	protected long edgeListVersion;
 
 	
 	// ------------- INCIDENCE LIST VARIABLES -------------

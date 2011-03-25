@@ -20,11 +20,12 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	
 	/* holds the graph this partial graph belongs to */
-	protected Graph completeGraph;
+	protected GraphBaseImpl completeGraph;
 	
+
 	boolean loading = false;
 
-	protected PartialGraphImpl(String id, GraphClass cls, Graph completeGraph) {
+	protected PartialGraphImpl(String id, GraphClass cls, GraphBaseImpl completeGraph) {
 		super(id, cls);
 		this.completeGraph = completeGraph;
 	}
@@ -33,6 +34,42 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public Graph getCompleteGraph() {
 		return completeGraph;
 	}
+	
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change. 
+	 */
+	public void graphModified() {
+		graphVersion++;
+		completeGraph.graphModified();
+	}
+	
+	
+	/**
+	 * Changes the vertex sequence version of this graph. Should be called
+	 * whenever the vertex list of this graph is changed, for instance by
+	 * creation and deletion or reordering of vertices.
+	 */
+	protected void vertexListModified() {
+		vertexListVersion++;
+		graphVersion++;
+		completeGraph.vertexListModified();
+	}
+	
+	/**
+	 * Changes the vertex sequence version of this graph. Should be called
+	 * whenever the vertex list of this graph is changed, for instance by
+	 * creation and deletion or reordering of vertices.
+	 */
+	protected void edgeListModified() {
+		edgeListVersion++;
+		graphVersion++;
+		completeGraph.edgeListModified();
+	}
+
+	
 
 	/*
 	 *TODO: Should return true, if e is part of this graph or

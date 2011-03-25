@@ -352,21 +352,13 @@ public abstract class GraphBaseImpl implements Graph {
 		return getGraphFactory().createVertex(cls, 0, this);
 	}
 
-	/**
-	 * Changes the graph structure version, should be called whenever the
-	 * structure of the graph is changed, for instance by creation and deletion
-	 * or reordering of vertices and edges
-	 */
-	protected void edgeListModified() {
-		setEdgeListVersion(getEdgeListVersion() + 1);
-		setGraphVersion(getGraphVersion() + 1);
-	}
+	
+	protected abstract void edgeListModified();
+	
+	
+	protected abstract void vertexListModified();
 
-	@Override
-	abstract public int getECount();
 
-	@Override
-	abstract public long getEdgeListVersion();
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
@@ -457,15 +449,7 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	abstract public long getVertexListVersion();
 
-	/**
-	 * Changes this graph's version. graphModified() is called whenever the
-	 * graph is changed, all changes like adding, creating and reordering of
-	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change.
-	 */
-	public void graphModified() {
-		setGraphVersion(getGraphVersion() + 1);
-	}
+
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
@@ -481,27 +465,16 @@ public abstract class GraphBaseImpl implements Graph {
 	public boolean isVertexListModified(long previousVersion) {
 		return getVertexListVersion() != previousVersion;
 	}
-
+	
 	/**
-	 * Sets the version counter of this graph. Should only be called immediately
-	 * after loading.
-	 * 
-	 * @param graphVersion
-	 *            new version value
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change. 
 	 */
-	public void setGraphVersion(long graphVersion) {
-		this.graphVersion = graphVersion;
-	}
+	public abstract void graphModified();
 
-	/**
-	 * Changes the vertex sequence version of this graph. Should be called
-	 * whenever the vertex list of this graph is changed, for instance by
-	 * creation and deletion or reordering of vertices.
-	 */
-	protected void vertexListModified() {
-		setVertexListVersion(getVertexListVersion() + 1);
-		setGraphVersion(getGraphVersion() + 1);
-	}
+
 
 	@Override
 	public Iterable<Vertex> getVertices() {
@@ -1088,4 +1061,20 @@ public abstract class GraphBaseImpl implements Graph {
 		return list;
 	}
 
+	
+	
+	/**
+	 * @return the distributed graph this graph belongs to
+	 */
+	public abstract GraphBaseImpl getParentDistributedGraph() ;
+	
+	/**
+	 * @return the distributed graph this graph belongs to
+	 */
+	public abstract GraphBaseImpl getSuperordinateGraph();
+	
+	/**
+	 * @return the complete top-level DHHTGraph 
+	 */
+	public abstract GraphBaseImpl getCompleteGraph();
 }

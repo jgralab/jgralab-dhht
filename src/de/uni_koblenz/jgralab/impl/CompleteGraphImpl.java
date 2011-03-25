@@ -215,7 +215,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	
 	@Override
-	public Graph getCompleteGraph() {
+	public CompleteGraphImpl getCompleteGraph() {
 		return this;
 	}
 	
@@ -697,6 +697,15 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 
+	/**
+	 * Changes the graph structure version, should be called whenever the
+	 * structure of the graph is changed, for instance by creation and deletion
+	 * or reordering of vertices and edges
+	 */
+	protected void edgeListModified() {
+		edgeListVersion++;
+		graphModified();
+	}
 
 
 
@@ -708,6 +717,16 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			this.traversalContext.put(Thread.currentThread(), stack);
 		}
 		stack.add(traversalContext);
+	}
+	
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change. 
+	 */
+	public void graphModified() {
+		graphVersion++;
 	}
 
 
@@ -729,5 +748,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
 
 	}
+	
+
 
 }

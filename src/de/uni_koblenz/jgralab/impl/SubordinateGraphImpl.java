@@ -226,10 +226,7 @@ public class SubordinateGraphImpl extends
 		vertexListVersion = containingElement.getGraph().getVertexListVersion();
 	}
 
-	@Override
-	public Graph getCompleteGraph() {
-		return containingElement.getGraph();
-	}
+
 
 	@Override
 	public <T> JGraLabList<T> createList() {
@@ -481,4 +478,39 @@ public class SubordinateGraphImpl extends
 		return getCompleteGraph().getGraphFactory();
 	}
 
+	
+	public void graphModified() {
+		getSuperordinateGraph().graphModified();
+	}
+	
+	public void vertexListModified() {
+		getSuperordinateGraph().vertexListModified();
+	}
+	
+	public void edgeListModified() {
+		getSuperordinateGraph().edgeListModified();
+	}
+	
+	/**
+	 * @return the distributed graph this graph belongs to
+	 */
+	public GraphBaseImpl getParentDistributedGraph() {
+		return this;
+	}
+	
+	/**
+	 * @return the distributed graph this graph belongs to
+	 */
+	public GraphBaseImpl getSuperordinateGraph() {
+		return (GraphBaseImpl) containingElement.getGraph();
+	}	
+	
+	/**
+	 * @return the complete top-level DHHTGraph 
+	 */
+	public GraphBaseImpl getCompleteGraph() {
+		return (GraphBaseImpl) getSuperordinateGraph().getCompleteGraph();
+	}
+	
+	
 }
