@@ -1,7 +1,8 @@
 package de.uni_koblenz.jgralab.impl;
 
-import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
@@ -10,11 +11,11 @@ import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
-import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -357,7 +358,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 *            an edge id
 	 * @return true if this graph contains an edge with id eId
 	 */
-	private final boolean containsEdgeId(int eId) {
+	protected final boolean containsEdgeId(int eId) {
 		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
 	}
 
@@ -383,7 +384,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 *            a vertex id
 	 * @return true if this graph contains a vertex with id vId
 	 */
-	private final boolean containsVertexId(int vId) {
+	protected final boolean containsVertexId(int vId) {
 		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
 	}
 	
@@ -996,58 +997,98 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	}
 
 
-	@Override
-	public void readAttributeValueFromString(String attributeName, String value)
-			throws GraphIOException, NoSuchAttributeException {
-		// TODO Auto-generated method stub
 
-	}
 
-	@Override
-	public String writeAttributeValueToString(String attributeName)
-			throws IOException, GraphIOException, NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void writeAttributeValues(GraphIO io) throws IOException,
-			GraphIOException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Class<? extends Graph> getM1Class() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public GraphClass getType() {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum edge count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum edge count.
+	 */
+	protected void notifyMaxEdgeCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxEdgeCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxEdgeCountIncreased(
+					newValue);
+		}
 	}
 
 
 
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum incidence count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum incidence count.
+	 */
+	protected void notifyMaxIncidenceCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxIncidenceCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxIncidenceCountIncreased(
+					newValue);
+		}
+	}
+
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum vertex count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum vertex count.
+	 */
+	protected void notifyMaxVertexCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxVertexCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxVertexCountIncreased(
+					newValue);
+		}
+	}
 }

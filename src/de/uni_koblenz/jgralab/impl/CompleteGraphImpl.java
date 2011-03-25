@@ -89,7 +89,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	private HashMap<Thread, Stack<Graph>> traversalContext;
 
 
-
 	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
@@ -139,10 +138,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Graph#containsEdge(de.uni_koblenz.jgralab.Edge)
+	 *TODO: Should return true, if e is part of this graph or
+	 * any of its partial graphs
 	 */
 	@Override
 	public boolean containsEdge(Edge e) {
@@ -382,97 +379,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 
 
-	/**
-	 * Notifies all registered <code>GraphStructureChangedListener</code> that
-	 * the maximum edge count has been increased to the given
-	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
-	 * deleted automatically from the internal listener list.
-	 * 
-	 * @param newValue
-	 *            the new maximum edge count.
-	 */
-	protected void notifyMaxEdgeCountIncreased(int newValue) {
-		if (graphStructureChangedListenersWithAutoRemoval != null) {
-			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
-			while (iterator.hasNext()) {
-				GraphStructureChangedListener currentListener = iterator.next()
-						.get();
-				if (currentListener == null) {
-					iterator.remove();
-				} else {
-					currentListener.maxEdgeCountIncreased(newValue);
-				}
-			}
-			setAutoListenerListToNullIfEmpty();
-		}
-		int n = graphStructureChangedListeners.size();
-		for (int i = 0; i < n; i++) {
-			graphStructureChangedListeners.get(i).maxEdgeCountIncreased(
-					newValue);
-		}
-	}
-
-
-
-	/**
-	 * Notifies all registered <code>GraphStructureChangedListener</code> that
-	 * the maximum incidence count has been increased to the given
-	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
-	 * deleted automatically from the internal listener list.
-	 * 
-	 * @param newValue
-	 *            the new maximum incidence count.
-	 */
-	protected void notifyMaxIncidenceCountIncreased(int newValue) {
-		if (graphStructureChangedListenersWithAutoRemoval != null) {
-			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
-			while (iterator.hasNext()) {
-				GraphStructureChangedListener currentListener = iterator.next()
-						.get();
-				if (currentListener == null) {
-					iterator.remove();
-				} else {
-					currentListener.maxIncidenceCountIncreased(newValue);
-				}
-			}
-			setAutoListenerListToNullIfEmpty();
-		}
-		int n = graphStructureChangedListeners.size();
-		for (int i = 0; i < n; i++) {
-			graphStructureChangedListeners.get(i).maxIncidenceCountIncreased(
-					newValue);
-		}
-	}
-
-	/**
-	 * Notifies all registered <code>GraphStructureChangedListener</code> that
-	 * the maximum vertex count has been increased to the given
-	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
-	 * deleted automatically from the internal listener list.
-	 * 
-	 * @param newValue
-	 *            the new maximum vertex count.
-	 */
-	protected void notifyMaxVertexCountIncreased(int newValue) {
-		if (graphStructureChangedListenersWithAutoRemoval != null) {
-			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
-			while (iterator.hasNext()) {
-				GraphStructureChangedListener currentListener = iterator.next()
-						.get();
-				if (currentListener == null) {
-					iterator.remove();
-				} else {
-					currentListener.maxVertexCountIncreased(newValue);
-				}
-			}
-			setAutoListenerListToNullIfEmpty();
-		}
-		int n = graphStructureChangedListeners.size();
-		for (int i = 0; i < n; i++) {
-			graphStructureChangedListeners.get(i).maxVertexCountIncreased(
-					newValue);
-		}
-	}
 
 	/**
 	 * Modifies eSeq such that the movedEdge is immediately after the

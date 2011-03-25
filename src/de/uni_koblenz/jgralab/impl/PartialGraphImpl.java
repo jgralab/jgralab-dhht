@@ -34,212 +34,50 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 		return completeGraph;
 	}
 
-
-
-	@Override
-	public boolean containsVertex(Vertex v) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
+	/*
+	 *TODO: Should return true, if e is part of this graph or
+	 * any of its partial graphs
+	 */
 	@Override
 	public boolean containsEdge(Edge e) {
-		// TODO Auto-generated method stub
-		return false;
+		return (e != null) && (e.getGraph() == this)
+				&& containsEdgeId(((EdgeImpl) e).id);
 	}
+
+
+
+	/*
+	 * TODO: Should return true, if v is part of this graph or
+	 * any of its partial graphs
+	 */
+	@Override
+	public boolean containsVertex(Vertex v) {
+		VertexImpl[] vertex = getVertexArray();
+		return (v != null) && (v.getGraph() == this)
+				&& containsVertexId(((VertexImpl) v).id)
+				&& (vertex[((VertexImpl) v).id] == v);
+	}
+
 
 	@Override
 	public void deleteVertex(Vertex v) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
-		// TODO Auto-generated method stub
-		
+		assert (e != null) && e.isValid() && containsEdge(e);
+		internalDeleteEdge(e);
+		edgeListModified();
 	}
 
-	@Override
-	public Vertex getVertex(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public Edge getEdge(int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getMaxVCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getMaxECount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getICount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public String getUid() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().getUid();
 	}
 
-	@Override
-	public void defragment() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void readAttributeValueFromString(String attributeName, String value)
-			throws GraphIOException, NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String writeAttributeValueToString(String attributeName)
-			throws IOException, GraphIOException, NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void writeAttributeValues(GraphIO io) throws IOException,
-			GraphIOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Class<? extends Graph> getM1Class() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public GraphClass getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Schema getSchema() {
@@ -247,108 +85,5 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 		return null;
 	}
 
-	@Override
-	protected void setVCount(int count) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setFirstVertex(VertexImpl firstVertex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setLastVertex(VertexImpl lastVertex) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setVertexListVersion(long vertexListVersion) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setECount(int count) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void setEdgeListVersion(long edgeListVersion) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int getECount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getEdgeListVersion() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Edge getFirstEdge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Edge getLastEdge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vertex getFirstVertex() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Vertex getLastVertex() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getVCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getVertexListVersion() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	protected void setICount(int count) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
 
 }
