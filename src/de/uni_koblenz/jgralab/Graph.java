@@ -52,8 +52,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {
 	
-
-
 	/**
 	 * @return {@link GraphElement} which contains this {@link Graph} or
 	 *         <code>null</code> if it is the complete {@link Graph}
@@ -61,12 +59,31 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public GraphElement<?, ?, ?> getContainingElement();
 
 	/**
-	 * TODO check with distributed graphs (there exists already a method with
-	 * this name
-	 * 
-	 * @return {@link Graph} the complete {@link Graph}
+	 * @return {@link Graph} the distributed {@link Graph} this
+	 *         partial graph is a member of or this graph itself,
+	 *         it is not directly a member of a distributed graph
 	 */
-	public Graph getCompleteGraph();
+	public abstract Graph getParentDistributedGraph() ;
+	
+	/**
+	 * @return {@link Graph} the superordinate {@link Graph} containing
+	 *         the element this graph is contained in as subordinate one
+	 *         or this graph, if it is not a subordinate one 
+	 */
+	public abstract Graph getSuperordinateGraph();
+	
+	/**
+	 * @return {@link Graph} the complete, top-level {@link Graph}
+	 */
+	public abstract Graph getCompleteGraph();
+	
+	
+	/**
+	 * 
+	 * @return {@link Graph} the graph viewed by this viewgraph or
+	 *         the graph itself if it is not a view
+	 */
+	public abstract Graph getViewedGraph();
 
 	/**
 	 * @see GraphElement#isVisible(int)

@@ -297,6 +297,7 @@ public class SubordinateGraphImpl extends
 		return containingElement.getGraph().createRecord(recordClass, fields);
 	}
 
+
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
@@ -477,40 +478,47 @@ public class SubordinateGraphImpl extends
 	public GraphFactory getGraphFactory() {
 		return getCompleteGraph().getGraphFactory();
 	}
-
 	
+	@Override
 	public void graphModified() {
 		getSuperordinateGraph().graphModified();
 	}
 	
+	@Override
 	public void vertexListModified() {
 		getSuperordinateGraph().vertexListModified();
 	}
 	
+	@Override
 	public void edgeListModified() {
 		getSuperordinateGraph().edgeListModified();
 	}
 	
-	/**
-	 * @return the distributed graph this graph belongs to
-	 */
+	@Override
 	public GraphBaseImpl getParentDistributedGraph() {
 		return this;
 	}
 	
-	/**
-	 * @return the distributed graph this graph belongs to
-	 */
+	@Override
 	public GraphBaseImpl getSuperordinateGraph() {
 		return (GraphBaseImpl) containingElement.getGraph();
 	}	
 	
-	/**
-	 * @return the complete top-level DHHTGraph 
-	 */
+	@Override
 	public GraphBaseImpl getCompleteGraph() {
-		return (GraphBaseImpl) getSuperordinateGraph().getCompleteGraph();
+		return getSuperordinateGraph().getCompleteGraph();
 	}
 	
+	@Override
+	public Graph getViewedGraph() {
+		return this;
+	}
+
+	@Override
+	public long getGraphVersion() {
+		return getSuperordinateGraph().getGraphVersion();
+	}
+
+
 	
 }

@@ -1110,4 +1110,8 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 					newValue);
 		}
 	}
+	
+	public Graph getViewedGraph() {
+		return this;
+	}
 }
