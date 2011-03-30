@@ -24,61 +24,63 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
-
 /**
- * Realizes a view on a complete, subordinate or partial graph defined by an 
+ * Realizes a view on a complete, subordinate or partial graph defined by an
  * integer value specifying the lowest level of elements visible in this view.
  * 
- * Implemented by delegation, e.g. all methods delegate to the graph
- * this view is an abstraction of
+ * Implemented by delegation, e.g. all methods delegate to the graph this view
+ * is an abstraction of
  * 
  * @author ist@uni-koblenz.de
- *
+ * 
  */
 public abstract class ViewGraphImpl implements Graph {
 
 	/**
-	 * the lowest kappa level of the elements which should be visible
-	 * in this graph
+	 * the lowest kappa level of the elements which should be visible in this
+	 * graph
 	 */
-	private int lowestVisibleKappaLevel;
-	
+	private final int lowestVisibleKappaLevel;
+
 	/**
-	 * The Graph viewed by this view 
+	 * The Graph viewed by this view
 	 */
-	private Graph viewedGraph;
-	
+	private final Graph viewedGraph;
+
 	/**
 	 * Creates a new view graph of the graph <code>viewedGraph</code>, all
-	 * elements of that graph (which may be a view, too) whose kappa-values
-	 * are equal or above <code>lowestVisibleKappaLevel</code> are visible
-	 * in this view, while all others are hidden. 
-	 * @param viewedGraph 
-	 * 						the graph to be viewed 
+	 * elements of that graph (which may be a view, too) whose kappa-values are
+	 * equal or above <code>lowestVisibleKappaLevel</code> are visible in this
+	 * view, while all others are hidden.
+	 * 
+	 * @param viewedGraph
+	 *            the graph to be viewed
 	 * @param lowestVisibleKappaLevel
-	 * 						the loweset kappa level of visible elements
+	 *            the loweset kappa level of visible elements
 	 */
 	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
 	}
-	
+
 	/**
-	 * Returns a new view on this view, implemented and not delegated to
-	 * avoid multi-delegation and unnecessary overhead
+	 * Returns a new view on this view, implemented and not delegated to avoid
+	 * multi-delegation and unnecessary overhead
 	 */
 	@Override
 	public ViewGraphImpl getView(int level) {
-		if (level < lowestVisibleKappaLevel)
+		if (level < lowestVisibleKappaLevel) {
 			level = lowestVisibleKappaLevel;
-		return ((GraphBaseImpl)getCompleteGraph()).graphFactory.createViewGraph(this, level);
+		}
+		return ((GraphBaseImpl) getCompleteGraph()).getGraphFactory()
+				.createViewGraph(this, level);
 	}
 
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException();
-	}	
+	}
 
 	@Override
 	public String writeAttributeValueToString(String attributeName)
@@ -89,7 +91,7 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
-		throw new UnsupportedOperationException();		
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -164,13 +166,13 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void useAsTraversalContext() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void releaseTraversalContext() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -208,7 +210,7 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void loadingCompleted() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -262,13 +264,13 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void deleteVertex(Vertex v) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -432,7 +434,7 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void defragment() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -525,33 +527,33 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sortEdges(Comparator<Edge> comp) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void removeGraphStructureChangedListener(
 			GraphStructureChangedListener listener) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void removeAllGraphStructureChangedListeners() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -559,6 +561,5 @@ public abstract class ViewGraphImpl implements Graph {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	
+
 }

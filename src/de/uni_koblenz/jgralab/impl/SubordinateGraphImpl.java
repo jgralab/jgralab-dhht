@@ -61,33 +61,32 @@ public abstract class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.GraphBaseImpl {
 
 	private GraphElement<?, ?, ?> containingElement;
-	
-	//TODO: Check if the respective methods are really 
-	//      needed in the graph interface and how to ensure, that
-	//      the variables reflect the number of elements in the subgraphs
+
+	// TODO: Check if the respective methods are really
+	// needed in the graph interface and how to ensure, that
+	// the variables reflect the number of elements in the subgraphs
 	private int vCount;
-	
+
 	private int eCount;
-	
+
 	private int iCount;
-	
-	//those variables should not be kept in each subgraph but only in the partial ones and the toplevel
+
+	// those variables should not be kept in each subgraph but only in the
+	// partial ones and the toplevel
 
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
 	 * adding/deleting a vertex or changing the vertex sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	//private long vertexListVersion;
+	// private long vertexListVersion;
 
 	/**
 	 * Holds the version of the edge sequence. For every modification (e.g.
 	 * adding/deleting an edge or changing the edge sequence) this version
 	 * number is increased by 1. It is set to 0 when the graph is loaded.
 	 */
-	//private long edgeListVersion;
-	
-	
+	// private long edgeListVersion;
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -123,7 +122,6 @@ public abstract class SubordinateGraphImpl extends
 	public long getVertexListVersion() {
 		return getSuperordinateGraph().getVertexListVersion();
 	}
-
 
 	@Override
 	public long getEdgeListVersion() {
@@ -218,8 +216,6 @@ public abstract class SubordinateGraphImpl extends
 		this.containingElement = containingElement;
 	}
 
-
-
 	@Override
 	public <T> JGraLabList<T> createList() {
 		return containingElement.getGraph().createList();
@@ -289,7 +285,6 @@ public abstract class SubordinateGraphImpl extends
 		return containingElement.getGraph().createRecord(recordClass, fields);
 	}
 
-
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
@@ -299,8 +294,8 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public Graph getView(int kappa) {
-		// TODO Auto-generated method stub
-		return null;
+		return containingElement.getGraph().getGraphFactory()
+				.createViewGraph(containingElement.getGraph(), kappa);
 	}
 
 	@Override
@@ -336,7 +331,6 @@ public abstract class SubordinateGraphImpl extends
 			throws NoSuchAttributeException {
 		containingElement.setAttribute(name, data);
 	}
-
 
 	@Override
 	public boolean isLoading() {
@@ -417,7 +411,6 @@ public abstract class SubordinateGraphImpl extends
 		throw new UnsupportedOperationException();
 	}
 
-
 	@Override
 	public void defragment() {
 		throw new UnsupportedOperationException();
@@ -459,37 +452,37 @@ public abstract class SubordinateGraphImpl extends
 	public GraphFactory getGraphFactory() {
 		return getCompleteGraph().getGraphFactory();
 	}
-	
+
 	@Override
 	public void graphModified() {
 		getSuperordinateGraph().graphModified();
 	}
-	
+
 	@Override
 	public void vertexListModified() {
 		getSuperordinateGraph().vertexListModified();
 	}
-	
+
 	@Override
 	public void edgeListModified() {
 		getSuperordinateGraph().edgeListModified();
 	}
-	
+
 	@Override
 	public GraphBaseImpl getParentDistributedGraph() {
 		return this;
 	}
-	
+
 	@Override
 	public GraphBaseImpl getSuperordinateGraph() {
 		return (GraphBaseImpl) containingElement.getGraph();
-	}	
-	
+	}
+
 	@Override
 	public GraphBaseImpl getCompleteGraph() {
 		return getSuperordinateGraph().getCompleteGraph();
 	}
-	
+
 	@Override
 	public Graph getViewedGraph() {
 		return this;
@@ -502,9 +495,9 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public boolean isPartOfGraph(Graph other) {
-		return other == getSuperordinateGraph() || getSuperordinateGraph().isPartOfGraph(other);
+		return other == getSuperordinateGraph()
+				|| getSuperordinateGraph().isPartOfGraph(other);
 	}
-
 
 	@Override
 	public boolean containsVertexLocally(Vertex v) {
@@ -516,13 +509,14 @@ public abstract class SubordinateGraphImpl extends
 		return getSuperordinateGraph().containsEdgeLocally(e);
 	}
 
-	//TODO: Check if these methods should return the type of the vertex or edge the
-	//subordinate graph is embedded in
+	// TODO: Check if these methods should return the type of the vertex or edge
+	// the
+	// subordinate graph is embedded in
+	@Override
 	public GraphClass getGraphClass() {
 		return getSuperordinateGraph().getGraphClass();
 	}
-	
-	
+
 	public Class<? extends Graph> getM1Class() {
 		return getSuperordinateGraph().getM1Class();
 	}
