@@ -36,7 +36,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
-import de.uni_koblenz.jgralab.impl.Over;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -52,7 +51,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {
-	
+
 	/**
 	 * @return {@link GraphElement} which contains this {@link Graph} or
 	 *         <code>null</code> if it is the complete {@link Graph}
@@ -60,29 +59,28 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public GraphElement<?, ?, ?> getContainingElement();
 
 	/**
-	 * @return {@link Graph} the distributed {@link Graph} this
-	 *         partial graph is a member of or this graph itself,
-	 *         it is not directly a member of a distributed graph
+	 * @return {@link Graph} the distributed {@link Graph} this partial graph is
+	 *         a member of or this graph itself, it is not directly a member of
+	 *         a distributed graph
 	 */
-	public abstract Graph getParentDistributedGraph() ;
-	
+	public abstract Graph getParentDistributedGraph();
+
 	/**
-	 * @return {@link Graph} the superordinate {@link Graph} containing
-	 *         the element this graph is contained in as subordinate one
-	 *         or this graph, if it is not a subordinate one 
+	 * @return {@link Graph} the superordinate {@link Graph} containing the
+	 *         element this graph is contained in as subordinate one or this
+	 *         graph, if it is not a subordinate one
 	 */
 	public abstract Graph getSuperordinateGraph();
-	
+
 	/**
 	 * @return {@link Graph} the complete, top-level {@link Graph}
 	 */
 	public abstract Graph getCompleteGraph();
-	
-	
+
 	/**
 	 * 
-	 * @return {@link Graph} the graph viewed by this viewgraph or
-	 *         the graph itself if it is not a view
+	 * @return {@link Graph} the graph viewed by this viewgraph or the graph
+	 *         itself if it is not a view
 	 */
 	public abstract Graph getViewedGraph();
 
@@ -93,7 +91,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return {@link Graph} which contains all {@link GraphElement}s
 	 *         <code>ge</code> where <code>ge.isVisible(kappa)==true</code>.
 	 */
-	public Graph getView(int kappa); 
+	public Graph getView(int kappa);
 
 	/**
 	 * @return {@link Graph} the current traversal context. It is not removed
@@ -434,7 +432,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getMaxVCount();
 
-	
 	/**
 	 * The maximum number of edges that can be stored in the graph before the
 	 * internal array structures are expanded.
@@ -456,12 +453,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the number of edges
 	 */
 	public int getECount();
-	
+
 	/**
 	 * @return the number of incidences in this graph
 	 */
 	public int getICount();
-	
 
 	/**
 	 * Returns the <code>id</code> of this Graph. JGraLab assigns a 128 bit
@@ -480,8 +476,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param id
 	 *            the new id
 	 */
-	//Method should be used internally only
-	//public void setId(String id);
+	// Method should be used internally only
+	// public void setId(String id);
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this
@@ -798,25 +794,25 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public GraphFactory getGraphFactory();
 
 	/**
-	 * @return true if this graph is a part of <code>other</code>
-	 * either directly as a subordinate or partial one or indirectly
-	 * by its parent
+	 * @return true if this graph is a part of <code>other</code> either
+	 *         directly as a subordinate or partial one or indirectly by its
+	 *         parent
 	 */
 	public boolean isPartOfGraph(Graph other);
 
 	/**
-	 * @returns the ID of this partial or complete graph. 
+	 * @returns the ID of this partial or complete graph.
 	 */
 	public int getId();
 
-	
 	/**
-	 * Adds a partial graph on the given host to the sequence
-	 * of partial graphs and returns a local proxy  
-	 * @param hostname name of the host running the remote JGraLab instance
+	 * Adds a partial graph on the given host to the sequence of partial graphs
+	 * and returns a local proxy
+	 * 
+	 * @param hostname
+	 *            name of the host running the remote JGraLab instance
 	 * @return a local proxy object for the created partial graph
 	 */
 	public Graph createPartialGraph(String hostname);
-
 
 }

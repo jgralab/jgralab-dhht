@@ -57,13 +57,12 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  */
 public abstract class GraphFactoryImpl implements GraphFactory {
 
-
 	// Maps for standard support.
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMap;
-	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMap;	
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMap;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMap;
 	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMap;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMap;
@@ -89,12 +88,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
 
-
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
 			Vertex alpha, Vertex omega) {
 		try {
-			Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha, omega);
+			Edge e = binaryEdgeMap.get(edgeClass).newInstance(id, g, alpha,
+					omega);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -105,7 +104,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ edgeClass.getCanonicalName(), ex);
 		}
 	}
-	
+
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
 		try {
@@ -212,19 +211,24 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { int.class, Graph.class};
+				Class<?>[] params = { int.class, Graph.class };
 				edgeMap.put(originalClass,
 						implementationClass.getConstructor(params));
-				
+
 				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces())
+				for (Class<?> c : originalClass.getInterfaces()) {
 					interfaces.add(c);
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class, Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass.getConstructor(binaryParams);
-					binaryEdgeMap.put((Class<? extends BinaryEdge>) originalClass, binaryConstructor);
 				}
-				
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class,
+							Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
+							.getConstructor(binaryParams);
+					binaryEdgeMap.put(
+							(Class<? extends BinaryEdge>) originalClass,
+							binaryConstructor);
+				}
+
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -262,7 +266,6 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ recordDomain.getCanonicalName(), ex);
 		}
 	}
-
 
 	// -------------------------------------------------------------------------
 	// Helper methods.
@@ -315,23 +318,28 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
-			ViewGraphImpl g = (ViewGraphImpl) viewGraphMap.get(graphClass).newInstance(viewGraph, level);
+			ViewGraphImpl g = (ViewGraphImpl) viewGraphMap.get(graphClass)
+					.newInstance(viewGraph, level);
 			return g;
 		} catch (Exception ex) {
-			throw new M1ClassAccessException("Cannot create view graph for graph of class "
-					+ viewGraph.getGraphClass().getQualifiedName(), ex);
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ viewGraph.getGraphClass().getQualifiedName(), ex);
 		}
 	}
 
 	@Override
-	public SubordinateGraphImpl createSubordinateGraph(GraphElement elem) {
+	public SubordinateGraphImpl createSubordinateGraph(
+			GraphElement<?, ?, ?> elem) {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
-			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap.get(graphClass).newInstance(elem);
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap
+					.get(graphClass).newInstance(elem);
 			return g;
 		} catch (Exception ex) {
-			throw new M1ClassAccessException("Cannot create subordinate graph for elem of class "
-					+ elem.getType().getQualifiedName(), ex);
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ elem.getType().getQualifiedName(), ex);
 		}
 	}
 
@@ -339,23 +347,28 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public PartialGraphImpl createPartialGraph(Graph completeGraph) {
 		try {
 			Class<? extends Graph> graphClass = completeGraph.getM1Class();
-			PartialGraphImpl g = (PartialGraphImpl) partialGraphMap.get(graphClass).newInstance(completeGraph);
+			PartialGraphImpl g = (PartialGraphImpl) partialGraphMap.get(
+					graphClass).newInstance(completeGraph);
 			return g;
 		} catch (Exception ex) {
-			throw new M1ClassAccessException("Cannot create view graph for graph of class "
-					+ completeGraph.getGraphClass().getUniqueName(), ex);
+			throw new M1ClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ completeGraph.getGraphClass().getUniqueName(), ex);
 		}
 	}
-	
+
 	@Override
-	public PartialSubordinateGraphImpl createPartialSubordinateGraph(GraphElement elem) {
+	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
+			GraphElement<?, ?, ?> elem) {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
-			PartialSubordinateGraphImpl g = (PartialSubordinateGraphImpl) partialSubordinateGraphMap.get(graphClass).newInstance(elem);
+			PartialSubordinateGraphImpl g = (PartialSubordinateGraphImpl) partialSubordinateGraphMap
+					.get(graphClass).newInstance(elem);
 			return g;
 		} catch (Exception ex) {
-			throw new M1ClassAccessException("Cannot create subordinate graph for elem of class "
-					+ elem.getType().getQualifiedName(), ex);
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ elem.getType().getQualifiedName(), ex);
 		}
 	}
 
@@ -365,7 +378,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { GraphElement.class};
+				Class<?>[] params = { GraphElement.class };
 				subordinateGraphMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -382,7 +395,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { Graph.class, int.class};
+				Class<?>[] params = { Graph.class, int.class };
 				viewGraphMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -390,16 +403,16 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 						"Unable to locate default constructor for graphclass "
 								+ implementationClass.getName(), ex);
 			}
-		}		
+		}
 	}
-	
+
 	@Override
 	public void setPartialGraphImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { Graph.class, int.class};
+				Class<?>[] params = { Graph.class, int.class };
 				partialGraphMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -407,16 +420,16 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 						"Unable to locate default constructor for graphclass "
 								+ implementationClass.getName(), ex);
 			}
-		}		
+		}
 	}
-	
+
 	@Override
 	public void setPartialSubordinateGraphImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { GraphElement.class, int.class};
+				Class<?>[] params = { GraphElement.class, int.class };
 				partialSubordinateGraphMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -424,7 +437,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 						"Unable to locate default constructor for graphclass "
 								+ implementationClass.getName(), ex);
 			}
-		}		
+		}
 	}
 
 }
