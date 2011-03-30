@@ -9,6 +9,7 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
@@ -153,64 +154,55 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public Graph getCompleteGraph() {
-		// TODO Auto-generated method stub
-		return null;
+		return viewedGraph;
 	}
 
 	@Override
 	public Graph getTraversalContext() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO return this oder return getTraversalContext
+		return getCompleteGraph().getTraversalContext();
 	}
 
 	@Override
 	public void useAsTraversalContext() {
-		// TODO Auto-generated method stub
-
+		((GraphBaseImpl) getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
 	public void releaseTraversalContext() {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().releaseTraversalContext();
 	}
 
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createVertex(cls);
 	}
 
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createEdge(cls);
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().connect(cls, vertex, edge);
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createEdge(cls, alpha, omega);
 	}
 
 	@Override
 	public boolean isLoading() {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void loadingCompleted() {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -251,124 +243,165 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public boolean containsVertex(Vertex v) {
-		// TODO Auto-generated method stub
-		return false;
+		return v.isVisible(lowestVisibleKappaLevel)
+				&& getCompleteGraph().containsVertex(v);
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		// TODO Auto-generated method stub
-		return false;
+		return e.isVisible(lowestVisibleKappaLevel)
+				&& getCompleteGraph().containsEdge(e);
 	}
 
 	@Override
 	public void deleteVertex(Vertex v) {
-		// TODO Auto-generated method stub
-
+		if (containsVertex(v)) {
+			getCompleteGraph().deleteVertex(v);
+		} else {
+			throw new GraphException(
+					"The view with lowest visible kappa value "
+							+ lowestVisibleKappaLevel
+							+ " does not contain vertex " + v.getId() + ".");
+		}
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
-		// TODO Auto-generated method stub
-
+		if (containsEdge(e)) {
+			getCompleteGraph().deleteEdge(e);
+		} else {
+			throw new GraphException(
+					"The view with lowest visible kappa value "
+							+ lowestVisibleKappaLevel
+							+ " does not contain edge " + e.getId() + ".");
+		}
 	}
 
 	@Override
 	public Vertex getFirstVertex() {
-		// TODO Auto-generated method stub
-		return null;
+		Vertex v = getCompleteGraph().getFirstVertex();
+		return v == null || containsVertex(v) ? v : v.getNextVertex(this);
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		// TODO Auto-generated method stub
-		return null;
+		Vertex v = getCompleteGraph().getLastVertex();
+		return v == null || containsVertex(v) ? v : v.getPreviousVertex(this);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass) {
-		// TODO Auto-generated method stub
-		return null;
+		assert vertexClass != null;
+		return getFirstVertex(vertexClass.getM1Class(), false);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
-		// TODO Auto-generated method stub
-		return null;
+		assert vertexClass != null;
+		return getFirstVertex(vertexClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
-		// TODO Auto-generated method stub
-		return null;
+		assert vertexClass != null;
+		return getFirstVertex(vertexClass, false);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
 			boolean noSubclasses) {
-		// TODO Auto-generated method stub
-		return null;
+		assert vertexClass != null;
+		Vertex firstVertex = getFirstVertex();
+		if (firstVertex == null) {
+			return null;
+		}
+		if (noSubclasses) {
+			if (vertexClass == firstVertex.getM1Class()) {
+				return firstVertex;
+			}
+		} else {
+			if (vertexClass.isInstance(firstVertex)) {
+				return firstVertex;
+			}
+		}
+		return firstVertex.getNextVertex(this, vertexClass, noSubclasses);
 	}
 
 	@Override
 	public Edge getFirstEdge() {
-		// TODO Auto-generated method stub
-		return null;
+		Edge e = getCompleteGraph().getFirstEdge();
+		return e == null || containsEdge(e) ? e : e.getNextEdge(this);
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		// TODO Auto-generated method stub
-		return null;
+		Edge e = getCompleteGraph().getLastEdge();
+		return e == null || containsEdge(e) ? e : e.getPreviousEdge(this);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return getFirstEdge(edgeClass.getM1Class(), false);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
-		// TODO Auto-generated method stub
-		return null;
+		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return getFirstEdge(edgeClass, false);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
 			boolean noSubclasses) {
-		// TODO Auto-generated method stub
+		assert edgeClass != null;
+		Edge currentEdge = getFirstEdge();
+		while (currentEdge != null) {
+			if (noSubclasses) {
+				if (edgeClass == currentEdge.getM1Class()) {
+					return currentEdge;
+				}
+			} else {
+				if (edgeClass.isInstance(currentEdge)) {
+					return currentEdge;
+				}
+			}
+			currentEdge = currentEdge.getNextEdge(this);
+		}
 		return null;
 	}
 
 	@Override
 	public Vertex getVertex(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Vertex v = getCompleteGraph().getVertex(id);
+		if (v.isVisible(lowestVisibleKappaLevel)) {
+			return v;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public Edge getEdge(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		Edge e = getCompleteGraph().getEdge(id);
+		if (e.isVisible(lowestVisibleKappaLevel)) {
+			return e;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public int getMaxVCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int getMaxECount() {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

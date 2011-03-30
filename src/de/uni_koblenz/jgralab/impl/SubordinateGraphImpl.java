@@ -294,6 +294,7 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public Graph getView(int kappa) {
+		// TODO check if this is correct
 		return containingElement.getGraph().getGraphFactory()
 				.createViewGraph(containingElement.getGraph(), kappa);
 	}
