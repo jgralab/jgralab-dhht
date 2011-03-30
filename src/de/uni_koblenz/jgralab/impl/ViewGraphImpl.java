@@ -118,26 +118,22 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public Class<? extends Graph> getM1Class() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().getM1Class();
 	}
 
 	@Override
 	public GraphClass getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().getType();
 	}
 
 	@Override
 	public GraphClass getGraphClass() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().getGraphClass();
 	}
 
 	@Override
 	public Schema getSchema() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().getSchema();
 	}
 
 	@Override
@@ -148,7 +144,6 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -159,7 +154,6 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public Graph getTraversalContext() {
-		// TODO return this oder return getTraversalContext
 		return getCompleteGraph().getTraversalContext();
 	}
 
@@ -430,131 +424,110 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public Iterable<Edge> getEdges() {
-		// TODO Auto-generated method stub
-		return null;
+		return new EdgeIterable<Edge>(this);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new EdgeIterable<Edge>(this, edgeClass.getM1Class());
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new EdgeIterable<Edge>(this, edgeClass);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices() {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexIterable<Vertex>(this);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(VertexClass vertexclass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexIterable<Vertex>(this, vertexclass.getM1Class());
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexIterable<Vertex>(this, vertexClass);
 	}
 
 	@Override
 	public void defragment() {
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createList();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createList(collection);
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createList(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createSet();
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createSet(collection);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createSet(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createSet(initialCapacity, loadFactor);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createMap();
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createMap(map);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createMap(initialCapacity, loadFactor);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		// TODO Auto-generated method stub
-		return null;
+		return getCompleteGraph().createRecord(recordClass, components);
 	}
 
 	@Override
