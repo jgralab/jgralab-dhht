@@ -60,7 +60,6 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.codegenerator.BinaryEdgeCodeGenerator;
@@ -76,7 +75,6 @@ import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
-import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
@@ -139,7 +137,7 @@ public class SchemaImpl implements Schema {
 	}
 
 	// TODO Remove
-	//private static final String GRAPH_IMPLEMENTATION_PACKAGE = "array";
+	// private static final String GRAPH_IMPLEMENTATION_PACKAGE = "array";
 
 	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE = { String.class,
 			int.class, int.class };
@@ -169,7 +167,7 @@ public class SchemaImpl implements Schema {
 	private boolean allowLowercaseEnumConstants = true;
 
 	private final EdgeClass defaultEdgeClass;
-	
+
 	private final BinaryEdgeClass defaultBinaryEdgeClass;
 
 	private final GraphClass defaultGraphClass;
@@ -178,9 +176,9 @@ public class SchemaImpl implements Schema {
 
 	private final VertexClass defaultVertexClass;
 
-	private IncidenceClass defaultEdgeToVertexIncidenceClass;
+	private final IncidenceClass defaultEdgeToVertexIncidenceClass;
 
-	private IncidenceClass defaultVertexToEdgeIncidenceClass;
+	private final IncidenceClass defaultVertexToEdgeIncidenceClass;
 
 	protected CodeGeneratorConfiguration config;
 
@@ -291,10 +289,13 @@ public class SchemaImpl implements Schema {
 		// Creation of default GraphElementClasses
 		defaultVertexClass = VertexClassImpl.createDefaultVertexClass(this);
 		defaultEdgeClass = EdgeClassImpl.createDefaultEdgeClass(this);
-		defaultBinaryEdgeClass = BinaryEdgeClassImpl.createDefaultBinaryEdgeClass(this);
+		defaultBinaryEdgeClass = BinaryEdgeClassImpl
+				.createDefaultBinaryEdgeClass(this);
 		defaultBinaryEdgeClass.addSuperClass(defaultEdgeClass);
-		defaultEdgeToVertexIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.EDGE_TO_VERTEX);
-		defaultVertexToEdgeIncidenceClass = IncidenceClassImpl.createDefaulIncidenceClass(this, Direction.VERTEX_TO_EDGE);
+		defaultEdgeToVertexIncidenceClass = IncidenceClassImpl
+				.createDefaulIncidenceClass(this, Direction.EDGE_TO_VERTEX);
+		defaultVertexToEdgeIncidenceClass = IncidenceClassImpl
+				.createDefaulIncidenceClass(this, Direction.VERTEX_TO_EDGE);
 		config = createDefaultConfig();
 	}
 
@@ -412,8 +413,7 @@ public class SchemaImpl implements Schema {
 
 		/* create code for graph */
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
-				graphClass, packagePrefix, name,
-				config);
+				graphClass, packagePrefix, name, config);
 		javaSources.addAll(graphCodeGenerator.createJavaSources());
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
@@ -427,8 +427,7 @@ public class SchemaImpl implements Schema {
 			CodeGenerator codeGen;
 			if (edgeClass.isBinary()) {
 				codeGen = new BinaryEdgeCodeGenerator(
-						(BinaryEdgeClass) edgeClass, packagePrefix,
-						 config);
+						(BinaryEdgeClass) edgeClass, packagePrefix, config);
 			} else {
 				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
 						config);
@@ -440,7 +439,7 @@ public class SchemaImpl implements Schema {
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
 			if (!incidenceClass.isInternal()) {
 				IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
-					incidenceClass, packagePrefix,	 config);
+						incidenceClass, packagePrefix, config);
 				javaSources.addAll(codeGen.createJavaSources());
 			}
 		}
@@ -449,8 +448,7 @@ public class SchemaImpl implements Schema {
 		for (Domain domain : getRecordDomains()) {
 			// also generate an abstract class for Records
 			CodeGenerator rcode = new RecordCodeGenerator(
-					(RecordDomain) domain, packagePrefix,
-					config);
+					(RecordDomain) domain, packagePrefix, config);
 			javaSources.addAll(rcode.createJavaSources());
 		}
 		for (Domain domain : getEnumDomains()) {
@@ -494,13 +492,12 @@ public class SchemaImpl implements Schema {
 
 		/* create code for graph */
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
-				graphClass, packagePrefix,  name,
-				config);
+				graphClass, packagePrefix, name, config);
 		graphCodeGenerator.createFiles(pathPrefix);
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,
-					packagePrefix,  config);
+					packagePrefix, config);
 			codeGen.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -515,11 +512,10 @@ public class SchemaImpl implements Schema {
 			CodeGenerator codeGen;
 			if (edgeClass.isBinary()) {
 				codeGen = new BinaryEdgeCodeGenerator(
-						(BinaryEdgeClass) edgeClass, packagePrefix,
-						config);
+						(BinaryEdgeClass) edgeClass, packagePrefix, config);
 			} else {
 				codeGen = new EdgeCodeGenerator(edgeClass, packagePrefix,
-						 config);
+						config);
 			}
 
 			codeGen.createFiles(pathPrefix);
@@ -536,18 +532,17 @@ public class SchemaImpl implements Schema {
 
 		for (IncidenceClass incidenceClass : getIncidenceClassesInTopologicalOrder()) {
 			if (!incidenceClass.isInternal()) {
-			IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
-					incidenceClass, packagePrefix,
-					 config);
-			codeGen.createFiles(pathPrefix);
-			if (progressFunction != null) {
-				schemaElements++;
-				currentCount++;
-				if (currentCount == interval) {
-					progressFunction.progress(schemaElements);
-					currentCount = 0;
+				IncidenceCodeGenerator codeGen = new IncidenceCodeGenerator(
+						incidenceClass, packagePrefix, config);
+				codeGen.createFiles(pathPrefix);
+				if (progressFunction != null) {
+					schemaElements++;
+					currentCount++;
+					if (currentCount == interval) {
+						progressFunction.progress(schemaElements);
+						currentCount = 0;
+					}
 				}
-			}
 			}
 		}
 
@@ -555,8 +550,7 @@ public class SchemaImpl implements Schema {
 		for (Domain domain : getRecordDomains()) {
 			// also generate an abstract class for Records
 			CodeGenerator rcode = new RecordCodeGenerator(
-					(RecordDomain) domain, packagePrefix,
-					config);
+					(RecordDomain) domain, packagePrefix, config);
 			rcode.createFiles(pathPrefix);
 			if (progressFunction != null) {
 				schemaElements++;
@@ -615,7 +609,7 @@ public class SchemaImpl implements Schema {
 
 		// generate factory
 		CodeGenerator factoryCodeGenerator = new GraphFactoryGenerator(this,
-				packagePrefix,  config);
+				packagePrefix, config);
 		factoryCodeGenerator.createFiles(pathPrefix);
 
 		// generate graph class
