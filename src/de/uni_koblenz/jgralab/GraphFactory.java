@@ -36,7 +36,6 @@ import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
 
-
 /**
  * Creates instances of graphs, edges and vertices. By changing factory it is
  * possible to extend Graph, Vertex, and Edge classes used in a graph.
@@ -44,7 +43,6 @@ import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
  * @author ist@uni-koblenz.de
  */
 public interface GraphFactory {
-
 
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
@@ -58,40 +56,47 @@ public interface GraphFactory {
 	 * be an instance of a subclass of the specified graphClass.
 	 */
 	public Graph createGraph(Class<? extends Graph> graphClass, String id);
-	
+
 	/**
-	 * creates a View-Graph object for the specified class. The returned object may
-	 * be an instance of a subclass of the specified graphClass.
+	 * creates a View-Graph object for the specified class. The returned object
+	 * may be an instance of a subclass of the specified graphClass.
+	 * 
 	 * @param viewGraph
 	 * @param level
 	 * @return
 	 */
 	public ViewGraphImpl createViewGraph(Graph viewGraph, int level);
-	
+
 	/**
-	 * creates a Subordinate-Graph object for the specified class. The returned object may
-	 * be an instance of a subclass of the specified graphClass.
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
 	 * @param elem
 	 * @return
 	 */
-	public SubordinateGraphImpl createSubordinateGraph(GraphElement elem);
-	
+	public SubordinateGraphImpl createSubordinateGraph(
+			GraphElement<?, ?, ?> elem);
+
 	/**
-	 * creates a PartialSubordinate-Graph object for the specified class. The returned object may
-	 * be an instance of a subclass of the specified graphClass.
+	 * creates a PartialSubordinate-Graph object for the specified class. The
+	 * returned object may be an instance of a subclass of the specified
+	 * graphClass.
+	 * 
 	 * @param elem
 	 * @return
 	 */
-	public PartialSubordinateGraphImpl createPartialSubordinateGraph(GraphElement elem);
-	
+	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
+			GraphElement<?, ?, ?> elem);
+
 	/**
-	 * creates a Partial-Graph object for the specified remote graph. The returned object may
-	 * be an instance of a subclass of the specified graphClass.
+	 * creates a Partial-Graph object for the specified remote graph. The
+	 * returned object may be an instance of a subclass of the specified
+	 * graphClass.
+	 * 
 	 * @param compelteGraph
 	 * @return
 	 */
 	public PartialGraphImpl createPartialGraph(Graph completeGraph);
-
 
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
@@ -107,8 +112,8 @@ public interface GraphFactory {
 	 * 
 	 * @param incidenceClass
 	 *            {@link Class}
-	 * @param id           
-	 *            the id of this incidence  
+	 * @param id
+	 *            the id of this incidence
 	 * @param v
 	 *            {@link Vertex} to which the created {@link Incidence} is
 	 *            connected
@@ -117,37 +122,38 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T createIncidence(Class<T> incidenceClass, int id,
-			Vertex v, Edge e);
+	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
+			int id, Vertex v, Edge e);
 
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g);
-	
+
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega);
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
+			Vertex alpha, Vertex omega);
 
 	public void setGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends Graph> implementationClass);
-	
+
 	public void setSubordinateGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends SubordinateGraphImpl> implementationClass);
-	
+
 	public void setViewGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends ViewGraphImpl> implementationClass);
-	
+
 	void setPartialGraphImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends ViewGraphImpl> implementationClass);
-	
+
 	void setPartialSubordinateGraphImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends ViewGraphImpl> implementationClass);
@@ -173,6 +179,5 @@ public interface GraphFactory {
 	 */
 	public void setRecordImplementationClass(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
-
 
 }
