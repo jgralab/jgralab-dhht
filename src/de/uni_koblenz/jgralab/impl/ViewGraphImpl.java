@@ -418,8 +418,7 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public String getUid() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
