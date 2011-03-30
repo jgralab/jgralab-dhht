@@ -124,7 +124,6 @@ public abstract class VertexImpl extends
 		nextVertexInGraph = (VertexImpl) nextVertex;
 	}
 
-
 	/**
 	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
 	 * of all vertices in the graph.
@@ -146,7 +145,6 @@ public abstract class VertexImpl extends
 		lastIncidenceAtVertex = lastIncidence;
 	}
 
-
 	@Override
 	protected void setId(int id) {
 		assert id >= 0;
@@ -160,7 +158,7 @@ public abstract class VertexImpl extends
 		}
 		return getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -174,7 +172,7 @@ public abstract class VertexImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected VertexImpl(int id, Graph graph)  throws RemoteException  {
+	protected VertexImpl(int id, Graph graph) throws RemoteException {
 		super(graph);
 		this.id = id;
 		((CompleteGraphImpl) graph).addVertex(this);
@@ -643,8 +641,6 @@ public abstract class VertexImpl extends
 		graph.putVertexAfter((VertexImpl) v, this);
 	}
 
-
-
 	@Override
 	public int getDegree() {
 		return getDegree(graph.getTraversalContext());
@@ -813,7 +809,7 @@ public abstract class VertexImpl extends
 		if (moved == getFirstIncidence()) {
 			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
 			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex(null);
+					.setPreviousIncidenceAtVertex(null);
 		} else if (moved == getLastIncidence()) {
 			setLastIncidence((IncidenceImpl) moved
 					.getPreviousIncidenceAtVertex());
@@ -824,8 +820,8 @@ public abstract class VertexImpl extends
 					.setNextIncidenceAtVertex((IncidenceImpl) moved
 							.getNextIncidenceAtVertex());
 			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-								.getPreviousIncidenceAtVertex());
+					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
+							.getPreviousIncidenceAtVertex());
 		}
 
 		// insert moved incidence in lambdaSeq immediately after target
@@ -834,7 +830,7 @@ public abstract class VertexImpl extends
 			moved.setNextIncidenceAtVertex(null);
 		} else {
 			((IncidenceImpl) target.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex(moved);
+					.setPreviousIncidenceAtVertex(moved);
 			moved.setNextIncidenceAtVertex((IncidenceImpl) target
 					.getNextIncidenceAtVertex());
 		}
@@ -864,7 +860,7 @@ public abstract class VertexImpl extends
 		if (moved == getFirstIncidence()) {
 			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
 			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex(null);
+					.setPreviousIncidenceAtVertex(null);
 		} else if (moved == getLastIncidence()) {
 			setLastIncidence((IncidenceImpl) moved
 					.getPreviousIncidenceAtVertex());
@@ -875,8 +871,8 @@ public abstract class VertexImpl extends
 					.setNextIncidenceAtVertex((IncidenceImpl) moved
 							.getNextIncidenceAtVertex());
 			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-								.getPreviousIncidenceAtVertex());
+					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
+							.getPreviousIncidenceAtVertex());
 		}
 
 		// insert moved incidence in lambdaSeq immediately before target
@@ -898,7 +894,7 @@ public abstract class VertexImpl extends
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;
 		assert i.getVertex() != this;
-		i.setIncidentVertex((VertexImpl) this);
+		i.setIncidentVertex(this);
 		i.setNextIncidenceAtVertex(null);
 		if (getFirstIncidence() == null) {
 			setFirstIncidence(i);
@@ -918,7 +914,7 @@ public abstract class VertexImpl extends
 		if (i == getFirstIncidence()) {
 			// delete at head of incidence list
 			setFirstIncidence((IncidenceImpl) i.getNextIncidenceAtVertex());
-			if (getFirstIncidence() != null ) {
+			if (getFirstIncidence() != null) {
 				((IncidenceImpl) getFirstIncidence())
 						.setPreviousIncidenceAtVertex(null);
 			}
@@ -939,8 +935,8 @@ public abstract class VertexImpl extends
 					.setNextIncidenceAtVertex((IncidenceImpl) i
 							.getNextIncidenceAtVertex());
 			((IncidenceImpl) i.getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex((IncidenceImpl) i
-								.getPreviousIncidenceAtVertex());
+					.setPreviousIncidenceAtVertex((IncidenceImpl) i
+							.getPreviousIncidenceAtVertex());
 		}
 		// delete incidence
 		i.setIncidentVertex(null);
@@ -1100,7 +1096,8 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public List<? extends Vertex> getAdjacences(Graph traversalContext, String role) {
+	public List<? extends Vertex> getAdjacences(Graph traversalContext,
+			String role) {
 		return getAdjacences(getIncidenceClassForRolename(role));
 	}
 
@@ -1264,11 +1261,20 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public <T extends Incidence> T connect(Class<T> incidenceClass, 
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect) {
 		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass, id,
-				this, elemToConnect);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+				id, this, elemToConnect);
 	}
 
+	@Override
+	protected void addFirstSubordinateEdge(Edge appendix) {
+		return;
+	}
+
+	@Override
+	protected void addFirstSubordinateVertex(Vertex appendix) {
+		appendix.putAfter(this);
+	}
 }

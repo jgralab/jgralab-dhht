@@ -1009,7 +1009,10 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
-		return vertex.connect(cls, edge);
+		T newIncidence = vertex.connect(cls, edge);
+		((GraphElementImpl<?, ?, ?>) vertex)
+				.updateSubordinateGraphs(newIncidence);
+		return newIncidence;
 	}
 
 	protected abstract void setICount(int count);

@@ -42,6 +42,7 @@ import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
@@ -65,6 +66,11 @@ public abstract class SubordinateGraphImpl extends
 	// TODO: Check if the respective methods are really
 	// needed in the graph interface and how to ensure, that
 	// the variables reflect the number of elements in the subgraphs
+	/*
+	 * If a vertex or edge is added to this subordinate graph, these values are
+	 * updated automatically. If an Incidence is created iCount is updated
+	 * automatically.
+	 */
 	private int vCount;
 
 	private int eCount;
@@ -511,8 +517,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	// TODO: Check if these methods should return the type of the vertex or edge
-	// the
-	// subordinate graph is embedded in
+	// the subordinate graph is embedded in
 	@Override
 	public GraphClass getGraphClass() {
 		return getSuperordinateGraph().getGraphClass();
@@ -520,5 +525,26 @@ public abstract class SubordinateGraphImpl extends
 
 	public Class<? extends Graph> getM1Class() {
 		return getSuperordinateGraph().getM1Class();
+	}
+
+	public void update(Vertex newLastVertex) {
+		if (getFirstVertex() == null) {
+			setFirstVertex((VertexImpl) newLastVertex);
+		}
+		setLastVertex((VertexImpl) newLastVertex);
+		setVCount(getVCount() + 1);
+	}
+
+	public void update(Edge newLastEdge) {
+		if (getFirstEdge() == null) {
+			setFirstEdge((EdgeImpl) newLastEdge);
+		}
+		setLastEdge((EdgeImpl) newLastEdge);
+		setECount(getECount() + 1);
+		setICount(getICount() + newLastEdge.getDegree());
+	}
+
+	public void update(Incidence newIncidence) {
+		setICount(getICount() + 1);
 	}
 }

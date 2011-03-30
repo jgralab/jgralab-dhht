@@ -81,7 +81,6 @@ public abstract class EdgeImpl extends
 		setId(anId);
 		((CompleteGraphImpl) graph).addEdge(this);
 	}
-	
 
 	@Override
 	public Vertex addAdjacence(IncidenceClass incidentIc,
@@ -118,7 +117,7 @@ public abstract class EdgeImpl extends
 	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;
 		assert i.getEdge() != this;
-		i.setIncidentEdge((EdgeImpl) this);
+		i.setIncidentEdge(this);
 		i.setNextIncidenceAtEdge(null);
 		if (getFirstIncidence() == null) {
 			setFirstIncidence(i);
@@ -145,8 +144,8 @@ public abstract class EdgeImpl extends
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass, id,
-				elemToConnect, this);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+				id, elemToConnect, this);
 	}
 
 	@Override
@@ -164,7 +163,6 @@ public abstract class EdgeImpl extends
 		assert isValid() : this + " is not valid!";
 		graph.deleteEdge(this);
 	}
-
 
 	@Override
 	public List<? extends Edge> getAdjacences(Graph traversalContext,
@@ -185,8 +183,10 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public List<? extends Edge> getAdjacences(Graph traversalContext, String role) {
-		return getAdjacences(traversalContext, getIncidenceClassForRolename(role));
+	public List<? extends Edge> getAdjacences(Graph traversalContext,
+			String role) {
+		return getAdjacences(traversalContext,
+				getIncidenceClassForRolename(role));
 	}
 
 	@Override
@@ -200,7 +200,6 @@ public abstract class EdgeImpl extends
 				getIncidenceClassForRolename(role));
 	}
 
-	
 	@Override
 	public Iterable<Vertex> getAlphaVertices() {
 		return new IncidentVertexIterable<Vertex>(this,
@@ -782,7 +781,6 @@ public abstract class EdgeImpl extends
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
-
 	@Override
 	public Edge getPreviousEdge() {
 		return getPreviousEdge(getGraph().getTraversalContext());
@@ -901,7 +899,7 @@ public abstract class EdgeImpl extends
 		if (moved == getFirstIncidence()) {
 			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
 			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge(null);
+					.setPreviousIncidenceAtEdge(null);
 		} else if (moved == getLastIncidence()) {
 			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
 			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
@@ -911,8 +909,8 @@ public abstract class EdgeImpl extends
 					.setNextIncidenceAtVertex((IncidenceImpl) moved
 							.getNextIncidenceAtEdge());
 			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge((IncidenceImpl) moved
-								.getPreviousIncidenceAtEdge());
+					.setPreviousIncidenceAtEdge((IncidenceImpl) moved
+							.getPreviousIncidenceAtEdge());
 		}
 
 		// insert moved incidence in lambdaSeq immediately after target
@@ -921,7 +919,7 @@ public abstract class EdgeImpl extends
 			moved.setNextIncidenceAtEdge(null);
 		} else {
 			((IncidenceImpl) target.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge(moved);
+					.setPreviousIncidenceAtEdge(moved);
 			moved.setNextIncidenceAtEdge((IncidenceImpl) target
 					.getNextIncidenceAtEdge());
 		}
@@ -950,7 +948,7 @@ public abstract class EdgeImpl extends
 		if (moved == getFirstIncidence()) {
 			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
 			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge(null);
+					.setPreviousIncidenceAtEdge(null);
 		} else if (moved == getLastIncidence()) {
 			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
 			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
@@ -959,9 +957,9 @@ public abstract class EdgeImpl extends
 			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
 					.setNextIncidenceAtEdge((IncidenceImpl) moved
 							.getNextIncidenceAtEdge());
-				((IncidenceImpl) moved.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge((IncidenceImpl) moved
-								.getPreviousIncidenceAtEdge());
+			((IncidenceImpl) moved.getNextIncidenceAtEdge())
+					.setPreviousIncidenceAtEdge((IncidenceImpl) moved
+							.getPreviousIncidenceAtEdge());
 		}
 
 		// insert moved incidence in lambdaSeq immediately before target
@@ -1061,8 +1059,8 @@ public abstract class EdgeImpl extends
 					.setNextIncidenceAtEdge((IncidenceImpl) i
 							.getNextIncidenceAtEdge());
 			((IncidenceImpl) i.getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge((IncidenceImpl) i
-								.getPreviousIncidenceAtEdge());
+					.setPreviousIncidenceAtEdge((IncidenceImpl) i
+							.getPreviousIncidenceAtEdge());
 		}
 		// delete incidence
 		i.setIncidentEdge(null);
@@ -1098,7 +1096,6 @@ public abstract class EdgeImpl extends
 		nextEdgeInGraph = (EdgeImpl) nextEdge;
 	}
 
-
 	/**
 	 * Puts <code>prevEdge</code> before this {@link Edge} in the sequence of
 	 * all edges in the graph.
@@ -1109,8 +1106,6 @@ public abstract class EdgeImpl extends
 	protected void setPreviousEdge(Edge prevEdge) {
 		prevEdgeInGraph = (EdgeImpl) prevEdge;
 	}
-
-
 
 	@Override
 	public void sortIncidences(Comparator<Incidence> comp) {
@@ -1253,6 +1248,16 @@ public abstract class EdgeImpl extends
 	public String toString() {
 		assert isValid();
 		return "+e" + id + ": " + getType().getQualifiedName();
+	}
+
+	@Override
+	protected void addFirstSubordinateEdge(Edge appendix) {
+		appendix.putAfter(this);
+	}
+
+	@Override
+	protected void addFirstSubordinateVertex(Vertex appendix) {
+		return;
 	}
 
 }
