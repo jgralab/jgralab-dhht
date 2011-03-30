@@ -62,38 +62,36 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 /**
  * Base class for all graph implementations
  * 
- * TODO
- *  - Implement connect operation between elements of different partial graphs
+ * TODO - Implement connect operation between elements of different partial
+ * graphs
  * 
  * @author ist@uni-koblenz.de
  */
 public abstract class GraphBaseImpl implements Graph {
-	
-	static final int PARTIAL_GRAPH_MASK = 0xff000000; 
-	
+
+	static final int PARTIAL_GRAPH_MASK = 0xff000000;
+
 	static final int LOCAL_ELEMENT_MASK = 0xffffffff ^ PARTIAL_GRAPH_MASK;
-		
+
 	public static final int getLocalId(int graphElementId) {
 		return graphElementId & LOCAL_ELEMENT_MASK;
 	}
-	
+
 	public static final int getPartialGraphId(int graphElementId) {
 		return graphElementId & PARTIAL_GRAPH_MASK;
 	}
-	
+
 	public static final int getGlobalId(int partialGraphId, int localElementId) {
 		assert getPartialGraphId(localElementId) == 0;
 		return partialGraphId & localElementId;
 	}
-	
-	
+
 	// ------------- PARTIAL GRAPH VARIABLES ------------
-	
+
 	protected List<PartialGraphImpl> partialGraphs = null;
-	
-	
+
 	// ------------- VERTEX LIST VARIABLES -------------
-	
+
 	private VertexImpl firstVertex;
 	private VertexImpl lastVertex;
 
@@ -101,12 +99,12 @@ public abstract class GraphBaseImpl implements Graph {
 	 * number of vertices in the graph
 	 */
 	abstract protected void setVCount(int count);
-	
+
 	@Override
 	public Vertex getFirstVertex() {
 		return firstVertex;
 	}
-	
+
 	@Override
 	public Vertex getLastVertex() {
 		return lastVertex;
@@ -132,10 +130,10 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param vertexListVersion
 	 *            Version of VSeq.
 	 */
-	//abstract protected void setVertexListVersion(long vertexListVersion);
+	// abstract protected void setVertexListVersion(long vertexListVersion);
 
 	// ------------- EDGE LIST VARIABLES -------------
-	
+
 	private EdgeImpl firstEdge;
 	private EdgeImpl lastEdge;
 
@@ -143,7 +141,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * number of edges in the graph
 	 */
 	abstract protected void setECount(int count);
-	
+
 	@Override
 	public Edge getFirstEdge() {
 		return firstEdge;
@@ -174,7 +172,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param edgeListVersion
 	 *            Version to set.
 	 */
-	//abstract protected void setEdgeListVersion(long edgeListVersion);
+	// abstract protected void setEdgeListVersion(long edgeListVersion);
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -223,15 +221,13 @@ public abstract class GraphBaseImpl implements Graph {
 		setECount(0);
 	}
 
-	
 	/*
 	 * Sets <code>traversalContext</code> as the traversal context.
 	 * 
-	 * @param traversalContext
-	 *            {@link Graph}
+	 * @param traversalContext {@link Graph}
 	 */
 	protected void setTraversalContext(Graph traversalContext) {
-		((GraphBaseImpl)getCompleteGraph()).setTraversalContext(traversalContext);
+		(getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
@@ -241,8 +237,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void useAsTraversalContext() {
-		((GraphBaseImpl)getCompleteGraph()).setTraversalContext(this);
-	//	getCompleteGraph().useAsTraversalContext();
+		(getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
@@ -352,13 +347,9 @@ public abstract class GraphBaseImpl implements Graph {
 		return getGraphFactory().createVertex(cls, 0, this);
 	}
 
-	
 	protected abstract void edgeListModified();
-	
-	
+
 	protected abstract void vertexListModified();
-
-
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
@@ -381,7 +372,7 @@ public abstract class GraphBaseImpl implements Graph {
 					return currentEdge;
 				}
 			}
-			currentEdge = currentEdge.getNextEdge();
+			currentEdge = currentEdge.getNextEdge(this);
 		}
 		return null;
 	}
@@ -397,7 +388,6 @@ public abstract class GraphBaseImpl implements Graph {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
-
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
@@ -422,7 +412,7 @@ public abstract class GraphBaseImpl implements Graph {
 				return firstVertex;
 			}
 		}
-		return firstVertex.getNextVertex(vertexClass, noSubclasses);
+		return firstVertex.getNextVertex(this, vertexClass, noSubclasses);
 	}
 
 	@Override
@@ -442,14 +432,11 @@ public abstract class GraphBaseImpl implements Graph {
 		return getType();
 	}
 
-
 	@Override
 	abstract public int getVCount();
 
 	@Override
 	abstract public long getVertexListVersion();
-
-
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
@@ -465,16 +452,14 @@ public abstract class GraphBaseImpl implements Graph {
 	public boolean isVertexListModified(long previousVersion) {
 		return getVertexListVersion() != previousVersion;
 	}
-	
+
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
 	 * graph is changed, all changes like adding, creating and reordering of
 	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change. 
+	 * vertex are treated as a change.
 	 */
 	public abstract void graphModified();
-
-
 
 	@Override
 	public Iterable<Vertex> getVertices() {
@@ -524,9 +509,9 @@ public abstract class GraphBaseImpl implements Graph {
 					assert (last == null);
 					last = v;
 				} else {
-				//	if (!hasSavememSupport()) {
-						v.setPreviousVertex(last);
-				//	}
+					// if (!hasSavememSupport()) {
+					v.setPreviousVertex(last);
+					// }
 					last.setNextVertex(v);
 					last = v;
 				}
@@ -546,9 +531,9 @@ public abstract class GraphBaseImpl implements Graph {
 				}
 				out = first;
 				first = (VertexImpl) out.getNextVertex();
-			//	if (!hasSavememSupport()) {
-					first.setPreviousVertex(null);
-			//	}
+				// if (!hasSavememSupport()) {
+				first.setPreviousVertex(null);
+				// }
 				return out;
 			}
 
@@ -665,9 +650,9 @@ public abstract class GraphBaseImpl implements Graph {
 					assert (last == null);
 					last = e;
 				} else {
-			//		if (!hasSavememSupport()) {
-						e.setPreviousEdge(last);
-			//		}
+					// if (!hasSavememSupport()) {
+					e.setPreviousEdge(last);
+					// }
 					last.setNextEdge(e);
 					last = e;
 				}
@@ -687,9 +672,9 @@ public abstract class GraphBaseImpl implements Graph {
 				}
 				out = first;
 				first = (EdgeImpl) out.getNextEdge();
-			//	if (!hasSavememSupport()) {
-					first.setPreviousEdge(null);
-			//	}
+				// if (!hasSavememSupport()) {
+				first.setPreviousEdge(null);
+				// }
 				return out;
 			}
 
@@ -1028,25 +1013,27 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	protected abstract void setICount(int count);
-	
 
-    @Override
+	@Override
 	public Graph createPartialGraph(String hostname) {
-		JGraLabServer remote = JGraLabServerImpl.getLocalInstance().getRemoteInstance(hostname);
+		JGraLabServer remote = JGraLabServerImpl.getLocalInstance()
+				.getRemoteInstance(hostname);
 		Schema s = remote.getSchema(getSchema().getQualifiedName());
-		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(this);
-		
+		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(
+				this);
+
 		if (partialGraphs == null) {
 			partialGraphs = new ArrayList<PartialGraphImpl>();
 		}
 		partialGraphs.add(partialGraph);
-		
+
 		return partialGraph;
 	}
-	
+
 	/**
 	 * 
-	 * @return the list of partial graphs directly and indirectly contained in this graph
+	 * @return the list of partial graphs directly and indirectly contained in
+	 *         this graph
 	 */
 	public List<PartialGraphImpl> getPartialGraphs() {
 		LinkedList<PartialGraphImpl> list = new LinkedList<PartialGraphImpl>();
@@ -1059,45 +1046,47 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		if (containsEdgeLocally(e))
+		if (containsEdgeLocally(e)) {
 			return true;
-		return e.getContainingGraph().isPartOfGraph(this) && e.getContainingGraph().containsEdge(e);
+		}
+		return e.getContainingGraph().isPartOfGraph(this)
+				&& e.getContainingGraph().containsEdge(e);
 	}
-
 
 	@Override
 	public boolean containsVertex(Vertex v) {
-		if (containsVertexLocally(v))
+		if (containsVertexLocally(v)) {
 			return true;
-		return v.getContainingGraph().isPartOfGraph(this)  && v.getContainingGraph().containsVertex(v);
+		}
+		return v.getContainingGraph().isPartOfGraph(this)
+				&& v.getContainingGraph().containsVertex(v);
 	}
-	
+
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getParentDistributedGraph() ;
-	
+	public abstract GraphBaseImpl getParentDistributedGraph();
+
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
 	public abstract GraphBaseImpl getSuperordinateGraph();
-	
+
 	/**
-	 * @return the complete top-level DHHTGraph 
+	 * @return the complete top-level DHHTGraph
 	 */
 	public abstract GraphBaseImpl getCompleteGraph();
-	
-	
+
 	/**
-	 * checks if the vertex v is contained directly in this graph,
-	 * ant not as a member of one of its partial graphs
+	 * checks if the vertex v is contained directly in this graph, ant not as a
+	 * member of one of its partial graphs
 	 */
 	public abstract boolean containsVertexLocally(Vertex v);
-	
+
 	/**
-	 * checks if the edge e is contained directly in this graph,
-	 * ant not as a member of one of its partial graphs
+	 * checks if the edge e is contained directly in this graph, ant not as a
+	 * member of one of its partial graphs
 	 */
 	public abstract boolean containsEdgeLocally(Edge e);
-	
+
 }
