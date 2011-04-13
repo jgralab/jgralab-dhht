@@ -20,7 +20,7 @@ public abstract class PartialSubordinateGraphImpl extends PartialGraphImpl {
 	private GraphElement containingElement;
 	
 	protected PartialSubordinateGraphImpl(String id, GraphClass cls, GraphElement elem) {
-		super(id, cls, elem.getGraph());
+		super(cls, (GraphBaseImpl)elem.getGraph());
 		containingElement = elem;
 	}
 	

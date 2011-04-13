@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -43,6 +44,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -735,6 +737,46 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
 
 	}
+	
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		T record = graphFactory.createRecord(recordClass, this);
+		record.setComponentValues(fields);
+		return record;
+	}
+
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		return false;
+	}
+
+	@Override
+	public int getId() {
+		return id;
+	}
+
+	@Override
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+
+	@Override
+	protected void vertexListModified() {
+		vertexListVersion++;
+	}
+
+	@Override
+	public GraphBaseImpl getParentDistributedGraph() {
+		return this;
+	}
+
+	@Override
+	public GraphBaseImpl getSuperordinateGraph() {
+		return this;
+	}
+	
 	
 
 

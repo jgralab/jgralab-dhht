@@ -141,7 +141,7 @@ public abstract class SubordinateGraphImpl extends
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
 	protected SubordinateGraphImpl(Vertex containingVertex) {
-		super(containingVertex.getGraph().getUid(), containingVertex.getGraph()
+		super(containingVertex.getGraph()
 				.getType());
 		initializeCommonFields(containingVertex);
 
@@ -183,7 +183,7 @@ public abstract class SubordinateGraphImpl extends
 	 *            {@link Edge} which contains this subordinate graph
 	 */
 	protected SubordinateGraphImpl(Edge containingEdge) {
-		super(containingEdge.getGraph().getUid(), containingEdge.getGraph()
+		super(containingEdge.getGraph()
 				.getType());
 		initializeCommonFields(containingEdge);
 

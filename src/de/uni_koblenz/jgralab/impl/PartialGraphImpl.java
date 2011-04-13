@@ -122,6 +122,11 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 
 
+	private void internalDeleteEdge(Edge e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public String getUid() {
 		return getCompleteGraph().getUid();
