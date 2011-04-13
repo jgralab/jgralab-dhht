@@ -59,8 +59,8 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(#connectedVertexClass# vertex, #connectedEdgeClass# edge) {",
-						"\tsuper((VertexImpl)vertex, (EdgeImpl)edge);"));
+						"public #simpleClassName#Impl(int id, #connectedVertexClass# vertex, #connectedEdgeClass# edge) {",
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;

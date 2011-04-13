@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -853,7 +854,7 @@ public class GraphIO {
 	}
 
 	private int getLambdaPositionOfIncidenceAtEdge(Incidence nextI,
-			BooleanGraphMarker subGraph) {
+			BooleanGraphMarker subGraph) throws RemoteException {
 		int position = 1;
 		Incidence currentI = nextI.getPreviousIncidenceAtEdge();
 		while (currentI != null) {
@@ -2819,7 +2820,12 @@ public class GraphIO {
 			}
 		}
 
-		sortLambdaSequenceAtVertex(graph);
+		try {
+			sortLambdaSequenceAtVertex(graph);
+		} catch (RemoteException ex) {
+			//TODO 
+			ex.printStackTrace();
+		}
 
 		graph.setGraphVersion(graphVersion);
 		if (pf != null) {
@@ -2829,8 +2835,8 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph) {
-		for (Vertex v : graph.getVertices()) {
+	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph)  throws RemoteException {
+		for (Vertex v : graph.getVertices())  {
 			Incidence firstUnsorted = v.getFirstIncidence();
 			for (Integer[] incArray : incidencesAtVertex[v.getId()]) {
 				if (incArray == null) {

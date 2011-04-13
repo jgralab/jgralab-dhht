@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -46,28 +48,28 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Direction}
 	 */
-	public Direction getDirection();
+	public Direction getDirection() throws RemoteException;
 
 	/**
 	 * Returns the graph containing this {@link GraphElement}.
 	 * 
 	 * @return {@link Graph} containing this {@link GraphElement}
 	 */
-	public Graph getGraph();
+	public Graph getGraph() throws RemoteException;
 
 	/**
 	 * Returns the {@link Edge} to which this {@link Incidence} is connected.
 	 * 
 	 * @return {@link Edge}
 	 */
-	public Edge getEdge();
+	public Edge getEdge() throws RemoteException;
 
 	/**
 	 * Returns the {@link Vertex} to which this {@link Incidence} is connected.
 	 * 
 	 * @return {@link Vertex}
 	 */
-	public Vertex getVertex();
+	public Vertex getVertex() throws RemoteException;
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -77,7 +79,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtEdge();
+	public Incidence getNextIncidenceAtEdge() throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -86,7 +88,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtEdge(Direction direction);
+	public Incidence getNextIncidenceAtEdge(Direction direction) throws RemoteException;
 
 	/**
 	 * Gets the next {@link Incidence} at the current {@link Edge}, which has
@@ -112,7 +114,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *         <code>thisIncidence == false</code>) side.
 	 */
 	public Incidence getNextIncidenceAtEdge(boolean thisIncidence,
-			IncidenceType... incidenceTypes);
+			IncidenceType... incidenceTypes) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -121,7 +123,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            instance of
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass);
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -130,7 +132,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass);
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -143,7 +145,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -155,7 +157,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -169,7 +171,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -182,7 +184,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -199,7 +201,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses);
+			Direction direction, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -216,7 +218,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -228,7 +230,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext);
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -240,7 +242,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Gets the next {@link Incidence} at the current {@link Edge}, which has
@@ -268,7 +270,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *         <code>thisIncidence == false</code>) side.
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidenceTypes);
+			boolean thisIncidence, IncidenceType... incidenceTypes) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -280,7 +282,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass);
+			IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -291,7 +293,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass);
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -306,7 +308,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -320,7 +322,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -336,7 +338,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses);
+			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -351,7 +353,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -371,7 +373,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -390,7 +392,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -400,7 +402,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtVertex();
+	public Incidence getNextIncidenceAtVertex() throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -409,7 +411,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtVertex(Direction direction);
+	public Incidence getNextIncidenceAtVertex(Direction direction) throws RemoteException;
 
 	/**
 	 * Gets the next {@link Incidence} at the current {@link Vertex}, which has
@@ -435,7 +437,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *         <code>thisIncidence == false</code>) side.
 	 */
 	public Incidence getNextIncidenceAtVertex(boolean thisIncidence,
-			IncidenceType... incidenceTypes);
+			IncidenceType... incidenceTypes) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -444,7 +446,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            instance of
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass);
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -453,7 +455,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass);
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -466,7 +468,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -478,7 +480,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -492,7 +494,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -505,7 +507,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -522,7 +524,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses);
+			Direction direction, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -539,7 +541,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -551,7 +553,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext);
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -563,7 +565,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Gets the next {@link Incidence} at the current {@link Vertex}, which has
@@ -590,7 +592,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *         <code>thisIncidence == false</code>) side.
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidenceTypes);
+			boolean thisIncidence, IncidenceType... incidenceTypes) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -602,7 +604,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass);
+			IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -613,7 +615,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass);
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -628,7 +630,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -642,7 +644,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -658,7 +660,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses);
+			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -673,7 +675,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Incidence}
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -693,7 +695,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -712,7 +714,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
@@ -722,7 +724,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getPreviousIncidenceAtEdge();
+	public Incidence getPreviousIncidenceAtEdge() throws RemoteException;
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
@@ -734,7 +736,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext);
+	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
@@ -744,7 +746,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getPreviousIncidenceAtVertex();
+	public Incidence getPreviousIncidenceAtVertex() throws RemoteException;
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all
@@ -756,7 +758,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext);
+	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
@@ -765,7 +767,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getTheseEdges();
+	public Iterable<Edge> getTheseEdges() throws RemoteException;
 
 	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
@@ -776,7 +778,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getTheseEdges(Graph traversalContext);
+	public Iterable<Edge> getTheseEdges(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
@@ -785,7 +787,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getThoseEdges();
+	public Iterable<Edge> getThoseEdges() throws RemoteException;
 
 	/**
 	 * Returns the sequence of all {@link Edge}s which are connected to
@@ -796,7 +798,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Edge}&gt;
 	 */
-	public Iterable<Edge> getThoseEdges(Graph traversalContext);
+	public Iterable<Edge> getThoseEdges(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}.
@@ -805,7 +807,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @throws UnsupportedOpperationException
 	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
-	public Vertex getThis();
+	public Vertex getThis() throws RemoteException;
 
 	/**
 	 * Returns {@link Incidence#getVertex()} of a binary {@link Edge}.
@@ -816,7 +818,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @throws UnsupportedOpperationException
 	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
-	public Vertex getThis(Graph traversalContext);
+	public Vertex getThis(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all vertices, which are connected to
@@ -825,7 +827,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getTheseVertices();
+	public Iterable<Vertex> getTheseVertices() throws RemoteException;
 
 	/**
 	 * Returns a sequence of all vertices, which are connected to
@@ -836,7 +838,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getTheseVertices(Graph traversalContext);
+	public Iterable<Vertex> getTheseVertices(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the {@link Vertex} which is at the other end of a binary
@@ -846,7 +848,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @throws UnsupportedOpperationException
 	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
-	public Vertex getThat();
+	public Vertex getThat() throws RemoteException;
 
 	/**
 	 * Returns the {@link Vertex} which is at the other end of a binary
@@ -858,7 +860,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @throws UnsupportedOpperationException
 	 *             if {@link Incidence#getEdge()} is not binary.
 	 */
-	public Vertex getThat(Graph traversalContext);
+	public Vertex getThat(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns a sequence of all vertices, which are connected to
@@ -867,7 +869,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getThoseVertices();
+	public Iterable<Vertex> getThoseVertices() throws RemoteException;
 
 	/**
 	 * Returns a sequence of all vertices, which are connected to
@@ -878,14 +880,14 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getThoseVertices(Graph traversalContext);
+	public Iterable<Vertex> getThoseVertices(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the m1-class of this {@link Incidence}.
 	 * 
 	 * @return {@link Class}
 	 */
-	public Class<? extends Incidence> getM1Class();
+	public Class<? extends Incidence> getM1Class() throws RemoteException;
 
 	/**
 	 * The semanctics of this {@link Incidence}, e.g. {@link IncidenceType#EDGE}
@@ -893,7 +895,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getThisSemantics();
+	public IncidenceType getThisSemantics() throws RemoteException;
 
 	/**
 	 * The semanctics of that {@link Incidence}, e.g. {@link IncidenceType#EDGE}
@@ -901,7 +903,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getThatSemantics();
+	public IncidenceType getThatSemantics() throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link Incidence} is before
@@ -912,7 +914,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isBeforeAtVertex(Incidence i);
+	public boolean isBeforeAtVertex(Incidence i) throws RemoteException;
 
 	/**
 	 * Puts this {@link Incidence} immediately before <code>i</code> in the
@@ -921,7 +923,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @param i
 	 *            {@link Incidence}
 	 */
-	public void putBeforeAtVertex(Incidence i);
+	public void putBeforeAtVertex(Incidence i) throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link Incidence} is after
@@ -932,7 +934,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isAfterAtVertex(Incidence i);
+	public boolean isAfterAtVertex(Incidence i) throws RemoteException;
 
 	/**
 	 * Puts this {@link Incidence} immediately after <code>i</code> in the
@@ -941,7 +943,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @param i
 	 *            {@link Incidence}
 	 */
-	public void putAfterAtVertex(Incidence i);
+	public void putAfterAtVertex(Incidence i) throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link Incidence} is before
@@ -952,7 +954,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isBeforeAtEdge(Incidence i);
+	public boolean isBeforeAtEdge(Incidence i) throws RemoteException;
 
 	/**
 	 * Puts this {@link Incidence} immediately before <code>i</code> in the
@@ -961,7 +963,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @param i
 	 *            {@link Incidence}
 	 */
-	public void putBeforeAtEdge(Incidence i);
+	public void putBeforeAtEdge(Incidence i) throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link Incidence} is after
@@ -972,7 +974,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            {@link Incidence}
 	 * @return boolean
 	 */
-	public boolean isAfterAtEdge(Incidence i);
+	public boolean isAfterAtEdge(Incidence i) throws RemoteException;
 
 	/**
 	 * Puts this {@link Incidence} immediately after <code>i</code> in the
@@ -981,11 +983,11 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @param i
 	 *            {@link Incidence}
 	 */
-	public void putAfterAtEdge(Incidence i);
+	public void putAfterAtEdge(Incidence i) throws RemoteException;
 
 	/**
 	 * @return the ID of this incidence which is unique in the graph
 	 */
-	public int getId();
+	public int getId() throws RemoteException;
 
 }

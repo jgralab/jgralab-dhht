@@ -146,18 +146,14 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
 		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
+		
 
 		if ((packageName != null) && !packageName.equals("")) {
-			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."
-					+ packageName);
-			// schema implementation packages (standard, savemem and for
-			// transaction)
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl." + packageName);
+			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."	+ packageName);
+			rootBlock.setVariable("schemaImplPackage", schemaRootPackageName + ".impl." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl");
+			rootBlock.setVariable("schemaImplPackage", schemaRootPackageName + ".impl");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
 		rootBlock.setVariable("isImplementationClassOnly", "false");
@@ -230,8 +226,7 @@ public abstract class CodeGenerator {
 		// String className = rootBlock.getVariable("className");
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
-		String simpleImplClassName = rootBlock
-				.getVariable("simpleImplClassName");
+		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -249,10 +244,8 @@ public abstract class CodeGenerator {
 						+ schemaPackage);
 			}
 			if (currentCycle.isStdImpl()) {
-				schemaImplPackage = rootBlock
-							.getVariable("schemaImplStdPackage");
-					logger
-							.finer(" - schemaImplStdPackage="
+				schemaImplPackage = rootBlock.getVariable("schemaImplPackage");
+					logger.finer(" - schemaImplPackage="
 									+ schemaImplPackage);
 				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",
 						schemaImplPackage);
@@ -337,8 +330,7 @@ public abstract class CodeGenerator {
 	public Vector<JavaSourceFromString> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(
-				2);
+		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {

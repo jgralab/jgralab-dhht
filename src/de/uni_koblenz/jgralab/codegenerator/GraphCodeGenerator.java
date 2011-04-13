@@ -69,7 +69,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isStdImpl()) {
-			addImports("#jgImplStdPackage#.#baseClassName#");
+			addImports("#jgImplPackage#.#baseClassName#");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
 			addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
 		//	addImports("java.util.List");
@@ -325,14 +325,14 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
 			}
 			code.add(" */",
-							"public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#);");
+					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#);");
+		} else {
+			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
+					"\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
+				 	"}");
+			code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
 		}
-		code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
-				 "\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
-				 "}");
 		code.setVariable("formalParams", (withTypeFlag ? "boolean noSubClasses"	: ""));
-		code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
-
 		return code;
 	}
 

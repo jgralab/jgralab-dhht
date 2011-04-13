@@ -85,6 +85,7 @@ import de.uni_koblenz.jgralab.schema.DoubleDomain;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.ListDomain;
@@ -909,11 +910,14 @@ public class SchemaImpl implements Schema {
 	@Override
 	public AttributedElementClass<?, ?> getAttributedElementClass(
 			String qualifiedName) {
+		System.out.println("Searching graph element class: " + qualifiedName);
 		if (graphClass == null) {
 			return null;
 		} else if (graphClass.getQualifiedName().equals(qualifiedName)) {
 			return graphClass;
 		} else {
+			GraphElementClass gc =  graphClass.getGraphElementClass(qualifiedName);
+			System.out.println("Returning graph element class: " + gc.getQualifiedName());
 			return graphClass.getGraphElementClass(qualifiedName);
 		}
 	}

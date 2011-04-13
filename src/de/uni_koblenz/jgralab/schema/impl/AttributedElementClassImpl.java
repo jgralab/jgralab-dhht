@@ -68,6 +68,7 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 
 	@Override
 	public void addAttribute(Attribute anAttribute) {
+		System.out.println("Adding attribute " + anAttribute.getName() + " to class " + this.getQualifiedName());
 		if (containsAttribute(anAttribute.getName())) {
 			throw new DuplicateAttributeException(anAttribute.getName(),
 					getQualifiedName());

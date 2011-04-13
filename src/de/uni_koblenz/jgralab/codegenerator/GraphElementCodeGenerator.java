@@ -58,9 +58,10 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
+		addImports("java.rmi.RemoteException");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) {",
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) throws RemoteException {",
 						"\tsuper(id, g);"));
 		if (hasDefaultAttributeValues()) {
 			code.addNoIndent(new CodeSnippet("\tinitializeAttributesWithDefaultValues();"));

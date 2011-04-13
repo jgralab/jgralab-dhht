@@ -79,7 +79,6 @@ public class SchemaCodeGenerator extends CodeGenerator {
 			 CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
-System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSupport());
 		rootBlock.setVariable("simpleClassName", schema.getName());
 		rootBlock.setVariable("simpleImplClassName", schema.getName());
 		rootBlock.setVariable("baseClassName", "SchemaImpl");
@@ -574,7 +573,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		code.setVariable("schemaVariable", ic.getVariableName());
 		code.setVariable("icVariable", "ic");
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
-		code.setVariable("icVertexClass", ic.getEdgeClass().getQualifiedName());
+		code.setVariable("icVertexClass", ic.getVertexClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
 		code.setVariable("icRoleName", ic.getRolename() != null ? ic.getRolename() : "");
 		code.setVariable("dir", ic.getDirection().toString());
@@ -696,7 +695,7 @@ System.out.println("CodeGenerator has Database Support: " + config.hasDatabaseSu
 		for (Attribute attr : aec.getOwnAttributeList()) {
 			CodeSnippet s = new CodeSnippet(
 					false,
-					"#aecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
+					"#gecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
 			s.setVariable("attrName", attr.getName());
 			s.setVariable("domainName", attr.getDomain().getQualifiedName());
 			s.setVariable("aecName", aec.getQualifiedName());
