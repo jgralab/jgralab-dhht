@@ -35,7 +35,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public abstract class ViewGraphImpl implements Graph {
+public abstract class ViewGraphImpl implements Graph,
+		GraphStructureChangedListener {
 
 	/**
 	 * the lowest kappa level of the elements which should be visible in this
@@ -47,6 +48,10 @@ public abstract class ViewGraphImpl implements Graph {
 	 * The Graph viewed by this view
 	 */
 	private final Graph viewedGraph;
+
+	private int eCount;
+	private int iCount;
+	private int vCount;
 
 	/**
 	 * Creates a new view graph of the graph <code>viewedGraph</code>, all
@@ -62,6 +67,22 @@ public abstract class ViewGraphImpl implements Graph {
 	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
+		setECount(viewedGraph.getECount());
+		setICount(viewedGraph.getICount());
+		setVCount(viewedGraph.getVCount());
+		getCompleteGraph().addGraphStructureChangedListener(this);
+	}
+
+	protected void setECount(int eCount) {
+		this.eCount = eCount;
+	}
+
+	protected void setICount(int iCount) {
+		this.iCount = iCount;
+	}
+
+	protected void setVCount(int vCount) {
+		this.vCount = vCount;
 	}
 
 	/**
@@ -394,20 +415,17 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public int getVCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return vCount;
 	}
 
 	@Override
 	public int getECount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return eCount;
 	}
 
 	@Override
 	public int getICount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return iCount;
 	}
 
 	@Override
@@ -555,6 +573,60 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public int getGraphStructureChangedListenerCount() {
 		return getCompleteGraph().getGraphStructureChangedListenerCount();
+	}
+
+	@Override
+	public void vertexAdded(Vertex v) {
+		if (containsVertex(v)) {
+			setVCount(getVCount() + 1);
+		}
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v) {
+		if (containsVertex(v)) {
+			setVCount(getVCount() + 1);
+		}
+	}
+
+	@Override
+	public void edgeAdded(Edge e) {
+		if (containsEdge(e)) {
+			setECount(getECount() + 1);
+		}
+	}
+
+	@Override
+	public void edgeDeleted(Edge e) {
+		if (containsEdge(e)) {
+			setECount(getECount() + 1);
+		}
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void maxEdgeCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void maxIncidenceCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void incidenceAdded(Incidence i) {
+		if (containsEdge(i.getEdge())) {
+			setICount(getICount() + 1);
+		}
+	}
+
+	@Override
+	public void incidenceDeleted(Incidence i) {
+		if (containsEdge(i.getEdge())) {
+			setICount(getICount() + 1);
+		}
 	}
 
 }
