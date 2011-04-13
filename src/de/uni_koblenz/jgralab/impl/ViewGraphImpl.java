@@ -543,14 +543,12 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().sortVertices(comp);
 	}
 
 	@Override
 	public void sortEdges(Comparator<Edge> comp) {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().sortEdges(comp);
 	}
 
 	@Override
