@@ -201,38 +201,32 @@ public abstract class ViewGraphImpl implements Graph {
 
 	@Override
 	public boolean isGraphModified(long previousVersion) {
-		// TODO Auto-generated method stub
-		return false;
+		return getCompleteGraph().isGraphModified(previousVersion);
 	}
 
 	@Override
 	public long getGraphVersion() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getCompleteGraph().getGraphVersion();
 	}
 
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
-		// TODO Auto-generated method stub
-		return false;
+		return getCompleteGraph().isVertexListModified(previousVersion);
 	}
 
 	@Override
 	public long getVertexListVersion() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getCompleteGraph().getVertexListVersion();
 	}
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
-		// TODO Auto-generated method stub
-		return false;
+		return getCompleteGraph().isEdgeListModified(edgeListVersion);
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getCompleteGraph().getEdgeListVersion();
 	}
 
 	@Override
@@ -544,27 +538,23 @@ public abstract class ViewGraphImpl implements Graph {
 	@Override
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().addGraphStructureChangedListener(newListener);
 	}
 
 	@Override
 	public void removeGraphStructureChangedListener(
 			GraphStructureChangedListener listener) {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().removeGraphStructureChangedListener(listener);
 	}
 
 	@Override
 	public void removeAllGraphStructureChangedListeners() {
-		// TODO Auto-generated method stub
-
+		getCompleteGraph().removeAllGraphStructureChangedListeners();
 	}
 
 	@Override
 	public int getGraphStructureChangedListenerCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getCompleteGraph().getGraphStructureChangedListenerCount();
 	}
 
 }

@@ -488,8 +488,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Vertex appendix) {
-		// update must be executed before the new parent of appendix is set
-		updateSubordinateGraphs(appendix);
 		if (getSubordinateGraph().getLastVertex() != null) {
 			appendix.putAfter(getSubordinateGraph().getLastVertex());
 		} else {
@@ -510,8 +508,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public void addSubordinateElement(Edge appendix) {
-		// update must be executed before the new parent of appendix is set
-		updateSubordinateGraphs(appendix);
 		if (getSubordinateGraph().getLastEdge() != null) {
 			appendix.putAfter(getSubordinateGraph().getLastEdge());
 		} else {
@@ -529,45 +525,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link Edge}
 	 */
 	protected abstract void addFirstSubordinateEdge(Edge appendix);
-
-	private void updateSubordinateGraphs(Vertex movedVertex) {
-		if (isSubordinateGraphObjectAlreadyCreated()) {
-			SubordinateGraphImpl subordinateGraph = (SubordinateGraphImpl) getSubordinateGraph();
-			if (!subordinateGraph.containsVertex(movedVertex)) {
-				subordinateGraph.update(movedVertex);
-			}
-		}
-		if (getParent() != null) {
-			((GraphElementImpl<?, ?, ?>) getParent())
-					.updateSubordinateGraphs(movedVertex);
-		}
-	}
-
-	private void updateSubordinateGraphs(Edge movedEdge) {
-		if (isSubordinateGraphObjectAlreadyCreated()) {
-			SubordinateGraphImpl subordinateGraph = (SubordinateGraphImpl) getSubordinateGraph();
-			if (!subordinateGraph.containsEdge(movedEdge)) {
-				subordinateGraph.update(movedEdge);
-			}
-		}
-		if (getParent() != null) {
-			((GraphElementImpl<?, ?, ?>) getParent())
-					.updateSubordinateGraphs(movedEdge);
-		}
-	}
-
-	void updateSubordinateGraphs(Incidence newIncidence) {
-		if (isSubordinateGraphObjectAlreadyCreated()) {
-			SubordinateGraphImpl subordinateGraph = (SubordinateGraphImpl) getSubordinateGraph();
-			if (subordinateGraph.containsEdge(newIncidence.getEdge())) {
-				subordinateGraph.update(newIncidence);
-			}
-		}
-		if (getParent() != null) {
-			((GraphElementImpl<?, ?, ?>) getParent())
-					.updateSubordinateGraphs(newIncidence);
-		}
-	}
 
 	/**
 	 * Sets {@link #parent} to <code>parent</code>.
