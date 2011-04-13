@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -116,6 +117,12 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public Schema getSchema() {
 		return schema;
+	}
+
+	@Override
+	public int compareTo(Graph o) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

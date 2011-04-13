@@ -60,7 +60,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
 public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	// ------------- GRAPH VARIABLES -------------
-	
+
 	/**
 	 * the unique id of the graph in the schema
 	 */
@@ -77,13 +77,11 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * {@link Graph}.
 	 */
 	private HashMap<Thread, Stack<Graph>> traversalContext;
-	
 
 	@Override
 	public void useAsTraversalContext() {
 		setTraversalContext(this);
 	}
-
 
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -97,8 +95,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		this(id, cls, 1000, 1000);
 	}
 
-
-	
 	/**
 	 * @param id
 	 *            this Graph's id
@@ -121,11 +117,10 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		graphFactory = cls.getSchema().getGraphFactory();
 		id = GraphBaseImpl.PARTIAL_GRAPH_MASK;
 		partialGraphIds = new LinkedList<Integer>();
-		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK+1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
+		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK + 1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
 			partialGraphIds.add(i);
 		}
-		
-		
+
 		expandVertexArray(vMax);
 		setDeleteVertexList(new LinkedList<VertexImpl>());
 
@@ -136,26 +131,24 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * 
 	 */
 	private List<Integer> partialGraphIds = null;
-	
+
 	public int allocateFreePartialGraphId() {
-		if (partialGraphIds.isEmpty())
+		if (partialGraphIds.isEmpty()) {
 			throw new GraphException("No free partial graph ID available");
+		}
 		return partialGraphIds.remove(0);
 	}
-	
+
 	/** should be called by all delete partial graph operations */
 	public void internalDeletePartialGraph(PartialGraphImpl graph) {
 		partialGraphIds.add(graph.getId());
 	}
-	
-
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -202,22 +195,15 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	}
 
-
-
-
-	
 	@Override
 	public CompleteGraphImpl getCompleteGraph() {
 		return this;
 	}
-	
-	
+
 	protected List<VertexImpl> getDeleteVertexList() {
 		return deleteVertexList;
 	}
-	
 
-	
 	@Override
 	public Edge getEdge(int eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
@@ -227,10 +213,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			return null;
 		}
 	}
-	
-
-
-	
 
 	/*
 	 * (non-Javadoc)
@@ -242,10 +224,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		return uid;
 	}
 
-
-
-
-
 	@Override
 	public Graph getTraversalContext() {
 		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
@@ -255,8 +233,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			return stack.peek();
 		}
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -272,8 +248,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			return null;
 		}
 	}
-
-
 
 	/**
 	 * Deletes the edge from the internal structures of this graph.
@@ -326,8 +300,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 					BinaryEdge bedge = (BinaryEdge) edge;
 					if (bedge.getAlpha() == v) {
 						if (bedge.getOmegaSemantics() == IncidenceType.COMPOSITION) {
-							VertexImpl omega = (VertexImpl) bedge
-									.getOmega();
+							VertexImpl omega = (VertexImpl) bedge.getOmega();
 							if ((omega != v) && containsVertex(omega)
 									&& !getDeleteVertexList().contains(omega)) {
 								getDeleteVertexList().add(omega);
@@ -338,8 +311,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 						}
 					} else if (bedge.getOmega() == v) {
 						if (bedge.getAlphaSemantics() == IncidenceType.COMPOSITION) {
-							VertexImpl alpha = (VertexImpl) bedge
-									.getAlpha();
+							VertexImpl alpha = (VertexImpl) bedge.getAlpha();
 							if ((alpha != v) && containsVertex(alpha)
 									&& !getDeleteVertexList().contains(alpha)) {
 								getDeleteVertexList().add(alpha);
@@ -369,10 +341,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		}
 	}
 
-
-
-
-
 	/**
 	 * Modifies eSeq such that the movedEdge is immediately after the
 	 * targetEdge.
@@ -382,8 +350,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	protected void putEdgeAfterInGraph(EdgeImpl targetEdge,
-			EdgeImpl movedEdge) {
+	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -407,8 +374,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		} else {
 			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(movedEdge
 					.getNextEdge());
-			((EdgeImpl) movedEdge.getNextEdge())
-						.setPreviousEdge(movedEdge.getPreviousEdge());
+			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(movedEdge
+					.getPreviousEdge());
 		}
 
 		// insert moved edge in eSeq immediately after target
@@ -416,8 +383,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			setLastEdge(movedEdge);
 			movedEdge.setNextEdge(null);
 		} else {
-			((EdgeImpl) targetEdge.getNextEdge())
-						.setPreviousEdge(movedEdge);
+			((EdgeImpl) targetEdge.getNextEdge()).setPreviousEdge(movedEdge);
 			movedEdge.setNextEdge(targetEdge.getNextEdge());
 		}
 		movedEdge.setPreviousEdge(targetEdge);
@@ -434,8 +400,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge,
-			EdgeImpl movedEdge) {
+	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -456,8 +421,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			setFirstEdge(movedEdge);
 			movedEdge.setPreviousEdge(null);
 		} else {
-			EdgeImpl previousEdge = ((EdgeImpl) targetEdge
-					.getPreviousEdge());
+			EdgeImpl previousEdge = ((EdgeImpl) targetEdge.getPreviousEdge());
 			previousEdge.setNextEdge(movedEdge);
 			movedEdge.setPreviousEdge(previousEdge);
 		}
@@ -498,8 +462,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			newFirstVertex.setPreviousVertex(null);
 		} else if (movedVertex == getLastVertex()) {
 			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
-			((VertexImpl) movedVertex.getPreviousVertex())
-					.setNextVertex(null);
+			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
 		} else {
 			((VertexImpl) movedVertex.getPreviousVertex())
 					.setNextVertex(movedVertex.getNextVertex());
@@ -513,7 +476,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			movedVertex.setNextVertex(null);
 		} else {
 			((VertexImpl) targetVertex.getNextVertex())
-						.setPreviousVertex(movedVertex);
+					.setPreviousVertex(movedVertex);
 			movedVertex.setNextVertex(targetVertex.getNextVertex());
 		}
 		movedVertex.setPreviousVertex(targetVertex);
@@ -548,17 +511,15 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		// remove moved vertex from vSeq
 		if (movedVertex == getFirstVertex()) {
 			setFirstVertex((VertexImpl) movedVertex.getNextVertex());
-			((VertexImpl) movedVertex.getNextVertex())
-						.setPreviousVertex(null);
+			((VertexImpl) movedVertex.getNextVertex()).setPreviousVertex(null);
 		} else if (movedVertex == getLastVertex()) {
 			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
-			((VertexImpl) movedVertex.getPreviousVertex())
-					.setNextVertex(null);
+			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
 		} else {
 			((VertexImpl) movedVertex.getPreviousVertex())
 					.setNextVertex(movedVertex.getNextVertex());
 			((VertexImpl) movedVertex.getNextVertex())
-						.setPreviousVertex(movedVertex.getPreviousVertex());
+					.setPreviousVertex(movedVertex.getPreviousVertex());
 		}
 
 		// insert moved vertex in vSeq immediately before target
@@ -586,7 +547,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			}
 		}
 	}
-	
+
 	/**
 	 * Removes the edge e from the global edge sequence of this graph.
 	 * 
@@ -605,8 +566,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		e.setId(0);
 		setECount(getECount() - 1);
 	}
-
-
 
 	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
 		if (e == getFirstEdge()) {
@@ -628,8 +587,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		} else {
 			// delete somewhere in the middle
 			((EdgeImpl) e.getPreviousEdge()).setNextEdge(e.getNextEdge());
-			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e
-						.getPreviousEdge());
+			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e.getPreviousEdge());
 		}
 	}
 
@@ -662,7 +620,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			((VertexImpl) v.getPreviousVertex()).setNextVertex(v
 					.getNextVertex());
 			((VertexImpl) v.getNextVertex()).setPreviousVertex(v
-						.getPreviousVertex());
+					.getPreviousVertex());
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
 		freeVertexIndex(v.getId());
@@ -673,12 +631,9 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		setVCount(getVCount() - 1);
 	}
 
-
 	protected void setDeleteVertexList(List<VertexImpl> deleteVertexList) {
 		this.deleteVertexList = deleteVertexList;
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -689,18 +644,16 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		this.uid = uid;
 	}
 
-
 	/**
 	 * Changes the graph structure version, should be called whenever the
 	 * structure of the graph is changed, for instance by creation and deletion
 	 * or reordering of vertices and edges
 	 */
+	@Override
 	protected void edgeListModified() {
 		edgeListVersion++;
 		graphModified();
 	}
-
-
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
@@ -711,19 +664,17 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		}
 		stack.add(traversalContext);
 	}
-	
+
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
 	 * graph is changed, all changes like adding, creating and reordering of
 	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change. 
+	 * vertex are treated as a change.
 	 */
+	@Override
 	public void graphModified() {
 		graphVersion++;
 	}
-
-
-
 
 	/**
 	 * Callback function for triggered actions just after the vertex
@@ -737,7 +688,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
 
 	}
-	
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
@@ -776,8 +726,14 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	public GraphBaseImpl getSuperordinateGraph() {
 		return this;
 	}
-	
-	
 
+	@Override
+	public int compareTo(Graph a) {
+		if (this == a) {
+			return 0;
+		}
+		// every graph is smaller than the complete graph
+		return -1;
+	}
 
 }

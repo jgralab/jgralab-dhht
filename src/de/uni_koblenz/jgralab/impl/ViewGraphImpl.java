@@ -70,7 +70,7 @@ public abstract class ViewGraphImpl implements Graph,
 		setECount(viewedGraph.getECount());
 		setICount(viewedGraph.getICount());
 		setVCount(viewedGraph.getVCount());
-		getCompleteGraph().addGraphStructureChangedListener(this);
+		viewedGraph.addGraphStructureChangedListener(this);
 	}
 
 	protected void setECount(int eCount) {
@@ -94,8 +94,8 @@ public abstract class ViewGraphImpl implements Graph,
 		if (level < lowestVisibleKappaLevel) {
 			level = lowestVisibleKappaLevel;
 		}
-		return ((GraphBaseImpl) getCompleteGraph()).getGraphFactory()
-				.createViewGraph(this, level);
+		return ((GraphBaseImpl) viewedGraph).getGraphFactory().createViewGraph(
+				this, level);
 	}
 
 	@Override
@@ -139,28 +139,38 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Class<? extends Graph> getM1Class() {
-		return getCompleteGraph().getM1Class();
+		return viewedGraph.getM1Class();
 	}
 
 	@Override
 	public GraphClass getType() {
-		return getCompleteGraph().getType();
+		return viewedGraph.getType();
 	}
 
 	@Override
 	public GraphClass getGraphClass() {
-		return getCompleteGraph().getGraphClass();
+		return viewedGraph.getGraphClass();
 	}
 
 	@Override
 	public Schema getSchema() {
-		return getCompleteGraph().getSchema();
+		return viewedGraph.getSchema();
 	}
 
 	@Override
 	public int compareTo(Graph arg0) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (viewedGraph == arg0) {
+			// each graph is smaller than the complete graph
+			return -1;
+		} else if (arg0.getContainingElement() == null) {
+			// this is a ViewGraphImpl
+			// the ViewGraphImpl with smaller lowestVisibleKappaLevel is greater
+			return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
+					- lowestVisibleKappaLevel;
+		} else {
+			// arg0 is a subordinate or partial graph
+			return viewedGraph.compareTo(arg0);
+		}
 	}
 
 	@Override
@@ -175,39 +185,39 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Graph getTraversalContext() {
-		return getCompleteGraph().getTraversalContext();
+		return viewedGraph.getTraversalContext();
 	}
 
 	@Override
 	public void useAsTraversalContext() {
-		((GraphBaseImpl) getCompleteGraph()).setTraversalContext(this);
+		((GraphBaseImpl) viewedGraph).setTraversalContext(this);
 	}
 
 	@Override
 	public void releaseTraversalContext() {
-		getCompleteGraph().releaseTraversalContext();
+		viewedGraph.releaseTraversalContext();
 	}
 
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
-		return getCompleteGraph().createVertex(cls);
+		return viewedGraph.createVertex(cls);
 	}
 
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
-		return getCompleteGraph().createEdge(cls);
+		return viewedGraph.createEdge(cls);
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
-		return getCompleteGraph().connect(cls, vertex, edge);
+		return viewedGraph.connect(cls, vertex, edge);
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
-		return getCompleteGraph().createEdge(cls, alpha, omega);
+		return viewedGraph.createEdge(cls, alpha, omega);
 	}
 
 	@Override
@@ -222,50 +232,50 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public boolean isGraphModified(long previousVersion) {
-		return getCompleteGraph().isGraphModified(previousVersion);
+		return viewedGraph.isGraphModified(previousVersion);
 	}
 
 	@Override
 	public long getGraphVersion() {
-		return getCompleteGraph().getGraphVersion();
+		return viewedGraph.getGraphVersion();
 	}
 
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
-		return getCompleteGraph().isVertexListModified(previousVersion);
+		return viewedGraph.isVertexListModified(previousVersion);
 	}
 
 	@Override
 	public long getVertexListVersion() {
-		return getCompleteGraph().getVertexListVersion();
+		return viewedGraph.getVertexListVersion();
 	}
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
-		return getCompleteGraph().isEdgeListModified(edgeListVersion);
+		return viewedGraph.isEdgeListModified(edgeListVersion);
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		return getCompleteGraph().getEdgeListVersion();
+		return viewedGraph.getEdgeListVersion();
 	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return v.isVisible(lowestVisibleKappaLevel)
-				&& getCompleteGraph().containsVertex(v);
+				&& viewedGraph.containsVertex(v);
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
 		return e.isVisible(lowestVisibleKappaLevel)
-				&& getCompleteGraph().containsEdge(e);
+				&& viewedGraph.containsEdge(e);
 	}
 
 	@Override
 	public void deleteVertex(Vertex v) {
 		if (containsVertex(v)) {
-			getCompleteGraph().deleteVertex(v);
+			viewedGraph.deleteVertex(v);
 		} else {
 			throw new GraphException(
 					"The view with lowest visible kappa value "
@@ -277,7 +287,7 @@ public abstract class ViewGraphImpl implements Graph,
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
-			getCompleteGraph().deleteEdge(e);
+			viewedGraph.deleteEdge(e);
 		} else {
 			throw new GraphException(
 					"The view with lowest visible kappa value "
@@ -288,13 +298,13 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Vertex getFirstVertex() {
-		Vertex v = getCompleteGraph().getFirstVertex();
+		Vertex v = viewedGraph.getFirstVertex();
 		return v == null || containsVertex(v) ? v : v.getNextVertex(this);
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		Vertex v = getCompleteGraph().getLastVertex();
+		Vertex v = viewedGraph.getLastVertex();
 		return v == null || containsVertex(v) ? v : v.getPreviousVertex(this);
 	}
 
@@ -338,13 +348,13 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Edge getFirstEdge() {
-		Edge e = getCompleteGraph().getFirstEdge();
+		Edge e = viewedGraph.getFirstEdge();
 		return e == null || containsEdge(e) ? e : e.getNextEdge(this);
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		Edge e = getCompleteGraph().getLastEdge();
+		Edge e = viewedGraph.getLastEdge();
 		return e == null || containsEdge(e) ? e : e.getPreviousEdge(this);
 	}
 
@@ -385,7 +395,7 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Vertex getVertex(int id) {
-		Vertex v = getCompleteGraph().getVertex(id);
+		Vertex v = viewedGraph.getVertex(id);
 		if (v.isVisible(lowestVisibleKappaLevel)) {
 			return v;
 		} else {
@@ -395,7 +405,7 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Edge getEdge(int id) {
-		Edge e = getCompleteGraph().getEdge(id);
+		Edge e = viewedGraph.getEdge(id);
 		if (e.isVisible(lowestVisibleKappaLevel)) {
 			return e;
 		} else {
@@ -470,107 +480,107 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public <T> JGraLabList<T> createList() {
-		return getCompleteGraph().createList();
+		return viewedGraph.createList();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return getCompleteGraph().createList(collection);
+		return viewedGraph.createList(collection);
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return getCompleteGraph().createList(initialCapacity);
+		return viewedGraph.createList(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		return getCompleteGraph().createSet();
+		return viewedGraph.createSet();
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return getCompleteGraph().createSet(collection);
+		return viewedGraph.createSet(collection);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return getCompleteGraph().createSet(initialCapacity);
+		return viewedGraph.createSet(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return getCompleteGraph().createSet(initialCapacity, loadFactor);
+		return viewedGraph.createSet(initialCapacity, loadFactor);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		return getCompleteGraph().createMap();
+		return viewedGraph.createMap();
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return getCompleteGraph().createMap(map);
+		return viewedGraph.createMap(map);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return getCompleteGraph().createMap(initialCapacity);
+		return viewedGraph.createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		return getCompleteGraph().createMap(initialCapacity, loadFactor);
+		return viewedGraph.createMap(initialCapacity, loadFactor);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return getCompleteGraph().createRecord(recordClass, io);
+		return viewedGraph.createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		return getCompleteGraph().createRecord(recordClass, fields);
+		return viewedGraph.createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		return getCompleteGraph().createRecord(recordClass, components);
+		return viewedGraph.createRecord(recordClass, components);
 	}
 
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
-		getCompleteGraph().sortVertices(comp);
+		viewedGraph.sortVertices(comp);
 	}
 
 	@Override
 	public void sortEdges(Comparator<Edge> comp) {
-		getCompleteGraph().sortEdges(comp);
+		viewedGraph.sortEdges(comp);
 	}
 
 	@Override
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
-		getCompleteGraph().addGraphStructureChangedListener(newListener);
+		viewedGraph.addGraphStructureChangedListener(newListener);
 	}
 
 	@Override
 	public void removeGraphStructureChangedListener(
 			GraphStructureChangedListener listener) {
-		getCompleteGraph().removeGraphStructureChangedListener(listener);
+		viewedGraph.removeGraphStructureChangedListener(listener);
 	}
 
 	@Override
 	public void removeAllGraphStructureChangedListeners() {
-		getCompleteGraph().removeAllGraphStructureChangedListeners();
+		viewedGraph.removeAllGraphStructureChangedListeners();
 	}
 
 	@Override
 	public int getGraphStructureChangedListenerCount() {
-		return getCompleteGraph().getGraphStructureChangedListenerCount();
+		return viewedGraph.getGraphStructureChangedListenerCount();
 	}
 
 	@Override

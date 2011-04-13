@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -54,7 +55,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	/**
 	 * @return {@link GraphElement} which contains this {@link Graph} or
-	 *         <code>null</code> if it is the complete {@link Graph}
+	 *         <code>null</code> if it is the complete {@link Graph} or a
+	 *         {@link ViewGraphImpl}
 	 */
 	public GraphElement<?, ?, ?> getContainingElement();
 

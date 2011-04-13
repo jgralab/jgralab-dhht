@@ -627,4 +627,14 @@ public abstract class SubordinateGraphImpl extends
 		}
 	}
 
+	@Override
+	public int compareTo(Graph a) {
+		// TODO check for subordinateGraph
+		if (a instanceof Graph) {
+			Graph g = a;
+			return hashCode() - g.hashCode();
+		}
+		return -1;
+	}
+
 }

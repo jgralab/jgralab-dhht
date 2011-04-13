@@ -254,16 +254,6 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-	@Override
-	public int compareTo(Graph a) {
-		// TODO check for subordinateGraph
-		if (a instanceof Graph) {
-			Graph g = a;
-			return hashCode() - g.hashCode();
-		}
-		return -1;
-	}
-
 	/**
 	 * Creates an edge of the given class and adds this edge to the graph.
 	 * <code>cls</code> has to be the "Impl" class.
