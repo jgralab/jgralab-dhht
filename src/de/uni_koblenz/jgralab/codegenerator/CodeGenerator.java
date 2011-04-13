@@ -58,24 +58,13 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, STDIMPL, DBIMPL, TRANSIMPL, SAVEMEMIMPL, CLASSONLY;
+		ABSTRACT, IMPL, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
-			if (config.hasStandardSupport()) {
-				out.add(STDIMPL);
-			}
-			if (config.hasTransactionSupport()) {
-				out.add(TRANSIMPL);
-			}
-			if (config.hasSavememSupport()) {
-				out.add(SAVEMEMIMPL);
-			}
-			if (config.hasDatabaseSupport()) {
-				out.add(DBIMPL);
-			}
+			out.add(IMPL);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -85,34 +74,9 @@ public abstract class CodeGenerator {
 		 * @return
 		 */
 		protected boolean isStdImpl() {
-			return this == STDIMPL;
+			return this == IMPL;
 		}
 
-		/**
-		 * 
-		 * @return Returns true if support for memory saving impl classes is
-		 *         enabled, otherwise false.
-		 */
-		protected boolean isSaveMemImpl() {
-			return this == SAVEMEMIMPL;
-		}
-
-		/**
-		 * 
-		 * @return Returns true if support for database impl classes is enabled,
-		 *         otherwise false.
-		 */
-		protected boolean isDbImpl() {
-			return this == DBIMPL;
-		}
-
-		/**
-		 * 
-		 * @return
-		 */
-		protected boolean isTransImpl() {
-			return this == TRANSIMPL;
-		}
 
 		/**
 		 * 
@@ -130,14 +94,6 @@ public abstract class CodeGenerator {
 			return this == CLASSONLY;
 		}
 
-		/**
-		 * 
-		 * @return
-		 */
-		protected boolean isStdOrSaveMemOrDbImplOrTransImpl() {
-			return (this == STDIMPL) || (this == SAVEMEMIMPL)
-					|| (this == TRANSIMPL) || (this == DBIMPL);
-		}
 	}
 
 	private final List<GenerationCycle> cycles;
@@ -188,10 +144,6 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgTransPackage", "de.uni_koblenz.jgralab.trans");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
-		rootBlock.setVariable("jgImplStdPackage","de.uni_koblenz.jgralab.impl.std");
-		rootBlock.setVariable("jgImplSaveMemPackage","de.uni_koblenz.jgralab.impl.savemem");
-		rootBlock.setVariable("jgImplTransPackage",	"de.uni_koblenz.jgralab.impl.trans");
-		rootBlock.setVariable("jgImplDbPackage","de.uni_koblenz.jgralab.impl.db");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
 		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
 
@@ -201,23 +153,11 @@ public abstract class CodeGenerator {
 			// schema implementation packages (standard, savemem and for
 			// transaction)
 			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std." + packageName);
-			rootBlock.setVariable("schemaImplSaveMemPackage",
-					schemaRootPackageName + ".impl.savemem." + packageName);
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans." + packageName);
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db." + packageName);
+					+ ".impl." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
 			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std");
-			rootBlock.setVariable("schemaImplSaveMemPackage",
-					schemaRootPackageName + ".impl.savemem");
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans");
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db");
+					+ ".impl");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
 		rootBlock.setVariable("isImplementationClassOnly", "false");
@@ -308,31 +248,12 @@ public abstract class CodeGenerator {
 				logger.finer("Writing file to: " + pathPrefix + "/"
 						+ schemaPackage);
 			}
-			if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-				if (currentCycle.isStdImpl()) {
-					schemaImplPackage = rootBlock
+			if (currentCycle.isStdImpl()) {
+				schemaImplPackage = rootBlock
 							.getVariable("schemaImplStdPackage");
 					logger
 							.finer(" - schemaImplStdPackage="
 									+ schemaImplPackage);
-				}
-				if (currentCycle.isSaveMemImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplSaveMemPackage");
-					logger.finer(" - schemaImplSaveMemPackage="
-							+ schemaImplPackage);
-				}
-				if (currentCycle.isTransImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplTransPackage");
-					logger.finer(" - schemaImplTransPackage="
-							+ schemaImplPackage);
-				}
-				if (currentCycle.isDbImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplDbPackage");
-					logger.finer(" - schemaImplDbPackage=" + schemaImplPackage);
-				}
 				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",
 						schemaImplPackage);
 			} else {
@@ -370,21 +291,9 @@ public abstract class CodeGenerator {
 			case ABSTRACT:
 				code.add("package #schemaPackage#;");
 				break;
-			case STDIMPL:
-				code.add("package #schemaImplStdPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplStdPackage"));
-				break;
-			case SAVEMEMIMPL:
-				code.add("package #schemaImplSaveMemPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplSaveMemPackage"));
-				break;
-			case TRANSIMPL:
-				code.add("package #schemaImplTransPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplTransPackage"));
-				break;
-			case DBIMPL:
-				code.add("package #schemaImplDbPackage#;");
-				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplDbPackage"));
+			case IMPL:
+				code.add("package #schemaImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgImplPackage"));
 				break;
 			case CLASSONLY:
 				code.add("package #schemaPackage#;");
@@ -434,7 +343,7 @@ public abstract class CodeGenerator {
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+			if (currentCycle.isStdImpl()) {
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
 			} else {

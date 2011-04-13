@@ -63,7 +63,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isStdImpl()) {
 			code.add(createBinaryConstructor());
 		}
 	}

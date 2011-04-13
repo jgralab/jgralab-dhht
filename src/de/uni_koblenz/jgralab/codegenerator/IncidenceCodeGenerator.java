@@ -160,7 +160,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			code.add(" */",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
 		}
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isStdImpl()) {
 			code.add("@Override",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",

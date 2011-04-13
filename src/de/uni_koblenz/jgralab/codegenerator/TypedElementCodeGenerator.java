@@ -63,23 +63,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-//			if (currentCycle.isStdImpl()) {
-//				addImports("#jgImplStdPackage#.#baseClassName#");
-//			} else if (currentCycle.isSaveMemImpl()) {
-//				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-//			} else if (currentCycle.isTransImpl()) {
-//				addImports("#jgImplTransPackage#.#baseClassName#");
-//			} else if (currentCycle.isDbImpl()) {
-//				addImports("#jgImplDbPackage#.#baseClassName#");
-//			}
+		if (currentCycle.isStdImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
-
-		//	rootBlock.setVariable("baseClassName", "#ownElementClass#Impl");
-			//add valid incidences
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isStdImpl()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
@@ -93,20 +81,20 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("classOrInterface", currentCycle
-				.isStdOrSaveMemOrDbImplOrTransImpl() ? " class" : " interface");
-		code.setVariable("abstract", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+				.isStdImpl() ? " class" : " interface");
+		code.setVariable("abstract", currentCycle.isStdImpl()
 				                       && aec.isAbstract() ? " abstract" : "");
-		code.setVariable("impl", currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+		code.setVariable("impl", currentCycle.isStdImpl()
 				                    && !aec.isAbstract() ? "Impl" : "");
 		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? 
+		code.setVariable("extends",	currentCycle.isStdImpl() ? 
 				                    " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isStdOrSaveMemOrDbImplOrTransImpl() ? " implements "
+			String delim = currentCycle.isStdImpl() ? " implements "
 					: " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()
+				if (currentCycle.isStdImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")

@@ -67,7 +67,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	@Override
 	protected CodeList createBody() {
 		CodeList code = super.createBody();
-		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
+		if (currentCycle.isStdImpl()) {
 			code.add(createFields(aec.getAttributeList()));
 			//code.add(createConstructor());
 			code.add(createGenericGetter(aec.getAttributeList()));
@@ -219,28 +219,9 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		case ABSTRACT:
 			code.add("public #type# #isOrGet#_#name#();");
 			break;
-		case STDIMPL:
-		case DBIMPL:
-		case SAVEMEMIMPL:
+		case IMPL:
 			code.add("public #type# #isOrGet#_#name#() {", "\treturn _#name#;",
 					"}");
-			break;
-		case TRANSIMPL:
-			code.setVariable("initValue", attr.getDomain().getInitialValue());
-			code.setVariable("ttype", attr.getDomain()
-					.getTransactionJavaAttributeImplementationTypeName(
-							schemaRootPackageName));
-
-			code.add("public #type# #isOrGet#_#name#() {");
-			addCheckValidityCode(code);
-			code.add("\tif (_#name# == null)", "\t\treturn #initValue#;",
-							"\t#ttype# value = _#name#.getValidValue(#theGraph#.getCurrentTransaction());");
-
-			if (attr.getDomain().isComposite()) {
-				code.add("\tif(_#name# != null && value != null)");
-				code.add("\t\tvalue.setName(this + \":#name#\");");
-			}
-			code.add("\treturn (value == null) ? #initValue# : value;", "}");
 			break;
 		}
 		return code;
@@ -257,68 +238,9 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#);");
 			break;
-		case STDIMPL:
-
-		case SAVEMEMIMPL:
+		case IMPL:
 			code.add("public void set_#name#(#type# _#name#) {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
-			break;
-		case DBIMPL:
-			code.add("public void set_#name#(#type# _#name#) {");
-			code.add("\tthis._#name# = _#name#;");
-			// code.add("\tif(this.isInitialized())");
-			// code.add("\t\tgraphModified();");
-			code.add("\tattributeChanged(\"#name#\");");
-			code.add("}");
-			break;
-		case TRANSIMPL:
-			Domain domain = attr.getDomain();
-			// setter for transaction support
-			code.setVariable("ttype", attr.getDomain()
-					.getTransactionJavaAttributeImplementationTypeName(
-							schemaRootPackageName));
-			code.setVariable("vclass", attr.getDomain().getVersionedClass(
-					schemaRootPackageName));
-
-			if (!(domain instanceof RecordDomain)) {
-				code.setVariable("initLoading",
-						"new #vclass#(this, _#name#, \"#name#\");");
-			} else {
-				code.setVariable("initLoading",
-						"new #vclass#(this, (#ttype) _#name#, \"#name#\");");
-			}
-			code.setVariable("init", "new #vclass#(this);");
-
-			code.add("public void set_#name#(#type# _#name#) {");
-			addCheckValidityCode(code);
-
-			if (domain.isComposite()) {
-				addImports("#jgTransPackage#.JGraLabTransactionCloneable");
-				addImports("#jgPackage#.GraphException");
-				code.setVariable("tclassname", attr.getDomain()
-						.getTransactionJavaClassName(schemaRootPackageName));
-				code.add("\tif(_#name# != null && !(_#name# instanceof #jgTransPackage#.JGraLabTransactionCloneable))");
-				code.add("\t\tthrow new GraphException(\"The given parameter of type #dname# doesn't support transactions.\");");
-				code.add("\tif(_#name# != null && ((#jgTransPackage#.JGraLabTransactionCloneable)_#name#).getGraph() != #theGraph#)");
-				code.add("\t\tthrow new GraphException(\"The given parameter of type #dname# belongs to another graph.\");");
-				code.setVariable("initLoading",
-						"new #vclass#(this, (#ttype#) _#name#, \"#name#\");");
-			}
-
-			code.add("\tif(#theGraph#.isLoading())",
-					"\t\tthis._#name# = #initLoading#",
-					"\tif(this._#name# == null) {",
-					"\t\tthis._#name# = #init#",
-					"\t\tthis._#name#.setName(\"#name#\");", "\t}");
-
-			if (domain.isComposite()) {
-				code.add("\tif(_#name# != null)");
-				code
-						.add("\t((JGraLabTransactionCloneable)_#name#).setName(this + \":#name#\");");
-			}
-			code.add("\tthis._#name#.setValidValue((#ttype#) _#name#, #theGraph#.getCurrentTransaction());",
-					 "\tattributeChanged(this._#name#);",
-					 "\tgraphModified();", "}");
 			break;
 		}
 		return code;
@@ -327,15 +249,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	protected CodeBlock createField(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
 		code.setVariable("name", attr.getName());
-		if (currentCycle.isStdImpl() || currentCycle.isSaveMemImpl()
-				|| currentCycle.isDbImpl()) {
+		if (currentCycle.isStdImpl()) {
 			code.setVariable("type", attr.getDomain()
 					.getJavaAttributeImplementationTypeName(
 							schemaRootPackageName));
-		}
-		if (currentCycle.isTransImpl()) {
-			code.setVariable("type", attr.getDomain().getVersionedClass(
-					schemaRootPackageName));
 		}
 		return code;
 	}
@@ -358,19 +275,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 						.addNoIndent(new CodeSnippet(
 								"if (attributeName.equals(\"#variableName#\")) {",
 								"\tGraphIO io = GraphIO.createStringReader(value, getSchema());"));
-				if (currentCycle.isTransImpl()) {
-					CodeSnippet readBlock = new CodeSnippet();
-					readBlock.setVariable("variableType", attribute.getDomain()
-							.getJavaClassName(schemaRootPackageName));
-					readBlock.add("#variableType# tmpVar = null;");
-					a.add(readBlock);
-					a.add(attribute.getDomain().getReadMethod(
-							schemaRootPackageName, "tmpVar", "io"));
-					a.addNoIndent(new CodeSnippet("\t#setterName#(tmpVar);",
-							"\treturn;", "}"));
-				}
-				if (currentCycle.isStdImpl() || currentCycle.isSaveMemImpl()
-						|| currentCycle.isDbImpl()) {
+				if (currentCycle.isStdImpl()) {
 					a.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
@@ -408,13 +313,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.addNoIndent(new CodeSnippet(
 								"if (attributeName.equals(\"#variableName#\")) {",
 								"\tGraphIO io = GraphIO.createStringWriter(getSchema());"));
-				if (currentCycle.isTransImpl()) {
-					a.add(attribute.getDomain().getTransactionWriteMethod(
-							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
-				}
-				if (currentCycle.isStdImpl() || currentCycle.isSaveMemImpl()
-						|| currentCycle.isDbImpl()) {
+				if (currentCycle.isStdImpl()) {
 					a.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
@@ -442,14 +341,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				CodeSnippet snippet = new CodeSnippet();
 				snippet.setVariable("setterName", "set_" + attribute.getName());
 				snippet.setVariable("variableName", attribute.getName());
-				if (currentCycle.isStdImpl() || currentCycle.isSaveMemImpl()
-						|| currentCycle.isDbImpl()) {
+				if (currentCycle.isStdImpl()) {
 					code.add(attribute.getDomain().getReadMethod(
-							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
-				}
-				if (currentCycle.isTransImpl()) {
-					code.add(attribute.getDomain().getTransactionReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
 				}
@@ -473,14 +366,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if ((attrSet != null) && !attrSet.isEmpty()) {
 			code.add(new CodeSnippet("io.space();"));
 			for (Attribute attribute : attrSet) {
-				if (currentCycle.isStdImpl() || currentCycle.isSaveMemImpl()
-						|| currentCycle.isDbImpl()) {
+				if (currentCycle.isStdImpl()) {
 					code.add(attribute.getDomain().getWriteMethod(
-							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
-				}
-				if (currentCycle.isTransImpl()) {
-					code.add(attribute.getDomain().getTransactionWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
 				}
@@ -500,23 +387,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	protected CodeBlock createGetVersionedAttributesMethod(
 			SortedSet<Attribute> attributeList) {
 		CodeList code = new CodeList();
-		if (currentCycle.isTransImpl()) {
-			CodeSnippet codeSnippet = new CodeSnippet();
-			codeSnippet
-					.add("public java.util.Set<#jgTransPackage#.VersionedDataObject<?>> attributes() {");
-			codeSnippet
-					.add("\tjava.util.Set<#jgTransPackage#.VersionedDataObject<?>> attributes = "
-							+ "new java.util.HashSet<#jgTransPackage#.VersionedDataObject<?>>();");
-			code.addNoIndent(codeSnippet);
-			for (Attribute attribute : attributeList) {
-				codeSnippet = new CodeSnippet("\tattributes.add(_#aname#);");
-				codeSnippet.setVariable("aname", attribute.getName());
-				code.addNoIndent(codeSnippet);
-			}
-			code.addNoIndent(new CodeSnippet("\treturn attributes;"));
-			code.addNoIndent(new CodeSnippet("}"));
-			return code;
-		}
 		return code;
 	}
 
