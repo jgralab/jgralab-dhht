@@ -59,7 +59,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #connectedVertexClass# vertex, #connectedEdgeClass# edge) throws RemoteException {",
+						"public #simpleClassName#Impl(int id, #connectedVertexClass# vertex, #connectedEdgeClass# edge) throws java.rmi.RemoteException {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
@@ -158,11 +158,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws RemoteException;");
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException;");
 		}
 		if (currentCycle.isStdImpl()) {
 			code.add("@Override",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws RemoteException {",
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
 					 "}");
 		}

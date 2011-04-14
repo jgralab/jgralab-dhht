@@ -173,7 +173,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	/**
 	 * maximal number of incidences
 	 */
-	private int iMax;
+	protected int iMax;
 
 	/**
 	 * current number of incidences

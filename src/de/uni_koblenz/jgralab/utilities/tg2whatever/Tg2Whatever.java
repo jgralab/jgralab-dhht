@@ -198,7 +198,11 @@ public abstract class Tg2Whatever {
 		initializeGraphAndSchema();
 		try {
 			PrintStream out = initializeOutputStream();
-			graphStart(out);
+			try {
+				graphStart(out);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			printBeforeVertices(out);
 			printVertices(out);
 			printBeforeEdges(out);
@@ -343,8 +347,9 @@ public abstract class Tg2Whatever {
 	 * 
 	 * @param out
 	 *            PrintStream as output stream.
+	 * @throws RemoteException 
 	 */
-	protected abstract void graphStart(PrintStream out);
+	protected abstract void graphStart(PrintStream out) throws RemoteException;
 
 	/**
 	 * Is called, when graph processing ends.

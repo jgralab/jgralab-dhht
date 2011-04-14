@@ -61,7 +61,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		addImports("java.rmi.RemoteException");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) throws RemoteException {",
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) throws java.rmi.RemoteException {",
 						"\tsuper(id, g);"));
 		if (hasDefaultAttributeValues()) {
 			code.addNoIndent(new CodeSnippet("\tinitializeAttributesWithDefaultValues();"));
@@ -112,7 +112,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("@Override");
-		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) throws RemoteException {");
+		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) throws java.rmi.RemoteException {");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
 			if (ic.getRolename() != null && ic.getRolename().length() > 0) {
@@ -177,10 +177,10 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 				s.add(" * @param noSubclass if set to true, only incidence of class #incidenceClassName# but not of subclasses will be returned");
 			}
 			s.add("*/",
-				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws RemoteException;"); 	
+				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException;"); 	
 		} else {
 			s.add("@Override",
-			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws RemoteException {");
+			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException {");
 			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
 			s.add("}");
 			
@@ -241,11 +241,11 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws RemoteException;");
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
 		if (currentCycle.isStdImpl()) {
 			code.add("@Override",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws RemoteException {",
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",
 					 "}");
 		}

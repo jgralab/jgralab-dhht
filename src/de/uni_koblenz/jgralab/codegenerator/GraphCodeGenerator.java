@@ -224,38 +224,38 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.setVariable("createSuffix", "");
 			code.add(
 							"/* Constructors and create methods with values for initial vertex and edge count */",
-							"public #simpleClassName#Impl(int vMax, int eMax) throws RemoteException {",
+							"public #simpleClassName#Impl(int vMax, int eMax) throws java.rmi.RemoteException {",
 							"\tthis(null, vMax, eMax);",
 							"}",
 							"",
-							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) throws RemoteException {",
+							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) throws java.rmi.RemoteException {",
 							"\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
 							"\tinitializeAttributesWithDefaultValues();",
 							"}",
 							"",
-							"public static #javaClassName# create(int vMax, int eMax) throws RemoteException {",
+							"public static #javaClassName# create(int vMax, int eMax) throws java.rmi.RemoteException {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null, vMax, eMax);",
 							"}",
 							"",
-							"public static #javaClassName# create(String id, int vMax, int eMax) throws RemoteException {",
+							"public static #javaClassName# create(String id, int vMax, int eMax) throws java.rmi.RemoteException {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id, vMax, eMax);",
 							"}",
 							"",
 							"/* Constructors and create methods without values for initial vertex and edge count */",
-							"public #simpleClassName#Impl() throws RemoteException {",
+							"public #simpleClassName#Impl() throws java.rmi.RemoteException {",
 							"\tthis(null);",
 							"}",
 							"",
-							"public #simpleClassName#Impl(java.lang.String id) throws RemoteException {",
+							"public #simpleClassName#Impl(java.lang.String id) throws java.rmi.RemoteException {",
 							"\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
 							"\tinitializeAttributesWithDefaultValues();",
 							"}",
 							"",
-							"public static #javaClassName# create() throws RemoteException {",
+							"public static #javaClassName# create() throws java.rmi.RemoteException {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null);",
 							"}",
 							"",
-							"public static #javaClassName# create(String id) throws RemoteException {",
+							"public static #javaClassName# create(String id) throws java.rmi.RemoteException {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id);",
 							"}");
 	
@@ -326,9 +326,9 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
 			}
 			code.add(" */",
-					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws RemoteException;");
+					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		} else {
-			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws RemoteException {",
+			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					"\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
 				 	"}");
 			code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
@@ -368,10 +368,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 					  	 " * @param omega the target vertex of the edge");
 			}
 			code.add("*/",
-					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws RemoteException;");
+					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
 		if (currentCycle.isStdImpl()) {
-			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws RemoteException {",
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType##cycleSupportSuffix#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
 					 "\treturn new#ecType#;", "}");
 			code.setVariable("additionalParams", "");
@@ -466,10 +466,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			s.add("/**");
 			s.add(" * @return an Iterable for all #elemClassPluralName# of this graph that are of type #elemQualifiedName# or subtypes.");
 			s.add(" */");
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws RemoteException;");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException;");
 		}
 		if (currentCycle.isStdImpl()) {
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws RemoteException {");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
 		}
@@ -482,10 +482,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				s.add(" *");
 				s.add(" * @param noSubClasses toggles wether subclasses of #elemQualifiedName# should be excluded");
 				s.add(" */");
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws RemoteException;");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException;");
 			}
 			if (currentCycle.isStdImpl()) {
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws RemoteException {");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException {");
 				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
 				s.add("}\n");
 			}
