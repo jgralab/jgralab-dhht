@@ -87,7 +87,7 @@ public class PerformaceTest {
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
-		
-	}
+		System.out.println("Finished");
+			}
 	
 }

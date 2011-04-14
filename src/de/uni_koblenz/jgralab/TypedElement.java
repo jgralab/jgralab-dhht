@@ -1,6 +1,6 @@
 package de.uni_koblenz.jgralab;
 
-import java.rmi.Remote;
+
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.schema.GraphClass;

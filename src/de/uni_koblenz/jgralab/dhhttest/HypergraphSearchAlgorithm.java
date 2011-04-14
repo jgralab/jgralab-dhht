@@ -40,9 +40,9 @@ public class HypergraphSearchAlgorithm {
 				//	System.out.println("Iterating incidence at vertex " + currentVertex.getId());
 					Edge currentEdge = curIncAtVertex.getEdge();
 					if (!parentEdgeInc.containsKey(currentEdge)) {   
-						handleEdge(currentEdge);
+					//	handleEdge(currentEdge);
 						parentEdgeInc.put(currentEdge, curIncAtVertex);     
-						handleTreeIncidence(curIncAtVertex); 
+					//	handleTreeIncidence(curIncAtVertex); 
 						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
 						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
 						while (curIncAtEdge != null) {
@@ -51,16 +51,16 @@ public class HypergraphSearchAlgorithm {
 								number.put(omega, ++num);
 								order.add(omega);
 								parentVertexInc.put(omega, curIncAtEdge);
-								handleVertex(omega);
-								handleTreeIncidence(curIncAtEdge);
+								//handleVertex(omega);
+								//handleTreeIncidence(curIncAtEdge);
 								buffer.add(omega);
 							} else {
-								handleCrossIncidence(curIncAtEdge);
+							//	handleCrossIncidence(curIncAtEdge);
 							}
 							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge(opposite);
 						}	  
 					} else {
-						handleCrossIncidence(curIncAtVertex);
+						//handleCrossIncidence(curIncAtVertex);
 					}
 					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex(Direction.BOTH);
 				}

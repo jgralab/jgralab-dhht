@@ -101,6 +101,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected CompleteGraphImpl graph;
 
+	/**
+	 * The subordinate graph nested in this graph‚
+	 */
 	protected Graph subOrdinateGraph;
 
 	/**
@@ -115,22 +118,22 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public GraphElement<?, ?, ?> getParent() {
+	public final GraphElement<?, ?, ?> getParent() {
 		return parent;
 	}
 
 	@Override
-	public int getKappa() {
+	public final int getKappa() {
 		return kappa;
 	}
 
 	@Override
-	public boolean isVisible(int kappa) {
+	public final boolean isVisible(int kappa) {
 		return this.kappa >= kappa;
 	}
 
 	@Override
-	public boolean containsElement(GraphElement<?, ?, ?> element) throws RemoteException {
+	public final boolean containsElement(GraphElement<?, ?, ?> element) throws RemoteException {
 		for (GraphElement<?, ?, ?> el = element; el.getParent() != null
 				&& getKappa() > el.getKappa(); el = el.getParent()) {
 			if (el.getParent() == this) {
@@ -141,17 +144,17 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Graph getGraph() {
+	public final Graph getGraph() {
 		return graph;
 	}
 
 	@Override
-	public GraphClass getGraphClass() throws RemoteException {
+	public final GraphClass getGraphClass() throws RemoteException {
 		return graph.getType();
 	}
 
 	@Override
-	public Schema getSchema() {
+	public final Schema getSchema() {
 		return graph.getSchema();
 	}
 
@@ -161,12 +164,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * and reordering of edges and vertices or changes of attributes of the
 	 * graph, an edge or a vertex are treated as a change.
 	 */
-	public void graphModified() {
+	public final void graphModified() {
 		graph.graphModified();
 	}
 
 	@Override
-	public int getId() {
+	public final int getId() {
 		return id;
 	}
 
@@ -176,10 +179,13 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param id
 	 *            int an id
 	 */
-	protected abstract void setId(int id);
+	protected final void setId(int id) {
+		assert id >= 0;
+		this.id = id;
+	}
 
 	@Override
-	public void initializeAttributesWithDefaultValues() {
+	public final void initializeAttributesWithDefaultValues() {
 		try {
 			for (Attribute attr : getType().getAttributeList()) {
 				if (attr.getDefaultValueAsString() == null) {
@@ -196,7 +202,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		}
 	}
 
-	protected void internalSetDefaultValue(Attribute attr)
+	protected final void internalSetDefaultValue(Attribute attr)
 			throws GraphIOException {
 		attr.setDefaultValue(this);
 	}
@@ -205,7 +211,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * Must be called by all methods which manipulate the incidence list of this
 	 * {@link GraphElement}.
 	 */
-	public void incidenceListModified() {
+	public final void incidenceListModified() {
 		try {
 			assert isValid();
 		} catch (RemoteException e) {
@@ -223,7 +229,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return boolean true if <code>incidenceListVersion</code> differs from
 	 *         {@link #incidenceListVersion}
 	 */
-	boolean isIncidenceListModified(long incidenceListVersion) {
+	final boolean isIncidenceListModified(long incidenceListVersion) {
 		try {
 			assert isValid();
 		} catch (RemoteException e) {
@@ -238,7 +244,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param incidenceListVersion
 	 *            long
 	 */
-	protected void setIncidenceListVersion(long incidenceListVersion) {
+	protected final void setIncidenceListVersion(long incidenceListVersion) {
 		this.incidenceListVersion = incidenceListVersion;
 	}
 
@@ -246,7 +252,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
-	long getIncidenceListVersion() {
+	final long getIncidenceListVersion() {
 		try {
 			assert isValid();
 		} catch (RemoteException e) {
@@ -256,21 +262,21 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) throws RemoteException {
+	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(graph.getTraversalContext(),
 				anIncidenceClass.getM1Class(), null, false);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) throws RemoteException {
+	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
 				null, false);
 	}
 
 	@Override
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(graph.getTraversalContext(),
@@ -278,14 +284,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			Direction direction) throws RemoteException {
 		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
 				direction, false);
 	}
 
 	@Override
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(graph.getTraversalContext(),
@@ -293,14 +299,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			boolean noSubclasses) throws RemoteException {
 		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
 				null, noSubclasses);
 	}
 
 	@Override
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
+	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(graph.getTraversalContext(),
@@ -308,7 +314,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
+	public final Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -317,7 +323,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+	public final <T extends Incidence> T getFirstIncidence(Graph traversalContext,
 			Class<T> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -326,7 +332,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
+	public final Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -335,7 +341,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+	public final <T extends Incidence> T getFirstIncidence(Graph traversalContext,
 			Class<T> anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -344,7 +350,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
+	public final Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -353,7 +359,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+	public final <T extends Incidence> T getFirstIncidence(Graph traversalContext,
 			Class<T> anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
@@ -362,7 +368,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
+	public final Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
 			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
@@ -372,49 +378,49 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public int getDegree(IncidenceClass ic) throws RemoteException {
+	public final int getDegree(IncidenceClass ic) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(graph.getTraversalContext(), ic, false);
 	}
 
 	@Override
-	public int getDegree(Class<? extends Incidence> ic) throws RemoteException {
+	public final int getDegree(Class<? extends Incidence> ic) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(graph.getTraversalContext(), ic, false);
 	}
 
 	@Override
-	public int getDegree(IncidenceClass ic, Direction direction) throws RemoteException {
+	public final int getDegree(IncidenceClass ic, Direction direction) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(graph.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
-	public int getDegree(Class<? extends Incidence> ic, Direction direction) throws RemoteException {
+	public final int getDegree(Class<? extends Incidence> ic, Direction direction) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(graph.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
-	public int getDegree(Graph traversalContext, IncidenceClass ic) throws RemoteException {
+	public final int getDegree(Graph traversalContext, IncidenceClass ic) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(ic, false);
 	}
 
 	@Override
-	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic) throws RemoteException {
+	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic) throws RemoteException {
 		assert ic != null;
 		assert isValid();
 		return getDegree(traversalContext, ic, false);
 	}
 
 	@Override
-	public int getDegree(Graph traversalContext, IncidenceClass ic,
+	public final int getDegree(Graph traversalContext, IncidenceClass ic,
 			Direction direction) throws RemoteException {
 		assert ic != null;
 		assert isValid();
@@ -422,7 +428,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
+	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
 			Direction direction) throws RemoteException {
 		assert ic != null;
 		assert isValid();
@@ -508,7 +514,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public abstract void sortIncidences(Comparator<Incidence> comp) throws RemoteException;
 
 	@Override
-	public void addSubordinateElement(Vertex appendix) throws RemoteException {
+	public final void addSubordinateElement(Vertex appendix) throws RemoteException {
 		if (getSubordinateGraph().getLastVertex() != null) {
 			appendix.putAfter(getSubordinateGraph().getLastVertex());
 		} else {
@@ -529,7 +535,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	protected abstract void addFirstSubordinateVertex(Vertex appendix) throws RemoteException;
 
 	@Override
-	public void addSubordinateElement(Edge appendix) throws RemoteException {
+	public final void addSubordinateElement(Edge appendix) throws RemoteException {
 		if (getSubordinateGraph().getLastEdge() != null) {
 			appendix.putAfter(getSubordinateGraph().getLastEdge());
 		} else {
@@ -554,7 +560,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param parent
 	 *            {@link GraphElementImpl}
 	 */
-	private void setParent(GraphElementImpl<?, ?, ?> parent) throws RemoteException {
+	private final void setParent(GraphElementImpl<?, ?, ?> parent) throws RemoteException {
 		assert parent != null;
 		assert getType().getAllowedSigmaClasses().contains(parent.getType());
 		this.parent = parent;
@@ -567,7 +573,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param kappa
 	 *            <b>int</b>
 	 */
-	public void setKappa(int kappa) throws RemoteException {
+	public final void setKappa(int kappa) throws RemoteException {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
 		this.kappa = kappa;
@@ -580,7 +586,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param kappa
 	 *            <b>int</b>
 	 */
-	private void setAllKappas(int kappa) throws RemoteException {
+	private final void setAllKappas(int kappa) throws RemoteException {
 		int kappaDifference = getKappa() - kappa;
 		setKappa(kappa);
 		for (Vertex v : getSubordinateGraph().getVertices()) {
@@ -596,7 +602,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
 	 */
-	boolean isSubordinateGraphObjectAlreadyCreated() {
+	 final boolean isSubordinateGraphObjectAlreadyCreated() {
 		return subOrdinateGraph != null;
 	}
 
@@ -606,7 +612,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public boolean isChildOf(GraphElement<?, ?, ?> parent) throws RemoteException {
+	public final boolean isChildOf(GraphElement<?, ?, ?> parent) throws RemoteException {
 		if (getParent() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getParent() == parent) {
@@ -617,18 +623,18 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public int getGlobalId() throws RemoteException {
+	public final int getGlobalId() throws RemoteException {
 		return GraphBaseImpl.getGlobalId(getLocalGraph().getId(), id);
 	}
 
 	@Override
-	public Graph getLocalGraph() {
+	public final Graph getLocalGraph() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Graph getContainingGraph() {
+	public final Graph getContainingGraph() {
 		// TODO Auto-generated method stub
 		return null;
 	}
