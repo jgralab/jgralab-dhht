@@ -916,8 +916,10 @@ public class SchemaImpl implements Schema {
 		} else if (graphClass.getQualifiedName().equals(qualifiedName)) {
 			return graphClass;
 		} else {
-			GraphElementClass gc =  graphClass.getGraphElementClass(qualifiedName);
-			System.out.println("Returning graph element class: " + gc.getQualifiedName());
+			GraphElementClass<?, ?> gc = graphClass
+					.getGraphElementClass(qualifiedName);
+			System.out.println("Returning graph element class: "
+					+ gc.getQualifiedName());
 			return graphClass.getGraphElementClass(qualifiedName);
 		}
 	}
