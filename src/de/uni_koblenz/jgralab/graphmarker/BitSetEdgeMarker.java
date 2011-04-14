@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -40,27 +41,27 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class BitSetEdgeMarker extends BitSetGraphMarker<Edge> {
 
-	public BitSetEdgeMarker(Graph graph) {
+	public BitSetEdgeMarker(Graph graph) throws RemoteException {
 		super(graph);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		removeMark(e);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 		// do nothing
 	}
 
 	@Override
-	public boolean mark(Edge edge) {
+	public boolean mark(Edge edge) throws RemoteException {
 		return super.mark(edge);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) {
+	public boolean isMarked(Edge edge) throws RemoteException {
 		return super.isMarked(edge);
 	}
 
@@ -95,7 +96,13 @@ public class BitSetEdgeMarker extends BitSetGraphMarker<Edge> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next = graph.getEdge(index++);
+						
+						Edge next;
+						try {
+							next = graph.getEdge(index++);
+						} catch (RemoteException e) {
+							throw new RuntimeException(e);
+						}
 						moveIndex();
 						return next;
 					}

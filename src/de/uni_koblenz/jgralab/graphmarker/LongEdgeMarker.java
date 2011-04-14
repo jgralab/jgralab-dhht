@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -40,12 +41,12 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class LongEdgeMarker extends LongGraphMarker<Edge> {
 
-	public LongEdgeMarker(Graph graph) {
+	public LongEdgeMarker(Graph graph) throws RemoteException {
 		super(graph, graph.getMaxECount() + 1);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		removeMark(e);
 	}
 
@@ -68,17 +69,17 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 	}
 
 	@Override
-	public long mark(Edge edge, long value) {
+	public long mark(Edge edge, long value) throws RemoteException {
 		return super.mark(edge, value);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) {
+	public boolean isMarked(Edge edge) throws RemoteException {
 		return super.isMarked(edge);
 	}
 
 	@Override
-	public long getMark(Edge edge) {
+	public long getMark(Edge edge) throws RemoteException {
 		return super.getMark(edge);
 	}
 
@@ -114,7 +115,12 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next = graph.getEdge(index++);
+						Edge next;
+						try {
+							next = graph.getEdge(index++);
+						} catch (RemoteException e) {
+							throw new RuntimeException(e);
+						}
 						moveIndex();
 						return next;
 					}

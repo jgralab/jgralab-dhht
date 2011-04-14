@@ -30,6 +30,8 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
@@ -44,7 +46,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	protected int unmarkedValue;
 	protected long version;
 
-	protected IntegerGraphMarker(Graph graph, int size) {
+	protected IntegerGraphMarker(Graph graph, int size) throws RemoteException {
 		super(graph);
 		unmarkedValue = DEFAULT_UNMARKED_VALUE;
 		temporaryAttributes = createNewArray(size);
@@ -72,7 +74,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public boolean isMarked(T graphElement) {
+	public boolean isMarked(T graphElement) throws RemoteException {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -89,7 +91,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	 * @return The previous element the given graph element has been marked
 	 *         with, <code>null</code> if the given element has not been marked.
 	 */
-	public int mark(T graphElement, int value) {
+	public int mark(T graphElement, int value) throws RemoteException {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -100,7 +102,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		return out;
 	}
 
-	public int getMark(T graphElement) {
+	public int getMark(T graphElement) throws RemoteException {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -109,7 +111,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public boolean removeMark(T graphElement) {
+	public boolean removeMark(T graphElement) throws RemoteException {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));

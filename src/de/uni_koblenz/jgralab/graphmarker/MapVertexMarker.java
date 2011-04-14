@@ -30,13 +30,15 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
 public class MapVertexMarker<O> extends MapGraphMarker<Vertex, O> {
 
-	public MapVertexMarker(Graph g) {
+	public MapVertexMarker(Graph g) throws RemoteException {
 		super(g);
 	}
 

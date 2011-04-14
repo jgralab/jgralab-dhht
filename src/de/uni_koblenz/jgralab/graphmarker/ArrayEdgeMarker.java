@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -40,17 +41,17 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 
-	public ArrayEdgeMarker(Graph graph) {
+	public ArrayEdgeMarker(Graph graph) throws RemoteException {
 		super(graph, graph.getMaxECount() + 1);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		removeMark(e);
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) {
+	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
 		newValue++;
 		if (newValue > temporaryAttributes.length) {
 			expand(newValue);
@@ -58,27 +59,27 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) {
+	public void maxVertexCountIncreased(int newValue) throws RemoteException {
 		// do nothing
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 		// do nothing
 	}
 
 	@Override
-	public O mark(Edge edge, O value) {
+	public O mark(Edge edge, O value) throws RemoteException {
 		return super.mark(edge, value);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) {
+	public boolean isMarked(Edge edge) throws RemoteException {
 		return super.isMarked(edge);
 	}
 
 	@Override
-	public O getMark(Edge edge) {
+	public O getMark(Edge edge) throws RemoteException {
 		return super.getMark(edge);
 	}
 
@@ -115,7 +116,12 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next = graph.getEdge(index++);
+						Edge next;
+						try {
+							next = graph.getEdge(index++);
+						} catch (RemoteException e) {
+							throw new RuntimeException(e);
+						}
 						moveIndex();
 						return next;
 					}

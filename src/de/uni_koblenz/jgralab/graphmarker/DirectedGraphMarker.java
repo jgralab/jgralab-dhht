@@ -30,6 +30,8 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -52,7 +54,7 @@ public class DirectedGraphMarker<O> extends
 	/**
 	 * Creates a new GraphMarker
 	 */
-	public DirectedGraphMarker(Graph g) {
+	public DirectedGraphMarker(Graph g) throws RemoteException {
 		super(g);
 	}
 
@@ -66,7 +68,7 @@ public class DirectedGraphMarker<O> extends
 	 *         the given element is not marked in this marking.
 	 */
 	@Override
-	public O getMark(AttributedElement<?, ?> elem) {
+	public O getMark(AttributedElement<?, ?> elem) throws RemoteException {
 		if (elem == null) {
 			return null;
 		}
@@ -86,7 +88,7 @@ public class DirectedGraphMarker<O> extends
 	 *         marking
 	 */
 	@Override
-	public O mark(AttributedElement<?, ?> elem, O value) {
+	public O mark(AttributedElement<?, ?> elem, O value) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -100,14 +102,14 @@ public class DirectedGraphMarker<O> extends
 	}
 
 	@Override
-	public boolean isMarked(AttributedElement<?, ?> elem) {
+	public boolean isMarked(AttributedElement<?, ?> elem) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
-	public boolean removeMark(AttributedElement<?, ?> elem) {
+	public boolean removeMark(AttributedElement<?, ?> elem) throws RemoteException {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.remove(elem) != null;
