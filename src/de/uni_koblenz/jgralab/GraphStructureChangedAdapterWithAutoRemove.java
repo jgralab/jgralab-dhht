@@ -30,6 +30,8 @@
  */
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
+
 /**
  * This class provides an adapter for the
  * <code>GraphStructureChangedListener</code>.
@@ -41,40 +43,40 @@ public abstract class GraphStructureChangedAdapterWithAutoRemove implements
 		GraphStructureChangedListenerWithAutoRemove {
 
 	@Override
-	public void edgeAdded(Edge e) {
+	public void edgeAdded(Edge e) throws RemoteException {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) {
+	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) {
+	public void maxVertexCountIncreased(int newValue) throws RemoteException {
 	}
 
 	@Override
-	public void vertexAdded(Vertex v) {
+	public void vertexAdded(Vertex v) throws RemoteException {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 	}
 	
 
 	@Override
-	public void incidenceAdded(Incidence i) {
+	public void incidenceAdded(Incidence i) throws RemoteException {
 	}
 	
 	@Override
-	public void incidenceDeleted(Incidence i) {
+	public void incidenceDeleted(Incidence i) throws RemoteException {
 	}
 
 	@Override
-	public void maxIncidenceCountIncreased(int newValue) {
+	public void maxIncidenceCountIncreased(int newValue) throws RemoteException {
 	}
 
 }

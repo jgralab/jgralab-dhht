@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
@@ -48,7 +49,7 @@ import java.rmi.RemoteException;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface GraphStructureChangedListener {
+public interface GraphStructureChangedListener extends Remote {
 
 	/**
 	 * This method is called after the vertex <code>v</code> has been added to
