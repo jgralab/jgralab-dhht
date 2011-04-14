@@ -1,0 +1,9 @@
+DHHTGraph 1;
+Schema de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
+GraphClass DHHTTestGraph;
+
+VertexClass BusinessProcess;
+VertexClass Feature;
+VertexClass TransformationRule;
+VertexClass Activity;
+EdgeClass TraceabilityLink from BusinessProcess role process (0,*) (0,*) from Feature role feature (0,*) (0,*) from TransformationRule role rule (0,*) (1,1) to Activity role target (0,*) (0,*);

@@ -59,10 +59,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		addImports("#jgPackage#.Edge");
 		addImports("#jgPackage#.Vertex");
+		addImports("#jgPackage#.Direction");
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) throws java.rmi.RemoteException {",
-						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, #dir#);"));
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
 		code.setVariable("dir", aec.getDirection().toString());

@@ -77,7 +77,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * Stores the traversal context of each {@link Thread} working on this
 	 * {@link Graph}.
 	 */
-	private HashMap<Thread, Stack<Graph>> traversalContext;
+	private HashMap<Thread, Stack<Graph>> traversalContextMap;
 
 	@Override
 	public void useAsTraversalContext() {
@@ -228,9 +228,9 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public Graph getTraversalContext() {
-		if (traversalContext == null)
+		if (traversalContextMap == null)
 			return null;
-		Stack<Graph> stack = traversalContext.get(Thread.currentThread());
+		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
 			return this;
 		} else {
@@ -542,13 +542,13 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public void releaseTraversalContext() {
-		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
 		if (stack != null) {
 			stack.pop();
 			if (stack.isEmpty()) {
-				traversalContext.remove(Thread.currentThread());
-				if (traversalContext.isEmpty())
-					traversalContext = null;
+				traversalContextMap.remove(Thread.currentThread());
+				if (traversalContextMap.isEmpty())
+					traversalContextMap = null;
 			}
 		}
 	}
@@ -662,12 +662,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
-		if (this.traversalContext == null)
-			this.traversalContext = new HashMap<Thread, Stack<Graph>>();
-		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		if (this.traversalContextMap == null)
+			this.traversalContextMap = new HashMap<Thread, Stack<Graph>>();
+		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
 		if (stack == null) {
 			stack = new Stack<Graph>();
-			this.traversalContext.put(Thread.currentThread(), stack);
+			this.traversalContextMap.put(Thread.currentThread(), stack);
 		}
 		stack.add(traversalContext);
 	}

@@ -145,8 +145,7 @@ public abstract class EdgeImpl extends
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) throws RemoteException {
 		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,
-				id, elemToConnect, this);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,  id, elemToConnect, this);
 	}
 
 	@Override
@@ -399,11 +398,10 @@ public abstract class EdgeImpl extends
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
 		Incidence firstIncidence = firstIncidenceAtEdge;
-		if ((firstIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(firstIncidence.getVertex()))) {
-			return firstIncidence;
-		} else {
-			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
+		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsVertex(firstIncidence.getVertex()))) {
+			firstIncidence = ((IncidenceImpl)firstIncidence).nextIncidenceAtEdge;
 		}
+		return firstIncidence;
 	}
 
 	@Override
@@ -432,8 +430,7 @@ public abstract class EdgeImpl extends
 			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
-		Incidence currentIncidence = getFirstIncidence(traversalContext,
-				direction);
+		Incidence currentIncidence = getFirstIncidence(traversalContext, direction);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -450,18 +447,19 @@ public abstract class EdgeImpl extends
 		return null;
 	}
 
+
+	
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
-			Direction direction) throws RemoteException {
+	public Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
 		assert isValid();
-		Incidence i = getFirstIncidence(traversalContext);
-		while ((i != null) && direction != null && direction != Direction.BOTH
-				&& i.getDirection() != direction) {
-			i = i.getNextIncidenceAtEdge(traversalContext);
-		}
+		Incidence i = firstIncidenceAtEdge;
+		while (((i != null) && (traversalContext != null) && (!traversalContext.containsVertex(i.getVertex()))) 
+				   || ((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection())))
+					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
 		return i;
 	}
 
+	
 	@Override
 	public Iterable<Incidence> getIncidences() throws RemoteException {
 		assert isValid();

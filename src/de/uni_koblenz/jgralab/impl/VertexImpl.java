@@ -60,17 +60,14 @@ public abstract class VertexImpl extends
 	private VertexImpl prevVertexInGraph;
 	private IncidenceImpl firstIncidenceAtVertex;
 	private IncidenceImpl lastIncidenceAtVertex;
-
+	
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
 		Incidence firstIncidence = firstIncidenceAtVertex;
-		System.out.println("firstIncidence: " + firstIncidence);
-		System.out.println("TraversalContet: " + traversalContext);
-		if ((firstIncidence == null) || (traversalContext == null) || (traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			return firstIncidence;
-		} else {
-			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
+		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
+			firstIncidence = ((IncidenceImpl)firstIncidence).nextIncidenceAtVertex;
 		}
+		return firstIncidence;
 	}
 
 	@Override
@@ -207,12 +204,11 @@ public abstract class VertexImpl extends
 	
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
-		Incidence firstIncidence = getFirstIncidence(traversalContext);
-		if ((firstIncidence == null) || (traversalContext == null) || (traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			return firstIncidence;
-		} else {
-			return firstIncidence.getNextIncidenceAtVertex(traversalContext, direction);
-		}
+		Incidence i = firstIncidenceAtVertex; 
+		while (((i != null) && (traversalContext != null) && (!traversalContext.containsEdge(i.getEdge()))) 
+				   || ((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection())))
+					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
+		return i;
 	}
 	
 
