@@ -628,13 +628,28 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int compareTo(Graph a) {
-		// TODO check for subordinateGraph
-		if (a instanceof Graph) {
-			Graph g = a;
-			return hashCode() - g.hashCode();
+	public int compareTo(Graph arg0) {
+		if (getCompleteGraph() == arg0) {
+			// each graph is smaller than the complete graph
+			return -1;
+		} else if (arg0.getContainingElement() != null) {
+			// this is a SubordinateGraphImpl
+			GraphElement<?, ?, ?> ce = arg0.getContainingElement();
+			boolean isArg0Vertex = ce instanceof Vertex;
+			boolean isThisVertex = getContainingElement() instanceof Vertex;
+			if (isArg0Vertex && isThisVertex) {
+				// both are vertices
+				return ((Vertex) getContainingElement()).compareTo((Vertex) ce);
+			} else if (!isArg0Vertex && !isThisVertex) {
+				// both are edges
+				return ((Edge) getContainingElement()).compareTo((Edge) ce);
+			} else {
+				// the subordinate graph of a vertex is greater
+				return isThisVertex ? 1 : -1;
+			}
+		} else {
+			// this is a ViewGraphImpl or PartialGraphImpl
+			return -arg0.compareTo(this);
 		}
-		return -1;
 	}
-
 }

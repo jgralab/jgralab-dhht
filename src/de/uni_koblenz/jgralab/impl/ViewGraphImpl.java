@@ -159,18 +159,23 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public int compareTo(Graph arg0) {
-		if (viewedGraph == arg0) {
+		if (viewedGraph == arg0 || getCompleteGraph() == arg0) {
 			// each graph is smaller than the complete graph
 			return -1;
-		} else if (arg0.getContainingElement() == null) {
+		} else if (arg0.getViewedGraph() != arg0) {
 			// this is a ViewGraphImpl
 			// the ViewGraphImpl with smaller lowestVisibleKappaLevel is greater
 			return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
 					- lowestVisibleKappaLevel;
 		} else {
-			// arg0 is a subordinate or partial graph
+			// arg0 is a subordinate graph or a partial graph
 			return viewedGraph.compareTo(arg0);
 		}
+	}
+
+	@Override
+	public Graph getViewedGraph() {
+		return viewedGraph;
 	}
 
 	@Override
@@ -180,7 +185,7 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public Graph getCompleteGraph() {
-		return viewedGraph;
+		return viewedGraph.getCompleteGraph();
 	}
 
 	@Override
