@@ -2939,7 +2939,12 @@ public class GraphIO {
 
 	private void parseIncidences(Edge edge) throws GraphIOException {
 		int lambdaSeqPosAtEdge = 0;
-		int eId = edge.getId();
+		int eId = 0;
+		try {
+			eId = edge.getId();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		incidenceInstancesAtEdge[eId] = new Incidence[incidencesAtEdge[eId]
 				.size()];
 
@@ -2954,8 +2959,12 @@ public class GraphIO {
 								+ " than defined at the vertices.");
 			}
 			Vertex v = incidencesAtEdge[eId].get(lambdaSeqPosAtEdge);
-			incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge.connect(
+			try {
+				incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge.connect(
 					currentRolename, v);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		if (lambdaSeqPosAtEdge + 1 != incidencesAtEdge[eId].size()) {
 			throw new GraphIOException(
@@ -2965,7 +2974,12 @@ public class GraphIO {
 	}
 
 	private void parseIncidentEdges(Vertex v) throws GraphIOException {
-		int vId = v.getId();
+		int vId = 0;
+		try {
+			v.getId();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		int eId = 0;
 		int lambdaSeqPosAtEdge = 0;
 		int lambdaSeqPosAtVertex = 0;

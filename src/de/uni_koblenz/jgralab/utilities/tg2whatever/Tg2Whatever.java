@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.utilities.tg2whatever;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -232,15 +233,20 @@ public abstract class Tg2Whatever {
 
 	private void printEdges(PrintStream out) {
 		currentElementSequenceIndex = 0;
+		try {
 		for (Edge e : graph.getEdges()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(e)) {
 				printEdge(out, e);
 			}
 		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void printVertices(PrintStream out) {
+		try{
 		currentElementSequenceIndex = 0;
 		for (Vertex v : graph.getVertices()) {
 			currentElementSequenceIndex++;
@@ -248,11 +254,15 @@ public abstract class Tg2Whatever {
 				printVertex(out, v);
 			}
 		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 
 	
 	protected void printIncidences(PrintStream out) {
+		try {
 		for (Edge e : graph.getEdges()) {
 			if ((marker == null) || marker.isMarked(e)) {
 				for (Incidence i : e.getIncidences()) {
@@ -262,10 +272,14 @@ public abstract class Tg2Whatever {
 				}
 			}
 		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 
 	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?> elem) {
+		try {
 		int num = 1;
 		for (Incidence current : elem.getIncidences()) {
 			if (current == inc) {
@@ -274,6 +288,9 @@ public abstract class Tg2Whatever {
 			num++;
 		}
 		return -1;
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
