@@ -229,7 +229,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public Graph getTraversalContext() {
 		if (traversalContext == null)
-			return this;
+			return null;
 		Stack<Graph> stack = traversalContext.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
 			return this;

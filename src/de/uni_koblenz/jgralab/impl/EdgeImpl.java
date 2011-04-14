@@ -395,16 +395,14 @@ public abstract class EdgeImpl extends
 		return getFirstIncidence(getGraph().getTraversalContext(), direction);
 	}
 
+
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
 		Incidence firstIncidence = firstIncidenceAtEdge;
-		if (firstIncidence == null
-				|| !traversalContext.getContainingElement().containsElement(
-						this)) {
-			// all incidences belong to the same graph like this edge
-			return null;
-		} else {
+		if ((firstIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(firstIncidence.getVertex()))) {
 			return firstIncidence;
+		} else {
+			return firstIncidence.getNextIncidenceAtVertex(traversalContext);
 		}
 	}
 
@@ -632,16 +630,15 @@ public abstract class EdgeImpl extends
 		return getLastIncidence(getGraph().getTraversalContext());
 	}
 
+	
+
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) throws RemoteException {
 		Incidence lastIncidence = lastIncidenceAtEdge;
-		if (lastIncidence == null
-				|| !traversalContext.getContainingElement().containsElement(
-						this)) {
-			// all incidences belong to the same graph like this edge
-			return null;
-		} else {
+		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
+		} else {
+			return lastIncidence.getPreviousIncidenceAtEdge(traversalContext);
 		}
 	}
 
@@ -688,7 +685,7 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		Edge nextEdge = nextEdgeInGraph;
 		if (nextEdge == null
-				|| !traversalContext.getContainingElement().containsElement(nextEdge)) {
+				|| ((traversalContext != null) && !traversalContext.containsEdge(nextEdge))) {
 			return null;
 		} else {
 			return nextEdge;

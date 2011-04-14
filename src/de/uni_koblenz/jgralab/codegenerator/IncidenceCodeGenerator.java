@@ -62,9 +62,10 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) throws java.rmi.RemoteException {",
-						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);"));
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, #dir#);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));
+		code.setVariable("dir", aec.getDirection().toString());
 		return code;
 	}
 
