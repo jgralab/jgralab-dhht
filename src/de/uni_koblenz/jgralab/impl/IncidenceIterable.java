@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 
@@ -107,7 +108,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(
 				Graph traversalContext,
 				GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
-				Class<? extends Incidence> ic, Direction dir) {
+				Class<? extends Incidence> ic, Direction dir) throws RemoteException {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;

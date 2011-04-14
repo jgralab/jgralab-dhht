@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
 import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
@@ -64,8 +66,9 @@ public interface GraphFactory {
 	 * @param viewGraph
 	 * @param level
 	 * @return
+	 * @throws RemoteException 
 	 */
-	public ViewGraphImpl createViewGraph(Graph viewGraph, int level);
+	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) throws RemoteException;
 
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -73,9 +76,10 @@ public interface GraphFactory {
 	 * 
 	 * @param elem
 	 * @return
+	 * @throws RemoteException 
 	 */
 	public SubordinateGraphImpl createSubordinateGraph(
-			GraphElement<?, ?, ?> elem);
+			GraphElement<?, ?, ?> elem) throws RemoteException;
 
 	/**
 	 * creates a PartialSubordinate-Graph object for the specified class. The
@@ -84,9 +88,10 @@ public interface GraphFactory {
 	 * 
 	 * @param elem
 	 * @return
+	 * @throws RemoteException 
 	 */
 	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
-			GraphElement<?, ?, ?> elem);
+			GraphElement<?, ?, ?> elem) throws RemoteException;
 
 	/**
 	 * creates a Partial-Graph object for the specified remote graph. The
@@ -96,7 +101,7 @@ public interface GraphFactory {
 	 * @param compelteGraph
 	 * @return
 	 */
-	public PartialGraphImpl createPartialGraph(Graph completeGraph);
+	public PartialGraphImpl createPartialGraph(Graph completeGraph) throws RemoteException;
 
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may

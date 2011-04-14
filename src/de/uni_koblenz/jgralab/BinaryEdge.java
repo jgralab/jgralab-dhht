@@ -3,6 +3,8 @@
  */
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -27,7 +29,7 @@ public interface BinaryEdge extends Edge {
 	 * @throws UnsupportedOpperationException
 	 *             if this {@link Edge} is not binary.
 	 */
-	public Vertex getAlpha();
+	public Vertex getAlpha() throws RemoteException;
 
 	/**
 	 * Returns the end {@link Vertex} of this {@link BinaryEdge}.
@@ -36,7 +38,7 @@ public interface BinaryEdge extends Edge {
 	 * @throws UnsupportedOpperationException
 	 *             if this {@link Edge} is not binary.
 	 */
-	public Vertex getOmega();
+	public Vertex getOmega() throws RemoteException;
 
 	/**
 	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
@@ -44,7 +46,7 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getSemantics();
+	public IncidenceType getSemantics() throws RemoteException;
 
 	/**
 	 * The semanctics of the alpha {@link Incidence} of this {@link Edge}, e.g.
@@ -53,7 +55,7 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getAlphaSemantics();
+	public IncidenceType getAlphaSemantics() throws RemoteException;
 
 	/**
 	 * The semanctics of the omega {@link Incidence} of this {@link Edge}, e.g.
@@ -62,6 +64,6 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getOmegaSemantics();
+	public IncidenceType getOmegaSemantics() throws RemoteException;
 
 }

@@ -106,7 +106,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.NoSuchAttributeException");
 		code.addNoIndent(new CodeSnippet(true,
-				"public Object getAttribute(String attributeName) {"));
+				"public Object getAttribute(String attributeName) throws RuntimeException {"));
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
 			s.setVariable("name", attr.getName());
@@ -139,7 +139,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if (suppressWarningsNeeded) {
 			snip.add("@SuppressWarnings(\"unchecked\")");
 		}
-		snip.add("public void setAttribute(String attributeName, Object data) {");
+		snip.add("public void setAttribute(String attributeName, Object data) throws RuntimeException {");
 		code.addNoIndent(snip);
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
@@ -217,10 +217,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#();");
+			code.add("public #type# #isOrGet#_#name#() throws RuntimeException;");
 			break;
 		case IMPL:
-			code.add("public #type# #isOrGet#_#name#() {", "\treturn _#name#;",
+			code.add("public #type# #isOrGet#_#name#()  throws RuntimeException {", "\treturn _#name#;",
 					"}");
 			break;
 		}
@@ -236,10 +236,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#);");
+			code.add("public void set_#name#(#type# _#name#) throws RuntimeException;");
 			break;
 		case IMPL:
-			code.add("public void set_#name#(#type# _#name#) {",
+			code.add("public void set_#name#(#type# _#name#) throws RuntimeException {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
 			break;
 		}

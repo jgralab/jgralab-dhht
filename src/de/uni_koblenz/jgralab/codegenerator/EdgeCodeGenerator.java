@@ -89,7 +89,6 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		code.setVariable("omegaVertex", absoluteName(omegaInc.getVertexClass()));
 		code.setVariable("alphaInc", absoluteName(alphaInc));
 		code.setVariable("omegaInc", absoluteName(omegaInc));
-		addImports("java.rmi.RemoteException");
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, #alphaVertex# alpha, #omegaVertex# omega) throws RemoteException {",

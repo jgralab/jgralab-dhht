@@ -31,6 +31,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -127,12 +128,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public long getVertexListVersion() {
+	public long getVertexListVersion() throws RemoteException {
 		return getSuperordinateGraph().getVertexListVersion();
 	}
 
 	@Override
-	public long getEdgeListVersion() {
+	public long getEdgeListVersion() throws RemoteException {
 		return getSuperordinateGraph().getEdgeListVersion();
 	}
 
@@ -142,7 +143,7 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(Vertex containingVertex) {
+	protected SubordinateGraphImpl(Vertex containingVertex) throws RemoteException {
 		super(containingVertex.getGraph().getType());
 		initializeCommonFields(containingVertex);
 
@@ -184,7 +185,7 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingEdge
 	 *            {@link Edge} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(Edge containingEdge) {
+	protected SubordinateGraphImpl(Edge containingEdge) throws RemoteException {
 		super(containingEdge.getGraph().getType());
 		initializeCommonFields(containingEdge);
 
@@ -225,86 +226,85 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList() {
+	public <T> JGraLabList<T> createList() throws RemoteException {
 		return containingElement.getGraph().createList();
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) throws RemoteException {
 		return containingElement.getGraph().createList(collection);
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
+	public <T> JGraLabList<T> createList(int initialCapacity) throws RemoteException {
 		return containingElement.getGraph().createList(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet() {
+	public <T> JGraLabSet<T> createSet() throws RemoteException {
 		return containingElement.getGraph().createSet();
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) throws RemoteException {
 		return containingElement.getGraph().createSet(collection);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
+	public <T> JGraLabSet<T> createSet(int initialCapacity) throws RemoteException {
 		return containingElement.getGraph().createSet(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) throws RemoteException {
 		return containingElement.getGraph().createSet(initialCapacity,
 				loadFactor);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
+	public <K, V> JGraLabMap<K, V> createMap() throws RemoteException {
 		return containingElement.getGraph().createMap();
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) throws RemoteException {
 		return containingElement.getGraph().createMap(map);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) throws RemoteException {
 		return containingElement.getGraph().createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
+			float loadFactor) throws RemoteException {
 		return containingElement.getGraph().createMap(initialCapacity,
 				loadFactor);
 	}
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) throws RemoteException {
 		return containingElement.getGraph().createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
+			Map<String, Object> fields) throws RemoteException {
 		return containingElement.getGraph().createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
+			Object... components) throws RemoteException {
 		return containingElement.getGraph().createRecord(recordClass,
 				components);
 	}
 
 	@Override
-	public Graph getView(int kappa) {
-		// TODO check if this is correct
+	public Graph getView(int kappa) throws RemoteException {
 		return containingElement.getGraph().getGraphFactory()
-				.createViewGraph(containingElement.getGraph(), kappa);
+				.createViewGraph(this, kappa);
 	}
 
 	@Override
@@ -352,19 +352,19 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public boolean containsVertex(Vertex v) {
+	public boolean containsVertex(Vertex v) throws RemoteException {
 		return ((GraphElementImpl<?, ?, ?>) v)
 				.isChildOf(getContainingElement());
 	}
 
 	@Override
-	public boolean containsEdge(Edge e) {
+	public boolean containsEdge(Edge e) throws RemoteException {
 		return ((GraphElementImpl<?, ?, ?>) e)
 				.isChildOf(getContainingElement());
 	}
 
 	@Override
-	public void deleteVertex(Vertex v) {
+	public void deleteVertex(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			containingElement.getGraph().deleteVertex(v);
 		} else {
@@ -375,7 +375,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public void deleteEdge(Edge e) {
+	public void deleteEdge(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			containingElement.getGraph().deleteEdge(e);
 		} else {
@@ -386,7 +386,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
+	public Vertex getVertex(int id) throws RemoteException {
 		Vertex v = containingElement.getGraph().getVertex(id);
 		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
 			return v;
@@ -396,7 +396,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Edge getEdge(int id) {
+	public Edge getEdge(int id) throws RemoteException {
 		Edge e = containingElement.getGraph().getEdge(id);
 		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
 			return e;
@@ -426,27 +426,27 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Schema getSchema() {
+	public Schema getSchema() throws RemoteException {
 		return containingElement.getGraph().getSchema();
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega) {
+			Vertex omega) throws RemoteException {
 		T edge = super.createEdge(cls, alpha, omega);
 		containingElement.addSubordinateElement(edge);
 		return edge;
 	}
 
 	@Override
-	public <T extends Edge> T createEdge(Class<T> cls) {
+	public <T extends Edge> T createEdge(Class<T> cls) throws RemoteException {
 		T edge = super.createEdge(cls);
 		containingElement.addSubordinateElement(edge);
 		return edge;
 	}
 
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls) {
+	public <T extends Vertex> T createVertex(Class<T> cls) throws RemoteException {
 		T vertex = super.createVertex(cls);
 		containingElement.addSubordinateElement(vertex);
 		return vertex;
@@ -458,22 +458,22 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public GraphFactory getGraphFactory() {
+	public GraphFactory getGraphFactory() throws RemoteException {
 		return getCompleteGraph().getGraphFactory();
 	}
 
 	@Override
-	public void graphModified() {
+	public void graphModified() throws RemoteException {
 		getSuperordinateGraph().graphModified();
 	}
 
 	@Override
-	public void vertexListModified() {
+	public void vertexListModified() throws RemoteException {
 		getSuperordinateGraph().vertexListModified();
 	}
 
 	@Override
-	public void edgeListModified() {
+	public void edgeListModified() throws RemoteException {
 		getSuperordinateGraph().edgeListModified();
 	}
 
@@ -483,12 +483,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public GraphBaseImpl getSuperordinateGraph() {
+	public GraphBaseImpl getSuperordinateGraph() throws RemoteException {
 		return (GraphBaseImpl) containingElement.getGraph();
 	}
 
 	@Override
-	public GraphBaseImpl getCompleteGraph() {
+	public GraphBaseImpl getCompleteGraph() throws RemoteException {
 		return getSuperordinateGraph().getCompleteGraph();
 	}
 
@@ -498,39 +498,39 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public long getGraphVersion() {
+	public long getGraphVersion() throws RemoteException {
 		return getSuperordinateGraph().getGraphVersion();
 	}
 
 	@Override
-	public boolean isPartOfGraph(Graph other) {
+	public boolean isPartOfGraph(Graph other) throws RemoteException {
 		return other == getSuperordinateGraph()
 				|| getSuperordinateGraph().isPartOfGraph(other);
 	}
 
 	@Override
-	public boolean containsVertexLocally(Vertex v) {
+	public boolean containsVertexLocally(Vertex v) throws RemoteException {
 		return getSuperordinateGraph().containsVertexLocally(v);
 	}
 
 	@Override
-	public boolean containsEdgeLocally(Edge e) {
+	public boolean containsEdgeLocally(Edge e) throws RemoteException {
 		return getSuperordinateGraph().containsEdgeLocally(e);
 	}
 
 	// TODO: Check if these methods should return the type of the vertex or edge
 	// the subordinate graph is embedded in
 	@Override
-	public GraphClass getGraphClass() {
+	public GraphClass getGraphClass() throws RemoteException {
 		return getSuperordinateGraph().getGraphClass();
 	}
 
-	public Class<? extends Graph> getM1Class() {
+	public Class<? extends Graph> getM1Class() throws RemoteException {
 		return getSuperordinateGraph().getM1Class();
 	}
 
 	@Override
-	public void vertexAdded(Vertex v) {
+	public void vertexAdded(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			setVCount(getVCount() + 1);
 			if (v.getPreviousVertex() == getContainingElement()) {
@@ -547,7 +547,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			setVCount(getVCount() + 1);
 			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
@@ -566,7 +566,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public void edgeAdded(Edge e) {
+	public void edgeAdded(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			setECount(getECount() + 1);
 			if (e.getPreviousEdge() == getContainingElement()) {
@@ -583,7 +583,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			setECount(getECount() + 1);
 			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
@@ -614,14 +614,14 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public void incidenceAdded(Incidence i) {
+	public void incidenceAdded(Incidence i) throws RemoteException {
 		if (containsEdge(i.getEdge())) {
 			setICount(getICount() + 1);
 		}
 	}
 
 	@Override
-	public void incidenceDeleted(Incidence i) {
+	public void incidenceDeleted(Incidence i) throws RemoteException {
 		if (containsEdge(i.getEdge())) {
 			setICount(getICount() + 1);
 		}

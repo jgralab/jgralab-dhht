@@ -139,7 +139,7 @@ public abstract class CodeGenerator {
 			CodeGeneratorConfiguration config) {
 		this.schemaRootPackageName = schemaRootPackageName;
 		this.config = config;
-
+		addImports("java.rmi.RemoteException");
 		rootBlock = new CodeList(null);
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgTransPackage", "de.uni_koblenz.jgralab.trans");

@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -181,6 +182,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
+		try {
 		for (Attribute attr : getType().getAttributeList()) {
 			try {
 				if ((attr.getDefaultValueAsString() != null)
@@ -190,6 +192,9 @@ public abstract class GraphBaseImpl implements Graph {
 			} catch (GraphIOException e) {
 				e.printStackTrace();
 			}
+		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -226,27 +231,27 @@ public abstract class GraphBaseImpl implements Graph {
 	 * 
 	 * @param traversalContext {@link Graph}
 	 */
-	protected void setTraversalContext(Graph traversalContext) {
+	protected void setTraversalContext(Graph traversalContext)  throws RemoteException {
 		(getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
-	public Graph getTraversalContext() {
+	public Graph getTraversalContext() throws RemoteException {
 		return getCompleteGraph().getTraversalContext();
 	}
 
 	@Override
-	public void useAsTraversalContext() {
+	public void useAsTraversalContext() throws RemoteException {
 		(getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
-	public void releaseTraversalContext() {
+	public void releaseTraversalContext() throws RemoteException {
 		getCompleteGraph().releaseTraversalContext();
 	}
 
 	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
-			GraphElement<?, ?, ?> child) {
+			GraphElement<?, ?, ?> child) throws RemoteException {
 		try {
 			parent.addSubordinateElement((Vertex) child);
 		} catch (ClassCastException e) {
@@ -261,7 +266,7 @@ public abstract class GraphBaseImpl implements Graph {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega) {
+			Vertex omega) throws RemoteException {
 		try {
 			T edge = (T) internalCreateEdge(cls);
 			IncidenceClass fromClass = null;
@@ -298,7 +303,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Edge> T createEdge(Class<T> cls) {
+	public <T extends Edge> T createEdge(Class<T> cls) throws RemoteException {
 		try {
 			return (T) internalCreateEdge(cls);
 		} catch (Exception exception) {
@@ -311,7 +316,7 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
+	protected Edge internalCreateEdge(Class<? extends Edge> cls) throws RemoteException {
 		return getGraphFactory().createEdge(cls, 0, this);
 	}
 
@@ -321,7 +326,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls) {
+	public <T extends Vertex> T createVertex(Class<T> cls) throws RemoteException {
 		try {
 			return (T) internalCreateVertex(cls);
 		} catch (Exception ex) {
@@ -333,23 +338,23 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-	protected Vertex internalCreateVertex(Class<? extends Vertex> cls) {
+	protected Vertex internalCreateVertex(Class<? extends Vertex> cls) throws RemoteException {
 		return getGraphFactory().createVertex(cls, 0, this);
 	}
 
-	protected abstract void edgeListModified();
+	protected abstract void edgeListModified() throws RemoteException;
 
-	protected abstract void vertexListModified();
+	protected abstract void vertexListModified() throws RemoteException;
 
 	@Override
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass) throws RemoteException {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass, false);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert edgeClass != null;
 		Edge currentEdge = getFirstEdge();
 		while (currentEdge != null) {
@@ -368,26 +373,25 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	@Override
-	public Edge getFirstEdge(EdgeClass edgeClass) {
+	public Edge getFirstEdge(EdgeClass edgeClass) throws RemoteException {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass.getM1Class(), false);
 	}
 
 	@Override
-	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
+	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) throws RemoteException {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass, false);
 	}
 
 	@Override
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
-			boolean noSubclasses) {
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass, boolean noSubclasses) throws RemoteException {
 		assert vertexClass != null;
 		Vertex firstVertex = getFirstVertex();
 		if (firstVertex == null) {
@@ -406,19 +410,19 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	@Override
-	public Vertex getFirstVertex(VertexClass vertexClass) {
+	public Vertex getFirstVertex(VertexClass vertexClass) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass, false);
 	}
 
 	@Override
-	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
+	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
-	public GraphClass getGraphClass() {
+	public GraphClass getGraphClass() throws RemoteException {
 		return getType();
 	}
 
@@ -426,20 +430,20 @@ public abstract class GraphBaseImpl implements Graph {
 	abstract public int getVCount();
 
 	@Override
-	abstract public long getVertexListVersion();
+	abstract public long getVertexListVersion() throws RemoteException;
 
 	@Override
-	public boolean isEdgeListModified(long edgeListVersion) {
+	public boolean isEdgeListModified(long edgeListVersion) throws RemoteException {
 		return getEdgeListVersion() != edgeListVersion;
 	}
 
 	@Override
-	public boolean isGraphModified(long previousVersion) {
+	public boolean isGraphModified(long previousVersion) throws RemoteException {
 		return getGraphVersion() != previousVersion;
 	}
 
 	@Override
-	public boolean isVertexListModified(long previousVersion) {
+	public boolean isVertexListModified(long previousVersion) throws RemoteException {
 		return getVertexListVersion() != previousVersion;
 	}
 
@@ -448,42 +452,43 @@ public abstract class GraphBaseImpl implements Graph {
 	 * graph is changed, all changes like adding, creating and reordering of
 	 * edges and vertices or changes of attributes of the graph, an edge or a
 	 * vertex are treated as a change.
+	 * @throws RemoteException 
 	 */
-	public abstract void graphModified();
+	public abstract void graphModified() throws RemoteException;
 
 	@Override
-	public Iterable<Vertex> getVertices() {
+	public Iterable<Vertex> getVertices() throws RemoteException {
 		return new VertexIterable<Vertex>(this);
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) throws RemoteException {
 		return new VertexIterable<Vertex>(this, vertexClass);
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices(VertexClass vertexClass) {
+	public Iterable<Vertex> getVertices(VertexClass vertexClass) throws RemoteException {
 		return new VertexIterable<Vertex>(this, vertexClass.getM1Class());
 	}
 
 	@Override
-	public Iterable<Edge> getEdges() {
+	public Iterable<Edge> getEdges() throws RemoteException {
 		return new EdgeIterable<Edge>(this);
 	}
 
 	@Override
-	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) throws RemoteException {
 		return new EdgeIterable<Edge>(this, edgeClass);
 	}
 
 	@Override
-	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
+	public Iterable<Edge> getEdges(EdgeClass edgeClass) throws RemoteException {
 		return new EdgeIterable<Edge>(this, edgeClass.getM1Class());
 	}
 
 	// sort vertices
 	@Override
-	public void sortVertices(Comparator<Vertex> comp) {
+	public void sortVertices(Comparator<Vertex> comp) throws RemoteException {
 
 		if (getFirstVertex() == null) {
 			// no sorting required for empty vertex lists
@@ -508,7 +513,7 @@ public abstract class GraphBaseImpl implements Graph {
 				v.setNextVertex(null);
 			}
 
-			public VertexImpl remove() {
+			public VertexImpl remove() throws RemoteException {
 				if (first == null) {
 					throw new NoSuchElementException();
 				}
@@ -624,7 +629,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	// sort edges
 	@Override
-	public void sortEdges(Comparator<Edge> comp) {
+	public void sortEdges(Comparator<Edge> comp) throws RemoteException {
 
 		if (getFirstEdge() == null) {
 			// no sorting required for empty edge lists
@@ -649,7 +654,7 @@ public abstract class GraphBaseImpl implements Graph {
 				e.setNextEdge(null);
 			}
 
-			public EdgeImpl remove() {
+			public EdgeImpl remove() throws RemoteException {
 				if (first == null) {
 					throw new NoSuchElementException();
 				}
@@ -784,7 +789,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void addGraphStructureChangedListener(
-			GraphStructureChangedListener newListener) {
+			GraphStructureChangedListener newListener) throws RemoteException {
 		assert newListener != null;
 		if (newListener instanceof GraphStructureChangedListenerWithAutoRemove) {
 			lazyCreateGraphStructureChangedListenersWithAutoRemoval();
@@ -798,7 +803,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void removeGraphStructureChangedListener(
-			GraphStructureChangedListener listener) {
+			GraphStructureChangedListener listener) throws RemoteException {
 		assert listener != null;
 		if (listener instanceof GraphStructureChangedListenerWithAutoRemove) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -856,7 +861,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param v
 	 *            the vertex that is about to be deleted.
 	 */
-	protected void notifyVertexDeleted(Vertex v) {
+	protected void notifyVertexDeleted(Vertex v)  throws RemoteException {
 		assert (v != null) && v.isValid() && containsVertex(v);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -886,7 +891,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param v
 	 *            the vertex that has been created.
 	 */
-	protected void notifyVertexAdded(Vertex v) {
+	protected void notifyVertexAdded(Vertex v)  throws RemoteException {
 		assert (v != null) && v.isValid() && containsVertex(v);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -916,7 +921,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param i
 	 *            the incidence that has been created.
 	 */
-	protected void notifyIncidenceAdded(Incidence i) {
+	protected void notifyIncidenceAdded(Incidence i)  throws RemoteException {
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {
@@ -945,7 +950,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param e
 	 *            the edge that is about to be deleted.
 	 */
-	protected void notifyEdgeDeleted(Edge e) {
+	protected void notifyEdgeDeleted(Edge e)  throws RemoteException {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -975,7 +980,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param e
 	 *            the edge that has been created.
 	 */
-	protected void notifyEdgeAdded(Edge e) {
+	protected void notifyEdgeAdded(Edge e)  throws RemoteException {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -998,7 +1003,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge) {
+			Edge edge)  throws RemoteException{
 		T newIncidence = vertex.connect(cls, edge);
 		return newIncidence;
 	}
@@ -1006,7 +1011,7 @@ public abstract class GraphBaseImpl implements Graph {
 	protected abstract void setICount(int count);
 
 	@Override
-	public Graph createPartialGraph(String hostname) {
+	public Graph createPartialGraph(String hostname)  throws RemoteException {
 		JGraLabServer remote = JGraLabServerImpl.getLocalInstance()
 				.getRemoteInstance(hostname);
 		Schema s = remote.getSchema(getSchema().getQualifiedName());
@@ -1026,7 +1031,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return the list of partial graphs directly and indirectly contained in
 	 *         this graph
 	 */
-	public List<PartialGraphImpl> getPartialGraphs() {
+	public List<PartialGraphImpl> getPartialGraphs() throws RemoteException {
 		LinkedList<PartialGraphImpl> list = new LinkedList<PartialGraphImpl>();
 		for (PartialGraphImpl p : partialGraphs) {
 			list.add(p);
@@ -1036,7 +1041,7 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	@Override
-	public boolean containsEdge(Edge e) {
+	public boolean containsEdge(Edge e)  throws RemoteException{
 		if (containsEdgeLocally(e)) {
 			return true;
 		}
@@ -1045,7 +1050,7 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	@Override
-	public boolean containsVertex(Vertex v) {
+	public boolean containsVertex(Vertex v) throws RemoteException {
 		if (containsVertexLocally(v)) {
 			return true;
 		}
@@ -1056,28 +1061,28 @@ public abstract class GraphBaseImpl implements Graph {
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getParentDistributedGraph();
+	public abstract GraphBaseImpl getParentDistributedGraph() throws RemoteException;
 
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getSuperordinateGraph();
+	public abstract GraphBaseImpl getSuperordinateGraph() throws RemoteException;
 
 	/**
 	 * @return the complete top-level DHHTGraph
 	 */
-	public abstract GraphBaseImpl getCompleteGraph();
+	public abstract GraphBaseImpl getCompleteGraph() throws RemoteException;
 
 	/**
 	 * checks if the vertex v is contained directly in this graph, ant not as a
 	 * member of one of its partial graphs
 	 */
-	public abstract boolean containsVertexLocally(Vertex v);
+	public abstract boolean containsVertexLocally(Vertex v) throws RemoteException;
 
 	/**
 	 * checks if the edge e is contained directly in this graph, ant not as a
 	 * member of one of its partial graphs
 	 */
-	public abstract boolean containsEdgeLocally(Edge e);
+	public abstract boolean containsEdgeLocally(Edge e) throws RemoteException;
 
 }

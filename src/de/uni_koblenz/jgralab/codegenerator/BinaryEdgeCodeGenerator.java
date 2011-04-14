@@ -36,7 +36,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 			val = "AGGREGATION";
 		}
 		code.setVariable("semantics", val);
-		code.add("public de.uni_koblenz.jgralab.schema.IncidenceType getSemantics() {",
+		code.add("public de.uni_koblenz.jgralab.schema.IncidenceType getSemantics() throws RuntimeException {",
 				 "\treturn de.uni_koblenz.jgralab.schema.IncidenceType.#semantics#;",
 				 "}");
 		return code;
@@ -46,7 +46,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("semantics", bec.getFromIncidenceClass().getIncidenceType().toString());
 		code.add("@Override",
-				 "public de.uni_koblenz.jgralab.schema.IncidenceType getAlphaSemantics() {",
+				 "public de.uni_koblenz.jgralab.schema.IncidenceType getAlphaSemantics() throws RuntimeException {",
 				 "\treturn de.uni_koblenz.jgralab.schema.IncidenceType.#semantics#;",
 				 "}");
 		return code;
@@ -56,7 +56,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("semantics", bec.getToIncidenceClass().getIncidenceType().toString());
 		code.add("@Override",
-				 "public de.uni_koblenz.jgralab.schema.IncidenceType getOmegaSemantics() {",
+				 "public de.uni_koblenz.jgralab.schema.IncidenceType getOmegaSemantics() throws RuntimeException {",
 				 "\treturn de.uni_koblenz.jgralab.schema.IncidenceType.#semantics#;",
 				 "}");
 		return code;

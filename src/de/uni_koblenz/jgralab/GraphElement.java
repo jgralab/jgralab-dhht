@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.impl.GraphElementImpl;
@@ -59,7 +60,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return int the id of this {@link GraphElement}.
 	 */
-	public int getId();
+	public int getId() throws RemoteException;
 	
 	/**
 	 * Returns the global id of this {@link GraphElement} as a combination of the partial graph id the 
@@ -67,7 +68,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return int the global id of this {@link GraphElement}.
 	 */
-	public int getGlobalId();	
+	public int getGlobalId() throws RemoteException;	
 	
 
 	/**
@@ -78,7 +79,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return boolean
 	 */
-	public boolean isValid();
+	public boolean isValid() throws RemoteException;
 
 	/**
 	 * Returns the graph containing this {@link GraphElement}. 
@@ -86,7 +87,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link Graph} containing this {@link GraphElement}
 	 */
-	public Graph getGraph();
+	public Graph getGraph() throws RemoteException;
 	
 	/**
 	 * Returns the local partial graph this element belongs to either
@@ -94,14 +95,14 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * TODO: Needs to be implemented
 	 * @return
 	 */
-	public Graph getLocalGraph();
+	public Graph getLocalGraph() throws RemoteException;
 	
 	/**
 	 * Returns the graph directly containing this graph elements, e.g. the
 	 * subordinate or partial one  
 	 * @return
 	 */
-	public Graph getContainingGraph();
+	public Graph getContainingGraph() throws RemoteException;
 
 	/**
 	 * Returns the {@link GraphElement} in which this {@link GraphElement} is
@@ -110,7 +111,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link GraphElement}
 	 */
-	public GraphElement<?, ?, ?> getParent();
+	public GraphElement<?, ?, ?> getParent() throws RemoteException;
 
 	/**
 	 * Returns a {@link Graph} which contains all elements which are nested in
@@ -118,7 +119,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link Graph}
 	 */
-	public Graph getSubordinateGraph();
+	public Graph getSubordinateGraph() throws RemoteException;
 
 	/**
 	 * Returns the kappa value of this {@link GraphElement}.
@@ -126,7 +127,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @see {@link GraphElementImpl#kappa}
 	 * @return int
 	 */
-	public int getKappa();
+	public int getKappa() throws RemoteException;
 
 	/**
 	 * Checks if this {@link GraphElement} is visible at a kappa value of
@@ -136,7 +137,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            int
 	 * @return boolean <code>true</code> if this GraphElement is visible
 	 */
-	public boolean isVisible(int kappa);
+	public boolean isVisible(int kappa) throws RemoteException;
 
 	/**
 	 * Checks if this {@link GraphElement} contains <code>element</code>.
@@ -146,7 +147,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return boolean <code>true</code> if <code>element</code> is contained in
 	 *         this {@link GraphElement}
 	 */
-	public boolean containsElement(GraphElement<?, ?, ?> element);
+	public boolean containsElement(GraphElement<?, ?, ?> element) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
@@ -154,7 +155,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence();
+	public Incidence getFirstIncidence() throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement} with
@@ -165,7 +166,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of connected {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(Direction direction);
+	public Incidence getFirstIncidence(Direction direction) throws RemoteException;
 
 	/**
 	 * Get the first {@link Incidence} which has one of the aggregation
@@ -199,8 +200,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(boolean thisIncidence,
-			IncidenceType... incidentTypes);
+	public Incidence getFirstIncidence(boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException;
 
 	/**
 	 * Returns the first incidence in lambda-seq where the corresponding
@@ -211,7 +211,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass} to search for
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass);
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -222,7 +222,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class} the {@link Incidence} class to search for
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -236,8 +236,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction);
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -251,8 +250,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,	Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -268,8 +266,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			boolean noSubclasses);
+	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,	boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -285,8 +282,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			boolean noSubclasses);
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,	boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -306,7 +302,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses);
+			Direction direction, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -326,7 +322,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction, boolean noSubclasses);
+			Direction direction, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
@@ -336,7 +332,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@Link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(Graph traversalContext);
+	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement} with
@@ -349,8 +345,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of connected {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(Graph traversalContext,
-			Direction direction);
+	public Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException;
 
 	/**
 	 * Get the first {@link Incidence} which has one of the aggregation
@@ -387,7 +382,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidentTypes);
+			boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException;
 
 	/**
 	 * Returns the first incidence in lambda-seq where the corresponding
@@ -400,8 +395,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass} to search for
 	 * @return {@link Incidence}
 	 */
-	public Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass);
+	public Incidence getFirstIncidence(Graph traversalContext, IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -414,8 +408,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class} the {@link Incidence} class to search for
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass);
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext, Class<T> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -432,7 +425,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -449,7 +442,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass, Direction direction);
+			Class<T> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -468,7 +461,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses);
+			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -487,7 +480,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass, boolean noSubclasses);
+			Class<T> anIncidenceClass, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -510,7 +503,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses);
+			boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the first {@link Incidence} in lambda-seq where the corresponding
@@ -532,14 +525,14 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Incidence}
 	 */
 	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses);
+			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) throws RemoteException;
 
 	/**
 	 * Returns the last {@link Incidence} of this {@link GraphElement}.
 	 * 
 	 * @return {@link Incidence}
 	 */
-	public Incidence getLastIncidence();
+	public Incidence getLastIncidence() throws RemoteException;
 
 	/**
 	 * Returns the last {@link Incidence} of this {@link GraphElement}.
@@ -548,7 +541,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@Link Graph}
 	 * @return {@link Incidence}
 	 */
-	public Incidence getLastIncidence(Graph traversalContext);
+	public Incidence getLastIncidence(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -556,7 +549,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences();
+	public Iterable<Incidence> getIncidences() throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -568,7 +561,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(Direction direction);
+	public Iterable<Incidence> getIncidences(Direction direction) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -579,8 +572,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public <T extends Incidence> Iterable<T> getIncidences(
-			Class<T> anIncidenceClass);
+	public <T extends Incidence> Iterable<T> getIncidences(Class<T> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -591,7 +583,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass}
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass);
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -607,7 +599,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public <T extends Incidence> Iterable<T> getIncidences(
-			Class<T> anIncidenceClass, Direction direction);
+			Class<T> anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -622,8 +614,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
-			Direction direction);
+	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -633,7 +624,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Graph}
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(Graph traversalContext);
+	public Iterable<Incidence> getIncidences(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -647,8 +638,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
-	public Iterable<Incidence> getIncidences(Graph traversalContext,
-			Direction direction);
+	public Iterable<Incidence> getIncidences(Graph traversalContext, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -662,7 +652,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public <T extends Incidence> Iterable<T> getIncidences(
-			Graph traversalContext, Class<T> anIncidenceClass);
+			Graph traversalContext, Class<T> anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -676,7 +666,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(Graph traversalContext,
-			IncidenceClass anIncidenceClass);
+			IncidenceClass anIncidenceClass) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -695,7 +685,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public <T extends Incidence> Iterable<T> getIncidences(
 			Graph traversalContext, Class<T> anIncidenceClass,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Returns an {@link Iterable} over all {@link Incidence}s at this
@@ -713,7 +703,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
 	public Iterable<Incidence> getIncidences(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -721,7 +711,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return int
 	 */
-	public int getDegree();
+	public int getDegree() throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -733,7 +723,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         connected to this GraphElement
 	 */
-	public int getDegree(Direction direction);
+	public int getDegree(Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -744,7 +734,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(IncidenceClass ic);
+	public int getDegree(IncidenceClass ic) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -755,7 +745,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(Class<? extends Incidence> ic);
+	public int getDegree(Class<? extends Incidence> ic) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -769,7 +759,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(IncidenceClass ic, boolean noSubClasses);
+	public int getDegree(IncidenceClass ic, boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -783,7 +773,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses);
+	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -797,7 +787,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
-	public int getDegree(IncidenceClass ic, Direction direction);
+	public int getDegree(IncidenceClass ic, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -811,7 +801,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
-	public int getDegree(Class<? extends Incidence> ic, Direction direction);
+	public int getDegree(Class<? extends Incidence> ic, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -829,7 +819,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(IncidenceClass ic, Direction direction,
-			boolean noSubClasses);
+			boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -847,7 +837,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(Class<? extends Incidence> ic, Direction direction,
-			boolean noSubClasses);
+			boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -857,7 +847,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Graph}
 	 * @return int
 	 */
-	public int getDegree(Graph traversalContext);
+	public int getDegree(Graph traversalContext) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -871,7 +861,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         connected to this GraphElement
 	 */
-	public int getDegree(Graph traversalContext, Direction direction);
+	public int getDegree(Graph traversalContext, Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -884,7 +874,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(Graph traversalContext, IncidenceClass ic);
+	public int getDegree(Graph traversalContext, IncidenceClass ic) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -897,7 +887,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic);
+	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -913,8 +903,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s which are an instance of
 	 *         <code>ic</code>
 	 */
-	public int getDegree(Graph traversalContext, IncidenceClass ic,
-			boolean noSubClasses);
+	public int getDegree(Graph traversalContext, IncidenceClass ic, boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -931,7 +920,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         <code>ic</code>
 	 */
 	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			boolean noSubClasses);
+			boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -948,7 +937,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -965,7 +954,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			Direction direction);
+			Direction direction) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -985,7 +974,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction, boolean noSubClasses);
+			Direction direction, boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns the number of connected {@link Incidence}s to this
@@ -1005,7 +994,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *         an instance of <code>ic</code>
 	 */
 	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			Direction direction, boolean noSubClasses);
+			Direction direction, boolean noSubClasses) throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is before
@@ -1014,7 +1003,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param g
 	 * @return boolean
 	 */
-	public boolean isBefore(OwnType g);
+	public boolean isBefore(OwnType g) throws RemoteException;
 
 	/**
 	 * TODO This method does not check, if this {@link GraphElement} is moved
@@ -1024,7 +1013,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @param g
 	 */
-	public void putBefore(OwnType g);
+	public void putBefore(OwnType g) throws RemoteException;
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is after
@@ -1033,7 +1022,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param g
 	 * @return boolean
 	 */
-	public boolean isAfter(OwnType g);
+	public boolean isAfter(OwnType g) throws RemoteException;
 
 	/**
 	 * TODO This method does not check, if this {@link GraphElement} is moved
@@ -1043,7 +1032,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @param g
 	 */
-	public void putAfter(OwnType g);
+	public void putAfter(OwnType g) throws RemoteException;
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1056,7 +1045,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> getAdjacences(String role);
+	public List<? extends OwnType> getAdjacences(String role) throws RemoteException;
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1069,7 +1058,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link IncidenceClass}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> getAdjacences(IncidenceClass ic);
+	public List<? extends OwnType> getAdjacences(IncidenceClass ic) throws RemoteException;
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1084,8 +1073,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
-	public List<? extends OwnType> getAdjacences(Graph traversalConext,
-			String role);
+	public List<? extends OwnType> getAdjacences(Graph traversalConext, String role) throws RemoteException;
 
 	/**
 	 * Returns a {@link List} of <code>OwnType</code>s, which are adjacent to
@@ -1101,7 +1089,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return {@link List} of <code>OwnType</code> objects
 	 */
 	public List<? extends OwnType> getAdjacences(Graph traversalConext,
-			IncidenceClass ic);
+			IncidenceClass ic) throws RemoteException;
 
 	/**
 	 * Creates and returns a new instance of <code>DualType</code> connected to
@@ -1118,9 +1106,10 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param other
 	 *            <code>OwnType</code>
 	 * @return <code>DualType</code>
+	 * @throws RemoteException 
 	 */
 	public DualType addAdjacence(String incidentRole, String adjacentRole,
-			OwnType other);
+			OwnType other) throws RemoteException;
 
 	/**
 	 * Creates and returns a new <code>DualType</code> instance, which is
@@ -1136,7 +1125,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return <code>DualType</code>
 	 */
 	public DualType addAdjacence(IncidenceClass incidentIc,
-			IncidenceClass adjacentIc, OwnType other);
+			IncidenceClass adjacentIc, OwnType other) throws RemoteException;
 
 	/**
 	 * Manipulation operations are not sensitive for a subgraph but affect the
@@ -1160,7 +1149,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param role
 	 * @return
 	 */
-	public List<OwnType> removeAdjacences(String role);
+	public List<OwnType> removeAdjacences(String role) throws RemoteException;
 
 	/**
 	 * TODO
@@ -1168,7 +1157,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param ic
 	 * @return
 	 */
-	public List<OwnType> removeAdjacences(IncidenceClass ic);
+	public List<OwnType> removeAdjacences(IncidenceClass ic) throws RemoteException;
 
 	/**
 	 * Manipulation operations are not sensitive for a subgraph but affect the
@@ -1190,7 +1179,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param role
 	 * @param other
 	 */
-	public void removeAdjacence(String role, OwnType other);
+	public void removeAdjacence(String role, OwnType other) throws RemoteException;
 
 	/**
 	 * TODO
@@ -1198,7 +1187,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param ic
 	 * @param other
 	 */
-	public void removeAdjacence(IncidenceClass ic, OwnType other);
+	public void removeAdjacence(IncidenceClass ic, OwnType other) throws RemoteException;
 
 	/**
 	 * Manipulation operations are not sensitive for a subgraph but affect the
@@ -1226,13 +1215,13 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link String}
 	 * @return {@link IncidenceClass}
 	 */
-	public IncidenceClass getIncidenceClassForRolename(String rolename);
+	public IncidenceClass getIncidenceClassForRolename(String rolename) throws RemoteException;
 
 	/**
 	 * Removes this {@link GraphElement} from the corresponding sequence and
 	 * erases its attributes.
 	 */
-	public void delete();
+	public void delete() throws RemoteException;
 
 	/**
 	 * Tests if the <code>DualType</code> <code>graphElement</code> may start at
@@ -1270,8 +1259,9 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            <code>DualType</code> to which this GraphElement should be
 	 *            connected
 	 * @return
+	 * @throws RemoteException 
 	 */
-	public Incidence connect(String rolename, DualType elemToConnect);
+	public Incidence connect(String rolename, DualType elemToConnect) throws RemoteException;
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -1285,7 +1275,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            connected
 	 */
 	public Incidence connect(IncidenceClass incidenceClass,
-			DualType elemToConnect);
+			DualType elemToConnect) throws RemoteException;
 
 	/**
 	 * Connects this {@link GraphElement} with <code>elemToConnect</code> via an
@@ -1299,7 +1289,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            connected
 	 */
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
-			DualType elemToConnect);
+			DualType elemToConnect) throws RemoteException;
 
 	/**
 	 * Adds <code>appendix</code> to the subordinate graph of this
@@ -1308,7 +1298,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param appendix
 	 *            {@link Vertex}
 	 */
-	public void addSubordinateElement(Vertex appendix);
+	public void addSubordinateElement(Vertex appendix) throws RemoteException;
 
 	/**
 	 * Adds <code>appendix</code> to the subordinate graph of this
@@ -1317,6 +1307,6 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @param appendix
 	 *            {@link Edge}
 	 */
-	public void addSubordinateElement(Edge appendix);
+	public void addSubordinateElement(Edge appendix) throws RemoteException;
 
 }

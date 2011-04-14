@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
 import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -51,7 +52,7 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 	 * @param elem 
 	 *            
 	 */
-	public AdjacentElementsIterable(OwnType elem) {
+	public AdjacentElementsIterable(OwnType elem) throws RemoteException {
 		this(elem, null, Direction.BOTH);
 	}
 
@@ -65,7 +66,7 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 	 *            restricts elements
 	 *           to that class or subclasses
 	 */
-	public AdjacentElementsIterable(OwnType elem, Class<? extends AdjacentElementClass> ec) {
+	public AdjacentElementsIterable(OwnType elem, Class<? extends AdjacentElementClass> ec) throws RemoteException {
 		this(elem, ec, Direction.BOTH);
 	}
 
@@ -78,7 +79,7 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 	 * @param orientation
 	 *            desired orientation
 	 */
-	public AdjacentElementsIterable(OwnType elem, Direction dir) {
+	public AdjacentElementsIterable(OwnType elem, Direction dir) throws RemoteException {
 		this(elem, null, dir);
 	}
 
@@ -93,9 +94,10 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 	 *            restricts edges to that class or subclasses
 	 * @param orientation
 	 *            desired orientation
+	 * @throws RemoteException 
 	 */
 	public AdjacentElementsIterable(OwnType elem, Class<? extends AdjacentElementClass> ec,
-			Direction dir) {
+			Direction dir) throws RemoteException {
 		assert elem != null && elem.isValid();
 		adjacentElementsIterator = new AdjacenctElementsIterator(elem, ec, dir);
 	}
@@ -109,7 +111,7 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
         private Class<? extends AdjacentElementClass> classOfAdjacentElements;
        
 		
-		public AdjacenctElementsIterator(OwnType elem, Class<? extends AdjacentElementClass> oc, Direction dir ) {
+		public AdjacenctElementsIterator(OwnType elem, Class<? extends AdjacentElementClass> oc, Direction dir ) throws RemoteException {
 			classOfAdjacentElements = oc;
 			incidencesAtOwnElementIterator = elem.getIncidences(dir).iterator();			
 		}
@@ -117,12 +119,16 @@ public abstract class AdjacentElementsIterable<OwnType extends GraphElement<?, ?
 		@Override
 		public boolean hasNext() {
 			if (gotNext)
-				nextElem = findNextElem();
+				try {
+					nextElem = findNextElem();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 			return nextElem != null;
 		}	
 		
 		@SuppressWarnings("unchecked")
-		private AdjacentElementClass findNextElem() {
+		private AdjacentElementClass findNextElem() throws RemoteException {
 			AdjacentElementClass element = null;
 			do {
 				element = null;

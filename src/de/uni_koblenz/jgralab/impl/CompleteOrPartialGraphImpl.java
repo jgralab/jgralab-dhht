@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -198,7 +199,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param currentId
 	 *            needed for transaction support
 	 */
-	protected int allocateEdgeIndex(int currentId) {
+	protected int allocateEdgeIndex(int currentId) throws RemoteException {
 		int eId = freeEdgeList.allocateIndex();
 		if (eId == 0) {
 			expandEdgeArray(getExpandedEdgeCount());
@@ -213,7 +214,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param currentId
 	 *            needed for transaction support
 	 */
-	protected int allocateIncidenceIndex(int currentId) {
+	protected int allocateIncidenceIndex(int currentId) throws RemoteException {
 		int iId = freeIncidenceList.allocateIndex();
 		if (iId == 0) {
 			expandIncidenceArray(getExpandedIncidenceCount());
@@ -228,7 +229,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param currentId
 	 *            needed for transaction support
 	 */
-	protected int allocateVertexIndex(int currentId) {
+	protected int allocateVertexIndex(int currentId) throws RemoteException {
 		int vId = freeVertexList.allocateIndex();
 		if (vId == 0) {
 			expandVertexArray(getExpandedVertexCount());
@@ -237,11 +238,11 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		return vId;
 	}
 	
-	public boolean containsVertexLocally(Vertex v) {
+	public boolean containsVertexLocally(Vertex v) throws RemoteException {
 		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
 	}
 
-	public boolean containsEdgeLocally(Edge e) {
+	public boolean containsEdgeLocally(Edge e) throws RemoteException {
 		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
 	}
 	
@@ -254,11 +255,12 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param newEdge
 	 *            Edge to add
+	 * @throws RemoteException 
 	 * @throws GraphException
 	 *             an edge with same id already exists in graph, id of edge
 	 *             greater than possible count of edges in graph
 	 */
-	protected void addEdge(Edge newEdge) {
+	protected void addEdge(Edge newEdge) throws RemoteException {
 		assert newEdge != null;
 		assert (newEdge.getSchema() == schema) : "The schemas of newEdge and this graph don't match!";
 		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
@@ -308,7 +310,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @throws GraphException if a incidence with the same id already exists
 	 */
-	protected void addIncidence(Incidence newIncidence) {
+	protected void addIncidence(Incidence newIncidence) throws RemoteException {
 		IncidenceImpl i = (IncidenceImpl) newIncidence;
 
 		int iId = i.getId();
@@ -355,7 +357,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @throws GraphException
 	 *             if a vertex with the same id already exists
 	 */
-	protected void addVertex(Vertex newVertex) {
+	protected void addVertex(Vertex newVertex) throws RemoteException {
 		VertexImpl v = (VertexImpl) newVertex;
 
 		int vId = v.getId();
@@ -473,7 +475,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	
 	
 	@Override
-	public Graph getView(int kappa) {
+	public Graph getView(int kappa) throws RemoteException {
 		return graphFactory.createViewGraph(this, kappa);
 	}
 
@@ -568,24 +570,24 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		iCount = count;
 	}
 	
-	protected void internalEdgeAdded(EdgeImpl e) {
+	protected void internalEdgeAdded(EdgeImpl e) throws RemoteException {
 		notifyEdgeAdded(e);
 	}
 
-	protected void internalEdgeDeleted(EdgeImpl e) {
+	protected void internalEdgeDeleted(EdgeImpl e) throws RemoteException {
 		assert e != null;
 		notifyEdgeDeleted(e);
 	}
 
-	protected void internalIncidenceAdded(IncidenceImpl i) {
+	protected void internalIncidenceAdded(IncidenceImpl i) throws RemoteException {
 		notifyIncidenceAdded(i);
 	}
 
-	protected void internalVertexAdded(VertexImpl v) {
+	protected void internalVertexAdded(VertexImpl v) throws RemoteException {
 		notifyVertexAdded(v);
 	}
 
-	protected void internalVertexDeleted(VertexImpl v) {
+	protected void internalVertexDeleted(VertexImpl v) throws RemoteException {
 		assert v != null;
 		notifyVertexDeleted(v);
 	}
@@ -725,7 +727,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the edge array
 	 */
-	protected void expandEdgeArray(int newSize) {
+	protected void expandEdgeArray(int newSize) throws RemoteException {
 		if (newSize <= eMax) {
 			throw new GraphException("newSize must be > eSize: eSize=" + eMax
 					+ ", newSize=" + newSize);
@@ -755,7 +757,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the incidence array
 	 */
-	protected void expandIncidenceArray(int newSize) {
+	protected void expandIncidenceArray(int newSize) throws RemoteException {
 		if (newSize <= iMax) {
 			throw new GraphException("newSize must > iSize: iSize=" + iMax
 					+ ", newSize=" + newSize);
@@ -781,7 +783,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the vertex array
 	 */
-	protected void expandVertexArray(int newSize) {
+	protected void expandVertexArray(int newSize) throws RemoteException {
 		if (newSize <= vMax) {
 			throw new GraphException("newSize must > vSize: vSize=" + vMax
 					+ ", newSize=" + newSize);
@@ -807,7 +809,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @see de.uni_koblenz.jgralab.Graph#defragment()
 	 */
 	@Override
-	public void defragment() {
+	public void defragment() throws RemoteException {
 		// defragment vertex array
 		if (getVCount() < vMax) {
 			if (getVCount() > 0) {
@@ -987,37 +989,37 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public boolean containsVertex(Vertex v) {
+	public boolean containsVertex(Vertex v)  throws RemoteException{
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean containsEdge(Edge e) {
+	public boolean containsEdge(Edge e)  throws RemoteException{
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void deleteVertex(Vertex v) {
+	public void deleteVertex(Vertex v)  throws RemoteException{
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void deleteEdge(Edge e) {
+	public void deleteEdge(Edge e) throws RemoteException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
+	public Vertex getVertex(int id)  throws RemoteException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Edge getEdge(int id) {
+	public Edge getEdge(int id)  throws RemoteException{
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -1049,7 +1051,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newValue
 	 *            the new maximum edge count.
 	 */
-	protected void notifyMaxEdgeCountIncreased(int newValue) {
+	protected void notifyMaxEdgeCountIncreased(int newValue) throws RemoteException {
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {
@@ -1081,7 +1083,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newValue
 	 *            the new maximum incidence count.
 	 */
-	protected void notifyMaxIncidenceCountIncreased(int newValue) {
+	protected void notifyMaxIncidenceCountIncreased(int newValue) throws RemoteException {
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {
@@ -1111,7 +1113,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newValue
 	 *            the new maximum vertex count.
 	 */
-	protected void notifyMaxVertexCountIncreased(int newValue) {
+	protected void notifyMaxVertexCountIncreased(int newValue) throws RemoteException {
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {

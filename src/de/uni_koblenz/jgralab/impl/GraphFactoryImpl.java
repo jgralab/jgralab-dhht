@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.reflect.Constructor;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -315,7 +316,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) {
+	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			ViewGraphImpl g = (ViewGraphImpl) viewGraphMap.get(graphClass)
@@ -329,8 +330,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public SubordinateGraphImpl createSubordinateGraph(
-			GraphElement<?, ?, ?> elem) {
+	public SubordinateGraphImpl createSubordinateGraph(GraphElement<?, ?, ?> elem) throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
 			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap
@@ -344,7 +344,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public PartialGraphImpl createPartialGraph(Graph completeGraph) {
+	public PartialGraphImpl createPartialGraph(Graph completeGraph) throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = completeGraph.getM1Class();
 			PartialGraphImpl g = (PartialGraphImpl) partialGraphMap.get(
@@ -359,7 +359,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
-			GraphElement<?, ?, ?> elem) {
+			GraphElement<?, ?, ?> elem) throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
 			PartialSubordinateGraphImpl g = (PartialSubordinateGraphImpl) partialSubordinateGraphMap

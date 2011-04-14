@@ -8,7 +8,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 public interface TypedElement<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
-                 extends Comparable<ConcreteInterface>, Remote {
+                 extends Comparable<ConcreteInterface> {
 
 	/**
 	 * Returns the m1-class of this {@link AttributedElement}.

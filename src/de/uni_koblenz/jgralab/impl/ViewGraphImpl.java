@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -64,7 +65,7 @@ public abstract class ViewGraphImpl implements Graph,
 	 * @param lowestVisibleKappaLevel
 	 *            the loweset kappa level of visible elements
 	 */
-	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
+	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) throws RemoteException {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
 		setECount(viewedGraph.getECount());
@@ -90,7 +91,7 @@ public abstract class ViewGraphImpl implements Graph,
 	 * multi-delegation and unnecessary overhead
 	 */
 	@Override
-	public ViewGraphImpl getView(int level) {
+	public ViewGraphImpl getView(int level) throws RemoteException {
 		if (level < lowestVisibleKappaLevel) {
 			level = lowestVisibleKappaLevel;
 		}
@@ -138,38 +139,43 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Class<? extends Graph> getM1Class() {
+	public Class<? extends Graph> getM1Class() throws RemoteException {
 		return viewedGraph.getM1Class();
 	}
 
 	@Override
-	public GraphClass getType() {
+	public GraphClass getType() throws RemoteException {
 		return viewedGraph.getType();
 	}
 
 	@Override
-	public GraphClass getGraphClass() {
+	public GraphClass getGraphClass() throws RemoteException {
 		return viewedGraph.getGraphClass();
 	}
 
 	@Override
-	public Schema getSchema() {
+	public Schema getSchema() throws RemoteException {
 		return viewedGraph.getSchema();
 	}
 
 	@Override
 	public int compareTo(Graph arg0) {
-		if (viewedGraph == arg0) {
-			// each graph is smaller than the complete graph
-			return -1;
-		} else if (arg0.getContainingElement() == null) {
-			// this is a ViewGraphImpl
-			// the ViewGraphImpl with smaller lowestVisibleKappaLevel is greater
-			return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
-					- lowestVisibleKappaLevel;
-		} else {
-			// arg0 is a subordinate or partial graph
-			return viewedGraph.compareTo(arg0);
+		try {
+			if (viewedGraph == arg0) {
+				// each graph is smaller than the complete graph
+				return -1;
+			} else
+			if (arg0.getContainingElement() == null) {
+					// this is a ViewGraphImpl
+					// the ViewGraphImpl with smaller lowestVisibleKappaLevel is greater
+					return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
+							- lowestVisibleKappaLevel;
+			} else {
+				// arg0 is a subordinate or partial graph
+				return viewedGraph.compareTo(arg0);
+			}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -184,39 +190,39 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Graph getTraversalContext() {
+	public Graph getTraversalContext() throws RemoteException {
 		return viewedGraph.getTraversalContext();
 	}
 
 	@Override
-	public void useAsTraversalContext() {
+	public void useAsTraversalContext() throws RemoteException {
 		((GraphBaseImpl) viewedGraph).setTraversalContext(this);
 	}
 
 	@Override
-	public void releaseTraversalContext() {
+	public void releaseTraversalContext() throws RemoteException {
 		viewedGraph.releaseTraversalContext();
 	}
 
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls) {
+	public <T extends Vertex> T createVertex(Class<T> cls) throws RemoteException {
 		return viewedGraph.createVertex(cls);
 	}
 
 	@Override
-	public <T extends Edge> T createEdge(Class<T> cls) {
+	public <T extends Edge> T createEdge(Class<T> cls) throws RemoteException {
 		return viewedGraph.createEdge(cls);
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge) {
+			Edge edge) throws RemoteException {
 		return viewedGraph.connect(cls, vertex, edge);
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega) {
+			Vertex omega) throws RemoteException {
 		return viewedGraph.createEdge(cls, alpha, omega);
 	}
 
@@ -231,49 +237,49 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public boolean isGraphModified(long previousVersion) {
+	public boolean isGraphModified(long previousVersion) throws RemoteException {
 		return viewedGraph.isGraphModified(previousVersion);
 	}
 
 	@Override
-	public long getGraphVersion() {
+	public long getGraphVersion() throws RemoteException {
 		return viewedGraph.getGraphVersion();
 	}
 
 	@Override
-	public boolean isVertexListModified(long previousVersion) {
+	public boolean isVertexListModified(long previousVersion) throws RemoteException {
 		return viewedGraph.isVertexListModified(previousVersion);
 	}
 
 	@Override
-	public long getVertexListVersion() {
+	public long getVertexListVersion() throws RemoteException {
 		return viewedGraph.getVertexListVersion();
 	}
 
 	@Override
-	public boolean isEdgeListModified(long edgeListVersion) {
+	public boolean isEdgeListModified(long edgeListVersion) throws RemoteException {
 		return viewedGraph.isEdgeListModified(edgeListVersion);
 	}
 
 	@Override
-	public long getEdgeListVersion() {
+	public long getEdgeListVersion() throws RemoteException {
 		return viewedGraph.getEdgeListVersion();
 	}
 
 	@Override
-	public boolean containsVertex(Vertex v) {
+	public boolean containsVertex(Vertex v) throws RemoteException {
 		return v.isVisible(lowestVisibleKappaLevel)
 				&& viewedGraph.containsVertex(v);
 	}
 
 	@Override
-	public boolean containsEdge(Edge e) {
+	public boolean containsEdge(Edge e) throws RemoteException {
 		return e.isVisible(lowestVisibleKappaLevel)
 				&& viewedGraph.containsEdge(e);
 	}
 
 	@Override
-	public void deleteVertex(Vertex v) {
+	public void deleteVertex(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			viewedGraph.deleteVertex(v);
 		} else {
@@ -285,7 +291,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public void deleteEdge(Edge e) {
+	public void deleteEdge(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			viewedGraph.deleteEdge(e);
 		} else {
@@ -297,38 +303,38 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Vertex getFirstVertex() {
+	public Vertex getFirstVertex() throws RemoteException {
 		Vertex v = viewedGraph.getFirstVertex();
 		return v == null || containsVertex(v) ? v : v.getNextVertex(this);
 	}
 
 	@Override
-	public Vertex getLastVertex() {
+	public Vertex getLastVertex() throws RemoteException {
 		Vertex v = viewedGraph.getLastVertex();
 		return v == null || containsVertex(v) ? v : v.getPreviousVertex(this);
 	}
 
 	@Override
-	public Vertex getFirstVertex(VertexClass vertexClass) {
+	public Vertex getFirstVertex(VertexClass vertexClass) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass.getM1Class(), false);
 	}
 
 	@Override
-	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
+	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) throws RemoteException {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass, false);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert vertexClass != null;
 		Vertex firstVertex = getFirstVertex();
 		if (firstVertex == null) {
@@ -347,35 +353,35 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Edge getFirstEdge() {
+	public Edge getFirstEdge() throws RemoteException {
 		Edge e = viewedGraph.getFirstEdge();
 		return e == null || containsEdge(e) ? e : e.getNextEdge(this);
 	}
 
 	@Override
-	public Edge getLastEdge() {
+	public Edge getLastEdge() throws RemoteException {
 		Edge e = viewedGraph.getLastEdge();
 		return e == null || containsEdge(e) ? e : e.getPreviousEdge(this);
 	}
 
 	@Override
-	public Edge getFirstEdge(EdgeClass edgeClass) {
+	public Edge getFirstEdge(EdgeClass edgeClass) throws RemoteException {
 		return getFirstEdge(edgeClass.getM1Class(), false);
 	}
 
 	@Override
-	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
+	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) throws RemoteException {
 		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass) throws RemoteException {
 		return getFirstEdge(edgeClass, false);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert edgeClass != null;
 		Edge currentEdge = getFirstEdge();
 		while (currentEdge != null) {
@@ -394,7 +400,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
+	public Vertex getVertex(int id) throws RemoteException {
 		Vertex v = viewedGraph.getVertex(id);
 		if (v.isVisible(lowestVisibleKappaLevel)) {
 			return v;
@@ -404,7 +410,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Edge getEdge(int id) {
+	public Edge getEdge(int id) throws RemoteException {
 		Edge e = viewedGraph.getEdge(id);
 		if (e.isVisible(lowestVisibleKappaLevel)) {
 			return e;
@@ -444,32 +450,32 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Iterable<Edge> getEdges() {
+	public Iterable<Edge> getEdges() throws RemoteException {
 		return new EdgeIterable<Edge>(this);
 	}
 
 	@Override
-	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
+	public Iterable<Edge> getEdges(EdgeClass edgeClass) throws RemoteException {
 		return new EdgeIterable<Edge>(this, edgeClass.getM1Class());
 	}
 
 	@Override
-	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) throws RemoteException {
 		return new EdgeIterable<Edge>(this, edgeClass);
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices() {
+	public Iterable<Vertex> getVertices() throws RemoteException {
 		return new VertexIterable<Vertex>(this);
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices(VertexClass vertexclass) {
+	public Iterable<Vertex> getVertices(VertexClass vertexclass) throws RemoteException {
 		return new VertexIterable<Vertex>(this, vertexclass.getM1Class());
 	}
 
 	@Override
-	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) throws RemoteException {
 		return new VertexIterable<Vertex>(this, vertexClass);
 	}
 
@@ -479,133 +485,133 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList() {
+	public <T> JGraLabList<T> createList() throws RemoteException {
 		return viewedGraph.createList();
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) throws RemoteException {
 		return viewedGraph.createList(collection);
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
+	public <T> JGraLabList<T> createList(int initialCapacity) throws RemoteException {
 		return viewedGraph.createList(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet() {
+	public <T> JGraLabSet<T> createSet() throws RemoteException {
 		return viewedGraph.createSet();
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) throws RemoteException {
 		return viewedGraph.createSet(collection);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
+	public <T> JGraLabSet<T> createSet(int initialCapacity) throws RemoteException {
 		return viewedGraph.createSet(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) throws RemoteException {
 		return viewedGraph.createSet(initialCapacity, loadFactor);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
+	public <K, V> JGraLabMap<K, V> createMap() throws RemoteException {
 		return viewedGraph.createMap();
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) throws RemoteException {
 		return viewedGraph.createMap(map);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) throws RemoteException {
 		return viewedGraph.createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
+			float loadFactor) throws RemoteException {
 		return viewedGraph.createMap(initialCapacity, loadFactor);
 	}
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) throws RemoteException {
 		return viewedGraph.createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
+			Map<String, Object> fields) throws RemoteException {
 		return viewedGraph.createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
+			Object... components) throws RemoteException {
 		return viewedGraph.createRecord(recordClass, components);
 	}
 
 	@Override
-	public void sortVertices(Comparator<Vertex> comp) {
+	public void sortVertices(Comparator<Vertex> comp) throws RemoteException {
 		viewedGraph.sortVertices(comp);
 	}
 
 	@Override
-	public void sortEdges(Comparator<Edge> comp) {
+	public void sortEdges(Comparator<Edge> comp) throws RemoteException {
 		viewedGraph.sortEdges(comp);
 	}
 
 	@Override
 	public void addGraphStructureChangedListener(
-			GraphStructureChangedListener newListener) {
+			GraphStructureChangedListener newListener) throws RemoteException {
 		viewedGraph.addGraphStructureChangedListener(newListener);
 	}
 
 	@Override
 	public void removeGraphStructureChangedListener(
-			GraphStructureChangedListener listener) {
+			GraphStructureChangedListener listener) throws RemoteException {
 		viewedGraph.removeGraphStructureChangedListener(listener);
 	}
 
 	@Override
-	public void removeAllGraphStructureChangedListeners() {
+	public void removeAllGraphStructureChangedListeners() throws RemoteException {
 		viewedGraph.removeAllGraphStructureChangedListeners();
 	}
 
 	@Override
-	public int getGraphStructureChangedListenerCount() {
+	public int getGraphStructureChangedListenerCount() throws RemoteException {
 		return viewedGraph.getGraphStructureChangedListenerCount();
 	}
 
 	@Override
-	public void vertexAdded(Vertex v) {
+	public void vertexAdded(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			setVCount(getVCount() + 1);
 		}
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
+	public void vertexDeleted(Vertex v) throws RemoteException {
 		if (containsVertex(v)) {
 			setVCount(getVCount() + 1);
 		}
 	}
 
 	@Override
-	public void edgeAdded(Edge e) {
+	public void edgeAdded(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			setECount(getECount() + 1);
 		}
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e) throws RemoteException {
 		if (containsEdge(e)) {
 			setECount(getECount() + 1);
 		}
@@ -624,14 +630,14 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public void incidenceAdded(Incidence i) {
+	public void incidenceAdded(Incidence i) throws RemoteException {
 		if (containsEdge(i.getEdge())) {
 			setICount(getICount() + 1);
 		}
 	}
 
 	@Override
-	public void incidenceDeleted(Incidence i) {
+	public void incidenceDeleted(Incidence i) throws RemoteException {
 		if (containsEdge(i.getEdge())) {
 			setICount(getICount() + 1);
 		}

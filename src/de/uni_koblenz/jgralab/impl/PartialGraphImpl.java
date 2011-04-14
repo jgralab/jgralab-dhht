@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
@@ -22,7 +24,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	boolean loading = false;
 
-	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph) {
+	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph) throws RemoteException {
 		super(cls);
 		this.completeGraph = completeGraph;
 		id = ((CompleteGraphImpl) completeGraph.getCompleteGraph())
@@ -41,7 +43,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * vertex are treated as a change.
 	 */
 	@Override
-	public void graphModified() {
+	public void graphModified() throws RemoteException {
 		graphVersion++;
 		completeGraph.graphModified();
 	}
@@ -52,7 +54,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * creation and deletion or reordering of vertices.
 	 */
 	@Override
-	protected void vertexListModified() {
+	protected void vertexListModified() throws RemoteException {
 		vertexListVersion++;
 		graphVersion++;
 		completeGraph.vertexListModified();
@@ -64,7 +66,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * creation and deletion or reordering of vertices.
 	 */
 	@Override
-	protected void edgeListModified() {
+	protected void edgeListModified() throws RemoteException {
 		edgeListVersion++;
 		graphVersion++;
 		completeGraph.edgeListModified();
@@ -75,7 +77,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * partial graphs
 	 */
 	@Override
-	public boolean containsEdge(Edge e) {
+	public boolean containsEdge(Edge e) throws RemoteException {
 		return (e != null) && (e.getGraph() == this)
 				&& containsEdgeId(((EdgeImpl) e).id);
 	}
@@ -85,7 +87,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * partial graphs
 	 */
 	@Override
-	public boolean containsVertex(Vertex v) {
+	public boolean containsVertex(Vertex v) throws RemoteException {
 		VertexImpl[] vertex = getVertexArray();
 		return (v != null) && (v.getGraph() == this)
 				&& containsVertexId(((VertexImpl) v).id)
@@ -98,7 +100,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public void deleteEdge(Edge e) {
+	public void deleteEdge(Edge e) throws RemoteException {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		internalDeleteEdge(e);
 		edgeListModified();
@@ -110,7 +112,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public String getUid() {
+	public String getUid() throws RemoteException {
 		return getCompleteGraph().getUid();
 	}
 

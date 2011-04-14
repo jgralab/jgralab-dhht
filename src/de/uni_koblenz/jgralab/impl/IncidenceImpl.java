@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.impl;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -62,7 +64,7 @@ public abstract class IncidenceImpl implements Incidence {
 	 * @param e
 	 *            {@link Edge}
 	 */
-	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e) {
+	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e) throws RemoteException {
 		this.id = id;
 		setIncidentEdge(e);
 		setIncidentVertex(v);
@@ -188,7 +190,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext) {
+	public Incidence getNextIncidenceAtEdge(Graph traversalContext) throws RemoteException {
 		Incidence nextIncidence = nextIncidenceAtEdge;
 		if (nextIncidence == null
 				|| !traversalContext.getContainingElement().containsElement(
@@ -201,7 +203,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext) {
+	public Incidence getNextIncidenceAtVertex(Graph traversalContext) throws RemoteException {
 		Incidence nextIncidence = nextIncidenceAtVertex;
 		if (nextIncidence == null) {
 			return null;
@@ -214,7 +216,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
+	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) throws RemoteException {
 		Incidence previousIncidence = previousIncidenceAtEdge;
 		if (previousIncidence == null
 				|| !traversalContext.getContainingElement().containsElement(
@@ -227,7 +229,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
+	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) throws RemoteException {
 		Incidence previousIncidence = previousIncidenceAtVertex;
 		if (previousIncidence == null) {
 			return null;
@@ -241,14 +243,14 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
+	public Iterable<Edge> getTheseEdges(Graph traversalContext) throws RemoteException {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentVertex);
 		return incidentVertex.getIncidentEdges(traversalContext, direction);
 	}
 
 	@Override
-	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
+	public Iterable<Edge> getThoseEdges(Graph traversalContext) throws RemoteException {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentVertex);
 		return incidentVertex
@@ -259,7 +261,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Vertex getThis(Graph traversalContext) {
+	public Vertex getThis(Graph traversalContext) throws RemoteException {
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
@@ -272,14 +274,14 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
+	public Iterable<Vertex> getTheseVertices(Graph traversalContext) throws RemoteException {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentEdge);
 		return incidentEdge.getIncidentVertices(traversalContext, direction);
 	}
 
 	@Override
-	public Vertex getThat(Graph traversalContext) {
+	public Vertex getThat(Graph traversalContext) throws RemoteException {
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
@@ -295,7 +297,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
+	public Iterable<Vertex> getThoseVertices(Graph traversalContext) throws RemoteException {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentEdge);
 		return incidentEdge
@@ -306,7 +308,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public void putBeforeAtVertex(Incidence i) {
+	public void putBeforeAtVertex(Incidence i) throws RemoteException {
 		assert i != null;
 		assert i != this;
 		assert getGraph() == i.getGraph();
@@ -355,7 +357,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public void putAfterAtVertex(Incidence i) {
+	public void putAfterAtVertex(Incidence i) throws RemoteException {
 		assert i != null;
 		assert i != this;
 		assert getGraph() == i.getGraph();
@@ -404,7 +406,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public void putBeforeAtEdge(Incidence i) {
+	public void putBeforeAtEdge(Incidence i) throws RemoteException {
 		assert i != null;
 		assert i != this;
 		assert getGraph() == i.getGraph();
@@ -452,7 +454,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public void putAfterAtEdge(Incidence i) {
+	public void putAfterAtEdge(Incidence i) throws RemoteException {
 		assert i != null;
 		assert i != this;
 		assert getGraph() == i.getGraph();
@@ -512,31 +514,35 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	@Override
 	public int compareTo(Incidence i) {
-		assert getGraph() == i.getGraph();
-		return getId() - i.getId();
+		try {
+			assert getGraph() == i.getGraph();
+			return getId() - i.getId();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
 	@Override
-	public Incidence getNextIncidenceAtEdge() {
+	public Incidence getNextIncidenceAtEdge() throws RemoteException {
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtEdge(Direction direction) {
+	public Incidence getNextIncidenceAtEdge(Direction direction) throws RemoteException {
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				direction);
 	}
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(boolean thisIncidence,
-			IncidenceType... incidenceTypes) {
+			IncidenceType... incidenceTypes) throws RemoteException {
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				thisIncidence, incidenceTypes);
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass) {
+	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass);
@@ -544,7 +550,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass) {
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass);
@@ -552,7 +558,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, direction);
@@ -560,7 +566,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, direction);
@@ -568,7 +574,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, noSubclasses);
@@ -576,7 +582,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, noSubclasses);
@@ -584,7 +590,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
+			Direction direction, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, direction, noSubclasses);
@@ -593,7 +599,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
 				anIncidenceClass, direction, noSubclasses);
@@ -601,7 +607,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		Incidence i = getNextIncidenceAtEdge();
 		while ((i != null) && direction != null && direction != Direction.BOTH
 				&& i.getDirection() != direction) {
@@ -612,7 +618,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidenceTypes) {
+			boolean thisIncidence, IncidenceType... incidenceTypes) throws RemoteException {
 		Incidence i = getNextIncidenceAtEdge(traversalContext);
 		if (incidenceTypes.length == 0) {
 			return i;
@@ -631,7 +637,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass) {
+			IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
 				false);
@@ -639,7 +645,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass) {
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
 				false);
@@ -647,7 +653,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass,
 				direction, false);
@@ -655,7 +661,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass,
 				direction, false);
@@ -663,7 +669,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
 				noSubclasses);
@@ -671,7 +677,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
 				noSubclasses);
@@ -680,7 +686,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(traversalContext,
 				anIncidenceClass.getM1Class(), direction, noSubclasses);
@@ -689,7 +695,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		Incidence currentIncidence = getNextIncidenceAtEdge(traversalContext,
 				direction);
@@ -710,30 +716,30 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtEdge() {
+	public Incidence getPreviousIncidenceAtEdge() throws RemoteException {
 		return getPreviousIncidenceAtEdge(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtVertex() {
+	public Incidence getNextIncidenceAtVertex() throws RemoteException {
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtVertex(Direction direction) {
+	public Incidence getNextIncidenceAtVertex(Direction direction) throws RemoteException {
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				direction);
 	}
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(boolean thisIncidence,
-			IncidenceType... incidenceTypes) {
+			IncidenceType... incidenceTypes) throws RemoteException {
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				thisIncidence, incidenceTypes);
 	}
 
 	@Override
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass) {
+	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass);
@@ -741,7 +747,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass) {
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass);
@@ -749,7 +755,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, direction);
@@ -757,7 +763,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, direction);
@@ -765,7 +771,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, noSubclasses);
@@ -773,7 +779,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, noSubclasses);
@@ -781,7 +787,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
+			Direction direction, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, direction, noSubclasses);
@@ -790,7 +796,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, direction, noSubclasses);
@@ -798,7 +804,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Direction direction) {
+			Direction direction) throws RemoteException {
 		Incidence i = getNextIncidenceAtVertex(traversalContext);
 		while ((i != null) && direction != null && direction != Direction.BOTH
 				&& i.getDirection() != direction) {
@@ -809,7 +815,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidenceTypes) {
+			boolean thisIncidence, IncidenceType... incidenceTypes) throws RemoteException {
 		Incidence i = getNextIncidenceAtVertex(traversalContext);
 		if (incidenceTypes.length == 0) {
 			return i;
@@ -828,7 +834,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass) {
+			IncidenceClass anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				null, false);
@@ -836,7 +842,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass) {
+			Class<? extends Incidence> anIncidenceClass) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				null, false);
@@ -844,7 +850,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
+			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				direction, false);
@@ -852,7 +858,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
+			Class<? extends Incidence> anIncidenceClass, Direction direction) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				direction, false);
@@ -860,7 +866,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+			IncidenceClass anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				null, noSubclasses);
@@ -868,7 +874,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
+			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
 				null, noSubclasses);
@@ -877,7 +883,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext,
 				anIncidenceClass.getM1Class(), direction, noSubclasses);
@@ -886,7 +892,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
+			boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		Incidence currentIncidence = getNextIncidenceAtVertex(traversalContext,
 				direction);
@@ -907,42 +913,42 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtVertex() {
+	public Incidence getPreviousIncidenceAtVertex() throws RemoteException {
 		return getPreviousIncidenceAtVertex(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Iterable<Edge> getThoseEdges() {
+	public Iterable<Edge> getThoseEdges() throws RemoteException {
 		return getThoseEdges(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Iterable<Edge> getTheseEdges() {
+	public Iterable<Edge> getTheseEdges() throws RemoteException {
 		return getTheseEdges(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Vertex getThis() {
+	public Vertex getThis() throws RemoteException {
 		return getThis(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Iterable<Vertex> getTheseVertices() {
+	public Iterable<Vertex> getTheseVertices() throws RemoteException {
 		return getTheseVertices(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Vertex getThat() {
+	public Vertex getThat() throws RemoteException {
 		return getThat(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public Iterable<Vertex> getThoseVertices() {
+	public Iterable<Vertex> getThoseVertices() throws RemoteException {
 		return getThoseVertices(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public boolean isBeforeAtVertex(Incidence i) {
+	public boolean isBeforeAtVertex(Incidence i) throws RemoteException {
 		assert i != null;
 		assert getGraph() == i.getGraph();
 		if (this == i) {
@@ -956,7 +962,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public boolean isAfterAtVertex(Incidence i) {
+	public boolean isAfterAtVertex(Incidence i) throws RemoteException {
 		assert i != null;
 		assert getGraph() == i.getGraph();
 		if (this == i) {
@@ -970,7 +976,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public boolean isBeforeAtEdge(Incidence i) {
+	public boolean isBeforeAtEdge(Incidence i) throws RemoteException {
 		assert i != null;
 		assert getGraph() == i.getGraph();
 		if (this == i) {
@@ -984,7 +990,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public boolean isAfterAtEdge(Incidence i) {
+	public boolean isAfterAtEdge(Incidence i) throws RemoteException {
 		assert i != null;
 		assert getGraph() == i.getGraph();
 		if (this == i) {
@@ -998,17 +1004,17 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public GraphClass getGraphClass() {
+	public GraphClass getGraphClass() throws RemoteException {
 		return getVertex().getGraphClass();
 	}
 
 	@Override
-	public Schema getSchema() {
+	public Schema getSchema() throws RemoteException {
 		return getVertex().getSchema();
 	}
 
 	@Override
-	public IncidenceType getThisSemantics() {
+	public IncidenceType getThisSemantics() throws RemoteException {
 		if (getEdge().isBinary()) {
 			return this.getType().getIncidenceType();
 		} else {
@@ -1018,7 +1024,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 
 	@Override
-	public IncidenceType getThatSemantics() {
+	public IncidenceType getThatSemantics() throws RemoteException {
 		if (getEdge().isBinary()) {
 			return getThatIncidence().getType().getIncidenceType();
 		} else {
@@ -1027,7 +1033,7 @@ public abstract class IncidenceImpl implements Incidence {
 		}
 	}
 
-	public Incidence getThatIncidence() {
+	public Incidence getThatIncidence() throws RemoteException {
 		if (getEdge().isBinary()) {
 			return getEdge().getFirstIncidence() == this ? getEdge()
 					.getFirstIncidence() : getEdge().getLastIncidence();
