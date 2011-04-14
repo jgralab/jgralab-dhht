@@ -69,33 +69,12 @@ public abstract class SubordinateGraphImpl extends
 	// TODO: Check if the respective methods are really
 	// needed in the graph interface and how to ensure, that
 	// the variables reflect the number of elements in the subgraphs
-	/*
-	 * If a vertex or edge is added to this subordinate graph, these values are
-	 * updated automatically. If an Incidence is created iCount is updated
-	 * automatically.
-	 */
+
 	private int vCount;
 
 	private int eCount;
 
 	private int iCount;
-
-	// those variables should not be kept in each subgraph but only in the
-	// partial ones and the toplevel
-
-	/**
-	 * Holds the version of the vertex sequence. For every modification (e.g.
-	 * adding/deleting a vertex or changing the vertex sequence) this version
-	 * number is increased by 1. It is set to 0 when the graph is loaded.
-	 */
-	// private long vertexListVersion;
-
-	/**
-	 * Holds the version of the edge sequence. For every modification (e.g.
-	 * adding/deleting an edge or changing the edge sequence) this version
-	 * number is increased by 1. It is set to 0 when the graph is loaded.
-	 */
-	// private long edgeListVersion;
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -143,7 +122,8 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(Vertex containingVertex) throws RemoteException {
+	protected SubordinateGraphImpl(Vertex containingVertex)
+			throws RemoteException {
 		super(containingVertex.getGraph().getType());
 		initializeCommonFields(containingVertex);
 
@@ -231,12 +211,14 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) throws RemoteException {
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection)
+			throws RemoteException {
 		return containingElement.getGraph().createList(collection);
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) throws RemoteException {
+	public <T> JGraLabList<T> createList(int initialCapacity)
+			throws RemoteException {
 		return containingElement.getGraph().createList(initialCapacity);
 	}
 
@@ -246,17 +228,20 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) throws RemoteException {
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection)
+			throws RemoteException {
 		return containingElement.getGraph().createSet(collection);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) throws RemoteException {
+	public <T> JGraLabSet<T> createSet(int initialCapacity)
+			throws RemoteException {
 		return containingElement.getGraph().createSet(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) throws RemoteException {
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor)
+			throws RemoteException {
 		return containingElement.getGraph().createSet(initialCapacity,
 				loadFactor);
 	}
@@ -267,12 +252,14 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) throws RemoteException {
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map)
+			throws RemoteException {
 		return containingElement.getGraph().createMap(map);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) throws RemoteException {
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity)
+			throws RemoteException {
 		return containingElement.getGraph().createMap(initialCapacity);
 	}
 
@@ -284,7 +271,8 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) throws RemoteException {
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
+			throws RemoteException {
 		return containingElement.getGraph().createRecord(recordClass, io);
 	}
 
@@ -446,7 +434,8 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls) throws RemoteException {
+	public <T extends Vertex> T createVertex(Class<T> cls)
+			throws RemoteException {
 		T vertex = super.createVertex(cls);
 		containingElement.addSubordinateElement(vertex);
 		return vertex;
@@ -628,13 +617,33 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int compareTo(Graph a) {
-		// TODO check for subordinateGraph
-		if (a instanceof Graph) {
-			Graph g = a;
-			return hashCode() - g.hashCode();
+	public int compareTo(Graph arg0) {
+		try {
+			if (getCompleteGraph() == arg0) {
+				// each graph is smaller than the complete graph
+				return -1;
+			} else if (arg0.getContainingElement() != null) {
+				// this is a SubordinateGraphImpl
+				GraphElement<?, ?, ?> ce = arg0.getContainingElement();
+				boolean isArg0Vertex = ce instanceof Vertex;
+				boolean isThisVertex = getContainingElement() instanceof Vertex;
+				if (isArg0Vertex && isThisVertex) {
+					// both are vertices
+					return ((Vertex) getContainingElement())
+							.compareTo((Vertex) ce);
+				} else if (!isArg0Vertex && !isThisVertex) {
+					// both are edges
+					return ((Edge) getContainingElement()).compareTo((Edge) ce);
+				} else {
+					// the subordinate graph of a vertex is greater
+					return isThisVertex ? 1 : -1;
+				}
+			} else {
+				// this is a ViewGraphImpl or PartialGraphImpl
+				return -arg0.compareTo(this);
+			}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
-		return -1;
 	}
-
 }
