@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -182,8 +183,12 @@ public class GreqlGui extends JFrame {
 									JOptionPane.ERROR_MESSAGE);
 							statusLabel.setText("Couldn't load graph :-(");
 						} else {
-							statusLabel.setText("Graph '" + graph.getUid()
-									+ "' loaded.");
+							try {
+								statusLabel.setText("Graph '" + graph.getUid()
+										+ "' loaded.");
+							} catch (RemoteException e) {
+								throw new RuntimeException(e);
+							}
 						}
 						fileSelectionButton.setEnabled(true);
 						evalQueryButton.setEnabled(graph != null);

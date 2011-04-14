@@ -38,6 +38,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -151,7 +152,7 @@ public class GreqlServer extends Thread {
 		}
 	}
 
-	private void saveAsDot(JValue val, String dotFileName) {
+	private void saveAsDot(JValue val, String dotFileName) throws RemoteException {
 		Graph g = eval.getDatagraph();
 		BooleanGraphMarker marker = new BooleanGraphMarker(g);
 		markResultElements(val, marker);
@@ -171,7 +172,7 @@ public class GreqlServer extends Thread {
 		//Tg2Dot.printGraphAsDot(marker, false, dotFileName);
 	}
 
-	private void markResultElements(JValue val, BooleanGraphMarker marker) {
+	private void markResultElements(JValue val, BooleanGraphMarker marker) throws RemoteException {
 		if (val.isCollection()) {
 			JValueCollection coll = val.toCollection();
 			for (JValue v : coll) {

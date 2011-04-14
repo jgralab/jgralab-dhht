@@ -58,6 +58,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
+		addImports("java.rmi.RemoteException");
 	}
 
 	@Override

@@ -47,6 +47,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		super(vertexClass, schemaPackageName, config, true);
 		rootBlock.setVariable("baseClassName", "VertexImpl");
 		rootBlock.setVariable("graphElementClass", "Vertex");
+		addImports("java.rmi.RemoteException");
 	}
 
 

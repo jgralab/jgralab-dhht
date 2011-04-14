@@ -50,6 +50,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		super(edgeClass, schemaPackageName, config, false);
 		rootBlock.setVariable("baseClassName", "EdgeImpl");
 		rootBlock.setVariable("graphElementClass", "Edge");
+		addImports("java.rmi.RemoteException");
 	}
 
 

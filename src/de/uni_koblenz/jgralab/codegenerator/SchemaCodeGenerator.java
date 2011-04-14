@@ -79,6 +79,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 			 CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
+		addImports("java.rmi.RemoteException");
 		rootBlock.setVariable("simpleClassName", schema.getName());
 		rootBlock.setVariable("simpleImplClassName", schema.getName());
 		rootBlock.setVariable("baseClassName", "SchemaImpl");

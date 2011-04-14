@@ -34,6 +34,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -102,7 +103,7 @@ public class GraphValidator {
 	 *         and where {@link MultiplicityConstraintViolation} constraints
 	 *         where violated
 	 */
-	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(IncidenceClass ic) {
+	public SortedSet<MultiplicityConstraintViolation> validateMultiplicities(IncidenceClass ic) throws RemoteException {
 		SortedSet<MultiplicityConstraintViolation> brokenConstraints = new TreeSet<MultiplicityConstraintViolation>();
 
 		Set<Vertex> badEdgesAtVertex = new HashSet<Vertex>();
@@ -146,7 +147,7 @@ public class GraphValidator {
 	 * @return a set of {@link ConstraintViolation} objects, one for each
 	 *         violation, sorted by their type
 	 */
-	public SortedSet<ConstraintViolation> validate() {
+	public SortedSet<ConstraintViolation> validate() throws RemoteException {
 		SortedSet<ConstraintViolation> brokenConstraints = new TreeSet<ConstraintViolation>();
 
 		// Check if all multiplicities are correct
