@@ -57,9 +57,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 		addImports("#usedJgImplPackage#.VertexImpl");
 		addImports("#usedJgImplPackage#.EdgeImpl");
+		addImports("#jgPackage#.Edge");
+		addImports("#jgPackage#.Vertex");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #connectedVertexClass# vertex, #connectedEdgeClass# edge) throws java.rmi.RemoteException {",
+						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) throws java.rmi.RemoteException {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));

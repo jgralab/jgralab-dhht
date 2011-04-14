@@ -228,7 +228,9 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public Graph getTraversalContext() {
-		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
+		if (traversalContext == null)
+			return this;
+		Stack<Graph> stack = traversalContext.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
 			return this;
 		} else {
@@ -545,6 +547,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 			stack.pop();
 			if (stack.isEmpty()) {
 				traversalContext.remove(Thread.currentThread());
+				if (traversalContext.isEmpty())
+					traversalContext = null;
 			}
 		}
 	}
@@ -658,6 +662,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
+		if (this.traversalContext == null)
+			this.traversalContext = new HashMap<Thread, Stack<Graph>>();
 		Stack<Graph> stack = this.traversalContext.get(Thread.currentThread());
 		if (stack == null) {
 			stack = new Stack<Graph>();

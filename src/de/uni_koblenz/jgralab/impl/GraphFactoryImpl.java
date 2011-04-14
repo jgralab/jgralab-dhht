@@ -212,13 +212,13 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-			try {
-				Class<?>[] params = { int.class, Graph.class };
+			try { 
+				Class<?>[] params = { int.class, Vertex.class, Edge.class };
 				incidenceMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
-						"Unable to locate default constructor for vertexclass"
+						"Unable to locate default constructor for incidenceclass"
 								+ implementationClass, ex);
 			}
 		}

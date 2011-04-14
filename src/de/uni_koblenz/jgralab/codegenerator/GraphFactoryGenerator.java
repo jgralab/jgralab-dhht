@@ -174,7 +174,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		
 
 		if (!incClass.isAbstract()) {
-			code.add("setEdgeImplementationClass(#edgeName#.class, #edgeImplName#Impl.class);");
+			code.add("setIncidenceImplementationClass(#incName#.class, #incImplName#Impl.class);");
 		}
 		return code;
 	}
