@@ -178,7 +178,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	/**
 	 * current number of incidences
 	 */
-	private int iCount;
+	protected int iCount;
 
 	/**
 	 * free index list for vertices

@@ -86,6 +86,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		edgeMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		binaryEdgeMap = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
 		vertexMap = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMap = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
 
@@ -198,6 +199,22 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
 				vertexMap.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for vertexclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	public void setIncidenceImplementationClass(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Graph.class };
+				incidenceMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(

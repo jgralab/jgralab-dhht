@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -98,6 +99,9 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		}
 		for (EdgeClass edgeClass : graphClass.getEdgeClasses()) {
 			code.add(createFillTableForEdge(edgeClass));
+			for (IncidenceClass incClass : edgeClass.getIncidenceClasses()) {
+				code.add(createFillTableForIncidence(incClass));
+			}
 		}
 		for (RecordDomain recordDomain : schema.getRecordDomains()) {
 			code.add(createFillTableForRecord(recordDomain));
@@ -158,6 +162,18 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		
 
 		if (!edgeClass.isAbstract()) {
+			code.add("setEdgeImplementationClass(#edgeName#.class, #edgeImplName#Impl.class);");
+		}
+		return code;
+	}
+	
+	protected CodeBlock createFillTableForIncidence(IncidenceClass incClass) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("incName", schemaRootPackageName + "." + incClass.getQualifiedName());
+		code.setVariable("incImplName", schemaRootPackageName + ".impl." + incClass.getQualifiedName());
+		
+
+		if (!incClass.isAbstract()) {
 			code.add("setEdgeImplementationClass(#edgeName#.class, #edgeImplName#Impl.class);");
 		}
 		return code;

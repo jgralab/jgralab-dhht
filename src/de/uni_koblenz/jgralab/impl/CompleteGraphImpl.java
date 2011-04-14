@@ -126,7 +126,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		setDeleteVertexList(new LinkedList<VertexImpl>());
 
 		expandEdgeArray(eMax);
-		expandIncidenceArray(iMax);
+		expandIncidenceArray(vMax+eMax);
 	}
 
 	/**
