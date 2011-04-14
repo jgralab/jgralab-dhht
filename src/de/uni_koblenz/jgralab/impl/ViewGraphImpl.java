@@ -642,4 +642,9 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
+	@Override
+	public Graph getSuperordinateGraph() {
+		return this;
+	}
+
 }
