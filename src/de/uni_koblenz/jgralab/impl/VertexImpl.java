@@ -143,10 +143,10 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Graph getSubordinateGraph() throws RemoteException {
-		if (subOrdinateGraph != null) {
-			return subOrdinateGraph;
+		if (subOrdinateGraph == null) {
+			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 		}
-		return getLocalGraph().getGraphFactory().createSubordinateGraph(this);
+		return subOrdinateGraph;
 	}
 
 	/**

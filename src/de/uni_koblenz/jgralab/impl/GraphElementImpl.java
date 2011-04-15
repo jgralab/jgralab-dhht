@@ -62,6 +62,11 @@ import de.uni_koblenz.jgralab.schema.Schema;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  * 
  */
+
+//TODO: Implement methods getLocalGraph, getGraph and getContainingGraph
+//getCompleteGraph returns the complete raph
+//get local graph the complete one or a local partial one 
+//getContainingGraph the graph that directly contains the element
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
@@ -628,14 +633,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final Graph getLocalGraph() {
-		// TODO Auto-generated method stub
-		return null;
+		return getGraph();
 	}
 
 	@Override
 	public final Graph getContainingGraph() {
-		// TODO Auto-generated method stub
-		return null;
+		return graph;
 	}
 
 }

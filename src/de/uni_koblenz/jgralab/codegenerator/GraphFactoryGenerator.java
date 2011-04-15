@@ -94,6 +94,8 @@ public class GraphFactoryGenerator extends CodeGenerator {
 
 		GraphClass graphClass = schema.getGraphClass();
 		code.add(createFillTableForGraph(graphClass));
+		code.add(createFillTableForSubordinateGraph(graphClass));
+		code.add(createFillTableForViewGraph(graphClass));
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			code.add(createFillTableForVertex(vertexClass));
 		}
@@ -128,6 +130,38 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		}
 		return code;
 	}
+	
+	protected CodeBlock createFillTableForSubordinateGraph(GraphClass graphClass) {
+		if (graphClass.isAbstract()) {
+			return null;
+		}
+
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
+		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		if (!graphClass.isAbstract()) {
+			code.add("/* code for graph #graphName# */");
+			code.add("setGraphImplementationClass(#graphName#.class, #graphImplName#SubordinateImpl.class);");
+		}
+		return code;
+	}
+
+	
+	protected CodeBlock createFillTableForViewGraph(GraphClass graphClass) {
+		if (graphClass.isAbstract()) {
+			return null;
+		}
+
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
+		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		if (!graphClass.isAbstract()) {
+			code.add("/* code for graph #graphName# */");
+			code.add("setGraphImplementationClass(#graphName#.class, #graphImplName#ViewImpl.class);");
+		}
+		return code;
+	}
+
 
 	protected CodeBlock createFillTableForVertex(VertexClass vertexClass) {
 		if (vertexClass.isAbstract()) {

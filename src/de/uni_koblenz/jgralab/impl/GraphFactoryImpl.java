@@ -348,8 +348,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public SubordinateGraphImpl createSubordinateGraph(GraphElement<?, ?, ?> elem) throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
-			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap
-					.get(graphClass).newInstance(elem);
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap.get(graphClass).newInstance(elem);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
