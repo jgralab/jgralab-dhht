@@ -61,7 +61,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	// Maps for standard support.
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMap;
-	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphMap;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMap;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMap;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMap;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMap;
@@ -80,7 +81,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	private void createMapsForStandardSupport() {
 		graphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		viewGraphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-		subordinateGraphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		partialGraphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		partialSubordinateGraphMap = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		edgeMap = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
@@ -345,15 +347,28 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public SubordinateGraphImpl createSubordinateGraph(GraphElement<?, ?, ?> elem) throws RemoteException {
+	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex) throws RemoteException {
 		try {
-			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
-			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphMap.get(graphClass).newInstance(elem);
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForVertexMap.get(graphClass).newInstance(vertex);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
 					"Cannot create subordinate graph for elem of class "
-							+ elem.getType().getQualifiedName(), ex);
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+	
+	@Override
+	public SubordinateGraphImpl createSubordinateGraph(Edge vertex) throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForEdgeMap.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
 		}
 	}
 
@@ -392,9 +407,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { GraphElement.class };
-				subordinateGraphMap.put(originalClass,
+				Class<?>[] params = { Vertex.class };
+				subordinateGraphForVertexMap.put(originalClass,
 						implementationClass.getConstructor(params));
+				Class<?>[] paramse = { Edge.class };
+				subordinateGraphForEdgeMap.put(originalClass,
+						implementationClass.getConstructor(paramse));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for graphclass "
@@ -409,7 +427,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { Graph.class, int.class };
+				Class<?>[] params = { originalClass, int.class };
 				viewGraphMap.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {

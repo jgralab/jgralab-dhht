@@ -75,8 +75,7 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (nextVertexInGraph == null) {
 			return null;
-		} else if (traversalContext.getContainingElement().containsElement(
-				nextVertexInGraph)) {
+		} else if ((traversalContext == null) || traversalContext.containsVertex(nextVertexInGraph)) {
 			return nextVertexInGraph;
 		} else {
 			return nextVertexInGraph.getNextVertex(traversalContext);
@@ -88,8 +87,7 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (prevVertexInGraph == null) {
 			return null;
-		} else if (traversalContext.getContainingElement().containsElement(
-				prevVertexInGraph)) {
+		} else if ((traversalContext == null) || traversalContext.containsVertex(prevVertexInGraph)) {
 			return prevVertexInGraph;
 		} else {
 			return prevVertexInGraph.getPreviousVertex(traversalContext);

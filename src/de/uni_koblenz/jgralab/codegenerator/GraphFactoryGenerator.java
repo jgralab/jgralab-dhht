@@ -141,7 +141,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
-			code.add("setGraphImplementationClass(#graphName#.class, #graphImplName#SubordinateImpl.class);");
+			code.add("setSubordinateGraphImplementationClass(#graphName#.class, #graphImplName#SubordinateImpl.class);");
 		}
 		return code;
 	}
@@ -157,7 +157,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
-			code.add("setGraphImplementationClass(#graphName#.class, #graphImplName#ViewImpl.class);");
+			code.add("setViewGraphImplementationClass(#graphName#.class, #graphImplName#ViewImpl.class);");
 		}
 		return code;
 	}

@@ -700,6 +700,7 @@ public abstract class EdgeImpl extends
 			return nextEdge;
 		}
 	}
+	
 
 	@Override
 	public final Edge getNextEdge(Graph traversalContext,

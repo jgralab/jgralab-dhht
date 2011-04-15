@@ -79,7 +79,18 @@ public interface GraphFactory {
 	 * @throws RemoteException 
 	 */
 	public SubordinateGraphImpl createSubordinateGraph(
-			GraphElement<?, ?, ?> elem) throws RemoteException;
+			Vertex vertex) throws RemoteException;
+	
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public SubordinateGraphImpl createSubordinateGraph(
+			Edge edge) throws RemoteException;
 
 	/**
 	 * creates a PartialSubordinate-Graph object for the specified class. The
