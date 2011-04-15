@@ -106,7 +106,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.NoSuchAttributeException");
 		code.addNoIndent(new CodeSnippet(true,
-				"public Object getAttribute(String attributeName) throws RuntimeException {"));
+				"public Object getAttribute(String attributeName) throws RemoteException {"));
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
 			s.setVariable("name", attr.getName());
@@ -139,7 +139,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if (suppressWarningsNeeded) {
 			snip.add("@SuppressWarnings(\"unchecked\")");
 		}
-		snip.add("public void setAttribute(String attributeName, Object data) throws RuntimeException {");
+		snip.add("public void setAttribute(String attributeName, Object data) throws RemoteException {");
 		code.addNoIndent(snip);
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();

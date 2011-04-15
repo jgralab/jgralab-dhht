@@ -1,6 +1,8 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
@@ -21,8 +23,41 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 			code.add(createGetSemanticsMethod());
 			code.add(createGetAlphaSemanticsMethod());
 			code.add(createGetOmegaSemanticsMethod());
+			code.add(createBinaryConstructor());
 		}
-	}	
+	}
+
+
+	protected CodeBlock createBinaryConstructor() {
+		if (aec.isAbstract())
+			return null;
+		CodeList code = new CodeList();
+		addImports("#jgPackage#.#ownElementClass#");
+		IncidenceClass alphaInc = null;
+		IncidenceClass omegaInc = null;
+		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
+			if (!ic.isAbstract()) {
+				if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
+					omegaInc = ic;
+				} else {
+					alphaInc = ic;
+				}
+			}
+		}
+		code.setVariable("alphaVertex", absoluteName(alphaInc.getVertexClass()));
+		code.setVariable("omegaVertex", absoluteName(omegaInc.getVertexClass()));
+		code.setVariable("alphaInc", absoluteName(alphaInc));
+		code.setVariable("omegaInc", absoluteName(omegaInc));
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, #alphaVertex# alpha, #omegaVertex# omega) throws java.rmi.RemoteException {",
+						"\tthis(id, g);"));
+		code.addNoIndent(new CodeSnippet("alpha.connect(#alphaInc#.class, this);"));
+		code.addNoIndent(new CodeSnippet("omega.connect(#omegaInc#.class, this);"));
+		//code.addNoIndent(new CodeSnippet("/* implement setting of alpha and omega */"));
+		code.addNoIndent(new CodeSnippet("}"));
+		return code;
+	}
 	
 	private CodeBlock createGetSemanticsMethod() {
 		CodeSnippet code = new CodeSnippet(true);
