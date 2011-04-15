@@ -522,10 +522,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		System.out.println("Adding vertex " + appendix + " to subordinate graph");
 		//TODO: Das gefällt mir noch nicht, dass hier schon der Graph gebaut wird
 		if (getSubordinateGraph().getLastVertex() != null) {
-			System.out.println("...putting after last vertex");
 			appendix.putAfter(getSubordinateGraph().getLastVertex());
 		} else {
-			System.out.println("Adding element to subordinate graph");
+			//TODO: In this case it is also necessary to set first and last of subordinate graph
 			addFirstSubordinateVertex(appendix);
 		}
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
@@ -568,7 +567,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	private final void setSigma(GraphElementImpl<?, ?, ?> newSigma) throws RemoteException {
+	public final void setSigma(GraphElementImpl<?, ?, ?> newSigma) throws RemoteException {
 		assert newSigma != null;
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
 		this.sigma = newSigma;

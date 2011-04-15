@@ -58,6 +58,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * The implementation of a <code>SubordninateGraph</code> accessing attributes
  * without versioning.
  * 
+ * TODO: firstEdge and firstVertex, respectively, are not needed but may be determined by the containing element
+ * 
  * @author ist@uni-koblenz.de
  */
 public abstract class SubordinateGraphImpl extends
@@ -126,21 +128,19 @@ public abstract class SubordinateGraphImpl extends
 	protected SubordinateGraphImpl(Vertex containingVertex)
 			throws RemoteException {
 		super(containingVertex.getGraph().getType());
-		System.out.println("Creating subordinate graph for vertex " + containingVertex.getId());
 		initializeCommonFields(containingVertex);
-
-		// initialize vertices
-		for (Vertex current = containingVertex.getNextVertex(); current != null
+//System.out.println("Initialozing subordinate graph " + this);
+		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
 				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current.getNextVertex()) {
-			System.out.println("iterating embedded vertices");
+						.isChildOf(containingElement); current = current.getNextVertex((Graph)null)) {
 			if (getFirstVertex() == null) {
 				setFirstVertex((VertexImpl) current);
 			}
+			//System.out.println("  Iterating vertex " + current);
 			setLastVertex((VertexImpl) current);
 			vCount++;
 		}
-
+//System.out.println("Iterating edges");
 		// initialize edges
 		Edge current = containingVertex.getGraph().getFirstEdge();
 		while (current != null

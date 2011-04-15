@@ -807,10 +807,10 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Graph getSubordinateGraph() throws RemoteException {
-		if (subOrdinateGraph != null) {
-			return subOrdinateGraph;
+		if (subOrdinateGraph == null) {
+			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 		}
-		return getLocalGraph().getGraphFactory().createSubordinateGraph(this);
+		return subOrdinateGraph;
 	}
 
 	@Override
