@@ -8,18 +8,18 @@ import de.uni_koblenz.jgralab.dhhttest.schema.BusinessProcess;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
 import de.uni_koblenz.jgralab.dhhttest.schema.Feature;
-import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink;
-import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_feature;
-import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_process;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_activity;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_feature;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_process;
 import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_rule;
-import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_target;
 import de.uni_koblenz.jgralab.dhhttest.schema.TransformationRule;
 
 public class PerformaceTest {
 
 	private static int factor = 1;
 	
-	private static int activityCount = 374002;
+	private static int activityCount = 874002;
 	
 	private static int ruleCount = 1541;
 	
@@ -27,7 +27,7 @@ public class PerformaceTest {
 	
 	private static int processCount = 1383;
 	
-	private static int linkCount = 500000;
+	private static int linkCount = 1000000;
 	
 	public static void main(String[] args) {
 		try {
@@ -60,12 +60,11 @@ public class PerformaceTest {
 			ruleList.add(r);
 		}
 		for (int i=0; i<linkCount; i++) {
-			TraceabilityLink l = graph.createTraceabilityLink();
-			//add 1 activity, 1 feature, one process, one rule
-			//System.out.println("i: " + i + " i%act: " + i%activityCount);
-			l.connect(TraceabilityLink_target.class, activityList.get(i%activityCount));
-			l.connect(TraceabilityLink_feature.class, featureList.get(i%featureCount));
-			l.connect(TraceabilityLink_process.class, processList.get(i%processCount));
+			FeatureTraceabilityLink l = graph.createFeatureTraceabilityLink();
+			l.connect(FeatureTraceabilityLink_activity.class, activityList.get(i%activityCount));
+			l.connect(FeatureTraceabilityLink_activity.class, activityList.get((i+1)%activityCount));
+			l.connect(FeatureTraceabilityLink_feature.class, featureList.get(i%featureCount));
+			l.connect(FeatureTraceabilityLink_process.class, processList.get(i%processCount));
 			l.connect(TraceabilityLink_rule.class, ruleList.get(i%ruleCount));
 		}
 		

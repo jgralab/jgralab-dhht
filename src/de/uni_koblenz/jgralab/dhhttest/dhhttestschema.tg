@@ -2,8 +2,10 @@ DHHTGraph 1;
 Schema de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
 GraphClass DHHTTestGraph;
 
-VertexClass BusinessProcess;
-VertexClass Feature;
+VertexClass ModelElement;
+VertexClass BusinessProcess : ModelElement;
+VertexClass Feature : ModelElement;
+VertexClass Activity : ModelElement;
 VertexClass TransformationRule;
-VertexClass Activity;
-EdgeClass TraceabilityLink from BusinessProcess role process (0,*) (0,*) from Feature role feature (0,*) (0,*) from TransformationRule role rule (0,*) (1,1) to Activity role target (0,*) (0,*);
+EdgeClass TraceabilityLink  from ModelElement role source (0,*) (0,*) from TransformationRule role rule (0,*) (0,1) to ModelElement role target (0,*) (0,*) {id:Integer};
+EdgeClass FeatureTraceabilityLink:TraceabilityLink from BusinessProcess role process:source (0,*) (0,*) from Feature role feature:source (0,*) (0,*) to Activity role activity:target (0,*) (0,*);

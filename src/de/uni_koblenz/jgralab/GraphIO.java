@@ -2145,7 +2145,7 @@ public class GraphIO {
 	 */
 	private Set<String> parseRolenameRedefinitions() throws GraphIOException {
 		if (!lookAhead.equals("redefines")) {
-			return null;
+			return new HashSet<String>();
 		}
 		match();
 		Set<String> result = new HashSet<String>();
@@ -2340,14 +2340,9 @@ public class GraphIO {
 				if (ic.getVertexClass() != icOfEc.getVertexClass()
 						&& !ic.getVertexClass().isSubClassOf(
 								icOfEc.getVertexClass())) {
-					throw new GraphIOException("The rolename "
-							+ ic.getRolename()
-							+ " can not be less general than "
-							+ icOfEc.getRolename()
-							+ " because the VertexClass "
-							+ ic.getVertexClass().getQualifiedName()
-							+ " is no subclass of or equal to "
-							+ icOfEc.getVertexClass().getQualifiedName() + ".");
+					throw new GraphIOException("The rolename " + ic.getRolename()	+ " can not be less general than "
+							+ icOfEc.getRolename()	+ " because the VertexClass "+ ic.getVertexClass().getQualifiedName()
+							+ " is no subclass of or equal to "	+ icOfEc.getVertexClass().getQualifiedName() + ".");
 				}
 				((IncidenceClassImpl) ic).addSuperClass(icOfEc);
 				// set redefined rolenames
