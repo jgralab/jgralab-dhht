@@ -111,7 +111,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * 
 	 * @return {@link GraphElement}
 	 */
-	public GraphElement<?, ?, ?> getParent() throws RemoteException;
+	public GraphElement<?, ?, ?> getSigma() throws RemoteException;
 
 	/**
 	 * Returns a {@link Graph} which contains all elements which are nested in

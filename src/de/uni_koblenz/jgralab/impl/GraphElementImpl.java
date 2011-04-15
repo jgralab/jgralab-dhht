@@ -98,7 +98,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	// TODO determine default value
 	private static final int DEFAULT_KAPPA_VALUE = Integer.MAX_VALUE;
 
-	private GraphElementImpl<?, ?, ?> parent;
+	private GraphElementImpl<?, ?, ?> sigma;
 
 	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
@@ -122,8 +122,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public final GraphElement<?, ?, ?> getParent() {
-		return parent;
+	public final GraphElement<?, ?, ?> getSigma() {
+		return sigma;
 	}
 
 	@Override
@@ -138,9 +138,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final boolean containsElement(GraphElement<?, ?, ?> element) throws RemoteException {
-		for (GraphElement<?, ?, ?> el = element; el.getParent() != null
-				&& getKappa() > el.getKappa(); el = el.getParent()) {
-			if (el.getParent() == this) {
+		for (GraphElement<?, ?, ?> el = element; el.getSigma() != null
+				&& getKappa() > el.getKappa(); el = el.getSigma()) {
+			if (el.getSigma() == this) {
 				return true;
 			}
 		}
@@ -559,7 +559,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	protected abstract void addFirstSubordinateEdge(Edge appendix) throws RemoteException;
 
 	/**
-	 * Sets {@link #parent} to <code>parent</code>.
+	 * Sets {@link #sigma} to <code>parent</code>.
 	 * 
 	 * @param parent
 	 *            {@link GraphElementImpl}
@@ -567,7 +567,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	private final void setParent(GraphElementImpl<?, ?, ?> parent) throws RemoteException {
 		assert parent != null;
 		assert getType().getAllowedSigmaClasses().contains(parent.getType());
-		this.parent = parent;
+		this.sigma = parent;
 	}
 
 	/**
@@ -617,12 +617,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *         child of <code>parent</code>.
 	 */
 	public final boolean isChildOf(GraphElement<?, ?, ?> parent) throws RemoteException {
-		if (getParent() == null || getKappa() >= parent.getKappa()) {
+		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
-		} else if (getParent() == parent) {
+		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?>) getParent()).isChildOf(parent);
+			return ((GraphElementImpl<?, ?, ?>) getSigma()).isChildOf(parent);
 		}
 	}
 

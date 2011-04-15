@@ -69,7 +69,7 @@ public class HypergraphSearchAlgorithmOptimized {
 				//	System.out.println("Iterating incidence at vertex " + currentVertex.getId());
 					Edge currentEdge = curIncAtVertex.getEdge();
 					if (parentEdgeInc[currentEdge.getId()]==null) {   
-					//	handleEdge(currentEdge);
+						handleEdge(currentEdge);
 						parentEdgeInc[currentEdge.getId()] = curIncAtVertex;     
 					//	handleTreeIncidence(curIncAtVertex); 
 						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
@@ -81,7 +81,7 @@ public class HypergraphSearchAlgorithmOptimized {
 							if ((parentVertexInc[omega.getId()]==null) && (omega!=startVertex)) {
 						//		order.add(omega);
 								parentVertexInc[omega.getId()]= curIncAtEdge;
-								//handleVertex(omega);
+								handleVertex(omega);
 								//handleTreeIncidence(curIncAtEdge);
 								buffer.add(omega);
 							} else {
