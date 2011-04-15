@@ -236,8 +236,8 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("createSuffix", "");
 		code.add("",
-				 "public #simpleImplClassName#(#simpleClassName# viewedGraph) throws java.rmi.RemoteException {",
-				 "\tsuper(viewedGraph);",
+				 "public #simpleImplClassName#(#schemaPackageName#.#simpleClassName# viewedGraph, int kappa) throws java.rmi.RemoteException {",
+				 "\tsuper(viewedGraph, kappa);",
 				 "}",
 				 "",
 				 "");	
@@ -262,20 +262,13 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				gecCode.setVariable("ecSimpleName", gec.getSimpleName());
 				gecCode.setVariable("ecUniqueName", gec.getUniqueName());
 				gecCode.setVariable("ecQualifiedName", gec.getQualifiedName());
-				gecCode.setVariable("ecSchemaVariableName", gec
-						.getVariableName());
-				gecCode.setVariable("ecJavaClassName", schemaRootPackageName
-						+ "." + gec.getQualifiedName());
-				gecCode.setVariable("ecType",
-						(gec instanceof VertexClass ? "Vertex" : "Edge"));
-				gecCode.setVariable("ecTypeInComment",
-						(gec instanceof VertexClass ? "vertex" : "edge"));
-				gecCode.setVariable("ecCamelName", camelCase(gec
-						.getUniqueName()));
-				gecCode.setVariable("ecImplName",
-						(gec.isAbstract() ? "**ERROR**" : camelCase(gec
-								.getQualifiedName())
-								+ "Impl"));
+				gecCode.setVariable("ecSchemaVariableName", gec.getVariableName());
+				gecCode.setVariable("ecJavaClassName", schemaRootPackageName + "." + gec.getQualifiedName());
+				gecCode.setVariable("ecType", (gec instanceof VertexClass ? "Vertex" : "Edge"));
+				gecCode.setVariable("ecTypeInComment", (gec instanceof VertexClass ? "vertex" : "edge"));
+				gecCode.setVariable("ecCamelName", camelCase(gec.getUniqueName()));
+				gecCode.setVariable("ecImplName",(gec.isAbstract() ? "**ERROR**" : 
+													camelCase(gec.getQualifiedName()) + "Impl"));
 
 				gecCode.addNoIndent(createGetFirstMethods(gec));
 				gecCode.addNoIndent(createFactoryMethods(gec));
@@ -513,16 +506,9 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 
+	/* for the views, no fields are created since all attribute access operations are delegatd to the viewed graph */
 	protected CodeBlock createField(Attribute attr) {
-		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
-		code.setVariable("name", attr.getName());
-		if (currentCycle.isImpl()) {
-			code.setVariable(
-					"type",
-					attr.getDomain().getJavaAttributeImplementationTypeName(
-							schemaRootPackageName));
-		}
-		return code;
+		return null;
 	}
 	
 }
