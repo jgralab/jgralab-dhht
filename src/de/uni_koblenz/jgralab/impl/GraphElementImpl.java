@@ -63,7 +63,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  */
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
-		extends UnicastRemoteObject implements
+		implements
 		GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**
