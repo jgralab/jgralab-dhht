@@ -647,4 +647,9 @@ public abstract class SubordinateGraphImpl extends
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public int getId() throws RemoteException {
+		return getCompleteGraph().getId();
+	}
 }

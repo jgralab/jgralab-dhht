@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -59,8 +60,27 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
-		rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "Subordinate");
+		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "SubordinateImpl");
+		//rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "Subordinate");
 		addImports("java.rmi.RemoteException");
+	}
+	
+	public Vector<JavaSourceFromString> createJavaSources() {
+		String implClassName = rootBlock.getVariable("simpleImplClassName");
+		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
+
+		currentCycle = getNextCycle();
+		while (currentCycle != null) {
+			createCode();
+			if (currentCycle.isImpl()) {
+				System.out.println("Writing code to file " + implClassName);
+				javaSources.add(new JavaSourceFromString(implClassName,
+						rootBlock.getCode()));
+				System.out.println("Written‚ code to file " + implClassName);
+			} 
+			currentCycle = getNextCycle();
+		}
+		return javaSources;
 	}
 
 	@Override
@@ -74,7 +94,6 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		if (currentCycle.isImpl()) {
 			addImports("#jgImplPackage#.#baseClassName#");
 			rootBlock.setVariable("baseClassName", "SubordinateGraphImpl");
-			addImports("de.uni_koblenz.jgralab.impl.SubordinateGraphImpl");
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
@@ -178,15 +197,17 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 	@Override
 	protected CodeBlock createConstructor() {
+		addImports("de.uni_koblenz.jgralab.Vertex");
+		addImports("de.uni_koblenz.jgralab.Edge");
 		addImports("#schemaPackageName#.#schemaName#");
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("createSuffix", "");
 		code.add("",
-				 "public #simpleClassName#Impl(Vertex vertex) throws java.rmi.RemoteException {",
+				 "public #simpleImplClassName#(Vertex vertex) throws java.rmi.RemoteException {",
 				 "\tsuper(vertex);",
 				 "}",
 				 "",
-				 "public #simpleClassName#Impl(Edge edge) throws java.rmi.RemoteException {",
+				 "public #simpleImplClassName#(Edge edge) throws java.rmi.RemoteException {",
 				 "\tsuper(edge);",
 				 "}",
 				 "",
@@ -212,20 +233,13 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				gecCode.setVariable("ecSimpleName", gec.getSimpleName());
 				gecCode.setVariable("ecUniqueName", gec.getUniqueName());
 				gecCode.setVariable("ecQualifiedName", gec.getQualifiedName());
-				gecCode.setVariable("ecSchemaVariableName", gec
-						.getVariableName());
-				gecCode.setVariable("ecJavaClassName", schemaRootPackageName
-						+ "." + gec.getQualifiedName());
-				gecCode.setVariable("ecType",
-						(gec instanceof VertexClass ? "Vertex" : "Edge"));
-				gecCode.setVariable("ecTypeInComment",
-						(gec instanceof VertexClass ? "vertex" : "edge"));
-				gecCode.setVariable("ecCamelName", camelCase(gec
-						.getUniqueName()));
-				gecCode.setVariable("ecImplName",
-						(gec.isAbstract() ? "**ERROR**" : camelCase(gec
-								.getQualifiedName())
-								+ "Impl"));
+				gecCode.setVariable("ecSchemaVariableName", gec.getVariableName());
+				gecCode.setVariable("ecJavaClassName", schemaRootPackageName+ "." + gec.getQualifiedName());
+				gecCode.setVariable("ecType", (gec instanceof VertexClass ? "Vertex" : "Edge"));
+				gecCode.setVariable("ecTypeInComment", (gec instanceof VertexClass ? "vertex" : "edge"));
+				gecCode.setVariable("ecCamelName", camelCase(gec.getUniqueName()));
+				gecCode.setVariable("ecImplName", (gec.isAbstract() ? "**ERROR**" : camelCase(gec
+								.getQualifiedName()) + "Impl"));
 
 				gecCode.addNoIndent(createGetFirstMethods(gec));
 				gecCode.addNoIndent(createFactoryMethods(gec));
@@ -298,9 +312,12 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
 		if (currentCycle.isImpl()) {
+			// "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
+
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#();",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class);",
 					 "\treturn new#ecType#;", "}");
+			code.setVariable("additionalParams", "");
 		}
 
 		//TODO: For binary Edge constructor

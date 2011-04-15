@@ -419,6 +419,7 @@ public class SchemaImpl implements Schema {
 		javaSources.addAll(graphCodeGenerator.createJavaSources());
 		
 		/* create code for subordinate graph */
+		
 		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
 		javaSources.addAll(subordinateGraphCodeGenerator.createJavaSources());
 		
@@ -504,6 +505,15 @@ public class SchemaImpl implements Schema {
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
 				graphClass, packagePrefix, name, config);
 		graphCodeGenerator.createFiles(pathPrefix);
+		
+		/* create code for subordinate graph */
+		
+		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		subordinateGraphCodeGenerator.createFiles(pathPrefix);
+		
+		/* create code for view graph */
+		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		viewGraphCodeGenerator.createFiles(pathPrefix);
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,

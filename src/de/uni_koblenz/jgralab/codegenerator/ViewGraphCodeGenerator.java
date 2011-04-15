@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -59,22 +60,74 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
-		rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "View");
+		//rootBlock.setVariable("simpleClassName", "ViewGraph");
+		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "ViewImpl");
 		addImports("java.rmi.RemoteException");
 	}
+	
+	public Vector<JavaSourceFromString> createJavaSources() {
+		//String className = rootBlock.getVariable("simpleClassName");
+		String implClassName = rootBlock.getVariable("simpleImplClassName");
+		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
-	@Override
-	protected CodeBlock createHeader() {
-		return super.createHeader();
+		currentCycle = getNextCycle();
+		while (currentCycle != null) {
+			createCode();
+			if (currentCycle.isImpl()) {
+				javaSources.add(new JavaSourceFromString(implClassName,
+						rootBlock.getCode()));
+			} 
+			currentCycle = getNextCycle();
+		}
+		return javaSources;
 	}
+	
+//	@Override
+//	protected CodeBlock createHeader() {
+//		CodeSnippet code = new CodeSnippet(true);
+//		code.setVariable("classOrInterface", currentCycle
+//				.isImpl() ? " class" : " interface");
+//		code.setVariable("abstract", currentCycle.isImpl()
+//				                       && aec.isAbstract() ? " abstract" : "");
+//		code.setVariable("impl", currentCycle.isImpl()
+//				                    && !aec.isAbstract() ? "Impl" : "");
+//		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
+//		code.setVariable("extends",	currentCycle.isImpl() ? 
+//				                    " extends #baseClassName#" : "");
+//		StringBuffer buf = new StringBuffer();
+//		if (interfaces.size() > 0) {
+//			String delim = currentCycle.isImpl() ? " implements "
+//					: " extends ";
+//			for (String interfaceName : interfaces) {
+//				if (currentCycle.isImpl()
+//						|| !interfaceName.equals(aec.getQualifiedName())) {
+//					if (interfaceName.equals("Vertex")
+//							|| interfaceName.equals("Edge")
+//							|| interfaceName.equals("BinaryEdge")
+//							|| interfaceName.equals("Graph")
+//							|| interfaceName.equals("Incidence")) {
+//						buf.append(delim);
+//						buf.append("#jgPackage#." + interfaceName);
+//						delim = ", ";
+//					} else {
+//						buf.append(delim);
+//						buf.append(schemaRootPackageName + "." + interfaceName);
+//						delim = ", ";
+//					}
+//				}
+//			}
+//		}
+//		code.setVariable("implements", buf.toString());
+//		return code;
+//	}
+
 
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isImpl()) {
 			addImports("#jgImplPackage#.#baseClassName#");
-			rootBlock.setVariable("baseClassName", "SubordinateGraphImpl");
-			addImports("de.uni_koblenz.jgralab.impl.SubordinateGraphImpl");
+			rootBlock.setVariable("baseClassName", "ViewGraphImpl");
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
@@ -179,10 +232,11 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 	@Override
 	protected CodeBlock createConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
+
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("createSuffix", "");
 		code.add("",
-				 "public #simpleClassName#Impl(Graph viewedGraph) throws java.rmi.RemoteException {",
+				 "public #simpleImplClassName#(#simpleClassName# viewedGraph) throws java.rmi.RemoteException {",
 				 "\tsuper(viewedGraph);",
 				 "}",
 				 "",
@@ -295,7 +349,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		if (currentCycle.isImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#();",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class);",
 					 "\treturn new#ecType#;", "}");
 		}
 

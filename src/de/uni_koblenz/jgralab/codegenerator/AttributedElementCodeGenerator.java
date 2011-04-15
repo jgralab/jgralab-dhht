@@ -286,7 +286,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				code.add(a);
 			}
 			code.add(new CodeSnippet(
-					"} catch (RemoteException ex) {" +
+					"} catch (Exception ex) {" +
 					"\tthrow new RuntimeException(ex);" +
 					"}"));
 		}

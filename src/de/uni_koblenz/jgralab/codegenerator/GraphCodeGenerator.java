@@ -352,10 +352,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	private CodeBlock createFactoryMethod(GraphElementClass<?,?> gec, boolean withId) {
 		CodeSnippet code = new CodeSnippet(true);
 
-		if (currentCycle.isImpl()) {
-			code.setVariable("cycleSupportSuffix", "");
-		} 
-
 		if (currentCycle.isAbstract()) {
 			code.add("/**",
 					 " * Creates a new #ecUniqueName# #ecTypeInComment# in this graph.",
@@ -372,7 +368,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		if (currentCycle.isImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType##cycleSupportSuffix#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
 					 "\treturn new#ecType#;", "}");
 			code.setVariable("additionalParams", "");
 		}

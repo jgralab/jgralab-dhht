@@ -11,6 +11,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
@@ -670,8 +671,38 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Graph getSuperordinateGraph() {
-		return this;
+	public Graph getSuperordinateGraph() throws RemoteException {
+		return viewedGraph.getSuperordinateGraph().getView(lowestVisibleKappaLevel);
+	}
+	
+	@Override
+	public Graph getParentDistributedGraph() throws RemoteException {
+		return viewedGraph.getParentDistributedGraph();
+	}
+
+
+
+	@Override
+	public GraphFactory getGraphFactory() throws RemoteException {
+		return viewedGraph.getGraphFactory();
+	}
+
+
+	@Override
+	public boolean isPartOfGraph(Graph other) throws RemoteException {
+		return viewedGraph.isPartOfGraph(other);
+	}
+
+
+	@Override
+	public int getId() throws RemoteException {
+		return viewedGraph.getId();
+	}
+
+
+	@Override
+	public Graph createPartialGraph(String hostname) throws RemoteException {
+		return viewedGraph.createPartialGraph(hostname);
 	}
 
 }

@@ -79,19 +79,15 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("classOrInterface", currentCycle
-				.isImpl() ? " class" : " interface");
-		code.setVariable("abstract", currentCycle.isImpl()
-				                       && aec.isAbstract() ? " abstract" : "");
-		code.setVariable("impl", currentCycle.isImpl()
-				                    && !aec.isAbstract() ? "Impl" : "");
-		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isImpl() ? 
-				                    " extends #baseClassName#" : "");
+		code.setVariable("classOrInterface", currentCycle.isImpl() ? " class" : " interface");
+		code.setVariable("interfaceOrImplClass", currentCycle.isImpl() ? rootBlock.getVariable("simpleImplClassName") 
+																: rootBlock.getVariable("simpleClassName"));
+		code.setVariable("abstract", currentCycle.isImpl()  && aec.isAbstract() ? " abstract" : "");
+		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
+		code.setVariable("extends",	currentCycle.isImpl() ?  " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isImpl() ? " implements "
-					: " extends ";
+			String delim = currentCycle.isImpl() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
 				if (currentCycle.isImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {

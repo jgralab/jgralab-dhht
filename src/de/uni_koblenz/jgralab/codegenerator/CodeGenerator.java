@@ -353,7 +353,7 @@ public abstract class CodeGenerator {
 	 * 
 	 * @return The next matching {@link GenerationCycle}.
 	 */
-	private GenerationCycle getNextCycle() {
+	protected GenerationCycle getNextCycle() {
 		// end of generation cycle
 		if (cycleCount >= cycles.size()) {
 			// cycleCount = 0;
