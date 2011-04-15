@@ -31,9 +31,12 @@
 
 package de.uni_koblenz.jgralab.schema.impl;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabCloneable;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Domain;
@@ -169,21 +172,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 
 	}
 
-	@Override
-	public void setDefaultTransactionValue(AttributedElement<?, ?> element)
-			throws GraphIOException {
-		if (defaultValueAsString != null) {
-			if (!defaultTransactionValueComputed) {
-				element.readAttributeValueFromString(name, defaultValueAsString);
-				if (!domain.isComposite()) {
-					defaultTransactionValue = element.getAttribute(name);
-					defaultTransactionValueComputed = true;
-				}
-			} else {
-				element.setAttribute(name, defaultTransactionValue);
-			}
-		}
-	}
+	
 
 	@Override
 	public void setDefaultValue(AttributedElement<?, ?> element)
@@ -192,7 +181,12 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 			if (defaultValueAsString != null) {
 				element.readAttributeValueFromString(name, defaultValueAsString);
 			}
-			defaultValue = element.getAttribute(name);
+			
+			try {
+				defaultValue = element.getAttribute(name);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			defaultValueComputed = true;
 		} else {
 			Object cloneOfDefaultValue = null;
@@ -202,8 +196,11 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 			} else {
 				cloneOfDefaultValue = defaultValue;
 			}
-
-			element.setAttribute(name, cloneOfDefaultValue);
+			try {
+				element.setAttribute(name, cloneOfDefaultValue);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

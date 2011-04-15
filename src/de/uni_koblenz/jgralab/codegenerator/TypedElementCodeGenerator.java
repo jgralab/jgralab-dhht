@@ -62,11 +62,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
@@ -80,20 +80,20 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("classOrInterface", currentCycle
-				.isStdImpl() ? " class" : " interface");
-		code.setVariable("abstract", currentCycle.isStdImpl()
+				.isImpl() ? " class" : " interface");
+		code.setVariable("abstract", currentCycle.isImpl()
 				                       && aec.isAbstract() ? " abstract" : "");
-		code.setVariable("impl", currentCycle.isStdImpl()
+		code.setVariable("impl", currentCycle.isImpl()
 				                    && !aec.isAbstract() ? "Impl" : "");
 		code.add("public#abstract##classOrInterface# #simpleClassName##impl##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isStdImpl() ? 
+		code.setVariable("extends",	currentCycle.isImpl() ? 
 				                    " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isStdImpl() ? " implements "
+			String delim = currentCycle.isImpl() ? " implements "
 					: " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isStdImpl()
+				if (currentCycle.isImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")

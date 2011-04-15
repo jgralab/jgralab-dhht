@@ -19,7 +19,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 	BinaryEdgeClass bec;
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add(createGetSemanticsMethod());
 			code.add(createGetAlphaSemanticsMethod());
 			code.add(createGetOmegaSemanticsMethod());

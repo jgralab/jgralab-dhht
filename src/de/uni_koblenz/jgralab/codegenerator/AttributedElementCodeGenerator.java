@@ -64,7 +64,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	@Override
 	protected CodeList createBody() {
 		CodeList code = super.createBody();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add(createFields(aec.getAttributeList()));
 			// code.add(createConstructor());
 			code.add(createGenericGetter(aec.getAttributeList()));
@@ -75,7 +75,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 					.getAttributeList()));
 			code.add(createWriteAttributesMethod(aec.getAttributeList()));
 			code.add(createWriteAttributeToStringMethod(aec.getAttributeList()));
-			code.add(createGetVersionedAttributesMethod(aec.getAttributeList()));
 		}
 		if (currentCycle.isAbstract()) {
 			code.add(createGettersAndSetters(aec.getOwnAttributeList()));
@@ -217,10 +216,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#() throws RuntimeException;");
+			code.add("public #type# #isOrGet#_#name#() throws RemoteException;");
 			break;
 		case IMPL:
-			code.add("public #type# #isOrGet#_#name#()  throws RuntimeException {", "\treturn _#name#;",
+			code.add("public #type# #isOrGet#_#name#()  throws RemoteException {", "\treturn _#name#;",
 					"}");
 			break;
 		}
@@ -236,10 +235,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#) throws RuntimeException;");
+			code.add("public void set_#name#(#type# _#name#) throws RemoteException;");
 			break;
 		case IMPL:
-			code.add("public void set_#name#(#type# _#name#) throws RuntimeException {",
+			code.add("public void set_#name#(#type# _#name#) throws RemoteException {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
 			break;
 		}
@@ -249,7 +248,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	protected CodeBlock createField(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
 		code.setVariable("name", attr.getName());
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.setVariable(
 					"type",
 					attr.getDomain().getJavaAttributeImplementationTypeName(
@@ -275,7 +274,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.addNoIndent(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringReader(value, getSchema());"));
-				if (currentCycle.isStdImpl()) {
+				if (currentCycle.isImpl()) {
 					a.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
@@ -313,7 +312,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.addNoIndent(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringWriter(getSchema());"));
-				if (currentCycle.isStdImpl()) {
+				if (currentCycle.isImpl()) {
 					a.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
@@ -341,7 +340,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				CodeSnippet snippet = new CodeSnippet();
 				snippet.setVariable("setterName", "set_" + attribute.getName());
 				snippet.setVariable("variableName", attribute.getName());
-				if (currentCycle.isStdImpl()) {
+				if (currentCycle.isImpl()) {
 					code.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));
@@ -366,7 +365,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if ((attrSet != null) && !attrSet.isEmpty()) {
 			code.add(new CodeSnippet("io.space();"));
 			for (Attribute attribute : attrSet) {
-				if (currentCycle.isStdImpl()) {
+				if (currentCycle.isImpl()) {
 					code.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io"));

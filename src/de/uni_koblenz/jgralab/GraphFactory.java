@@ -107,8 +107,7 @@ public interface GraphFactory {
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g);
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g);
 
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned

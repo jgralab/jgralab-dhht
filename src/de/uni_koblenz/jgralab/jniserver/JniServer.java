@@ -45,6 +45,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -548,7 +549,11 @@ public class JniServer {
 
 	private void setAttribute(AttributedElement<?, ?> e, String attributeName,
 			Object value) {
-		e.setAttribute(attributeName, value);
+		try {
+			e.setAttribute(attributeName, value);
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 	private String getEnumAttribute(AttributedElement<?, ?> e,
@@ -569,7 +574,11 @@ public class JniServer {
 	}
 
 	private Object getAttribute(AttributedElement<?, ?> e, String attributeName) {
-		return e.getAttribute(attributeName);
+		try {
+			return e.getAttribute(attributeName);
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 }

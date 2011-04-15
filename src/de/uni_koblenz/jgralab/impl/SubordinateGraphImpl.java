@@ -69,6 +69,7 @@ public abstract class SubordinateGraphImpl extends
 	// TODO: Check if the respective methods are really
 	// needed in the graph interface and how to ensure, that
 	// the variables reflect the number of elements in the subgraphs
+	// implemented methods of GraphStructureChangeListener to react on adding/deletion of vertices
 
 	private int vCount;
 
@@ -82,12 +83,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getVCount() {
+	public int getVCount() throws RemoteException {
 		return vCount;
 	}
 
 	@Override
-	public int getECount() {
+	public int getECount() throws RemoteException {
 		return eCount;
 	}
 
@@ -310,22 +311,22 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
-		containingElement.writeAttributeValues(io);
+		throw new UnsupportedOperationException("writeAttributeValues may not be called on a SubordinateGraph");
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		containingElement.readAttributeValues(io);
+		throw new UnsupportedOperationException("writeAttributeValues may not be called on a SubordinateGraph");
 	}
 
 	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException {
+	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException {
 		return containingElement.getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException {
+			throws NoSuchAttributeException, RemoteException {
 		containingElement.setAttribute(name, data);
 	}
 

@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -50,14 +51,15 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClass> {
+public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerator<GraphClass> {
 
-	public GraphCodeGenerator(GraphClass graphClass, String schemaPackageName,
+	public SubordinateGraphCodeGenerator(GraphClass graphClass, String schemaPackageName,
 			String schemaName, CodeGeneratorConfiguration config) {
 		super(graphClass, schemaPackageName, config);
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
+		rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "Subordinate");
 		addImports("java.rmi.RemoteException");
 	}
 
@@ -71,34 +73,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isImpl()) {
 			addImports("#jgImplPackage#.#baseClassName#");
-			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
-			addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
-		//	addImports("java.util.List");
-		//	addImports("de.uni_koblenz.jgralab.Vertex");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValue");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueSet");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl");
-		//	addImports("de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator");
-
-			// for Vertex.reachableVertices()
-//			code.add(new CodeSnippet(
-//						"\n\tprotected GreqlEvaluator greqlEvaluator = null;\n",
-//						"@SuppressWarnings(\"unchecked\") ",
-//						"@Override ",
-//						"public synchronized <T extends Vertex> List<T> reachableVertices(Vertex startVertex, String pathDescription, Class<T> vertexType) { ",
-//						"\tif (greqlEvaluator == null) { ",
-//						"\t\tgreqlEvaluator = new GreqlEvaluator((String) null, this, null); ",
-//						"\t} ",
-//						"\tgreqlEvaluator.setVariable(\"v\", new JValueImpl(startVertex)); ",
-//						"\tgreqlEvaluator.setQuery(\"using v: v \" + pathDescription); ",
-//						"\tgreqlEvaluator.startEvaluation(); ",
-//						"\tJValueSet rs = greqlEvaluator.getEvaluationResult().toJValueSet(); ",
-//						"\tjava.util.List<T> lst = new java.util.LinkedList<T>(); ",
-//						"\tfor (JValue jv : rs) { ",
-//						"\t\tVertex v = jv.toVertex();",
-//						"\t\tif (vertexType.isInstance(v)) {",
-//						"\t\t\tlst.add((T) v);", "\t\t}", "\t}",
-//						"\treturn lst; ", "}"));
+			rootBlock.setVariable("baseClassName", "SubordinateGraphImpl");
+			addImports("de.uni_koblenz.jgralab.impl.SubordinateGraphImpl");
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
@@ -130,11 +106,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				cs.add("");
 
 				cs.add("public #rcname# create#rname#(#parawtypes#);");
-
-				cs.setVariable("parawtypes", buildParametersOutput(rd
-						.getComponents(), true));
-				cs.setVariable("rcname", rd
-						.getJavaClassName(schemaRootPackageName));
+				cs.setVariable("parawtypes", buildParametersOutput(rd.getComponents(), true));
+				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
 				cs.setVariable("rname", rd.getUniqueName());
 				cs.add("");
 				code.addNoIndent(cs);
@@ -148,35 +121,21 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
 				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
-				cs.add("\trecord.readComponentValues(io);");
-				cs.add("\treturn record;");
+				cs.add("\treturn getCompleteGraph().create#rname#(io);");
 				cs.add("}");
 				cs.add("");
 
 				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
-				
-
-				cs.add("\trecord.setComponentValues(fields);");
-				cs.add("\treturn record;");
+				cs.add("\treturn getCompleteGraph().create#rname#(fields);");
 				cs.add("}");
 				cs.add("");
 
-				cs.setVariable("parawtypes", buildParametersOutput(rd
-						.getComponents(), true));
-				cs.setVariable("parawotypes", buildParametersOutput(rd
-						.getComponents(), false));
+				cs.setVariable("parawtypes", buildParametersOutput(rd.getComponents(), true));
+				cs.setVariable("parawotypes", buildParametersOutput(rd.getComponents(), false));
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
-				
-				for (RecordComponent entry : rd.getComponents()) {
-					cs.add("\trecord.set_" + entry.getName() + "(_"
-							+ entry.getName() + ");");
-				}
-				cs.add("\treturn record;");
+				cs.add("\treturn getCompleteGraph().create#rname#(#parawtypes#);");
 				cs.add("}");
 				cs.add("");
 
@@ -222,43 +181,16 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		addImports("#schemaPackageName#.#schemaName#");
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("createSuffix", "");
-			code.add(
-							"/* Constructors and create methods with values for initial vertex and edge count */",
-							"public #simpleClassName#Impl(int vMax, int eMax) throws java.rmi.RemoteException {",
-							"\tthis(null, vMax, eMax);",
-							"}",
-							"",
-							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) throws java.rmi.RemoteException {",
-							"\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
-							"\tinitializeAttributesWithDefaultValues();",
-							"}",
-							"",
-							"public static #javaClassName# create(int vMax, int eMax) throws java.rmi.RemoteException {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null, vMax, eMax);",
-							"}",
-							"",
-							"public static #javaClassName# create(String id, int vMax, int eMax) throws java.rmi.RemoteException {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id, vMax, eMax);",
-							"}",
-							"",
-							"/* Constructors and create methods without values for initial vertex and edge count */",
-							"public #simpleClassName#Impl() throws java.rmi.RemoteException {",
-							"\tthis(null);",
-							"}",
-							"",
-							"public #simpleClassName#Impl(java.lang.String id) throws java.rmi.RemoteException {",
-							"\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
-							"\tinitializeAttributesWithDefaultValues();",
-							"}",
-							"",
-							"public static #javaClassName# create() throws java.rmi.RemoteException {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null);",
-							"}",
-							"",
-							"public static #javaClassName# create(String id) throws java.rmi.RemoteException {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id);",
-							"}");
-	
+		code.add("",
+				 "public #simpleClassName#Impl(Vertex vertex) throws java.rmi.RemoteException {",
+				 "\tsuper(vertex);",
+				 "}",
+				 "",
+				 "public #simpleClassName#Impl(Edge edge) throws java.rmi.RemoteException {",
+				 "\tsuper(edge);",
+				 "}",
+				 "",
+				 "");	
 		return code;
 	}
 
@@ -316,8 +248,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		return code;
 	}
 
-	private CodeBlock createGetFirstMethod(GraphElementClass<?,?> gec,
-			boolean withTypeFlag) {
+	private CodeBlock createGetFirstMethod(GraphElementClass<?,?> gec, boolean withTypeFlag) {
 		CodeSnippet code = new CodeSnippet(true);
 		if (currentCycle.isAbstract()) {
 			code.add("/**",
@@ -352,10 +283,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	private CodeBlock createFactoryMethod(GraphElementClass<?,?> gec, boolean withId) {
 		CodeSnippet code = new CodeSnippet(true);
 
-		if (currentCycle.isImpl()) {
-			code.setVariable("cycleSupportSuffix", "");
-		} 
-
 		if (currentCycle.isAbstract()) {
 			code.add("/**",
 					 " * Creates a new #ecUniqueName# #ecTypeInComment# in this graph.",
@@ -372,9 +299,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		if (currentCycle.isImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType##cycleSupportSuffix#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#();",
 					 "\treturn new#ecType#;", "}");
-			code.setVariable("additionalParams", "");
 		}
 
 		//TODO: For binary Edge constructor
@@ -397,14 +323,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				code.setVariable("fromClass", schemaRootPackageName + "." + fromClass);
 			}
 			if (toClass.equals("Vertex")) {
-				code.setVariable("toClass", rootBlock.getVariable("jgPackage")
-						+ "." + "Vertex");
+				code.setVariable("toClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
 			} else {
-				code.setVariable("toClass", schemaRootPackageName + "."
-						+ toClass);
+				code.setVariable("toClass", schemaRootPackageName + "."	+ toClass);
 			}
-			code.setVariable("formalParams", (withId ? "int id, " : "")
-					+ "#fromClass# alpha, #toClass# omega");
+			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#fromClass# alpha, #toClass# omega");
 			code.setVariable("addActualParams", ", alpha, omega");
 			code.setVariable("additionalParams", ", alpha, omega");
 		} else {
@@ -498,4 +421,58 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	protected void addCheckValidityCode(CodeSnippet code) {
 		// just do nothing here
 	}
+	
+	//Overwritten methods from AttributedElement to delegate to the complete graph
+	protected CodeBlock createGetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("isOrGet",
+				attr.getDomain().getJavaClassName(schemaRootPackageName)
+						.equals("Boolean") ? "is" : "get");
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public #type# #isOrGet#_#name#() throws RemoteException;");
+			break;
+		case IMPL:
+			code.add("public #type# #isOrGet#_#name#() throws RemoteException {", 
+					"\treturn getSuperordinateGraph().get_#name#();",
+					"}");
+			break;
+		}
+		return code;
+	}
+
+	protected CodeBlock createSetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("dname", attr.getDomain().getSimpleName());
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public void set_#name#(#type# _#name#) throws RemoteException;");
+			break;
+		case IMPL:
+			code.add("public void set_#name#(#type# _#name#) throws RemoteException {",
+					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
+			break;
+		}
+		return code;
+	}
+
+	protected CodeBlock createField(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
+		code.setVariable("name", attr.getName());
+		if (currentCycle.isImpl()) {
+			code.setVariable(
+					"type",
+					attr.getDomain().getJavaAttributeImplementationTypeName(
+							schemaRootPackageName));
+		}
+		return code;
+	}
+	
 }

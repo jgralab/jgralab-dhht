@@ -73,7 +73,7 @@ public abstract class CodeGenerator {
 		 * 
 		 * @return
 		 */
-		protected boolean isStdImpl() {
+		protected boolean isImpl() {
 			return this == IMPL;
 		}
 
@@ -243,7 +243,7 @@ public abstract class CodeGenerator {
 				logger.finer("Writing file to: " + pathPrefix + "/"
 						+ schemaPackage);
 			}
-			if (currentCycle.isStdImpl()) {
+			if (currentCycle.isImpl()) {
 				schemaImplPackage = rootBlock.getVariable("schemaImplPackage");
 					logger.finer(" - schemaImplPackage="
 									+ schemaImplPackage);
@@ -335,7 +335,7 @@ public abstract class CodeGenerator {
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isStdImpl()) {
+			if (currentCycle.isImpl()) {
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
 			} else {

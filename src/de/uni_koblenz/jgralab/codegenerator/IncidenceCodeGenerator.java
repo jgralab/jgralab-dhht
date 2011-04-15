@@ -164,7 +164,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			code.add(" */",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add("@Override",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",

@@ -124,13 +124,13 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException {
+	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException {
 		return viewedGraph.getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException {
+			throws NoSuchAttributeException, RemoteException {
 		viewedGraph.setAttribute(name, data);
 	}
 

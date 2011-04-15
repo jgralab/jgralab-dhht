@@ -108,7 +108,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createFieldConstructor() {
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			StringBuilder sb = new StringBuilder();
 			CodeSnippet header = null;
 			header = new CodeSnippet(true,
@@ -149,7 +149,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	private CodeBlock createVariableParametersSetter() {
 		CodeList code = new CodeList();
 
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			CodeSnippet codeSnippet = new CodeSnippet(true);
 
 			if (hasCompositeRecordComponent()) {
@@ -195,7 +195,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 		code.addNoIndent(new CodeSnippet(true,
 				"public boolean equals(Object o) {"));
 		code.add(new CodeSnippet("if(o == null)", "\treturn false;"));
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add(new CodeSnippet(
 					"if(!(o instanceof #simpleImplClassName#))",
 					"\treturn false;"));
@@ -230,7 +230,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = null;
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			addImports("de.uni_koblenz.jgralab.NoSuchAttributeException");
 		}
 		switch (currentCycle) {
@@ -323,7 +323,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createMapSetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			// suppress "unchecked" warnings if this record domain contains a
 			// Collection domain (Set<E>, List<E>, Map<K, V>)
 			for (RecordComponent comp : recordDomain.getComponents()) {
@@ -355,7 +355,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createGenericSetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			// suppress "unchecked" warnings if this record domain contains a
 			// Collection domain (Set<E>, List<E>, Map<K, V>)
 			for (RecordComponent comp : recordDomain.getComponents()) {
@@ -392,7 +392,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createGenericGetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.addNoIndent(new CodeSnippet(false, "@Override"));
 			code.addNoIndent(new CodeSnippet(false,
 					"public Object getComponent(String name) {"));
@@ -421,7 +421,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	private CodeBlock createReadComponentsMethod() {
 		CodeList code = new CodeList();
 		// abstract class (or better use interface?)
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException");
 			code.addNoIndent(new CodeSnippet("@Override"));
 			code
@@ -464,7 +464,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createRecordComponents() {
 		CodeList code = new CodeList();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			for (RecordComponent rdc : recordDomain.getComponents()) {
 				Domain dom = rdc.getDomain();
 				CodeSnippet s = new CodeSnippet(true,

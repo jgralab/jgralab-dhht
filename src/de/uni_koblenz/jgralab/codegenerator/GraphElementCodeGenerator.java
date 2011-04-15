@@ -88,7 +88,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add(createGetIncidenceClassForRolenameMethod());
 		}	
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
@@ -243,7 +243,7 @@ public class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaC
 			code.add(" */",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isStdImpl()) {
+		if (currentCycle.isImpl()) {
 			code.add("@Override",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",

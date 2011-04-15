@@ -161,15 +161,13 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g) {
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g) {
 		try {
 			Vertex v = vertexMap.get(vertexClass).newInstance(id, g);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
+				throw new GraphException(ex.getCause().getLocalizedMessage(), ex);
 			}
 			throw new M1ClassAccessException("Cannot create vertex of class "
 					+ vertexClass.getCanonicalName(), ex);

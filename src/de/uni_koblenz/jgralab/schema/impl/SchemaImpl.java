@@ -74,6 +74,7 @@ import de.uni_koblenz.jgralab.codegenerator.IncidenceCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
+import de.uni_koblenz.jgralab.codegenerator.SubordinateGraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -413,9 +414,12 @@ public class SchemaImpl implements Schema {
 		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>();
 
 		/* create code for graph */
-		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
-				graphClass, packagePrefix, name, config);
+		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(graphClass, packagePrefix, name, config);
 		javaSources.addAll(graphCodeGenerator.createJavaSources());
+		
+		/* create code for subordinate graph */
+		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		javaSources.addAll(subordinateGraphCodeGenerator.createJavaSources());
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,

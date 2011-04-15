@@ -98,6 +98,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	/**
 	 * number of vertices in the graph
+	 * @throws RemoteException 
 	 */
 	abstract protected void setVCount(int count);
 
@@ -140,6 +141,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	/**
 	 * number of edges in the graph
+	 * @throws RemoteException 
 	 */
 	abstract protected void setECount(int count);
 
@@ -427,7 +429,7 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 
 	@Override
-	abstract public int getVCount();
+	abstract public int getVCount() throws RemoteException;
 
 	@Override
 	abstract public long getVertexListVersion() throws RemoteException;
@@ -1008,7 +1010,7 @@ public abstract class GraphBaseImpl implements Graph {
 		return newIncidence;
 	}
 
-	protected abstract void setICount(int count);
+	protected abstract void setICount(int count) throws RemoteException;
 
 	@Override
 	public Graph createPartialGraph(String hostname)  throws RemoteException {

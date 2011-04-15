@@ -83,15 +83,6 @@ public interface Attribute {
 			throws SchemaException;
 
 	/**
-	 * Set default value for attributed elements with transaction support.
-	 * 
-	 * @param element
-	 * @throws GraphIOException
-	 */
-	public void setDefaultTransactionValue(AttributedElement<?, ?> element)
-			throws GraphIOException;
-
-	/**
 	 * Set default value for attributed elements without transaction support.
 	 * 
 	 * @param element
