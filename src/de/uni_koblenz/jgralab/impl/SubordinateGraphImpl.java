@@ -126,17 +126,19 @@ public abstract class SubordinateGraphImpl extends
 	protected SubordinateGraphImpl(Vertex containingVertex)
 			throws RemoteException {
 		super(containingVertex.getGraph().getType());
+		System.out.println("Creating subordinate graph for vertex " + containingVertex.getId());
 		initializeCommonFields(containingVertex);
 
 		// initialize vertices
 		for (Vertex current = containingVertex.getNextVertex(); current != null
 				&& ((GraphElementImpl<?, ?, ?>) current)
 						.isChildOf(containingElement); current.getNextVertex()) {
+			System.out.println("iterating embedded vertices");
 			if (getFirstVertex() == null) {
 				setFirstVertex((VertexImpl) current);
 			}
 			setLastVertex((VertexImpl) current);
-			setVCount(getVCount() + 1);
+			vCount++;
 		}
 
 		// initialize edges
@@ -178,8 +180,8 @@ public abstract class SubordinateGraphImpl extends
 				setFirstEdge((EdgeImpl) current);
 			}
 			setLastEdge((EdgeImpl) current);
-			setECount(getECount() + 1);
-			setICount(getICount() + current.getDegree());
+			eCount++;
+			iCount += current.getDegree();
 		}
 
 		// initialize vertices

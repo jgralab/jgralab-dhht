@@ -71,7 +71,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**
-	 * Generated Serual Version UID
+	 * Generated Serial Version UID
 	 */
 	private static final long serialVersionUID = 1245169302974416890L;
 
@@ -519,13 +519,17 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final void addSubordinateElement(Vertex appendix) throws RemoteException {
+		System.out.println("Adding vertex " + appendix + " to subordinate graph");
+		//TODO: Das gefällt mir noch nicht, dass hier schon der Graph gebaut wird
 		if (getSubordinateGraph().getLastVertex() != null) {
+			System.out.println("...putting after last vertex");
 			appendix.putAfter(getSubordinateGraph().getLastVertex());
 		} else {
+			System.out.println("Adding element to subordinate graph");
 			addFirstSubordinateVertex(appendix);
 		}
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+		((GraphElementImpl<?, ?, ?>) appendix).setSigma(this);
 	}
 
 	/**
@@ -546,7 +550,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			addFirstSubordinateEdge(appendix);
 		}
 		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?>) appendix).setParent(this);
+		((GraphElementImpl<?, ?, ?>) appendix).setSigma(this);
 	}
 
 	/**
@@ -561,13 +565,13 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * Sets {@link #sigma} to <code>parent</code>.
 	 * 
-	 * @param parent
+	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	private final void setParent(GraphElementImpl<?, ?, ?> parent) throws RemoteException {
-		assert parent != null;
-		assert getType().getAllowedSigmaClasses().contains(parent.getType());
-		this.sigma = parent;
+	private final void setSigma(GraphElementImpl<?, ?, ?> newSigma) throws RemoteException {
+		assert newSigma != null;
+		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
+		this.sigma = newSigma;
 	}
 
 	/**
