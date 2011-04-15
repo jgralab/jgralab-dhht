@@ -76,6 +76,7 @@ import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SubordinateGraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
+import de.uni_koblenz.jgralab.codegenerator.ViewGraphCodeGenerator;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
@@ -420,6 +421,10 @@ public class SchemaImpl implements Schema {
 		/* create code for subordinate graph */
 		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
 		javaSources.addAll(subordinateGraphCodeGenerator.createJavaSources());
+		
+		/* create code for view graph */
+		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		javaSources.addAll(viewGraphCodeGenerator.createJavaSources());
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
 			VertexCodeGenerator codeGen = new VertexCodeGenerator(vertexClass,
