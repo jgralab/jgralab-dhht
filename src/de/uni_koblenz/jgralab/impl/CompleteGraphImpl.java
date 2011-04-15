@@ -542,6 +542,8 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	@Override
 	public void releaseTraversalContext() {
+		if (traversalContextMap == null)
+			return;
 		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
 		if (stack != null) {
 			stack.pop();

@@ -19,15 +19,15 @@ public class PerformaceTest {
 
 	private static int factor = 1;
 	
-	private static int activityCount = 87377;
+	private static int activityCount = 374002;
 	
-	private static int ruleCount = 1141;
+	private static int ruleCount = 1541;
 	
-	private static int featureCount = 13071;
+	private static int featureCount = 123074;
 	
 	private static int processCount = 1383;
 	
-	private static int linkCount = 176233;
+	private static int linkCount = 500000;
 	
 	public static void main(String[] args) {
 		try {
@@ -87,7 +87,6 @@ public class PerformaceTest {
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}
-		System.out.println("Finished");
-			}
+	}
 	
 }

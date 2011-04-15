@@ -4,7 +4,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class CountHypergraphSearchAlgorithm extends HypergraphSearchAlgorithm {
+public class CountHypergraphSearchAlgorithm extends HypergraphSearchAlgorithmOptimized {
 
 	public CountHypergraphSearchAlgorithm() {
 		super();

@@ -453,9 +453,20 @@ public abstract class EdgeImpl extends
 	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
 		assert isValid();
 		Incidence i = firstIncidenceAtEdge;
-		while (((i != null) && (traversalContext != null) && (!traversalContext.containsVertex(i.getVertex()))) 
-				   || ((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection())))
+		if (traversalContext==null) {
+			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
 					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
+			}		
+		} else {
+			if ((direction != null) && (direction != Direction.BOTH)) {
+				while ((i != null) && ((!traversalContext.containsVertex(i.getVertex())) || (direction != i.getDirection())))
+					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
+			} else {
+				while ((i != null) && (!traversalContext.containsVertex(i.getVertex())))
+					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
+			}
+			
+		}
 		return i;
 	}
 

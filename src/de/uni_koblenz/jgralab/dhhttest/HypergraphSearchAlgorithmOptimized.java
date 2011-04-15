@@ -14,14 +14,14 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class HypergraphSearchAlgorithm {
+public class HypergraphSearchAlgorithmOptimized {
 
 	//TODO: Record TreeIncidences separately to avoid handling them as tree and as cross incidence
 		//protected Set<Vertex> marking;
 		//protected Map<Vertex, Integer> number;
-		protected List<Vertex> order;
-		protected Map<Vertex, Incidence> parentVertexInc;
-		protected Map<Edge, Incidence> parentEdgeInc;
+	//	protected List<Vertex> order;
+		protected Incidence[] parentVertexInc;
+		protected Incidence[] parentEdgeInc;
 		protected int num;
 
 		/* this buffer needs to be instatiated in a subclass
@@ -46,9 +46,9 @@ public class HypergraphSearchAlgorithm {
 			}
 		//	marking = new HashSet<Vertex>(vCount);
 			//number = new HashMap<Vertex, Integer>(vCount);
-			order = new ArrayList<Vertex>(vCount);
-			parentVertexInc = new HashMap<Vertex, Incidence>(vCount);
-			parentEdgeInc = new HashMap<Edge, Incidence>(eCount);
+			//order = new ArrayList<Vertex>(vCount);
+			parentVertexInc = new Incidence[vCount+1];
+			parentEdgeInc = new Incidence[eCount+1];
 			num = 0;
 		}
 
@@ -57,7 +57,7 @@ public class HypergraphSearchAlgorithm {
 		public void run(Vertex startVertex) throws RemoteException {
 			init(startVertex.getGraph());
 			//number.put(startVertex, ++num); //number first vertex with 1
-			order.add(startVertex);
+		//	order.add(startVertex);
 			handleRoot(startVertex);
 			handleVertex(startVertex);
 			buffer.add(startVertex);
@@ -68,9 +68,9 @@ public class HypergraphSearchAlgorithm {
 				while (curIncAtVertex != null) {
 				//	System.out.println("Iterating incidence at vertex " + currentVertex.getId());
 					Edge currentEdge = curIncAtVertex.getEdge();
-					if (!parentEdgeInc.containsKey(currentEdge)) {   
+					if (parentEdgeInc[currentEdge.getId()]==null) {   
 					//	handleEdge(currentEdge);
-						parentEdgeInc.put(currentEdge, curIncAtVertex);     
+						parentEdgeInc[currentEdge.getId()] = curIncAtVertex;     
 					//	handleTreeIncidence(curIncAtVertex); 
 						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
 						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
@@ -78,9 +78,9 @@ public class HypergraphSearchAlgorithm {
 							Vertex omega = curIncAtEdge.getVertex();
 							//if (!number.containsKey(omega)) {
 							//	number.put(omega, ++num);
-							if ((!parentVertexInc.containsKey(omega)) && (omega!=startVertex)) {
-								order.add(omega);
-								parentVertexInc.put(omega, curIncAtEdge);
+							if ((parentVertexInc[omega.getId()]==null) && (omega!=startVertex)) {
+						//		order.add(omega);
+								parentVertexInc[omega.getId()]= curIncAtEdge;
 								//handleVertex(omega);
 								//handleTreeIncidence(curIncAtEdge);
 								buffer.add(omega);

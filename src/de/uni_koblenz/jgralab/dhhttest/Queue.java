@@ -5,6 +5,11 @@ import java.util.LinkedList;
 public class Queue<T> extends LinkedList<T> implements Buffer<T> {
 
 
+	public Queue() {
+		super();
+	}
+	
+
 	/**
 	 * 
 	 */
