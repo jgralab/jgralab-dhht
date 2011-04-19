@@ -833,6 +833,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getId() throws RemoteException;
 
+	public String getURL();
+
 	/**
 	 * Adds a partial graph on the given host to the sequence of partial graphs
 	 * and returns a local proxy
