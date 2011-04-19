@@ -55,6 +55,7 @@ import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -1113,10 +1114,47 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	public void writePartialGraphs(GraphIO graphIO) throws IOException {
 		graphIO.write("{");
+		BooleanGraphMarker graphmarker = new BooleanGraphMarker(
+				getCompleteGraph());
+		graphmarker.mark(this);
+		String delim = "";
+		// write complete graph
 		if (getCompleteGraph() != this) {
-			// graphIO.write(getCompleteGraph().getUid()+"-"+);
+			GraphBaseImpl graph = getCompleteGraph();
+			writePartialGraphEntry(graphIO, graphmarker, graph, delim);
+			delim = ", ";
+		}
+		// write partial graphs
+		for (Graph graph : getPartialGraphs()) {
+			writePartialGraphEntry(graphIO, graphmarker, graph, delim);
+			delim = ", ";
+		}
+		// write used graphs of graphelements
+		for (Vertex v : getVertices()) {
+			for (Incidence i : v.getIncidences()) {
+				Graph graph = i.getLocalGraph();
+				if (graph != this && !graphmarker.isMarked(graph)) {
+					writePartialGraphEntry(graphIO, graphmarker, graph, delim);
+					delim = ", ";
+				}
+			}
+		}
+		for (Edge e : getEdges()) {
+			for (Incidence i : e.getIncidences()) {
+				Graph graph = i.getVertex().getLocalGraph();
+				if (graph != this && !graphmarker.isMarked(graph)) {
+					writePartialGraphEntry(graphIO, graphmarker, graph, delim);
+					delim = ", ";
+				}
+			}
 		}
 		graphIO.write("}");
 	}
 
+	private void writePartialGraphEntry(GraphIO graphIO,
+			BooleanGraphMarker graphmarker, Graph graph, String delim)
+			throws IOException, RemoteException {
+		graphIO.write(delim + graph.getId() + "-" + graph.getURL());
+		graphmarker.mark(graph);
+	}
 }
