@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -116,7 +117,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Creates a vertex the specified class <code>cls</code> and adds the new
 	 * vertex to this Graph.
 	 */
-	public <T extends Vertex> T createVertex(Class<T> cls) throws RemoteException;
+	public <T extends Vertex> T createVertex(Class<T> cls)
+			throws RemoteException;
 
 	/**
 	 * Creates an edge of the specified class <code>cls</code> and adds the new
@@ -184,7 +186,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return <code>true</code> if the vertex list version of this graph is
 	 *         different from <code>previousVersion</code>.
 	 */
-	public boolean isVertexListModified(long previousVersion) throws RemoteException;
+	public boolean isVertexListModified(long previousVersion)
+			throws RemoteException;
 
 	/**
 	 * Returns the version counter of the vertex sequence of this graph.
@@ -203,7 +206,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return <code>true</code> if the edge list version of this graph is
 	 *         different from <code>previousVersion</code>.
 	 */
-	public boolean isEdgeListModified(long edgeListVersion) throws RemoteException;
+	public boolean isEdgeListModified(long edgeListVersion)
+			throws RemoteException;
 
 	/**
 	 * Returns the version counter of the edge sequence of this graph.
@@ -282,7 +286,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(VertexClass vertexClass) throws RemoteException;
+	public Vertex getFirstVertex(VertexClass vertexClass)
+			throws RemoteException;
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>,
@@ -299,7 +304,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) throws RemoteException;
+	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses)
+			throws RemoteException;
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>
@@ -311,7 +317,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) throws RemoteException;
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass)
+			throws RemoteException;
 
 	/**
 	 * Returns the first Vertex of the specified <code>vertexClass</code>,
@@ -374,7 +381,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
 	 */
-	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) throws RemoteException;
+	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses)
+			throws RemoteException;
 
 	/**
 	 * Returns the first Edge of the specified <code>edgeClass</code> (including
@@ -386,7 +394,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
 	 */
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass) throws RemoteException;
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass)
+			throws RemoteException;
 
 	/**
 	 * Returns the first Edge of the specified <code>edgeClass</code>, including
@@ -402,7 +411,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the first Edge, or null if this graph contains no edges of the
 	 *         specified <code>edgeClass</code>.
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
 			boolean noSubclasses) throws RemoteException;
@@ -513,7 +522,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return an Iterable for all edges of the specified <code>edgeClass</code>
 	 */
-	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) throws RemoteException;
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass)
+			throws RemoteException;
 
 	/**
 	 * Returns the list of reachable vertices.
@@ -551,7 +561,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return an Iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> getVertices(VertexClass vertexclass) throws RemoteException;
+	public Iterable<Vertex> getVertices(VertexClass vertexclass)
+			throws RemoteException;
 
 	/**
 	 * Returns an Iterable which iterates over all vertices of this Graph which
@@ -564,7 +575,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return a iterable for all vertices of the specified
 	 *         <code>vertexClass</code>
 	 */
-	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) throws RemoteException;
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass)
+			throws RemoteException;
 
 	/**
 	 * Optimizes edge and vertex ids such that after defragmentation
@@ -575,7 +587,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * <b>Attention:</b> defragment() possibly changes vertex and edge IDs! *
 	 * <b>Attention:</b> Not supported within when using transactions!
-	 * @throws RemoteException 
+	 * 
+	 * @throws RemoteException
 	 */
 	public void defragment() throws RemoteException;
 
@@ -598,7 +611,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) throws RemoteException;
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -609,7 +623,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(int initialCapacity) throws RemoteException;
+	public <T> JGraLabList<T> createList(int initialCapacity)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -630,7 +645,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) throws RemoteException;
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -641,7 +657,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity) throws RemoteException;
+	public <T> JGraLabSet<T> createSet(int initialCapacity)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -653,7 +670,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param loadFactor
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) throws RemoteException;
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -682,7 +700,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param map
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) throws RemoteException;
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -693,7 +712,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) throws RemoteException;
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -721,7 +741,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param io
 	 * @return
 	 */
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) throws RemoteException;
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
+			throws RemoteException;
 
 	/**
 	 * 
@@ -739,7 +760,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param recordClass
 	 * @param io
 	 * @return
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) throws RemoteException;
@@ -786,7 +807,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Removes all <code>GraphStructureChangedListener</code> from the internal
 	 * listener list.
 	 */
-	public void removeAllGraphStructureChangedListeners() throws RemoteException;
+	public void removeAllGraphStructureChangedListeners()
+			throws RemoteException;
 
 	/**
 	 * Returns the amount of registered
@@ -818,8 +840,10 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param hostname
 	 *            name of the host running the remote JGraLab instance
 	 * @return a local proxy object for the created partial graph
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
 	public Graph createPartialGraph(String hostname) throws RemoteException;
+
+	public void writePartialGraphs(GraphIO graphIO) throws IOException;
 
 }
