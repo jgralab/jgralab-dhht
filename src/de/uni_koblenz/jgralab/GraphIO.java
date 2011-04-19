@@ -351,6 +351,11 @@ public class GraphIO {
 		space();
 		writeIdentifier(gc.getSimpleName());
 		writeAttributes(null, gc);
+		if (!gc.hasAttributes()) {
+			space();
+		} else {
+			noSpace();
+		}
 		writeConstraints(gc);
 		write(";\n");
 		writeComments(gc, gc.getSimpleName());
@@ -419,6 +424,9 @@ public class GraphIO {
 				writeIdentifier(vc.getSimpleName());
 				writeHierarchy(pkg, vc);
 				writeAttributes(pkg, vc);
+				writeSigmaDefinition(vc);
+				writeKappaDefintion(vc);
+				noSpace();
 				writeConstraints(vc);
 				write(";\n");
 				writeComments(vc, vc.getSimpleName());
@@ -458,6 +466,9 @@ public class GraphIO {
 				}
 
 				writeAttributes(pkg, ec);
+				writeSigmaDefinition(ec);
+				writeKappaDefintion(ec);
+				noSpace();
 				writeConstraints(ec);
 				write(";\n");
 				writeComments(ec, ec.getSimpleName());
@@ -465,6 +476,31 @@ public class GraphIO {
 
 			// write package comments
 			writeComments(pkg, pkg.getQualifiedName());
+		}
+	}
+
+	private void writeKappaDefintion(GraphElementClass<?, ?> gec)
+			throws IOException {
+		if (gec.getAllowedMinKappa() != 0
+				|| gec.getAllowedMaxKappa() != Integer.MAX_VALUE) {
+			noSpace();
+			write(" validkappa ");
+			write("(");
+			writeInteger(gec.getAllowedMinKappa());
+			write(",");
+			writeInteger(gec.getAllowedMaxKappa());
+			write(")");
+		}
+	}
+
+	private void writeSigmaDefinition(GraphElementClass<?, ?> gec)
+			throws IOException {
+		String delim = " validsigma";
+		for (GraphElementClass<?, ?> sigmaClass : gec.getAllowedSigmaClasses()) {
+			space();
+			write(delim);
+			writeIdentifier(sigmaClass.getQualifiedName());
+			delim = ",";
 		}
 	}
 
@@ -916,7 +952,7 @@ public class GraphIO {
 				writeUtfString(a.getDefaultValueAsString());
 			}
 			if (ait.hasNext()) {
-				write(", ");
+				write(",");
 			} else {
 				write(" }");
 			}
@@ -2322,7 +2358,10 @@ public class GraphIO {
 				IncidenceClassData icd = incidenceClassMap.get(ic);
 				buildIncidenceClassHierarchy(ic, icd, ec);
 				if (ic.getDirectSuperClasses().size() != icd.directSuperClasses
-						.size() && !(ic.getDirectSuperClasses().size() == 1 && ic.getDirectSuperClasses().contains(ic.getDefaultClass()))) {
+						.size()
+						&& !(ic.getDirectSuperClasses().size() == 1 && ic
+								.getDirectSuperClasses().contains(
+										ic.getDefaultClass()))) {
 					System.out.println("Superclasses");
 					throw new GraphIOException(
 							"The number of direct super classes of incidence class "
@@ -2340,9 +2379,14 @@ public class GraphIO {
 				if (ic.getVertexClass() != icOfEc.getVertexClass()
 						&& !ic.getVertexClass().isSubClassOf(
 								icOfEc.getVertexClass())) {
-					throw new GraphIOException("The rolename " + ic.getRolename()	+ " can not be less general than "
-							+ icOfEc.getRolename()	+ " because the VertexClass "+ ic.getVertexClass().getQualifiedName()
-							+ " is no subclass of or equal to "	+ icOfEc.getVertexClass().getQualifiedName() + ".");
+					throw new GraphIOException("The rolename "
+							+ ic.getRolename()
+							+ " can not be less general than "
+							+ icOfEc.getRolename()
+							+ " because the VertexClass "
+							+ ic.getVertexClass().getQualifiedName()
+							+ " is no subclass of or equal to "
+							+ icOfEc.getVertexClass().getQualifiedName() + ".");
 				}
 				((IncidenceClassImpl) ic).addSuperClass(icOfEc);
 				// set redefined rolenames
@@ -2818,7 +2862,7 @@ public class GraphIO {
 		try {
 			sortLambdaSequenceAtVertex(graph);
 		} catch (RemoteException ex) {
-			//TODO 
+			// TODO
 			ex.printStackTrace();
 		}
 
@@ -2830,8 +2874,9 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph)  throws RemoteException {
-		for (Vertex v : graph.getVertices())  {
+	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph)
+			throws RemoteException {
+		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();
 			for (Integer[] incArray : incidencesAtVertex[v.getId()]) {
 				if (incArray == null) {
@@ -2955,8 +3000,8 @@ public class GraphIO {
 			}
 			Vertex v = incidencesAtEdge[eId].get(lambdaSeqPosAtEdge);
 			try {
-				incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge.connect(
-					currentRolename, v);
+				incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge
+						.connect(currentRolename, v);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
