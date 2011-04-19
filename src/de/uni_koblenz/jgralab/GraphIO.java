@@ -730,8 +730,8 @@ public class GraphIO {
 		schema = graph.getSchema();
 		saveSchema(schema);
 
-		long eId;
-		long vId;
+		int eId;
+		int vId;
 
 		// progress bar for graph
 		long graphElements = 0, currentCount = 0, interval = 1;
@@ -768,10 +768,14 @@ public class GraphIO {
 		space();
 		writeSpace();
 		graph.writePartialGraphs(this);
-		graph.writeAttributeValues(this);
+		if (graph.getType().hasAttributes()) {
+			writeSpace();
+			graph.writeAttributeValues(this);
+		}
 		write(";\n");
 
 		Package oldPackage = null;
+
 		// write vertices
 		// System.out.println("Writing vertices");
 		Vertex nextV = graph.getFirstVertex();
@@ -792,7 +796,7 @@ public class GraphIO {
 				oldPackage = currentPackage;
 			}
 
-			write(Long.toString(vId));
+			write(Integer.toString(vId));
 			space();
 			writeIdentifier(aec.getSimpleName());
 
@@ -806,17 +810,26 @@ public class GraphIO {
 					nextI = nextI.getNextIncidenceAtVertex();
 					continue;
 				}
-				writeLong(nextI.getEdge().getId());
-				write("-");
-				noSpace();
-				writeInteger(getLambdaPositionOfIncidenceAtEdge(nextI, subGraph));
-				nextI = nextI.getNextIncidenceAtVertex();
-				space();
+				Graph g = nextI.getLocalGraph();
+				writeSpace();
+				write((g == graph ? "" : g.getId() + "-") + nextI.getId());
 			}
 			write(">");
-			space();
 
-			nextV.writeAttributeValues(this);
+			space();
+			if (nextV.getType().hasAttributes()) {
+				writeSpace();
+				nextV.writeAttributeValues(this);
+			}
+
+			GraphElement<?, ?, ?> containingElement = nextV
+					.getContainingGraph().getContainingElement();
+			if (containingElement != null) {
+				// TODO check if globalId should be used
+				write(" sigma="
+						+ (containingElement instanceof Vertex ? "v" : "e")
+						+ containingElement.getId());
+			}
 			write(";\n");
 			nextV = nextV.getNextVertex(graph);
 
