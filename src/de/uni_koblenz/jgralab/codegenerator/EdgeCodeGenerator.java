@@ -31,10 +31,7 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-
 
 /**
  * TODO add comment
@@ -44,7 +41,6 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
  */
 public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
-	
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(edgeClass, schemaPackageName, config, false);
@@ -53,19 +49,15 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		addImports("java.rmi.RemoteException");
 	}
 
-
-
-
 	@Override
 	protected CodeList createBody() {
-		CodeList code = (CodeList) super.createBody();
-	    createMethodsForBinaryEdge(code);
+		CodeList code = super.createBody();
+		createMethodsForBinaryEdge(code);
 		return code;
 	}
-	
+
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		//to be overwritten in the binary edge codegen
+		// to be overwritten in the binary edge codegen
 	}
 
-	
 }
