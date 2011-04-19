@@ -36,7 +36,6 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabCloneable;
-import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Domain;
@@ -172,8 +171,6 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 
 	}
 
-	
-
 	@Override
 	public void setDefaultValue(AttributedElement<?, ?> element)
 			throws GraphIOException {
@@ -181,7 +178,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 			if (defaultValueAsString != null) {
 				element.readAttributeValueFromString(name, defaultValueAsString);
 			}
-			
+
 			try {
 				defaultValue = element.getAttribute(name);
 			} catch (RemoteException e) {
