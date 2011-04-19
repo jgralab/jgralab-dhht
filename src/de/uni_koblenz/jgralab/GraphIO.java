@@ -766,6 +766,8 @@ public class GraphIO {
 		write(" (" + graph.getMaxVCount() + " " + graph.getMaxECount() + " "
 				+ vCount + " " + eCount + ")");
 		space();
+		writeSpace();
+		graph.writePartialGraphs(this);
 		graph.writeAttributeValues(this);
 		write(";\n");
 
@@ -775,7 +777,7 @@ public class GraphIO {
 		Vertex nextV = graph.getFirstVertex();
 		while (nextV != null) {
 			if (subGraph != null && !subGraph.isMarked(nextV)) {
-				nextV = nextV.getNextVertex();
+				nextV = nextV.getNextVertex(graph);
 				continue;
 			}
 			vId = nextV.getId();
@@ -816,7 +818,7 @@ public class GraphIO {
 
 			nextV.writeAttributeValues(this);
 			write(";\n");
-			nextV = nextV.getNextVertex();
+			nextV = nextV.getNextVertex(graph);
 
 			// update progress bar
 			if (pf != null) {
