@@ -904,19 +904,6 @@ public class GraphIO {
 		}
 	}
 
-	private int getLambdaPositionOfIncidenceAtEdge(Incidence nextI,
-			BooleanGraphMarker subGraph) throws RemoteException {
-		int position = 1;
-		Incidence currentI = nextI.getPreviousIncidenceAtEdge();
-		while (currentI != null) {
-			if (subGraph == null || subGraph.isMarked(currentI.getVertex())) {
-				position++;
-			}
-			currentI = currentI.getPreviousIncidenceAtEdge();
-		}
-		return position;
-	}
-
 	private void saveHeader() throws IOException {
 		write(JGraLab.getVersionInfo(true));
 		write("DHHTGraph " + TGFILE_VERSION + ";\n");
