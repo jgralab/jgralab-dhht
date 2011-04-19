@@ -45,7 +45,6 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -155,7 +154,8 @@ public class JniServer {
 	// ----------------------------------------------------------------------------
 	// ----------------------------------------------------------------------------
 
-	public int createVertex(int graphId, String vertexClassName) throws RemoteException {
+	public int createVertex(int graphId, String vertexClassName)
+			throws RemoteException {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Vertex> m1Class = graph.getGraphClass()
 				.getVertexClass(vertexClassName).getM1Class();
@@ -208,9 +208,10 @@ public class JniServer {
 				value);
 	}
 
-	public String getVertexClassName(int graphId, int vertexId) throws RemoteException {
-		return graphs.get(graphId).getVertex(vertexId)
-				.getType().getQualifiedName();
+	public String getVertexClassName(int graphId, int vertexId)
+			throws RemoteException {
+		return graphs.get(graphId).getVertex(vertexId).getType()
+				.getQualifiedName();
 	}
 
 	public boolean getVertexBooleanAttribute(int graphId, int vertexId,
@@ -277,9 +278,9 @@ public class JniServer {
 		return graphs.get(graphId).getEdge(edgeId);
 	}
 
-	public String getEdgeClassName(int graphId, int edgeId) throws RemoteException {
-		return graphs.get(graphId).getEdge(edgeId).getType()
-				.getQualifiedName();
+	public String getEdgeClassName(int graphId, int edgeId)
+			throws RemoteException {
+		return graphs.get(graphId).getEdge(edgeId).getType().getQualifiedName();
 	}
 
 	public void setEdgeAttribute(int graphId, int edgeId, String attributeName,
@@ -388,7 +389,8 @@ public class JniServer {
 		return graphs.get(graphId).getVertex(vertexId);
 	}
 
-	public int getFirstVertex(int graphId, String vertexClassName) throws RemoteException {
+	public int getFirstVertex(int graphId, String vertexClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Vertex v = (vertexClassName != null) ? g.getFirstVertex((VertexClass) g
 				.getSchema().getAttributedElementClass(vertexClassName)) : g
@@ -396,7 +398,8 @@ public class JniServer {
 		return (v == null) ? 0 : v.getId();
 	}
 
-	public int getNextVertex(int graphId, int vertexId, String vertexClassName) throws RemoteException {
+	public int getNextVertex(int graphId, int vertexId, String vertexClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Vertex v = (vertexClassName != null) ? g.getVertex(vertexId)
 				.getNextVertex(
@@ -406,7 +409,8 @@ public class JniServer {
 		return (v == null) ? 0 : v.getId();
 	}
 
-	public int getFirstEdgeInGraph(int graphId, String edgeClassName) throws RemoteException {
+	public int getFirstEdgeInGraph(int graphId, String edgeClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Edge e = (edgeClassName != null) ? g.getFirstEdge((EdgeClass) g
 				.getSchema().getAttributedElementClass(edgeClassName)) : g
@@ -414,7 +418,8 @@ public class JniServer {
 		return (e == null) ? 0 : e.getId();
 	}
 
-	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName) throws RemoteException {
+	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName)
+			throws RemoteException {
 		Graph g = graphs.get(graphId);
 		Edge e = (edgeClassName != null) ? g.getEdge(edgeId).getNextEdge(
 				((EdgeClass) g.getSchema().getAttributedElementClass(
