@@ -1101,6 +1101,7 @@ public class GraphIO {
 				in = new BufferedInputStream(new FileInputStream(filename),
 						BUFFER_SIZE);
 			}
+			GraphIO.filename = filename;
 			return loadSchemaFromStream(in);
 
 		} catch (IOException ex) {
@@ -1384,6 +1385,7 @@ public class GraphIO {
 				inputStream = new BufferedInputStream(fileStream, BUFFER_SIZE);
 			}
 
+			GraphIO.filename = filename;
 			return loadGraphFromStream(inputStream, schema, pf,
 					implementationType);
 
@@ -1532,7 +1534,6 @@ public class GraphIO {
 		// test for correct syntax, because otherwise, the following
 		// sorting/creation methods probably can't work.
 		if (!(lookAhead.equals("") || lookAhead.equals("Graph"))) {
-			// TODO adapt for hierarchical graphs
 			throw new GraphIOException("symbol '" + lookAhead
 					+ "' not recognized in line " + line, null);
 		}
@@ -1808,8 +1809,12 @@ public class GraphIO {
 	 * @throws GraphIOException
 	 */
 	private List<String> parseHierarchy() throws GraphIOException {
-		List<String> hierarchy = new LinkedList<String>();
 		match(":");
+		return parseQualifiedNameList();
+	}
+
+	private List<String> parseQualifiedNameList() throws GraphIOException {
+		List<String> hierarchy = new LinkedList<String>();
 		String[] qn = matchQualifiedName(true);
 		hierarchy.add(toQNameString(qn));
 		while (lookAhead.equals(",")) {
@@ -2062,6 +2067,14 @@ public class GraphIO {
 			graphElementClassData.attributes = parseAttributes();
 		}
 
+		if (lookAhead.equals("validsigma")) {
+			graphElementClassData.validSigmas = parseQualifiedNameList();
+		}
+
+		if (lookAhead.equals("validkappa")) {
+			graphElementClassData.validKappa = parseMultiplicity();
+		}
+
 		if (lookAhead.equals("[")) {
 			// There are constraints
 			graphElementClassData.constraints = parseConstraints();
@@ -2123,6 +2136,8 @@ public class GraphIO {
 			vc.addConstraint(constraint);
 		}
 
+		vc.setAllowedKappaRange(vcd.validKappa[0], vcd.validKappa[1]);
+
 		GECsearch.put(vc, gc);
 		return vc;
 	}
@@ -2158,6 +2173,8 @@ public class GraphIO {
 		}
 
 		ec.setAbstract(ecd.isAbstract);
+
+		ec.setAllowedKappaRange(ecd.validKappa[0], ecd.validKappa[1]);
 
 		GECsearch.put(ec, gc);
 		return ec;
@@ -2248,9 +2265,6 @@ public class GraphIO {
 			return IncidenceType.COMPOSITION;
 		} else {
 			return IncidenceType.EDGE;
-			// throw new GraphIOException(
-			// "invalid incidenceType: expected EDGE, AGGREGATE, or COMPOSITE, but found '"
-			// + lookAhead + "' in line " + line);
 		}
 	}
 
@@ -2448,6 +2462,36 @@ public class GraphIO {
 		buildVertexClassHierarchy();
 		buildEdgeClassHierarchy();
 		buildIncidenceClassHierarchy();
+		buildSigmaHierarchy(vertexClassBuffer);
+		buildSigmaHierarchy(edgeClassBuffer);
+	}
+
+	private void buildSigmaHierarchy(
+			Map<String, List<GraphElementClassData>> classBuffer)
+			throws GraphIOException {
+		GraphElementClass<?, ?> gec;
+		GraphElementClass<?, ?> sigma;
+
+		for (Entry<String, List<GraphElementClassData>> gcElements : classBuffer
+				.entrySet()) {
+			for (GraphElementClassData vData : gcElements.getValue()) {
+				gec = (GraphElementClass<?, ?>) schema
+						.getAttributedElementClass(vData.getQualifiedName());
+				if (gec == null) {
+					throw new GraphIOException("undefined GraphElementClass '"
+							+ vData.getQualifiedName() + "'");
+				}
+				for (String sigmaQN : vData.validSigmas) {
+					sigma = (GraphElementClass<?, ?>) schema
+							.getAttributedElementClass(sigmaQN);
+					if (gec == null) {
+						throw new GraphIOException(
+								"undefined GraphElementClass '" + sigmaQN + "'");
+					}
+					gec.addAllowedSigmaClass(sigma);
+				}
+			}
+		}
 	}
 
 	private final String nextToken() throws GraphIOException {
@@ -3515,6 +3559,10 @@ public class GraphIO {
 		List<IncidenceClassData> toIncidenceClasses = new LinkedList<IncidenceClassData>();
 
 		List<AttributeData> attributes = new ArrayList<AttributeData>();
+
+		List<String> validSigmas = new ArrayList<String>();
+
+		int[] validKappa;
 
 		Set<Constraint> constraints = new HashSet<Constraint>(1);
 	}
