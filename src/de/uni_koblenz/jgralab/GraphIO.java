@@ -66,6 +66,11 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.CompleteGraphImpl;
+import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
+import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
+import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
+import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -107,6 +112,8 @@ public class GraphIO {
 	public static String FALSE_LITERAL = "f";
 	public static String TGRAPH_FILE_EXTENSION = ".dhhtg";
 	public static String TGRAPH_COMPRESSED_FILE_EXTENSION = ".dhhtg.gz";
+
+	private static String filename;
 
 	/**
 	 * A {@link FilenameFilter} that accepts TG files.
@@ -623,6 +630,7 @@ public class GraphIO {
 				out = new DataOutputStream(new BufferedOutputStream(
 						new FileOutputStream(filename), BUFFER_SIZE));
 			}
+			GraphIO.filename = filename;
 			saveGraphToStream(out, graph, pf);
 		} catch (IOException ex) {
 			throw new GraphIOException("Exception while saving graph to "
@@ -687,7 +695,7 @@ public class GraphIO {
 		try {
 			GraphIO io = new GraphIO();
 			io.TGOut = out;
-			io.saveGraph(graph, pf, null);
+			io.saveGraph(graph, pf, null);// TODO save partial graphs
 			out.flush();
 		} catch (IOException e) {
 			throw new GraphIOException("exception while saving graph", e);
@@ -724,11 +732,23 @@ public class GraphIO {
 
 	private void saveGraph(Graph graph, ProgressFunction pf,
 			BooleanGraphMarker subGraph) throws IOException, GraphIOException {
+		if (graph instanceof SubordinateGraphImpl
+				|| graph instanceof PartialSubordinateGraphImpl
+				|| graph instanceof ViewGraphImpl) {
+			throw new GraphIOException(
+					"You can only save a complete graph or a PartialGraph");
+		}
+
 		// Write the jgralab version and license in a comment
 		saveHeader();
 
 		schema = graph.getSchema();
 		saveSchema(schema);
+
+		for (PartialGraphImpl pgraph : ((GraphBaseImpl) graph)
+				.getPartialGraphs()) {
+			pgraph.saveGraph(filename, pf, subGraph);
+		}
 
 		int eId;
 		int vId;
@@ -796,41 +816,31 @@ public class GraphIO {
 				oldPackage = currentPackage;
 			}
 
-			write(Integer.toString(vId));
-			space();
-			writeIdentifier(aec.getSimpleName());
+			if (nextV.getLocalGraph() == graph) {
+				write(Integer.toString(vId));
+				space();
+				writeIdentifier(aec.getSimpleName());
 
-			// write incidences
-			Incidence nextI = nextV.getFirstIncidence();
-			write(" <");
-			noSpace();
-			// System.out.print("  Writing incidences of vertex.");
-			while (nextI != null) {
-				if (subGraph != null && !subGraph.isMarked(nextI.getEdge())) {
-					nextI = nextI.getNextIncidenceAtVertex();
-					continue;
+				// write incidences
+				Incidence nextI = nextV.getFirstIncidence();
+				write(" <");
+				noSpace();
+				// System.out.print("  Writing incidences of vertex.");
+				while (nextI != null) {
+					if (subGraph != null && !subGraph.isMarked(nextI.getEdge())) {
+						nextI = nextI.getNextIncidenceAtVertex();
+						continue;
+					}
+					writeSpace();
+					Graph g = nextI.getLocalGraph();
+					write((g == graph ? "" : g.getId() + "-"));
+					write(Integer.toString(nextI.getId()));
 				}
-				Graph g = nextI.getLocalGraph();
-				writeSpace();
-				write((g == graph ? "" : g.getId() + "-") + nextI.getId());
-			}
-			write(">");
+				write(">");
 
-			space();
-			if (nextV.getType().hasAttributes()) {
-				writeSpace();
-				nextV.writeAttributeValues(this);
+				writeAttributesSigmaKappa(graph, nextV);
+				write(";\n");
 			}
-
-			GraphElement<?, ?, ?> containingElement = nextV
-					.getContainingGraph().getContainingElement();
-			if (containingElement != null) {
-				// TODO check if globalId should be used
-				write(" sigma="
-						+ (containingElement instanceof Vertex ? "v" : "e")
-						+ containingElement.getId());
-			}
-			write(";\n");
 			nextV = nextV.getNextVertex(graph);
 
 			// update progress bar
@@ -852,38 +862,42 @@ public class GraphIO {
 				nextE = nextE.getNextEdge();
 				continue;
 			}
-			eId = nextE.getId();
-			AttributedElementClass<?, ?> aec = nextE.getType();
 
-			Package currentPackage = aec.getPackage();
-			if (currentPackage != oldPackage) {
-				write("Package");
-				space();
-				writeIdentifier(currentPackage.getQualifiedName());
-				write(";\n");
-				oldPackage = currentPackage;
-			}
+			if (nextE.getLocalGraph() == graph) {
+				eId = nextE.getId();
+				AttributedElementClass<?, ?> aec = nextE.getType();
 
-			write(Long.toString(eId));
-			space();
-			writeIdentifier(aec.getSimpleName());
-
-			// write OrderedTypedIncidences
-			write("<");
-			noSpace();
-			for (Incidence i : nextE.getIncidences()) {
-				if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
-					continue;
+				Package currentPackage = aec.getPackage();
+				if (currentPackage != oldPackage) {
+					write("Package");
+					space();
+					writeIdentifier(currentPackage.getQualifiedName());
+					write(";\n");
+					oldPackage = currentPackage;
 				}
-				writeSpace();
-				write(i.getType().getRolename());
-				space();
-			}
-			write(">");
 
-			space();
-			nextE.writeAttributeValues(this);
-			write(";\n");
+				write(Long.toString(eId));
+				space();
+				writeIdentifier(aec.getSimpleName());
+
+				// write OrderedTypedIncidences
+				write("<");
+				noSpace();
+				int edgeIncidenceCounter = 0;
+				for (Incidence i : nextE.getIncidences()) {
+					if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
+						continue;
+					}
+					writeSpace();
+					write(++edgeIncidenceCounter + ":"
+							+ i.getType().getRolename());
+					space();
+				}
+				write(">");
+
+				writeAttributesSigmaKappa(graph, nextE);
+				write(";\n");
+			}
 			nextE = nextE.getNextEdge();
 
 			// update progress bar
@@ -902,6 +916,31 @@ public class GraphIO {
 		if (pf != null) {
 			pf.finished();
 		}
+	}
+
+	private void writeAttributesSigmaKappa(Graph graph,
+			GraphElement<?, ?, ?> next) throws RemoteException, IOException,
+			GraphIOException {
+		space();
+		// write attributes
+		if (next.getType().hasAttributes()) {
+			writeSpace();
+			next.writeAttributeValues(this);
+		}
+
+		// write sigma
+		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
+				.getContainingElement();
+		if (containingElement != null) {
+			write(" sigma=");
+			Graph g = next.getLocalGraph();
+			write((g == graph ? "" : g.getId() + "-"));
+			write((containingElement instanceof Vertex ? "v" : "e")
+					+ containingElement.getId());
+		}
+
+		// write kappa
+		write(" kappa=" + next.getKappa());
 	}
 
 	private void saveHeader() throws IOException {
