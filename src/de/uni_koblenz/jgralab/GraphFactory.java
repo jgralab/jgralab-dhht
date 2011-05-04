@@ -66,9 +66,10 @@ public interface GraphFactory {
 	 * @param viewGraph
 	 * @param level
 	 * @return
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
-	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) throws RemoteException;
+	public ViewGraphImpl createViewGraph(Graph viewGraph, int level)
+			throws RemoteException;
 
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -76,21 +77,21 @@ public interface GraphFactory {
 	 * 
 	 * @param elem
 	 * @return
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
-	public SubordinateGraphImpl createSubordinateGraph(
-			Vertex vertex) throws RemoteException;
-	
+	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex)
+			throws RemoteException;
+
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
 	 * object may be an instance of a subclass of the specified graphClass.
 	 * 
 	 * @param elem
 	 * @return
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
-	public SubordinateGraphImpl createSubordinateGraph(
-			Edge edge) throws RemoteException;
+	public SubordinateGraphImpl createSubordinateGraph(Edge edge)
+			throws RemoteException;
 
 	/**
 	 * creates a PartialSubordinate-Graph object for the specified class. The
@@ -99,7 +100,7 @@ public interface GraphFactory {
 	 * 
 	 * @param elem
 	 * @return
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
 	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
 			GraphElement<?, ?, ?> elem) throws RemoteException;
@@ -109,16 +110,18 @@ public interface GraphFactory {
 	 * returned object may be an instance of a subclass of the specified
 	 * graphClass.
 	 * 
-	 * @param compelteGraph
+	 * @param completeGraph
 	 * @return
 	 */
-	public PartialGraphImpl createPartialGraph(Graph completeGraph) throws RemoteException;
+	public PartialGraphImpl createPartialGraph(Graph completeGraph)
+			throws RemoteException;
 
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g);
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
+			Graph g);
 
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned
