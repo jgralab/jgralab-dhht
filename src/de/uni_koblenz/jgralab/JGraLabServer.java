@@ -11,4 +11,8 @@ public interface JGraLabServer {
 	public abstract Schema createSchema(String schemaString)
 			throws GraphIOException;
 
+	public void registerGraph(Graph graph);
+
+	public void unregisterGraph(Graph graph);
+
 }

@@ -8,12 +8,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.schema.Schema;
 
+@SuppressWarnings("deprecation")
 public class JGraLabServerImpl extends UnicastRemoteObject implements
 		JGraLabServer {
 
@@ -84,11 +86,28 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	 */
 	@Override
 	public Schema createSchema(String schemaString) throws GraphIOException {
-		@SuppressWarnings("deprecation")
 		Schema s = GraphIO.loadSchemaFromStream(new StringBufferInputStream(
 				schemaString));
 		s.compile(CodeGeneratorConfiguration.MINIMAL);
 		return s;
+	}
+
+	@Override
+	public void registerGraph(Graph graph) {
+		try {
+			Naming.bind(Long.toString(graph.getId()), graph);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void unregisterGraph(Graph graph) {
+		try {
+			Naming.unbind(Long.toString(graph.getId()));
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
