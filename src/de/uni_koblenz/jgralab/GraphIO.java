@@ -207,6 +207,8 @@ public class GraphIO {
 
 	private int bufferSize;
 
+	private Map<Integer, Graph> graphBuffer;
+
 	/**
 	 * Stores the information about incidences at the edges.<br>
 	 * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
@@ -2973,9 +2975,10 @@ public class GraphIO {
 
 	private void readPartialGraphs(CompleteGraphImpl graph)
 			throws GraphIOException, RemoteException {
+		graphBuffer = new HashMap<Integer, Graph>();
 		match("{");
 		while (!lookAhead.equals("}")) {
-			String partialGraphId = Integer.toString(matchInteger());
+			int partialGraphId = matchInteger();
 			isURL = true;
 			match("-");
 			String urlValue = lookAhead;
@@ -2983,11 +2986,12 @@ public class GraphIO {
 			isURL = false;
 
 			JGraLabServer remoteServer = server.getRemoteInstance(urlValue);
-			Graph g = remoteServer.getGraph(partialGraphId);
+			Graph g = remoteServer.getGraph(Integer.toString(partialGraphId));
 			if (g == null) {
 				g = server.loadGraph(filename, pf);
-				assert server.getGraph(partialGraphId) == g;
+				assert server.getGraph(Integer.toString(partialGraphId)) == g;
 			}
+			graphBuffer.put(partialGraphId, g);
 
 			if (lookAhead.equals(",")) {
 				match(",");
