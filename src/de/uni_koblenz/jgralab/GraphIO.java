@@ -67,6 +67,7 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
 import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
@@ -114,6 +115,7 @@ public class GraphIO {
 	public static String TGRAPH_COMPRESSED_FILE_EXTENSION = ".dhhtg.gz";
 
 	private static String filename;
+	private static ProgressFunction pf;
 
 	/**
 	 * A {@link FilenameFilter} that accepts TG files.
@@ -274,6 +276,9 @@ public class GraphIO {
 	// stringPool allows re-use string values, saves memory if
 	// multiple identical strings are used as attribute values
 	private final HashMap<String, String> stringPool;
+
+	private JGraLabServer server;
+	private boolean isURL;
 
 	private GraphIO() {
 		domains = new TreeMap<String, Domain>();
@@ -1386,6 +1391,7 @@ public class GraphIO {
 			}
 
 			GraphIO.filename = filename;
+			GraphIO.pf = pf;
 			return loadGraphFromStream(inputStream, schema, pf,
 					implementationType);
 
@@ -2502,6 +2508,8 @@ public class GraphIO {
 			if (la == '"') {
 				readUtfString(out);
 				isUtfString = true;
+			} else if (isURL && la == '-') {
+				readUtfString(out);
 			} else if (isSeparator(la)) {
 				out.append((char) la);
 				la = read();
@@ -2847,7 +2855,8 @@ public class GraphIO {
 
 	@SuppressWarnings("unchecked")
 	private CompleteGraphImpl graph(ProgressFunction pf,
-			ImplementationType implementationType) throws GraphIOException {
+			ImplementationType implementationType) throws GraphIOException,
+			RemoteException {
 		currentPackageName = "";
 		match("Graph");
 		String graphId = matchUtfString();
@@ -2903,6 +2912,9 @@ public class GraphIO {
 					+ gcName + "'", e);
 		}
 		graph.setLoading(true);
+		server = JGraLabServerImpl.getLocalInstance();
+		server.putGraph(Integer.toString(graph.getId()), graph);
+		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
 
@@ -2957,6 +2969,31 @@ public class GraphIO {
 		}
 		graph.setLoading(false);
 		return graph;
+	}
+
+	private void readPartialGraphs(CompleteGraphImpl graph)
+			throws GraphIOException, RemoteException {
+		match("{");
+		while (!lookAhead.equals("}")) {
+			String partialGraphId = Integer.toString(matchInteger());
+			isURL = true;
+			match("-");
+			String urlValue = lookAhead;
+			match();
+			isURL = false;
+
+			JGraLabServer remoteServer = server.getRemoteInstance(urlValue);
+			Graph g = remoteServer.getGraph(partialGraphId);
+			if (g == null) {
+				g = server.loadGraph(filename, pf);
+				assert server.getGraph(partialGraphId) == g;
+			}
+
+			if (lookAhead.equals(",")) {
+				match(",");
+			}
+		}
+		match("}");
 	}
 
 	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph)

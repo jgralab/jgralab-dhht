@@ -11,8 +11,11 @@ public interface JGraLabServer {
 	public abstract Schema createSchema(String schemaString)
 			throws GraphIOException;
 
-	public void registerGraph(Graph graph);
+	public void putGraph(String graphId, Graph graph);
 
-	public void unregisterGraph(Graph graph);
+	public Graph getGraph(String graphId);
+
+	public Graph loadGraph(String filename, ProgressFunction pf)
+			throws GraphIOException;
 
 }

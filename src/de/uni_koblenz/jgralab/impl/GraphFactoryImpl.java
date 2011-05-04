@@ -128,6 +128,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			int vMax, int eMax) {
 		try {
 			Graph g = graphMap.get(graphClass).newInstance(id, vMax, eMax);
+			JGraLabServerImpl.getLocalInstance().putGraph(id, g);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -138,6 +139,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public Graph createGraph(Class<? extends Graph> graphClass, String id) {
 		try {
 			Graph g = graphMap.get(graphClass).newInstance(id, 1000, 1000);
+			JGraLabServerImpl.getLocalInstance().putGraph(id, g);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -163,13 +165,15 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g) {
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
+			Graph g) {
 		try {
 			Vertex v = vertexMap.get(vertexClass).newInstance(id, g);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(), ex);
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
 			}
 			throw new M1ClassAccessException("Cannot create vertex of class "
 					+ vertexClass.getCanonicalName(), ex);
@@ -207,12 +211,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
-	
+
 	public void setIncidenceImplementationClass(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-			try { 
+			try {
 				Class<?>[] params = { int.class, Vertex.class, Edge.class };
 				incidenceMap.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -333,7 +337,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) throws RemoteException {
+	public ViewGraphImpl createViewGraph(Graph viewGraph, int level)
+			throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			ViewGraphImpl g = (ViewGraphImpl) viewGraphMap.get(graphClass)
@@ -347,23 +352,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex) throws RemoteException {
+	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex)
+			throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForVertexMap.get(graphClass).newInstance(vertex);
-			return g;
-		} catch (Exception ex) {
-			throw new M1ClassAccessException(
-					"Cannot create subordinate graph for elem of class "
-							+ vertex.getType().getQualifiedName(), ex);
-		}
-	}
-	
-	@Override
-	public SubordinateGraphImpl createSubordinateGraph(Edge vertex) throws RemoteException {
-		try {
-			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForEdgeMap.get(graphClass).newInstance(vertex);
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForVertexMap
+					.get(graphClass).newInstance(vertex);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
@@ -373,11 +367,29 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public PartialGraphImpl createPartialGraph(Graph completeGraph) throws RemoteException {
+	public SubordinateGraphImpl createSubordinateGraph(Edge vertex)
+			throws RemoteException {
+		try {
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			SubordinateGraphImpl g = (SubordinateGraphImpl) subordinateGraphForEdgeMap
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new M1ClassAccessException(
+					"Cannot create subordinate graph for elem of class "
+							+ vertex.getType().getQualifiedName(), ex);
+		}
+	}
+
+	@Override
+	public PartialGraphImpl createPartialGraph(Graph completeGraph)
+			throws RemoteException {
 		try {
 			Class<? extends Graph> graphClass = completeGraph.getM1Class();
 			PartialGraphImpl g = (PartialGraphImpl) partialGraphMap.get(
 					graphClass).newInstance(completeGraph);
+			JGraLabServerImpl.getLocalInstance().putGraph(
+					Integer.toString(g.getId()), g);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
@@ -393,6 +405,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
 			PartialSubordinateGraphImpl g = (PartialSubordinateGraphImpl) partialSubordinateGraphMap
 					.get(graphClass).newInstance(elem);
+			JGraLabServerImpl.getLocalInstance().putGraph(
+					Integer.toString(g.getId()), g);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(

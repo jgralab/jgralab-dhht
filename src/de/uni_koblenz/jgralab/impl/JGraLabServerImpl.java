@@ -7,11 +7,14 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -27,6 +30,8 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	private static final String JGRALAB_SERVER_IDENTIFIER = "JGraLabServer";
 
 	private static JGraLabServerImpl localInstance = null;
+
+	private final Map<String, Graph> graphs = new HashMap<String, Graph>();
 
 	private JGraLabServerImpl() throws RemoteException, MalformedURLException,
 			AlreadyBoundException {
@@ -93,21 +98,20 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public void registerGraph(Graph graph) {
-		try {
-			Naming.bind(Long.toString(graph.getId()), graph);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public void putGraph(String graphId, Graph graph) {
+		graphs.put(graphId, graph);
 	}
 
 	@Override
-	public void unregisterGraph(Graph graph) {
-		try {
-			Naming.unbind(Long.toString(graph.getId()));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	public Graph getGraph(String graphId) {
+		return graphs.get(graphId);
+	}
+
+	@Override
+	public Graph loadGraph(String filename, ProgressFunction pf)
+			throws GraphIOException {
+		return GraphIO.loadSchemaAndGraphFromFile(filename,
+				CodeGeneratorConfiguration.MINIMAL, pf);
 	}
 
 }
