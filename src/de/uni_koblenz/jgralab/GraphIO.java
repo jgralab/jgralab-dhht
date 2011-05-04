@@ -67,6 +67,7 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.GraphElementImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
 import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
@@ -209,29 +210,38 @@ public class GraphIO {
 
 	private Map<Integer, Graph> graphBuffer;
 
-	/**
-	 * Stores the information about incidences at the edges.<br>
-	 * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
-	 * vertices at the edge with id i.
-	 */
-	private ArrayList<Vertex>[] incidencesAtEdge;
+	private ArrayList<String[]> partialGraphs;
+
+	// TODO delete/**
+	// * Stores the information about incidences at the edges.<br>
+	// * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
+	// * vertices at the edge with id i.
+	// */
+	// private ArrayList<Vertex>[] incidencesAtEdge;
 
 	/**
 	 * Stores the information about incidences at the vertices.<br>
 	 * <code>incidencesAtVertex[i]</code> = the lambda sequence at the vertex
 	 * with id i.<br>
-	 * <code>incidencesAtVertex[i].get(j)[0]</code> = edge id of incident edge<br>
-	 * <code>incidencesAtVertex[i].get(j)[1]</code> = position of incidence at
-	 * lambda sequence of edge
+	 * <code>incidencesAtVertex[i].get(j)</code> = id of the {@link Incidence}<br>
+	 * If Integer[] is of length 1 it only contains the local id otherwise it
+	 * contains the partialGraphId followed by the id of the incidence
 	 */
 	private ArrayList<Integer[]>[] incidencesAtVertex;
 
+	// TODO delete/**
+	// * Stores the information about incidences at the edges.<br>
+	// * <code>incidenceInstancesAtEdge[i]</code> = the lambda sequence of all
+	// * Incidences at the edge with id i.
+	// */
+	// private Incidence[][] incidenceInstancesAtEdge;
+
 	/**
-	 * Stores the information about incidences at the edges.<br>
-	 * <code>incidenceInstancesAtEdge[i]</code> = the lambda sequence of all
-	 * Incidences at the edge with id i.
+	 * The value is the sigma information of the graph element. If String[] is
+	 * of length 1 it only contains the local id otherwise it contains the
+	 * partialGraphId followed by the local id of sigma.
 	 */
-	private Incidence[][] incidenceInstancesAtEdge;
+	private Map<GraphElement<?, ?, ?>, String[]> sigmasOfGraphElement;
 
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
@@ -805,6 +815,7 @@ public class GraphIO {
 
 		// write vertices
 		// System.out.println("Writing vertices");
+		write("vertices\n");
 		Vertex nextV = graph.getFirstVertex();
 		while (nextV != null) {
 			if (subGraph != null && !subGraph.isMarked(nextV)) {
@@ -863,6 +874,7 @@ public class GraphIO {
 
 		// System.out.println("Writing edges");
 		// write edges
+		write("edges\n");
 		Edge nextE = graph.getFirstEdge();
 		while (nextE != null) {
 			if (subGraph != null && !subGraph.isMarked(nextE)) {
@@ -2920,8 +2932,7 @@ public class GraphIO {
 		graph.readAttributeValues(this);
 		match(";");
 
-		int vNo = 1;
-		while (vNo <= vCount) {
+		while (!lookAhead.equals("edges")) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
 			} else {
@@ -2935,12 +2946,10 @@ public class GraphIO {
 						currentCount = 0;
 					}
 				}
-				++vNo;
 			}
 		}
 
-		int eNo = 1;
-		while (eNo <= eCount) {
+		while (lookAhead != null && !lookAhead.isEmpty()) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
 			} else {
@@ -2954,7 +2963,6 @@ public class GraphIO {
 						currentCount = 0;
 					}
 				}
-				++eNo;
 			}
 		}
 
@@ -2965,6 +2973,10 @@ public class GraphIO {
 			ex.printStackTrace();
 		}
 
+		createPartialGraphs();
+		createIncidences();
+		setSigmas();
+
 		graph.setGraphVersion(graphVersion);
 		if (pf != null) {
 			pf.finished();
@@ -2973,9 +2985,32 @@ public class GraphIO {
 		return graph;
 	}
 
+	private void setSigmas() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createIncidences() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void createPartialGraphs() throws GraphIOException {
+		graphBuffer = new HashMap<Integer, Graph>();
+		for (String[] pGraph : partialGraphs) {
+			JGraLabServer remoteServer = server.getRemoteInstance(pGraph[1]);
+			Graph g = remoteServer.getGraph(pGraph[0]);
+			if (g == null) {
+				g = server.loadGraph(filename, pf);
+				assert server.getGraph(pGraph[0]) == g;
+			}
+			graphBuffer.put(Integer.parseInt(pGraph[0]), g);
+		}
+	}
+
 	private void readPartialGraphs(CompleteGraphImpl graph)
 			throws GraphIOException, RemoteException {
-		graphBuffer = new HashMap<Integer, Graph>();
+		partialGraphs = new ArrayList<String[]>();
 		match("{");
 		while (!lookAhead.equals("}")) {
 			int partialGraphId = matchInteger();
@@ -2985,13 +3020,8 @@ public class GraphIO {
 			match();
 			isURL = false;
 
-			JGraLabServer remoteServer = server.getRemoteInstance(urlValue);
-			Graph g = remoteServer.getGraph(Integer.toString(partialGraphId));
-			if (g == null) {
-				g = server.loadGraph(filename, pf);
-				assert server.getGraph(Integer.toString(partialGraphId)) == g;
-			}
-			graphBuffer.put(partialGraphId, g);
+			partialGraphs.add(new String[] { Integer.toString(partialGraphId),
+					urlValue });
 
 			if (lookAhead.equals(",")) {
 				match(",");
@@ -3030,7 +3060,7 @@ public class GraphIO {
 	}
 
 	private void vertexDesc(Graph graph, ImplementationType implementationType)
-			throws GraphIOException {
+			throws GraphIOException, RemoteException {
 		int vId = vId();
 		String vcName = className();
 		Vertex vertex;
@@ -3048,13 +3078,45 @@ public class GraphIO {
 			e.printStackTrace();
 			throw new GraphIOException("can't create vertex " + vId, e);
 		}
-		parseIncidentEdges(vertex);
+		parseIncidencesAtVertex(vertex);
 		vertex.readAttributeValues(this);
+		parseSigma(vertex);
+		parseKappa(vertex);
 		match(";");
 	}
 
+	private void parseKappa(GraphElement<?, ?, ?> ge) throws GraphIOException,
+			RemoteException {
+		match("kappa");
+		match("=");
+		((GraphElementImpl<?, ?, ?>) ge).setKappa(matchInteger());
+	}
+
+	private void parseSigma(GraphElement<?, ?, ?> ge) throws GraphIOException {
+		if (lookAhead.equals("sigma")) {
+			match("sigma");
+			match("=");
+			int partialGraphId = -1;
+			if (!lookAhead.startsWith("v") && !lookAhead.startsWith("e")) {
+				partialGraphId = matchInteger();
+				match("-");
+			}
+			boolean isVertex = lookAhead.startsWith("v");
+			int idOfSigma = matchInteger();
+			String[] content = null;
+			if (partialGraphId == -1) {
+				content = new String[1];
+			} else {
+				content = new String[2];
+				content[0] = Integer.toString(partialGraphId);
+			}
+			content[content.length - 1] = (isVertex ? "v" : "e") + idOfSigma;
+			sigmasOfGraphElement.put(ge, content);
+		}
+	}
+
 	private void edgeDesc(Graph graph, ImplementationType implementationType)
-			throws GraphIOException {
+			throws GraphIOException, RemoteException {
 		int eId = eId();
 		String ecName = className();
 		Edge edge;
@@ -3073,6 +3135,8 @@ public class GraphIO {
 		}
 		parseIncidences(edge);
 		edge.readAttributeValues(this);
+		parseSigma(edge);
+		parseKappa(edge);
 		match(";");
 	}
 
@@ -3082,6 +3146,24 @@ public class GraphIO {
 			throw new GraphIOException("Invalid edge id " + eId + ".");
 		}
 		return eId;
+	}
+
+	private Integer[] iId() throws GraphIOException {
+		int first = matchInteger();
+		if (first == 0) {
+			throw new GraphIOException("Invalid incidence id " + first + ".");
+		}
+		int second = 0;
+		if (lookAhead.equals("-")) {
+			match("-");
+			second = matchInteger();
+			if (second == 0) {
+				throw new GraphIOException("Invalid incidence id " + second
+						+ ".");
+			}
+		}
+		Integer[] iId = new Integer[second == 0 ? 1 : 2];
+		return iId;
 	}
 
 	private String className() throws GraphIOException {
@@ -3139,31 +3221,22 @@ public class GraphIO {
 		}
 	}
 
-	private void parseIncidentEdges(Vertex v) throws GraphIOException {
+	private void parseIncidencesAtVertex(Vertex v) throws GraphIOException {
 		int vId = 0;
 		try {
-			v.getId();
+			vId = v.getId();
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		int eId = 0;
-		int lambdaSeqPosAtEdge = 0;
+		Integer[] iId;
 		int lambdaSeqPosAtVertex = 0;
 
 		match("<");
 		while (!lookAhead.equals(">")) {
 			lambdaSeqPosAtVertex++;
-			eId = eId();
-			match("-");
-			lambdaSeqPosAtEdge = matchInteger();
-			if (lambdaSeqPosAtEdge == 0) {
-				throw new GraphIOException("Invalid lambda sequenz position "
-						+ lambdaSeqPosAtEdge + ".");
-			}
-
+			iId = iId();
 			addToIncidenceList(incidencesAtVertex, vId, lambdaSeqPosAtVertex,
-					new Integer[] { eId, lambdaSeqPosAtEdge });
-			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge, v);
+					iId);
 		}
 		match();
 	}
