@@ -34,7 +34,7 @@ package de.uni_koblenz.jgralab;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.uni_koblenz.jgralab.impl.GraphElementImpl;
+import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;

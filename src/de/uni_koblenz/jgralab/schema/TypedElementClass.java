@@ -509,4 +509,16 @@ public interface TypedElementClass<ConcreteMetaClass extends TypedElementClass<C
 	public void addSuperClass(ConcreteMetaClass superClass);
 
 	
+	/**
+	 * Returns the unique ID of this typed element class in the schema
+	 * @return
+	 */
+	public int getId();
+	
+	/**
+	 * Sets the unique ID of this typed element class in the schema,
+	 * to be used only internally by the schema class
+	 */
+	public void setId(int id);
+	
 }

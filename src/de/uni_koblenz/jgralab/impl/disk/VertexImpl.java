@@ -29,8 +29,9 @@
  * the parts of JGraLab used as well as that of the covered work.
  */
 
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.disk;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,6 +43,8 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.IncidenceIterableAtVertex;
+import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -56,100 +59,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class VertexImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
-	private VertexImpl nextVertexInGraph;
-	private VertexImpl prevVertexInGraph;
-	private IncidenceImpl firstIncidenceAtVertex;
-	private IncidenceImpl lastIncidenceAtVertex;
-	
-	@Override
-	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
-		Incidence firstIncidence = firstIncidenceAtVertex;
-		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			firstIncidence = ((IncidenceImpl)firstIncidence).nextIncidenceAtVertex;
-		}
-		return firstIncidence;
-	}
-
-	@Override
-	public Vertex getNextVertex(Graph traversalContext) throws RemoteException {
-		assert isValid();
-		if (nextVertexInGraph == null) {
-			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(nextVertexInGraph)) {
-			return nextVertexInGraph;
-		} else {
-			return nextVertexInGraph.getNextVertex(traversalContext);
-		}
-	}
-
-	@Override
-	public Vertex getPreviousVertex(Graph traversalContext) throws RemoteException {
-		assert isValid();
-		if (prevVertexInGraph == null) {
-			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(prevVertexInGraph)) {
-			return prevVertexInGraph;
-		} else {
-			return prevVertexInGraph.getPreviousVertex(traversalContext);
-		}
-	}
-
-
-	
-	@Override
-	public Incidence getLastIncidence(Graph traversalContext) throws RemoteException {
-		Incidence lastIncidence = lastIncidenceAtVertex;
-		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
-			return lastIncidence;
-		} else {
-			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
-		}
-	}
-
-	/**
-	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
-	 * all vertices in the graph.
-	 * 
-	 * @param nextVertex
-	 *            {@link Vertex}which should be put after this {@link Vertex}
-	 */
-	protected void setNextVertex(Vertex nextVertex) {
-		nextVertexInGraph = (VertexImpl) nextVertex;
-	}
-
-	/**
-	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
-	 * of all vertices in the graph.
-	 * 
-	 * @param prevVertex
-	 *            {@link Vertex}which should be put before this {@link Vertex}
-	 */
-	protected void setPreviousVertex(Vertex prevVertex) {
-		prevVertexInGraph = (VertexImpl) prevVertex;
-	}
-
-	@Override
-	public void setFirstIncidence(IncidenceImpl firstIncidence) {
-		firstIncidenceAtVertex = firstIncidence;
-	}
-
-	@Override
-	public void setLastIncidence(IncidenceImpl lastIncidence) {
-		lastIncidenceAtVertex = lastIncidence;
-	}
-
-
-	@Override
-	public Graph getSubordinateGraph() throws RemoteException {
-		if (subOrdinateGraph == null) {
-			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
-		}
-		return subOrdinateGraph;
-	}
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 3588328684461421331L;
 
 	/**
@@ -159,66 +68,288 @@ public abstract class VertexImpl extends
 	 *            int the id of the vertex
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
+	 * @throws IOException 
 	 */
-	protected VertexImpl(int id, Graph graph) throws RemoteException {
+	protected VertexImpl(int id, Graph graph) throws IOException {
 		super(graph);
 		this.id = id;
 		((CompleteGraphImpl) graph).addVertex(this);
+		id = getId();
+		this.storage = graph.getBackgroundStorage().getVertexStorage(id);
+	}
+	
+	protected VertexImpl(int id, VertexContainer storage, Graph graph) throws RemoteException {
+		super(graph);
+		this.id = id;
+		this.storage = storage;
+	}
+	
+	
+
+	
+	/* **********************************************************
+	 * Access next and previous elements in Vseq 
+	 * **********************************************************/
+	
+	@Override
+	public Vertex getNextVertex() throws RemoteException {
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext());
+	}
+	
+	@Override
+	public Vertex getPreviousVertex() throws RemoteException {
+		assert isValid();
+		return getPreviousVertex(graph.getTraversalContext());
 	}
 
+	@Override
+	public Vertex getNextVertex(Graph traversalContext) throws RemoteException {
+		assert isValid();
+		if (storage.nextElementInGraphId[getIdInStorage(id)] == 0) {
+			return null;
+		} else if ((traversalContext == null) || traversalContext.containsVertex(getVertexFromBg(storage.nextElementInGraphId[getIdInStorage(id)]))) {
+			return getVertexFromBg(storage.nextElementInGraphId[getIdInStorage(id)]);
+		} else {
+			return getVertexFromBg(storage.nextElementInGraphId[getIdInStorage(id)]).getNextVertex(traversalContext);
+		}
+	}
+
+	@Override
+	public Vertex getPreviousVertex(Graph traversalContext) throws RemoteException {
+		assert isValid();
+		if (storage.previousElementInGraphId[getIdInStorage(id)] == 0) {
+			return null;
+		} else if ((traversalContext == null) || traversalContext.containsVertex(getVertexFromBg(storage.previousElementInGraphId[getIdInStorage(id)]))) {
+			return getVertexFromBg(storage.previousElementInGraphId[getIdInStorage(id)]);
+		} else {
+			return getVertexFromBg(storage.previousElementInGraphId[getIdInStorage(id)]).getPreviousVertex(traversalContext);
+		}
+	}
+	
+	@Override
+	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), vertexClass, false);
+	}
+
+	@Override
+	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass, boolean noSubclasses) throws RemoteException {
+		assert m1VertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), m1VertexClass, noSubclasses);
+	}
+
+	@Override
+	public Vertex getNextVertex(VertexClass vertexClass) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), vertexClass.getM1Class(), false);
+	}
+
+	@Override
+	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(graph.getTraversalContext(), vertexClass.getM1Class(), noSubclasses);
+	}
+
+	@Override
+	public <T extends Vertex> T getNextVertex(Graph traversalContext, Class<T> vertexClass) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(vertexClass, false);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Vertex> T getNextVertex(Graph traversalContext, Class<T> m1VertexClass, boolean noSubclasses) throws RemoteException {
+		assert m1VertexClass != null;
+		assert isValid();
+		VertexImpl v = (VertexImpl) getNextVertex();
+		while (v != null) {
+			if (noSubclasses) {
+				if (m1VertexClass == v.getM1Class()) {
+					return (T) v;
+				}
+			} else {
+				if (m1VertexClass.isInstance(v)) {
+					return (T) v;
+				}
+			}
+			v = (VertexImpl) v.getNextVertex();
+		}
+		return null;
+	}
+
+	@Override
+	public Vertex getNextVertex(Graph traversalContext, VertexClass vertexClass) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(vertexClass.getM1Class(), false);
+	}
+
+	@Override
+	public Vertex getNextVertex(Graph traversalContext,	VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
+		assert vertexClass != null;
+		assert isValid();
+		return getNextVertex(vertexClass.getM1Class(), noSubclasses);
+	}
+	
+	/**
+	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
+	 * all vertices in the graph.
+	 * 
+	 * @param nextVertex
+	 *            {@link Vertex}which should be put after this {@link Vertex}
+	 */
+	protected void setNextVertex(Vertex nextVertex) throws RemoteException {
+		storage.nextElementInGraphId[getIdInStorage(id)] = nextVertex.getId();
+	}
+
+	/**
+	 * Puts <code>prevVertex</code> before this {@link Vertex} in the sequence
+	 * of all vertices in the graph.
+	 * 
+	 * @param prevVertex
+	 *            {@link Vertex}which should be put before this {@link Vertex}
+	 */
+	protected void setPreviousVertex(Vertex prevVertex) throws RemoteException {
+		storage.previousElementInGraphId[getIdInStorage(id)] = prevVertex.getId();
+	}
+	
+	@Override
+	public boolean isBefore(Vertex v) throws RemoteException {
+		assert v != null;
+		assert getGraph() == v.getGraph();
+		assert isValid() && v.isValid();
+		if (this == v) {
+			return false;
+		}
+		Vertex prev = v.getPreviousVertex();
+		while ((prev != null) && (prev != this)) {
+			prev = v.getPreviousVertex();
+		}
+		return prev != null;
+	}
+
+	@Override
+	public void putBefore(Vertex v) throws RemoteException {
+		assert v != null;
+		assert v != this;
+		assert getGraph() == v.getGraph();
+		assert isValid() && v.isValid();
+		graph.putVertexBefore((VertexImpl) v, this);
+	}
+
+	@Override
+	public boolean isAfter(Vertex v) throws RemoteException {
+		assert v != null;
+		assert getGraph() == v.getGraph();
+		assert isValid() && v.isValid();
+		if (this == v) {
+			return false;
+		}
+		VertexImpl next = (VertexImpl) v.getNextVertex();
+		while ((next != null) && (next != this)) {
+			next = (VertexImpl) next.getNextVertex();
+		}
+		return next != null;
+	}
+
+	@Override
+	public void putAfter(Vertex v) throws RemoteException {
+		assert v != null;
+		assert v != this;
+		assert getGraph() == v.getGraph();
+		assert isValid() && v.isValid();
+		graph.putVertexAfter((VertexImpl) v, this);
+	}
+	
+	
+	/* **********************************************************
+	 * Access first and last element in Lambda_seq 
+	 * **********************************************************/
+	
 	@Override
 	public final Incidence getFirstIncidence() throws RemoteException {
 		return getFirstIncidence(graph.getTraversalContext());
 	}
+	
+	@Override
+	public Incidence getLastIncidence() throws RemoteException {
+		return getLastIncidence(graph.getTraversalContext());
+	}
+	
+	
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
+		Incidence firstIncidence = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
+		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
+			firstIncidence = getIncidenceFromBg(((IncidenceImpl)firstIncidence).storage.nextIncidenceAtVertexId[getIdInStorage(((IncidenceImpl)firstIncidence).getId())]);
+		}
+		return firstIncidence;
+	}
+
+	
+	@Override
+	public Incidence getLastIncidence(Graph traversalContext) throws RemoteException {
+		Incidence lastIncidence = getIncidenceFromBg(storage.lastIncidenceId[getIdInStorage(id)]);
+		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
+			return lastIncidence;
+		} else {
+			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
+		}
+	}
+
+	
 
 	@Override
 	public final Incidence getFirstIncidence(Direction direction) throws RemoteException {
 		assert isValid();
 		return getFirstIncidence(graph.getTraversalContext(), direction);
 	}
+	
+	
+	@Override
+	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
+		assert isValid();
+		Incidence i = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
+		if (traversalContext==null) {
+			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
+					i = getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtVertexId[getIdInStorage(i.getId())]);
+			}		
+		} else {
+			if ((direction != null) && (direction != Direction.BOTH)) {
+				while ((i != null) && ((!traversalContext.containsEdge(i.getEdge())) || (direction != i.getDirection())))
+					i =  getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtVertexId[getIdInStorage(i.getId())]);
+			} else {
+				while ((i != null) && (!traversalContext.containsEdge(i.getEdge())))
+					i =  getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtVertexId[getIdInStorage(i.getId())]);
+			}
+			
+		}
+		return i;
+	}
+		
 
 	@Override
-	public Incidence getFirstIncidence(boolean thisIncidence,
-			IncidenceType... incidentTypes) throws RemoteException {
+	public Incidence getFirstIncidence(boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException {
 		assert isValid();
-		return getFirstIncidence(graph.getTraversalContext(), thisIncidence,
-				incidentTypes);
+		return getFirstIncidence(graph.getTraversalContext(), thisIncidence, incidentTypes);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction, boolean noSubclasses) throws RemoteException {
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,	Direction direction, boolean noSubclasses) throws RemoteException {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
 				direction, noSubclasses);
 	}
 
-	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
-		assert isValid();
-		Incidence i = firstIncidenceAtVertex;
-		if (traversalContext==null) {
-			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
-			}		
-		} else {
-			if ((direction != null) && (direction != Direction.BOTH)) {
-				while ((i != null) && ((!traversalContext.containsEdge(i.getEdge())) || (direction != i.getDirection())))
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
-			} else {
-				while ((i != null) && (!traversalContext.containsEdge(i.getEdge())))
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
-			}
-			
-		}
-		return i;
-	}
-
-	@Override
-	public Incidence getFirstIncidence(Graph traversalContext,
-			boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException {
+	public Incidence getFirstIncidence(Graph traversalContext, boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException {
 		assert isValid();
 		Incidence i = getFirstIncidence();
 		if (incidentTypes.length == 0) {
@@ -259,6 +390,9 @@ public abstract class VertexImpl extends
 		return null;
 	}
 
+	
+	
+	
 	@Override
 	public Iterable<Incidence> getIncidences() throws RemoteException {
 		assert isValid();
@@ -272,8 +406,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public <T extends Incidence> Iterable<T> getIncidences(
-			Class<T> anIncidenceClass) throws RemoteException {
+	public <T extends Incidence> Iterable<T> getIncidences(Class<T> anIncidenceClass) throws RemoteException {
 		assert isValid();
 		return new IncidenceIterableAtVertex<T>(this, anIncidenceClass);
 	}
@@ -349,97 +482,43 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public Incidence getLastIncidence() throws RemoteException {
-		return getLastIncidence(graph.getTraversalContext());
+	public Incidence connect(String rolename, Edge elemToConnect) throws RemoteException {
+		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
 
 	@Override
-	public Vertex getPreviousVertex() throws RemoteException {
-		return getPreviousVertex(graph.getTraversalContext());
+	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect) throws RemoteException {
+		return connect(incidenceClass.getM1Class(), elemToConnect);
 	}
 
 	@Override
-	public Vertex getNextVertex() throws RemoteException {
-		assert isValid();
-		return getNextVertex(graph.getTraversalContext());
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
+			Edge elemToConnect) throws RemoteException {
+		//int id = graph.allocateIncidenceIndex(0);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+				0, this, elemToConnect);
 	}
 
-	@Override
-	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(graph.getTraversalContext(), vertexClass, false);
-	}
+	
+	/* **********************************************************
+	 * Access sigma information
+	 * **********************************************************/
 
 	@Override
-	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass,
-			boolean noSubclasses) throws RemoteException {
-		assert m1VertexClass != null;
-		assert isValid();
-		return getNextVertex(graph.getTraversalContext(), m1VertexClass,
-				noSubclasses);
-	}
-
-	@Override
-	public Vertex getNextVertex(VertexClass vertexClass) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(graph.getTraversalContext(),
-				vertexClass.getM1Class(), false);
-	}
-
-	@Override
-	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(graph.getTraversalContext(),
-				vertexClass.getM1Class(), noSubclasses);
-	}
-
-	@Override
-	public <T extends Vertex> T getNextVertex(Graph traversalContext,
-			Class<T> vertexClass) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(vertexClass, false);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Vertex> T getNextVertex(Graph traversalContext,
-			Class<T> m1VertexClass, boolean noSubclasses) throws RemoteException {
-		assert m1VertexClass != null;
-		assert isValid();
-		VertexImpl v = (VertexImpl) getNextVertex();
-		while (v != null) {
-			if (noSubclasses) {
-				if (m1VertexClass == v.getM1Class()) {
-					return (T) v;
-				}
-			} else {
-				if (m1VertexClass.isInstance(v)) {
-					return (T) v;
-				}
-			}
-			v = (VertexImpl) v.getNextVertex();
+	public Graph getSubordinateGraph() throws RemoteException {
+		if (subOrdinateGraph == null) {
+			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 		}
-		return null;
+		return subOrdinateGraph;
 	}
-
-	@Override
-	public Vertex getNextVertex(Graph traversalContext, VertexClass vertexClass) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(vertexClass.getM1Class(), false);
-	}
-
-	@Override
-	public Vertex getNextVertex(Graph traversalContext,
-			VertexClass vertexClass, boolean noSubclasses) throws RemoteException {
-		assert vertexClass != null;
-		assert isValid();
-		return getNextVertex(vertexClass.getM1Class(), noSubclasses);
-	}
+	
+	
+	
+	
+	/* **********************************************************
+	 * Access alpha and omega information
+	 * **********************************************************/
+	
 
 	@Override
 	public Iterable<Edge> getAlphaEdges() throws RemoteException {
@@ -585,59 +664,17 @@ public abstract class VertexImpl extends
 		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass,
 				direction);
 	}
+	
+	
+	
+	
 
 	@Override
 	public boolean isValid() throws RemoteException {
 		return graph.containsVertex(this);
 	}
 
-	@Override
-	public boolean isBefore(Vertex v) throws RemoteException {
-		assert v != null;
-		assert getGraph() == v.getGraph();
-		assert isValid() && v.isValid();
-		if (this == v) {
-			return false;
-		}
-		Vertex prev = v.getPreviousVertex();
-		while ((prev != null) && (prev != this)) {
-			prev = v.getPreviousVertex();
-		}
-		return prev != null;
-	}
-
-	@Override
-	public void putBefore(Vertex v) throws RemoteException {
-		assert v != null;
-		assert v != this;
-		assert getGraph() == v.getGraph();
-		assert isValid() && v.isValid();
-		graph.putVertexBefore((VertexImpl) v, this);
-	}
-
-	@Override
-	public boolean isAfter(Vertex v) throws RemoteException {
-		assert v != null;
-		assert getGraph() == v.getGraph();
-		assert isValid() && v.isValid();
-		if (this == v) {
-			return false;
-		}
-		VertexImpl next = (VertexImpl) v.getNextVertex();
-		while ((next != null) && (next != this)) {
-			next = (VertexImpl) next.getNextVertex();
-		}
-		return next != null;
-	}
-
-	@Override
-	public void putAfter(Vertex v) throws RemoteException {
-		assert v != null;
-		assert v != this;
-		assert getGraph() == v.getGraph();
-		assert isValid() && v.isValid();
-		graph.putVertexAfter((VertexImpl) v, this);
-	}
+	
 
 	@Override
 	public int getDegree() throws RemoteException {
@@ -742,12 +779,10 @@ public abstract class VertexImpl extends
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction,
-				noSubClasses);
+		Incidence i = getFirstIncidence(traversalContext, ic, direction, noSubClasses);
 		while (i != null) {
 			++degree;
-			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
-					noSubClasses);
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,	noSubClasses);
 		}
 		return degree;
 	}
@@ -758,12 +793,10 @@ public abstract class VertexImpl extends
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction,
-				noSubClasses);
+		Incidence i = getFirstIncidence(traversalContext, ic, direction, noSubClasses);
 		while (i != null) {
 			++degree;
-			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
-					noSubClasses);
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,	noSubClasses);
 		}
 		return degree;
 	}
@@ -1256,23 +1289,7 @@ public abstract class VertexImpl extends
 	// return result;
 	// }
 
-	@Override
-	public Incidence connect(String rolename, Edge elemToConnect) throws RemoteException {
-		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
-	}
 
-	@Override
-	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect) throws RemoteException {
-		return connect(incidenceClass.getM1Class(), elemToConnect);
-	}
-
-	@Override
-	public <T extends Incidence> T connect(Class<T> incidenceClass,
-			Edge elemToConnect) throws RemoteException {
-		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,
-				id, this, elemToConnect);
-	}
 
 	@Override
 	protected void addFirstSubordinateEdge(Edge appendix) throws RemoteException {
@@ -1283,4 +1300,6 @@ public abstract class VertexImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) throws RemoteException {
 		appendix.putAfter(this);
 	}
+	
+	
 }

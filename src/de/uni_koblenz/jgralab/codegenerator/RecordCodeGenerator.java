@@ -108,7 +108,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createFieldConstructor() {
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			StringBuilder sb = new StringBuilder();
 			CodeSnippet header = null;
 			header = new CodeSnippet(true,
@@ -149,7 +149,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	private CodeBlock createVariableParametersSetter() {
 		CodeList code = new CodeList();
 
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			CodeSnippet codeSnippet = new CodeSnippet(true);
 
 			if (hasCompositeRecordComponent()) {
@@ -195,7 +195,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 		code.addNoIndent(new CodeSnippet(true,
 				"public boolean equals(Object o) {"));
 		code.add(new CodeSnippet("if(o == null)", "\treturn false;"));
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add(new CodeSnippet(
 					"if(!(o instanceof #simpleImplClassName#))",
 					"\treturn false;"));
@@ -206,7 +206,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 		CodeSnippet codeSnippet = null;
 		for (RecordComponent entry : recordDomain.getComponents()) {
 			switch (currentCycle) {
-			case IMPL:
+			case MEMORYBASED:
 				codeSnippet = new CodeSnippet(true);
 				if (entry.getDomain().isComposite()) {
 					codeSnippet.add("\tif(!(_#name#.equals(record._#name#)))");
@@ -230,7 +230,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = null;
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("de.uni_koblenz.jgralab.NoSuchAttributeException");
 		}
 		switch (currentCycle) {
@@ -239,7 +239,8 @@ public class RecordCodeGenerator extends CodeGenerator {
 					true,
 					"public abstract class #simpleClassName# implements de.uni_koblenz.jgralab.Record {");
 			break;
-		case IMPL:
+		case DISKBASED:	
+		case MEMORYBASED:
 			addImports("#jgPackage#.Graph");
 			addImports("#schemaPackage#.#simpleClassName#");
 			code = new CodeSnippet(true,
@@ -273,7 +274,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 			case ABSTRACT:
 				getterCode.add("public abstract #type# #isOrGet#_#name#();");
 				break;
-			case IMPL:
+			case MEMORYBASED:
 				getterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));
@@ -307,7 +308,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 			case ABSTRACT:
 				setterCode.add("public abstract void #setter#;");
 				break;
-			case IMPL:
+			case MEMORYBASED:
 				setterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));
@@ -323,7 +324,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createMapSetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			// suppress "unchecked" warnings if this record domain contains a
 			// Collection domain (Set<E>, List<E>, Map<K, V>)
 			for (RecordComponent comp : recordDomain.getComponents()) {
@@ -355,7 +356,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createGenericSetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			// suppress "unchecked" warnings if this record domain contains a
 			// Collection domain (Set<E>, List<E>, Map<K, V>)
 			for (RecordComponent comp : recordDomain.getComponents()) {
@@ -392,7 +393,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createGenericGetter() {
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.addNoIndent(new CodeSnippet(false, "@Override"));
 			code.addNoIndent(new CodeSnippet(false,
 					"public Object getComponent(String name) {"));
@@ -421,7 +422,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 	private CodeBlock createReadComponentsMethod() {
 		CodeList code = new CodeList();
 		// abstract class (or better use interface?)
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException");
 			code.addNoIndent(new CodeSnippet("@Override"));
 			code
@@ -431,7 +432,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 			code.add(new CodeSnippet("io.match(\"(\");"));
 			for (RecordComponent c : recordDomain.getComponents()) {
 				code.add(c.getDomain().getReadMethod(schemaRootPackageName,
-							"_" + c.getName(), "io"));
+							"_" + c.getName(), "io", ""));
 			}
 			code.add(new CodeSnippet("io.match(\")\");"));
 			code.addNoIndent(new CodeSnippet("}"));
@@ -445,8 +446,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 			addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException",
 					"java.io.IOException");
 			code.addNoIndent(new CodeSnippet(false, "@Override"));
-			code
-					.addNoIndent(new CodeSnippet(
+			code.addNoIndent(new CodeSnippet(
 							true,
 							"public void writeComponentValues(GraphIO io) throws IOException, GraphIOException {",
 							"\tio.writeSpace();", "\tio.write(\"(\");",
@@ -455,7 +455,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 				String isOrGet = c.getDomain() instanceof BooleanDomain ? "is"
 						: "get";
 				code.add(c.getDomain().getWriteMethod(schemaRootPackageName,
-						isOrGet + "_" + c.getName() + "()", "io"));
+						isOrGet + "_" + c.getName() + "()", "io",""));
 			}
 			code.addNoIndent(new CodeSnippet("\tio.write(\")\");", "}"));
 		}
@@ -464,7 +464,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 
 	private CodeBlock createRecordComponents() {
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			for (RecordComponent rdc : recordDomain.getComponents()) {
 				Domain dom = rdc.getDomain();
 				CodeSnippet s = new CodeSnippet(true,

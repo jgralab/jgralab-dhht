@@ -28,7 +28,7 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -63,7 +63,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public abstract class SubordinateGraphImpl extends
-		de.uni_koblenz.jgralab.impl.GraphBaseImpl implements
+		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
 		GraphStructureChangedListener {
 
 	private GraphElement<?, ?, ?> containingElement;
@@ -134,10 +134,10 @@ public abstract class SubordinateGraphImpl extends
 				&& ((GraphElementImpl<?, ?, ?>) current)
 						.isChildOf(containingElement); current = current.getNextVertex((Graph)null)) {
 			if (getFirstVertex() == null) {
-				setFirstVertex((VertexImpl) current);
+				setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
 			}
 			//System.out.println("  Iterating vertex " + current);
-			setLastVertex((VertexImpl) current);
+			setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
 			vCount++;
 		}
 //System.out.println("Iterating edges");
@@ -149,9 +149,9 @@ public abstract class SubordinateGraphImpl extends
 			current = current.getNextEdge();
 		}
 		if (current != null) {
-			setFirstEdge((EdgeImpl) current);
+			setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
 			do {
-				setLastEdge((EdgeImpl) current);
+				setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
 				setECount(getECount() + 1);
 				setICount(getICount() + current.getDegree());
 				current = current.getNextEdge();
@@ -177,9 +177,9 @@ public abstract class SubordinateGraphImpl extends
 				&& ((GraphElementImpl<?, ?, ?>) current)
 						.isChildOf(containingElement); current.getNextEdge()) {
 			if (getFirstEdge() == null) {
-				setFirstEdge((EdgeImpl) current);
+				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
 			}
-			setLastEdge((EdgeImpl) current);
+			setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
 			eCount++;
 			iCount += current.getDegree();
 		}
@@ -192,9 +192,9 @@ public abstract class SubordinateGraphImpl extends
 			current = current.getNextVertex();
 		}
 		if (current != null) {
-			setFirstVertex((VertexImpl) current);
+			setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
 			do {
-				setLastVertex((VertexImpl) current);
+				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
 				setVCount(getVCount() + 1);
 				current = current.getNextVertex();
 			} while (current != null
@@ -461,27 +461,27 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public void vertexListModified() throws RemoteException {
-		getSuperordinateGraph().vertexListModified();
+	//	getSuperordinateGraph().vertexListModified();
 	}
 
 	@Override
 	public void edgeListModified() throws RemoteException {
-		getSuperordinateGraph().edgeListModified();
+	//	getSuperordinateGraph().edgeListModified();
 	}
 
 	@Override
-	public GraphBaseImpl getParentDistributedGraph() {
-		return this;
+	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getParentDistributedGraph() {
+		return null; // this;
 	}
 
 	@Override
-	public GraphBaseImpl getSuperordinateGraph() throws RemoteException {
-		return (GraphBaseImpl) containingElement.getGraph();
+	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getSuperordinateGraph() throws RemoteException {
+		return null; //(GraphBaseImpl) containingElement.getGraph();
 	}
 
 	@Override
-	public GraphBaseImpl getCompleteGraph() throws RemoteException {
-		return getSuperordinateGraph().getCompleteGraph();
+	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getCompleteGraph() throws RemoteException {
+		return null; // getSuperordinateGraph().getCompleteGraph();
 	}
 
 	@Override
@@ -527,13 +527,13 @@ public abstract class SubordinateGraphImpl extends
 			setVCount(getVCount() + 1);
 			if (v.getPreviousVertex() == getContainingElement()) {
 				// this is a new first vertex
-				setFirstVertex((VertexImpl) v);
+				setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
 				if (getLastVertex() == null) {
-					setLastVertex((VertexImpl) v);
+					setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
 				}
 			} else if (v.getPreviousVertex() == getLastVertex()) {
 				// this is a new last vertex
-				setLastVertex((VertexImpl) v);
+				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
 			}
 		}
 	}
@@ -548,10 +548,10 @@ public abstract class SubordinateGraphImpl extends
 				setFirstVertex(null);
 			} else {
 				if (getLastVertex() == v) {
-					setLastVertex((VertexImpl) v.getPreviousVertex());
+					setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v.getPreviousVertex());
 				}
 				if (getFirstVertex() == v) {
-					setFirstVertex((VertexImpl) v.getNextVertex());
+					setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v.getNextVertex());
 				}
 			}
 		}
@@ -563,12 +563,12 @@ public abstract class SubordinateGraphImpl extends
 			setECount(getECount() + 1);
 			if (e.getPreviousEdge() == getContainingElement()) {
 				// this is a new first edge
-				setFirstEdge((EdgeImpl) e);
+				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
 				if (getLastEdge() == null) {
-					setLastEdge((EdgeImpl) e);
+					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
 				} else if (e.getPreviousEdge() == getLastEdge()) {
 					// this is a new last edge
-					setLastEdge((EdgeImpl) e);
+					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
 				}
 			}
 		}
@@ -584,10 +584,10 @@ public abstract class SubordinateGraphImpl extends
 				setFirstEdge(null);
 			} else {
 				if (getLastEdge() == e) {
-					setLastEdge((EdgeImpl) e.getPreviousEdge());
+					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e.getPreviousEdge());
 				}
 				if (getFirstEdge() == e) {
-					setFirstEdge((EdgeImpl) e.getNextEdge());
+					setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e.getNextEdge());
 				}
 			}
 		}

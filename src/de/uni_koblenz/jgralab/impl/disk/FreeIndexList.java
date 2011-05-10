@@ -29,7 +29,7 @@
  * the parts of JGraLab used as well as that of the covered work.
  */
 
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.PrintStream;
 
@@ -89,6 +89,8 @@ import java.io.PrintStream;
  */
 public class FreeIndexList {
 
+	int count = 0;
+	
 	// runs array
 	private int[] runs;
 
@@ -125,69 +127,70 @@ public class FreeIndexList {
 	 * @return the first free index, or 0 if no more indexes are available.
 	 */
 	public int allocateIndex() {
-		if (free == 0) {
-			return 0;
-		}
-		assert runCount > 0;
-		int result = 0;
-		if (runs[0] > 0) {
-			// first run is a "free" run
-			result = 1;
-			// decrease free count
-			--runs[0];
-			if (runs[0] == 0) {
-				// free run is empty
-				if (runCount > 1) {
-					// there are more runs, shift them one position to the left
-					System.arraycopy(runs, 1, runs, 0, runCount - 1);
-					runs[--runCount] = 0;
-					// one more used;
-					--runs[0];
-				} else {
-					// convert free run to used run
-					runs[0] = -1;
-				}
-			} else {
-				// insert a "used" entry as first run
-				if (runCount >= runs.length) {
-					// allocate more space
-					int[] newRuns = new int[runs.length * 2];
-					System.arraycopy(runs, 0, newRuns, 1, runs.length);
-					runs = newRuns;
-				} else {
-					System.arraycopy(runs, 0, runs, 1, runCount);
-				}
-				++runCount;
-				runs[0] = -1;
-			}
-		} else {
-			// first run is a "used" run
-			assert runCount >= 2;
-			result = (-runs[0]) + 1;
-			// use one
-			--runs[0];
-			--runs[1];
-			if (runs[1] == 0) {
-				// a "free" run becomes empty
-				if (runCount > 2) {
-					// merge used runs
-					assert runs[2] < 0;
-					runs[0] += runs[2];
-					System.arraycopy(runs, 3, runs, 1, runCount - 3);
-					// clear last 2 entries
-					runs[--runCount] = 0;
-					runs[--runCount] = 0;
-				} else {
-					// only "remove" last entry which is already 0
-					assert runs[runCount - 1] == 0;
-					--runCount;
-				}
-			}
-		}
-		--free;
-		++used;
-		assert isHealthy();
-		return result;
+		return ++count;
+//		if (free == 0) {
+//			return 0;
+//		}
+//		assert runCount > 0;
+//		int result = 0;
+//		if (runs[0] > 0) {
+//			// first run is a "free" run
+//			result = 1;
+//			// decrease free count
+//			--runs[0];
+//			if (runs[0] == 0) {
+//				// free run is empty
+//				if (runCount > 1) {
+//					// there are more runs, shift them one position to the left
+//					System.arraycopy(runs, 1, runs, 0, runCount - 1);
+//					runs[--runCount] = 0;
+//					// one more used;
+//					--runs[0];
+//				} else {
+//					// convert free run to used run
+//					runs[0] = -1;
+//				}
+//			} else {
+//				// insert a "used" entry as first run
+//				if (runCount >= runs.length) {
+//					// allocate more space
+//					int[] newRuns = new int[runs.length * 2];
+//					System.arraycopy(runs, 0, newRuns, 1, runs.length);
+//					runs = newRuns;
+//				} else {
+//					System.arraycopy(runs, 0, runs, 1, runCount);
+//				}
+//				++runCount;
+//				runs[0] = -1;
+//			}
+//		} else {
+//			// first run is a "used" run
+//			assert runCount >= 2;
+//			result = (-runs[0]) + 1;
+//			// use one
+//			--runs[0];
+//			--runs[1];
+//			if (runs[1] == 0) {
+//				// a "free" run becomes empty
+//				if (runCount > 2) {
+//					// merge used runs
+//					assert runs[2] < 0;
+//					runs[0] += runs[2];
+//					System.arraycopy(runs, 3, runs, 1, runCount - 3);
+//					// clear last 2 entries
+//					runs[--runCount] = 0;
+//					runs[--runCount] = 0;
+//				} else {
+//					// only "remove" last entry which is already 0
+//					assert runs[runCount - 1] == 0;
+//					--runCount;
+//				}
+//			}
+//		}
+//		--free;
+//		++used;
+//		assert isHealthy();
+//		return result;
 	}
 
 	/**

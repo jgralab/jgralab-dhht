@@ -1,14 +1,10 @@
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -28,8 +24,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	boolean loading = false;
 
-	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph)
-			throws RemoteException {
+	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph) throws RemoteException {
 		super(cls);
 		this.completeGraph = completeGraph;
 		id = ((CompleteGraphImpl) completeGraph.getCompleteGraph())
@@ -93,10 +88,8 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 */
 	@Override
 	public boolean containsVertex(Vertex v) throws RemoteException {
-		VertexImpl[] vertex = getVertexArray();
-		return (v != null) && (v.getGraph() == this)
-				&& containsVertexId(((VertexImpl) v).id)
-				&& (vertex[((VertexImpl) v).id] == v);
+//TODO
+		return false;
 	}
 
 	@Override
@@ -130,15 +123,6 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	public int compareTo(Graph o) {
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	public void saveGraph(String filename, ProgressFunction pf,
-			BooleanGraphMarker subGraph) throws GraphIOException {
-		if (subGraph == null) {
-			GraphIO.saveGraphToFile(filename, this, pf);
-		} else {
-			GraphIO.saveGraphToFile(filename, subGraph, pf);
-		}
 	}
 
 }

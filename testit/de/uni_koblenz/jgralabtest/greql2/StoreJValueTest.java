@@ -36,10 +36,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueXMLLoader;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueXMLOutputVisitor;
-
 public class StoreJValueTest extends GenericTests {
 
 	@Test

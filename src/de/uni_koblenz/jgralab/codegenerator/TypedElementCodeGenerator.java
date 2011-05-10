@@ -9,6 +9,8 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ?>>
 		extends CodeGenerator {
 
+
+	
 	/**
 	 * all the interfaces of the class which are being implemented
 	 */
@@ -62,11 +64,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
@@ -79,17 +81,17 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("classOrInterface", currentCycle.isImpl() ? " class" : " interface");
-		code.setVariable("interfaceOrImplClass", currentCycle.isImpl() ? rootBlock.getVariable("simpleImplClassName") 
+		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() ? " class" : " interface");
+		code.setVariable("interfaceOrImplClass", currentCycle.isMemOrDiskImpl() ? rootBlock.getVariable("simpleImplClassName") 
 																: rootBlock.getVariable("simpleClassName"));
-		code.setVariable("abstract", currentCycle.isImpl()  && aec.isAbstract() ? " abstract" : "");
+		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
 		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isImpl() ?  " extends #baseClassName#" : "");
+		code.setVariable("extends",	currentCycle.isMemOrDiskImpl() ?  " extends #baseClassName#" : "");
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isImpl() ? " implements " : " extends ";
+			String delim = currentCycle.isMemOrDiskImpl() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isImpl()
+				if (currentCycle.isMemOrDiskImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")

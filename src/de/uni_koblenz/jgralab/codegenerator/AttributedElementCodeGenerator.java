@@ -64,17 +64,12 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	@Override
 	protected CodeList createBody() {
 		CodeList code = super.createBody();
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add(createFields(aec.getAttributeList()));
 			// code.add(createConstructor());
 			code.add(createGenericGetter(aec.getAttributeList()));
 			code.add(createGenericSetter(aec.getAttributeList()));
 			code.add(createGettersAndSetters(aec.getAttributeList()));
-			code.add(createReadAttributesMethod(aec.getAttributeList()));
-			code.add(createReadAttributesFromStringMethod(aec
-					.getAttributeList()));
-			code.add(createWriteAttributesMethod(aec.getAttributeList()));
-			code.add(createWriteAttributeToStringMethod(aec.getAttributeList()));
 		}
 		if (currentCycle.isAbstract()) {
 			code.add(createGettersAndSetters(aec.getOwnAttributeList()));
@@ -218,8 +213,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		case ABSTRACT:
 			code.add("public #type# #isOrGet#_#name#() throws java.rmi.RemoteException;");
 			break;
-		case IMPL:
-			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {", "\treturn _#name#;",
+		case DISKBASED:
+		case MEMORYBASED:
+			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+					"\treturn _#name#;",
 					"}");
 			break;
 		}
@@ -237,7 +234,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException;");
 			break;
-		case IMPL:
+		case DISKBASED:
+		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
 			break;
@@ -248,17 +246,11 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	protected CodeBlock createField(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
 		code.setVariable("name", attr.getName());
-		if (currentCycle.isImpl()) {
-			code.setVariable(
-					"type",
-					attr.getDomain().getJavaAttributeImplementationTypeName(
-							schemaRootPackageName));
-		}
+		code.setVariable("type", attr.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
 		return code;
 	}
 
-	protected CodeBlock createReadAttributesFromStringMethod(
-			Set<Attribute> attrSet) {
+	protected CodeBlock createReadAttributesFromStringMethod(Set<Attribute> attrSet, String attributeContainer) {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException",
 				"#jgPackage#.NoSuchAttributeException");
@@ -272,17 +264,16 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				CodeList a = new CodeList();
 				a.setVariable("variableName", attribute.getName());
 				a.setVariable("setterName", "set_" + attribute.getName());
+				a.setVariable("attributeContainer", attributeContainer);
 				a.add(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringReader(value, getSchema());"));
-				if (currentCycle.isImpl()) {
-					a.add(attribute.getDomain().getReadMethod(
+				a.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
+							"io", attributeContainer));
 					a.addNoIndent(new CodeSnippet(
-							"\t#setterName#(_#variableName#);", "\treturn;",
+							"\t#setterName#(#attributeContainer#_#variableName#);", "\treturn;",
 							"}"));
-				}
 				code.add(a);
 			}
 			code.add(new CodeSnippet(
@@ -301,8 +292,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	 * @param attrSet
 	 * @return
 	 */
-	protected CodeBlock createWriteAttributeToStringMethod(
-			Set<Attribute> attrSet) {
+	protected CodeBlock createWriteAttributeToStringMethod(Set<Attribute> attrSet, String attributeContainer) {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException",
 				"#jgPackage#.NoSuchAttributeException");
@@ -317,11 +307,9 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.addNoIndent(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringWriter(getSchema());"));
-				if (currentCycle.isImpl()) {
-					a.add(attribute.getDomain().getWriteMethod(
+				a.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
-				}
+							"io", attributeContainer));
 				a.addNoIndent(new CodeSnippet(
 						"\treturn io.getStringWriterResult();", "}"));
 				code.add(a);
@@ -333,7 +321,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return code;
 	}
 
-	protected CodeBlock createReadAttributesMethod(SortedSet<Attribute> attrSet) {
+	protected CodeBlock createReadAttributesMethod(SortedSet<Attribute> attrSet, String attributeContainer) {
 		CodeList code = new CodeList();
 
 		addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException");
@@ -346,12 +334,13 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				CodeSnippet snippet = new CodeSnippet();
 				snippet.setVariable("setterName", "set_" + attribute.getName());
 				snippet.setVariable("variableName", attribute.getName());
-				if (currentCycle.isImpl()) {
+				snippet.setVariable("attributeContainer", attributeContainer);
+				if (currentCycle.isMemOrDiskImpl()) {
 					code.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
+							"io", attributeContainer));
 				}
-				snippet.add("#setterName#(_#variableName#);");
+				snippet.add("#setterName#(#attributeContainer#_#variableName#);");
 				code.add(snippet);
 			}
 			code.add(new CodeSnippet(true,
@@ -363,7 +352,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return code;
 	}
 
-	protected CodeBlock createWriteAttributesMethod(Set<Attribute> attrSet) {
+	protected CodeBlock createWriteAttributesMethod(Set<Attribute> attrSet, String attributeContainer) {
 		CodeList code = new CodeList();
 
 		addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException",
@@ -375,10 +364,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if ((attrSet != null) && !attrSet.isEmpty()) {
 			code.add(new CodeSnippet("io.space();"));
 			for (Attribute attribute : attrSet) {
-				if (currentCycle.isImpl()) {
+				if (currentCycle.isMemOrDiskImpl()) {
 					code.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
-							"io"));
+							"io", attributeContainer));
 				}
 			}
 		}
@@ -386,17 +375,5 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return code;
 	}
 
-	/**
-	 * Generates method attributes() which returns a set of all versioned
-	 * attributes for an <code>AttributedElement</code>.
-	 * 
-	 * @param attributeList
-	 * @return
-	 */
-	protected CodeBlock createGetVersionedAttributesMethod(
-			SortedSet<Attribute> attributeList) {
-		CodeList code = new CodeList();
-		return code;
-	}
 
 }

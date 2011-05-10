@@ -72,7 +72,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isImpl()) {
+			if (currentCycle.isMemOrDiskImpl()) {
 				System.out.println("Writing code to file " + implClassName);
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
@@ -91,8 +91,8 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isImpl()) {
-			addImports("#jgImplPackage#.#baseClassName#");
+		if (currentCycle.isMemOrDiskImpl()) {
+			addImports("#usedJgImplPackage#.#baseClassName#");
 			rootBlock.setVariable("baseClassName", "SubordinateGraphImpl");
 		}
 		code.add(createGraphElementClassMethods());
@@ -133,7 +133,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			}
 		}
 
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
 			}
@@ -161,7 +161,6 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
 				cs.setVariable("rname", rd.getUniqueName());
 				cs.setVariable("rtype",	rd.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				cs.setVariable("rtranstype",rd.getTransactionJavaAttributeImplementationTypeName(schemaRootPackageName));
 				cs.setVariable("rstdtype",rd.getStandardJavaAttributeImplementationTypeName(schemaRootPackageName));
 				cs.setVariable("rsavememtype",rd.getSavememJavaAttributeImplementationTypeName(schemaRootPackageName));
 				code.addNoIndent(cs);
@@ -288,7 +287,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		}
 		CodeList code = new CodeList();
 		code.addNoIndent(createFactoryMethod(gec, false));
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.addNoIndent(createFactoryMethod(gec, true));
 		}
 		return code;
@@ -311,7 +310,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			code.add("*/",
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			// "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
 
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
@@ -366,7 +365,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		block.setVariable("elemClassName", "Vertex");
 		block.setVariable("elemClassLowName", "vertex"); 
 		block.setVariable("elemClassPluralName", "Vertices");
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#jgImplPackage#.VertexIterable");
 		}
 		code.add(block);
@@ -374,7 +373,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		block.setVariable("elemClassName", "Edge");
 		block.setVariable("elemClassLowName", "edge"); 
 		block.setVariable("elemClassPluralName", "Edges");
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#jgImplPackage#.EdgeIterable");
 		}
 		code.add(block);
@@ -408,7 +407,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			s.add(" */");
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
@@ -424,7 +423,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				s.add(" */");
 				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException;");
 			}
-			if (currentCycle.isImpl()) {
+			if (currentCycle.isMemOrDiskImpl()) {
 				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException {");
 				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
 				s.add("}\n");
@@ -452,7 +451,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		case ABSTRACT:
 			code.add("public #type# #isOrGet#_#name#() throws RemoteException;");
 			break;
-		case IMPL:
+		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#() throws RemoteException {", 
 					"\treturn getSuperordinateGraph().get_#name#();",
 					"}");
@@ -472,7 +471,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#) throws RemoteException;");
 			break;
-		case IMPL:
+		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#) throws RemoteException {",
 					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
 			break;
@@ -483,7 +482,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 	protected CodeBlock createField(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
 		code.setVariable("name", attr.getName());
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.setVariable(
 					"type",
 					attr.getDomain().getJavaAttributeImplementationTypeName(

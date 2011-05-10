@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.mem;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -22,6 +22,9 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.EdgeIterable;
+import de.uni_koblenz.jgralab.impl.VertexIterable;
+import de.uni_koblenz.jgralab.impl.disk.BackgroundStorage;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -705,4 +708,13 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.createPartialGraph(hostname);
 	}
 
+	public BackgroundStorage getBackgroundStorage() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void writePartialGraphs(GraphIO graphIO) {
+		throw new UnsupportedOperationException();
+	}
+	
 }

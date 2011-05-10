@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.mem;
 
 import java.rmi.RemoteException;
 

@@ -29,7 +29,7 @@
  * the parts of JGraLab used as well as that of the covered work.
  */
 
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.mem;
 
 import java.rmi.RemoteException;
 import java.util.Comparator;
@@ -233,7 +233,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return boolean true if <code>incidenceListVersion</code> differs from
 	 *         {@link #incidenceListVersion}
 	 */
-	final boolean isIncidenceListModified(long incidenceListVersion) {
+	public final boolean isIncidenceListModified(long incidenceListVersion) {
 		try {
 			assert isValid();
 		} catch (RemoteException e) {
@@ -256,7 +256,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
-	final long getIncidenceListVersion() {
+	public final long getIncidenceListVersion() {
 		try {
 			assert isValid();
 		} catch (RemoteException e) {

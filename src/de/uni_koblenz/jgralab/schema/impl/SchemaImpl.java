@@ -100,6 +100,7 @@ import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.SetDomain;
 import de.uni_koblenz.jgralab.schema.StringDomain;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
@@ -138,9 +139,9 @@ public class SchemaImpl implements Schema {
 	public M1ClassManager getM1ClassManager() {
 		return m1ClassManager;
 	}
+	
 
-	// TODO Remove
-	// private static final String GRAPH_IMPLEMENTATION_PACKAGE = "array";
+	private ArrayList<TypedElementClass<?,?>> typedElementClasses = new ArrayList<TypedElementClass<?,?>>();
 
 	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE = { String.class,
 			int.class, int.class };
@@ -929,7 +930,6 @@ public class SchemaImpl implements Schema {
 	@Override
 	public AttributedElementClass<?, ?> getAttributedElementClass(
 			String qualifiedName) {
-		System.out.println("Searching graph element class: " + qualifiedName);
 		if (graphClass == null) {
 			return null;
 		} else if (graphClass.getQualifiedName().equals(qualifiedName)) {
@@ -937,8 +937,6 @@ public class SchemaImpl implements Schema {
 		} else {
 			GraphElementClass<?, ?> gc = graphClass
 					.getGraphElementClass(qualifiedName);
-			System.out.println("Returning graph element class: "
-					+ gc.getQualifiedName());
 			return graphClass.getGraphElementClass(qualifiedName);
 		}
 	}
@@ -1376,4 +1374,27 @@ public class SchemaImpl implements Schema {
 		return defaultBinaryEdgeClass;
 	}
 
+	@Override
+	public Integer getClassId(TypedElementClass schemaClass) {
+		return schemaClass.getId();
+	}
+	
+	@Override
+	public TypedElementClass<?,?> getTypeForId(Integer id) {
+		return typedElementClasses.get(id);
+	}
+	
+	@Override
+	public Class getM1ClassForId(Integer id) {
+		return typedElementClasses.get(id).getM1Class();
+	}
+
+	public void registerM1ClassId(TypedElementClass clazz) {
+		typedElementClasses.add(clazz);
+		int id = typedElementClasses.size();	
+		clazz.setId(id);
+	}
+	
+
+	
 }

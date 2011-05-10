@@ -34,9 +34,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueBag;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
 import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 
 public class SliceTest extends GenericTests {

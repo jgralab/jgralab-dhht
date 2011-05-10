@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
+
 /**
  * TODO add comment
  * 
@@ -41,6 +42,7 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
  */
 public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
+	
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(edgeClass, schemaPackageName, config, false);
@@ -50,14 +52,40 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 
 	@Override
-	protected CodeList createBody() {
-		CodeList code = super.createBody();
-		createMethodsForBinaryEdge(code);
+	protected CodeBlock createConstructor() {
+		CodeList code = (CodeList) super.createConstructor();
+		if (currentCycle.isDiskbasedImpl()) {
+			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
+			code.addNoIndent(new CodeSnippet(
+				true,
+				"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.EdgeContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
+				"\tsuper(id, storage, g);",
+				"}"));
+		}
 		return code;
 	}
-
-	protected void createMethodsForBinaryEdge(CodeList code) {
-		// to be overwritten in the binary edge codegen
+	
+	protected CodeBlock createLoadAttributeContainer() {
+		return new CodeSnippet(
+				true,
+				"protected InnerAttributeContainer loadAttributeContainer() {",
+				"\treturn (InnerAttributeContainer) storage.backgroundStorage.getEdgeAttributeContainer(id);",
+				"}"
+		);
 	}
+
+	@Override
+	protected CodeList createBody() {
+		CodeList code = (CodeList) super.createBody();
+	    createMethodsForBinaryEdge(code);
+		return code;
+	}
+	
+	protected void createMethodsForBinaryEdge(CodeList code) {
+		//to be overwritten in the binary edge codegen
+	}
+
+	
+
 
 }

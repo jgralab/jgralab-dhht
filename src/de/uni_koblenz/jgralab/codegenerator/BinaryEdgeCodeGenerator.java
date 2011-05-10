@@ -19,7 +19,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 	BinaryEdgeClass bec;
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add(createGetSemanticsMethod());
 			code.add(createGetAlphaSemanticsMethod());
 			code.add(createGetOmegaSemanticsMethod());
@@ -50,7 +50,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 		code.setVariable("omegaInc", absoluteName(omegaInc));
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, #alphaVertex# alpha, #omegaVertex# omega) throws java.rmi.RemoteException {",
+						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g, #alphaVertex# alpha, #omegaVertex# omega) throws java.io.IOException {",
 						"\tthis(id, g);"));
 		code.addNoIndent(new CodeSnippet("alpha.connect(#alphaInc#.class, this);"));
 		code.addNoIndent(new CodeSnippet("omega.connect(#omegaInc#.class, this);"));

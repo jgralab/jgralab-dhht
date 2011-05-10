@@ -48,6 +48,8 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 		extends TypedElementClassImpl<ConcreteMetaClass, ConcreteInterface>
 		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
+
+	
 	/**
 	 * a list of attributes which belongs to the m2 element
 	 * (edgeclass/vertexclass/graphclass). Only the own attributes of this class
@@ -68,7 +70,6 @@ public abstract class AttributedElementClassImpl<ConcreteMetaClass extends Attri
 
 	@Override
 	public void addAttribute(Attribute anAttribute) {
-		System.out.println("Adding attribute " + anAttribute.getName() + " to class " + this.getQualifiedName());
 		if (containsAttribute(anAttribute.getName())) {
 			throw new DuplicateAttributeException(anAttribute.getName(),
 					getQualifiedName());

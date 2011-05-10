@@ -65,14 +65,14 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.impl.CompleteGraphImpl;
-import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
-import de.uni_koblenz.jgralab.impl.GraphElementImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
-import de.uni_koblenz.jgralab.impl.PartialGraphImpl;
-import de.uni_koblenz.jgralab.impl.PartialSubordinateGraphImpl;
-import de.uni_koblenz.jgralab.impl.SubordinateGraphImpl;
-import de.uni_koblenz.jgralab.impl.ViewGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
+import de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -217,7 +217,7 @@ public class GraphIO {
 	// * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
 	// * vertices at the edge with id i.
 	// */
-	// private ArrayList<Vertex>[] incidencesAtEdge;
+	 private ArrayList<Vertex>[] incidencesAtEdge;
 
 	/**
 	 * Stores the information about incidences at the vertices.<br>
@@ -234,7 +234,7 @@ public class GraphIO {
 	// * <code>incidenceInstancesAtEdge[i]</code> = the lambda sequence of all
 	// * Incidences at the edge with id i.
 	// */
-	// private Incidence[][] incidenceInstancesAtEdge;
+	 private Incidence[][] incidenceInstancesAtEdge;
 
 	/**
 	 * The value is the sigma information of the graph element. If String[] is
@@ -2147,17 +2147,20 @@ public class GraphIO {
 
 	private VertexClass createVertexClass(GraphElementClassData vcd,
 			GraphClass gc) throws GraphIOException, SchemaException {
+		System.out.println("1");
 		VertexClass vc = gc.createVertexClass(vcd.getQualifiedName());
+		System.out.println("2");
 		vc.setAbstract(vcd.isAbstract);
-
+		System.out.println("3");
 		addAttributes(vcd.attributes, vc);
-
+		System.out.println("4");
 		for (Constraint constraint : vcd.constraints) {
 			vc.addConstraint(constraint);
 		}
-
-		vc.setAllowedKappaRange(vcd.validKappa[0], vcd.validKappa[1]);
-
+		System.out.println("5");
+		if (vcd.validKappa != null)
+			vc.setAllowedKappaRange(vcd.validKappa[0], vcd.validKappa[1]);
+		System.out.println("6");
 		GECsearch.put(vc, gc);
 		return vc;
 	}
@@ -2193,8 +2196,8 @@ public class GraphIO {
 		}
 
 		ec.setAbstract(ecd.isAbstract);
-
-		ec.setAllowedKappaRange(ecd.validKappa[0], ecd.validKappa[1]);
+		if (ecd.validKappa != null)
+			ec.setAllowedKappaRange(ecd.validKappa[0], ecd.validKappa[1]);
 
 		GECsearch.put(ec, gc);
 		return ec;

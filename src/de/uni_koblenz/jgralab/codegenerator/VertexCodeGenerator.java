@@ -52,8 +52,29 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 
 
 
-
+	@Override
+	protected CodeBlock createConstructor() {
+		CodeList code = (CodeList) super.createConstructor();
+		if (currentCycle.isDiskbasedImpl()) {
+			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
+			code.addNoIndent(new CodeSnippet(
+					true,
+					"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.VertexContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
+					"\tsuper(id, storage, g);" +
+					"}"));
+		}
+		return code;
+	}
 	
+
+	protected CodeBlock createLoadAttributeContainer() {
+		return new CodeSnippet(
+				true,
+				"protected InnerAttributeContainer loadAttributeContainer() {",
+				"\treturn (InnerAttributeContainer) storage.backgroundStorage.getVertexAttributeContainer(id);",
+				"}"
+		);
+	}
 
 
 

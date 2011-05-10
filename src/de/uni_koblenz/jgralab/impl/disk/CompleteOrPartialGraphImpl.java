@@ -1,5 +1,6 @@
-package de.uni_koblenz.jgralab.impl;
+package de.uni_koblenz.jgralab.impl.disk;
 
+import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -19,6 +20,9 @@ import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -30,9 +34,19 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
+	
 	protected CompleteOrPartialGraphImpl(GraphClass cls) {
 		super(cls);
 		schema = cls.getSchema();
+		graphFactory = cls.getSchema().getGraphFactory();
+		try {
+			backgroundStorage = new BackgroundStorage(this);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		setFreeVertexList(new FreeIndexList(10));
+		setFreeIncidenceList(new FreeIndexList(10));
+		setFreeEdgeList(new FreeIndexList(10));
 		graphVersion = -1;
 		setGraphVersion(0);
 	}
@@ -97,6 +111,12 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	private boolean loading;
 	
+	
+	protected BackgroundStorage backgroundStorage;
+	
+	public BackgroundStorage getBackgroundStorage() {
+		return backgroundStorage;
+	}
 
 	
 	// ------------- VERTEX LIST VARIABLES -------------
@@ -115,14 +135,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected FreeIndexList freeVertexList;
 	
-	/**
-	 * array of vertices
-	 */
-	private VertexImpl[] vertexArray;
-
-	private VertexImpl firstVertex;
-
-	private VertexImpl lastVertex;
 	
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -150,15 +162,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected FreeIndexList freeEdgeList;
 
-	/**
-	 * array of edges
-	 */
-	private EdgeImpl[] edgeArray;
-	
-	private EdgeImpl firstEdge;
-
-	private EdgeImpl lastEdge;
-	
+		
 	/**
 	 * Holds the version of the edge sequence. For every modification (e.g.
 	 * adding/deleting an edge or changing the edge sequence) this version
@@ -185,12 +189,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected FreeIndexList freeIncidenceList;
 	
-	/**
-	 * array of incidences
-	 */
-	private IncidenceImpl[] incidenceArray;
-
-
 
 	
 	/**
@@ -202,7 +200,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	protected int allocateEdgeIndex(int currentId) throws RemoteException {
 		int eId = freeEdgeList.allocateIndex();
 		if (eId == 0) {
-			expandEdgeArray(getExpandedEdgeCount());
 			eId = freeEdgeList.allocateIndex();
 		}
 		return eId;
@@ -216,10 +213,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected int allocateIncidenceIndex(int currentId) throws RemoteException {
 		int iId = freeIncidenceList.allocateIndex();
-		if (iId == 0) {
-			expandIncidenceArray(getExpandedIncidenceCount());
-			iId = freeIncidenceList.allocateIndex();
-		}
 		return iId;
 	}
 
@@ -232,18 +225,17 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	protected int allocateVertexIndex(int currentId) throws RemoteException {
 		int vId = freeVertexList.allocateIndex();
 		if (vId == 0) {
-			expandVertexArray(getExpandedVertexCount());
 			vId = freeVertexList.allocateIndex();
 		}
 		return vId;
 	}
 	
 	public boolean containsVertexLocally(Vertex v) throws RemoteException {
-		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
+		return (v != null) && (v.getGraph() == this) && (backgroundStorage.getVertex(v.getId()) == v);
 	}
 
 	public boolean containsEdgeLocally(Edge e) throws RemoteException {
-		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
+		return (e != null) && (e.getGraph() == this) && (backgroundStorage.getEdge(e.getId()) == e);
 	}
 	
 	/**
@@ -290,7 +282,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			assert eId != 0;
 			e.setId(eId);
 		}
-
+		backgroundStorage.storeEdge(e);
 		appendEdgeToESeq(e);
 
 		if (!isLoading()) {
@@ -312,7 +304,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected void addIncidence(Incidence newIncidence) throws RemoteException {
 		IncidenceImpl i = (IncidenceImpl) newIncidence;
-
 		int iId = i.getId();
 		if (isLoading()) {
 			if (iId > 0) {
@@ -337,8 +328,9 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			iId = allocateIncidenceIndex(iId);
 			assert iId != 0;
 			i.setId(iId);
+			
 		}
-
+		backgroundStorage.storeIncidence(i);
 		if (!isLoading()) {
 			internalIncidenceAdded(i);
 		}
@@ -383,7 +375,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			assert vId != 0;
 			v.setId(vId);
 		}
-
+		backgroundStorage.storeVertex(v);
 		appendVertexToVSeq(v);
 
 		if (!isLoading()) {
@@ -401,7 +393,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains an edge with id eId
 	 */
 	protected final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
+		return (eId > 0) && (eId <= eMax) && (backgroundStorage.getEdge(eId) != null);
 	}
 
 	/**
@@ -413,7 +405,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains an incidence with id iId
 	 */
 	private final boolean containsIncidenceId(int iId) {
-		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
+		return (iId > 0) && (iId <= vMax) && (backgroundStorage.getIncidence(iId) != null);
 	}
 
 
@@ -427,7 +419,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains a vertex with id vId
 	 */
 	protected final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
+		return (vId > 0) && (vId <= vMax) && (backgroundStorage.getVertex(vId) != null);
 	}
 	
 	
@@ -436,9 +428,9 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param e
 	 *            an edge
+	 * @throws RemoteException 
 	 */
-	protected void appendEdgeToESeq(EdgeImpl e) {
-		getEdgeArray()[e.id] = e;
+	protected void appendEdgeToESeq(EdgeImpl e) throws RemoteException {
 		setECount(getECount() + 1);
 		if (getFirstEdge() == null) {
 			setFirstEdge(e);
@@ -455,9 +447,9 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param v
 	 *            a vertex
+	 * @throws RemoteException 
 	 */
-	protected void appendVertexToVSeq(VertexImpl v) {
-		getVertexArray()[v.id] = v;
+	protected void appendVertexToVSeq(VertexImpl v) throws RemoteException {
 		setVCount(getVCount() + 1);
 		if (getFirstVertex() == null) {
 			setFirstVertex(v);
@@ -504,54 +496,18 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		vCount = count;
 	}
 
-	protected void setVertexArray(VertexImpl[] vertex) {
-		this.vertexArray = vertex;
-	}
-
-
 	protected void setVertexListVersion(long vertexListVersion) {
 		this.vertexListVersion = vertexListVersion;
 	}
-	
-	protected void setIncidenceArray(IncidenceImpl[] incidenceArray) {
-		this.incidenceArray = incidenceArray;
-	}
-
-	@Override
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		this.lastEdge = lastEdge;
-	}
-
-	@Override
-	protected void setLastVertex(VertexImpl lastVertex) {
-		this.lastVertex = lastVertex;
-	}
-	
+		
 	@Override
 	protected void setECount(int count) {
 		eCount = count;
 	}
 
-
-	protected void setEdgeArray(EdgeImpl[] edge) {
-		this.edgeArray = edge;
-	}
-
-
 	protected void setEdgeListVersion(long edgeListVersion) {
 		this.edgeListVersion = edgeListVersion;
 	}
-
-	@Override
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		this.firstEdge = firstEdge;
-	}
-
-	@Override
-	protected void setFirstVertex(VertexImpl firstVertex) {
-		this.firstVertex = firstVertex;
-	}
-
 
 	protected void setFreeEdgeList(FreeIndexList freeEdgeList) {
 		this.freeEdgeList = freeEdgeList;
@@ -593,11 +549,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	}
 	
 	
-	protected VertexImpl[] getVertexArray() {
-		return vertexArray;
-	}
-
-
 	@Override
 	public long getVertexListVersion() {
 		return vertexListVersion;
@@ -608,19 +559,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		return vCount;
 	}
 	
-	protected IncidenceImpl[] getIncidenceArray() {
-		return incidenceArray;
-	}
-	
-	@Override
-	public Edge getLastEdge() {
-		return lastEdge;
-	}
-	
-	@Override
-	public Vertex getLastVertex() {
-		return lastVertex;
-	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -628,16 +566,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	public int getExpandedVertexCount() {
 		return computeNewSize(vMax);
-	}
-
-	@Override
-	public Edge getFirstEdge() {
-		return firstEdge;
-	}
-
-	@Override
-	public Vertex getFirstVertex() {
-		return firstVertex;
 	}
 
 	protected FreeIndexList getFreeEdgeList() {
@@ -653,10 +581,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	@Override
 	public int getICount() {
 		return iCount;
-	}
-	
-	protected EdgeImpl[] getEdgeArray() {
-		return edgeArray;
 	}
 	
 	@Override
@@ -727,27 +651,27 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the edge array
 	 */
-	protected void expandEdgeArray(int newSize) throws RemoteException {
-		if (newSize <= eMax) {
-			throw new GraphException("newSize must be > eSize: eSize=" + eMax
-					+ ", newSize=" + newSize);
-		}
-
-		EdgeImpl[] e = new EdgeImpl[newSize + 1];
-		if (getEdgeArray() != null) {
-			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
-		}
-		setEdgeArray(e);
-
-		if (getFreeEdgeList() == null) {
-			setFreeEdgeList(new FreeIndexList(newSize));
-		} else {
-			getFreeEdgeList().expandBy(newSize - eMax);
-		}
-
-		eMax = newSize;
-		notifyMaxEdgeCountIncreased(newSize);
-	}
+//	protected void expandEdgeArray(int newSize) throws RemoteException {
+//		if (newSize <= eMax) {
+//			throw new GraphException("newSize must be > eSize: eSize=" + eMax
+//					+ ", newSize=" + newSize);
+//		}
+//
+//		EdgeImpl[] e = new EdgeImpl[newSize + 1];
+//		if (getEdgeArray() != null) {
+//			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
+//		}
+//		setEdgeArray(e);
+//
+//		if (getFreeEdgeList() == null) {
+//			setFreeEdgeList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeEdgeList().expandBy(newSize - eMax);
+//		}
+//
+//		eMax = newSize;
+//		notifyMaxEdgeCountIncreased(newSize);
+//	}
 
 	// handle GraphStructureChangedListener
 
@@ -757,25 +681,25 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the incidence array
 	 */
-	protected void expandIncidenceArray(int newSize) throws RemoteException {
-		if (newSize <= iMax) {
-			throw new GraphException("newSize must > iSize: iSize=" + iMax
-					+ ", newSize=" + newSize);
-		}
-		IncidenceImpl[] expandedArray = new IncidenceImpl[newSize + 1];
-		if (getIncidenceArray() != null) {
-			System.arraycopy(getIncidenceArray(), 0, expandedArray, 0,
-					getIncidenceArray().length);
-		}
-		if (getFreeIncidenceList() == null) {
-			setFreeIncidenceList(new FreeIndexList(newSize));
-		} else {
-			getFreeIncidenceList().expandBy(newSize - vMax);
-		}
-		setIncidenceArray(expandedArray);
-		iMax = newSize;
-		notifyMaxIncidenceCountIncreased(newSize);
-	}
+//	protected void expandIncidenceArray(int newSize) throws RemoteException {
+//		if (newSize <= iMax) {
+//			throw new GraphException("newSize must > iSize: iSize=" + iMax
+//					+ ", newSize=" + newSize);
+//		}
+//		IncidenceImpl[] expandedArray = new IncidenceImpl[newSize + 1];
+//		if (getIncidenceArray() != null) {
+//			System.arraycopy(getIncidenceArray(), 0, expandedArray, 0,
+//					getIncidenceArray().length);
+//		}
+//		if (getFreeIncidenceList() == null) {
+//			setFreeIncidenceList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeIncidenceList().expandBy(newSize - vMax);
+//		}
+//		setIncidenceArray(expandedArray);
+//		iMax = newSize;
+//		notifyMaxIncidenceCountIncreased(newSize);
+//	}
 
 	/**
 	 * Changes the size of the vertex array of this graph to newSize.
@@ -783,25 +707,25 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @param newSize
 	 *            the new size of the vertex array
 	 */
-	protected void expandVertexArray(int newSize) throws RemoteException {
-		if (newSize <= vMax) {
-			throw new GraphException("newSize must > vSize: vSize=" + vMax
-					+ ", newSize=" + newSize);
-		}
-		VertexImpl[] expandedArray = new VertexImpl[newSize + 1];
-		if (getVertexArray() != null) {
-			System.arraycopy(getVertexArray(), 0, expandedArray, 0,
-					getVertexArray().length);
-		}
-		if (getFreeVertexList() == null) {
-			setFreeVertexList(new FreeIndexList(newSize));
-		} else {
-			getFreeVertexList().expandBy(newSize - vMax);
-		}
-		setVertexArray(expandedArray);
-		vMax = newSize;
-		notifyMaxVertexCountIncreased(newSize);
-	}
+//	protected void expandVertexArray(int newSize) throws RemoteException {
+//		if (newSize <= vMax) {
+//			throw new GraphException("newSize must > vSize: vSize=" + vMax
+//					+ ", newSize=" + newSize);
+//		}
+//		VertexImpl[] expandedArray = new VertexImpl[newSize + 1];
+//		if (getVertexArray() != null) {
+//			System.arraycopy(getVertexArray(), 0, expandedArray, 0,
+//					getVertexArray().length);
+//		}
+//		if (getFreeVertexList() == null) {
+//			setFreeVertexList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeVertexList().expandBy(newSize - vMax);
+//		}
+//		setVertexArray(expandedArray);
+//		vMax = newSize;
+//		notifyMaxVertexCountIncreased(newSize);
+//	}
 	
 	/*
 	 * (non-Javadoc)
@@ -810,98 +734,98 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	@Override
 	public void defragment() throws RemoteException {
-		// defragment vertex array
-		if (getVCount() < vMax) {
-			if (getVCount() > 0) {
-				int vId = vMax;
-				while (getFreeVertexList().isFragmented()) {
-					while ((vId >= 1) && (getVertexArray()[vId] == null)) {
-						--vId;
-					}
-					assert vId >= 1;
-					VertexImpl v = getVertexArray()[vId];
-					getVertexArray()[vId] = null;
-					getFreeVertexList().freeIndex(vId);
-					int newId = allocateVertexIndex(vId);
-					assert newId < vId;
-					v.setId(newId);
-					getVertexArray()[newId] = v;
-					--vId;
-				}
-			}
-			int newVMax = getVCount() == 0 ? 1 : getVCount();
-			if (newVMax != vMax) {
-				vMax = newVMax;
-				VertexImpl[] newVertex = new VertexImpl[vMax + 1];
-				System.arraycopy(getVertexArray(), 0, newVertex, 0,
-						newVertex.length);
-				setVertexArray(newVertex);
-			}
-			graphModified();
-			System.gc();
-		}
-		// defragment edge array
-		if (getECount() < eMax) {
-			if (getECount() > 0) {
-				int eId = eMax;
-				while (getFreeEdgeList().isFragmented()) {
-					while ((eId >= 1) && (getEdgeArray()[eId] == null)) {
-						--eId;
-					}
-					assert eId >= 1;
-					EdgeImpl e = getEdgeArray()[eId];
-					getEdgeArray()[eId] = null;
-					getFreeEdgeList().freeIndex(eId);
-					int newId = allocateEdgeIndex(eId);
-					assert newId < eId;
-					e.setId(newId);
-					getEdgeArray()[newId] = e;
-					--eId;
-				}
-			}
-			int newEMax = getECount() == 0 ? 1 : getECount();
-			if (newEMax != eMax) {
-				eMax = newEMax;
-				EdgeImpl[] newEdge = new EdgeImpl[eMax + 1];
-				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
-				setEdgeArray(newEdge);
-				System.gc();
-			}
-			graphModified();
-			System.gc();
-		}
-
-		if (getICount() < iMax) {
-			if (getICount() > 0) {
-				int iId = iMax;
-				while (getFreeEdgeList().isFragmented()) {
-					while ((iId >= 1) && (getIncidenceArray()[iId] == null)) {
-						--iId;
-					}
-					assert iId >= 1;
-					IncidenceImpl i = getIncidenceArray()[iId];
-					getIncidenceArray()[iId] = null;
-					getFreeIncidenceList().freeIndex(iId);
-					int newId = allocateIncidenceIndex(iId);
-					assert newId < iId;
-					i.setId(newId);
-					getIncidenceArray()[newId] = i;
-					// getRevEdge()[newId] = r;
-					--iId;
-				}
-			}
-			int newIMax = getICount() == 0 ? 1 : getICount();
-			if (newIMax != iMax) {
-				iMax = newIMax;
-				IncidenceImpl[] newIncidence = new IncidenceImpl[iMax + 1];
-				System.arraycopy(getIncidenceArray(), 0, newIncidence, 0,
-						newIncidence.length);
-				setIncidenceArray(newIncidence);
-				System.gc();
-			}
-			graphModified();
-			System.gc();
-		}
+//		// defragment vertex array
+//		if (getVCount() < vMax) {
+//			if (getVCount() > 0) {
+//				int vId = vMax;
+//				while (getFreeVertexList().isFragmented()) {
+//					while ((vId >= 1) && (getVertexArray()[vId] == null)) {
+//						--vId;
+//					}
+//					assert vId >= 1;
+//					VertexImpl v = getVertexArray()[vId];
+//					getVertexArray()[vId] = null;
+//					getFreeVertexList().freeIndex(vId);
+//					int newId = allocateVertexIndex(vId);
+//					assert newId < vId;
+//					v.setId(newId);
+//					getVertexArray()[newId] = v;
+//					--vId;
+//				}
+//			}
+//			int newVMax = getVCount() == 0 ? 1 : getVCount();
+//			if (newVMax != vMax) {
+//				vMax = newVMax;
+//				VertexImpl[] newVertex = new VertexImpl[vMax + 1];
+//				System.arraycopy(getVertexArray(), 0, newVertex, 0,
+//						newVertex.length);
+//				setVertexArray(newVertex);
+//			}
+//			graphModified();
+//			System.gc();
+//		}
+//		// defragment edge array
+//		if (getECount() < eMax) {
+//			if (getECount() > 0) {
+//				int eId = eMax;
+//				while (getFreeEdgeList().isFragmented()) {
+//					while ((eId >= 1) && (getEdgeArray()[eId] == null)) {
+//						--eId;
+//					}
+//					assert eId >= 1;
+//					EdgeImpl e = getEdgeArray()[eId];
+//					getEdgeArray()[eId] = null;
+//					getFreeEdgeList().freeIndex(eId);
+//					int newId = allocateEdgeIndex(eId);
+//					assert newId < eId;
+//					e.setId(newId);
+//					getEdgeArray()[newId] = e;
+//					--eId;
+//				}
+//			}
+//			int newEMax = getECount() == 0 ? 1 : getECount();
+//			if (newEMax != eMax) {
+//				eMax = newEMax;
+//				EdgeImpl[] newEdge = new EdgeImpl[eMax + 1];
+//				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
+//				setEdgeArray(newEdge);
+//				System.gc();
+//			}
+//			graphModified();
+//			System.gc();
+//		}
+//
+//		if (getICount() < iMax) {
+//			if (getICount() > 0) {
+//				int iId = iMax;
+//				while (getFreeEdgeList().isFragmented()) {
+//					while ((iId >= 1) && (getIncidenceArray()[iId] == null)) {
+//						--iId;
+//					}
+//					assert iId >= 1;
+//					IncidenceImpl i = getIncidenceArray()[iId];
+//					getIncidenceArray()[iId] = null;
+//					getFreeIncidenceList().freeIndex(iId);
+//					int newId = allocateIncidenceIndex(iId);
+//					assert newId < iId;
+//					i.setId(newId);
+//					getIncidenceArray()[newId] = i;
+//					// getRevEdge()[newId] = r;
+//					--iId;
+//				}
+//			}
+//			int newIMax = getICount() == 0 ? 1 : getICount();
+//			if (newIMax != iMax) {
+//				iMax = newIMax;
+//				IncidenceImpl[] newIncidence = new IncidenceImpl[iMax + 1];
+//				System.arraycopy(getIncidenceArray(), 0, newIncidence, 0,
+//						newIncidence.length);
+//				setIncidenceArray(newIncidence);
+//				System.gc();
+//			}
+//			graphModified();
+//			System.gc();
+//		}
 	}
 	
 	@Override
@@ -988,41 +912,6 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
 	}
 
-	@Override
-	public boolean containsVertex(Vertex v)  throws RemoteException{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean containsEdge(Edge e)  throws RemoteException{
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void deleteVertex(Vertex v)  throws RemoteException{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void deleteEdge(Edge e) throws RemoteException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Vertex getVertex(int id)  throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Edge getEdge(int id)  throws RemoteException{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	
 	/**
@@ -1137,4 +1026,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	public Graph getViewedGraph() {
 		return this;
 	}
+	
+	
+
 }

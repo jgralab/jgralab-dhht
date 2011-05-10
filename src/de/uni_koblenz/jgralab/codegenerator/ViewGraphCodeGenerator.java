@@ -73,7 +73,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isImpl()) {
+			if (currentCycle.isMemOrDiskImpl()) {
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
 			} 
@@ -125,10 +125,13 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		if (currentCycle.isImpl()) {
-			addImports("#jgImplPackage#.#baseClassName#");
-			rootBlock.setVariable("baseClassName", "ViewGraphImpl");
+		if (currentCycle.isMembasedImpl()) {
+			addImports("#jgMemImplPackage#.#baseClassName#");
 		}
+		if (currentCycle.isDiskbasedImpl()) {
+			addImports("#jgDiskImplPackage#.#baseClassName#");
+		}
+		rootBlock.setVariable("baseClassName", "ViewGraphImpl");
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
 		code.add(createCreateRecordsMethods());
@@ -167,7 +170,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			}
 		}
 
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
 			}
@@ -195,7 +198,6 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
 				cs.setVariable("rname", rd.getUniqueName());
 				cs.setVariable("rtype",	rd.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				cs.setVariable("rtranstype",rd.getTransactionJavaAttributeImplementationTypeName(schemaRootPackageName));
 				cs.setVariable("rstdtype",rd.getStandardJavaAttributeImplementationTypeName(schemaRootPackageName));
 				cs.setVariable("rsavememtype",rd.getSavememJavaAttributeImplementationTypeName(schemaRootPackageName));
 				code.addNoIndent(cs);
@@ -317,7 +319,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		CodeList code = new CodeList();
 		code.addNoIndent(createFactoryMethod(gec, false));
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.addNoIndent(createFactoryMethod(gec, true));
 		}
 		return code;
@@ -340,7 +342,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			code.add("*/",
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class);",
 					 "\treturn new#ecType#;", "}");
@@ -392,7 +394,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		block.setVariable("elemClassName", "Vertex");
 		block.setVariable("elemClassLowName", "vertex"); 
 		block.setVariable("elemClassPluralName", "Vertices");
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#jgImplPackage#.VertexIterable");
 		}
 		code.add(block);
@@ -400,7 +402,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		block.setVariable("elemClassName", "Edge");
 		block.setVariable("elemClassLowName", "edge"); 
 		block.setVariable("elemClassPluralName", "Edges");
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#jgImplPackage#.EdgeIterable");
 		}
 		code.add(block);
@@ -434,7 +436,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			s.add(" */");
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException;");
 		}
-		if (currentCycle.isImpl()) {
+		if (currentCycle.isMemOrDiskImpl()) {
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
@@ -450,7 +452,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				s.add(" */");
 				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException;");
 			}
-			if (currentCycle.isImpl()) {
+			if (currentCycle.isMemOrDiskImpl()) {
 				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException {");
 				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
 				s.add("}\n");
@@ -478,7 +480,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		case ABSTRACT:
 			code.add("public #type# #isOrGet#_#name#() throws RemoteException;");
 			break;
-		case IMPL:
+		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#() throws RemoteException {", 
 					"\treturn getSuperordinateGraph().get_#name#();",
 					"}");
@@ -498,7 +500,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#) throws RemoteException;");
 			break;
-		case IMPL:
+		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#) throws RemoteException {",
 					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
 			break;
