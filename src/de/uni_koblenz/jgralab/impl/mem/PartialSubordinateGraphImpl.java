@@ -23,7 +23,7 @@ public abstract class PartialSubordinateGraphImpl extends PartialGraphImpl {
 	private final GraphElement<?, ?, ?> containingElement;
 
 	protected PartialSubordinateGraphImpl(String id, GraphClass cls,
-			GraphElement<?, ?, ?> elem) throws RemoteException {
+			GraphElement<?, ?, ?> elem) {
 		super(cls, (GraphBaseImpl) elem.getGraph());
 		containingElement = elem;
 	}

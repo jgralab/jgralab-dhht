@@ -874,7 +874,7 @@ public class GraphIO {
 						nextI = nextI.getNextIncidenceAtVertex();
 						continue;
 					}
-					if (isLocal(nextI.getId(), graph.getId())) {
+					if (isLocal(nextI.getId(), graph.getPartialGraphId())) {
 						writeSpace();
 						write(Integer.toString(nextI.getId()));
 					}
@@ -965,7 +965,7 @@ public class GraphIO {
 	}
 
 	private void writeAttributesSigmaKappa(Graph graph,
-			GraphElement<?, ?, ?> next) throws RemoteException, IOException,
+			GraphElement<?, ?, ?> next), IOException,
 			GraphIOException {
 		space();
 		// write attributes
@@ -3016,15 +3016,15 @@ public class GraphIO {
 		return graph;
 	}
 
-	private boolean isCompleteGraph(Graph graph) throws RemoteException {
+	private boolean isCompleteGraph(Graph graph) {
 		return isCompleteGraph(graph.getPartialGraphId());
 	}
 
-	private boolean isCompleteGraph(int graphId) throws RemoteException {
+	private boolean isCompleteGraph(int graphId) {
 		return GraphStorage.getPartialGraphId(graphId) == 0;
 	}
 
-	private boolean isLocal(int elementId, int graphId) throws RemoteException {
+	private boolean isLocal(int elementId, int graphId) {
 		return isCompleteGraph(graphId)
 				|| GraphStorage.getPartialGraphId(graphId) == GraphStorage
 						.getPartialGraphId(elementId);
@@ -3111,7 +3111,7 @@ public class GraphIO {
 		match("}");
 	}
 
-	private void sortLambdaSequences(Graph graph) throws RemoteException {
+	private void sortLambdaSequences(Graph graph) {
 		// sort lambda sequence at vertices
 		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();

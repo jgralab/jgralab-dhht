@@ -43,40 +43,40 @@ public abstract class GraphStructureChangedAdapterWithAutoRemove implements
 		GraphStructureChangedListenerWithAutoRemove {
 
 	@Override
-	public void edgeAdded(Edge e) throws RemoteException {
+	public void edgeAdded(Edge e) {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e) {
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
+	public void maxEdgeCountIncreased(int newValue) {
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) throws RemoteException {
+	public void maxVertexCountIncreased(int newValue) {
 	}
 
 	@Override
-	public void vertexAdded(Vertex v) throws RemoteException {
+	public void vertexAdded(Vertex v) {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 	}
 	
 
 	@Override
-	public void incidenceAdded(Incidence i) throws RemoteException {
+	public void incidenceAdded(Incidence i) {
 	}
 	
 	@Override
-	public void incidenceDeleted(Incidence i) throws RemoteException {
+	public void incidenceDeleted(Incidence i) {
 	}
 
 	@Override
-	public void maxIncidenceCountIncreased(int newValue) throws RemoteException {
+	public void maxIncidenceCountIncreased(int newValue) {
 	}
 
 }

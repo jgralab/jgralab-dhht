@@ -671,7 +671,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl createViewGraph(
-			Graph viewGraph, int level) throws RemoteException {
+			Graph viewGraph, int level)  {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl) viewGraphMapForMemBasedImpl
@@ -686,7 +686,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraphDiskBasedStorage(
-			Graph viewGraph, int level) throws RemoteException {
+			Graph viewGraph, int level)  {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl) viewGraphMapForMemBasedImpl
@@ -701,7 +701,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
-			Vertex vertex) throws RemoteException {
+			Vertex vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
@@ -716,7 +716,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
-			Vertex vertex) throws RemoteException {
+			Vertex vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
@@ -731,7 +731,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
-			Edge vertex) throws RemoteException {
+			Edge vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
@@ -746,7 +746,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
-			Edge vertex) throws RemoteException {
+			Edge vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
@@ -761,7 +761,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl createPartialGraph(
-			Graph completeGraph) throws RemoteException {
+			Graph completeGraph)  {
 		try {
 			Class<? extends Graph> graphClass = completeGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl) partialGraphMapForMemBasedImpl
@@ -776,7 +776,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl createPartialGraphDiskBasedStorage(
-			Graph completeGraph) throws RemoteException {
+			Graph completeGraph)  {
 		try {
 			Class<? extends Graph> graphClass = completeGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl) partialGraphMapForMemBasedImpl
@@ -791,7 +791,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl createPartialSubordinateGraph(
-			GraphElement<?, ?, ?> elem) throws RemoteException {
+			GraphElement<?, ?, ?> elem)  {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl) partialSubordinateGraphMapForMemBasedImpl
@@ -806,7 +806,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl createPartialSubordinateGraphDiskBasedStorage(
-			GraphElement<?, ?, ?> elem) throws RemoteException {
+			GraphElement<?, ?, ?> elem)  {
 		try {
 			Class<? extends Graph> graphClass = elem.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl) partialSubordinateGraphMapForMemBasedImpl

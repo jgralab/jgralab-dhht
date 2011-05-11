@@ -11,11 +11,7 @@ public class PartialGraphDatabase extends GraphDatabase {
 		
 	protected PartialGraphDatabase(PartialGraphImpl localGraph, String hosenameOfCompleteGraph) {
 		super(localGraph);
-		try {
-			completeGraphDatabase = (CompleteGraphDatabase) server.getRemoteInstance(hosenameOfCompleteGraph).getGraph(localGraph.getCompleteGraphUid(), 0);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		completeGraphDatabase = (CompleteGraphDatabase) server.getRemoteInstance(hosenameOfCompleteGraph).getGraph(localGraph.getCompleteGraphUid(), 0);
 	}
 
 	@Override

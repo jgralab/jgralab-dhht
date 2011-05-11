@@ -730,7 +730,7 @@ public final class DiskStorageManager {
 	}
 
 
-	public void storeVertex(VertexImpl v) throws RemoteException {
+	public void storeVertex(VertexImpl v) {
 		int vId = v.getId();
 		VertexContainer storage = getVertexStorage(vId);
 		int id = getElementIdInContainer(vId);
@@ -741,7 +741,7 @@ public final class DiskStorageManager {
 		containerArray[id] = v.getAttributeContainer();
 	}
 
-	public void storeEdge(EdgeImpl e) throws RemoteException {
+	public void storeEdge(EdgeImpl e) {
 		int eId = e.getId();
 		EdgeContainer storage = getEdgeStorage(eId);
 		int id = getElementIdInContainer(eId);
@@ -752,7 +752,7 @@ public final class DiskStorageManager {
 		containerArray[id] = e.getAttributeContainer();
 	}
 
-	public void storeIncidence(IncidenceImpl i) throws RemoteException {
+	public void storeIncidence(IncidenceImpl i) {
 		IncidenceContainer storage = getIncidenceStorage(i.getId());
 		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = i;

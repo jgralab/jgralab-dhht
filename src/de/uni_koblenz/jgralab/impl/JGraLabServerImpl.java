@@ -116,9 +116,9 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public GraphDatabase createGraph(int graphClassId, String completeGraphUid, int partialGraphId, String hostnameOfCompleteGraph) {
+	public GraphDatabase createGraph(int graphClassId, String completeGraphUid,
+			int partialGraphId, String hostnameOfCompleteGraph) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

@@ -94,13 +94,13 @@ public abstract class EdgeProxy implements Edge {
 	 * ************************************************************/
 
 	@Override
-	public final Edge getNextEdge() throws RemoteException {
+	public final Edge getNextEdge() {
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext());
 	}
 	
 	@Override
-	public final Edge getPreviousEdge() throws RemoteException {
+	public final Edge getPreviousEdge() {
 		return getPreviousEdge(getGraph().getTraversalContext());
 	}
 	
@@ -113,7 +113,7 @@ public abstract class EdgeProxy implements Edge {
 	 *            {@link Edge} which should be put after this {@link Edge}
 	 * @throws RemoteException 
 	 */
-	protected final void setNextEdge(Edge nextEdge) throws RemoteException {
+	protected final void setNextEdge(Edge nextEdge) {
 		storage.nextElementInGraphId[getIdInStorage(id)] = nextEdge.getId();
 	}
 
@@ -125,12 +125,12 @@ public abstract class EdgeProxy implements Edge {
 	 *            {@link Edge} which should be put before this {@link Edge}
 	 * @throws RemoteException 
 	 */
-	protected final void setPreviousEdge(Edge prevEdge) throws RemoteException {
+	protected final void setPreviousEdge(Edge prevEdge) {
 		storage.previousElementInGraphId[getIdInStorage(id)] = prevEdge.getId();
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext) throws RemoteException {
+	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
 		Edge nextEdge = getEdgeFromBg(storage.nextElementInGraphId[getIdInStorage(id)]); 
 		if (nextEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(nextEdge))) {
@@ -141,7 +141,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	public final Edge getPreviousEdge(Graph traversalContext) throws RemoteException {
+	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
 		Edge previousEdge = getEdgeFromBg(storage.previousElementInGraphId[getIdInStorage(id)]);
 		if (previousEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(previousEdge))) {
@@ -152,14 +152,14 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	public final Edge getNextEdge(Class<? extends Edge> edgeClass) throws RemoteException {
+	public final Edge getNextEdge(Class<? extends Edge> edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext(), edgeClass, false);
 	}
 
 	@Override
-	public final Edge getNextEdge(Class<? extends Edge> m1EdgeClass, boolean noSubclasses) throws RemoteException {
+	public final Edge getNextEdge(Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext(), m1EdgeClass,
@@ -167,14 +167,14 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext,Class<? extends Edge> edgeClass) throws RemoteException {
+	public final Edge getNextEdge(Graph traversalContext,Class<? extends Edge> edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(traversalContext, edgeClass, false);
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext, Class<? extends Edge> m1EdgeClass, boolean noSubclasses) throws RemoteException {
+	public final Edge getNextEdge(Graph traversalContext, Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
 		EdgeImpl e = (EdgeImpl) getNextEdge(traversalContext);
@@ -194,7 +194,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	public final Edge getNextEdge(EdgeClass edgeClass) throws RemoteException {
+	public final Edge getNextEdge(EdgeClass edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext(),
@@ -202,7 +202,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final Edge getNextEdge(EdgeClass edgeClass, boolean noSubclasses) throws RemoteException {
+	public final Edge getNextEdge(EdgeClass edgeClass, boolean noSubclasses) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(getGraph().getTraversalContext(),
@@ -210,14 +210,14 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext, EdgeClass edgeClass) throws RemoteException {
+	public final Edge getNextEdge(Graph traversalContext, EdgeClass edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(traversalContext, edgeClass.getM1Class(), false);
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext, EdgeClass edgeClass,	boolean noSubclasses) throws RemoteException {
+	public final Edge getNextEdge(Graph traversalContext, EdgeClass edgeClass,	boolean noSubclasses) {
 		assert edgeClass != null;
 		assert isValid();
 		return getNextEdge(traversalContext, edgeClass.getM1Class(),
@@ -226,7 +226,7 @@ public abstract class EdgeProxy implements Edge {
 	
 	
 	@Override
-	public final boolean isAfter(Edge e) throws RemoteException {
+	public final boolean isAfter(Edge e) {
 		assert e != null;
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
@@ -241,7 +241,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final boolean isBefore(Edge e) throws RemoteException {
+	public final boolean isBefore(Edge e) {
 		assert e != null;
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
@@ -256,7 +256,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	public final void putAfter(Edge e) throws RemoteException {
+	public final void putAfter(Edge e) {
 		assert e != null;
 		assert e != this;
 		assert isValid();
@@ -267,7 +267,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final void putBefore(Edge e) throws RemoteException {
+	public final void putBefore(Edge e) {
 		assert e != null;
 		assert e != this;
 		assert isValid();
@@ -285,12 +285,12 @@ public abstract class EdgeProxy implements Edge {
 
 	
 	@Override
-	public final Incidence getFirstIncidence() throws RemoteException {
+	public final Incidence getFirstIncidence() {
 		return getFirstIncidence(getGraph().getTraversalContext());
 	}
 	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext) throws RemoteException {
+	public final Incidence getFirstIncidence(Graph traversalContext) {
 		Incidence firstIncidence = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
 		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsVertex(firstIncidence.getVertex()))) {
 			firstIncidence = getIncidenceFromBg(((IncidenceImpl)firstIncidence).storage.nextIncidenceAtEdgeId[getIdInStorage(((IncidenceImpl)firstIncidence).getId())]);
@@ -299,13 +299,13 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	public final Incidence getFirstIncidence(Direction direction) throws RemoteException {
+	public final Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
 		return getFirstIncidence(getGraph().getTraversalContext(), direction);
 	}
 	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) throws RemoteException {
+	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
 		assert isValid();
 		Incidence i = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
 		if (traversalContext==null) {
@@ -325,14 +325,14 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final Incidence getFirstIncidence(boolean thisIncidence,	IncidenceType... incidentTypes) throws RemoteException {
+	public final Incidence getFirstIncidence(boolean thisIncidence,	IncidenceType... incidentTypes) {
 		assert isValid();
 		return getFirstIncidence(getGraph().getTraversalContext(),
 				thisIncidence, incidentTypes);
 	}
 	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, boolean thisIncidence, IncidenceType... incidentTypes) throws RemoteException {
+	public final Incidence getFirstIncidence(Graph traversalContext, boolean thisIncidence, IncidenceType... incidentTypes) {
 		assert isValid();
 		Incidence i = getFirstIncidence(traversalContext);
 		if (incidentTypes.length == 0) {
@@ -353,7 +353,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction, boolean noSubclasses) throws RemoteException {
+			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(getGraph().getTraversalContext(),
@@ -363,7 +363,7 @@ public abstract class EdgeProxy implements Edge {
 	@SuppressWarnings("unchecked")
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) throws RemoteException {
+			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		Incidence currentIncidence = getFirstIncidence(traversalContext, direction);
@@ -385,14 +385,14 @@ public abstract class EdgeProxy implements Edge {
 
 	
 	@Override
-	public final Incidence getLastIncidence() throws RemoteException {
+	public final Incidence getLastIncidence() {
 		return getLastIncidence(getGraph().getTraversalContext());
 	}
 
 	
 
 	@Override
-	public final Incidence getLastIncidence(Graph traversalContext) throws RemoteException {
+	public final Incidence getLastIncidence(Graph traversalContext) {
 //		if (storage.lastIncidenceId[getIdInStorage(id)] == 0) {
 //			System.out.println("Last incidence: " +  storage.lastIncidenceId[getIdInStorage(id)]);
 //			System.out.println("First incidence: " + storage.firstIncidenceId[getIdInStorage(id)]);
@@ -409,40 +409,40 @@ public abstract class EdgeProxy implements Edge {
 
 	
 	@Override
-	public final Iterable<Incidence> getIncidences() throws RemoteException {
+	public final Iterable<Incidence> getIncidences() {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this);
 	}
 
 	@Override
 	public final <T extends Incidence> Iterable<T> getIncidences(
-			Class<T> anIncidenceClass) throws RemoteException {
+			Class<T> anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(this, anIncidenceClass);
 	}
 
 	@Override
 	public final <T extends Incidence> Iterable<T> getIncidences(
-			Class<T> anIncidenceClass, Direction direction) throws RemoteException {
+			Class<T> anIncidenceClass, Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(this, anIncidenceClass, direction);
 	}
 
 	@Override
-	public final Iterable<Incidence> getIncidences(Direction direction) throws RemoteException {
+	public final Iterable<Incidence> getIncidences(Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this, direction);
 	}
 
 	@Override
-	public final Iterable<Incidence> getIncidences(Graph traversalContext) throws RemoteException {
+	public final Iterable<Incidence> getIncidences(Graph traversalContext) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this);
 	}
 
 	@Override
 	public final <T extends Incidence> Iterable<T> getIncidences(
-			Graph traversalContext, Class<T> anIncidenceClass) throws RemoteException {
+			Graph traversalContext, Class<T> anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(traversalContext, this,
 				anIncidenceClass);
@@ -451,7 +451,7 @@ public abstract class EdgeProxy implements Edge {
 	@Override
 	public final <T extends Incidence> Iterable<T> getIncidences(
 			Graph traversalContext, Class<T> anIncidenceClass,
-			Direction direction) throws RemoteException {
+			Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(traversalContext, this,
 				anIncidenceClass, direction);
@@ -459,7 +459,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final Iterable<Incidence> getIncidences(Graph traversalContext,
-			Direction direction) throws RemoteException {
+			Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
 				direction);
@@ -467,7 +467,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final Iterable<Incidence> getIncidences(Graph traversalContext,
-			IncidenceClass anIncidenceClass) throws RemoteException {
+			IncidenceClass anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
 				anIncidenceClass.getM1Class());
@@ -475,14 +475,14 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final Iterable<Incidence> getIncidences(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) throws RemoteException {
+			IncidenceClass anIncidenceClass, Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(traversalContext, this,
 				anIncidenceClass.getM1Class(), direction);
 	}
 
 	@Override
-	public final Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) throws RemoteException {
+	public final Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this,
 				anIncidenceClass.getM1Class());
@@ -490,7 +490,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
-			Direction direction) throws RemoteException {
+			Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this,
 				anIncidenceClass.getM1Class(), direction);
@@ -501,7 +501,7 @@ public abstract class EdgeProxy implements Edge {
 	
 
 	@Override
-	protected final void appendIncidenceToLambdaSeq(IncidenceImpl i) throws RemoteException {
+	protected final void appendIncidenceToLambdaSeq(IncidenceImpl i) {
 		assert i != null;
 		assert i.getEdge() != this;
 		i.setIncidentEdge(this);
@@ -518,7 +518,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 	
 	@Override
-	protected final void removeIncidenceFromLambdaSeq(IncidenceImpl i) throws RemoteException {
+	protected final void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
 		assert i != null;
 		assert i.getEdge() == this;
 		if (i == getFirstIncidence()) {
@@ -556,7 +556,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	protected final void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) throws RemoteException {
+	protected final void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
@@ -605,7 +605,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	protected final void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) throws RemoteException {
+	protected final void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
@@ -655,7 +655,7 @@ public abstract class EdgeProxy implements Edge {
 
 	
 	@Override
-	public final void sortIncidences(Comparator<Incidence> comp) throws RemoteException {
+	public final void sortIncidences(Comparator<Incidence> comp) {
 		assert isValid();
 
 		if (getFirstIncidence() == null) {
@@ -684,7 +684,7 @@ public abstract class EdgeProxy implements Edge {
 				return first == null;
 			}
 
-			public IncidenceImpl remove() throws RemoteException {
+			public IncidenceImpl remove() {
 				if (first == null) {
 					throw new NoSuchElementException();
 				}
@@ -793,17 +793,17 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
-			Vertex elemToConnect) throws RemoteException {
+			Vertex elemToConnect) {
 		return getSchema().getGraphFactory().createIncidenceDiskBasedStorage(incidenceClass, 0, elemToConnect, this);
 	}
 
 	@Override
-	public final Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) throws RemoteException {
+	public final Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
 		return connect(incidenceClass.getM1Class(), elemToConnect);
 	}
 
 	@Override
-	public final Incidence connect(String rolename, Vertex elemToConnect) throws RemoteException {
+	public final Incidence connect(String rolename, Vertex elemToConnect) {
 		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
 
@@ -813,7 +813,7 @@ public abstract class EdgeProxy implements Edge {
 	
 
 	@Override
-	public final List<? extends Edge> getAdjacences(Graph traversalContext, IncidenceClass ic) throws RemoteException {
+	public final List<? extends Edge> getAdjacences(Graph traversalContext, IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
 		List<Edge> adjacences = new ArrayList<Edge>();
@@ -831,24 +831,24 @@ public abstract class EdgeProxy implements Edge {
 	
 	
 	@Override
-	public final List<? extends Edge> getAdjacences(Graph traversalContext,	String role) throws RemoteException {
+	public final List<? extends Edge> getAdjacences(Graph traversalContext,	String role) {
 		return getAdjacences(traversalContext,
 				getIncidenceClassForRolename(role));
 	}
 
 	@Override
-	public final List<? extends Edge> getAdjacences(IncidenceClass ic) throws RemoteException {
+	public final List<? extends Edge> getAdjacences(IncidenceClass ic) {
 		return getAdjacences(getGraph().getTraversalContext(), ic);
 	}
 
 	@Override
-	public final List<? extends Edge> getAdjacences(String role) throws RemoteException {
+	public final List<? extends Edge> getAdjacences(String role) {
 		return getAdjacences(getGraph().getTraversalContext(),
 				getIncidenceClassForRolename(role));
 	}
 	
 	@Override
-	public final Vertex addAdjacence(IncidenceClass incidentIc, IncidenceClass adjacentIc, Edge other) throws RemoteException {
+	public final Vertex addAdjacence(IncidenceClass incidentIc, IncidenceClass adjacentIc, Edge other) {
 		assert incidentIc != null;
 		assert adjacentIc != null;
 		assert isValid();
@@ -871,7 +871,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final Vertex addAdjacence(String incidentRole, String adjacentRole, Edge other) throws RemoteException {
+	public final Vertex addAdjacence(String incidentRole, String adjacentRole, Edge other) {
 		return addAdjacence(getIncidenceClassForRolename(incidentRole),
 				getIncidenceClassForRolename(adjacentRole), other);
 	}
@@ -881,12 +881,12 @@ public abstract class EdgeProxy implements Edge {
 
 
 	@Override
-	public final int getDegree() throws RemoteException {
+	public final int getDegree() {
 		return getDegree(getGraph().getTraversalContext());
 	}
 
 	@Override
-	public final int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) throws RemoteException {
+	public final int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
@@ -894,7 +894,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(Class<? extends Incidence> ic, Direction direction,
-			boolean noSubClasses) throws RemoteException {
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, direction,
@@ -902,12 +902,12 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final int getDegree(Direction direction) throws RemoteException {
+	public final int getDegree(Direction direction) {
 		return getDegree(getGraph().getTraversalContext(), direction);
 	}
 
 	@Override
-	public final int getDegree(Graph traversalContext) throws RemoteException {
+	public final int getDegree(Graph traversalContext) {
 		int d = 0;
 		Incidence i = getFirstIncidence(traversalContext);
 		while (i != null) {
@@ -919,7 +919,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			boolean noSubClasses) throws RemoteException {
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -933,7 +933,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			Direction direction, boolean noSubClasses) throws RemoteException {
+			Direction direction, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -948,7 +948,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final int getDegree(Graph traversalContext, Direction direction) throws RemoteException {
+	public final int getDegree(Graph traversalContext, Direction direction) {
 		if (direction == null) {
 			return getDegree();
 		}
@@ -965,7 +965,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(Graph traversalContext, IncidenceClass ic,
-			boolean noSubClasses) throws RemoteException {
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -979,7 +979,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction, boolean noSubClasses) throws RemoteException {
+			Direction direction, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -994,7 +994,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final int getDegree(IncidenceClass ic, boolean noSubClasses) throws RemoteException {
+	public final int getDegree(IncidenceClass ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
@@ -1002,7 +1002,7 @@ public abstract class EdgeProxy implements Edge {
 
 	@Override
 	public final int getDegree(IncidenceClass ic, Direction direction,
-			boolean noSubClasses) throws RemoteException {
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, direction,
@@ -1012,155 +1012,155 @@ public abstract class EdgeProxy implements Edge {
 	
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices() throws RemoteException {
+	public final Iterable<Vertex> getIncidentVertices() {
 		return new IncidentVertexIterable<Vertex>(this);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass) throws RemoteException {
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this, aVertexClass);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass, Direction direction) throws RemoteException {
+			Class<? extends Vertex> aVertexClass, Direction direction) {
 		return new IncidentVertexIterable<Vertex>(this, aVertexClass, direction);
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(Direction direction) throws RemoteException {
+	public final Iterable<Vertex> getIncidentVertices(Direction direction) {
 		return new IncidentVertexIterable<Vertex>(this, direction);
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext) throws RemoteException {
+	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) throws RemoteException {
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass, Direction direction) throws RemoteException {
+			Class<? extends Vertex> aVertexClass, Direction direction) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, direction);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Direction direction) throws RemoteException {
+			Direction direction) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				direction);
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			VertexClass aVertexClass) throws RemoteException {
+			VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass.getM1Class());
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			VertexClass aVertexClass, Direction direction) throws RemoteException {
+			VertexClass aVertexClass, Direction direction) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass.getM1Class(), direction);
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) throws RemoteException {
+	public final Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class());
 	}
 
 	@Override
 	public final Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
-			Direction direction) throws RemoteException {
+			Direction direction) {
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class(), direction);
 	}
 
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices() throws RemoteException {
+	public final Iterable<Vertex> getAlphaVertices() {
 		return new IncidentVertexIterable<Vertex>(this,
 				Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices(Class<? extends Vertex> aVertexClass) throws RemoteException {
+	public final Iterable<Vertex> getAlphaVertices(Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
 				Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext) throws RemoteException {
+	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
 	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) throws RemoteException {
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
 	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext,
-			VertexClass aVertexClass) throws RemoteException {
+			VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
 	}
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) throws RemoteException {
+	public final Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class(), Direction.VERTEX_TO_EDGE);
 	}
 
 
 	@Override
-	public final Iterable<Vertex> getOmegaVertices() throws RemoteException {
+	public final Iterable<Vertex> getOmegaVertices() {
 		return new IncidentVertexIterable<Vertex>(this,
 				Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public final Iterable<Vertex> getOmegaVertices(
-			Class<? extends Vertex> aVertexClass) throws RemoteException {
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
 				Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
-	public final Iterable<Vertex> getOmegaVertices(Graph traversalContext) throws RemoteException {
+	public final Iterable<Vertex> getOmegaVertices(Graph traversalContext) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public final Iterable<Vertex> getOmegaVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) throws RemoteException {
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public final Iterable<Vertex> getOmegaVertices(Graph traversalContext,
-			VertexClass aVertexClass) throws RemoteException {
+			VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
-	public final Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) throws RemoteException {
+	public final Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
@@ -1191,7 +1191,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final void removeAdjacence(String role, Edge other) throws RemoteException {
+	public final void removeAdjacence(String role, Edge other) {
 		removeAdjacence(getIncidenceClassForRolename(role), other);
 	}
 
@@ -1218,7 +1218,7 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final List<Edge> removeAdjacences(String role) throws RemoteException {
+	public final List<Edge> removeAdjacences(String role) {
 		return removeAdjacences(getIncidenceClassForRolename(role));
 	}
 
@@ -1232,17 +1232,17 @@ public abstract class EdgeProxy implements Edge {
 
 
 	@Override
-	protected final void addFirstSubordinateEdge(Edge appendix) throws RemoteException {
+	protected final void addFirstSubordinateEdge(Edge appendix) {
 		appendix.putAfter(this);
 	}
 
 	@Override
-	protected final void addFirstSubordinateVertex(Vertex appendix) throws RemoteException {
+	protected final void addFirstSubordinateVertex(Vertex appendix) {
 		return;
 	}
 	
 	@Override
-	public final Graph getSubordinateGraph() throws RemoteException {
+	public final Graph getSubordinateGraph() {
 		if (subOrdinateGraph == null) {
 			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
 		}
@@ -1280,12 +1280,12 @@ public abstract class EdgeProxy implements Edge {
 	}
 
 	@Override
-	public final boolean isValid() throws RemoteException {
+	public final boolean isValid() {
 		return graph.containsEdge(this);
 	}
 	
 	@Override
-	public final void delete() throws RemoteException {
+	public final void delete() {
 		assert isValid() : this + " is not valid!";
 		graph.deleteEdge(this);
 	}

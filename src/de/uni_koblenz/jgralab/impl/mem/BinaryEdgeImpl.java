@@ -14,7 +14,7 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	 */
 	private static final long serialVersionUID = -8155387019211417812L;
 
-	protected BinaryEdgeImpl(int anId, Graph graph) throws RemoteException {
+	protected BinaryEdgeImpl(int anId, Graph graph) {
 		super(anId, graph);
 	}
 	

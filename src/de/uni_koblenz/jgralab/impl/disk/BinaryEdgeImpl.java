@@ -25,7 +25,7 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	
 
 	@Override
-	public Vertex getAlpha() throws RemoteException {
+	public Vertex getAlpha() {
 		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.VERTEX_TO_EDGE) {
 			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
 		} else {
@@ -34,7 +34,7 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	}
 
 	@Override
-	public Vertex getOmega() throws RemoteException {
+	public Vertex getOmega() {
 		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.EDGE_TO_VERTEX) {
 			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
 		} else {

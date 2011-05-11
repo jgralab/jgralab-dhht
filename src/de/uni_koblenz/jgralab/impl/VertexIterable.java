@@ -99,7 +99,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		 */
 		@SuppressWarnings("unchecked")
 		VertexIterator(Graph traversalContext, Graph graph,
-				Class<? extends Vertex> vc) throws RemoteException {
+				Class<? extends Vertex> vc)  {
 			this.graph = graph;
 			this.vc = vc;
 			vertexListVersion = graph.getVertexListVersion();
@@ -111,7 +111,6 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		@SuppressWarnings("unchecked")
 		@Override
 		public V next() {
-			try {
 				if (graph.isVertexListModified(vertexListVersion)) {
 					throw new ConcurrentModificationException(
 							"The vertex list of the graph has been modified - the iterator is not longer valid");
@@ -123,9 +122,6 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 				current = (V) (vc == null ? current.getNextVertex(traversalContext)
 						: current.getNextVertex(traversalContext, vc));
 				return result;
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
 		}
 
 		@Override
@@ -139,7 +135,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 		 * 
 		 * @throws ConcurrentModificationException
 		 */
-		protected void checkConcurrentModification() throws RemoteException {
+		protected void checkConcurrentModification()  {
 			if (graph.isVertexListModified(vertexListVersion)) {
 				throw new ConcurrentModificationException(
 						"The vertex list of the graph has been modified - the iterator is not longer valid");
@@ -165,7 +161,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	public VertexIterable(Graph graph) throws RemoteException {
+	public VertexIterable(Graph graph)  {
 		this(graph.getTraversalContext(), graph, null);
 	}
 
@@ -178,7 +174,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param vc
 	 *            {@link Class}
 	 */
-	public VertexIterable(Graph g, Class<? extends Vertex> vc) throws RemoteException {
+	public VertexIterable(Graph g, Class<? extends Vertex> vc)  {
 		assert g != null;
 		iter = new VertexIterator(g.getTraversalContext(), g, vc);
 	}
@@ -192,7 +188,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	public VertexIterable(Graph traversalContext, Graph graph) throws RemoteException {
+	public VertexIterable(Graph traversalContext, Graph graph)  {
 		this(traversalContext, graph, null);
 	}
 
@@ -208,7 +204,7 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	 *            {@link Class}
 	 */
 	public VertexIterable(Graph traversalContext, Graph g,
-			Class<? extends Vertex> vc) throws RemoteException {
+			Class<? extends Vertex> vc)  {
 		assert g != null;
 		iter = new VertexIterator(traversalContext, g, vc);
 	}

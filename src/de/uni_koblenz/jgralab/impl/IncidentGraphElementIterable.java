@@ -111,11 +111,11 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 *            {@link Class} only instances of this class are returned.
 		 * @param dir
 		 *            {@link Direction} of the desired {@link Incidence}s.
-		 * @throws RemoteException 
+		 * @ 
 		 */
 		public IncidentGraphElementIterator(Graph traversalContext,
 				GraphElement<?, ?, ?> graphElement,
-				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir) throws RemoteException {
+				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir)  {
 			this.graphElement = graphElement;
 			this.gc = gc;
 			this.dir = dir;
@@ -151,9 +151,9 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 * {@link #graphElement} and of {@link GraphElementClass} {@link #gc}.
 		 * If such an element does not exist {@link #current} is set to
 		 * <code>null</code>.
-		 * @throws RemoteException 
+		 * @ 
 		 */
-		protected abstract void setCurrentToNextIncidentGraphElement() throws RemoteException;
+		protected abstract void setCurrentToNextIncidentGraphElement() ;
 
 		@Override
 		public void remove() {

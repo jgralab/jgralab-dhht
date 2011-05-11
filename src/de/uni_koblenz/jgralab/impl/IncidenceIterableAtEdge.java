@@ -25,7 +25,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param edge
 	 *            {@link Edge}
 	 */
-	public IncidenceIterableAtEdge(Edge edge) throws RemoteException {
+	public IncidenceIterableAtEdge(Edge edge)  {
 		this(edge.getGraph().getTraversalContext(), edge, null, null);
 	}
 
@@ -38,7 +38,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
-	public IncidenceIterableAtEdge(Edge edge, Direction direction) throws RemoteException {
+	public IncidenceIterableAtEdge(Edge edge, Direction direction)  {
 		this(edge.getGraph().getTraversalContext(), edge, null, direction);
 	}
 
@@ -52,7 +52,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Class} returned {@link Incidence}s are restricted to
 	 *            that class or subclasses
 	 */
-	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic) throws RemoteException {
+	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic)  {
 		this(edge.getGraph().getTraversalContext(), edge, ic, null);
 	}
 
@@ -70,7 +70,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Edge edge, Class<? extends Incidence> ic,
-			Direction direction) throws RemoteException {
+			Direction direction)  {
 		assert edge != null && edge.isValid();
 		iter = new IncidenceIteratorAtEdge(edge.getGraph()
 				.getTraversalContext(), edge, ic, direction);
@@ -85,7 +85,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 * @param edge
 	 *            {@link Edge}
 	 */
-	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge) throws RemoteException {
+	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge)  {
 		this(traversalContext, edge, null, null);
 	}
 
@@ -101,7 +101,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Direction direction) throws RemoteException {
+			Direction direction)  {
 		this(traversalContext, edge, null, direction);
 	}
 
@@ -118,7 +118,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            that class or subclasses
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Class<? extends Incidence> ic) throws RemoteException {
+			Class<? extends Incidence> ic)  {
 		this(traversalContext, edge, ic, null);
 	}
 
@@ -138,7 +138,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtEdge(Graph traversalContext, Edge edge,
-			Class<? extends Incidence> ic, Direction direction) throws RemoteException {
+			Class<? extends Incidence> ic, Direction direction)  {
 		assert edge != null && edge.isValid();
 		iter = new IncidenceIteratorAtEdge(traversalContext, edge, ic,
 				direction);
@@ -166,7 +166,7 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		public IncidenceIteratorAtEdge(Graph traversalContext, Edge edge,
-				Class<? extends Incidence> ic, Direction dir) throws RemoteException {
+				Class<? extends Incidence> ic, Direction dir)  {
 			super(traversalContext, edge, ic, dir);
 		}
 
@@ -178,13 +178,9 @@ public class IncidenceIterableAtEdge<I extends Incidence> extends
 				throw new NoSuchElementException();
 			}
 			I result = current;
-			try {
 				current = (I) ((ic == null) ? current.getNextIncidenceAtEdge(
 						traversalContext, dir) : current.getNextIncidenceAtEdge(
 						traversalContext, ic, dir));
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
 			return result;
 		}
 

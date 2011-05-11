@@ -8,19 +8,19 @@ import de.uni_koblenz.jgralab.Edge;
 
 public class AdjacentEdgesIterable<T extends Edge> extends AdjacentElementsIterable<Edge, T> {
 
-	public AdjacentEdgesIterable(Edge elem) throws RemoteException {
+	public AdjacentEdgesIterable(Edge elem)  {
 		super(elem);
 	}
 
-	public AdjacentEdgesIterable(Edge elem, Class<? extends T> vertexClass) throws RemoteException {
+	public AdjacentEdgesIterable(Edge elem, Class<? extends T> vertexClass)  {
 		super(elem, vertexClass);
 	}
 	
-	public AdjacentEdgesIterable(Edge elem, Direction dir) throws RemoteException {
+	public AdjacentEdgesIterable(Edge elem, Direction dir)  {
 		super(elem, dir);
 	}
 	
-	public AdjacentEdgesIterable(Edge elem, Class<? extends T> ec, Direction dir) throws RemoteException {
+	public AdjacentEdgesIterable(Edge elem, Class<? extends T> ec, Direction dir)  {
 		super(elem, ec, dir);
 	}
 	

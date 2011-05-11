@@ -58,7 +58,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param v
 	 *            the vertex that has been added.
 	 */
-	public void vertexAdded(Vertex v) throws RemoteException;
+	public void vertexAdded(Vertex v);
 
 	/**
 	 * This method is called before the vertex <code>v</code> is deleted.
@@ -66,7 +66,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param v
 	 *            the vertex that is about to be deleted.
 	 */
-	public void vertexDeleted(Vertex v) throws RemoteException;
+	public void vertexDeleted(Vertex v);
 
 	/**
 	 * This method is called after the Edge <code>e</code> has been added to the
@@ -75,7 +75,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param e
 	 *            the edge that has been added.
 	 */
-	public void edgeAdded(Edge e) throws RemoteException;
+	public void edgeAdded(Edge e);
 
 	/**
 	 * This method is called before the edge <code>e</code> is deleted.
@@ -83,7 +83,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param e
 	 *            the edge that is about to be deleted.
 	 */
-	public void edgeDeleted(Edge e) throws RemoteException;
+	public void edgeDeleted(Edge e);
 
 	/**
 	 * This method is called after the maximum vertex count has been increased
@@ -92,7 +92,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param newValue
 	 *            the new value of <code>maxVCount</code>.
 	 */
-	public void maxVertexCountIncreased(int newValue) throws RemoteException;
+	public void maxVertexCountIncreased(int newValue);
 
 	/**
 	 * This method is called after the maximum edge count has been increased to
@@ -101,7 +101,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param newValue
 	 *            the new value of <code>maxECount</code>.
 	 */
-	public void maxEdgeCountIncreased(int newValue) throws RemoteException;
+	public void maxEdgeCountIncreased(int newValue);
 
 	/**
 	 * This method is called after the maximum incidence count has been increased to
@@ -110,7 +110,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 * @param newValue
 	 *            the new value of <code>maxECount</code>.
 	 */
-	public void maxIncidenceCountIncreased(int newValue) throws RemoteException;
+	public void maxIncidenceCountIncreased(int newValue);
 
 	/**
 	 * This method is called after the Incidence <code>i</code> has been added to the
@@ -120,7 +120,7 @@ public interface GraphStructureChangedListener extends Remote {
 	 *            the incidence that has been added.
 	 * @throws RemoteException 
 	 */
-	public void incidenceAdded(Incidence i) throws RemoteException;
+	public void incidenceAdded(Incidence i);
 
 	/**
 	 * This method is called before the Incidence <code>i</code> is deleted.
@@ -129,5 +129,5 @@ public interface GraphStructureChangedListener extends Remote {
 	 *            the incidence that is about to be deleted.
 	 * @throws RemoteException 
 	 */
-	void incidenceDeleted(Incidence i) throws RemoteException;
+	void incidenceDeleted(Incidence i);
 }

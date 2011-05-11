@@ -24,7 +24,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	boolean loading = false;
 
-	protected PartialGraphImpl(GraphClass cls, String uidOfCompleteGraph, String hostnameOfCompleteGraph) throws RemoteException {
+	protected PartialGraphImpl(GraphClass cls, String uidOfCompleteGraph, String hostnameOfCompleteGraph) {
 		super(cls);
 		//create local graph database
 		graphDatabase = new PartialGraphDatabase(this, hostnameOfCompleteGraph);
@@ -46,7 +46,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * vertex are treated as a change.
 	 */
 	@Override
-	public void graphModified() throws RemoteException {
+	public void graphModified() {
 		graphVersion++;
 		completeGraph.graphModified();
 	}
@@ -57,7 +57,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * creation and deletion or reordering of vertices.
 	 */
 	@Override
-	protected void vertexListModified() throws RemoteException {
+	protected void vertexListModified() {
 		vertexListVersion++;
 		graphVersion++;
 		completeGraph.vertexListModified();
@@ -69,7 +69,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * creation and deletion or reordering of vertices.
 	 */
 	@Override
-	protected void edgeListModified() throws RemoteException {
+	protected void edgeListModified() {
 		edgeListVersion++;
 		graphVersion++;
 		completeGraph.edgeListModified();
@@ -80,7 +80,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * partial graphs
 	 */
 	@Override
-	public boolean containsEdge(Edge e) throws RemoteException {
+	public boolean containsEdge(Edge e) {
 		return (e != null) && (e.getGraph() == this)
 				&& containsEdgeId(((EdgeImpl) e).id);
 	}
@@ -90,7 +90,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 * partial graphs
 	 */
 	@Override
-	public boolean containsVertex(Vertex v) throws RemoteException {
+	public boolean containsVertex(Vertex v) {
 //TODO
 		return false;
 	}
@@ -101,7 +101,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public void deleteEdge(Edge e) throws RemoteException {
+	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		internalDeleteEdge(e);
 		edgeListModified();
@@ -113,7 +113,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public String getCompleteGraphUid() throws RemoteException {
+	public String getCompleteGraphUid() {
 		return getCompleteGraph().getCompleteGraphUid();
 	}
 

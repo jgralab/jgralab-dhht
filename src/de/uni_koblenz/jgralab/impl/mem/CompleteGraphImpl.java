@@ -92,7 +92,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected CompleteGraphImpl(String id, GraphClass cls) throws RemoteException {
+	protected CompleteGraphImpl(String id, GraphClass cls) {
 		this(id, cls, 1000, 1000);
 	}
 
@@ -106,7 +106,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param eMax
 	 *            initial maximum number of edges
 	 */
-	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) throws RemoteException {
+	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) {
 		super(cls);
 		this.uid = uid;
 		if (vMax < 1) {
@@ -143,12 +143,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	/** should be called by all delete partial graph operations 
 	 * @throws RemoteException */
-	public void internalDeletePartialGraph(PartialGraphImpl graph) throws RemoteException {
+	public void internalDeletePartialGraph(PartialGraphImpl graph) {
 		partialGraphIds.add(graph.getPartialGraphId());
 	}
 
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) throws RemoteException {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
 		return vertex.connect(cls, edge);
 	}
 
@@ -158,7 +158,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @see de.uni_koblenz.jgralab.Graph#deleteEdge(de.uni_koblenz.jgralab.Edge)
 	 */
 	@Override
-	public void deleteEdge(Edge e)  throws RemoteException{
+	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		internalDeleteEdge(e);
 		edgeListModified();
@@ -171,7 +171,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * de.uni_koblenz.jgralab.Graph#deleteVertex(de.uni_koblenz.jgralab.Vertex)
 	 */
 	@Override
-	public void deleteVertex(Vertex v)  throws RemoteException{
+	public void deleteVertex(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
 
 		getDeleteVertexList().add((VertexImpl) v);
@@ -259,7 +259,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param edge
 	 *            an edge
 	 */
-	private void internalDeleteEdge(Edge edge) throws RemoteException {
+	private void internalDeleteEdge(Edge edge) {
 		assert (edge != null) && edge.isValid() && containsEdge(edge);
 
 		EdgeImpl e = (EdgeImpl) edge;
@@ -287,7 +287,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * this graph. Possibly, cascading deletes of child vertices occur when
 	 * parent vertices of Composition classes are deleted.
 	 */
-	private void internalDeleteVertex()  throws RemoteException {
+	private void internalDeleteVertex()  {
 		boolean edgeHasBeenDeleted = false;
 		while (!getDeleteVertexList().isEmpty()) {
 			VertexImpl v = getDeleteVertexList().remove(0);
@@ -354,7 +354,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) throws RemoteException {
+	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -404,7 +404,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) throws RemoteException {
+	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -444,7 +444,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 *            the vertex to be moved
 	 */
 	protected void putVertexAfter(VertexImpl targetVertex,
-			VertexImpl movedVertex) throws RemoteException {
+			VertexImpl movedVertex) {
 		assert (targetVertex != null) && targetVertex.isValid()
 				&& containsVertex(targetVertex);
 		assert (movedVertex != null) && movedVertex.isValid()
@@ -497,7 +497,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param movedVertex
 	 *            the vertex to be moved
 	 */
-	protected void putVertexBefore(VertexImpl targetVertex,	VertexImpl movedVertex) throws RemoteException {
+	protected void putVertexBefore(VertexImpl targetVertex,	VertexImpl movedVertex) {
 		assert (targetVertex != null) && targetVertex.isValid()
 				&& containsVertex(targetVertex);
 		assert (movedVertex != null) && movedVertex.isValid()
@@ -561,7 +561,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param e
 	 *            an edge
 	 */
-	protected void removeEdgeFromESeq(EdgeImpl e) throws RemoteException {
+	protected void removeEdgeFromESeq(EdgeImpl e) {
 		assert e != null;
 		removeEdgeFromESeqWithoutDeletingIt(e);
 
@@ -574,7 +574,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		setECount(getECount() - 1);
 	}
 
-	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) throws RemoteException {
+	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
 		if (e == getFirstEdge()) {
 			// delete at head of edge list
 			setFirstEdge((EdgeImpl) e.getNextEdge());
@@ -604,7 +604,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @param v
 	 *            a vertex
 	 */
-	protected void removeVertexFromVSeq(VertexImpl v) throws RemoteException {
+	protected void removeVertexFromVSeq(VertexImpl v) {
 		assert v != null;
 		if (v == getFirstVertex()) {
 			// delete at head of vertex list

@@ -29,7 +29,7 @@ public interface BinaryEdge extends Edge {
 	 * @throws UnsupportedOpperationException
 	 *             if this {@link Edge} is not binary.
 	 */
-	public Vertex getAlpha() throws RemoteException;
+	public Vertex getAlpha();
 
 	/**
 	 * Returns the end {@link Vertex} of this {@link BinaryEdge}.
@@ -38,7 +38,7 @@ public interface BinaryEdge extends Edge {
 	 * @throws UnsupportedOpperationException
 	 *             if this {@link Edge} is not binary.
 	 */
-	public Vertex getOmega() throws RemoteException;
+	public Vertex getOmega();
 
 	/**
 	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
@@ -46,7 +46,7 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getSemantics() throws RemoteException;
+	public IncidenceType getSemantics();
 
 	/**
 	 * The semanctics of the alpha {@link Incidence} of this {@link Edge}, e.g.
@@ -55,7 +55,7 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getAlphaSemantics() throws RemoteException;
+	public IncidenceType getAlphaSemantics();
 
 	/**
 	 * The semanctics of the omega {@link Incidence} of this {@link Edge}, e.g.
@@ -64,6 +64,6 @@ public interface BinaryEdge extends Edge {
 	 * 
 	 * @return {@link IncidenceType}
 	 */
-	public IncidenceType getOmegaSemantics() throws RemoteException;
+	public IncidenceType getOmegaSemantics();
 
 }

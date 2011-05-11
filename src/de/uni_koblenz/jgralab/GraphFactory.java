@@ -84,7 +84,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public ViewGraphImpl createViewGraph(Graph viewGraph, int level) throws RemoteException;
+	public ViewGraphImpl createViewGraph(Graph viewGraph, int level);
 	
 	/**
 	 * creates a View-Graph object for the specified class. The returned object
@@ -95,7 +95,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraphDiskBasedStorage(Graph viewGraph, int level) throws RemoteException;
+	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraphDiskBasedStorage(Graph viewGraph, int level);
 
 
 	/**
@@ -106,7 +106,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex) throws RemoteException;
+	public SubordinateGraphImpl createSubordinateGraph(Vertex vertex);
 	
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -116,7 +116,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Vertex vertex) throws RemoteException;
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Vertex vertex);
 	
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -126,7 +126,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public SubordinateGraphImpl createSubordinateGraph(Edge edge) throws RemoteException;
+	public SubordinateGraphImpl createSubordinateGraph(Edge edge);
 	
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -136,7 +136,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Edge edge) throws RemoteException;
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Edge edge);
 
 	/**
 	 * creates a PartialSubordinate-Graph object for the specified class. The
@@ -148,7 +148,7 @@ public interface GraphFactory {
 	 * @throws RemoteException 
 	 */
 	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
-			GraphElement<?, ?, ?> elem) throws RemoteException;
+			GraphElement<?, ?, ?> elem);
 	
 	/**
 	 * creates a PartialSubordinate-Graph object for the specified class. The
@@ -160,7 +160,7 @@ public interface GraphFactory {
 	 * @throws RemoteException 
 	 */
 	public de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl createPartialSubordinateGraphDiskBasedStorage(
-			GraphElement<?, ?, ?> elem) throws RemoteException;
+			GraphElement<?, ?, ?> elem);
 
 	/**
 	 * creates a Partial-Graph object for the specified remote graph. The
@@ -170,7 +170,7 @@ public interface GraphFactory {
 	 * @param compelteGraph
 	 * @return
 	 */
-	public PartialGraphImpl createPartialGraph(Graph completeGraph) throws RemoteException;
+	public PartialGraphImpl createPartialGraph(Graph completeGraph);
 	
 	/**
 	 * creates a Partial-Graph object for the specified remote graph. The
@@ -180,7 +180,7 @@ public interface GraphFactory {
 	 * @param compelteGraph
 	 * @return
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl createPartialGraphDiskBasedStorage(Graph completeGraph) throws RemoteException;
+	public de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl createPartialGraphDiskBasedStorage(Graph completeGraph);
 
 
 	/**

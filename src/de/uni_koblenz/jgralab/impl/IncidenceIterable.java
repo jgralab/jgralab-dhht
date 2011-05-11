@@ -109,7 +109,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(
 				Graph traversalContext,
 				GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
-				Class<? extends Incidence> ic, Direction dir) throws RemoteException {
+				Class<? extends Incidence> ic, Direction dir)  {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;

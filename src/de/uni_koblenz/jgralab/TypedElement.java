@@ -9,14 +9,14 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 public interface TypedElement<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
-                 extends Comparable<ConcreteInterface>, Remote {
+                 extends Comparable<ConcreteInterface> {
 
 	/**
 	 * Returns the m1-class of this {@link AttributedElement}.
 	 * 
 	 * @return {@link Class}
 	 */
-	public abstract Class<? extends ConcreteInterface> getM1Class() throws RemoteException;
+	public abstract Class<? extends ConcreteInterface> getM1Class();
 	
 	/**
 	 * Returns the {@link GraphClass} of which this {@link Graph} is an instance
@@ -24,14 +24,14 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 * 
 	 * @return {@link GraphClass}
 	 */
-	public ConcreteMetaClass getType() throws RemoteException;
+	public ConcreteMetaClass getType();
 
-	public GraphClass getGraphClass() throws RemoteException;
+	public GraphClass getGraphClass();
 
 	/**
 	 * @return the schema this AttributedElement belongs to
 	 */
-	public Schema getSchema() throws RemoteException;
+	public Schema getSchema();
 	
 	/**
 	 * Returns the M1 implementation class for this IncidenceClass.
