@@ -237,6 +237,12 @@ public class GraphIO {
 	private ArrayList<String> incidenceTypes;
 
 	/**
+	 * Stores the Incidences.<br>
+	 * <code>incidenceObject.get(i)</code> = the Incidence with id i.
+	 */
+	private ArrayList<Incidence> incidenceObject;
+
+	/**
 	 * Stores the incidence information of incidences.<br>
 	 * <code>incidence.get(i)[0]</code> = id of incidence vertex<br>
 	 * <code>incidence.get(i)[1]</code> = id of incidence edge<br>
@@ -2967,10 +2973,11 @@ public class GraphIO {
 
 		createPartialGraphs();
 		createIncidences(graph);
-		sortLambdaSequenceAtVertex(graph);
+		sortLambdaSequences(graph);
 		setSigmas(graph);
-
-		graph.setGraphVersion(graphVersion);
+		if (graph instanceof CompleteGraphImpl) {
+			((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+		}
 		if (pf != null) {
 			pf.finished();
 		}
@@ -2978,20 +2985,34 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void createIncidences(Graph graph) {
+	private void createIncidences(Graph graph) throws RemoteException {
+		int iId = 0;
 		for (Integer[] incidence : incidences) {
 			if (incidences != null) {
 				assert incidence.length == 2;
-
-				// TODO ids von partiellen Graphen bekannt
-				// machen!!!!!!!!!!!!!!!!!
+				assert incidence[0] != 0 && incidence[1] != 0;
+				Vertex v = graph.getVertex(incidence[0]);
+				Edge e = graph.getEdge(incidence[1]);
+				Incidence i = e.connect(incidenceTypes.get(iId), v);
+				insertElementInSequence(iId, i, incidenceObject);
 			}
+			iId++;
 		}
 	}
 
-	private void setSigmas(Graph graph) {
-		// TODO Auto-generated method stub
-
+	private void setSigmas(Graph graph) throws NumberFormatException,
+			RemoteException {
+		for (Entry<GraphElement<?, ?, ?>, String> sigma : sigmasOfGraphElement
+				.entrySet()) {
+			int parentId = Integer.parseInt(sigma.getValue().substring(1));
+			GraphElementImpl<?, ?, ?> parent;
+			if (sigma.getValue().startsWith("v")) {
+				parent = (GraphElementImpl<?, ?, ?>) graph.getVertex(parentId);
+			} else {
+				parent = (GraphElementImpl<?, ?, ?>) graph.getEdge(parentId);
+			}
+			((GraphElementImpl<?, ?, ?>) sigma.getKey()).setSigma(parent);
+		}
 	}
 
 	private void createPartialGraphs() throws GraphIOException {
@@ -3029,19 +3050,34 @@ public class GraphIO {
 		match("}");
 	}
 
-	private void sortLambdaSequenceAtVertex(CompleteGraphImpl graph)
-			throws RemoteException {
+	private void sortLambdaSequences(Graph graph) throws RemoteException {
+		// sort lambda sequence at vertices
 		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();
-			for (Integer[] incArray : incidencesAtVertex[v.getId()]) {
-				if (incArray == null) {
+			for (Integer incidenceId : incidencesAtVertex[v.getId()]) {
+				if (incidenceId == null) {
 					continue;
 				}
-				Incidence current = incidenceTypes[incArray[0]][incArray[1]];
+				Incidence current = incidenceObject.get(incidenceId);
 				if (current == firstUnsorted) {
 					firstUnsorted = firstUnsorted.getNextIncidenceAtVertex();
 				} else {
 					current.putBeforeAtVertex(firstUnsorted);
+				}
+			}
+		}
+		// sort lambda sequence at edges
+		for (Edge e : graph.getEdges()) {
+			Incidence firstUnsorted = e.getFirstIncidence();
+			for (Integer incidenceId : incidencesAtEdge[e.getId()]) {
+				if (incidenceId == null) {
+					continue;
+				}
+				Incidence current = incidenceObject.get(incidenceId);
+				if (current == firstUnsorted) {
+					firstUnsorted = firstUnsorted.getNextIncidenceAtEdge();
+				} else {
+					current.putBeforeAtEdge(firstUnsorted);
 				}
 			}
 		}
