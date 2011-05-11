@@ -11,8 +11,10 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 
@@ -27,9 +29,9 @@ public abstract class GraphDatabase implements Remote {
 	
 	private Schema schema;
 	
-	private CompleteOrPartialGraphImpl localGraph;
+	protected CompleteOrPartialGraphImpl localGraph;
 	
-	private final int localGraphId;
+	protected final int localGraphId;
 	
 	protected DiskStorageManager diskStorage;
 	
@@ -46,7 +48,7 @@ public abstract class GraphDatabase implements Remote {
 	/* stores the graph databases for the partial graphs, these elements
 	 * may be local proxies for the remote elements automatically created by RMI
 	 */
-	private GraphDatabase[] partialGraphDatabases;
+	protected GraphDatabase[] partialGraphDatabases;
 	
 //	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
 	
@@ -86,7 +88,9 @@ public abstract class GraphDatabase implements Remote {
 	protected abstract String getHostname(int id);
 	
 
-	public abstract int getFreePartialGraphId();
+	protected abstract int getFreePartialGraphId();
+	
+	protected abstract void releasePartialGraphId(int partialGraphId);
 	
 	/**
 	 * Registers the partial graph with the given id <code>id</code> which is stored on the
@@ -95,6 +99,12 @@ public abstract class GraphDatabase implements Remote {
 	 * @param hostname
 	 */
 	public abstract void registerPartialGraph(int id, String hostname);
+	
+	public abstract Graph createPartialGraph(GraphClass gc, String hostname);
+	
+	public abstract void deletePartialGraph(int partialGraphId);
+	
+	
 	
 	
 	//Methods to access Graph, vertex, edge and incidence objects
@@ -221,5 +231,11 @@ public abstract class GraphDatabase implements Remote {
 	int getLastVertex(int partialGraphId) {
 		return 0;
 	}
+
+	public int getLocalGraphId() {
+		return localGraphId;
+	}
+
+
 
 }

@@ -20,19 +20,22 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
 	/* holds the graph this partial graph belongs to */
-	protected GraphBaseImpl completeGraph;
+	protected Graph completeGraph;
 
 	boolean loading = false;
 
-	protected PartialGraphImpl(GraphClass cls, GraphBaseImpl completeGraph) throws RemoteException {
+	protected PartialGraphImpl(GraphClass cls, String uidOfCompleteGraph, String hostnameOfCompleteGraph) throws RemoteException {
 		super(cls);
-		this.completeGraph = completeGraph;
+		//create local graph database
+		graphDatabase = new PartialGraphDatabase(this, hostnameOfCompleteGraph);
+		id = graphDatabase.getLocalGraphId();
+		this.completeGraph = graphDatabase.getGraphObject(0);
 		id = ((CompleteGraphImpl) completeGraph.getCompleteGraph())
 				.allocateFreePartialGraphId();
 	}
 
 	@Override
-	public GraphBaseImpl getCompleteGraph() {
+	public Graph getCompleteGraph() {
 		return completeGraph;
 	}
 

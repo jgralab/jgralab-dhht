@@ -1055,7 +1055,7 @@ public abstract class GraphBaseImpl implements Graph {
 	/**
 	 * @return the complete top-level DHHTGraph
 	 */
-	public abstract GraphBaseImpl getCompleteGraph() throws RemoteException;
+	public abstract Graph getCompleteGraph() throws RemoteException;
 
 	/**
 	 * checks if the vertex v is contained directly in this graph, ant not as a
