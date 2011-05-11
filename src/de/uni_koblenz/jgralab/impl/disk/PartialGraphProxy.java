@@ -8,7 +8,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author dbildh
  *
  */
-public class PartialGraphProxy implements Graph {
+public abstract class PartialGraphProxy implements Graph {
 	
 	/* id of the partial graph */
 	private int id;
@@ -25,11 +25,6 @@ public class PartialGraphProxy implements Graph {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Vertex getFirstVertex() {
-		int vertexId = 
-		return storageManager.getVertex(vertexId);	
-	}
-	
 	
 
 }

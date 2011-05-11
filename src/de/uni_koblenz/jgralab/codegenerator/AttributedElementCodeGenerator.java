@@ -58,7 +58,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 			String schemaRootPackageName, CodeGeneratorConfiguration config) {
 		super(attributedElementClass, schemaRootPackageName,
 				attributedElementClass.getPackageName(), config);
-		addImports("java.rmi.RemoteException");
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.NoSuchAttributeException");
 		code.addNoIndent(new CodeSnippet(true,
-				"public Object getAttribute(String attributeName) throws java.rmi.RemoteException {"));
+				"public Object getAttribute(String attributeName) {"));
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
 			s.setVariable("name", attr.getName());
@@ -133,7 +132,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if (suppressWarningsNeeded) {
 			snip.add("@SuppressWarnings(\"unchecked\")");
 		}
-		snip.add("public void setAttribute(String attributeName, Object data) throws java.rmi.RemoteException {");
+		snip.add("public void setAttribute(String attributeName, Object data) {");
 		code.addNoIndent(snip);
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
@@ -211,11 +210,11 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#() throws java.rmi.RemoteException;");
+			code.add("public #type# #isOrGet#_#name#();");
 			break;
 		case DISKBASED:
 		case MEMORYBASED:
-			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+			code.add("public #type# #isOrGet#_#name#()  {",
 					"\treturn _#name#;",
 					"}");
 			break;
@@ -232,11 +231,11 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException;");
+			code.add("public void set_#name#(#type# _#name#);");
 			break;
 		case DISKBASED:
 		case MEMORYBASED:
-			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
+			code.add("public void set_#name#(#type# _#name#) {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
 			break;
 		}

@@ -171,7 +171,6 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-		try {
 		for (Attribute attr : getType().getAttributeList()) {
 			try {
 				if ((attr.getDefaultValueAsString() != null)
@@ -181,9 +180,6 @@ public abstract class GraphBaseImpl implements Graph {
 			} catch (GraphIOException e) {
 				e.printStackTrace();
 			}
-		}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -221,7 +217,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param traversalContext {@link Graph}
 	 */
 	protected void setTraversalContext(Graph traversalContext)  {
-		(getCompleteGraph()).setTraversalContext(traversalContext);
+		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
@@ -231,7 +227,7 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public void useAsTraversalContext() {
-		(getCompleteGraph()).setTraversalContext(this);
+		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override

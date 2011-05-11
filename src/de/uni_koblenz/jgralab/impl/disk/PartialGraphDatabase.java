@@ -45,4 +45,22 @@ public class PartialGraphDatabase extends GraphDatabase {
 		completeGraphDatabase.deletePartialGraph(partialGraphId);
 	}
 	
+	public void edgeListModified() {
+		edgeListVersion++;
+		completeGraphDatabase.edgeListModified();
+	}
+	
+	public void vertexListModified() {
+		vertexListVersion++;
+		completeGraphDatabase.vertexListModified();
+	}
+	
+	public void graphModified() {
+		graphVersion++;
+		completeGraphDatabase.graphModified();
+	}
+	
+	
+	
+	
 }

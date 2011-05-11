@@ -39,6 +39,12 @@ public abstract class GraphDatabase implements Remote {
 	
 	protected GraphFactory factory;
 	
+	protected long edgeListVersion = 0;
+	
+	protected long vertexListVersion = 0;
+	
+	protected long graphVersion = 0;
+	
 
 	/*
 	 * The list of local (proxy) objects for the remote graphs
@@ -61,7 +67,7 @@ public abstract class GraphDatabase implements Remote {
 	
 	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph) {
 		this.localGraph = localGraph;
-		localGraphId = localGraph.getId();
+		localGraphId = localGraph.getPartialGraphId();
 		diskStorage = localGraph.getDiskStorage();
 		factory = localGraph.graphFactory;
 		partialGraphs = new Graph[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
@@ -235,7 +241,11 @@ public abstract class GraphDatabase implements Remote {
 	public int getLocalGraphId() {
 		return localGraphId;
 	}
-
-
+	
+	public abstract void edgeListModified();
+	
+	public abstract void vertexListModified();
+	
+	public abstract void graphModified();
 
 }

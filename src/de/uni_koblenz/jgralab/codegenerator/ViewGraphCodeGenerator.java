@@ -238,7 +238,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("createSuffix", "");
 		code.add("",
-				 "public #simpleImplClassName#(#schemaPackageName#.#simpleClassName# viewedGraph, int kappa) throws java.rmi.RemoteException {",
+				 "public #simpleImplClassName#(#schemaPackageName#.#simpleClassName# viewedGraph, int kappa) {",
 				 "\tsuper(viewedGraph, kappa);",
 				 "}",
 				 "",
@@ -302,9 +302,9 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
 			}
 			code.add(" */",
-					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#);");
 		} else {
-			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
+			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
 					"\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
 				 	"}");
 			code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
@@ -340,10 +340,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 					  	 " * @param omega the target vertex of the edge");
 			}
 			code.add("*/",
-					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
-			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class);",
 					 "\treturn new#ecType#;", "}");
 		}
@@ -434,10 +434,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			s.add("/**");
 			s.add(" * @return an Iterable for all #elemClassPluralName# of this graph that are of type #elemQualifiedName# or subtypes.");
 			s.add(" */");
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException;");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#();");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException {");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
 		}
@@ -450,10 +450,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				s.add(" *");
 				s.add(" * @param noSubClasses toggles wether subclasses of #elemQualifiedName# should be excluded");
 				s.add(" */");
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException;");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses);");
 			}
 			if (currentCycle.isMemOrDiskImpl()) {
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException {");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) {");
 				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
 				s.add("}\n");
 			}
@@ -478,10 +478,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#() throws RemoteException;");
+			code.add("public #type# #isOrGet#_#name#() ;");
 			break;
 		case MEMORYBASED:
-			code.add("public #type# #isOrGet#_#name#() throws RemoteException {", 
+			code.add("public #type# #isOrGet#_#name#()  {", 
 					"\treturn getSuperordinateGraph().get_#name#();",
 					"}");
 			break;
@@ -498,10 +498,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#) throws RemoteException;");
+			code.add("public void set_#name#(#type# _#name#) ;");
 			break;
 		case MEMORYBASED:
-			code.add("public void set_#name#(#type# _#name#) throws RemoteException {",
+			code.add("public void set_#name#(#type# _#name#)  {",
 					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
 			break;
 		}

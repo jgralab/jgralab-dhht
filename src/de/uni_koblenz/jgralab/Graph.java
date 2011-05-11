@@ -843,5 +843,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	public Collection<? extends Graph> getPartialGraphs();
 
+
 	
 }

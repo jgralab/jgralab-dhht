@@ -75,7 +75,17 @@ public class CompleteGraphDatabase extends GraphDatabase {
 	}
 	
 
-
+	public void edgeListModified() {
+		edgeListVersion++;
+	}
+	
+	public void vertexListModified() {
+		vertexListVersion++;
+	}
+	
+	public void graphModified() {
+		graphVersion++;
+	}
 	
 	
 	

@@ -155,15 +155,15 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#() throws java.rmi.RemoteException;");
+			code.add("public #type# #isOrGet#_#name#();");
 			break;
 		case MEMORYBASED:
-			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\treturn _#name#;",
 					 "}");
 			break;
 		case DISKBASED:
-			code.add("public #type# #isOrGet#_#name#()  throws java.rmi.RemoteException {",
+			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\tif (attributeContainer == null) {",
 					 "\t\tattributeContainer = loadAttributeContainer();",
 					 "\t}",
@@ -183,15 +183,15 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException;");
+			code.add("public void set_#name#(#type# _#name#);");
 			break;
 		case MEMORYBASED:
-			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
+			code.add("public void set_#name#(#type# _#name#) {",
 					 "\t_#name# = _#name#;", 
 					 "\tgraphModified();", "}");
 			break;
 		case DISKBASED:
-			code.add("public void set_#name#(#type# _#name#) throws java.rmi.RemoteException {",
+			code.add("public void set_#name#(#type# _#name#) {",
 					 "\tif (attributeContainer == null) {",
 					 "\t\tattributeContainer = loadAttributeContainer();",
 					 "\t}",
@@ -210,7 +210,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("@Override");
-		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) throws java.rmi.RemoteException {");
+		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) {");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
 			if (ic.getRolename() != null && ic.getRolename().length() > 0) {
@@ -275,10 +275,10 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 				s.add(" * @param noSubclass if set to true, only incidence of class #incidenceClassName# but not of subclasses will be returned");
 			}
 			s.add("*/",
-				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException;"); 	
+				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#);"); 	
 		} else {
 			s.add("@Override",
-			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) throws java.rmi.RemoteException {");
+			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) {");
 			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
 			s.add("}");
 			
@@ -339,11 +339,11 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#);");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("@Override",
-					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) throws java.rmi.RemoteException {",
+					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",
 					 "}");
 		}

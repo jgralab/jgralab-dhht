@@ -1,7 +1,5 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
@@ -22,9 +20,8 @@ public abstract class PartialSubordinateGraphImpl extends PartialGraphImpl {
 
 	private final GraphElement<?, ?, ?> containingElement;
 
-	protected PartialSubordinateGraphImpl(String id, GraphClass cls,
-			GraphElement<?, ?, ?> elem, String hostname) {
-		super(cls, (GraphBaseImpl) elem.getGraph(), hostname);
+	protected PartialSubordinateGraphImpl(GraphClass cls, GraphElement elem, GraphDatabase graphDatabase) {
+		super(cls, graphDatabase);
 		containingElement = elem;
 	}
 

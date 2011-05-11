@@ -158,13 +158,9 @@ public final class DiskStorageManager {
 	
 	public DiskStorageManager(Graph graph) throws FileNotFoundException {
 		this.graph = graph;
-		try {
-			this.localPartialGraphId = graph.getPartialGraphId();
-			factory = graph.getGraphFactory();
-			schema = graph.getSchema();
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		this.localPartialGraphId = graph.getPartialGraphId();
+		factory = graph.getGraphFactory();
+		schema = graph.getSchema();
 		randomId = Long.toString(System.currentTimeMillis());
 		vertexFiles = new FileChannel[ELEMENT_CONTAINER_COUNT];
 		edgeFiles = new FileChannel[ELEMENT_CONTAINER_COUNT];
@@ -705,7 +701,6 @@ public final class DiskStorageManager {
 
 	
 	public final Incidence getIncidenceObject(int id) {
-		try {
 			if (id == 0)
 				return null;
 			IncidenceContainer container = getIncidenceStorage(id);
@@ -723,10 +718,6 @@ public final class DiskStorageManager {
 			} else {
 				return null;
 			}	
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 	}
 
 

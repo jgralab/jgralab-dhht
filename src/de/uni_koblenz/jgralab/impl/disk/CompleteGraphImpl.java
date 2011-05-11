@@ -84,10 +84,6 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		setTraversalContext(this);
 	}
 	
-	public void setHostname(String hostname) {
-		graphDatabase.setHostname(hostname);
-	}
-
 	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
@@ -542,7 +538,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		freeEdgeIndex(e.getId());
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
-		backgroundStorage.removeEdgeFromBackgroundStorage(e);
+		diskStorage.removeEdgeFromBackgroundStorage(e);
 		e.setId(0);
 		setECount(getECount() - 1);
 	}
@@ -606,7 +602,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		freeVertexIndex(v.getId());
 		v.setPreviousVertex(null);
 		v.setNextVertex(null);
-		backgroundStorage.removeVertexFromBackgroundStorage(v);
+		diskStorage.removeVertexFromBackgroundStorage(v);
 		v.setId(0);
 		setVCount(getVCount() - 1);
 	}

@@ -229,38 +229,38 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.setVariable("createSuffix", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
 			code.add(
 							"/* Constructors and create methods with values for initial vertex and edge count */",
-							"public #simpleClassName#Impl(int vMax, int eMax) throws java.rmi.RemoteException {",
+							"public #simpleClassName#Impl(int vMax, int eMax) {",
 							"\tthis(null, vMax, eMax);",
 							"}",
 							"",
-							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) throws java.rmi.RemoteException {",
+							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
 							"\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
 							"\tinitializeAttributesWithDefaultValues();",
 							"}",
 							"",
-							"public static #javaClassName# create(int vMax, int eMax) throws java.rmi.RemoteException {",
+							"public static #javaClassName# create(int vMax, int eMax) {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null, vMax, eMax);",
 							"}",
 							"",
-							"public static #javaClassName# create(String id, int vMax, int eMax) throws java.rmi.RemoteException {",
+							"public static #javaClassName# create(String id, int vMax, int eMax) {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id, vMax, eMax);",
 							"}",
 							"",
 							"/* Constructors and create methods without values for initial vertex and edge count */",
-							"public #simpleClassName#Impl() throws java.rmi.RemoteException {",
+							"public #simpleClassName#Impl() {",
 							"\tthis(null);",
 							"}",
 							"",
-							"public #simpleClassName#Impl(java.lang.String id) throws java.rmi.RemoteException {",
+							"public #simpleClassName#Impl(java.lang.String id) {",
 							"\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
 							"\tinitializeAttributesWithDefaultValues();",
 							"}",
 							"",
-							"public static #javaClassName# create() throws java.rmi.RemoteException {",
+							"public static #javaClassName# create() {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null);",
 							"}",
 							"",
-							"public static #javaClassName# create(String id) throws java.rmi.RemoteException {",
+							"public static #javaClassName# create(String id) {",
 							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id);",
 							"}");
 	
@@ -331,9 +331,9 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #ecSimpleName# are accepted");
 			}
 			code.add(" */",
-					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#);");
 		} else {
-			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
+			code.add("public #ecJavaClassName# getFirst#ecCamelName#(#formalParams#) {",
 					"\treturn (#ecJavaClassName#)getFirst#ecType#(#schemaName#.instance().#ecSchemaVariableName##actualParams#);",
 				 	"}");
 			code.setVariable("actualParams", (withTypeFlag ? ", noSubClasses"	: ""));
@@ -369,11 +369,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 					  	 " * @param omega the target vertex of the edge");
 			}
 			code.add("*/",
-					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
-			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) throws java.rmi.RemoteException {",
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
 					 "\treturn new#ecType#;", "}");
 			code.setVariable("additionalParams", "");
@@ -468,10 +468,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			s.add("/**");
 			s.add(" * @return an Iterable for all #elemClassPluralName# of this graph that are of type #elemQualifiedName# or subtypes.");
 			s.add(" */");
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException;");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#();");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
-			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() throws java.rmi.RemoteException {");
+			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
 		}
@@ -484,10 +484,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				s.add(" *");
 				s.add(" * @param noSubClasses toggles wether subclasses of #elemQualifiedName# should be excluded");
 				s.add(" */");
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException;");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses);");
 			}
 			if (currentCycle.isMemOrDiskImpl()) {
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) throws java.rmi.RemoteException {");
+				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) {");
 				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
 				s.add("}\n");
 			}

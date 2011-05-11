@@ -131,7 +131,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetTypeMethod() {
 		return new CodeSnippet(
 				true,
-				"public final #jgSchemaPackage#.#graphElementClass#Class getType() throws java.rmi.RemoteException {",
+				"public final #jgSchemaPackage#.#graphElementClass#Class getType() {",
 				"\treturn #schemaPackageName#.#schemaName#.instance().#schemaVariableName#;",
 				"}");
 	}
@@ -140,7 +140,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetM1ClassMethod() {
 		return new CodeSnippet(
 				true,
-				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1Class() throws java.rmi.RemoteException {",
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1Class() {",
 				"\treturn #javaClassName#.class;", "}");
 	}
 
@@ -148,7 +148,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	protected CodeBlock createGetM1ImplementationClassMethod() {
 		return new CodeSnippet(
 				true,
-				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1ImplementationClass() throws java.rmi.RemoteException {",
+				"public final java.lang.Class<? extends #jgPackage#.#graphElementClass#> getM1ImplementationClass() {",
 				"\treturn #javaImplClassName#.class;", "}");
 	}
 

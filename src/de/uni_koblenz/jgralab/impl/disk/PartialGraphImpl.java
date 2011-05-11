@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -14,29 +13,26 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * TODO: - Implement add and delete edge/vertex operations with correct linking
  * on next/previous vertex in global graph -
  * 
+ * TODO: Check if CompleteGraph and PartialGraph may be combined to onw class, since 
+ * all aspects related to distribution are kept in the databases
+ * 
  * @author dbildh
  * 
  */
 public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 
-	/* holds the graph this partial graph belongs to */
-	protected Graph completeGraph;
-
 	boolean loading = false;
 
-	protected PartialGraphImpl(GraphClass cls, String uidOfCompleteGraph, String hostnameOfCompleteGraph) {
+	protected PartialGraphImpl(GraphClass cls, GraphDatabase graphDatabase) {
 		super(cls);
 		//create local graph database
-		graphDatabase = new PartialGraphDatabase(this, hostnameOfCompleteGraph);
+		this.graphDatabase = graphDatabase;
 		id = graphDatabase.getLocalGraphId();
-		this.completeGraph = graphDatabase.getGraphObject(0);
-		id = ((CompleteGraphImpl) completeGraph.getCompleteGraph())
-				.allocateFreePartialGraphId();
 	}
 
 	@Override
 	public Graph getCompleteGraph() {
-		return completeGraph;
+		return graphDatabase.getGraphObject(0);
 	}
 
 	/**
@@ -47,8 +43,7 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 */
 	@Override
 	public void graphModified() {
-		graphVersion++;
-		completeGraph.graphModified();
+		graphDatabase.graphModified();
 	}
 
 	/**
@@ -58,9 +53,8 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 */
 	@Override
 	protected void vertexListModified() {
-		vertexListVersion++;
-		graphVersion++;
-		completeGraph.vertexListModified();
+		graphDatabase.vertexListModified();
+		graphDatabase.graphModified();
 	}
 
 	/**
@@ -70,9 +64,8 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	 */
 	@Override
 	protected void edgeListModified() {
-		edgeListVersion++;
-		graphVersion++;
-		completeGraph.edgeListModified();
+		graphDatabase.edgeListModified();
+		graphDatabase.graphModified();
 	}
 
 	/*

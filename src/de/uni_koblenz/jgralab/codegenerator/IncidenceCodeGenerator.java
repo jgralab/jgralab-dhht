@@ -170,11 +170,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 				code.add(" * @param noSubClasses if set to <code>true</code>, no subclasses of #mcName# are accepted");
 			}
 			code.add(" */",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException;");
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
 		}
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("@Override",
-					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) throws java.rmi.RemoteException {",
+					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
 					 "}");
 		}

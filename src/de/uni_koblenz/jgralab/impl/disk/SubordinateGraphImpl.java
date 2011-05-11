@@ -621,7 +621,6 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public int compareTo(Graph arg0) {
-		try {
 			if (getCompleteGraph() == arg0) {
 				// each graph is smaller than the complete graph
 				return -1;
@@ -645,9 +644,6 @@ public abstract class SubordinateGraphImpl extends
 				// this is a ViewGraphImpl or PartialGraphImpl
 				return -arg0.compareTo(this);
 			}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	@Override
