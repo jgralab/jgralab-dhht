@@ -226,15 +226,23 @@ public class GraphIO {
 	 * with id i.<br>
 	 * <code>incidencesAtVertex[i].get(j)</code> = id of the {@link Incidence}<br>
 	 * If Integer[] is of length 1 it only contains the local id otherwise it
-	 * contains the partialGraphId followed by the id of the incidence
+	 * contains the id of the incidence followed by the partialGraphId
 	 */
 	private ArrayList<Integer[]>[] incidencesAtVertex;
 
 	/**
 	 * Stores the information about incidences and their types.<br>
-	 * <code>incidenceTypes[i]</code> = the type of the Incidence with id i.
+	 * <code>incidenceTypes.get(i)</code> = the type of the Incidence with id i.
 	 */
 	private ArrayList<String> incidenceTypes;
+
+	/**
+	 * Stores the incidence information of incidences.<br>
+	 * <code>incidence.get(i)[0]</code> = id of incidence vertex<br>
+	 * <code>incidence.get(i)[1]</code> = id of incidence edge<br>
+	 * i = id of incidence
+	 */
+	private ArrayList<Integer[]> incidences;
 
 	/**
 	 * The value is the sigma information of the graph element. If String[] is
@@ -2905,6 +2913,7 @@ public class GraphIO {
 		incidencesAtEdge = new ArrayList[maxE + 1];
 		incidencesAtVertex = new ArrayList[maxV + 1];
 		incidenceTypes = new ArrayList<String>();
+		incidences = new ArrayList<Integer[]>();
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
@@ -2962,14 +2971,9 @@ public class GraphIO {
 		}
 
 		createPartialGraphs();
-		createIncidences();
-		try {
-			sortLambdaSequenceAtVertex(graph);
-		} catch (RemoteException ex) {
-			// TODO
-			ex.printStackTrace();
-		}
-		setSigmas();
+		createIncidences(graph);
+		sortLambdaSequenceAtVertex(graph);
+		setSigmas(graph);
 
 		graph.setGraphVersion(graphVersion);
 		if (pf != null) {
@@ -2979,12 +2983,18 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void setSigmas() {
-		// TODO Auto-generated method stub
+	private void createIncidences(Graph graph) {
+		for (Integer[] incidence : incidences) {
+			if (incidences != null) {
+				assert incidence.length == 2;
 
+				// TODO ids von partiellen Graphen bekannt
+				// machen!!!!!!!!!!!!!!!!!
+			}
+		}
 	}
 
-	private void createIncidences() {
+	private void setSigmas(Graph graph) {
 		// TODO Auto-generated method stub
 
 	}
@@ -3157,6 +3167,12 @@ public class GraphIO {
 			}
 		}
 		Integer[] iId = new Integer[second == 0 ? 1 : 2];
+		if (second != 0) {
+			iId[0] = second;// id
+			iId[1] = first;// partialGraphId
+		} else {
+			iId[0] = first;
+		}
 		return iId;
 	}
 
@@ -3197,6 +3213,7 @@ public class GraphIO {
 			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge,
 					new Integer(incidenceId));
 			insertElementInSequence(incidenceId, incidenceName, incidenceTypes);
+			setIncidence(eId, incidenceId, false);
 		}
 	}
 
@@ -3216,8 +3233,22 @@ public class GraphIO {
 			iId = iId();
 			addToIncidenceList(incidencesAtVertex, vId, lambdaSeqPosAtVertex,
 					iId);
+			setIncidence(vId, iId[0], true);
 		}
 		match();
+	}
+
+	private void setIncidence(int gElemId, int incidenceId, boolean isVertex) {
+		for (int i = incidences.size(); i <= incidenceId; i++) {
+			// fill missing entries until graphElementId with null
+			incidences.add(null);
+		}
+		Integer[] incidenceInfo = incidences.get(incidenceId);
+		if (incidenceInfo == null) {
+			incidenceInfo = new Integer[2];
+			incidences.add(incidenceId, incidenceInfo);
+		}
+		incidenceInfo[isVertex ? 0 : 1] = gElemId;
 	}
 
 	private <V> void addToIncidenceList(
