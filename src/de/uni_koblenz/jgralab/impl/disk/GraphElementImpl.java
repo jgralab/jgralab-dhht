@@ -563,7 +563,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final int getGlobalId() throws RemoteException {
-		return GraphBaseImpl.getGlobalId(getLocalGraph().getId(), id);
+		return GraphBaseImpl.getGlobalId(getLocalGraph().getPartialGraphId(), id);
 	}
 
 	@Override
@@ -582,9 +582,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final GraphElement<?, ?, ?> getSigma() {
 		int id = storage.sigmaId[DiskStorageManager.getElementIdInStorage(this.id)];
 		if (id < 0) {
-			return storage.backgroundStorage.getEdge(-id);
+			return storage.backgroundStorage.getEdgeObject(-id);
 		} else {
-			return storage.backgroundStorage.getVertex(id);
+			return storage.backgroundStorage.getVertexObject(id);
 		}
 	}
 	
@@ -660,15 +660,15 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * Methods to access backgroud storage
 	 */
 	protected final Incidence getIncidenceFromBg(int id) {
-		return storage.backgroundStorage.getIncidence(id);
+		return storage.backgroundStorage.getIncidenceObject(id);
 	}
 	
 	protected final Vertex getVertexFromBg(int id) {
-		return storage.backgroundStorage.getVertex(id);
+		return storage.backgroundStorage.getVertexObject(id);
 	}
 	
 	protected final Edge getEdgeFromBg(int id) {
-		return storage.backgroundStorage.getEdge(id);
+		return storage.backgroundStorage.getEdgeObject(id);
 	}
 	
 	protected final int getIdInStorage(int id) {

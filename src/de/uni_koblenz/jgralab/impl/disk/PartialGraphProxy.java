@@ -21,6 +21,10 @@ public class PartialGraphProxy implements Graph {
 		this.storageManager = storageManager;
 	}
 	
+	public PartialGraphProxy(int partialGraphId, GraphDatabase graphDatabase) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public Vertex getFirstVertex() {
 		int vertexId = 
 		return storageManager.getVertex(vertexId);	

@@ -10,12 +10,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
+import de.uni_koblenz.jgralab.impl.disk.CompleteOrPartialGraphImpl;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 @SuppressWarnings("deprecation")
@@ -31,7 +32,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 
 	private static JGraLabServerImpl localInstance = null;
 
-	private final Map<String, Graph> graphs = new HashMap<String, Graph>();
+	private final Map<String, GraphDatabase> graphs = new HashMap<String, GraphDatabase>();
 
 	private JGraLabServerImpl() throws RemoteException, MalformedURLException,
 			AlreadyBoundException {
@@ -98,20 +99,20 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public void putGraph(String graphId, Graph graph) {
-		graphs.put(graphId, graph);
+	public void registerGraph(String graphUid, int partialGraphId, GraphDatabase graph) {
+		graphs.put(graphUid+ "::" + Integer.toString(partialGraphId), graph);
 	}
 
 	@Override
-	public Graph getGraph(String graphId) {
-		return graphs.get(graphId);
+	public GraphDatabase getGraph(String graphUid, int partialGraphId) {
+		return graphs.get(graphUid+ "::" + Integer.toString(partialGraphId));
 	}
 
 	@Override
-	public Graph loadGraph(String filename, ProgressFunction pf)
+	public GraphDatabase loadGraph(String filename, ProgressFunction pf)
 			throws GraphIOException {
-		return GraphIO.loadSchemaAndGraphFromFile(filename,
-				CodeGeneratorConfiguration.MINIMAL, pf);
+		return ((CompleteOrPartialGraphImpl)GraphIO.loadSchemaAndGraphFromFile(filename,
+				CodeGeneratorConfiguration.MINIMAL, pf)).getGraphDatabase();
 	}
 
 }

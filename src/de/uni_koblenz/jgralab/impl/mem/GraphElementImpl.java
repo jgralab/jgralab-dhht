@@ -658,7 +658,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final int getGlobalId() throws RemoteException {
-		return GraphBaseImpl.getGlobalId(getLocalGraph().getId(), id);
+		return GraphBaseImpl.getGlobalId(getLocalGraph().getPartialGraphId(), id);
 	}
 
 	@Override

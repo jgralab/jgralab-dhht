@@ -407,7 +407,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public String getUid() {
+	public String getCompleteGraphUid() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -651,7 +651,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 	
 	@Override
-	public int getId() throws RemoteException {
-		return getCompleteGraph().getId();
+	public int getPartialGraphId() throws RemoteException {
+		return getCompleteGraph().getPartialGraphId();
 	}
 }

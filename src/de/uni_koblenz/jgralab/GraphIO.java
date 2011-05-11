@@ -803,7 +803,7 @@ public class GraphIO {
 		}
 
 		space();
-		write("Graph " + toUtfString(graph.getUid()) + " "
+		write("Graph " + toUtfString(graph.getCompleteGraphUid()) + " "
 				+ graph.getGraphVersion());
 		writeIdentifier(graph.getType().getQualifiedName());
 		int vCount = graph.getVCount();
@@ -2953,7 +2953,7 @@ public class GraphIO {
 		}
 		graph.setLoading(true);
 		server = JGraLabServerImpl.getLocalInstance();
-		server.putGraph(Integer.toString(graph.getId()), graph);
+		server.registerGraph(Integer.toString(graph.getPartialGraphId()), graph);
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
@@ -3017,7 +3017,7 @@ public class GraphIO {
 	}
 
 	private boolean isCompleteGraph(Graph graph) throws RemoteException {
-		return isCompleteGraph(graph.getId());
+		return isCompleteGraph(graph.getPartialGraphId());
 	}
 
 	private boolean isCompleteGraph(int graphId) throws RemoteException {

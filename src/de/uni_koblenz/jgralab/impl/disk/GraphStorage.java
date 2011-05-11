@@ -13,7 +13,7 @@ public class GraphStorage {
 	
 	public final static int MAX_NUMBER_OF_LOCAL_INCIDENCES = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
 	
-	
+	public static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = Integer.MAX_VALUE >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
 	
 
 	public static final int getPartialGraphId(int elementId) {

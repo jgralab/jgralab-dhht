@@ -2956,7 +2956,7 @@ public class EdgeTest extends InstanceTest {
 
 		createReadOnlyTransaction(g);
 		for (int i = 0; i < g.getECount(); i++) {
-			assertEquals(thisVertices[i], g.getEdge(i + 1).getThis());
+			assertEquals(thisVertices[i], g.getEdgeObject(i + 1).getThis());
 		}
 		commit(g);
 	}
@@ -3000,7 +3000,7 @@ public class EdgeTest extends InstanceTest {
 
 		createReadOnlyTransaction(g);
 		for (int i = 0; i < g.getECount(); i++) {
-			assertEquals(thisVertices[i], g.getEdge(i + 1).getThat());
+			assertEquals(thisVertices[i], g.getEdgeObject(i + 1).getThat());
 		}
 		commit(g);
 	}
@@ -4371,10 +4371,10 @@ public class EdgeTest extends InstanceTest {
 
 			createReadOnlyTransaction(g);
 			int edgeId = rand.nextInt(g.getECount()) + 1;
-			Edge e = g.getEdge(edgeId);
-			int oldAlphaId = e.getAlpha().getUid();
+			Edge e = g.getEdgeObject(edgeId);
+			int oldAlphaId = e.getAlpha().getCompleteGraphUid();
 			int newAlphaId = rand.nextInt(3) + 1;
-			Vertex newAlpha = g.getVertex(newAlphaId);
+			Vertex newAlpha = g.getVertexObject(newAlphaId);
 			commit(g);
 
 			createTransaction(g);
@@ -4404,11 +4404,11 @@ public class EdgeTest extends InstanceTest {
 		}
 
 		createReadOnlyTransaction(g);
-		Vertex vertex = g.getVertex(1);
+		Vertex vertex = g.getVertexObject(1);
 		Edge[] array = incidences.get(0).toArray(new Edge[0]);
-		Vertex vertex2 = g.getVertex(2);
+		Vertex vertex2 = g.getVertexObject(2);
 		Edge[] array2 = incidences.get(1).toArray(new Edge[0]);
-		Vertex vertex3 = g.getVertex(3);
+		Vertex vertex3 = g.getVertexObject(3);
 		Edge[] array3 = incidences.get(2).toArray(new Edge[0]);
 		commit(g);
 
@@ -4643,10 +4643,10 @@ public class EdgeTest extends InstanceTest {
 		for (int i = 0; i < RANDOM_VERTEX_COUNT; i++) {
 			createReadOnlyTransaction(g);
 			int edgeId = rand.nextInt(g.getECount()) + 1;
-			Edge e = g.getEdge(edgeId);
-			int oldOmegaId = e.getOmega().getUid();
+			Edge e = g.getEdgeObject(edgeId);
+			int oldOmegaId = e.getOmega().getCompleteGraphUid();
 			int newOmegaId = rand.nextInt(3) + 1;
-			Vertex newOmega = g.getVertex(newOmegaId);
+			Vertex newOmega = g.getVertexObject(newOmegaId);
 			commit(g);
 
 			try {
@@ -4675,12 +4675,12 @@ public class EdgeTest extends InstanceTest {
 		}
 
 		createReadOnlyTransaction(g);
-		Vertex vertex = g.getVertex(1);
+		Vertex vertex = g.getVertexObject(1);
 		Edge[] array = incidences.get(0).toArray(new Edge[0]);
-		Vertex vertex2 = g.getVertex(2);
+		Vertex vertex2 = g.getVertexObject(2);
 		Edge[] array2 = incidences.get(1).toArray(new Edge[0]);
 		Edge[] array3 = incidences.get(2).toArray(new Edge[0]);
-		Vertex vertex3 = g.getVertex(3);
+		Vertex vertex3 = g.getVertexObject(3);
 		commit(g);
 
 		testIncidenceList(vertex, array);
@@ -5236,7 +5236,7 @@ public class EdgeTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) e1.getUid()).toString())
+			if (parts[0].equals(((Integer) e1.getCompleteGraphUid()).toString())
 					&& parts[1].equals(e1.getClass().getName())) {
 				commit(g);
 				break;
@@ -5318,7 +5318,7 @@ public class EdgeTest extends InstanceTest {
 			}
 			parts = line.split(" ");
 			createReadOnlyTransaction(g);
-			if (parts[0].equals(((Integer) e1.getUid()).toString())
+			if (parts[0].equals(((Integer) e1.getCompleteGraphUid()).toString())
 					&& parts[1].equals(e1.getClass().getName())) {
 				commit(g);
 				break;

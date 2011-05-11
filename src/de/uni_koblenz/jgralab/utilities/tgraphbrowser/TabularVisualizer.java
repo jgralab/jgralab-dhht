@@ -261,9 +261,9 @@ public class TabularVisualizer {
 		JValue elem = state.navigationHistory.get(state.insertPosition - 1);
 		String coloredElementId = "";
 		if (elem.isVertex()) {
-			coloredElementId = "v" + elem.toVertex().getId();
+			coloredElementId = "v" + elem.toVertex().getPartialGraphId();
 		} else if (elem.isEdge()) {
-			coloredElementId = "e" + elem.toEdge().getId();
+			coloredElementId = "e" + elem.toEdge().getPartialGraphId();
 		}
 		code.append("changeBackgroundColor(\"").append(coloredElementId)
 				.append("\");\n");
@@ -552,7 +552,7 @@ public class TabularVisualizer {
 						code
 								.append("var aThat = document.createElement(\"a\");\n");
 						code.append("aThat.href = \"javascript:showElement('v")
-								.append(e.getThat().getUid()).append("');\";\n");
+								.append(e.getThat().getCompleteGraphUid()).append("');\";\n");
 					} else {
 						code
 								.append("var aThat = document.createElement(\"span\");\n");
@@ -602,7 +602,7 @@ public class TabularVisualizer {
 			// if the type of alpha is selected, show it as link
 			code.append("var aAlpha = document.createElement(\"a\");\n");
 			code.append("aAlpha.href = \"javascript:showElement('v").append(
-					currentEdge.getAlpha().getUid()).append("');\";\n");
+					currentEdge.getAlpha().getCompleteGraphUid()).append("');\";\n");
 		} else {
 			code.append("var aAlpha = document.createElement(\"span\");\n");
 		}
@@ -628,7 +628,7 @@ public class TabularVisualizer {
 			// if the type of alpha is selected, show it as link
 			code.append("var aOmega = document.createElement(\"a\");\n");
 			code.append("aOmega.href = \"javascript:showElement('v").append(
-					currentEdge.getOmega().getUid()).append("');\";\n");
+					currentEdge.getOmega().getCompleteGraphUid()).append("');\";\n");
 		} else {
 			code.append("var aOmega = document.createElement(\"span\");\n");
 		}

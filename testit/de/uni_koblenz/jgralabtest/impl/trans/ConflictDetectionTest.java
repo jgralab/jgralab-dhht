@@ -141,7 +141,7 @@ public class ConflictDetectionTest {
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			assertTrue(!v24.isValid());
-			Vertex v2 = motorwayMap.getVertex(2);
+			Vertex v2 = motorwayMap.getVertexObject(2);
 			v2.delete();
 			assertTrue(!v2.isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount);
@@ -206,7 +206,7 @@ public class ConflictDetectionTest {
 					motorwayMap.createCity();
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
-					Vertex v2 = motorwayMap.getVertex(2);
+					Vertex v2 = motorwayMap.getVertexObject(2);
 					v2.delete();
 					assertTrue(!v2.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount);
@@ -239,7 +239,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
 					motorwayMap.setCurrentTransaction(readWriteTransaction2);
-					Vertex v2 = motorwayMap.getVertex(2);
+					Vertex v2 = motorwayMap.getVertexObject(2);
 					assertTrue(v2.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
@@ -267,9 +267,9 @@ public class ConflictDetectionTest {
 			assertTrue(!readWriteTransaction1.isValid());
 			assertFalse(readWriteTransaction2.isValid());
 			readOnlyTransaction = motorwayMap.newReadOnlyTransaction();
-			assertTrue(motorwayMap.getVertex(2) == null);
-			assertTrue(motorwayMap.getVertex(internalVCount + 1).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(2) == null);
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 1).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 2).isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 			readOnlyTransaction.commit();
 		} catch (Exception e) {
@@ -359,7 +359,7 @@ public class ConflictDetectionTest {
 			assertFalse(e22.isValid());
 			assertFalse(v25.isValid());
 			assertFalse(v26.isValid());
-			Edge e2 = motorwayMap.getEdge(2);
+			Edge e2 = motorwayMap.getEdgeObject(2);
 			e2.delete();
 			assertFalse(e2.isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 2);
@@ -436,7 +436,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
 					assertEquals(motorwayMap.getECount(), internalECount + 1);
 
-					Edge e7 = motorwayMap.getEdge(7);
+					Edge e7 = motorwayMap.getEdgeObject(7);
 					e7.delete();
 					assertFalse(e7.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
@@ -475,7 +475,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
 					assertEquals(motorwayMap.getECount(), internalECount + 1);
 
-					Edge e7 = motorwayMap.getEdge(7);
+					Edge e7 = motorwayMap.getEdgeObject(7);
 					assertTrue(e7.isValid());
 					try {
 						long sleepTime = 0;
@@ -501,13 +501,13 @@ public class ConflictDetectionTest {
 					&& !readWriteTransaction2.isValid());
 			assertTrue(lastTransactionCommitted == lastToCommit);
 			readOnlyTransaction = motorwayMap.newReadOnlyTransaction();
-			assertTrue(motorwayMap.getEdge(7) == null);
-			assertTrue(motorwayMap.getEdge(internalECount + 1).isValid());
-			assertTrue(motorwayMap.getEdge(internalECount + 2).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 1).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 2).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 3).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 4).isValid());
+			assertTrue(motorwayMap.getEdgeObject(7) == null);
+			assertTrue(motorwayMap.getEdgeObject(internalECount + 1).isValid());
+			assertTrue(motorwayMap.getEdgeObject(internalECount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 1).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 3).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 4).isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 4);
 			assertEquals(motorwayMap.getECount(), internalECount + 1);
 			readOnlyTransaction.commit();
@@ -686,7 +686,7 @@ public class ConflictDetectionTest {
 				assertEquals(motorwayMap.getVCount(), internalVCount);
 				assertTrue(v1.isValid());
 				assertTrue(v2.isValid());
-				assertTrue(motorwayMap.getEdge(internalECount + 1) == null);
+				assertTrue(motorwayMap.getEdgeObject(internalECount + 1) == null);
 				v1.delete();
 				assertEquals(motorwayMap.getVCount(), internalVCount - 1);
 				// all incidences of v1 are deleted too
@@ -729,16 +729,16 @@ public class ConflictDetectionTest {
 	public void testConflictVseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
 			assertEquals(v2.getNextVertex(), v4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v1 = motorwayMap.getVertex(1);
-			v4 = motorwayMap.getVertex(4);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v1);
 			assertTrue(v4.isAfter(v1));
 			assertEquals(v4.getPrevVertex(), v1);
@@ -791,8 +791,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictVseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v4 = motorwayMap.getVertex(4);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -823,7 +823,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v1 = motorwayMap.getVertex(1);
+				Vertex v1 = motorwayMap.getVertexObject(1);
 				v4.putAfter(v1);
 				assertTrue(v4.isAfter(v1));
 				assertEquals(v4.getPrevVertex(), v1);
@@ -869,15 +869,15 @@ public class ConflictDetectionTest {
 	public void testConflictVseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
 			assertEquals(v2.getNextVertex(), v4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v5 = motorwayMap.getVertex(5);
+			Vertex v5 = motorwayMap.getVertexObject(5);
 			v2.putAfter(v5);
 			assertTrue(v2.isAfter(v5));
 			assertEquals(v2.getPrevVertex(), v5);
@@ -906,8 +906,8 @@ public class ConflictDetectionTest {
 	public void testConflictVseq3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
@@ -951,10 +951,10 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictVseq4() {
 		try {
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			v4 = motorwayMap.getVertex(4);
+			v4 = motorwayMap.getVertexObject(4);
 			v4.delete();
 			assertFalse(v4.isValid());
 
@@ -992,8 +992,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictVseq3And4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v4 = motorwayMap.getVertex(4);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1063,12 +1063,12 @@ public class ConflictDetectionTest {
 	public void testMergeVseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v3 = motorwayMap.getVertex(3);
-			Vertex v4 = motorwayMap.getVertex(4);
-			Vertex v5 = motorwayMap.getVertex(5);
-			Vertex v6 = motorwayMap.getVertex(6);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v3 = motorwayMap.getVertexObject(3);
+			Vertex v4 = motorwayMap.getVertexObject(4);
+			Vertex v5 = motorwayMap.getVertexObject(5);
+			Vertex v6 = motorwayMap.getVertexObject(6);
 			// Vseq at beginning <v1, v2, v3, v4, v5, v6,...>
 			assertEquals(motorwayMap.getFirstVertex(), v1);
 			assertEquals(v1.getPrevVertex(), null);
@@ -1158,12 +1158,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeVseq1Parallel(final Transaction lastToCommit) {
-		final Vertex v1 = motorwayMap.getVertex(1);
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v3 = motorwayMap.getVertex(3);
-		final Vertex v4 = motorwayMap.getVertex(4);
-		final Vertex v5 = motorwayMap.getVertex(5);
-		final Vertex v6 = motorwayMap.getVertex(6);
+		final Vertex v1 = motorwayMap.getVertexObject(1);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v3 = motorwayMap.getVertexObject(3);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
+		final Vertex v5 = motorwayMap.getVertexObject(5);
+		final Vertex v6 = motorwayMap.getVertexObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1272,12 +1272,12 @@ public class ConflictDetectionTest {
 	public void testMergeVseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v3 = motorwayMap.getVertex(3);
-			Vertex v4 = motorwayMap.getVertex(4);
-			Vertex v5 = motorwayMap.getVertex(5);
-			Vertex v6 = motorwayMap.getVertex(6);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v3 = motorwayMap.getVertexObject(3);
+			Vertex v4 = motorwayMap.getVertexObject(4);
+			Vertex v5 = motorwayMap.getVertexObject(5);
+			Vertex v6 = motorwayMap.getVertexObject(6);
 			// Vseq at beginning <v1, v2, v3, v4, v5, v6,...>
 			assertEquals(motorwayMap.getFirstVertex(), v1);
 			assertEquals(v1.getPrevVertex(), null);
@@ -1394,12 +1394,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeVseq2Parallel(final Transaction lastToCommit) {
-		final Vertex v1 = motorwayMap.getVertex(1);
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v3 = motorwayMap.getVertex(3);
-		final Vertex v4 = motorwayMap.getVertex(4);
-		final Vertex v5 = motorwayMap.getVertex(5);
-		final Vertex v6 = motorwayMap.getVertex(6);
+		final Vertex v1 = motorwayMap.getVertexObject(1);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v3 = motorwayMap.getVertexObject(3);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
+		final Vertex v5 = motorwayMap.getVertexObject(5);
+		final Vertex v6 = motorwayMap.getVertexObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1521,15 +1521,15 @@ public class ConflictDetectionTest {
 	public void testConflictEseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
 			assertEquals(e2.getNextEdge(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e4.putAfterEdge(e1);
 			assertTrue(e4.isAfterEdge(e1));
 			assertEquals(e4.getPrevEdge(), e1);
@@ -1572,9 +1572,9 @@ public class ConflictDetectionTest {
 
 	private void internalConflictEseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1650,15 +1650,15 @@ public class ConflictDetectionTest {
 	public void testConflictEseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
 			assertEquals(e2.getNextEdge(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e5 = motorwayMap.getEdge(5);
+			Edge e5 = motorwayMap.getEdgeObject(5);
 			e2.putAfterEdge(e5);
 			assertTrue(e2.isAfterEdge(e5));
 			assertEquals(e2.getPrevEdge(), e5);
@@ -1687,8 +1687,8 @@ public class ConflictDetectionTest {
 	public void testConflictEseq3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
@@ -1730,8 +1730,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictEseq4() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
 			e4.delete();
 			assertFalse(e4.isValid());
@@ -1768,8 +1768,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictEseq3and4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1840,12 +1840,12 @@ public class ConflictDetectionTest {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			// t2
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 			assertEquals(motorwayMap.getFirstEdge(), e1);
 			assertEquals(e1.getPrevEdge(), null);
@@ -1934,23 +1934,23 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeEseq1Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Edge e1 = motorwayMap.getEdge(1);
-				Edge e2 = motorwayMap.getEdge(2);
-				Edge e3 = motorwayMap.getEdge(3);
-				Edge e4 = motorwayMap.getEdge(4);
-				Edge e5 = motorwayMap.getEdge(5);
-				Edge e6 = motorwayMap.getEdge(6);
+				Edge e1 = motorwayMap.getEdgeObject(1);
+				Edge e2 = motorwayMap.getEdgeObject(2);
+				Edge e3 = motorwayMap.getEdgeObject(3);
+				Edge e4 = motorwayMap.getEdgeObject(4);
+				Edge e5 = motorwayMap.getEdgeObject(5);
+				Edge e6 = motorwayMap.getEdgeObject(6);
 				// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 				assertEquals(motorwayMap.getFirstEdge(), e1);
 				assertEquals(e1.getPrevEdge(), null);
@@ -2053,12 +2053,12 @@ public class ConflictDetectionTest {
 	public void testMergeEseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 			assertEquals(motorwayMap.getFirstEdge(), e1);
 			assertEquals(e1.getPrevEdge(), null);
@@ -2175,23 +2175,23 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeEseq2Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Edge e1 = motorwayMap.getEdge(1);
-				Edge e2 = motorwayMap.getEdge(2);
-				Edge e3 = motorwayMap.getEdge(3);
-				Edge e4 = motorwayMap.getEdge(4);
-				Edge e5 = motorwayMap.getEdge(5);
-				Edge e6 = motorwayMap.getEdge(6);
+				Edge e1 = motorwayMap.getEdgeObject(1);
+				Edge e2 = motorwayMap.getEdgeObject(2);
+				Edge e3 = motorwayMap.getEdgeObject(3);
+				Edge e4 = motorwayMap.getEdgeObject(4);
+				Edge e5 = motorwayMap.getEdgeObject(5);
+				Edge e6 = motorwayMap.getEdgeObject(6);
 				// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 				assertEquals(motorwayMap.getFirstEdge(), e1);
 				assertEquals(e1.getPrevEdge(), null);
@@ -2308,15 +2308,15 @@ public class ConflictDetectionTest {
 	public void testConflictIseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
 			assertEquals(e2.getNextIncidence(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e4.putIncidenceAfter(e1);
 			assertTrue(e4.isAfterIncidence(e1));
 			assertEquals(e4.getPrevIncidence(), e1);
@@ -2359,8 +2359,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -2391,7 +2391,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Edge e1 = motorwayMap.getEdge(1);
+				Edge e1 = motorwayMap.getEdgeObject(1);
 				e4.putIncidenceAfter(e1);
 				assertTrue(e4.isAfterIncidence(e1));
 				assertEquals(e4.getPrevIncidence(), e1);
@@ -2438,15 +2438,15 @@ public class ConflictDetectionTest {
 	public void testConflictIseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
 			assertEquals(e2.getNextIncidence(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e5 = motorwayMap.getEdge(5);
+			Edge e5 = motorwayMap.getEdgeObject(5);
 			e2.putIncidenceAfter(e5);
 			assertTrue(e2.isAfterIncidence(e5));
 			assertEquals(e2.getPrevIncidence(), e5);
@@ -2474,8 +2474,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq3() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			Vertex incidentVertex = e2.getAlpha();
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -2521,8 +2521,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq4() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			Vertex incidentVertex = e2.getAlpha();
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			incidentVertex.delete();
@@ -2561,8 +2561,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq3And4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 		final Vertex incidentVertex = e2.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -2633,8 +2633,8 @@ public class ConflictDetectionTest {
 	public void testConflictIseq5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
@@ -2676,8 +2676,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq6() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			e4.delete();
 			assertFalse(e4.isValid());
@@ -2714,8 +2714,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq5And6Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -2784,12 +2784,12 @@ public class ConflictDetectionTest {
 	public void testMergeIseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			Vertex incidentVertex = e1.getAlpha();
 			// Iseq(v1) at beginning <+e1, +e2, +e3, +e4, +e5, +e6,...>
 			assertEquals(incidentVertex.getFirstIncidence(), e1);
@@ -2877,12 +2877,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeIseq1Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 		final Vertex incidentVertex = e1.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -2992,12 +2992,12 @@ public class ConflictDetectionTest {
 	public void testMergeIseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			Vertex incidentVertex = e1.getAlpha();
 			// Iseq(v1) at beginning <+e1, +e2, +e3, +e4, +e5, +e6,...>
 			assertEquals(incidentVertex.getFirstIncidence(), e1);
@@ -3115,12 +3115,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeIseq2Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 		final Vertex incidentVertex = e1.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -3244,12 +3244,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v13 = motorwayMap.getVertex(13);
+			Vertex v13 = motorwayMap.getVertexObject(13);
 			e1.setAlpha(v13);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3289,13 +3289,13 @@ public class ConflictDetectionTest {
 
 	private void internalConflictSetAlpha1Parallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Vertex v11 = motorwayMap.getVertex(11);
+				Vertex v11 = motorwayMap.getVertexObject(11);
 				e1.setAlpha(v11);
 				try {
 					long sleepTime = 0;
@@ -3318,7 +3318,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v13 = motorwayMap.getVertex(13);
+				Vertex v13 = motorwayMap.getVertexObject(13);
 				e1.setAlpha(v13);
 
 				try {
@@ -3358,8 +3358,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3399,8 +3399,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.delete();
 			assertFalse(e1.isValid());
 
@@ -3433,8 +3433,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictSetAlpha2And3Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3503,8 +3503,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha4() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3544,12 +3544,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
+			Vertex v11 = motorwayMap.getVertexObject(11);
 			v11.delete();
 			assertFalse(v11.isValid());
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e2 = motorwayMap.getEdge(2);
+			Edge e2 = motorwayMap.getEdgeObject(2);
 			e2.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3587,8 +3587,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetAlpha4And5Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3657,12 +3657,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v12 = motorwayMap.getVertex(12);
+			Vertex v12 = motorwayMap.getVertexObject(12);
 			e1.setOmega(v12);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3708,13 +3708,13 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega1Parallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Vertex v10 = motorwayMap.getVertex(10);
+				Vertex v10 = motorwayMap.getVertexObject(10);
 				e1.setOmega(v10);
 				try {
 					long sleepTime = 0;
@@ -3737,7 +3737,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v12 = motorwayMap.getVertex(12);
+				Vertex v12 = motorwayMap.getVertexObject(12);
 				e1.setOmega(v12);
 
 				try {
@@ -3777,8 +3777,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3818,8 +3818,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.delete();
 			assertFalse(e1.isValid());
 
@@ -3861,8 +3861,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega2And3Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v10 = motorwayMap.getVertex(10);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v10 = motorwayMap.getVertexObject(10);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3931,8 +3931,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega4() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3972,12 +3972,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
+			Vertex v10 = motorwayMap.getVertexObject(10);
 			v10.delete();
 			assertFalse(v10.isValid());
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -4015,8 +4015,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega4And5Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v10 = motorwayMap.getVertex(10);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v10 = motorwayMap.getVertexObject(10);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -4086,12 +4086,12 @@ public class ConflictDetectionTest {
 	public void testMergeSetAlphaOmega() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v12 = motorwayMap.getVertex(12);
+			Vertex v12 = motorwayMap.getVertexObject(12);
 			e1.setOmega(v12);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -4140,9 +4140,9 @@ public class ConflictDetectionTest {
 	 */
 	private void internalMergeSetAlphaOmegaParallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
-		final Vertex v12 = motorwayMap.getVertex(12);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
+		final Vertex v12 = motorwayMap.getVertexObject(12);
 		try {
 			thread1 = new Thread(threadGroup, "Thread1") {
 

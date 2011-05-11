@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab;
 
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public interface JGraLabServer {
@@ -11,11 +12,12 @@ public interface JGraLabServer {
 	public abstract Schema createSchema(String schemaString)
 			throws GraphIOException;
 
-	public void putGraph(String graphId, Graph graph);
+	public void registerGraph(String graphId, int partialGraphId, GraphDatabase graph);
 
-	public Graph getGraph(String graphId);
+	public GraphDatabase getGraph(String graphUid, int partialGraphId);
 
-	public Graph loadGraph(String filename, ProgressFunction pf)
+	public GraphDatabase loadGraph(String filename, ProgressFunction pf)
 			throws GraphIOException;
+
 
 }

@@ -86,17 +86,17 @@ public class TryGraphMarkerIterators {
 
 		for (int i = 0; i < nodes.length; i++) {
 			arrayVertexMarker.mark(nodes[i], "StringMark: " + nodes[i]);
-			integerVertexMarker.mark(nodes[i], nodes[i].getUid());
-			doubleVertexMarker.mark(nodes[i], nodes[i].getUid() + 0.5);
-			longVertexMarker.mark(nodes[i], 1000l + nodes[i].getUid());
+			integerVertexMarker.mark(nodes[i], nodes[i].getCompleteGraphUid());
+			doubleVertexMarker.mark(nodes[i], nodes[i].getCompleteGraphUid() + 0.5);
+			longVertexMarker.mark(nodes[i], 1000l + nodes[i].getCompleteGraphUid());
 			bitSetVertexMarker.mark(nodes[i]);
 			subGraphMarker.mark(nodes[i]);
 		}
 		for (int i = 0; i < links.length; i++) {
 			arrayEdgeMarker.mark(links[i], "StringMark: " + links[i]);
-			integerEdgeMarker.mark(links[i], links[i].getUid());
-			doubleEdgeMarker.mark(links[i], links[i].getUid() + 0.5);
-			longEdgeMarker.mark(links[i], 1000l + links[i].getUid());
+			integerEdgeMarker.mark(links[i], links[i].getCompleteGraphUid());
+			doubleEdgeMarker.mark(links[i], links[i].getCompleteGraphUid() + 0.5);
+			longEdgeMarker.mark(links[i], 1000l + links[i].getCompleteGraphUid());
 			bitSetEdgeMarker.mark(links[i]);
 			subGraphMarker.mark(links[i]);
 		}

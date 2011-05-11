@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.FileNotFoundException;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +20,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
-import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
@@ -44,7 +44,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		schema = cls.getSchema();
 		graphFactory = cls.getSchema().getGraphFactory();
 		try {
-			backgroundStorage = new DiskStorageManager(this);
+			diskStorage = new DiskStorageManager(this);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -57,6 +57,11 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
 
 	// ------------- GRAPH VARIABLES -------------
+	
+	/* the graph database that stores this graph and manages all connections to all 
+	 * partial graphs 
+	 */
+	protected GraphDatabase graphDatabase;
 	
 	/**
 	 * The id of this complete or partial graph identifying it in the complete graph  
@@ -116,34 +121,22 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	private boolean loading;
 	
 	
-	protected DiskStorageManager backgroundStorage;
+	protected DiskStorageManager diskStorage;
 	
 	/**
 	 * @return the DiskStorageManager that stores elements of this 
 	 * complete or partial graph
 	 */
-	public DiskStorageManager getBackgroundStorage() {
-		return backgroundStorage;
+	public DiskStorageManager getDiskStorage() {
+		return diskStorage;
 	}
 
 	
-	// ------------- PARTIAL GRAPH VARIABLES ------------
-	
-	/* list of all partial graphs contained in this partial or complete one */
-	protected List<Graph> containedPartialGraphs;
-
-	
-	/* maps ids of partial graphs to the respective proxy objects */
-	protected Graph[] allPartialGraphs;
-	
-	public Graph getPartialGraphById(int id) {
-		if (allPartialGraphs[id] == null) {
-			//create local proxy
-		}
-		return allPartialGraphs[id];
+	@Override
+	public Graph createPartialGraph(String hostname)  throws RemoteException {
+		int id = graphDatabase.getFreePartialGraphId();
+		
 	}
-	
-	
 	
 	
 	// ------------- VERTEX LIST VARIABLES -------------
@@ -258,11 +251,11 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	}
 	
 	public boolean containsVertexLocally(Vertex v) throws RemoteException {
-		return (v != null) && (v.getGraph() == this) && (backgroundStorage.getVertex(v.getId()) == v);
+		return (v != null) && (v.getGraph() == this) && (diskStorage.getVertexObject(v.getId()) == v);
 	}
 
 	public boolean containsEdgeLocally(Edge e) throws RemoteException {
-		return (e != null) && (e.getGraph() == this) && (backgroundStorage.getEdge(e.getId()) == e);
+		return (e != null) && (e.getGraph() == this) && (diskStorage.getEdgeObject(e.getId()) == e);
 	}
 	
 	/**
@@ -309,7 +302,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			assert eId != 0;
 			e.setId(eId);
 		}
-		backgroundStorage.storeEdge(e);
+		diskStorage.storeEdge(e);
 		appendEdgeToESeq(e);
 
 		if (!isLoading()) {
@@ -357,7 +350,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			i.setId(iId);
 			
 		}
-		backgroundStorage.storeIncidence(i);
+		diskStorage.storeIncidence(i);
 		if (!isLoading()) {
 			internalIncidenceAdded(i);
 		}
@@ -402,7 +395,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 			assert vId != 0;
 			v.setId(vId);
 		}
-		backgroundStorage.storeVertex(v);
+		diskStorage.storeVertex(v);
 		appendVertexToVSeq(v);
 
 		if (!isLoading()) {
@@ -420,7 +413,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains an edge with id eId
 	 */
 	protected final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (backgroundStorage.getEdge(eId) != null);
+		return (eId > 0) && (eId <= eMax) && (diskStorage.getEdgeObject(eId) != null);
 	}
 
 	/**
@@ -432,7 +425,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains an incidence with id iId
 	 */
 	private final boolean containsIncidenceId(int iId) {
-		return (iId > 0) && (iId <= vMax) && (backgroundStorage.getIncidence(iId) != null);
+		return (iId > 0) && (iId <= vMax) && (diskStorage.getIncidenceObject(iId) != null);
 	}
 
 
@@ -446,7 +439,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 * @return true if this graph contains a vertex with id vId
 	 */
 	protected final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (backgroundStorage.getVertex(vId) != null);
+		return (vId > 0) && (vId <= vMax) && (diskStorage.getVertexObject(vId) != null);
 	}
 	
 	

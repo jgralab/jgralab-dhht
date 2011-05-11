@@ -22,7 +22,12 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-
+/**
+ * This class realizes the storage of vertices, edges and incidences on the disk. All
+ * methods may be used only with local objects
+ * @author dbildh
+ *
+ */
 public final class DiskStorageManager {
 	
 	
@@ -61,13 +66,7 @@ public final class DiskStorageManager {
 	
 	/* maps that store proxies for remote elements */
 	
-//	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
-	
-	private Map<Integer, Reference<VertexProxy>> remoteVertices;
-	
-	private Map<Integer, Reference<EdgeProxy>> remoteEdges;
-	
-	private Map<Integer, Reference<IncidenceProxy>> remoteIncidences;
+
 	
 	
 	/* names of files to store element data */
@@ -160,7 +159,7 @@ public final class DiskStorageManager {
 	public DiskStorageManager(Graph graph) throws FileNotFoundException {
 		this.graph = graph;
 		try {
-			this.localPartialGraphId = graph.getId();
+			this.localPartialGraphId = graph.getPartialGraphId();
 			factory = graph.getGraphFactory();
 			schema = graph.getSchema();
 		} catch (RemoteException e) {
@@ -179,10 +178,7 @@ public final class DiskStorageManager {
 		edgeStorageSaved = new BitSet(ELEMENT_CONTAINER_COUNT);
 		incidenceStorageSaved = new BitSet(INCIDENCE_CONTAINER_COUNT);
 		
-		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
-		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
-		remoteEdges = new HashMap<Integer, Reference<EdgeProxy>>();
-		remoteIncidences = new HashMap<Integer, Reference<IncidenceProxy>>();
+
 		
 		vertexQueue = new ReferenceQueue<VertexContainer>();
 		edgeQueue = new ReferenceQueue<EdgeContainer>();
@@ -482,29 +478,8 @@ public final class DiskStorageManager {
 	}	
 	
 	
-	public final VertexProxy createVertexProxy(int id) {
-		int partialGraphId = GraphStorage.getPartialGraphId(id);
-		Graph partialGraph = graph.getPartialGraph(partialGraphId);
-	}
 	
-	
-	public final Vertex getVertex(int id) {
-		int partialGraphId = GraphStorage.getPartialGraphId(id);
-		if (partialGraphId != localPartialGraphId) {
-			//select vertex proxie
-			VertexProxy proxy  = null;
-			Reference<VertexProxy> ref = remoteVertices.get(id);
-			if ((ref == null) || (ref.get() == null)) {
-				proxy = createVertexProxy(id);
-				ref = new WeakReference<VertexProxy>(proxy);
-				remoteVertices.put(id, ref);
-			} else {
-				proxy = ref.get();
-			}
-			return proxy;
-			
-		}
-		
+	public final Vertex getVertexObject(int id) {
 		VertexContainer container = getVertexStorage(id);
 		int idInStorage = getElementIdInContainer(id);
 		int type = container.types[idInStorage]; 
@@ -512,7 +487,7 @@ public final class DiskStorageManager {
 			//element is typed, so return either the existing vertex or create a new one
 			Vertex v = container.vertices[idInStorage];
 			if (v == null) {
-				Class<? extends Vertex> c = schema.getM1ClassForId(type);
+				Class<? extends Vertex> c = (Class<? extends Vertex>) schema.getM1ClassForId(type);
 				v = factory.reloadVertex(c, id, graph, container);
 				container.vertices[idInStorage] = v;
 			}	
@@ -620,7 +595,7 @@ public final class DiskStorageManager {
 	 * @param id
 	 * @return
 	 */
-	public final Edge getEdge(int id) {
+	public final Edge getEdgeObject(int id) {
 			EdgeContainer container = getEdgeStorage(id);
 			int idInStorage = getElementIdInContainer(id);
 			int type = container.types[idInStorage]; 
@@ -628,7 +603,7 @@ public final class DiskStorageManager {
 				//element is typed, so return either the existing vertex or create a new one
 				Edge e = container.edges[idInStorage];
 				if (e == null) {
-					e = factory.reloadEdge(schema.getM1ClassForId(type), id, graph, container);
+					e = factory.reloadEdge((Class<? extends Edge>) schema.getM1ClassForId(type), id, graph, container);
 					container.edges[idInStorage] = e;
 				}
 				return e;
@@ -729,7 +704,7 @@ public final class DiskStorageManager {
 			
 
 	
-	public final Incidence getIncidence(int id) {
+	public final Incidence getIncidenceObject(int id) {
 		try {
 			if (id == 0)
 				return null;
@@ -741,7 +716,7 @@ public final class DiskStorageManager {
 				Incidence i = container.incidences[idInStorage];
 				if (i == null) {
 					Class<?> c = graph.getSchema().getM1ClassForId(type);
-					i = factory.reloadIncidence(schema.getM1ClassForId(type), id, container);
+					i = factory.reloadIncidence((Class<? extends Incidence>) schema.getM1ClassForId(type), id, container);
 					container.incidences[idInStorage] = i;
 				}
 				return i;
@@ -838,6 +813,7 @@ public final class DiskStorageManager {
 		incidenceStorageSaved.set(id, false);
 		return b;		
 	}
+
 	
 	
 

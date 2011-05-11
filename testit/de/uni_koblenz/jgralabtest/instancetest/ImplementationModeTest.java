@@ -86,7 +86,7 @@ public class ImplementationModeTest extends InstanceTest {
 			g.createNode();
 		}
 		for (int i = 0; i < N; ++i) {
-			g.createLink(g.getFirstNode(), (Node) g.getVertex(i + 1));
+			g.createLink(g.getFirstNode(), (Node) g.getVertexObject(i + 1));
 		}
 		commit(g);
 		createTransaction(g);

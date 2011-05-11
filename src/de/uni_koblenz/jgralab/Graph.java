@@ -471,7 +471,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the id of this graph
 	 */
-	public String getUid() throws RemoteException;
+	public String getCompleteGraphUid() throws RemoteException;
 
 	/**
 	 * Sets the <code>id</code> of this Graph.
@@ -810,7 +810,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	/**
 	 * @returns the ID of this partial or complete graph.
 	 */
-	public int getId() throws RemoteException;
+	public int getPartialGraphId() throws RemoteException;
 
 	/**
 	 * Adds a partial graph on the given host to the sequence of partial graphs
@@ -827,7 +827,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 
 
-	public DiskStorageManager getBackgroundStorage();
+	public DiskStorageManager getDiskStorage();
 	
 	
 	/**
@@ -840,6 +840,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Retrieves the partial graph with the given id partialGraphId
 	 */
 	public Graph getPartialGraph(int partialGraphId);
+
+	public Collection<? extends Graph> getPartialGraphs();
 
 	
 }

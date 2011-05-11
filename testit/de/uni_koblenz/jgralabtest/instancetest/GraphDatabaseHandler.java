@@ -130,7 +130,7 @@ public class GraphDatabaseHandler {
 
 	public void cleanDatabaseOfTestGraph(Graph testGraph) {
 		try {
-			if (graphDatabase.containsGraph(testGraph.getUid())) {
+			if (graphDatabase.containsGraph(testGraph.getCompleteGraphUid())) {
 				graphDatabase.delete((DatabasePersistableGraph) testGraph);
 			}
 		} catch (GraphDatabaseException exception) {
