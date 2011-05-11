@@ -74,26 +74,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class GraphBaseImpl implements Graph {
 
-	static final int PARTIAL_GRAPH_MASK = 0xff000000;
+	
 
-	static final int LOCAL_ELEMENT_MASK = 0xffffffff ^ PARTIAL_GRAPH_MASK;
-
-	public static final int getLocalId(int graphElementId) {
-		return graphElementId & LOCAL_ELEMENT_MASK;
-	}
-
-	public static final int getPartialGraphId(int graphElementId) {
-		return graphElementId & PARTIAL_GRAPH_MASK;
-	}
-
-	public static final int getGlobalId(int partialGraphId, int localElementId) {
-		assert getPartialGraphId(localElementId) == 0;
-		return partialGraphId & localElementId;
-	}
-
-	// ------------- PARTIAL GRAPH VARIABLES ------------
-
-	protected List<PartialGraphImpl> partialGraphs = null;
 
 	// ------------- VERTEX LIST VARIABLES -------------
 
@@ -108,12 +90,12 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public Vertex getFirstVertex() {
-		return getBackgroundStorage().getVertex(firstVertexId);
+		return getVertexObjectForId(firstVertexId);
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		return getBackgroundStorage().getVertex(lastVertexId);
+		return getVertexObjectForId(lastVertexId);
 	}
 
 	/**
@@ -1108,6 +1090,17 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return
 	 */
 	Vertex getVertexObjectForId(int vid) {
+		return getBackgroundStorage().getVertex(vid);
+	}
+	
+	/**
+	 * Retrieves the Vertex object representing the vertex with the id vid
+	 * that is part of the global graph this graph belongs to. In the case
+	 * of remote elements, 
+	 * @param id
+	 * @return
+	 */
+	Vertex getEdgeObjectForId(int vid) {
 		return getBackgroundStorage().getVertex(vid);
 	}
 	

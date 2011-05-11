@@ -63,11 +63,11 @@ public final class DiskStorageManager {
 	
 //	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
 	
-	private Map<Integer, ? extends Reference<VertexProxy>> remoteVertices;
+	private Map<Integer, Reference<VertexProxy>> remoteVertices;
 	
-	private Map<Integer, ? extends Reference<EdgeProxy>> remoteEdges;
+	private Map<Integer, Reference<EdgeProxy>> remoteEdges;
 	
-	private Map<Integer, ? extends Reference<IncidenceProxy>> remoteIncidences;
+	private Map<Integer, Reference<IncidenceProxy>> remoteIncidences;
 	
 	
 	/* names of files to store element data */
@@ -482,15 +482,21 @@ public final class DiskStorageManager {
 	}	
 	
 	
+	public final VertexProxy createVertexProxy(int id) {
+		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		Graph partialGraph = graph.getPartialGraph(partialGraphId);
+	}
+	
+	
 	public final Vertex getVertex(int id) {
-		int partialGraphId = getPartialGraphId(id);
+		int partialGraphId = GraphStorage.getPartialGraphId(id);
 		if (partialGraphId != localPartialGraphId) {
 			//select vertex proxie
 			VertexProxy proxy  = null;
 			Reference<VertexProxy> ref = remoteVertices.get(id);
 			if ((ref == null) || (ref.get() == null)) {
-				proxy = new VertexProxy(id);
-				ref = new WeakReference(id);
+				proxy = createVertexProxy(id);
+				ref = new WeakReference<VertexProxy>(proxy);
 				remoteVertices.put(id, ref);
 			} else {
 				proxy = ref.get();

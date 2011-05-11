@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
@@ -18,6 +19,7 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
+import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
@@ -34,6 +36,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 
+	
+	
 	
 	protected CompleteOrPartialGraphImpl(GraphClass cls) {
 		super(cls);
@@ -59,7 +63,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	 */
 	protected int id;
 	
-	
+		
 	/**
 	 * The GraphFactory that was used to create this graph. This factory will be
 	 * used to create vertices and edges in this graph.
@@ -114,10 +118,33 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	
 	protected DiskStorageManager backgroundStorage;
 	
+	/**
+	 * @return the DiskStorageManager that stores elements of this 
+	 * complete or partial graph
+	 */
 	public DiskStorageManager getBackgroundStorage() {
 		return backgroundStorage;
 	}
 
+	
+	// ------------- PARTIAL GRAPH VARIABLES ------------
+	
+	/* list of all partial graphs contained in this partial or complete one */
+	protected List<Graph> containedPartialGraphs;
+
+	
+	/* maps ids of partial graphs to the respective proxy objects */
+	protected Graph[] allPartialGraphs;
+	
+	public Graph getPartialGraphById(int id) {
+		if (allPartialGraphs[id] == null) {
+			//create local proxy
+		}
+		return allPartialGraphs[id];
+	}
+	
+	
+	
 	
 	// ------------- VERTEX LIST VARIABLES -------------
 	/**

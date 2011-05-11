@@ -79,7 +79,7 @@ public abstract class EdgeImpl extends
 		this.id =anId;
 		((CompleteGraphImpl) graph).addEdge(this);
 		id = getId();
-		this.storage = graph.getBackgroundStorage().getEdgeStorage(id);
+		this.storage = ((CompleteOrPartialGraphImpl) graph).getBackgroundStorage().getEdgeStorage(id);
 	}
 	
 
