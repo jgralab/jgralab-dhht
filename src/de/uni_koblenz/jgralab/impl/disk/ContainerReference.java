@@ -8,7 +8,7 @@ import java.nio.channels.FileChannel;
 public abstract class ContainerReference<T extends StorageContainer> extends WeakReference<T> {
 	
 	
-	BackgroundStorage backgroundStorage;
+	DiskStorageManager backgroundStorage;
 	
 	private boolean reused = false;
 	

@@ -48,14 +48,14 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
 
-		container.types = types = new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.incidenceListVersion = incidenceListVersion= new long[BackgroundStorage.CONTAINER_SIZE];
-   		container.kappa = kappa= new int[BackgroundStorage.CONTAINER_SIZE];
-  		container.sigmaId = sigmaId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.nextElementInGraphId = nextElementInGraphId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.previousElementInGraphId = previousElementInGraphId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.firstIncidenceId = firstIncidenceId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.lastIncidenceId = lastIncidenceId= new int[BackgroundStorage.CONTAINER_SIZE];
+		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.incidenceListVersion = incidenceListVersion= new long[DiskStorageManager.CONTAINER_SIZE];
+   		container.kappa = kappa= new int[DiskStorageManager.CONTAINER_SIZE];
+  		container.sigmaId = sigmaId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.nextElementInGraphId = nextElementInGraphId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.previousElementInGraphId = previousElementInGraphId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.firstIncidenceId = firstIncidenceId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.lastIncidenceId = lastIncidenceId= new int[DiskStorageManager.CONTAINER_SIZE];
    		read(input);
 	}
 	
@@ -91,7 +91,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 
 
 	void writeAttributes(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, BackgroundStorage.CONTAINER_SIZE * 4 * 9);
+		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9);
 		ByteArrayOutputStream bao = new ByteArrayOutputStream();
 		ObjectOutputStream output = new ObjectOutputStream(bao);
 		output.writeObject(attributes);
@@ -103,7 +103,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 
 	
 	void read(FileChannel channel) throws IOException {
-		IntBuffer ib = channel.map(MapMode.READ_ONLY, 0, BackgroundStorage.CONTAINER_SIZE * 4 * 9).asIntBuffer();
+		IntBuffer ib = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9).asIntBuffer();
 		if (types == null)
 			throw new RuntimeException("Types is null");
 		ib.get(types);
@@ -118,7 +118,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 	
 
 	void write(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, BackgroundStorage.CONTAINER_SIZE * 4 * 9);
+		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9);
 		IntBuffer ib = bb.asIntBuffer();
 		ib.clear();
 		ib.put(types);

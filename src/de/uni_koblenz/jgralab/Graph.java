@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
-import de.uni_koblenz.jgralab.impl.disk.BackgroundStorage;
+import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -823,7 +823,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public Graph createPartialGraph(String hostname) throws RemoteException;
 
-	public BackgroundStorage getBackgroundStorage();
+	public DiskStorageManager getBackgroundStorage();
 
 	public void writePartialGraphs(GraphIO graphIO);
 

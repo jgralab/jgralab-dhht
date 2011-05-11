@@ -52,16 +52,16 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
 
-		container.types = types = new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.edgeId = edgeId = new int[BackgroundStorage.CONTAINER_SIZE];
-		container.vertexId = vertexId = new int[BackgroundStorage.CONTAINER_SIZE];
-		container.direction = direction = new boolean[BackgroundStorage.CONTAINER_SIZE];
-   		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new int[BackgroundStorage.CONTAINER_SIZE];
-  		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.previousIncidenceAtVertexId = previousIncidenceAtVertexId= new int[BackgroundStorage.CONTAINER_SIZE];
-   		container.incidences = new Incidence[BackgroundStorage.CONTAINER_SIZE];
+		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.edgeId = edgeId = new int[DiskStorageManager.CONTAINER_SIZE];
+		container.vertexId = vertexId = new int[DiskStorageManager.CONTAINER_SIZE];
+		container.direction = direction = new boolean[DiskStorageManager.CONTAINER_SIZE];
+   		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new int[DiskStorageManager.CONTAINER_SIZE];
+  		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.previousIncidenceAtVertexId = previousIncidenceAtVertexId= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.incidences = new Incidence[DiskStorageManager.CONTAINER_SIZE];
    		read(input);
 	}
 	
@@ -77,7 +77,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
    		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = oldRef.nextIncidenceAtVertexId;
    		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId = oldRef.previousIncidenceAtEdgeId;
    		container.previousIncidenceAtVertexId = previousIncidenceAtVertexId = oldRef.previousIncidenceAtVertexId;
-   		container.incidences = new Incidence[BackgroundStorage.CONTAINER_SIZE];
+   		container.incidences = new Incidence[DiskStorageManager.CONTAINER_SIZE];
    		read(input);
 	}
 		
@@ -101,15 +101,15 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
    		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = oldRef.nextIncidenceAtVertexId;
    		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId = oldRef.previousIncidenceAtEdgeId;
    		container.previousIncidenceAtVertexId = previousIncidenceAtVertexId = oldRef.previousIncidenceAtVertexId;
-   		container.incidences = new Incidence[BackgroundStorage.CONTAINER_SIZE];
+   		container.incidences = new Incidence[DiskStorageManager.CONTAINER_SIZE];
 	}
 
 	void read(FileChannel channel) throws IOException {
-		IntBuffer ib = channel.map(MapMode.READ_ONLY, 0, BackgroundStorage.CONTAINER_SIZE * 4 * 8).asIntBuffer();
+		IntBuffer ib = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 8).asIntBuffer();
 		ib.get(types);
 		ib.get(edgeId);
 		ib.get(vertexId);
-		for (int i = 0; i<BackgroundStorage.CONTAINER_SIZE; i++) {
+		for (int i = 0; i<DiskStorageManager.CONTAINER_SIZE; i++) {
 			direction[i] = ib.get() == 1;
 		}
 		ib.get(nextIncidenceAtEdgeId);
@@ -126,13 +126,13 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 
 
 	void write(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, BackgroundStorage.CONTAINER_SIZE * 4 * 8);
+		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 8);
 		IntBuffer ib = bb.asIntBuffer();
 		ib.clear();
 		ib.put(types);
 		ib.put(edgeId);
 		ib.put(vertexId);
-		for (int i = 0; i<BackgroundStorage.CONTAINER_SIZE; i++) {
+		for (int i = 0; i<DiskStorageManager.CONTAINER_SIZE; i++) {
 			ib.put(direction[i] ? 1 : 2);
 		}
 		ib.put(nextIncidenceAtEdgeId);

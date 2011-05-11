@@ -24,17 +24,17 @@ public class VertexContainerReference extends GraphElementContainerReference<Ver
 	public VertexContainerReference(VertexContainer container,
 			FileChannel input, ReferenceQueue queue) throws IOException, ClassNotFoundException {
 		super(container, input, queue);
-   		container.vertices = new Vertex[BackgroundStorage.CONTAINER_SIZE];
+   		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
 	public VertexContainerReference(VertexContainer container, FileChannel input, VertexContainerReference oldRef, ReferenceQueue queue) throws IOException {
 		super(container, input, oldRef, queue);
-   		container.vertices = new Vertex[BackgroundStorage.CONTAINER_SIZE];
+   		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
 	public VertexContainerReference(VertexContainer container, VertexContainerReference oldRef, ReferenceQueue queue) {
 		super(container, oldRef, queue);
-   		container.vertices = new Vertex[BackgroundStorage.CONTAINER_SIZE];
+   		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
 	public String toString() {

@@ -8,7 +8,7 @@ public abstract class GraphElementContainer extends StorageContainer {
 	 */
 	private static final long serialVersionUID = 7263708635173794673L;
 
-	public GraphElementContainer(int id, int size, BackgroundStorage backgroundStorage) {
+	public GraphElementContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		super(id, size, backgroundStorage);
 		incidenceListVersion = new long[size];
 		kappa = new int[size];

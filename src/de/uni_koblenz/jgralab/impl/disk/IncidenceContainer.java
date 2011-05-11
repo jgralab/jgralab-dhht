@@ -4,7 +4,7 @@ import de.uni_koblenz.jgralab.Incidence;
 
 public class IncidenceContainer extends StorageContainer {
 	
-	public IncidenceContainer(int id, int size, BackgroundStorage backgroundStorage) {
+	public IncidenceContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		super(id, size, backgroundStorage);
 		vertexId = new int[size];
 		edgeId = new int[size];
@@ -16,7 +16,7 @@ public class IncidenceContainer extends StorageContainer {
 		incidences = new Incidence[size];
 	}
 	
-	public IncidenceContainer(int id, BackgroundStorage backgroundStorage) {
+	public IncidenceContainer(int id, DiskStorageManager backgroundStorage) {
 		this.id = id;
 		this.backgroundStorage = backgroundStorage;
 	}

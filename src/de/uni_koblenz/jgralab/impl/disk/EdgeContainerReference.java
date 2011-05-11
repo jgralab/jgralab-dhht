@@ -39,17 +39,17 @@ public class EdgeContainerReference extends GraphElementContainerReference<EdgeC
 	public EdgeContainerReference(EdgeContainer container,
 			FileChannel input, ReferenceQueue  queue) throws IOException, ClassNotFoundException {
 		super(container, input, queue);
-   		container.edges = new Edge[BackgroundStorage.CONTAINER_SIZE];
+   		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
 	public EdgeContainerReference(EdgeContainer container, FileChannel input, EdgeContainerReference oldRef, ReferenceQueue queue) throws IOException {
 		super(container, input, oldRef, queue);
-   		container.edges = new Edge[BackgroundStorage.CONTAINER_SIZE];
+   		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
 	public EdgeContainerReference(EdgeContainer container, EdgeContainerReference oldRef, ReferenceQueue queue) {
 		super(container, oldRef, queue);
-   		container.edges = new Edge[BackgroundStorage.CONTAINER_SIZE];
+   		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
 		
 		

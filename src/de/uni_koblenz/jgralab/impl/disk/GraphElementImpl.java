@@ -580,7 +580,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	@Override
 	public final GraphElement<?, ?, ?> getSigma() {
-		int id = storage.sigmaId[BackgroundStorage.getElementIdInStorage(this.id)];
+		int id = storage.sigmaId[DiskStorageManager.getElementIdInStorage(this.id)];
 		if (id < 0) {
 			return storage.backgroundStorage.getEdge(-id);
 		} else {
@@ -599,9 +599,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
 		GraphElement s = (GraphElement) newSigma;
 		if (s instanceof Edge) {
-			storage.sigmaId[BackgroundStorage.getElementIdInStorage(this.id)] = - newSigma.getId();
+			storage.sigmaId[DiskStorageManager.getElementIdInStorage(this.id)] = - newSigma.getId();
 		} else {
-			storage.sigmaId[BackgroundStorage.getElementIdInStorage(this.id)] = newSigma.getId();
+			storage.sigmaId[DiskStorageManager.getElementIdInStorage(this.id)] = newSigma.getId();
 		}
 	}
 
@@ -609,7 +609,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	@Override
 	public final int getKappa() {
-		return storage.kappa[BackgroundStorage.getElementIdInStorage(id)];
+		return storage.kappa[DiskStorageManager.getElementIdInStorage(id)];
 	}
 	
 	/**
@@ -622,12 +622,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final void setKappa(int kappa) throws RemoteException {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storage.kappa[BackgroundStorage.getElementIdInStorage(id)] = kappa;
+		storage.kappa[DiskStorageManager.getElementIdInStorage(id)] = kappa;
 	}	
 
 	@Override
 	public final boolean isVisible(int kappa) {
-		return storage.kappa[BackgroundStorage.getElementIdInStorage(id)] >= kappa;
+		return storage.kappa[DiskStorageManager.getElementIdInStorage(id)] >= kappa;
 	}
 	
 	/**
@@ -637,7 +637,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            long
 	 */
 	protected final void setIncidenceListVersion(long incidenceListVersion) {
-		storage.incidenceListVersion[BackgroundStorage.getElementIdInStorage(id)] = incidenceListVersion;
+		storage.incidenceListVersion[DiskStorageManager.getElementIdInStorage(id)] = incidenceListVersion;
 	}
 
 	/**
@@ -650,7 +650,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		return storage.incidenceListVersion[BackgroundStorage.getElementIdInStorage(id)];
+		return storage.incidenceListVersion[DiskStorageManager.getElementIdInStorage(id)];
 	}
 	
 	
@@ -672,7 +672,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 	
 	protected final int getIdInStorage(int id) {
-		return id & BackgroundStorage.CONTAINER_MASK;// BackgroundStorage.getElementIdInStorage(id);
+		return id & DiskStorageManager.CONTAINER_MASK;// BackgroundStorage.getElementIdInStorage(id);
 	}
 	
 

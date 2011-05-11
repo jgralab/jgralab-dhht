@@ -11,12 +11,12 @@ public class VertexContainer extends GraphElementContainer {
 	
 	transient Vertex[] vertices;
 
-	public VertexContainer(int id, int size, BackgroundStorage backgroundStorage) {
+	public VertexContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		super(id, size, backgroundStorage);
 		vertices = new Vertex[size];
 	}
 	
-	public VertexContainer(int id, BackgroundStorage backgroundStorage) {
+	public VertexContainer(int id, DiskStorageManager backgroundStorage) {
 		super();
 		this.id = id;
 		this.backgroundStorage = backgroundStorage;

@@ -15,9 +15,9 @@ public abstract class StorageContainer {
 	StorageContainer previousInQueue = null;
 	
 	//TODO: Remove this field as soon as graph is storage
-	public BackgroundStorage backgroundStorage;
+	public DiskStorageManager backgroundStorage;
 
-	public StorageContainer(int id, int size, BackgroundStorage backgroundStorage) {
+	public StorageContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		this.id = id;
 		types = new int[size];
 		this.backgroundStorage = backgroundStorage;

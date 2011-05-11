@@ -708,7 +708,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	
-	public BackgroundStorage getBackgroundStorage() {
+	public DiskStorageManager getBackgroundStorage() {
 		return viewedGraph.getBackgroundStorage();
 	}
 	

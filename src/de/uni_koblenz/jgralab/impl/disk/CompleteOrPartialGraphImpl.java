@@ -40,7 +40,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 		schema = cls.getSchema();
 		graphFactory = cls.getSchema().getGraphFactory();
 		try {
-			backgroundStorage = new BackgroundStorage(this);
+			backgroundStorage = new DiskStorageManager(this);
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -112,9 +112,9 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	private boolean loading;
 	
 	
-	protected BackgroundStorage backgroundStorage;
+	protected DiskStorageManager backgroundStorage;
 	
-	public BackgroundStorage getBackgroundStorage() {
+	public DiskStorageManager getBackgroundStorage() {
 		return backgroundStorage;
 	}
 

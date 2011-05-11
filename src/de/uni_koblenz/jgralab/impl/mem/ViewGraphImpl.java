@@ -24,7 +24,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
-import de.uni_koblenz.jgralab.impl.disk.BackgroundStorage;
+import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -708,7 +708,7 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.createPartialGraph(hostname);
 	}
 
-	public BackgroundStorage getBackgroundStorage() {
+	public DiskStorageManager getBackgroundStorage() {
 		throw new UnsupportedOperationException();
 	}
 	

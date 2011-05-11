@@ -57,7 +57,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
-import de.uni_koblenz.jgralab.impl.disk.BackgroundStorage;
+import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -1093,7 +1093,7 @@ public abstract class GraphBaseImpl implements Graph {
 	public abstract boolean containsEdgeLocally(Edge e) throws RemoteException;
 
 	
-	public BackgroundStorage getBackgroundStorage() {
+	public DiskStorageManager getBackgroundStorage() {
 		return null;
 	}
 	

@@ -23,7 +23,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 
-public final class BackgroundStorage {
+public final class DiskStorageManager {
 	
 	
 	/* Switches to toggle behaviour */
@@ -157,7 +157,7 @@ public final class BackgroundStorage {
 	private int incidenceReuseQueueSize = 0;
 	
 	
-	public BackgroundStorage(Graph graph) throws FileNotFoundException {
+	public DiskStorageManager(Graph graph) throws FileNotFoundException {
 		this.graph = graph;
 		try {
 			this.localPartialGraphId = graph.getId();

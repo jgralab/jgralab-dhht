@@ -68,7 +68,7 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 	
 	private final int getIdInStorage(int id) {
-		return id & BackgroundStorage.CONTAINER_MASK; //BackgroundStorage.getElementIdInStorage(id);
+		return id & DiskStorageManager.CONTAINER_MASK; //BackgroundStorage.getElementIdInStorage(id);
 	}
 	
 	protected IncidenceImpl(int id, IncidenceContainer storage) {
