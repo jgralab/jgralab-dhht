@@ -87,7 +87,6 @@ import de.uni_koblenz.jgralab.schema.DoubleDomain;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.ListDomain;
@@ -139,9 +138,8 @@ public class SchemaImpl implements Schema {
 	public M1ClassManager getM1ClassManager() {
 		return m1ClassManager;
 	}
-	
 
-	private ArrayList<TypedElementClass<?,?>> typedElementClasses = new ArrayList<TypedElementClass<?,?>>();
+	private final ArrayList<TypedElementClass<?, ?>> typedElementClasses = new ArrayList<TypedElementClass<?, ?>>();
 
 	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE = { String.class,
 			int.class, int.class };
@@ -416,16 +414,19 @@ public class SchemaImpl implements Schema {
 		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>();
 
 		/* create code for graph */
-		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(graphClass, packagePrefix, name, config);
+		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
+				graphClass, packagePrefix, name, config);
 		javaSources.addAll(graphCodeGenerator.createJavaSources());
-		
+
 		/* create code for subordinate graph */
-		
-		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
+
+		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(
+				graphClass, packagePrefix, name, config);
 		javaSources.addAll(subordinateGraphCodeGenerator.createJavaSources());
-		
+
 		/* create code for view graph */
-		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(
+				graphClass, packagePrefix, name, config);
 		javaSources.addAll(viewGraphCodeGenerator.createJavaSources());
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
@@ -506,14 +507,16 @@ public class SchemaImpl implements Schema {
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
 				graphClass, packagePrefix, name, config);
 		graphCodeGenerator.createFiles(pathPrefix);
-		
+
 		/* create code for subordinate graph */
-		
-		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(graphClass, packagePrefix, name, config);
+
+		SubordinateGraphCodeGenerator subordinateGraphCodeGenerator = new SubordinateGraphCodeGenerator(
+				graphClass, packagePrefix, name, config);
 		subordinateGraphCodeGenerator.createFiles(pathPrefix);
-		
+
 		/* create code for view graph */
-		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(graphClass, packagePrefix, name, config);
+		ViewGraphCodeGenerator viewGraphCodeGenerator = new ViewGraphCodeGenerator(
+				graphClass, packagePrefix, name, config);
 		viewGraphCodeGenerator.createFiles(pathPrefix);
 
 		for (VertexClass vertexClass : graphClass.getVertexClasses()) {
@@ -935,8 +938,6 @@ public class SchemaImpl implements Schema {
 		} else if (graphClass.getQualifiedName().equals(qualifiedName)) {
 			return graphClass;
 		} else {
-			GraphElementClass<?, ?> gc = graphClass
-					.getGraphElementClass(qualifiedName);
 			return graphClass.getGraphElementClass(qualifiedName);
 		}
 	}
@@ -1375,26 +1376,24 @@ public class SchemaImpl implements Schema {
 	}
 
 	@Override
-	public Integer getClassId(TypedElementClass schemaClass) {
+	public Integer getClassId(TypedElementClass<?, ?> schemaClass) {
 		return schemaClass.getId();
 	}
-	
+
 	@Override
-	public TypedElementClass<?,?> getTypeForId(Integer id) {
+	public TypedElementClass<?, ?> getTypeForId(Integer id) {
 		return typedElementClasses.get(id);
 	}
-	
+
 	@Override
-	public Class getM1ClassForId(Integer id) {
+	public Class<?> getM1ClassForId(Integer id) {
 		return typedElementClasses.get(id).getM1Class();
 	}
 
-	public void registerM1ClassId(TypedElementClass clazz) {
+	public void registerM1ClassId(TypedElementClass<?, ?> clazz) {
 		typedElementClasses.add(clazz);
-		int id = typedElementClasses.size();	
+		int id = typedElementClasses.size();
 		clazz.setId(id);
 	}
-	
 
-	
 }
