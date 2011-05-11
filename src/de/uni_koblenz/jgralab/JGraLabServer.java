@@ -19,5 +19,7 @@ public interface JGraLabServer {
 	public GraphDatabase loadGraph(String filename, ProgressFunction pf)
 			throws GraphIOException;
 
+	public abstract GraphDatabase createGraph(int graphClassId, String completeGraphUid, int partialGraphId, String hostnameOfCompleteGraph);
+
 
 }

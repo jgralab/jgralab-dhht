@@ -134,8 +134,7 @@ public abstract class CompleteOrPartialGraphImpl extends GraphBaseImpl {
 	
 	@Override
 	public Graph createPartialGraph(String hostname)  throws RemoteException {
-		int id = graphDatabase.getFreePartialGraphId();
-		
+		return graphDatabase.createPartialGraph(this.getGraphClass(), hostname);
 	}
 	
 	

@@ -83,6 +83,10 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	public void useAsTraversalContext() {
 		setTraversalContext(this);
 	}
+	
+	public void setHostname(String hostname) {
+		graphDatabase.setHostname(hostname);
+	}
 
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -101,15 +105,11 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 *            this Graph's id
 	 * @param cls
 	 *            the GraphClass of this Graph
-	 * @param vMax
-	 *            initial maximum number of vertices
-	 * @param eMax
-	 *            initial maximum number of edges
 	 */
 	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) throws RemoteException {
 		super(cls);
 		this.uid = uid;
-		graphDatabase = new CompleteGraphDatabase(this);
+		graphDatabase = new CompleteGraphDatabase(this, "127.0.0.1");
 		if (vMax < 1) {
 			throw new GraphException("vMax must not be less than 1", null);
 		}
@@ -120,22 +120,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		setDeleteVertexList(new LinkedList<VertexImpl>());
 	}
 
-	/**
-	 * 
-	 */
-	private List<Integer> partialGraphIds = null;
 
-	public int allocateFreePartialGraphId() {
-		if (partialGraphIds.isEmpty()) {
-			throw new GraphException("No free partial graph ID available");
-		}
-		return partialGraphIds.remove(0);
-	}
 
 	/** should be called by all delete partial graph operations 
 	 * @throws RemoteException */
 	public void internalDeletePartialGraph(PartialGraphImpl graph) throws RemoteException {
-		partialGraphIds.add(graph.getPartialGraphId());
+		graphDatabase.releasePartialGraphId(graph.getPartialGraphId());
 	}
 
 	@Override
