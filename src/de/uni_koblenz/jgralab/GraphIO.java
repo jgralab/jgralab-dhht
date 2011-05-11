@@ -1465,7 +1465,7 @@ public class GraphIO {
 			Method instanceMethod = schemaClass.getMethod("instance",
 					(Class<?>[]) null);
 			io.schema = (Schema) instanceMethod.invoke(null, new Object[0]);
-			CompleteGraphImpl loadedGraph = io.graph(pf, implementationType);
+			Graph loadedGraph = io.graph(pf, implementationType);
 			io.incidencesAtEdge = null;
 			io.incidencesAtVertex = null;
 			loadedGraph.loadingCompleted();
@@ -2871,7 +2871,7 @@ public class GraphIO {
 	}
 
 	@SuppressWarnings("unchecked")
-	private CompleteGraphImpl graph(ProgressFunction pf,
+	private Graph graph(ProgressFunction pf,
 			ImplementationType implementationType) throws GraphIOException,
 			RemoteException {
 		currentPackageName = "";
@@ -2915,9 +2915,9 @@ public class GraphIO {
 			pf.init(vCount + eCount);
 			interval = pf.getUpdateInterval();
 		}
-		CompleteGraphImpl graph = null;
+		GraphBaseImpl graph = null;
 		try {
-			graph = (CompleteGraphImpl) schema.getGraphCreateMethod(
+			graph = (GraphBaseImpl) schema.getGraphCreateMethod(
 					implementationType).invoke(null,
 					new Object[] { graphId, maxV, maxE });
 		} catch (Exception e) {
@@ -3007,8 +3007,8 @@ public class GraphIO {
 		}
 	}
 
-	private void readPartialGraphs(CompleteGraphImpl graph)
-			throws GraphIOException, RemoteException {
+	private void readPartialGraphs(Graph graph) throws GraphIOException,
+			RemoteException {
 		partialGraphs = new ArrayList<String[]>();
 		match("{");
 		while (!lookAhead.equals("}")) {
