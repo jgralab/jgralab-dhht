@@ -2910,7 +2910,6 @@ public class GraphIO {
 					+ ") exceeds maximum number of edges (" + maxE + ")");
 		}
 
-		// adjust fields for incidences
 		incidencesAtEdge = new ArrayList[maxE + 1];
 		incidencesAtVertex = new ArrayList[maxV + 1];
 		incidenceTypes = new ArrayList<String>();
@@ -2936,6 +2935,11 @@ public class GraphIO {
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
+		// TODO set complete graph if it is not the complete
+		// adjust fields for incidences
+		if (!isCompleteGraph()) {
+
+		}
 
 		while (!lookAhead.equals("edges")) {
 			if (lookAhead.equals("Package")) {
@@ -2975,6 +2979,7 @@ public class GraphIO {
 		createIncidences(graph);
 		sortLambdaSequences(graph);
 		setSigmas(graph);
+		// TODO check graphId
 		if (graph instanceof CompleteGraphImpl) {
 			((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 		}
@@ -2983,6 +2988,11 @@ public class GraphIO {
 		}
 		graph.setLoading(false);
 		return graph;
+	}
+
+	private boolean isCompleteGraph() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	private void createIncidences(Graph graph) throws RemoteException {
