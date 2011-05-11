@@ -75,7 +75,7 @@ public abstract class VertexImpl extends
 		this.id = id;
 		((CompleteGraphImpl) graph).addVertex(this);
 		id = getId();
-		this.storage = graph.getBackgroundStorage().getVertexStorage(id);
+		this.storage = graph.getDiskStorage().getVertexStorage(id);
 	}
 	
 	protected VertexImpl(int id, VertexContainer storage, Graph graph) throws RemoteException {

@@ -91,7 +91,7 @@ public class EdgeListTest extends InstanceTest {
 			g.createNode();
 		}
 		for (int i = 0; i < N; ++i) {
-			g.createLink((Node) g.getVertex(i + 1), (Node) g.getVertex((i + 1)
+			g.createLink((Node) g.getVertexObject(i + 1), (Node) g.getVertexObject((i + 1)
 					% N + 1));
 		}
 		commit(g);
@@ -140,52 +140,52 @@ public class EdgeListTest extends InstanceTest {
 		// fail("testcase creates an infinite loop.");
 		// }
 		createReadOnlyTransaction(g);
-		Edge e5 = g.getEdge(5).getReversedEdge();
+		Edge e5 = g.getEdgeObject(5).getReversedEdge();
 		commit(g);
 
 		createTransaction(g);
-		e5.putBeforeEdge(g.getEdge(6));
+		e5.putBeforeEdge(g.getEdgeObject(6));
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertTrue(e5.isBeforeEdge(g.getEdge(6)));
+		assertTrue(e5.isBeforeEdge(g.getEdgeObject(6)));
 		assertEquals("e1 e2 e3 e4 e5 e6 e7 e8 e9 e10", getESeq());
-		assertTrue(e5.isAfterEdge(g.getEdge(4)));
-		assertFalse(e5.isBeforeEdge(g.getEdge(4)));
+		assertTrue(e5.isAfterEdge(g.getEdgeObject(4)));
+		assertFalse(e5.isBeforeEdge(g.getEdgeObject(4)));
 		commit(g);
 
 		createTransaction(g);
-		e5.putBeforeEdge(g.getEdge(4));
+		e5.putBeforeEdge(g.getEdgeObject(4));
 		commit(g);
 
 		createReadOnlyTransaction(g);
 		assertEquals("e1 e2 e3 e5 e4 e6 e7 e8 e9 e10", getESeq());
-		assertFalse(e5.isAfterEdge(g.getEdge(4)));
-		assertTrue(e5.isBeforeEdge(g.getEdge(4)));
+		assertFalse(e5.isAfterEdge(g.getEdgeObject(4)));
+		assertTrue(e5.isBeforeEdge(g.getEdgeObject(4)));
 		commit(g);
 
 		createTransaction(g);
-		e5.putBeforeEdge(g.getEdge(10).getReversedEdge());
+		e5.putBeforeEdge(g.getEdgeObject(10).getReversedEdge());
 		// e5.putBeforeInGraph(g.getEdge(10));
 		commit(g);
 
 		createReadOnlyTransaction(g);
 		assertEquals("e1 e2 e3 e4 e6 e7 e8 e9 e5 e10", getESeq());
-		assertFalse(e5.isAfterEdge(g.getEdge(10)));
-		assertTrue(e5.isBeforeEdge(g.getEdge(10)));
-		assertFalse(e5.isBeforeEdge(g.getEdge(1)));
-		assertTrue(g.getEdge(1).isBeforeEdge(e5));
+		assertFalse(e5.isAfterEdge(g.getEdgeObject(10)));
+		assertTrue(e5.isBeforeEdge(g.getEdgeObject(10)));
+		assertFalse(e5.isBeforeEdge(g.getEdgeObject(1)));
+		assertTrue(g.getEdgeObject(1).isBeforeEdge(e5));
 		commit(g);
 
 		createTransaction(g);
-		e5.putBeforeEdge(g.getEdge(1));
+		e5.putBeforeEdge(g.getEdgeObject(1));
 		commit(g);
 
 		createReadOnlyTransaction(g);
 		assertEquals("e5 e1 e2 e3 e4 e6 e7 e8 e9 e10", getESeq());
-		assertTrue(e5.isBeforeEdge(g.getEdge(1)));
-		assertFalse(e5.isAfterEdge(g.getEdge(1)));
-		assertTrue(g.getEdge(1).isAfterEdge(e5));
+		assertTrue(e5.isBeforeEdge(g.getEdgeObject(1)));
+		assertFalse(e5.isAfterEdge(g.getEdgeObject(1)));
+		assertTrue(g.getEdgeObject(1).isAfterEdge(e5));
 		commit(g);
 
 	}
@@ -193,11 +193,11 @@ public class EdgeListTest extends InstanceTest {
 	@Test
 	public void putAfterTest() throws Exception {
 		createReadOnlyTransaction(g);
-		Edge e5 = g.getEdge(5).getReversedEdge();
+		Edge e5 = g.getEdgeObject(5).getReversedEdge();
 		commit(g);
 
 		createTransaction(g);
-		e5.putAfterEdge(g.getEdge(4));
+		e5.putAfterEdge(g.getEdgeObject(4));
 		commit(g);
 
 		createReadOnlyTransaction(g);
@@ -205,7 +205,7 @@ public class EdgeListTest extends InstanceTest {
 		commit(g);
 
 		createTransaction(g);
-		e5.putAfterEdge(g.getEdge(6).getReversedEdge());
+		e5.putAfterEdge(g.getEdgeObject(6).getReversedEdge());
 		commit(g);
 
 		createReadOnlyTransaction(g);
@@ -213,7 +213,7 @@ public class EdgeListTest extends InstanceTest {
 		commit(g);
 
 		createTransaction(g);
-		e5.putAfterEdge(g.getEdge(10));
+		e5.putAfterEdge(g.getEdgeObject(10));
 		commit(g);
 
 		createReadOnlyTransaction(g);
@@ -221,7 +221,7 @@ public class EdgeListTest extends InstanceTest {
 		commit(g);
 
 		createTransaction(g);
-		e5.putAfterEdge(g.getEdge(1));
+		e5.putAfterEdge(g.getEdgeObject(1));
 		commit(g);
 
 		createReadOnlyTransaction(g);
@@ -232,7 +232,7 @@ public class EdgeListTest extends InstanceTest {
 	@Test
 	public void deleteEdgeTest() throws Exception {
 		createReadOnlyTransaction(g);
-		Edge e = g.getEdge(5);
+		Edge e = g.getEdgeObject(5);
 		commit(g);
 
 		createTransaction(g);
@@ -241,14 +241,14 @@ public class EdgeListTest extends InstanceTest {
 
 		createReadOnlyTransaction(g);
 		assertFalse(e.isValid());
-		assertEquals(null, g.getEdge(5));
+		assertEquals(null, g.getEdgeObject(5));
 		assertEquals(9, g.getECount());
-		assertEquals(1, g.getVertex(5).getDegree());
-		assertEquals(1, g.getVertex(5).getDegree(EdgeDirection.IN));
-		assertEquals(0, g.getVertex(5).getDegree(EdgeDirection.OUT));
-		assertEquals(1, g.getVertex(6).getDegree());
-		assertEquals(0, g.getVertex(6).getDegree(EdgeDirection.IN));
-		assertEquals(1, g.getVertex(6).getDegree(EdgeDirection.OUT));
+		assertEquals(1, g.getVertexObject(5).getDegree());
+		assertEquals(1, g.getVertexObject(5).getDegree(EdgeDirection.IN));
+		assertEquals(0, g.getVertexObject(5).getDegree(EdgeDirection.OUT));
+		assertEquals(1, g.getVertexObject(6).getDegree());
+		assertEquals(0, g.getVertexObject(6).getDegree(EdgeDirection.IN));
+		assertEquals(1, g.getVertexObject(6).getDegree(EdgeDirection.OUT));
 		assertEquals("e1 e2 e3 e4 e6 e7 e8 e9 e10", getESeq());
 		commit(g);
 
@@ -262,13 +262,13 @@ public class EdgeListTest extends InstanceTest {
 
 		createReadOnlyTransaction(g);
 		assertFalse(e.isValid());
-		assertEquals(null, g.getEdge(1));
+		assertEquals(null, g.getEdgeObject(1));
 		assertEquals(8, g.getECount());
 		assertEquals("e2 e3 e4 e6 e7 e8 e9 e10", getESeq());
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		e = g.getEdge(10);
+		e = g.getEdgeObject(10);
 		commit(g);
 
 		createTransaction(g);
@@ -277,14 +277,14 @@ public class EdgeListTest extends InstanceTest {
 
 		createReadOnlyTransaction(g);
 		assertFalse(e.isValid());
-		assertEquals(null, g.getEdge(1));
+		assertEquals(null, g.getEdgeObject(1));
 		assertEquals(7, g.getECount());
 		assertEquals("e2 e3 e4 e6 e7 e8 e9", getESeq());
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		Node v1 = (Node) g.getVertex(1);
-		Node v2 = (Node) g.getVertex(2);
+		Node v1 = (Node) g.getVertexObject(1);
+		Node v2 = (Node) g.getVertexObject(2);
 		commit(g);
 
 		createTransaction(g);
@@ -361,7 +361,7 @@ public class EdgeListTest extends InstanceTest {
 
 		int i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getUid());
+			assertEquals(currentEdge.getId(), links[i++].getCompleteGraphUid());
 		}
 
 		Comparator<Edge> comp = new Comparator<Edge>() {
@@ -377,7 +377,7 @@ public class EdgeListTest extends InstanceTest {
 
 		i = EDGE_COUNT;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i--].getUid());
+			assertEquals(currentEdge.getId(), links[i--].getCompleteGraphUid());
 		}
 
 		comp = new Comparator<Edge>() {
@@ -393,7 +393,7 @@ public class EdgeListTest extends InstanceTest {
 
 		i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getUid());
+			assertEquals(currentEdge.getId(), links[i++].getCompleteGraphUid());
 		}
 		commit(g);
 

@@ -181,7 +181,7 @@ public class GreqlGui extends JFrame {
 							statusLabel.setText("Couldn't load graph :-(");
 						} else {
 							try {
-								statusLabel.setText("Graph '" + graph.getUid()
+								statusLabel.setText("Graph '" + graph.getCompleteGraphUid()
 										+ "' loaded.");
 							} catch (RemoteException e) {
 								throw new RuntimeException(e);

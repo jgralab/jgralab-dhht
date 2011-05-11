@@ -462,7 +462,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public String getUid() {
+	public String getCompleteGraphUid() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -697,8 +697,8 @@ public abstract class ViewGraphImpl implements Graph,
 
 
 	@Override
-	public int getId() throws RemoteException {
-		return viewedGraph.getId();
+	public int getPartialGraphId() throws RemoteException {
+		return viewedGraph.getPartialGraphId();
 	}
 
 
@@ -708,8 +708,8 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	
-	public DiskStorageManager getBackgroundStorage() {
-		return viewedGraph.getBackgroundStorage();
+	public DiskStorageManager getDiskStorage() {
+		return viewedGraph.getDiskStorage();
 	}
 	
 

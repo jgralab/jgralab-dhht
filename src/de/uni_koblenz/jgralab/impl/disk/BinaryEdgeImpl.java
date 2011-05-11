@@ -26,19 +26,19 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 
 	@Override
 	public Vertex getAlpha() throws RemoteException {
-		if (storage.backgroundStorage.getIncidence(storage.firstIncidenceId[id]).getDirection() == Direction.VERTEX_TO_EDGE) {
-			return storage.backgroundStorage.getIncidence(storage.firstIncidenceId[id]).getVertex();
+		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.VERTEX_TO_EDGE) {
+			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
 		} else {
-			return storage.backgroundStorage.getIncidence(storage.lastIncidenceId[id]).getVertex();
+			return storage.backgroundStorage.getIncidenceObject(storage.lastIncidenceId[id]).getVertex();
 		}
 	}
 
 	@Override
 	public Vertex getOmega() throws RemoteException {
-		if (storage.backgroundStorage.getIncidence(storage.firstIncidenceId[id]).getDirection() == Direction.EDGE_TO_VERTEX) {
-			return storage.backgroundStorage.getIncidence(storage.firstIncidenceId[id]).getVertex();
+		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.EDGE_TO_VERTEX) {
+			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
 		} else {
-			return storage.backgroundStorage.getIncidence(storage.lastIncidenceId[id]).getVertex();
+			return storage.backgroundStorage.getIncidenceObject(storage.lastIncidenceId[id]).getVertex();
 		}
 	}
 

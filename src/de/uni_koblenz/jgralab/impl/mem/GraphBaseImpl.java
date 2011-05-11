@@ -1113,7 +1113,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 */
 	public abstract boolean containsEdgeLocally(Edge e) throws RemoteException;
 
-	public DiskStorageManager getBackgroundStorage() {
+	public DiskStorageManager getDiskStorage() {
 		return null;
 	}
 

@@ -78,7 +78,7 @@ public abstract class EdgeProxy implements Edge {
 		this.id =anId;
 		((CompleteGraphImpl) graph).addEdge(this);
 		id = getId();
-		this.storage = graph.getBackgroundStorage().getEdgeStorage(id);
+		this.storage = graph.getDiskStorage().getEdgeStorage(id);
 	}
 	
 

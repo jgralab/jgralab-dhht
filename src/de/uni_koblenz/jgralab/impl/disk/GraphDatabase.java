@@ -3,13 +3,16 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphFactory;
+import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 
@@ -20,7 +23,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * on the ids
  */
 
-public class GraphDatabase implements Remote {
+public abstract class GraphDatabase implements Remote {
 	
 	private Schema schema;
 	
@@ -28,12 +31,13 @@ public class GraphDatabase implements Remote {
 	
 	private final int localGraphId;
 	
+	protected DiskStorageManager diskStorage;
 	
-	/*
-	 * Stores the hostnames of the partial graphs
-	 */
-	private String[] hostnames;
+	protected JGraLabServer server;
 	
+	protected GraphFactory factory;
+	
+
 	/*
 	 * The list of local (proxy) objects for the remote graphs
 	 */
@@ -46,17 +50,18 @@ public class GraphDatabase implements Remote {
 	
 //	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
 	
-	private Map<Integer, Reference<VertexProxy>> remoteVertices;
+	protected Map<Integer, Reference<VertexProxy>> remoteVertices;
 	
-	private Map<Integer, Reference<EdgeProxy>> remoteEdges;
+	protected Map<Integer, Reference<EdgeProxy>> remoteEdges;
 	
 	private Map<Integer, Reference<IncidenceProxy>> remoteIncidences;
 	
 	
-	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph) throws RemoteException {
+	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph) {
 		this.localGraph = localGraph;
 		localGraphId = localGraph.getId();
-		hostnames = new String[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
+		diskStorage = localGraph.getDiskStorage();
+		factory = localGraph.graphFactory;
 		partialGraphs = new Graph[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		partialGraphDatabases = new GraphDatabase[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		
@@ -64,24 +69,24 @@ public class GraphDatabase implements Remote {
 		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
 		remoteEdges = new HashMap<Integer, Reference<EdgeProxy>>();
 		remoteIncidences = new HashMap<Integer, Reference<IncidenceProxy>>();
+		
+		//register graph at server
+		server = JGraLabServerImpl.getLocalInstance();
+		server.registerGraph(localGraph.getCompleteGraphUid(), localGraph.getPartialGraphId(), this);
 	}
-	
-	/*
-	 * Methods to access Vseq
-	 */
 	
 	private GraphDatabase getGraphDatabase(int partialGraphId) {
 		if (partialGraphDatabases[partialGraphId] == null) {
 			//initialize new remote graph database
+			partialGraphDatabases[partialGraphId] = server.getRemoteInstance(getHostname(partialGraphId)).getGraph(localGraph.getCompleteGraphUid(), partialGraphId);
 		}
 		return partialGraphDatabases[partialGraphId];
 	}
 	
-	public Graph getPartialGraph(int partialGraphId) {
-		if (partialGraphs[partialGraphId] == null) {
-			partialGraphs[partialGraphId] = new PartialGraphProxy(int partialGraphId, this);
-		}
-	}
+	protected abstract String getHostname(int id);
+	
+
+	public abstract int getFreePartialGraphId();
 	
 	/**
 	 * Registers the partial graph with the given id <code>id</code> which is stored on the
@@ -89,15 +94,30 @@ public class GraphDatabase implements Remote {
 	 * @param id
 	 * @param hostname
 	 */
-	public void registerPartialGraph(int id, String hostname) {
-		if (hostnames[id] == null) {
-			hostnames[id] = hostname;
-		} else {
-			throw new RuntimeException("There is already a graph with the id " + id + " registered");
-		}
-	}
-
+	public abstract void registerPartialGraph(int id, String hostname);
 	
+	
+	//Methods to access Graph, vertex, edge and incidence objects
+	
+	/**
+	 * Retrieves a Graph object (local or proxy) that represents the (partial) graph identified by the given id
+	 * @param partialGraphId
+	 * @return
+	 */
+	public Graph getGraphObject(int partialGraphId) {
+		if (partialGraphId == localGraphId)
+			return localGraph;
+		if (partialGraphs[partialGraphId] == null) {
+			if (partialGraphId == 0) {
+				//Proxy for complete graph,
+				//TODO change to factory call
+				partialGraphs[partialGraphId] = new PartialGraphProxy(partialGraphId, this);				
+			} else {
+				partialGraphs[partialGraphId] = new PartialGraphProxy(partialGraphId, this);	
+			}
+		}
+		return partialGraphs[partialGraphId];
+	}
 
 	/**
 	 * @return an object realizing the vertex with the given id. The object
@@ -106,17 +126,16 @@ public class GraphDatabase implements Remote {
 	public Vertex getVertexObject(int id) {
 		int partialGraphId = GraphStorage.getPartialGraphId(id);
 		if (partialGraphId == localGraphId) {
-			return localGraph.getVertex(id);
+			return diskStorage.getVertexObject(id);
 		}
 		Reference<VertexProxy> ref = remoteVertices.get(id);
 		VertexProxy proxy = null;
 		if ((ref == null) || (ref.get() == null)) {
 			//create new vertex proxy
 			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
-			int vertexClassId = 
-			VertexClass vc = schema.getM1ClassForId(vertexClassId);
-			
-			
+			int vertexClassId = remoteDatabase.getVertexTypeId(id);
+			Class<? extends Vertex> vc = (Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId);
+			proxy = (VertexProxy) factory.createVertexProxy(vc, id, getGraphObject(partialGraphId));
 			ref = new WeakReference<VertexProxy>(proxy);
 			remoteVertices.put(id, ref);
 		} else {
@@ -125,22 +144,82 @@ public class GraphDatabase implements Remote {
 		return proxy;
 	}
 	
-	
-	
 
+	private int getVertexTypeId(int id) {
+		return getVertexObject(id).getType().getId();
+	}
+
+	
+	/**
+	 * @return an object realizing the edge with the given id. The object
+	 *         may be either a local one or a proxy for a remote one
+	 */
+	public Edge getEdgeObject(int id) {
+		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		if (partialGraphId == localGraphId) {
+			return diskStorage.getEdgeObject(id);
+		}
+		Reference<EdgeProxy> ref = remoteEdges.get(id);
+		EdgeProxy proxy = null;
+		if ((ref == null) || (ref.get() == null)) {
+			//create new vertex proxy
+			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
+			int edgeClassId = remoteDatabase.getEdgeTypeId(id);
+			Class<? extends Edge> ec = (Class<? extends Edge>) schema.getM1ClassForId(edgeClassId);
+			proxy = (EdgeProxy) factory.createEdgeProxy(ec, id, getGraphObject(partialGraphId));
+			ref = new WeakReference<EdgeProxy>(proxy);
+			remoteEdges.put(id, ref);
+		} else {
+			proxy = ref.get();
+		}
+		return proxy;
+	}
+
+	private int getEdgeTypeId(int id) {
+		return getEdgeObject(id).getType().getId();
+	}	
+
+	
+	
+	/**
+	 * @return an object realizing the incidence with the given id. The object
+	 *         may be either a local one or a proxy for a remote one
+	 */
+	public Incidence getIncidenceObject(int id) {
+		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		if (partialGraphId == localGraphId) {
+			return diskStorage.getIncidenceObject(id);
+		}
+		Reference<IncidenceProxy> ref = remoteIncidences.get(id);
+		IncidenceProxy proxy = null;
+		if ((ref == null) || (ref.get() == null)) {
+			//create new vertex proxy
+			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
+			int incidenceClassId = remoteDatabase.getIncidenceTypeId(id);
+			Class<? extends Incidence> ec = (Class<? extends Incidence>) schema.getM1ClassForId(incidenceClassId);
+			proxy = (IncidenceProxy) factory.createIncidenceProxy(ec, id, getGraphObject(partialGraphId));
+			ref = new WeakReference<IncidenceProxy>(proxy);
+			remoteIncidences.put(id, ref);
+		} else {
+			proxy = ref.get();
+		}
+		return proxy;
+	}
+
+	private int getIncidenceTypeId(int id) {
+		return getIncidenceObject(id).getType().getId();
+	}	
+	
+	
+	
+	
+	// Methods to access vsed
 	int getFirstVertex(int partialGraphId) {
-		
+		return 0;
 	}
 	
 	int getLastVertex(int partialGraphId) {
-		
+		return 0;
 	}
-	
-	
-	
-	public Edge getEdgeObject(int id) {
-	}
-	
-	
 
 }

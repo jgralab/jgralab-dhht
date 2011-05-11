@@ -86,12 +86,12 @@ public class GraphValidatorTest {
 	public void validate2() {
 		ConstrainedNode n1 = g.createConstrainedNode();
 		n1.set_name("n1");
-		n1.set_uid(n1.getUid());
+		n1.set_uid(n1.getCompleteGraphUid());
 		ConstrainedNode n2 = g.createConstrainedNode();
 		n2.set_name("n2");
-		n2.set_uid(n2.getUid());
+		n2.set_uid(n2.getCompleteGraphUid());
 		ConstrainedLink l1 = g.createConstrainedLink(n1, n2);
-		l1.set_uid(Integer.MAX_VALUE - l1.getUid());
+		l1.set_uid(Integer.MAX_VALUE - l1.getCompleteGraphUid());
 
 		Set<ConstraintViolation> brokenConstraints = validator.validate();
 
@@ -105,7 +105,7 @@ public class GraphValidatorTest {
 	public void validate3() {
 		OtherConstrainedNode n1 = g.createOtherConstrainedNode();
 		n1.set_name("n1");
-		n1.set_uid(n1.getUid());
+		n1.set_uid(n1.getCompleteGraphUid());
 		// This should be between 0 and 20.
 		n1.set_niceness(-17);
 

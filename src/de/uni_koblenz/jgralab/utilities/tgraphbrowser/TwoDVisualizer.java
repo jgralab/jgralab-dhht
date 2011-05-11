@@ -83,10 +83,10 @@ public class TwoDVisualizer {
 		// set currentVertex or currentEdge to the current element
 		if (currentElement.isVertex()) {
 			code.append("current").append("Vertex = \"").append(
-					currentElement.toVertex().getId()).append("\";\n");
+					currentElement.toVertex().getPartialGraphId()).append("\";\n");
 		} else if (currentElement.isEdge()) {
 			code.append("current").append("Edge = \"").append(
-					currentElement.toEdge().getId()).append("\";\n");
+					currentElement.toEdge().getPartialGraphId()).append("\";\n");
 		}
 		// calculate environment
 		JValueSet elementsToDisplay = new JValueSet();

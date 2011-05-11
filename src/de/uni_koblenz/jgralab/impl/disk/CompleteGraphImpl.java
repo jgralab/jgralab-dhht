@@ -109,16 +109,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) throws RemoteException {
 		super(cls);
 		this.uid = uid;
+		graphDatabase = new CompleteGraphDatabase(this);
 		if (vMax < 1) {
 			throw new GraphException("vMax must not be less than 1", null);
 		}
 		if (eMax < 1) {
 			throw new GraphException("eMax must not be less than 1", null);
-		}
-		id = GraphBaseImpl.PARTIAL_GRAPH_MASK;
-		partialGraphIds = new LinkedList<Integer>();
-		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK + 1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
-			partialGraphIds.add(i);
 		}
 
 		setDeleteVertexList(new LinkedList<VertexImpl>());
@@ -139,7 +135,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	/** should be called by all delete partial graph operations 
 	 * @throws RemoteException */
 	public void internalDeletePartialGraph(PartialGraphImpl graph) throws RemoteException {
-		partialGraphIds.add(graph.getId());
+		partialGraphIds.add(graph.getPartialGraphId());
 	}
 
 	@Override
@@ -204,7 +200,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public Edge getEdge(int eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
-		return backgroundStorage.getEdge(eId);
+		return diskStorage.getEdgeObject(eId);
 	}
 
 	/*
@@ -213,7 +209,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @see de.uni_koblenz.jgralab.Graph#getId()
 	 */
 	@Override
-	public String getUid() {
+	public String getCompleteGraphUid() {
 		return uid;
 	}
 
@@ -237,7 +233,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public Vertex getVertex(int vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
-		return backgroundStorage.getVertex(vId);
+		return diskStorage.getVertexObject(vId);
 	}
 
 	/**
@@ -699,7 +695,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public int getId() {
+	public int getPartialGraphId() {
 		return id;
 	}
 

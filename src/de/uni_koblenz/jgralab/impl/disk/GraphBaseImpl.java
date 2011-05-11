@@ -52,16 +52,13 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
-import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -135,12 +132,12 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public Edge getFirstEdge() {
-		return getBackgroundStorage().getEdge(firstEdgeId);
+		return getDiskStorage().getEdgeObject(firstEdgeId);
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		return getBackgroundStorage().getEdge(lastEdgeId);
+		return getDiskStorage().getEdgeObject(lastEdgeId);
 	}
 
 	/**
@@ -1002,34 +999,30 @@ public abstract class GraphBaseImpl implements Graph {
 
 	protected abstract void setICount(int count) throws RemoteException;
 
-	@Override
-	public Graph createPartialGraph(String hostname)  throws RemoteException {
-		JGraLabServer remote = JGraLabServerImpl.getLocalInstance()
-				.getRemoteInstance(hostname);
-		Schema s = remote.getSchema(getSchema().getQualifiedName());
-		PartialGraphImpl partialGraph = null; //(PartialGraphImpl) s.getGraphFactory().createPartialGraph(this);
 
-		if (partialGraphs == null) {
-			partialGraphs = new ArrayList<PartialGraphImpl>();
-		}
-		partialGraphs.add(partialGraph);
-
-		return partialGraph;
-	}
+	
+	// ------------- PARTIAL GRAPH VARIABLES ------------
+	
+	/* list of all partial graphs contained in this partial or complete one */
+	protected List<Integer> containedPartialGraphIds;
 
 	/**
 	 * 
 	 * @return the list of partial graphs directly and indirectly contained in
 	 *         this graph
 	 */
-	public List<PartialGraphImpl> getPartialGraphs() throws RemoteException {
-		LinkedList<PartialGraphImpl> list = new LinkedList<PartialGraphImpl>();
-		for (PartialGraphImpl p : partialGraphs) {
+	public List<Graph> getPartialGraphs() {
+		LinkedList<Graph> list = new LinkedList<Graph>();
+		for (Integer i : containedPartialGraphIds) {
+			Graph p = getGraphDatabase().getGraphObject(i);
 			list.add(p);
 			list.addAll(p.getPartialGraphs());
 		}
 		return list;
 	}
+
+	public abstract GraphDatabase getGraphDatabase();
+
 
 	@Override
 	public boolean containsEdge(Edge e)  throws RemoteException{
@@ -1090,7 +1083,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return
 	 */
 	Vertex getVertexObjectForId(int vid) {
-		return getBackgroundStorage().getVertex(vid);
+		return getDiskStorage().getVertexObject(vid);
 	}
 	
 	/**
@@ -1101,7 +1094,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @return
 	 */
 	Vertex getEdgeObjectForId(int vid) {
-		return getBackgroundStorage().getVertex(vid);
+		return getDiskStorage().getVertexObject(vid);
 	}
 	
 	

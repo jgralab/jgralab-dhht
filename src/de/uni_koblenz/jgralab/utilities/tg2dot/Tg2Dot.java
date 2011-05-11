@@ -87,7 +87,7 @@ public class Tg2Dot extends Tg2Whatever {
 	@Override
 	public void graphStart(PrintStream out) {
 		try {
-			out.println("digraph \"" + graph.getUid() + "\"");
+			out.println("digraph \"" + graph.getCompleteGraphUid() + "\"");
 			out.println("{");
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);

@@ -117,8 +117,8 @@ public abstract class PartialGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public String getUid() throws RemoteException {
-		return getCompleteGraph().getUid();
+	public String getCompleteGraphUid() throws RemoteException {
+		return getCompleteGraph().getCompleteGraphUid();
 	}
 
 	@Override

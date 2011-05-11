@@ -741,8 +741,8 @@ public class StateRepository {
 				code.append("}\n");
 				new TabularVisualizer().visualizeElements(code, state,
 						numberPerPage, showAttributes, isVertex ? "v"
-								+ currentElement.toVertex().getId() : "e"
-								+ currentElement.toEdge().getId(), true,
+								+ currentElement.toVertex().getPartialGraphId() : "e"
+								+ currentElement.toEdge().getPartialGraphId(), true,
 						state.currentExplicitlyDefinedSet == null);
 				if (createVerticesAndEdges) {
 					new TabularVisualizer()
@@ -766,8 +766,8 @@ public class StateRepository {
 				}
 				if (!currentElement.isEdge() && !currentElement.isVertex()) {
 					code.append("changeBackgroundColor(\"").append(
-							isVertex ? "v" + currentElement.toVertex().getId()
-									: "e" + currentElement.toEdge().getId())
+							isVertex ? "v" + currentElement.toVertex().getPartialGraphId()
+									: "e" + currentElement.toEdge().getPartialGraphId())
 							.append("\");");
 				}
 			} else {
@@ -1057,8 +1057,8 @@ public class StateRepository {
 			addToBreadcrumbBar(code, state, null, isNewElement);
 			code.append("current").append(isVertex ? "Vertex" : "Edge").append(
 					" = \"").append(
-					isVertex ? "v" + currentElement.toVertex().getId() : "e"
-							+ Math.abs(currentElement.toEdge().getId()))
+					isVertex ? "v" + currentElement.toVertex().getPartialGraphId() : "e"
+							+ Math.abs(currentElement.toEdge().getPartialGraphId()))
 					.append("\";\n");
 		}
 		code.append("timestamp = ").append(state.lastAccess).append(";\n");
@@ -1200,9 +1200,9 @@ public class StateRepository {
 		StringBuilder elementId = new StringBuilder();
 		JValue elem = state.navigationHistory.get(i);
 		if (elem.isVertex()) {
-			elementId.append("v").append(elem.toVertex().getId());
+			elementId.append("v").append(elem.toVertex().getPartialGraphId());
 		} else if (elem.isEdge()) {
-			elementId.append("e").append(elem.toEdge().getId());
+			elementId.append("e").append(elem.toEdge().getPartialGraphId());
 		} else {
 			elementId.append("{");
 			boolean first = true;
@@ -1217,9 +1217,9 @@ public class StateRepository {
 					}
 				}
 				if (v.isVertex()) {
-					elementId.append("v").append(v.toVertex().getId());
+					elementId.append("v").append(v.toVertex().getPartialGraphId());
 				} else {
-					elementId.append("e").append(v.toEdge().getId());
+					elementId.append("e").append(v.toEdge().getPartialGraphId());
 				}
 				first = false;
 				counter++;

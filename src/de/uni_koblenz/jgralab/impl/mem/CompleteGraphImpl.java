@@ -144,7 +144,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	/** should be called by all delete partial graph operations 
 	 * @throws RemoteException */
 	public void internalDeletePartialGraph(PartialGraphImpl graph) throws RemoteException {
-		partialGraphIds.add(graph.getId());
+		partialGraphIds.add(graph.getPartialGraphId());
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	 * @see de.uni_koblenz.jgralab.Graph#getId()
 	 */
 	@Override
-	public String getUid() {
+	public String getCompleteGraphUid() {
 		return uid;
 	}
 
@@ -712,7 +712,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	@Override
-	public int getId() {
+	public int getPartialGraphId() {
 		return id;
 	}
 

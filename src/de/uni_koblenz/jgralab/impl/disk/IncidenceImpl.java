@@ -56,15 +56,15 @@ public abstract class IncidenceImpl implements Incidence {
 	IncidenceContainer storage;
 	
 	private final Incidence getIncidenceFromBg(int id) {
-		return storage.backgroundStorage.getIncidence(id);
+		return storage.backgroundStorage.getIncidenceObject(id);
 	}
 	
 	private final Vertex getVertexFromBg(int id) {
-		return storage.backgroundStorage.getVertex(id);
+		return storage.backgroundStorage.getVertexObject(id);
 	}
 	
 	private final Edge getEdgeFromBg(int id) {
-		return storage.backgroundStorage.getEdge(id);
+		return storage.backgroundStorage.getEdgeObject(id);
 	}
 	
 	private final int getIdInStorage(int id) {
