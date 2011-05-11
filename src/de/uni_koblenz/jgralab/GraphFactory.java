@@ -287,11 +287,11 @@ public interface GraphFactory {
 
 	void setPartialGraphImplementationClass(
 			Class<? extends Graph> originalClass,
-			Class<? extends ViewGraphImpl> implementationClass);
+			Class<? extends PartialGraphImpl> implementationClass);
 	
 	void setPartialGraphImplementationClassForDiskBasedStorage(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass);
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl> implementationClass);
 	
 	void setPartialSubordinateGraphImplementationClass(
 			Class<? extends Graph> originalClass,

@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.reflect.Constructor;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +46,10 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**
@@ -459,8 +460,6 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { int.class, Graph.class };
 				vertexMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { int.class, VertexContainer.class,
-						Graph.class };
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for vertexclass"
@@ -896,7 +895,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setPartialGraphImplementationClass(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class, int.class };
@@ -913,11 +912,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setPartialGraphImplementationClassForDiskBasedStorage(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { Graph.class, int.class };
-				partialGraphMapForMemBasedImpl.put(originalClass,
+				Class<?>[] params = { GraphClass.class, GraphDatabase.class };
+				partialGraphMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
