@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralab.dhhttest;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.dhhttest.schema.Activity;
 import de.uni_koblenz.jgralab.dhhttest.schema.BusinessProcess;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
@@ -16,8 +17,6 @@ import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_rule;
 import de.uni_koblenz.jgralab.dhhttest.schema.TransformationRule;
 
 public class PerformaceTest {
-
-	private static int factor = 1;
 	
 	private static int activityCount = 874002;
 	
@@ -29,19 +28,15 @@ public class PerformaceTest {
 	
 	private static int linkCount = 1000000;
 	
-	public static void main(String[] args) {
-		try {
-			activityCount *= factor;
-			featureCount *= factor;
-			ruleCount *= factor;
-			processCount *= factor;
-			linkCount *= factor;
-		ArrayList<Activity> activityList = new ArrayList<Activity>(activityCount);
-		ArrayList<Feature> featureList = new ArrayList<Feature>(featureCount);
-		ArrayList<BusinessProcess> processList = new ArrayList<BusinessProcess>(processCount);
-		ArrayList<TransformationRule> ruleList = new ArrayList<TransformationRule>(ruleCount);
+	ArrayList<Activity> activityList = new ArrayList<Activity>(activityCount);
+	ArrayList<Feature> featureList = new ArrayList<Feature>(featureCount);
+	ArrayList<BusinessProcess> processList = new ArrayList<BusinessProcess>(processCount);
+	ArrayList<TransformationRule> ruleList = new ArrayList<TransformationRule>(ruleCount);
+	
+	private Graph createGraph()  throws RemoteException {
+		System.out.println("Creating graph...");
 		DHHTTestGraph graph = DHHTTestSchema.instance().createDHHTTestGraph();
-		System.out.println("Creating example DHHTGraph");
+		
 		long startTime = System.currentTimeMillis();
 		for (int i=0; i<activityCount;i++) {
 			Activity a = graph.createActivity();
@@ -72,17 +67,23 @@ public class PerformaceTest {
 		long time = System.currentTimeMillis() - startTime;
 		System.out.println("Sucessfully created graph in " + time + " milliseconds");
 		System.out.println("Graph has: " + graph.getVCount() + " vertices and " + graph.getECount() + " edges");
-		
-		System.out.println("Starting search");
-		startTime = System.currentTimeMillis();
-		CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm();
-		algo.run(graph.getFirstVertex());
-		time = System.currentTimeMillis() - startTime;
-		System.out.println("Applied BFS on hypergraph in " + time + " milliseconds");
-		
-		System.out.println("Visited " + algo.getVertexCount() + " of " + graph.getVCount() + " vertices");
-		System.out.println("Visited " + algo.getEdgeCount() + " of " + graph.getECount() + " edges");
-		
+		return graph;
+	}
+	
+	
+	public static void main(String[] args) {
+		try {
+			PerformaceTest test = new PerformaceTest();
+			Graph graph = test.createGraph();
+			
+			System.out.println("Starting search");
+			long startTime = System.currentTimeMillis();
+			
+			CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm();
+			algo.run(graph.getFirstVertex());
+			
+			System.out.println("Applied BFS in " + (System.currentTimeMillis() - startTime) + " milliseconds");
+			
 		} catch (RemoteException ex) {
 			ex.printStackTrace();
 		}

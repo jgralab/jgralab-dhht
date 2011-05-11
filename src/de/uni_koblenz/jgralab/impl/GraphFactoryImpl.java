@@ -67,7 +67,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 
 	/* maps for in-memory storage */
-	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapFromMemBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForMemBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForMemBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForMemBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForMemBasedImpl;
@@ -80,7 +80,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	
 	
 	/* maps for disk-based storage */
-	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapFromDiskBasedImpl;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForDiskBasedImpl;
@@ -90,6 +90,19 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForDiskBasedImpl;
+	
+	/* maps for proxy elements */
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> viewGraphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialGraphMapForProxies;
+	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> partialSubordinateGraphMapForProxies;
+	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForProxies;
+	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForProxies;
+	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForProxies;
+	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForProxies;
+	
 	
 	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMap;
 	
@@ -105,7 +118,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	private void createMapsForStandardSupport() {
-		graphMapFromMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		graphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		viewGraphMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForVertexMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForEdgeMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
@@ -116,7 +129,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		vertexMapForMemBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMapForMemBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		
-		graphMapFromMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		graphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		viewGraphMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForVertexMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForEdgeMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
@@ -125,7 +138,19 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		edgeMapForDiskBasedImpl = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		binaryEdgeMapForDiskBasedImpl = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
 		vertexMapForDiskBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-		incidenceMapForDiskBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+		incidenceMapForDiskBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>(); 
+		
+		graphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		viewGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		partialSubordinateGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		edgeMapForProxies = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		binaryEdgeMapForProxies = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
+		vertexMapForProxies = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForProxies = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+		
 		
 		edgeMapForDiskStorageReloading = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		vertexMapForDiskStorageReloading = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
@@ -200,6 +225,24 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, int id, Graph g) {
+		
+		//CompleteGraphImpl cg = (CompleteGraphImpl) g;
+		//cg.backgroundStorage.freeMem();
+		try {
+			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
 	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, int id, Graph g) {
 		
 		//CompleteGraphImpl cg = (CompleteGraphImpl) g;
@@ -220,7 +263,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public Graph createGraph(Class<? extends Graph> graphClass, String id,
 			int vMax, int eMax) {
 		try {
-			Graph g = graphMapFromMemBasedImpl.get(graphClass).newInstance(id, vMax, eMax);
+			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id, vMax, eMax);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -231,7 +274,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id,
 			int vMax, int eMax) {
 		try {
-			Graph g = graphMapFromDiskBasedImpl.get(graphClass).newInstance(id, vMax, eMax);
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id, vMax, eMax);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -241,7 +284,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 
 	public Graph createGraph(Class<? extends Graph> graphClass, String id) {
 		try {
-			Graph g = graphMapFromMemBasedImpl.get(graphClass).newInstance(id, 1000, 1000);
+			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id, 1000, 1000);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -251,7 +294,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	
 	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id) {
 		try {
-			Graph g = graphMapFromDiskBasedImpl.get(graphClass).newInstance(id, 1000, 1000);
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id, 1000, 1000);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -365,7 +408,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphMapFromMemBasedImpl.put(originalClass,
+				graphMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
@@ -382,7 +425,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, int.class, int.class };
-				graphMapFromMemBasedImpl.put(originalClass,
+				graphMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(

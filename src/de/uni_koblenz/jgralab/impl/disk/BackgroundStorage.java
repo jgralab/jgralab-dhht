@@ -5,11 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.rmi.RemoteException;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -21,6 +25,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public final class BackgroundStorage {
 	
+	
 	/* Switches to toggle behaviour */
 	
 	private final static int MAX_REUSE_QUEUE_SIZE = 80;
@@ -28,29 +33,22 @@ public final class BackgroundStorage {
 	private final static int MAX_LRU_QUEUE_SIZE = 200;
 	
 	private final static int CLEANUP_THREAD_WAITING_TIME = 50;
-	
-	private final static int MAX_NUMBER_OF_ELEMENTS = 1100000;
-	
-	private final static int MAX_NUMBER_OF_INCIDENCES = 6000000;
-	
+		
 	private final static int BITS_FOR_ELEMENT_MASK = 14;
 	
 	private static final boolean USE_LRU_QUEUE = true;
-
-
 
 	
 	/* Values that are calculated on the basis of MAX_NUMER_OF_ELEMENT and BITS_FOR_ELEMENT_MASK  */
 	
 	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32-(BITS_FOR_ELEMENT_MASK+1)); //= 00000011 11111111 in binary, 10 bit = 1024 elements per container
 	
-	static final int ELEMENT_CONTAINER_COUNT = MAX_NUMBER_OF_ELEMENTS >> BITS_FOR_ELEMENT_MASK;
+	static final int ELEMENT_CONTAINER_COUNT = GraphStorage.MAX_NUMBER_OF_LOCAL_ELEMENTS >> BITS_FOR_ELEMENT_MASK;
 	
-	static final int INCIDENCE_CONTAINER_COUNT = MAX_NUMBER_OF_INCIDENCES >> BITS_FOR_ELEMENT_MASK;
+	static final int INCIDENCE_CONTAINER_COUNT = GraphStorage.MAX_NUMBER_OF_LOCAL_INCIDENCES >> BITS_FOR_ELEMENT_MASK;
 	
 	static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
-	
-	
+		
 	
 	/* Threads to control the disk buffering */
 		
@@ -60,18 +58,19 @@ public final class BackgroundStorage {
 	
 	private Thread incidenceCleanupThread;
 	
-
-	Schema schema;
 	
-	Graph graph;
+	/* maps that store proxies for remote elements */
 	
-	GraphFactory factory;
+//	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
 	
-	private int vertexStorageCount = 0;
+	private Map<Integer, ? extends Reference<VertexProxy>> remoteVertices;
 	
-	private int edgeStorageCount = 0;
+	private Map<Integer, ? extends Reference<EdgeProxy>> remoteEdges;
 	
-	private int incidenceStorageCount = 0;
+	private Map<Integer, ? extends Reference<IncidenceProxy>> remoteIncidences;
+	
+	
+	/* names of files to store element data */
 	
 	private static final String vertexFileName = "dhht_disk_storage_vertices";
 	
@@ -82,6 +81,25 @@ public final class BackgroundStorage {
 	private static final String edgeAttributeFileName =  "dhht_disk_storage_edge_attributes";
 	
 	private static final String incidenceFileName =   "dhht_disk_storage_incidences";
+	
+	
+	Schema schema;
+	
+	Graph graph;
+	
+	private int localPartialGraphId = 0;
+	
+	GraphFactory factory;
+	
+	
+	
+	
+	private int vertexStorageCount = 0;
+	
+	private int edgeStorageCount = 0;
+	
+	private int incidenceStorageCount = 0;
+
 
 
 	
@@ -142,6 +160,7 @@ public final class BackgroundStorage {
 	public BackgroundStorage(Graph graph) throws FileNotFoundException {
 		this.graph = graph;
 		try {
+			this.localPartialGraphId = graph.getId();
 			factory = graph.getGraphFactory();
 			schema = graph.getSchema();
 		} catch (RemoteException e) {
@@ -159,9 +178,16 @@ public final class BackgroundStorage {
 		vertexStorageSaved = new BitSet(ELEMENT_CONTAINER_COUNT);
 		edgeStorageSaved = new BitSet(ELEMENT_CONTAINER_COUNT);
 		incidenceStorageSaved = new BitSet(INCIDENCE_CONTAINER_COUNT);
+		
+		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
+		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
+		remoteEdges = new HashMap<Integer, Reference<EdgeProxy>>();
+		remoteIncidences = new HashMap<Integer, Reference<IncidenceProxy>>();
+		
 		vertexQueue = new ReferenceQueue<VertexContainer>();
 		edgeQueue = new ReferenceQueue<EdgeContainer>();
 		incidenceQueue = new ReferenceQueue<IncidenceContainer>();
+		
 		createFreeMemThread();
 	}
 	
@@ -245,11 +271,15 @@ public final class BackgroundStorage {
 		return channel;
 	}
 	
-	public static final int calculateStorageId(int elementId) {
+	
+	
+	
+	
+	public static final int getContainerId(int elementId) {
 		return elementId >> BITS_FOR_ELEMENT_MASK;
 	}
 	
-	public static final int getElementIdInStorage(int elementId) {
+	public static final int getElementIdInContainer(int elementId) {
 		return elementId & CONTAINER_MASK;
 	}
 	
@@ -419,7 +449,7 @@ public final class BackgroundStorage {
 	}
 	
 	final VertexContainer getVertexStorage(int vertexId) {
-		int storageId = calculateStorageId(vertexId);
+		int storageId = getContainerId(vertexId);
 		VertexContainer storage = null;
 		VertexContainerReference reference = null;
 		if (storageId < vertexStorageCount) {
@@ -453,8 +483,24 @@ public final class BackgroundStorage {
 	
 	
 	public final Vertex getVertex(int id) {
+		int partialGraphId = getPartialGraphId(id);
+		if (partialGraphId != localPartialGraphId) {
+			//select vertex proxie
+			VertexProxy proxy  = null;
+			Reference<VertexProxy> ref = remoteVertices.get(id);
+			if ((ref == null) || (ref.get() == null)) {
+				proxy = new VertexProxy(id);
+				ref = new WeakReference(id);
+				remoteVertices.put(id, ref);
+			} else {
+				proxy = ref.get();
+			}
+			return proxy;
+			
+		}
+		
 		VertexContainer container = getVertexStorage(id);
-		int idInStorage = getElementIdInStorage(id);
+		int idInStorage = getElementIdInContainer(id);
 		int type = container.types[idInStorage]; 
 		if (type != 0) {
 			//element is typed, so return either the existing vertex or create a new one
@@ -475,13 +521,8 @@ public final class BackgroundStorage {
 		VertexContainer container = getVertexStorage(id);
 		if (container.attributes == null) {
 			try {
-				
-				//TODO check if file exists
-				
+					
 				FileChannel channel = getChannel(vertexAttributeFiles, container.id, vertexAttributeFileName);
-				//channel mappen
-				
-			//	MappedByteBuffer buffer = channel.map(MapMode.READ_WRITE, 0, channel.size());
 				if (channel.size() != 0) {
 					ObjectInputStream input = new ObjectInputStream(Channels.newInputStream(channel));
 					container.attributes = (AttributeContainer[]) input.readObject();
@@ -489,7 +530,6 @@ public final class BackgroundStorage {
 				} else {
 					container.attributes = new AttributeContainer[CONTAINER_SIZE];
 				}
-			//	buffer.clear();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -500,7 +540,7 @@ public final class BackgroundStorage {
 	
 	public AttributeContainer getVertexAttributeContainer(int id) {
 		AttributeContainer[] containerArray = getVertexAttributeContainerArray(id);
-		int idInStorage = getElementIdInStorage(id);
+		int idInStorage = getElementIdInContainer(id);
 		AttributeContainer container = containerArray[idInStorage];
 		return container;
 	}
@@ -536,7 +576,7 @@ public final class BackgroundStorage {
 	}
 	
 	final EdgeContainer getEdgeStorage(int edgeId) {
-		int storageId = calculateStorageId(edgeId);
+		int storageId = getContainerId(edgeId);
 		EdgeContainer storage = null;
 		EdgeContainerReference reference = null;
 		if (storageId < edgeStorageCount) {
@@ -576,11 +616,7 @@ public final class BackgroundStorage {
 	 */
 	public final Edge getEdge(int id) {
 			EdgeContainer container = getEdgeStorage(id);
-			int idInStorage = getElementIdInStorage(id);
-			if (container == null)
-				System.out.println("Container for edge " + id + " is null");
-			if (container.types == null)
-				System.out.println("Container types for edge " + id + " is null");
+			int idInStorage = getElementIdInContainer(id);
 			int type = container.types[idInStorage]; 
 			if (type != 0) {
 				//element is typed, so return either the existing vertex or create a new one
@@ -619,7 +655,7 @@ public final class BackgroundStorage {
 	
 	public AttributeContainer getEdgeAttributeContainer(int id) {
 		AttributeContainer[] containerArray = getEdgeAttributeContainerArray(id);
-		int idInStorage = getElementIdInStorage(id);
+		int idInStorage = getElementIdInContainer(id);
 		AttributeContainer container = containerArray[idInStorage];
 		return container;
 	}
@@ -653,7 +689,7 @@ public final class BackgroundStorage {
 	
 	
 	final IncidenceContainer getIncidenceStorage(int incidenceId) {
-		int storageId = calculateStorageId(incidenceId);
+		int storageId = getContainerId(incidenceId);
 		IncidenceContainer storage = null;
 		IncidenceContainerReference reference = null;
 		if (storageId < incidenceStorageCount) {
@@ -692,7 +728,7 @@ public final class BackgroundStorage {
 			if (id == 0)
 				return null;
 			IncidenceContainer container = getIncidenceStorage(id);
-			int idInStorage = getElementIdInStorage(id);
+			int idInStorage = getElementIdInContainer(id);
 			int type = container.types[idInStorage]; 
 			if (type != 0) {
 				//element is typed, so return either the existing vertex or create a new one
@@ -716,28 +752,28 @@ public final class BackgroundStorage {
 	public void storeVertex(VertexImpl v) throws RemoteException {
 		int vId = v.getId();
 		VertexContainer storage = getVertexStorage(vId);
-		int id = getElementIdInStorage(vId);
+		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
 		v.storage = storage;
 		storage.types[id] = graph.getSchema().getClassId(v.getType());
-		AttributeContainer[] containerArray = getVertexAttributeContainerArray(calculateStorageId(vId));
+		AttributeContainer[] containerArray = getVertexAttributeContainerArray(getContainerId(vId));
 		containerArray[id] = v.getAttributeContainer();
 	}
 
 	public void storeEdge(EdgeImpl e) throws RemoteException {
 		int eId = e.getId();
 		EdgeContainer storage = getEdgeStorage(eId);
-		int id = getElementIdInStorage(eId);
+		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
 		e.storage = storage;
 		storage.types[id] = graph.getSchema().getClassId(e.getType());
-		AttributeContainer[] containerArray = getEdgeAttributeContainerArray(calculateStorageId(eId));
+		AttributeContainer[] containerArray = getEdgeAttributeContainerArray(getContainerId(eId));
 		containerArray[id] = e.getAttributeContainer();
 	}
 
 	public void storeIncidence(IncidenceImpl i) throws RemoteException {
 		IncidenceContainer storage = getIncidenceStorage(i.getId());
-		int id = getElementIdInStorage(i.getId());
+		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = i;
 		i.storage = storage;
 		storage.types[id] = graph.getSchema().getClassId(i.getType());
@@ -746,7 +782,7 @@ public final class BackgroundStorage {
 
 	public void removeEdgeFromBackgroundStorage(EdgeImpl e) {
 		EdgeContainer storage = getEdgeStorage(e.getId());
-		int id = getElementIdInStorage(e.getId());
+		int id = getElementIdInContainer(e.getId());
 		storage.edges[id] = null;
 		storage.types[id] = 0;
 	}
@@ -754,7 +790,7 @@ public final class BackgroundStorage {
 
 	public void removeVertexFromBackgroundStorage(VertexImpl v) {
 		VertexContainer storage = getVertexStorage(v.getId());
-		int id = getElementIdInStorage(v.getId());
+		int id = getElementIdInContainer(v.getId());
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
 	}
@@ -762,7 +798,7 @@ public final class BackgroundStorage {
 	
 	public void removeIncidenceFromBackgroundStorage(IncidenceImpl i) {
 		IncidenceContainer storage = getIncidenceStorage(i.getId());
-		int id = getElementIdInStorage(i.getId());
+		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = null;
 		storage.types[id] = 0;
 	}

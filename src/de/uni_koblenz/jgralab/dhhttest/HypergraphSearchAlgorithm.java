@@ -1,12 +1,8 @@
 package de.uni_koblenz.jgralab.dhhttest;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -16,10 +12,6 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class HypergraphSearchAlgorithm {
 
-	//TODO: Record TreeIncidences separately to avoid handling them as tree and as cross incidence
-		//protected Set<Vertex> marking;
-		//protected Map<Vertex, Integer> number;
-		protected List<Vertex> order;
 		protected Map<Vertex, Incidence> parentVertexInc;
 		protected Map<Edge, Incidence> parentEdgeInc;
 		protected int num;
@@ -44,9 +36,6 @@ public class HypergraphSearchAlgorithm {
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
-		//	marking = new HashSet<Vertex>(vCount);
-			//number = new HashMap<Vertex, Integer>(vCount);
-			order = new ArrayList<Vertex>(vCount);
 			parentVertexInc = new HashMap<Vertex, Incidence>(vCount);
 			parentEdgeInc = new HashMap<Edge, Incidence>(eCount);
 			num = 0;
@@ -56,8 +45,6 @@ public class HypergraphSearchAlgorithm {
 		 * @throws RemoteException */
 		public void run(Vertex startVertex) throws RemoteException {
 			init(startVertex.getGraph());
-			//number.put(startVertex, ++num); //number first vertex with 1
-			order.add(startVertex);
 			handleRoot(startVertex);
 			handleVertex(startVertex);
 			buffer.add(startVertex);
@@ -66,31 +53,27 @@ public class HypergraphSearchAlgorithm {
 				Vertex currentVertex = buffer.get();        
 				Incidence curIncAtVertex = currentVertex.getFirstIncidence(Direction.BOTH);
 				while (curIncAtVertex != null) {
-				//	System.out.println("Iterating incidence at vertex " + currentVertex.getId());
 					Edge currentEdge = curIncAtVertex.getEdge();
 					if (!parentEdgeInc.containsKey(currentEdge)) {   
-					//	handleEdge(currentEdge);
+						handleEdge(currentEdge);
 						parentEdgeInc.put(currentEdge, curIncAtVertex);     
-					//	handleTreeIncidence(curIncAtVertex); 
+						handleTreeIncidence(curIncAtVertex); 
 						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
 						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
 						while (curIncAtEdge != null) {
 							Vertex omega = curIncAtEdge.getVertex();
-							//if (!number.containsKey(omega)) {
-							//	number.put(omega, ++num);
 							if ((!parentVertexInc.containsKey(omega)) && (omega!=startVertex)) {
-								order.add(omega);
 								parentVertexInc.put(omega, curIncAtEdge);
-								//handleVertex(omega);
-								//handleTreeIncidence(curIncAtEdge);
+								handleVertex(omega);
+								handleTreeIncidence(curIncAtEdge);
 								buffer.add(omega);
 							} else {
-							//	handleCrossIncidence(curIncAtEdge);
+								handleCrossIncidence(curIncAtEdge);
 							}
 							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge(opposite);
 						}	  
 					} else {
-						//handleCrossIncidence(curIncAtVertex);
+						handleCrossIncidence(curIncAtVertex);
 					}
 					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex(Direction.BOTH);
 				}

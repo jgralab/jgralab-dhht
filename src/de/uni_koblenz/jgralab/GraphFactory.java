@@ -340,4 +340,10 @@ public interface GraphFactory {
 	Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id, Graph g,
 			VertexContainer container);
 
+	Edge createEdgeProxy(Class<? extends Edge> edgeClass, int id, Graph g);
+	
+	Vertex createVertexProxy(Class<? extends Vertex> vertexClass, int id, Graph g);
+	
+	Incidence createIncidenceProxy(Class<? extends Incidence> incidenceClass, int id, Graph g);
+
 }

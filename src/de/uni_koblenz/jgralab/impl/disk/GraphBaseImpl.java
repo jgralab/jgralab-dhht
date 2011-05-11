@@ -1099,4 +1099,17 @@ public abstract class GraphBaseImpl implements Graph {
 		throw new RuntimeException("Operation not yet implemented");
 	}
 
+	
+	/**
+	 * Retrieves the Vertex object representing the vertex with the id vid
+	 * that is part of the global graph this graph belongs to. In the case
+	 * of remote elements, 
+	 * @param id
+	 * @return
+	 */
+	Vertex getVertexObjectForId(int vid) {
+		return getBackgroundStorage().getVertex(vid);
+	}
+	
+	
 }

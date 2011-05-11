@@ -827,4 +827,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	public void writePartialGraphs(GraphIO graphIO);
 
+	public boolean isIdOfLocalElement(int id);
+
+	
 }
