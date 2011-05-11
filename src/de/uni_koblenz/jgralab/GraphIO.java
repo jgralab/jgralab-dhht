@@ -256,8 +256,6 @@ public class GraphIO {
 	 */
 	private Map<GraphElement<?, ?, ?>, String> sigmasOfGraphElement;
 
-	private Graph completeGraph;
-
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
 	 * JGraLab.
@@ -663,7 +661,7 @@ public class GraphIO {
 						new FileOutputStream(filename), BUFFER_SIZE));
 			}
 			GraphIO.filename = filename;
-			saveGraphToStream(out, graph, pf);
+			saveGraphToStream(out, graph, pf, false);
 		} catch (IOException ex) {
 			throw new GraphIOException("Exception while saving graph to "
 					+ filename, ex);
@@ -699,7 +697,7 @@ public class GraphIO {
 				out = new DataOutputStream(new BufferedOutputStream(
 						new FileOutputStream(filename), BUFFER_SIZE));
 			}
-			saveGraphToStream(out, subGraph, pf);
+			saveGraphToStream(out, subGraph, pf, false);
 		} catch (IOException e) {
 			throw new GraphIOException("exception while saving graph to "
 					+ filename, e);
@@ -719,15 +717,19 @@ public class GraphIO {
 	 *            a graph
 	 * @param pf
 	 *            a {@link ProgressFunction}, may be <code>null</code>
+	 * @param onlyLocalGraph
+	 *            if set to <code>true</code> there are only elements saved
+	 *            which belongs to the graph and no remote access is needed
 	 * @throws GraphIOException
 	 *             if an IOException occurs
 	 */
 	public static void saveGraphToStream(DataOutputStream out, Graph graph,
-			ProgressFunction pf) throws GraphIOException {
+			ProgressFunction pf, boolean onlyLocalGraph)
+			throws GraphIOException {
 		try {
 			GraphIO io = new GraphIO();
 			io.TGOut = out;
-			io.saveGraph(graph, pf, null);// TODO save partial graphs
+			io.saveGraph(graph, pf, null, onlyLocalGraph);
 			out.flush();
 		} catch (IOException e) {
 			throw new GraphIOException("exception while saving graph", e);
@@ -746,16 +748,19 @@ public class GraphIO {
 	 *            a BooleanGraphMarker denoting the subgraph to be saved
 	 * @param pf
 	 *            a {@link ProgressFunction}, may be <code>null</code>
+	 * @param onlyLocalGraph
+	 *            if set to <code>true</code> there are only elements saved
+	 *            which belongs to the graph and no remote access is needed
 	 * @throws GraphIOException
 	 *             if an IOException occurs
 	 */
 	public static void saveGraphToStream(DataOutputStream out,
-			BooleanGraphMarker subGraph, ProgressFunction pf)
-			throws GraphIOException {
+			BooleanGraphMarker subGraph, ProgressFunction pf,
+			boolean onlyLocalGraph) throws GraphIOException {
 		try {
 			GraphIO io = new GraphIO();
 			io.TGOut = out;
-			io.saveGraph(subGraph.getGraph(), pf, subGraph);
+			io.saveGraph(subGraph.getGraph(), pf, subGraph, onlyLocalGraph);
 			out.flush();
 		} catch (IOException e) {
 			throw new GraphIOException("exception while saving graph", e);
@@ -763,7 +768,8 @@ public class GraphIO {
 	}
 
 	private void saveGraph(Graph graph, ProgressFunction pf,
-			BooleanGraphMarker subGraph) throws IOException, GraphIOException {
+			BooleanGraphMarker subGraph, boolean onlyLocalGraph)
+			throws IOException, GraphIOException {
 		if (graph instanceof SubordinateGraphImpl
 				|| graph instanceof PartialSubordinateGraphImpl
 				|| graph instanceof ViewGraphImpl) {
@@ -819,7 +825,11 @@ public class GraphIO {
 				+ vCount + " " + eCount + ")");
 		space();
 		writeSpace();
-		graph.writePartialGraphs(this);
+		if (onlyLocalGraph) {
+			write("{}");
+		} else {
+			graph.writePartialGraphs(this);
+		}
 		if (graph.getType().hasAttributes()) {
 			writeSpace();
 			graph.writeAttributeValues(this);
@@ -864,8 +874,10 @@ public class GraphIO {
 						nextI = nextI.getNextIncidenceAtVertex();
 						continue;
 					}
-					writeSpace();
-					write(Integer.toString(nextI.getId()));
+					if (isLocal(nextI.getId(), graph.getId())) {
+						writeSpace();
+						write(Integer.toString(nextI.getId()));
+					}
 				}
 				write(">");
 
@@ -920,10 +932,12 @@ public class GraphIO {
 					if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
 						continue;
 					}
-					writeSpace();
-					write(++edgeIncidenceCounter + ":"
-							+ i.getType().getRolename());
-					space();
+					if (isLocal(i.getVertex().getId(), graph.getId())) {
+						writeSpace();
+						write(++edgeIncidenceCounter + ":"
+								+ i.getType().getRolename());
+						space();
+					}
 				}
 				write(">");
 
@@ -963,7 +977,8 @@ public class GraphIO {
 		// write sigma
 		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
 				.getContainingElement();
-		if (containingElement != null) {
+		if (containingElement != null
+				&& isLocal(containingElement.getId(), graph.getId())) {
 			write(" sigma=");
 			write((containingElement instanceof Vertex ? "v" : "e")
 					+ containingElement.getId());
@@ -2925,6 +2940,7 @@ public class GraphIO {
 		}
 		GraphBaseImpl graph = null;
 		try {
+			// TODO adapt to partial graph loading
 			graph = (GraphBaseImpl) schema.getGraphCreateMethod(
 					implementationType).invoke(null,
 					new Object[] { graphId, maxV, maxE });
@@ -2976,11 +2992,11 @@ public class GraphIO {
 		createPartialGraphs();
 		// TODO set complete graph if it is not the complete
 		// adjust fields for incidences
-		if (!isCompleteGraph(graph)) {
-			// ((PartialGraphImpl)graph).s
-		} else {
-			completeGraph = graph;
-		}
+		// if (!isCompleteGraph(graph)) {
+		// // ((PartialGraphImpl)graph).s
+		// } else {
+		// completeGraph = graph;
+		// }
 		createIncidences(graph);
 		sortLambdaSequences(graph);
 		setSigmas(graph);
@@ -3001,6 +3017,12 @@ public class GraphIO {
 
 	private boolean isCompleteGraph(int graphId) throws RemoteException {
 		return GraphStorage.getPartialGraphId(graphId) == 0;
+	}
+
+	private boolean isLocal(int elementId, int graphId) throws RemoteException {
+		return isCompleteGraph(graphId)
+				|| GraphStorage.getPartialGraphId(graphId) == GraphStorage
+						.getPartialGraphId(elementId);
 	}
 
 	private void createIncidences(Graph graph) throws RemoteException {
@@ -3043,9 +3065,9 @@ public class GraphIO {
 				assert server.getGraph(pGraph[0]) == g;
 			}
 			graphBuffer.put(Integer.parseInt(pGraph[0]), g);
-			if (isCompleteGraph(g)) {
-				completeGraph = g;
-			}
+			// TODO if (isCompleteGraph(g)) {
+			// completeGraph = g;
+			// }
 		}
 	}
 
