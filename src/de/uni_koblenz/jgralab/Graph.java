@@ -823,11 +823,23 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public Graph createPartialGraph(String hostname) throws RemoteException;
 
-	public DiskStorageManager getBackgroundStorage();
-
 	public void writePartialGraphs(GraphIO graphIO);
 
+
+
+	public DiskStorageManager getBackgroundStorage();
+	
+	
+	/**
+	 * Checks if the given id <code>id</code> is the id of an local
+	 * element or a remote one
+	 */
 	public boolean isIdOfLocalElement(int id);
+
+	/**
+	 * Retrieves the partial graph with the given id partialGraphId
+	 */
+	public Graph getPartialGraph(int partialGraphId);
 
 	
 }
