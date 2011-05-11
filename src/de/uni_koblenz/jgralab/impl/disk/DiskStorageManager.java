@@ -22,7 +22,12 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-
+/**
+ * This class realizes the storage of vertices, edges and incidences on the disk. All
+ * methods may be used only with local objects
+ * @author dbildh
+ *
+ */
 public final class DiskStorageManager {
 	
 	
@@ -61,13 +66,7 @@ public final class DiskStorageManager {
 	
 	/* maps that store proxies for remote elements */
 	
-//	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
-	
-	private Map<Integer, Reference<VertexProxy>> remoteVertices;
-	
-	private Map<Integer, Reference<EdgeProxy>> remoteEdges;
-	
-	private Map<Integer, Reference<IncidenceProxy>> remoteIncidences;
+
 	
 	
 	/* names of files to store element data */
@@ -179,10 +178,7 @@ public final class DiskStorageManager {
 		edgeStorageSaved = new BitSet(ELEMENT_CONTAINER_COUNT);
 		incidenceStorageSaved = new BitSet(INCIDENCE_CONTAINER_COUNT);
 		
-		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
-		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
-		remoteEdges = new HashMap<Integer, Reference<EdgeProxy>>();
-		remoteIncidences = new HashMap<Integer, Reference<IncidenceProxy>>();
+
 		
 		vertexQueue = new ReferenceQueue<VertexContainer>();
 		edgeQueue = new ReferenceQueue<EdgeContainer>();
