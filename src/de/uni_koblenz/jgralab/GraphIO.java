@@ -66,6 +66,7 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.disk.GraphStorage;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl;
 import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
@@ -254,6 +255,8 @@ public class GraphIO {
 	 * The value is the sigma information of the graph element.
 	 */
 	private Map<GraphElement<?, ?, ?>, String> sigmasOfGraphElement;
+
+	private Graph completeGraph;
 
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
@@ -2935,11 +2938,6 @@ public class GraphIO {
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
-		// TODO set complete graph if it is not the complete
-		// adjust fields for incidences
-		if (!isCompleteGraph()) {
-
-		}
 
 		while (!lookAhead.equals("edges")) {
 			if (lookAhead.equals("Package")) {
@@ -2976,11 +2974,18 @@ public class GraphIO {
 		}
 
 		createPartialGraphs();
+		// TODO set complete graph if it is not the complete
+		// adjust fields for incidences
+		if (!isCompleteGraph(graph)) {
+			// ((PartialGraphImpl)graph).s
+		} else {
+			completeGraph = graph;
+		}
 		createIncidences(graph);
 		sortLambdaSequences(graph);
 		setSigmas(graph);
-		// TODO check graphId
-		if (graph instanceof CompleteGraphImpl) {
+
+		if (isCompleteGraph(graph)) {
 			((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 		}
 		if (pf != null) {
@@ -2990,9 +2995,12 @@ public class GraphIO {
 		return graph;
 	}
 
-	private boolean isCompleteGraph() {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean isCompleteGraph(Graph graph) throws RemoteException {
+		return isCompleteGraph(graph.getId());
+	}
+
+	private boolean isCompleteGraph(int graphId) throws RemoteException {
+		return GraphStorage.getPartialGraphId(graphId) == 0;
 	}
 
 	private void createIncidences(Graph graph) throws RemoteException {
@@ -3025,7 +3033,7 @@ public class GraphIO {
 		}
 	}
 
-	private void createPartialGraphs() throws GraphIOException {
+	private void createPartialGraphs() throws GraphIOException, RemoteException {
 		graphBuffer = new HashMap<Integer, Graph>();
 		for (String[] pGraph : partialGraphs) {
 			JGraLabServer remoteServer = server.getRemoteInstance(pGraph[1]);
@@ -3035,6 +3043,9 @@ public class GraphIO {
 				assert server.getGraph(pGraph[0]) == g;
 			}
 			graphBuffer.put(Integer.parseInt(pGraph[0]), g);
+			if (isCompleteGraph(g)) {
+				completeGraph = g;
+			}
 		}
 	}
 
