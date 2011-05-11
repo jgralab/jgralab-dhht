@@ -212,36 +212,42 @@ public class GraphIO {
 
 	private ArrayList<String[]> partialGraphs;
 
-	// TODO delete/**
-	// * Stores the information about incidences at the edges.<br>
-	// * <code>incidencesAtEdge[i]</code> = the lambda sequence of all incident
-	// * vertices at the edge with id i.
-	// */
-	 private ArrayList<Vertex>[] incidencesAtEdge;
+	/**
+	 * Stores the information about incidences at the edge<br>
+	 * <code>incidencesAtEdge[i]</code> = the lambda sequence at the edge with
+	 * id i.<br>
+	 * <code>incidencesAtEdge[i].get(j)</code> = id of the {@link Incidence} at
+	 * position j in the lambda sequence at the vertex
+	 */
+	private ArrayList<Integer>[] incidencesAtEdge;
 
 	/**
 	 * Stores the information about incidences at the vertices.<br>
 	 * <code>incidencesAtVertex[i]</code> = the lambda sequence at the vertex
 	 * with id i.<br>
-	 * <code>incidencesAtVertex[i].get(j)</code> = id of the {@link Incidence}<br>
-	 * If Integer[] is of length 1 it only contains the local id otherwise it
-	 * contains the partialGraphId followed by the id of the incidence
+	 * <code>incidencesAtVertex[i].get(j)</code> = id of the {@link Incidence}
+	 * at position j in the lambda sequence at the vertex
 	 */
-	private ArrayList<Integer[]>[] incidencesAtVertex;
-
-	// TODO delete/**
-	// * Stores the information about incidences at the edges.<br>
-	// * <code>incidenceInstancesAtEdge[i]</code> = the lambda sequence of all
-	// * Incidences at the edge with id i.
-	// */
-	 private Incidence[][] incidenceInstancesAtEdge;
+	private ArrayList<Integer>[] incidencesAtVertex;
 
 	/**
-	 * The value is the sigma information of the graph element. If String[] is
-	 * of length 1 it only contains the local id otherwise it contains the
-	 * partialGraphId followed by the local id of sigma.
+	 * Stores the information about incidences and their types.<br>
+	 * <code>incidenceTypes.get(i)</code> = the type of the Incidence with id i.
 	 */
-	private Map<GraphElement<?, ?, ?>, String[]> sigmasOfGraphElement;
+	private ArrayList<String> incidenceTypes;
+
+	/**
+	 * Stores the incidence information of incidences.<br>
+	 * <code>incidence.get(i)[0]</code> = id of incidence vertex<br>
+	 * <code>incidence.get(i)[1]</code> = id of incidence edge<br>
+	 * i = id of incidence
+	 */
+	private ArrayList<Integer[]> incidences;
+
+	/**
+	 * The value is the sigma information of the graph element.
+	 */
+	private Map<GraphElement<?, ?, ?>, String> sigmasOfGraphElement;
 
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
@@ -850,8 +856,6 @@ public class GraphIO {
 						continue;
 					}
 					writeSpace();
-					Graph g = nextI.getLocalGraph();
-					write((g == graph ? "" : g.getId() + "-"));
 					write(Integer.toString(nextI.getId()));
 				}
 				write(">");
@@ -952,8 +956,6 @@ public class GraphIO {
 				.getContainingElement();
 		if (containingElement != null) {
 			write(" sigma=");
-			Graph g = next.getLocalGraph();
-			write((g == graph ? "" : g.getId() + "-"));
 			write((containingElement instanceof Vertex ? "v" : "e")
 					+ containingElement.getId());
 		}
@@ -2147,20 +2149,17 @@ public class GraphIO {
 
 	private VertexClass createVertexClass(GraphElementClassData vcd,
 			GraphClass gc) throws GraphIOException, SchemaException {
-		System.out.println("1");
 		VertexClass vc = gc.createVertexClass(vcd.getQualifiedName());
-		System.out.println("2");
 		vc.setAbstract(vcd.isAbstract);
-		System.out.println("3");
+
 		addAttributes(vcd.attributes, vc);
-		System.out.println("4");
+
 		for (Constraint constraint : vcd.constraints) {
 			vc.addConstraint(constraint);
 		}
-		System.out.println("5");
-		if (vcd.validKappa != null)
+		if (vcd.validKappa != null) {
 			vc.setAllowedKappaRange(vcd.validKappa[0], vcd.validKappa[1]);
-		System.out.println("6");
+		}
 		GECsearch.put(vc, gc);
 		return vc;
 	}
@@ -2196,8 +2195,9 @@ public class GraphIO {
 		}
 
 		ec.setAbstract(ecd.isAbstract);
-		if (ecd.validKappa != null)
+		if (ecd.validKappa != null) {
 			ec.setAllowedKappaRange(ecd.validKappa[0], ecd.validKappa[1]);
+		}
 
 		GECsearch.put(ec, gc);
 		return ec;
@@ -2907,12 +2907,8 @@ public class GraphIO {
 		// adjust fields for incidences
 		incidencesAtEdge = new ArrayList[maxE + 1];
 		incidencesAtVertex = new ArrayList[maxV + 1];
-		incidenceInstancesAtEdge = new Incidence[maxE + 1][];
-		// edgeIn = new Vertex[maxE + 1];
-		// edgeOut = new Vertex[maxE + 1];
-		// firstIncidence = new int[maxV + 1];
-		// nextIncidence = new int[2 * maxE + 1];
-		// edgeOffset = maxE;
+		incidenceTypes = new ArrayList<String>();
+		incidences = new ArrayList<Integer[]>();
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
@@ -2969,16 +2965,10 @@ public class GraphIO {
 			}
 		}
 
-		try {
-			sortLambdaSequenceAtVertex(graph);
-		} catch (RemoteException ex) {
-			// TODO
-			ex.printStackTrace();
-		}
-
 		createPartialGraphs();
-		createIncidences();
-		setSigmas();
+		createIncidences(graph);
+		sortLambdaSequenceAtVertex(graph);
+		setSigmas(graph);
 
 		graph.setGraphVersion(graphVersion);
 		if (pf != null) {
@@ -2988,12 +2978,18 @@ public class GraphIO {
 		return graph;
 	}
 
-	private void setSigmas() {
-		// TODO Auto-generated method stub
+	private void createIncidences(Graph graph) {
+		for (Integer[] incidence : incidences) {
+			if (incidences != null) {
+				assert incidence.length == 2;
 
+				// TODO ids von partiellen Graphen bekannt
+				// machen!!!!!!!!!!!!!!!!!
+			}
+		}
 	}
 
-	private void createIncidences() {
+	private void setSigmas(Graph graph) {
 		// TODO Auto-generated method stub
 
 	}
@@ -3041,7 +3037,7 @@ public class GraphIO {
 				if (incArray == null) {
 					continue;
 				}
-				Incidence current = incidenceInstancesAtEdge[incArray[0]][incArray[1]];
+				Incidence current = incidenceTypes[incArray[0]][incArray[1]];
 				if (current == firstUnsorted) {
 					firstUnsorted = firstUnsorted.getNextIncidenceAtVertex();
 				} else {
@@ -3099,22 +3095,9 @@ public class GraphIO {
 		if (lookAhead.equals("sigma")) {
 			match("sigma");
 			match("=");
-			int partialGraphId = -1;
-			if (!lookAhead.startsWith("v") && !lookAhead.startsWith("e")) {
-				partialGraphId = matchInteger();
-				match("-");
-			}
 			boolean isVertex = lookAhead.startsWith("v");
 			int idOfSigma = matchInteger();
-			String[] content = null;
-			if (partialGraphId == -1) {
-				content = new String[1];
-			} else {
-				content = new String[2];
-				content[0] = Integer.toString(partialGraphId);
-			}
-			content[content.length - 1] = (isVertex ? "v" : "e") + idOfSigma;
-			sigmasOfGraphElement.put(ge, content);
+			sigmasOfGraphElement.put(ge, (isVertex ? "v" : "e") + idOfSigma);
 		}
 	}
 
@@ -3151,21 +3134,11 @@ public class GraphIO {
 		return eId;
 	}
 
-	private Integer[] iId() throws GraphIOException {
-		int first = matchInteger();
-		if (first == 0) {
-			throw new GraphIOException("Invalid incidence id " + first + ".");
+	private int iId() throws GraphIOException {
+		int iId = matchInteger();
+		if (iId == 0) {
+			throw new GraphIOException("Invalid incidence id " + iId + ".");
 		}
-		int second = 0;
-		if (lookAhead.equals("-")) {
-			match("-");
-			second = matchInteger();
-			if (second == 0) {
-				throw new GraphIOException("Invalid incidence id " + second
-						+ ".");
-			}
-		}
-		Integer[] iId = new Integer[second == 0 ? 1 : 2];
 		return iId;
 	}
 
@@ -3196,31 +3169,17 @@ public class GraphIO {
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		incidenceInstancesAtEdge[eId] = new Incidence[incidencesAtEdge[eId]
-				.size()];
 
 		match("<");
 		while (!lookAhead.equals(">")) {
 			lambdaSeqPosAtEdge++;
-			String currentRolename = matchSimpleName(false);
-			if (incidencesAtEdge[eId] == null
-					|| incidencesAtEdge[eId].size() < lambdaSeqPosAtEdge) {
-				throw new GraphIOException(
-						"There are more incidences defined at edge e" + eId
-								+ " than defined at the vertices.");
-			}
-			Vertex v = incidencesAtEdge[eId].get(lambdaSeqPosAtEdge);
-			try {
-				incidenceInstancesAtEdge[eId][lambdaSeqPosAtEdge] = edge
-						.connect(currentRolename, v);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		if (lambdaSeqPosAtEdge + 1 != incidencesAtEdge[eId].size()) {
-			throw new GraphIOException(
-					"There are more incidences defined at the vertices than defined at edge e"
-							+ eId + ".");
+			int incidenceId = matchInteger();
+			match(":");
+			String incidenceName = matchSimpleName(false);
+			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge,
+					new Integer(incidenceId));
+			insertElementInSequence(incidenceId, incidenceName, incidenceTypes);
+			setIncidence(eId, incidenceId, false);
 		}
 	}
 
@@ -3231,17 +3190,30 @@ public class GraphIO {
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		Integer[] iId;
 		int lambdaSeqPosAtVertex = 0;
 
 		match("<");
 		while (!lookAhead.equals(">")) {
 			lambdaSeqPosAtVertex++;
-			iId = iId();
+			int iId = iId();
 			addToIncidenceList(incidencesAtVertex, vId, lambdaSeqPosAtVertex,
 					iId);
+			setIncidence(vId, iId, true);
 		}
 		match();
+	}
+
+	private void setIncidence(int gElemId, int incidenceId, boolean isVertex) {
+		for (int i = incidences.size(); i <= incidenceId; i++) {
+			// fill missing entries until graphElementId with null
+			incidences.add(null);
+		}
+		Integer[] incidenceInfo = incidences.get(incidenceId);
+		if (incidenceInfo == null) {
+			incidenceInfo = new Integer[2];
+			incidences.add(incidenceId, incidenceInfo);
+		}
+		incidenceInfo[isVertex ? 0 : 1] = gElemId;
 	}
 
 	private <V> void addToIncidenceList(
@@ -3259,11 +3231,17 @@ public class GraphIO {
 							+ posInLambdaSequence + ". Concerning vertex is v"
 							+ graphElementId + ".");
 		}
-		for (int i = lambdaSequence.size(); i < posInLambdaSequence; i++) {
+		insertElementInSequence(posInLambdaSequence, incidentElement,
+				lambdaSequence);
+	}
+
+	private <V> void insertElementInSequence(int insertPosition, V element,
+			ArrayList<V> sequence) {
+		for (int i = sequence.size(); i < insertPosition; i++) {
 			// fill missing entries until graphElementId with null
-			lambdaSequence.add(null);
+			sequence.add(null);
 		}
-		lambdaSequence.add(posInLambdaSequence, incidentElement);
+		sequence.add(insertPosition, element);
 	}
 
 	/**
