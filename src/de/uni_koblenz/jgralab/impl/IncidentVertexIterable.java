@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.impl;
 
-import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

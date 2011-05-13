@@ -28,7 +28,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author dbildh
  *
  */
-public final class DiskStorageManager {
+public final class DiskStorageManager implements GraphPropertyAccess {
 	
 	
 	/* Switches to toggle behaviour */
@@ -48,9 +48,9 @@ public final class DiskStorageManager {
 	
 	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32-(BITS_FOR_ELEMENT_MASK+1)); //= 00000011 11111111 in binary, 10 bit = 1024 elements per container
 	
-	static final int ELEMENT_CONTAINER_COUNT = GraphStorage.MAX_NUMBER_OF_LOCAL_ELEMENTS >> BITS_FOR_ELEMENT_MASK;
+	static final int ELEMENT_CONTAINER_COUNT = GraphDatabase.MAX_NUMBER_OF_LOCAL_ELEMENTS >> BITS_FOR_ELEMENT_MASK;
 	
-	static final int INCIDENCE_CONTAINER_COUNT = GraphStorage.MAX_NUMBER_OF_LOCAL_INCIDENCES >> BITS_FOR_ELEMENT_MASK;
+	static final int INCIDENCE_CONTAINER_COUNT = GraphDatabase.MAX_NUMBER_OF_LOCAL_INCIDENCES >> BITS_FOR_ELEMENT_MASK;
 	
 	static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
 		
@@ -267,12 +267,12 @@ public final class DiskStorageManager {
 	
 	
 	
-	public static final int getContainerId(int elementId) {
-		return elementId >> BITS_FOR_ELEMENT_MASK;
+	private static final int getContainerId(int elementId) {
+		return elementId >> BITS_FOR_ELEMENT_MASK & Integer.MAX_VALUE;
 	}
 	
-	public static final int getElementIdInContainer(int elementId) {
-		return elementId & CONTAINER_MASK;
+	private static final int getElementIdInContainer(int elementId) {
+		return elementId & CONTAINER_MASK & Integer.MAX_VALUE;
 	}
 	
 	
@@ -412,6 +412,14 @@ public final class DiskStorageManager {
 	}
 	
 	
+	private final GraphElementContainer getElementContainer(int id) {
+		if (id >0)
+			return getVertexContainer(id);
+		else
+			return getEdgeContainer(id);
+	}
+	
+	
 	
 	private final VertexContainer reloadVertexStorage(int storageId) {
 		while (!isVertexStorageSaved(storageId)) {
@@ -440,7 +448,7 @@ public final class DiskStorageManager {
 		}
 	}
 	
-	final VertexContainer getVertexStorage(int vertexId) {
+	final VertexContainer getVertexContainer(int vertexId) {
 		int storageId = getContainerId(vertexId);
 		VertexContainer storage = null;
 		VertexContainerReference reference = null;
@@ -476,7 +484,7 @@ public final class DiskStorageManager {
 	
 	
 	public final Vertex getVertexObject(int id) {
-		VertexContainer container = getVertexStorage(id);
+		VertexContainer container = getVertexContainer(id);
 		int idInStorage = getElementIdInContainer(id);
 		int type = container.types[idInStorage]; 
 		if (type != 0) {
@@ -495,7 +503,7 @@ public final class DiskStorageManager {
 
 	
 	public AttributeContainer[] getVertexAttributeContainerArray(int id) {
-		VertexContainer container = getVertexStorage(id);
+		VertexContainer container = getVertexContainer(id);
 		if (container.attributes == null) {
 			try {
 					
@@ -552,7 +560,7 @@ public final class DiskStorageManager {
 		}
 	}
 	
-	final EdgeContainer getEdgeStorage(int edgeId) {
+	final EdgeContainer getEdgeContainer(int edgeId) {
 		int storageId = getContainerId(edgeId);
 		EdgeContainer storage = null;
 		EdgeContainerReference reference = null;
@@ -592,7 +600,7 @@ public final class DiskStorageManager {
 	 * @return
 	 */
 	public final Edge getEdgeObject(int id) {
-			EdgeContainer container = getEdgeStorage(id);
+			EdgeContainer container = getEdgeContainer(id);
 			int idInStorage = getElementIdInContainer(id);
 			int type = container.types[idInStorage]; 
 			if (type != 0) {
@@ -610,7 +618,7 @@ public final class DiskStorageManager {
 	}
 	
 	public AttributeContainer[] getEdgeAttributeContainerArray(int id) {
-		EdgeContainer container = getEdgeStorage(id);
+		EdgeContainer container = getEdgeContainer(id);
 		if (container.attributes == null) {
 			try {
 				FileChannel channel = getChannel(edgeAttributeFiles, container.id, edgeAttributeFileName);
@@ -665,7 +673,7 @@ public final class DiskStorageManager {
 	}
 	
 	
-	final IncidenceContainer getIncidenceStorage(int incidenceId) {
+	final IncidenceContainer getIncidenceContainer(int incidenceId) {
 		int storageId = getContainerId(incidenceId);
 		IncidenceContainer storage = null;
 		IncidenceContainerReference reference = null;
@@ -703,7 +711,7 @@ public final class DiskStorageManager {
 	public final Incidence getIncidenceObject(int id) {
 			if (id == 0)
 				return null;
-			IncidenceContainer container = getIncidenceStorage(id);
+			IncidenceContainer container = getIncidenceContainer(id);
 			int idInStorage = getElementIdInContainer(id);
 			int type = container.types[idInStorage]; 
 			if (type != 0) {
@@ -723,7 +731,7 @@ public final class DiskStorageManager {
 
 	public void storeVertex(VertexImpl v) {
 		int vId = v.getId();
-		VertexContainer storage = getVertexStorage(vId);
+		VertexContainer storage = getVertexContainer(vId);
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
 		v.storage = storage;
@@ -734,7 +742,7 @@ public final class DiskStorageManager {
 
 	public void storeEdge(EdgeImpl e) {
 		int eId = e.getId();
-		EdgeContainer storage = getEdgeStorage(eId);
+		EdgeContainer storage = getEdgeContainer(eId);
 		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
 		e.storage = storage;
@@ -744,7 +752,7 @@ public final class DiskStorageManager {
 	}
 
 	public void storeIncidence(IncidenceImpl i) {
-		IncidenceContainer storage = getIncidenceStorage(i.getId());
+		IncidenceContainer storage = getIncidenceContainer(i.getId());
 		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = i;
 		i.storage = storage;
@@ -753,7 +761,7 @@ public final class DiskStorageManager {
 	
 
 	public void removeEdgeFromBackgroundStorage(EdgeImpl e) {
-		EdgeContainer storage = getEdgeStorage(e.getId());
+		EdgeContainer storage = getEdgeContainer(e.getId());
 		int id = getElementIdInContainer(e.getId());
 		storage.edges[id] = null;
 		storage.types[id] = 0;
@@ -761,7 +769,7 @@ public final class DiskStorageManager {
 
 
 	public void removeVertexFromBackgroundStorage(VertexImpl v) {
-		VertexContainer storage = getVertexStorage(v.getId());
+		VertexContainer storage = getVertexContainer(v.getId());
 		int id = getElementIdInContainer(v.getId());
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
@@ -769,7 +777,7 @@ public final class DiskStorageManager {
 	
 	
 	public void removeIncidenceFromBackgroundStorage(IncidenceImpl i) {
-		IncidenceContainer storage = getIncidenceStorage(i.getId());
+		IncidenceContainer storage = getIncidenceContainer(i.getId());
 		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = null;
 		storage.types[id] = 0;
@@ -804,6 +812,50 @@ public final class DiskStorageManager {
 		incidenceStorageSaved.set(id, false);
 		return b;		
 	}
+
+	
+	
+	
+	
+	/*
+	 * Methods to access and modify Vseq and Eseq
+	 */
+	public void setFirstIncidence(int elemId, int incidenceId) {
+		getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	}
+	
+	public void setLastIncidence(int elemId, int incidenceId) {
+		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	}
+
+	public void incidenceListModified(int elemId) {
+		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)]++;
+	}
+
+	@Override
+	public int getSigma(int elemId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setSigma(int elementId, int sigmaId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getKappa(int elementId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setKappa(int elementId, int kappa) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 
 	
 	

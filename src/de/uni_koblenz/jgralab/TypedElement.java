@@ -1,9 +1,5 @@
 package de.uni_koblenz.jgralab;
 
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
@@ -32,6 +28,8 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 * @return the schema this AttributedElement belongs to
 	 */
 	public Schema getSchema();
+
+	Graph getCompleteGraph();
 	
 	/**
 	 * Returns the M1 implementation class for this IncidenceClass.

@@ -932,7 +932,7 @@ public class GraphIO {
 					if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
 						continue;
 					}
-					if (isLocal(i.getVertex().getId(), graph.getId())) {
+					if (isLocal(i.getVertex().getId(), graph.getPartialGraphId())) {
 						writeSpace();
 						write(++edgeIncidenceCounter + ":"
 								+ i.getType().getRolename());
@@ -2941,10 +2941,10 @@ public class GraphIO {
 			pf.init(vCount + eCount);
 			interval = pf.getUpdateInterval();
 		}
-		GraphBaseImpl graph = null;
+		Graph graph = null;
 		try {
 			// TODO adapt to partial graph loading
-			graph = (GraphBaseImpl) schema.getGraphCreateMethod(
+			graph = (Graph) schema.getGraphCreateMethod(
 					implementationType).invoke(null,
 					new Object[] { graphId, maxV, maxE });
 		} catch (Exception e) {
@@ -2953,7 +2953,7 @@ public class GraphIO {
 		}
 		graph.setLoading(true);
 		server = JGraLabServerImpl.getLocalInstance();
-		server.registerGraph(Integer.toString(graph.getPartialGraphId()), graph);
+		server.registerGraph(graph.getCompleteGraphUid(), Integer.toString(graph.getPartialGraphId()), graph.getGraphDatabase());
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");

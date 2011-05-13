@@ -42,7 +42,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
-import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -68,39 +67,33 @@ import de.uni_koblenz.jgralab.schema.Schema;
 //getContainingGraph the graph that directly contains the element
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
+	
+	/**
+	 * The global id of this {@link GraphElement}.
+	 */
+	protected int elementId;
+	
 
 	/**
-	 * Generated Serial Version UID
+	 * Local RMI-Proxy for remote graph database that stores 
+	 * the data of this vertex
 	 */
-	private static final long serialVersionUID = 1245169302974416890L;
+	protected GraphDatabase graphDatabase;
+		
+	
+	
+	protected abstract void setId(int id);
+
+	
+	//TODO Move to concrete classes VertexLocalImpl and EdgeLocalImpl 
+	
+	//protected GraphElementContainer container;
+
 
 	/**
-	 * The id of this {@link GraphElement}.
+	 * The id of the subordinate graph nested in this element
 	 */
-	protected int id;
-	
-	
-	protected final void setId(int id) {
-		assert id >= 0;
-		this.id = id;
-	}
-	
-	
-	protected GraphElementContainer storage;
-	
-
-	// TODO determine default value
-	private static final int DEFAULT_KAPPA_VALUE = Integer.MAX_VALUE;
-
-	/**
-	 * The {@link Graph} to which this {@link GraphElement} belongs.
-	 */
-	protected CompleteGraphImpl graph;
-
-	/**
-	 * The subordinate graph nested in this graph‚
-	 */
-	protected Graph subOrdinateGraph;
+	protected Graph subordinateGraph;
 
 	/**
 	 * Creates a new {@link GraphElement} which belongs to <code>graph</code>.
@@ -110,11 +103,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphElementImpl(Graph graph)  {
 		assert graph != null;
-		this.graph = (CompleteGraphImpl) graph;
+		this.graphDatabase = ((CompleteOrPartialGraphImpl)graph).getGraphDatabase();
 	}
 
-
-	
 
 	@Override
 	public final boolean containsElement(GraphElement<?, ?, ?> element) {
@@ -129,17 +120,23 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final Graph getGraph() {
-		return graph;
+		return graphDatabase.getGraphObject(GraphDatabase.getPartialGraphId(elementId));
 	}
-
+	
 	@Override
-	public final GraphClass getGraphClass() {
-		return graph.getType();
+	public final Graph getLocalGraph() {
+		return graphDatabase.getGraphObject(GraphDatabase.getPartialGraphId(elementId));
 	}
+	
+	@Override
+	public final Graph getCompleteGraph() {
+		return graphDatabase.getCompleteGraphObject();
+	}
+	
 
 	@Override
 	public final Schema getSchema() {
-		return graph.getSchema();
+		return graphDatabase.getSchema();
 	}
 
 	/**
@@ -149,14 +146,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * graph, an edge or a vertex are treated as a change.
 	 */
 	public final void graphModified() {
-		graph.graphModified();
+		graphDatabase.graphModified(GraphDatabase.getPartialGraphId(elementId));
 	}
-
-	@Override
-	public final int getId() {
-		return id;
-	}
-
 
 
 	@Override
@@ -184,7 +175,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	public final void incidenceListModified() {
 		assert isValid();
-		setIncidenceListVersion(getIncidenceListVersion() + 1);
+		graphDatabase.incidenceListModified(elementId);
 	}
 
 	/**
@@ -201,16 +192,18 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return (this.getIncidenceListVersion() != incidenceListVersion);
 	}
 	
+	
 	/**
 	 * Sets the first {@link Incidence} of this {@link GraphElement} to
-	 * <code>firstIncidence</code>.
+	 * <code>lastIncidence</code>.
 	 * 
-	 * @param firstIncidence
+	 * @param lastIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	final void setFirstIncidence(IncidenceImpl firstIncidence) {
-		storage.firstIncidenceId[getIdInStorage(id)] = firstIncidence.getId();
+	final void setFirstIncidence(IncidenceImpl lastIncidence) {
+		graphDatabase.setFirstIncidence(elementId, lastIncidence.id);
 	}
+
 
 	/**
 	 * Sets the last {@link Incidence} of this {@link GraphElement} to
@@ -220,38 +213,35 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl}
 	 */
 	final void setLastIncidence(IncidenceImpl lastIncidence) {
-//		if (this instanceof Edge) {
-//			System.out.println("Setting last incidence of edge " + id + " to " + lastIncidence.getId());
-//		}
-		storage.lastIncidenceId[getIdInStorage(id)] = lastIncidence.getId();
+		graphDatabase.setLastIncidence(elementId, lastIncidence.id);
 	}
 
+	
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDatabase.getTraversalContext(),
 				anIncidenceClass.getM1Class(), null, false);
 	}
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
-				null, false);
+		return getFirstIncidence(graphDatabase.getTraversalContext(), anIncidenceClass, null, false);
 	}
 
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDatabase.getTraversalContext(),
 				anIncidenceClass.getM1Class(), direction, false);
 	}
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			Direction direction) {
-		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+		return getFirstIncidence(graphDatabase.getTraversalContext(), anIncidenceClass,
 				direction, false);
 	}
 
@@ -259,14 +249,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDatabase.getTraversalContext(),
 				anIncidenceClass.getM1Class(), null, noSubclasses);
 	}
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			boolean noSubclasses) {
-		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+		return getFirstIncidence(graphDatabase.getTraversalContext(), anIncidenceClass,
 				null, noSubclasses);
 	}
 
@@ -274,7 +264,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDatabase.getTraversalContext(),
 				anIncidenceClass.getM1Class(), direction, noSubclasses);
 	}
 
@@ -283,8 +273,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), null, false);
+		return getFirstIncidence(traversalContext, anIncidenceClass.getM1Class(), null, false);
 	}
 
 	@Override
@@ -292,8 +281,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, null,
-				false);
+		return getFirstIncidence(traversalContext, anIncidenceClass, null, false);
 	}
 
 	@Override
@@ -346,28 +334,28 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final int getDegree(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, false);
+		return getDegree(graphDatabase.getTraversalContext(), ic, false);
 	}
 
 	@Override
 	public final int getDegree(Class<? extends Incidence> ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, false);
+		return getDegree(graphDatabase.getTraversalContext(), ic, false);
 	}
 
 	@Override
 	public final int getDegree(IncidenceClass ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, direction, false);
+		return getDegree(graphDatabase.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
 	public final int getDegree(Class<? extends Incidence> ic, Direction direction) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, direction, false);
+		return getDegree(graphDatabase.getTraversalContext(), ic, direction, false);
 	}
 
 	@Override
@@ -464,7 +452,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final void addSubordinateElement(Vertex appendix) {
-		System.out.println("Adding vertex " + appendix + " to subordinate graph");
+		//System.out.println("Adding vertex " + appendix + " to subordinate graph");
 		//TODO: Das gefällt mir noch nicht, dass hier schon der Graph gebaut wird
 		if (getSubordinateGraph().getLastVertex() != null) {
 			appendix.putAfter(getSubordinateGraph().getLastVertex());
@@ -530,7 +518,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
 	 */
 	 final boolean isSubordinateGraphObjectAlreadyCreated() {
-		return subOrdinateGraph != null;
+		return subordinateGraph != null;
 	}
 
 	/**
@@ -549,26 +537,10 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		}
 	}
 
-	@Override
-	public final Graph getLocalGraph() {
-		return getGraph();
-	}
-
-	@Override
-	public final Graph getContainingGraph() {
-		return graph;
-	}
-	
-
 	
 	@Override
 	public final GraphElement<?, ?, ?> getSigma() {
-		int id = storage.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)];
-		if (id < 0) {
-			return storage.backgroundStorage.getEdgeObject(-id);
-		} else {
-			return storage.backgroundStorage.getVertexObject(id);
-		}
+		return graphDatabase.getGraphElementObject(graphDatabase.getSigma(elementId));
 	}
 	
 	/**
@@ -580,19 +552,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final void setSigma(GraphElementImpl<?, ?, ?> newSigma) {
 		assert newSigma != null;
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		GraphElement s = (GraphElement) newSigma;
-		if (s instanceof Edge) {
-			storage.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = - newSigma.getId();
-		} else {
-			storage.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = newSigma.getId();
-		}
+		graphDatabase.setSigma(elementId, newSigma.elementId);
 	}
 
 	
 	
 	@Override
 	public final int getKappa() {
-		return storage.kappa[DiskStorageManager.getElementIdInContainer(id)];
+		return graphDatabase.getKappa(elementId);
 	}
 	
 	/**
@@ -605,12 +572,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storage.kappa[DiskStorageManager.getElementIdInContainer(id)] = kappa;
+		graphDatabase.setKappa(elementId, kappa);
 	}	
 
 	@Override
 	public final boolean isVisible(int kappa) {
-		return storage.kappa[DiskStorageManager.getElementIdInContainer(id)] >= kappa;
+		return graphDatabase.getKappa(elementId) >= kappa; 
 	}
 	
 	/**
@@ -620,7 +587,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            long
 	 */
 	protected final void setIncidenceListVersion(long incidenceListVersion) {
-		storage.incidenceListVersion[DiskStorageManager.getElementIdInContainer(id)] = incidenceListVersion;
+		graphDatabase.setIncidenceListVersion(elementId, incidenceListVersion);
 	}
 
 	/**
@@ -629,29 +596,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	final long getIncidenceListVersion() {
 		assert isValid();
-		return storage.incidenceListVersion[DiskStorageManager.getElementIdInContainer(id)];
-	}
-	
-	
-	
-	
-	/*
-	 * Methods to access backgroud storage
-	 */
-	protected final Incidence getIncidenceFromBg(int id) {
-		return storage.backgroundStorage.getIncidenceObject(id);
-	}
-	
-	protected final Vertex getVertexFromBg(int id) {
-		return storage.backgroundStorage.getVertexObject(id);
-	}
-	
-	protected final Edge getEdgeFromBg(int id) {
-		return storage.backgroundStorage.getEdgeObject(id);
-	}
-	
-	protected final int getIdInStorage(int id) {
-		return id & DiskStorageManager.CONTAINER_MASK;// BackgroundStorage.getElementIdInStorage(id);
+		return graphDatabase.getIncidenceListVersion(elementId);
 	}
 	
 

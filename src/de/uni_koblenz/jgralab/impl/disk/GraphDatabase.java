@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
@@ -25,7 +26,30 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * on the ids
  */
 
-public abstract class GraphDatabase implements Remote {
+public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
+	
+	//Static parts 
+	/* Switches that toggle number of elements in a local partial graph
+	 * and number of partial graphs
+	 */
+	private final static int BITS_FOR_PARTIAL_GRAPH_MASK = 5;
+	
+	/* Values that are calculated on the basis of BITS_FOR_PARTIAL_GRAPH_MASK */
+	
+	public final static int MAX_NUMBER_OF_LOCAL_ELEMENTS = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
+	
+	public final static int MAX_NUMBER_OF_LOCAL_INCIDENCES = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
+	
+	public static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = Integer.MAX_VALUE >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+	
+
+	public static final int getPartialGraphId(int elementId) {
+		return elementId >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+	}
+	
+	public static final int getElementIdInPartialGraph(int elementId) {
+		return elementId & (MAX_NUMBER_OF_LOCAL_ELEMENTS);
+	}	
 	
 	private Schema schema;
 	
@@ -33,6 +57,9 @@ public abstract class GraphDatabase implements Remote {
 	
 	protected final int localGraphId;
 	
+	/**
+	 * The disk storage to store all local elements
+	 */
 	protected DiskStorageManager diskStorage;
 	
 	protected JGraLabServer server;
@@ -70,8 +97,8 @@ public abstract class GraphDatabase implements Remote {
 		localGraphId = localGraph.getPartialGraphId();
 		diskStorage = localGraph.getDiskStorage();
 		factory = localGraph.graphFactory;
-		partialGraphs = new Graph[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
-		partialGraphDatabases = new GraphDatabase[GraphStorage.MAX_NUMBER_OF_PARTIAL_GRAPHS];
+		partialGraphs = new Graph[MAX_NUMBER_OF_PARTIAL_GRAPHS];
+		partialGraphDatabases = new GraphDatabase[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		
 		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
 		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
@@ -106,7 +133,15 @@ public abstract class GraphDatabase implements Remote {
 	 */
 	public abstract void registerPartialGraph(int id, String hostname);
 	
-	public abstract Graph createPartialGraph(GraphClass gc, String hostname);
+	public abstract Graph createPartialGraph(String hostname);
+	
+	/**
+	 * Loads the partial graph 
+	 * @param hostname
+	 * @param id
+	 * @return
+	 */
+	public abstract Graph loadRemotePartialGraph(String hostname, int id);
 	
 	public abstract void deletePartialGraph(int partialGraphId);
 	
@@ -140,7 +175,7 @@ public abstract class GraphDatabase implements Remote {
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Vertex getVertexObject(int id) {
-		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getVertexObject(id);
 		}
@@ -171,7 +206,7 @@ public abstract class GraphDatabase implements Remote {
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Edge getEdgeObject(int id) {
-		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getEdgeObject(id);
 		}
@@ -202,7 +237,7 @@ public abstract class GraphDatabase implements Remote {
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Incidence getIncidenceObject(int id) {
-		int partialGraphId = GraphStorage.getPartialGraphId(id);
+		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getIncidenceObject(id);
 		}
@@ -246,6 +281,120 @@ public abstract class GraphDatabase implements Remote {
 	
 	public abstract void vertexListModified();
 	
-	public abstract void graphModified();
+	public abstract void graphModified(int i);
+
+	public Schema getSchema() {
+		return schema;
+	}
+
+	public Graph getCompleteGraphObject() {
+		return getGraphObject(0);
+	}
+	
+	
+	
+	/**
+	 * Sets the first {@link Incidence} of this {@link GraphElement} to
+	 * <code>firstIncidence</code>.
+	 * 
+	 * @param firstIncidence
+	 *            {@link IncidenceImpl}
+	 */
+	public void setFirstIncidence(int elemId, int incidenceId) {
+		int partialGraphId = getPartialGraphId(elemId);
+		if (partialGraphId == localGraphId)
+			diskStorage.setFirstIncidence(elemId, incidenceId);
+		else
+			getGraphDatabase(partialGraphId).setFirstIncidence(elemId, incidenceId);
+	}
+	
+	public void setLastIncidence(int elemId, int incidenceId) {
+		int partialGraphId = getPartialGraphId(elemId);
+		if (partialGraphId == localGraphId)
+			diskStorage.setLastIncidence(elemId, incidenceId);
+		else
+			getGraphDatabase(partialGraphId).setLastIncidence(elemId, incidenceId);
+	}
+
+
+	public void incidenceListModified(int elemId) {
+		int partialGraphId = getPartialGraphId(elemId);
+		if (partialGraphId == localGraphId)
+			diskStorage.incidenceListModified(elemId);
+		else
+			getGraphDatabase(partialGraphId).incidenceListModified(elemId);
+	}
+
+
+
+	public int getSigma(int elemId) {
+		int partialGraphId = getPartialGraphId(elemId);
+		if (partialGraphId == localGraphId)
+			diskStorage.incidenceListModified(elemId);
+		else
+			getGraphDatabase(partialGraphId).incidenceListModified(elemId);
+		
+		
+		int id = container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)];
+		if (id < 0) {
+			return container.backgroundStorage.getEdgeObject(-id);
+		} else {
+			return container.backgroundStorage.getVertexObject(id);
+		}
+	}
+
+	/**
+	 * Returns an object (Vertex or Edge) representing the GraphElement
+	 * identified by the given global id
+	 * @param elemId
+	 * @return
+	 */
+	public GraphElement<?, ?, ?> getGraphElementObject(int elemId) {
+		if (elemId < 0)
+			return getEdgeObject(-elemId);
+		else
+			return getVertexObject(elemId);
+	}
+
+	public void setSigma(int elementId, int elementId2) {
+		// TODO Auto-generated method stub
+		GraphElement s = (GraphElement) newSigma;
+		if (s instanceof Edge) {
+			container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = - newSigma.getId();
+		} else {
+			container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = newSigma.getId();
+		}
+	}
+
+	
+	
+	public int getKappa(int elementId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId == localGraphId)
+			return diskStorage.getKappa(elementId);
+		else
+			getGraphDatabase(partialGraphId).getKappa(elementId);
+	}
+	
+	
+	public Graph getTraversalContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public void setIncidenceListVersion(int elementId, long incidenceListVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public long getIncidenceListVersion(int elementId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	
+
+
 
 }

@@ -73,7 +73,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphBaseImpl implements Graph {
+public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	static final int PARTIAL_GRAPH_MASK = 0xff000000;
 

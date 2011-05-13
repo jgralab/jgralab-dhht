@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -59,8 +58,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class VertexImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
-	private static final long serialVersionUID = 3588328684461421331L;
-
 	/**
 	 * Creates a new {@link Vertex} instance.
 	 * 
@@ -75,7 +72,7 @@ public abstract class VertexImpl extends
 		this.id = id;
 		((CompleteGraphImpl) graph).addVertex(this);
 		id = getId();
-		this.storage = graph.getDiskStorage().getVertexStorage(id);
+		this.storage = graph.getDiskStorage().getVertexContainer(id);
 	}
 	
 	protected VertexImpl(int id, VertexContainer storage, Graph graph) {
@@ -84,6 +81,20 @@ public abstract class VertexImpl extends
 		this.storage = storage;
 	}
 	
+	/* **********************************************************
+	 *  Access id
+	 * **********************************************************/
+	
+	protected final void setId(int id) {
+		assert id >= 0;
+		this.elementId = id;
+	}
+	
+
+	@Override
+	public final int getId() {
+		return elementId;
+	}
 	
 
 	

@@ -59,11 +59,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6297447377016245955L;
-
 
 	/**
 	 * Creates a new {@link Edge} instance.
@@ -76,10 +71,10 @@ public abstract class EdgeImpl extends
 	 */
 	protected EdgeImpl(int anId, Graph graph) throws IOException {
 		super(graph);
-		this.id =anId;
+		this.elementId = anId;
 		((CompleteGraphImpl) graph).addEdge(this);
-		id = getId();
-		this.storage = ((CompleteOrPartialGraphImpl) graph).getDiskStorage().getEdgeStorage(id);
+		elementId = getId();
+		this.container = ((CompleteOrPartialGraphImpl) graph).getDiskStorage().getEdgeContainer(elementId);
 	}
 	
 
@@ -88,6 +83,24 @@ public abstract class EdgeImpl extends
 		setId(anId);
 		this.storage = storage;
 	}
+	
+	
+	/* **********************************************************
+	 *  Access id, remember, the signed bit is used to encode that this 
+	 *  object is an edge in all operations inside GraphDatabase and DiskStorage
+	 * **********************************************************/
+	
+	protected final void setId(int id) {
+		assert id >= 0;
+		this.elementId = -id;
+	}
+	
+
+	@Override
+	public final int getId() {
+		return -elementId;
+	}
+	
 	
 	
 	/* ***********************************************************

@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.lang.ref.WeakReference;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -54,6 +53,7 @@ import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
+import de.uni_koblenz.jgralab.impl.GraphInternalMethods;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -69,7 +69,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphBaseImpl implements Graph {
+public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	
 

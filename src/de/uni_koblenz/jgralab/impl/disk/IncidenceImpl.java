@@ -93,7 +93,7 @@ public abstract class IncidenceImpl implements Incidence {
 		this.id = id;
 		((CompleteGraphImpl) v.getGraph()).addIncidence(this);
 		id = getId();
-		this.storage = v.storage.backgroundStorage.getIncidenceStorage(id);
+		this.storage = v.storage.backgroundStorage.getIncidenceContainer(id);
 		setIncidentEdge(e);
 		setIncidentVertex(v);
 		setDirection(dir);

@@ -1,7 +1,5 @@
 package de.uni_koblenz.jgralab.impl;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Vertex;
 
