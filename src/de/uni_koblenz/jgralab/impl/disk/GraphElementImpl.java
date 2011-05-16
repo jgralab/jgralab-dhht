@@ -103,7 +103,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphElementImpl(Graph graph)  {
 		assert graph != null;
-		this.graphDatabase = ((CompleteOrPartialGraphImpl)graph).getGraphDatabase();
+		this.graphDatabase = ((CompleteGraphImpl)graph).getGraphDatabase();
 	}
 
 
@@ -146,7 +146,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * graph, an edge or a vertex are treated as a change.
 	 */
 	public final void graphModified() {
-		graphDatabase.graphModified(GraphDatabase.getPartialGraphId(elementId));
+		graphDatabase.graphModified();
 	}
 
 
@@ -552,7 +552,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final void setSigma(GraphElementImpl<?, ?, ?> newSigma) {
 		assert newSigma != null;
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		graphDatabase.setSigma(elementId, newSigma.elementId);
+		if (newSigma instanceof Edge) {
+			graphDatabase.setSigma(elementId, -newSigma.getId());
+		} else {
+			graphDatabase.setSigma(elementId, newSigma.getId());
+		}
 	}
 
 	
@@ -600,9 +604,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 	
 
-	public AttributeContainer getAttributeContainer() {
-		return null;
-	}
+	public abstract AttributeContainer getAttributeContainer();
 
 
 }

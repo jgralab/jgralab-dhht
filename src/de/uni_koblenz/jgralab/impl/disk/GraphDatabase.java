@@ -1,18 +1,25 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
+import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.PartialGraph;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -57,22 +64,60 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	
 	protected final int localGraphId;
 	
-	/**
-	 * The disk storage to store all local elements
-	 */
-	protected DiskStorageManager diskStorage;
-	
 	protected JGraLabServer server;
 	
-	protected GraphFactory factory;
+	protected GraphFactory graphFactory;
 	
-	protected long edgeListVersion = 0;
-	
-	protected long vertexListVersion = 0;
-	
+	protected boolean loading = false;
+
 	protected long graphVersion = 0;
 	
+	/**
+	 * Holds the version of the vertex sequence. For every modification (e.g.
+	 * adding/deleting a vertex or changing the vertex sequence) this version
+	 * number is increased by 1. It is set to 0 when the graph is loaded.
+	 */
+	protected long vertexListVersion;
+	
+	/**
+	 * Holds the version of the edge sequence. For every modification (e.g.
+	 * adding/deleting an edge or changing the edge sequence) this version
+	 * number is increased by 1. It is set to 0 when the graph is loaded.
+	 */
+	protected long edgeListVersion;
 
+	/**
+	 * maximum number of vertices
+	 */
+	protected int vMax;
+
+	/**
+	 * current number of vertices
+	 */
+	private int vCount;
+	
+	
+	
+	/**
+	 * maximum number of edges
+	 */
+	protected int eMax;
+	
+	/**
+	 * current number of edges
+	 */
+	protected int eCount;
+	
+	/**
+	 * free index list for edges
+	 */
+	protected FreeIndexList freeEdgeList;
+	
+	
+	
+
+	private DiskStorageManager diskStorage;
+	
 	/*
 	 * The list of local (proxy) objects for the remote graphs
 	 */
@@ -85,32 +130,45 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	
 //	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
 	
-	protected Map<Integer, Reference<VertexProxy>> remoteVertices;
+	protected Map<Integer, Reference<Vertex>> remoteVertices;
 	
-	protected Map<Integer, Reference<EdgeProxy>> remoteEdges;
+	protected Map<Integer, Reference<Edge>> remoteEdges;
 	
-	private Map<Integer, Reference<IncidenceProxy>> remoteIncidences;
+	private Map<Integer, Reference<Incidence>> remoteIncidences;
 	
 	
-	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph) {
+	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph, Schema schema) {
+		// initialize graph, factory and schema
 		this.localGraph = localGraph;
 		localGraphId = localGraph.getPartialGraphId();
-		diskStorage = localGraph.getDiskStorage();
-		factory = localGraph.graphFactory;
+		graphFactory = schema.getGraphFactory();
+		
+		try {
+			diskStorage = new DiskStorageManager(this);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+
+
 		partialGraphs = new Graph[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		partialGraphDatabases = new GraphDatabase[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		
 		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
-		remoteVertices  = new HashMap<Integer, Reference<VertexProxy>>();
-		remoteEdges = new HashMap<Integer, Reference<EdgeProxy>>();
-		remoteIncidences = new HashMap<Integer, Reference<IncidenceProxy>>();
+		remoteVertices  = new HashMap<Integer, Reference<Vertex>>();
+		remoteEdges = new HashMap<Integer, Reference<Edge>>();
+		remoteIncidences = new HashMap<Integer, Reference<Incidence>>();
+		
+		//initialize fields
+		graphVersion = -1;
+		vCount =0;
+		
 		
 		//register graph at server
 		server = JGraLabServerImpl.getLocalInstance();
 		server.registerGraph(localGraph.getCompleteGraphUid(), localGraph.getPartialGraphId(), this);
 	}
 	
-	private GraphDatabase getGraphDatabase(int partialGraphId) {
+	protected GraphDatabase getGraphDatabase(int partialGraphId) {
 		if (partialGraphDatabases[partialGraphId] == null) {
 			//initialize new remote graph database
 			partialGraphDatabases[partialGraphId] = server.getRemoteInstance(getHostname(partialGraphId)).getGraph(localGraph.getCompleteGraphUid(), partialGraphId);
@@ -162,9 +220,9 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 			if (partialGraphId == 0) {
 				//Proxy for complete graph,
 				//TODO change to factory call
-				partialGraphs[partialGraphId] = new PartialGraphProxy(partialGraphId, this);				
+				partialGraphs[partialGraphId] = new PartialGraphImpl(partialGraphId, this);				
 			} else {
-				partialGraphs[partialGraphId] = new PartialGraphProxy(partialGraphId, this);	
+				partialGraphs[partialGraphId] = new PartialGraphImpl(partialGraphId, this);	
 			}
 		}
 		return partialGraphs[partialGraphId];
@@ -179,15 +237,15 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getVertexObject(id);
 		}
-		Reference<VertexProxy> ref = remoteVertices.get(id);
-		VertexProxy proxy = null;
+		Reference<Vertex> ref = remoteVertices.get(id);
+		Vertex proxy = null;
 		if ((ref == null) || (ref.get() == null)) {
 			//create new vertex proxy
 			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
 			int vertexClassId = remoteDatabase.getVertexTypeId(id);
 			Class<? extends Vertex> vc = (Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId);
-			proxy = (VertexProxy) factory.createVertexProxy(vc, id, getGraphObject(partialGraphId));
-			ref = new WeakReference<VertexProxy>(proxy);
+			proxy = (Vertex) graphFactory.createVertexProxy(vc, id, getGraphObject(partialGraphId));
+			ref = new WeakReference<Vertex>(proxy);
 			remoteVertices.put(id, ref);
 		} else {
 			proxy = ref.get();
@@ -210,15 +268,15 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getEdgeObject(id);
 		}
-		Reference<EdgeProxy> ref = remoteEdges.get(id);
-		EdgeProxy proxy = null;
+		Reference<Edge> ref = remoteEdges.get(id);
+		Edge proxy = null;
 		if ((ref == null) || (ref.get() == null)) {
 			//create new vertex proxy
 			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
 			int edgeClassId = remoteDatabase.getEdgeTypeId(id);
 			Class<? extends Edge> ec = (Class<? extends Edge>) schema.getM1ClassForId(edgeClassId);
-			proxy = (EdgeProxy) factory.createEdgeProxy(ec, id, getGraphObject(partialGraphId));
-			ref = new WeakReference<EdgeProxy>(proxy);
+			proxy = (Edge) graphFactory.createEdgeProxy(ec, id, getGraphObject(partialGraphId));
+			ref = new WeakReference<Edge>(proxy);
 			remoteEdges.put(id, ref);
 		} else {
 			proxy = ref.get();
@@ -241,15 +299,15 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		if (partialGraphId == localGraphId) {
 			return diskStorage.getIncidenceObject(id);
 		}
-		Reference<IncidenceProxy> ref = remoteIncidences.get(id);
-		IncidenceProxy proxy = null;
+		Reference<Incidence> ref = remoteIncidences.get(id);
+		Incidence proxy = null;
 		if ((ref == null) || (ref.get() == null)) {
 			//create new vertex proxy
 			GraphDatabase remoteDatabase = getGraphDatabase(partialGraphId);
 			int incidenceClassId = remoteDatabase.getIncidenceTypeId(id);
 			Class<? extends Incidence> ec = (Class<? extends Incidence>) schema.getM1ClassForId(incidenceClassId);
-			proxy = (IncidenceProxy) factory.createIncidenceProxy(ec, id, getGraphObject(partialGraphId));
-			ref = new WeakReference<IncidenceProxy>(proxy);
+			proxy = (Incidence) graphFactory.createIncidenceProxy(ec, id, getGraphObject(partialGraphId));
+			ref = new WeakReference<Incidence>(proxy);
 			remoteIncidences.put(id, ref);
 		} else {
 			proxy = ref.get();
@@ -277,11 +335,6 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		return localGraphId;
 	}
 	
-	public abstract void edgeListModified();
-	
-	public abstract void vertexListModified();
-	
-	public abstract void graphModified(int i);
 
 	public Schema getSchema() {
 		return schema;
@@ -330,17 +383,9 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	public int getSigma(int elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		if (partialGraphId == localGraphId)
-			diskStorage.incidenceListModified(elemId);
+			return diskStorage.getSigma(elemId);
 		else
-			getGraphDatabase(partialGraphId).incidenceListModified(elemId);
-		
-		
-		int id = container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)];
-		if (id < 0) {
-			return container.backgroundStorage.getEdgeObject(-id);
-		} else {
-			return container.backgroundStorage.getVertexObject(id);
-		}
+			return getGraphDatabase(partialGraphId).getSigma(elemId);
 	}
 
 	/**
@@ -356,14 +401,18 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 			return getVertexObject(elemId);
 	}
 
-	public void setSigma(int elementId, int elementId2) {
-		// TODO Auto-generated method stub
-		GraphElement s = (GraphElement) newSigma;
-		if (s instanceof Edge) {
-			container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = - newSigma.getId();
-		} else {
-			container.sigmaId[DiskStorageManager.getElementIdInContainer(this.id)] = newSigma.getId();
-		}
+	/**
+	 * Sets the sigma value of the element identified by <code>elementId</code>
+	 * to the value <code>sigmaId</code>. Both values are signed, negative values
+	 * identify edges while positve ones identify vertices as in all other methods
+	 * of this class 
+	 */
+	public void setSigma(int elementId, int sigmaId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId == localGraphId)
+			diskStorage.setSigma(elementId, sigmaId);
+		else
+			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
 	}
 
 	
@@ -373,28 +422,285 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		if (partialGraphId == localGraphId)
 			return diskStorage.getKappa(elementId);
 		else
+			return getGraphDatabase(partialGraphId).getKappa(elementId);
+	}
+	
+	
+	public void setKappa(int elementId, int kappa) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId == localGraphId)
+			diskStorage.setKappa(elementId, kappa);
+		else
+			getGraphDatabase(partialGraphId).setKappa(elementId, kappa);
+	}
+	
+	
+
+	public void setIncidenceListVersion(int elementId, long incidenceListVersion) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId == localGraphId)
+			diskStorage.setIncidenceListVersion(elementId, incidenceListVersion);
+		else
 			getGraphDatabase(partialGraphId).getKappa(elementId);
 	}
 	
+
+	public long getIncidenceListVersion(int elementId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId == localGraphId)
+			return diskStorage.getIncidenceListVersion(elementId);
+		else
+			return getGraphDatabase(partialGraphId).getIncidenceListVersion(elementId);
+	}
 	
-	public Graph getTraversalContext() {
-		// TODO Auto-generated method stub
-		return null;
+	public abstract void edgeListModified();
+	
+	public abstract void vertexListModified();
+	
+	public abstract void graphModified();
+	
+
+	
+
+	/* **************************************************************************
+	 * Methods to access traversal context
+	 * **************************************************************************/
+	
+
+	
+	public abstract Graph getTraversalContext();
+	
+	public abstract void releaseTraversalContext();
+	
+	public abstract void setTraversalContext(Graph traversalContext);
+
+	public GraphFactory getGraphFactory() {
+		return graphFactory;
 	}
 
+	public long getGraphVersion() {
+		return graphVersion;
+	}
 
-	public void setIncidenceListVersion(int elementId, long incidenceListVersion) {
+	public void setGraphVersion(long graphVersion2) {
+		this.graphVersion = graphVersion2;		
+	}
+
+	/**
+	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
+	 * otherwise the edges current id is used if possible. Should only be used
+	 * by m1-Graphs derived from Graph. To create a new Edge as user, use the
+	 * appropriate methods from the derived Graphs like
+	 * <code>createStreet(...)</code>
+	 * 
+	 * @param newEdge
+	 *            Edge to add
+	 * @throws RemoteException 
+	 * @throws GraphException
+	 *             an edge with same id already exists in graph, id of edge
+	 *             greater than possible count of edges in graph
+	 */
+	protected void addEdge(Edge newEdge) {
+		assert newEdge != null;
+		assert (newEdge.getSchema() == getSchema()) : "The schemas of newEdge and this graph don't match!";
+		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
+
+		EdgeImpl e = (EdgeImpl) newEdge;
+
+		int eId = e.getId();
+		if (isLoading()) {
+			if (eId > 0) {
+				// the given edge already has an id, try to use it
+				if (containsEdgeId(eId)) {
+					throw new GraphException("edge with id " + e.getId()
+							+ " already exists");
+				}
+			} else {
+				throw new GraphException("can not load an edge with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(eId)) {
+				throw new GraphException("can not add an edge with id " + eId);
+			}
+			eId = allocateEdgeIndex(eId);
+			assert eId != 0;
+			e.setId(eId);
+		}
+		diskStorage.storeEdge(e);
+		appendEdgeToESeq(e);
+
+		if (!isLoading()) {
+			edgeListModified();
+			internalEdgeAdded(e);
+		}
+	}
+	
+	/*
+	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is
+	 * set, otherwise the incidence's current id is used if possible. Should
+	 * only be used by m1-Graphs derived from Graph. To create a new Incidence
+	 * as user, use the appropriate <code>connect(...)</code>-methods from the
+	 * GraphElements
+	 * 
+	 * @param newIncidence the Incidence to add
+	 * 
+	 * @throws GraphException if a incidence with the same id already exists
+	 */
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceImpl i = (IncidenceImpl) newIncidence;
+		int iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+				if (iId > iMax) {
+					throw new GraphException("vertex id " + iId
+							+ " is bigger than vSize");
+				}
+			} else {
+				throw new GraphException(
+						"can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId "
+						+ iId);
+			}
+			iId = allocateIncidenceIndex(iId);
+			assert iId != 0;
+			i.setId(iId);
+			
+		}
+		diskStorage.storeIncidence(i);
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
+
+	/**
+	 * Adds a vertex to this graph. If the vertex' id is 0, a valid id is set,
+	 * otherwise the vertex' current id is used if possible. Should only be used
+	 * by m1-Graphs derived from Graph. To create a new Vertex as user, use the
+	 * appropriate methods from the derived Graphs like
+	 * <code>createStreet(...)</code>
+	 * 
+	 * @param newVertex
+	 *            the Vertex to add
+	 * 
+	 * @throws GraphException
+	 *             if a vertex with the same id already exists
+	 */
+	protected void addVertex(Vertex newVertex) {
+		VertexImpl v = (VertexImpl) newVertex;
+
+		int vId = v.getId();
+		if (isLoading()) {
+			if (vId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsVertexId(vId)) {
+					throw new GraphException("vertex with id " + vId
+							+ " already exists");
+				}
+				if (vId > vMax) {
+					throw new GraphException("vertex id " + vId
+							+ " is bigger than vSize");
+				}
+			} else {
+				throw new GraphException("can not load a vertex with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(vId)) {
+				throw new GraphException("can not add a vertex with vId " + vId);
+			}
+			vId = allocateVertexIndex(vId);
+			assert vId != 0;
+			v.setId(vId);
+		}
+		diskStorage.storeVertex(v);
+		appendVertexToVSeq(v);
+
+		if (!isLoading()) {
+			vertexListModified();
+			internalVertexAdded(v);
+		}
+	}
+	
+
+	private void internalEdgeAdded(EdgeImpl e) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public long getIncidenceListVersion(int elementId) {
+	private void appendEdgeToESeq(EdgeImpl e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private int allocateEdgeIndex(int eId) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	
 
+	private boolean canAddGraphElement(int eId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
+	private boolean containsEdgeId(int eId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	boolean isLoading() {
+		return loading;
+	}
+
+	public void setLoading(boolean isLoading) {
+		this.loading = isLoading;
+	}
+
+	public void setVCount(int count) {
+		vCount = count;
+	}
+
+	public void removeEdgeFromDatabase(EdgeImpl e) {
+		int partialGraphId = getPartialGraphId(e.getId());
+
+	}
+
+	
+	public void removeVertexFromDatabase(VertexImpl v) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
+		T record = graphFactory.createRecord(recordClass, this);
+		try {
+			record.readComponentValues(io);
+		} catch (GraphIOException e) {
+			e.printStackTrace();
+		}
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
+		T record = graphFactory.createRecord(recordClass, this);
+		record.setComponentValues(fields);
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
+		T record = graphFactory.createRecord(recordClass, this);
+		record.setComponentValues(components);
+		return record;
+	}
+	
 
 }

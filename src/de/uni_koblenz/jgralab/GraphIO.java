@@ -66,6 +66,7 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.GraphStorage;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl;
@@ -965,7 +966,7 @@ public class GraphIO {
 	}
 
 	private void writeAttributesSigmaKappa(Graph graph,
-			GraphElement<?, ?, ?> next), IOException,
+			GraphElement<?, ?, ?> next) throws IOException,
 			GraphIOException {
 		space();
 		// write attributes
@@ -978,7 +979,7 @@ public class GraphIO {
 		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
 				.getContainingElement();
 		if (containingElement != null
-				&& isLocal(containingElement.getId(), graph.getId())) {
+				&& isLocal(containingElement.getId(), graph.getPartialGraphId())) {
 			write(" sigma=");
 			write((containingElement instanceof Vertex ? "v" : "e")
 					+ containingElement.getId());
@@ -3021,12 +3022,12 @@ public class GraphIO {
 	}
 
 	private boolean isCompleteGraph(int graphId) {
-		return GraphStorage.getPartialGraphId(graphId) == 0;
+		return GraphDatabase.getPartialGraphId(graphId) == 0;
 	}
 
 	private boolean isLocal(int elementId, int graphId) {
 		return isCompleteGraph(graphId)
-				|| GraphStorage.getPartialGraphId(graphId) == GraphStorage
+				|| GraphDatabase.getPartialGraphId(graphId) == GraphDatabase
 						.getPartialGraphId(elementId);
 	}
 
@@ -3036,7 +3037,7 @@ public class GraphIO {
 			throws RemoteException {
 		for (Entry<Integer, Integer[]> incidence : incidenceInformation
 				.entrySet()) {
-			if (!onlyLocalGraph || isLocal(incidence.getKey(), graph.getId())) {
+			if (!onlyLocalGraph || isLocal(incidence.getKey(), graph.getPartialGraphId())) {
 				assert incidence.getValue().length == 2;
 				assert incidence.getValue()[0] != 0
 						&& incidence.getValue()[1] != 0;

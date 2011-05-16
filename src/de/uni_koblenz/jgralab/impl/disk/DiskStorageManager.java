@@ -82,16 +82,13 @@ public final class DiskStorageManager implements GraphPropertyAccess {
 	private static final String incidenceFileName =   "dhht_disk_storage_incidences";
 	
 	
-	Schema schema;
+	private Schema schema;
+//	
+//	Graph graph;
+//	
+	private GraphFactory factory;
 	
-	Graph graph;
-	
-	private int localPartialGraphId = 0;
-	
-	GraphFactory factory;
-	
-	
-	
+	private GraphDatabase graphDatabase;
 	
 	private int vertexStorageCount = 0;
 	
@@ -99,9 +96,6 @@ public final class DiskStorageManager implements GraphPropertyAccess {
 	
 	private int incidenceStorageCount = 0;
 
-
-
-	
 	private String randomId; 
 
 	private FileChannel[] vertexFiles;
@@ -156,11 +150,10 @@ public final class DiskStorageManager implements GraphPropertyAccess {
 	private int incidenceReuseQueueSize = 0;
 	
 	
-	public DiskStorageManager(Graph graph) throws FileNotFoundException {
-		this.graph = graph;
-		this.localPartialGraphId = graph.getPartialGraphId();
-		factory = graph.getGraphFactory();
+	public DiskStorageManager(GraphDatabase database) throws FileNotFoundException {
 		schema = graph.getSchema();
+		this.graphDatabase = database;
+		this.factory = database.getGraphFactory();
 		randomId = Long.toString(System.currentTimeMillis());
 		vertexFiles = new FileChannel[ELEMENT_CONTAINER_COUNT];
 		edgeFiles = new FileChannel[ELEMENT_CONTAINER_COUNT];
@@ -768,7 +761,7 @@ public final class DiskStorageManager implements GraphPropertyAccess {
 	}
 
 
-	public void removeVertexFromBackgroundStorage(VertexImpl v) {
+	public void removeVertexFromDatabase(VertexImpl v) {
 		VertexContainer storage = getVertexContainer(v.getId());
 		int id = getElementIdInContainer(v.getId());
 		storage.vertices[id] = null;

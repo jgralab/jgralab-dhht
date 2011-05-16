@@ -36,8 +36,6 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
-import de.uni_koblenz.jgralab.impl.mem.PartialGraphImpl;
-import de.uni_koblenz.jgralab.impl.mem.PartialSubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 
@@ -138,51 +136,7 @@ public interface GraphFactory {
 	 */
 	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Edge edge);
 
-	/**
-	 * creates a PartialSubordinate-Graph object for the specified class. The
-	 * returned object may be an instance of a subclass of the specified
-	 * graphClass.
-	 * 
-	 * @param elem
-	 * @return
-	 * @throws RemoteException 
-	 */
-	public PartialSubordinateGraphImpl createPartialSubordinateGraph(
-			GraphElement<?, ?, ?> elem);
 	
-	/**
-	 * creates a PartialSubordinate-Graph object for the specified class. The
-	 * returned object may be an instance of a subclass of the specified
-	 * graphClass.
-	 * 
-	 * @param elem
-	 * @return
-	 * @throws RemoteException 
-	 */
-	public de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl createPartialSubordinateGraphDiskBasedStorage(
-			GraphElement<?, ?, ?> elem);
-
-	/**
-	 * creates a Partial-Graph object for the specified remote graph. The
-	 * returned object may be an instance of a subclass of the specified
-	 * graphClass.
-	 * 
-	 * @param compelteGraph
-	 * @return
-	 */
-	public PartialGraphImpl createPartialGraph(Graph completeGraph);
-	
-	/**
-	 * creates a Partial-Graph object for the specified remote graph. The
-	 * returned object may be an instance of a subclass of the specified
-	 * graphClass.
-	 * 
-	 * @param compelteGraph
-	 * @return
-	 */
-	public de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl createPartialGraphDiskBasedStorage(Graph completeGraph);
-
-
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
@@ -284,24 +238,7 @@ public interface GraphFactory {
 	public void setViewGraphImplementationClassForDiskBasedStorage(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass);
-
-	void setPartialGraphImplementationClass(
-			Class<? extends Graph> originalClass,
-			Class<? extends PartialGraphImpl> implementationClass);
-	
-	void setPartialGraphImplementationClassForDiskBasedStorage(
-			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.disk.PartialGraphImpl> implementationClass);
-	
-	void setPartialSubordinateGraphImplementationClass(
-			Class<? extends Graph> originalClass,
-			Class<? extends PartialSubordinateGraphImpl> implementationClass);
-	
-	void setPartialSubordinateGraphImplementationClassForDiskBasedStorage(
-			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.disk.PartialSubordinateGraphImpl> implementationClass);
-
-
+		
 	public void setVertexImplementationClass(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends Vertex> implementationClass);

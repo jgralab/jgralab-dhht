@@ -31,9 +31,12 @@
 
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,11 +47,22 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.GraphFactory;
+import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.JGraLabList;
+import de.uni_koblenz.jgralab.JGraLabMap;
+import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * Implementation of the complete, possibly distributed DHHTGraph
@@ -58,15 +72,31 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
-
-	// ------------- GRAPH VARIABLES -------------
+public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	/**
 	 * the unique id of the graph in the schema
 	 */
 	private String uid;
 
+	/** the graph database that stores this graph and manages all connections to all 
+	 * partial graphs 
+	 */
+	protected GraphDatabase graphDatabase;
+
+	/**
+	 * The property access providing direct access to the data of this graph, either
+	 * it is the local disk storage of the local graph database or the remote
+	 * graph database
+	 */
+	protected GraphPropertyAccess directAccess;
+
+	/**
+	 * The id of this complete or partial graph identifying it in the complete graph  
+	 */
+	protected int id;
+
+	
 	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
 	 * of a composition "parent".
@@ -74,15 +104,24 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	private List<VertexImpl> deleteVertexList;
 
 	/**
-	 * Stores the traversal context of each {@link Thread} working on this
-	 * {@link Graph}.
+	 * free index list for vertices
 	 */
-	private HashMap<Thread, Stack<Graph>> traversalContextMap;
+	protected FreeIndexList freeVertexList;
+	
 
-	@Override
-	public void useAsTraversalContext() {
-		setTraversalContext(this);
-	}
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeEdgeList;
+
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+
+	
+	
 	
 	/**
 	 * Creates a graph of the given GraphClass with the given id
@@ -105,28 +144,415 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected CompleteGraphImpl(String uid, GraphClass cls, int vMax, int eMax) {
 		super(cls);
 		this.uid = uid;
-		graphDatabase = new CompleteGraphDatabase(this, "127.0.0.1");
-		if (vMax < 1) {
-			throw new GraphException("vMax must not be less than 1", null);
-		}
-		if (eMax < 1) {
-			throw new GraphException("eMax must not be less than 1", null);
-		}
-
 		setDeleteVertexList(new LinkedList<VertexImpl>());
+	}
+	
+	/**
+	 * Use to allocate a <code>Vertex</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateVertexIndex(int currentId) {
+		int vId = freeVertexList.allocateIndex();
+		if (vId == 0) {
+			vId = freeVertexList.allocateIndex();
+		}
+		return vId;
+	}
+
+	/**
+	 * Use to allocate a <code>Edge</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateEdgeIndex(int currentId) {
+		int eId = freeEdgeList.allocateIndex();
+		if (eId == 0) {
+			eId = freeEdgeList.allocateIndex();
+		}
+		return eId;
+	}
+
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateIncidenceIndex(int currentId) {
+		int iId = freeIncidenceList.allocateIndex();
+		return iId;
+	}
+	
+	/**
+	 * Appends the edge e to the global edge sequence of this graph.
+	 * 
+	 * @param e
+	 *            an edge
+	 * @throws RemoteException 
+	 */
+	protected void appendEdgeToESeq(EdgeImpl e) {
+		setECount(getECount() + 1);
+		if (getFirstEdge() == null) {
+			setFirstEdge(e);
+		}
+		if (getLastEdge() != null) {
+			((EdgeImpl) getLastEdge()).setNextEdge(e);
+			e.setPreviousEdge(getLastEdge());
+		}
+		setLastEdge(e);
 	}
 
 
+	/**
+	 * Appends the vertex v to the global vertex sequence of this graph.
+	 * 
+	 * @param v
+	 *            a vertex
+	 * @throws RemoteException 
+	 */
+	protected void appendVertexToVSeq(VertexImpl v) {
+		setVCount(getVCount() + 1);
+		if (getFirstVertex() == null) {
+			setFirstVertex(v);
+		}
+		if (getLastVertex() != null) {
+			((VertexImpl) getLastVertex()).setNextVertex(v);
+			v.setPreviousVertex(getLastVertex());
+		}
+		setLastVertex(v);
+	}
+	
+	protected boolean canAddGraphElement(int graphElementId) {
+		return graphElementId == 0;
+	}
 
-	/** should be called by all delete partial graph operations 
-	 * @throws RemoteException */
-	public void internalDeletePartialGraph(PartialGraphImpl graph) {
-		graphDatabase.releasePartialGraphId(graph.getPartialGraphId());
+
+	@Override
+	public int compareTo(Graph a) {
+		if (this == a) {
+			return 0;
+		}
+		// every graph is smaller than the complete graph
+		return -1;
+	}
+
+	protected CompleteGraphImpl(GraphClass cls) {
+		super(cls);
+		setFreeVertexList(new FreeIndexList(10));
+		setFreeIncidenceList(new FreeIndexList(10));
+		setFreeEdgeList(new FreeIndexList(10));
+		setGraphVersion(0);
+	}
+
+	/**
+	 * Computes new size of vertex and edge array depending on the current size.
+	 * Up to 256k elements, the size is doubled. Between 256k and 1M elements,
+	 * 256k elements are added. Beyond 1M, increase is 128k elements.
+	 * 
+	 * @param n
+	 *            current size
+	 * @return new size
+	 */
+	private int computeNewSize(int n) {
+		return n >= 1048576 ? n + 131072 : n >= 262144 ? n + 262144 : n + n;
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
 		return vertex.connect(cls, edge);
+	}
+
+	/*
+	 * TODO: Should return true, if e is part of this graph or any of its
+	 * partial graphs
+	 */
+	@Override
+	public boolean containsEdge(Edge e) {
+		return (e != null) && (e.getGraph() == this)
+				&& containsEdgeId(((EdgeImpl) e).id);
+	}
+
+	/**
+	 * Checks if the edge id eId is valid and if there is an such an edge locally in
+	 * this graph.
+	 * 
+	 * @param eId
+	 *            an edge id
+	 * @return true if this graph contains an edge with id eId
+	 */
+	protected final boolean containsEdgeId(int eId) {
+		return (eId > 0) && (eId <= eMax) && (diskStorage.getEdgeObject(eId) != null);
+	}
+
+	public boolean containsEdgeLocally(Edge e) {
+		return (e != null) && (e.getGraph() == this) && (directAccess.getEdgeObject(e.getId()) == e);
+	}
+
+	/**
+	 * Checks if the incidence id iId is valid and if there is an such an
+	 * incidence locally in this graph.
+	 * 
+	 * @param iId
+	 *            a incidence id
+	 * @return true if this graph contains an incidence with id iId
+	 */
+	private final boolean containsIncidenceId(int iId) {
+		return (iId > 0) && (graphDatabase.getIncidenceObject(iId) != null);
+	}
+
+	/*
+	 * TODO: Should return true, if v is part of this graph or any of its
+	 * partial graphs
+	 */
+	@Override
+	public boolean containsVertex(Vertex v) {
+		return (v.getId() > 0) && (graphDatabase.getVertexObject(v.getId()) == v);
+	}
+
+	/**
+	 * Checks if the vertex id vId is valid and if there is an such a vertex locally in
+	 * this graph.
+	 * 
+	 * @param vId
+	 *            a vertex id
+	 * @return true if this graph contains a vertex with id vId
+	 */
+	protected final boolean containsVertexId(int vId) {
+		return (vId > 0) && (graphDatabase.getVertexObject(vId) != null);
+	}
+	
+
+	public boolean containsVertexLocally(Vertex v) {
+		return (v != null) && (v.getGraph() == this) && (directAccess.getVertexObject(v.getId()) == v);
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList() {
+		return new JGraLabListImpl<T>();
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
+		return new JGraLabListImpl<T>(collection);
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(int initialCapacity) {
+		return new JGraLabListImpl<T>(initialCapacity);
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap() {
+		return new JGraLabMapImpl<K, V>();
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
+		return new JGraLabMapImpl<K, V>(initialCapacity);
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
+			float loadFactor) {
+		return new JGraLabMapImpl<K, V>(initialCapacity, loadFactor);
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
+		return new JGraLabMapImpl<K, V>(map);
+	}
+
+
+	@Override
+	public Graph createPartialGraph(String hostname)  {
+		return graphDatabase.createPartialGraph(this.getGraphClass(), hostname);
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
+		T record = graphFactory.createRecord(recordClass, this);
+		try {
+			record.readComponentValues(io);
+		} catch (GraphIOException e) {
+			e.printStackTrace();
+		}
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
+		return graphDatabase.createRecord(recordClass, fields);
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
+		T record = graphFactory.createRecord(recordClass, this);
+		record.setComponentValues(fields);
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
+		T record = graphFactory.createRecord(recordClass, this);
+		record.setComponentValues(components);
+		return record;
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet() {
+		return new JGraLabSetImpl<T>();
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
+		return new JGraLabSetImpl<T>(collection);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity) {
+		return new JGraLabSetImpl<T>(initialCapacity);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
+		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
+	}
+
+	/**
+	 * Changes the size of the vertex array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the vertex array
+	 */
+//	protected void expandVertexArray(int newSize) {
+//		if (newSize <= vMax) {
+//			throw new GraphException("newSize must > vSize: vSize=" + vMax
+//					+ ", newSize=" + newSize);
+//		}
+//		VertexImpl[] expandedArray = new VertexImpl[newSize + 1];
+//		if (getVertexArray() != null) {
+//			System.arraycopy(getVertexArray(), 0, expandedArray, 0,
+//					getVertexArray().length);
+//		}
+//		if (getFreeVertexList() == null) {
+//			setFreeVertexList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeVertexList().expandBy(newSize - vMax);
+//		}
+//		setVertexArray(expandedArray);
+//		vMax = newSize;
+//		notifyMaxVertexCountIncreased(newSize);
+//	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.Graph#defragment()
+	 */
+	@Override
+	public void defragment() {
+//		// defragment vertex array
+//		if (getVCount() < vMax) {
+//			if (getVCount() > 0) {
+//				int vId = vMax;
+//				while (getFreeVertexList().isFragmented()) {
+//					while ((vId >= 1) && (getVertexArray()[vId] == null)) {
+//						--vId;
+//					}
+//					assert vId >= 1;
+//					VertexImpl v = getVertexArray()[vId];
+//					getVertexArray()[vId] = null;
+//					getFreeVertexList().freeIndex(vId);
+//					int newId = allocateVertexIndex(vId);
+//					assert newId < vId;
+//					v.setId(newId);
+//					getVertexArray()[newId] = v;
+//					--vId;
+//				}
+//			}
+//			int newVMax = getVCount() == 0 ? 1 : getVCount();
+//			if (newVMax != vMax) {
+//				vMax = newVMax;
+//				VertexImpl[] newVertex = new VertexImpl[vMax + 1];
+//				System.arraycopy(getVertexArray(), 0, newVertex, 0,
+//						newVertex.length);
+//				setVertexArray(newVertex);
+//			}
+//			graphModified();
+//			System.gc();
+//		}
+//		// defragment edge array
+//		if (getECount() < eMax) {
+//			if (getECount() > 0) {
+//				int eId = eMax;
+//				while (getFreeEdgeList().isFragmented()) {
+//					while ((eId >= 1) && (getEdgeArray()[eId] == null)) {
+//						--eId;
+//					}
+//					assert eId >= 1;
+//					EdgeImpl e = getEdgeArray()[eId];
+//					getEdgeArray()[eId] = null;
+//					getFreeEdgeList().freeIndex(eId);
+//					int newId = allocateEdgeIndex(eId);
+//					assert newId < eId;
+//					e.setId(newId);
+//					getEdgeArray()[newId] = e;
+//					--eId;
+//				}
+//			}
+//			int newEMax = getECount() == 0 ? 1 : getECount();
+//			if (newEMax != eMax) {
+//				eMax = newEMax;
+//				EdgeImpl[] newEdge = new EdgeImpl[eMax + 1];
+//				System.arraycopy(getEdgeArray(), 0, newEdge, 0, newEdge.length);
+//				setEdgeArray(newEdge);
+//				System.gc();
+//			}
+//			graphModified();
+//			System.gc();
+//		}
+//
+//		if (getICount() < iMax) {
+//			if (getICount() > 0) {
+//				int iId = iMax;
+//				while (getFreeEdgeList().isFragmented()) {
+//					while ((iId >= 1) && (getIncidenceArray()[iId] == null)) {
+//						--iId;
+//					}
+//					assert iId >= 1;
+//					IncidenceImpl i = getIncidenceArray()[iId];
+//					getIncidenceArray()[iId] = null;
+//					getFreeIncidenceList().freeIndex(iId);
+//					int newId = allocateIncidenceIndex(iId);
+//					assert newId < iId;
+//					i.setId(newId);
+//					getIncidenceArray()[newId] = i;
+//					// getRevEdge()[newId] = r;
+//					--iId;
+//				}
+//			}
+//			int newIMax = getICount() == 0 ? 1 : getICount();
+//			if (newIMax != iMax) {
+//				iMax = newIMax;
+//				IncidenceImpl[] newIncidence = new IncidenceImpl[iMax + 1];
+//				System.arraycopy(getIncidenceArray(), 0, newIncidence, 0,
+//						newIncidence.length);
+//				setIncidenceArray(newIncidence);
+//				System.gc();
+//			}
+//			graphModified();
+//			System.gc();
+//		}
+	}
+
+	@Override
+	public void deleteEdge(Edge e) {
+		assert (e != null) && e.isValid() && containsEdge(e);
+		internalDeleteEdge(e);
+		edgeListModified();
 	}
 
 	/*
@@ -139,6 +565,11 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		internalDeleteEdge(e);
 		edgeListModified();
+	}
+
+	@Override
+	public void deleteVertex(Vertex v) {
+		// TODO
 	}
 
 	/*
@@ -174,21 +605,66 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 
 	}
 
+	/**
+	 * Changes the vertex sequence version of this graph. Should be called
+	 * whenever the vertex list of this graph is changed, for instance by
+	 * creation and deletion or reordering of vertices.
+	 */
+	@Override
+	protected void edgeListModified() {
+		graphDatabase.edgeListModified();
+		graphDatabase.graphModified();
+	}
+
+	/**
+	 * Changes the graph structure version, should be called whenever the
+	 * structure of the graph is changed, for instance by creation and deletion
+	 * or reordering of vertices and edges
+	 */
+	@Override
+	protected void edgeListModified() {
+		graphDatabase.edgeListModified();
+	}
+
+	/**
+	 * Use to free an <code>Edge</code>-index
+	 * 
+	 * @param index
+	 */
+	protected void freeEdgeIndex(int index) {
+		freeEdgeList.freeIndex(index);
+	}
+
+
+	// ------------- GRAPH VARIABLES -------------
+	
+	/**
+	 * Use to free a <code>Vertex</code>-index.
+	 * 
+	 * @param index
+	 */
+	protected void freeVertexIndex(int index) {
+		freeVertexList.freeIndex(index);
+	}
+	
+	@Override
+	public Graph getCompleteGraph() {
+		return graphDatabase.getGraphObject(0);
+	}	
+	
 	@Override
 	public CompleteGraphImpl getCompleteGraph() {
 		return this;
 	}
-
-	protected List<VertexImpl> getDeleteVertexList() {
-		return deleteVertexList;
-	}
-
+	
+	
 	@Override
-	public Edge getEdge(int eId) {
-		assert eId != 0 : "The edge id must be != 0, given was " + eId;
-		return diskStorage.getEdgeObject(eId);
+	public String getCompleteGraphUid() {
+		return getCompleteGraph().getCompleteGraphUid();
 	}
 
+
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -198,19 +674,163 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	public String getCompleteGraphUid() {
 		return uid;
 	}
-
-	@Override
-	public Graph getTraversalContext() {
-		if (traversalContextMap == null)
-			return null;
-		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
-		if (stack == null || stack.isEmpty()) {
-			return this;
-		} else {
-			return stack.peek();
-		}
+	
+	protected List<VertexImpl> getDeleteVertexList() {
+		return deleteVertexList;
 	}
 
+	
+	@Override
+	public int getECount() {
+		return eCount;
+	}
+
+	
+	@Override
+	public Edge getEdge(int eId) {
+		assert eId != 0 : "The edge id must be != 0, given was " + eId;
+		return graphDatabase.getEdgeObject(eId);
+	}
+	
+	
+	// ------------- VERTEX LIST VARIABLES -------------
+
+	
+	@Override
+	public long getEdgeListVersion() {
+		return edgeListVersion;
+	}
+	
+	
+
+
+
+	
+	// ------------- INCIDENCE LIST VARIABLES -------------
+
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.Graph#getExpandedEdgeCount()
+	 */
+	public int getExpandedEdgeCount() {
+		return computeNewSize(eMax);
+	}
+
+	protected int getExpandedIncidenceCount() {
+		return computeNewSize(iMax);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.Graph#getExpandedVertexCount()
+	 */
+	public int getExpandedVertexCount() {
+		return computeNewSize(vMax);
+	}
+	
+
+	
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
+
+	@Override
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+
+	abstract protected FreeIndexList getFreeIncidenceList();
+	
+	protected FreeIndexList getFreeVertexList() {
+		return freeVertexList;
+	}
+
+	public GraphDatabase getGraphDatabase() {
+		return graphDatabase;
+	}
+	
+
+
+	
+	
+	@Override
+	public GraphFactory getGraphFactory() {
+		return graphDatabase.getGraphFactory();
+	}
+
+	@Override
+	public long getGraphVersion() {
+		return graphDatabase.getGraphVersion();
+	}
+
+
+	
+	@Override
+	public int getICount() {
+		return iCount;
+	}
+	
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.Graph#getMaxECount()
+	 */
+	@Override
+	public int getMaxECount() {
+		return eMax;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.Graph#getMaxVCount()
+	 */
+	@Override
+	public int getMaxVCount() {
+		return vMax;
+	}
+
+	@Override
+	public GraphBaseImpl getParentDistributedGraph() {
+		return this;
+	}
+	
+	
+	@Override
+	public int getPartialGraphId() {
+		return id;
+	}
+
+	@Override
+	public Schema getSchema() {
+		return schema;
+	}	
+
+	@Override
+	public Schema getSchema() {
+		return graphDatabase.getSchema();
+	}
+
+
+	@Override
+	public GraphBaseImpl getSuperordinateGraph() {
+		return this;
+	}
+	
+	@Override
+	public Graph getTraversalContext() {
+		return graphDatabase.getTraversalContext();
+	}
+
+	@Override
+	public int getVCount() {
+		return vCount;
+	}
+		
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -219,7 +839,49 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	@Override
 	public Vertex getVertex(int vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
-		return diskStorage.getVertexObject(vId);
+		return graphDatabase.getVertexObject(vId);
+	}
+
+	@Override
+	public long getVertexListVersion() {
+		return vertexListVersion;
+	}
+
+	@Override
+	public Graph getView(int kappa) {
+		return graphDatabase.getGraphFactory().createViewGraph(this, kappa);
+	}
+
+	public Graph getViewedGraph() {
+		return this;
+	}
+
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change.
+	 */
+	@Override
+	public void graphModified() {
+		graphDatabase.graphModified();
+	}
+
+
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change.
+	 */
+	@Override
+	public void graphModified() {
+		graphDatabase.graphModified();
+	}
+	
+	private void internalDeleteEdge(Edge e) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -249,6 +911,12 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		removeEdgeFromESeq(e);
 		edgeListModified();
 		edgeAfterDeleted(e);
+	}
+
+	/** should be called by all delete partial graph operations 
+	 * @throws RemoteException */
+	public void internalDeletePartialGraph(PartialGraphImpl graph) {
+		graphDatabase.releasePartialGraphId(graph.getPartialGraphId());
 	}
 
 	/**
@@ -312,6 +980,141 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		if (edgeHasBeenDeleted) {
 			edgeListModified();
 		}
+	}
+
+	protected void internalEdgeAdded(EdgeImpl e) {
+		notifyEdgeAdded(e);
+	}
+	
+	
+	protected void internalEdgeDeleted(EdgeImpl e) {
+		assert e != null;
+		notifyEdgeDeleted(e);
+	}
+	
+	protected void internalIncidenceAdded(IncidenceImpl i) {
+		notifyIncidenceAdded(i);
+	}
+	
+	protected void internalVertexAdded(VertexImpl v) {
+		notifyVertexAdded(v);
+	}
+
+	protected void internalVertexDeleted(VertexImpl v) {
+		assert v != null;
+		notifyVertexDeleted(v);
+	}
+
+	@Override
+	public boolean isLoading() {
+		return graphDatabase.isLoading();
+	}
+
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		return false;
+	}
+
+	@Override
+	public void loadingCompleted() {
+		
+	}
+	
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum edge count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum edge count.
+	 */
+	protected void notifyMaxEdgeCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxEdgeCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxEdgeCountIncreased(
+					newValue);
+		}
+	}
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum incidence count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum incidence count.
+	 */
+	protected void notifyMaxIncidenceCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxIncidenceCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxIncidenceCountIncreased(
+					newValue);
+		}
+	}
+	
+	/**
+	 * Notifies all registered <code>GraphStructureChangedListener</code> that
+	 * the maximum vertex count has been increased to the given
+	 * <code>newValue</code>. All invalid <code>WeakReference</code>s are
+	 * deleted automatically from the internal listener list.
+	 * 
+	 * @param newValue
+	 *            the new maximum vertex count.
+	 */
+	protected void notifyMaxVertexCountIncreased(int newValue) {
+		if (graphStructureChangedListenersWithAutoRemoval != null) {
+			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
+			while (iterator.hasNext()) {
+				GraphStructureChangedListener currentListener = iterator.next()
+						.get();
+				if (currentListener == null) {
+					iterator.remove();
+				} else {
+					currentListener.maxVertexCountIncreased(newValue);
+				}
+			}
+			setAutoListenerListToNullIfEmpty();
+		}
+		int n = graphStructureChangedListeners.size();
+		for (int i = 0; i < n; i++) {
+			graphStructureChangedListeners.get(i).maxVertexCountIncreased(
+					newValue);
+		}
+	}
+
+
+	protected PartialGraphImpl(GraphClass cls, GraphDatabase graphDatabase) {
+		super(cls);
+		//create local graph database
+		this.graphDatabase = graphDatabase;
+		id = graphDatabase.getLocalGraphId();
 	}
 
 	/**
@@ -403,6 +1206,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		edgeListModified();
 	}
 
+	
 	/**
 	 * Modifies vSeq such that the movedVertex is immediately after the
 	 * targetVertex.
@@ -508,22 +1312,68 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		targetVertex.setPreviousVertex(movedVertex);
 		vertexListModified();
 	}
+	
+	/**
+	 * Changes the size of the edge array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the edge array
+	 */
+//	protected void expandEdgeArray(int newSize) {
+//		if (newSize <= eMax) {
+//			throw new GraphException("newSize must be > eSize: eSize=" + eMax
+//					+ ", newSize=" + newSize);
+//		}
+//
+//		EdgeImpl[] e = new EdgeImpl[newSize + 1];
+//		if (getEdgeArray() != null) {
+//			System.arraycopy(getEdgeArray(), 0, e, 0, getEdgeArray().length);
+//		}
+//		setEdgeArray(e);
+//
+//		if (getFreeEdgeList() == null) {
+//			setFreeEdgeList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeEdgeList().expandBy(newSize - eMax);
+//		}
+//
+//		eMax = newSize;
+//		notifyMaxEdgeCountIncreased(newSize);
+//	}
+
+	// handle GraphStructureChangedListener
+
+	/**
+	 * Changes the size of the incidence array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the incidence array
+	 */
+//	protected void expandIncidenceArray(int newSize) {
+//		if (newSize <= iMax) {
+//			throw new GraphException("newSize must > iSize: iSize=" + iMax
+//					+ ", newSize=" + newSize);
+//		}
+//		IncidenceImpl[] expandedArray = new IncidenceImpl[newSize + 1];
+//		if (getIncidenceArray() != null) {
+//			System.arraycopy(getIncidenceArray(), 0, expandedArray, 0,
+//					getIncidenceArray().length);
+//		}
+//		if (getFreeIncidenceList() == null) {
+//			setFreeIncidenceList(new FreeIndexList(newSize));
+//		} else {
+//			getFreeIncidenceList().expandBy(newSize - vMax);
+//		}
+//		setIncidenceArray(expandedArray);
+//		iMax = newSize;
+//		notifyMaxIncidenceCountIncreased(newSize);
+//	}
 
 	@Override
 	public void releaseTraversalContext() {
-		if (traversalContextMap == null)
-			return;
-		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
-		if (stack != null) {
-			stack.pop();
-			if (stack.isEmpty()) {
-				traversalContextMap.remove(Thread.currentThread());
-				if (traversalContextMap.isEmpty())
-					traversalContextMap = null;
-			}
-		}
+		graphDatabase.releaseTraversalContext();
 	}
-
+	
 	/**
 	 * Removes the edge e from the global edge sequence of this graph.
 	 * 
@@ -538,7 +1388,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		freeEdgeIndex(e.getId());
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
-		diskStorage.removeEdgeFromBackgroundStorage(e);
+		graphDatabase.removeEdgeFromDatabase(e);
 		e.setId(0);
 		setECount(getECount() - 1);
 	}
@@ -602,7 +1452,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		freeVertexIndex(v.getId());
 		v.setPreviousVertex(null);
 		v.setNextVertex(null);
-		diskStorage.removeVertexFromBackgroundStorage(v);
+		graphDatabase.removeVertexFromDatabase(v);
 		v.setId(0);
 		setVCount(getVCount() - 1);
 	}
@@ -610,6 +1460,57 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected void setDeleteVertexList(List<VertexImpl> deleteVertexList) {
 		this.deleteVertexList = deleteVertexList;
 	}
+
+	@Override
+	protected void setECount(int count) {
+		eCount = count;
+	}
+
+	protected void setEdgeListVersion(long edgeListVersion) {
+		this.edgeListVersion = edgeListVersion;
+	}
+
+	protected void setFreeEdgeList(FreeIndexList freeEdgeList) {
+		this.freeEdgeList = freeEdgeList;
+	}
+
+	protected void setFreeIncidenceList(FreeIndexList freeIndexList) {
+		this.freeIncidenceList = freeIndexList;
+	}
+
+	protected void setFreeVertexList(FreeIndexList freeVertexList) {
+		this.freeVertexList = freeVertexList;
+	}
+
+	/**
+	 * Sets the version counter of this graph. Should only be called immediately
+	 * after loading and in graphModified.
+	 * 
+	 * @param graphVersion
+	 *            new version value
+	 */
+	public void setGraphVersion(long graphVersion) {
+		graphDatabase.setGraphVersion(graphVersion);
+	}
+
+	protected void setICount(int count) {
+		iCount = count;
+	}
+
+	/**
+	 * Sets the loading flag.
+	 * 
+	 * @param isLoading
+	 */
+	public void setLoading(boolean isLoading) {
+		graphDatabase.setLoading(isLoading);
+	}
+
+	@Override
+	public void setTraversalContext(Graph traversalContext) {
+		graphDatabase.setTraversalContext(traversalContext);
+	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -620,38 +1521,26 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 		this.uid = uid;
 	}
 
-	/**
-	 * Changes the graph structure version, should be called whenever the
-	 * structure of the graph is changed, for instance by creation and deletion
-	 * or reordering of vertices and edges
-	 */
+
+	
 	@Override
-	protected void edgeListModified() {
-		edgeListVersion++;
-		graphModified();
+	protected void setVCount(int count) {
+		graphDatabase.setVCount(count);
 	}
 
-	@Override
-	public void setTraversalContext(Graph traversalContext) {
-		if (this.traversalContextMap == null)
-			this.traversalContextMap = new HashMap<Thread, Stack<Graph>>();
-		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
-		if (stack == null) {
-			stack = new Stack<Graph>();
-			this.traversalContextMap.put(Thread.currentThread(), stack);
-		}
-		stack.add(traversalContext);
+
+
+
+
+	protected void setVertexListVersion(long vertexListVersion) {
+		this.vertexListVersion = vertexListVersion;
 	}
 
-	/**
-	 * Changes this graph's version. graphModified() is called whenever the
-	 * graph is changed, all changes like adding, creating and reordering of
-	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change.
-	 */
+
+
 	@Override
-	public void graphModified() {
-		graphVersion++;
+	public void useAsTraversalContext() {
+		graphDatabase.setTraversalContext(this);
 	}
 
 	/**
@@ -666,55 +1555,23 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
 
 	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, this);
-		record.setComponentValues(fields);
-		return record;
-	}
-
-	@Override
-	public boolean isPartOfGraph(Graph other) {
-		return false;
-	}
-
-	@Override
-	public int getPartialGraphId() {
-		return id;
-	}
-
-	@Override
-	protected FreeIndexList getFreeIncidenceList() {
-		return freeIncidenceList;
-	}
-
+	
+	/**
+	 * Changes the vertex sequence version of this graph. Should be called
+	 * whenever the vertex list of this graph is changed, for instance by
+	 * creation and deletion or reordering of vertices.
+	 */
 	@Override
 	protected void vertexListModified() {
-		vertexListVersion++;
+		graphDatabase.vertexListModified();
+		graphDatabase.graphModified();
 	}
-
-	@Override
-	public GraphBaseImpl getParentDistributedGraph() {
-		return this;
-	}
-
-	@Override
-	public GraphBaseImpl getSuperordinateGraph() {
-		return this;
-	}
-
-	@Override
-	public int compareTo(Graph a) {
-		if (this == a) {
-			return 0;
-		}
-		// every graph is smaller than the complete graph
-		return -1;
-	}
-
 	
+	
+	public void setGraphDatabase(GraphDatabase graphDatabase) {
+		this.graphDatabase = graphDatabase;
+	}
+
 	
 	
 }

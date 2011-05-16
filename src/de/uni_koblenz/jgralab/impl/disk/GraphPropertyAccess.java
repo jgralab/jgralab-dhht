@@ -1,9 +1,14 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.util.Map;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Record;
+import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * This interface defines all methods needed to access properties of the graph and its elements
@@ -49,6 +54,23 @@ public interface GraphPropertyAccess {
 	public void setIncidenceListVersion(int elementId, long incidenceListVersion);
 
 	public long getIncidenceListVersion(int elementId);
+
+
+	public Vertex getVertexObject(int id);
+
+
+	public Edge getEdgeObject(int id);
+
+
+	public Schema getSchema();
+	
+	public abstract void removeEdgeFromDatabase(EdgeImpl e);
+
+	public abstract void removeVertexFromDatabase(VertexImpl v);
+
+
+	public <T extends Record> T createRecord(Class<T> recordClass, Map<String, Object> fields);
+
 	
 	
 }

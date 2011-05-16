@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -842,6 +843,10 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public Graph getPartialGraph(int partialGraphId);
 
 	public Collection<? extends Graph> getPartialGraphs();
+
+	public void setLoading(boolean b);
+
+	public GraphDatabase getGraphDatabase();
 
 
 	

@@ -60,7 +60,35 @@ public class PartialGraphDatabase extends GraphDatabase {
 		completeGraphDatabase.graphModified();
 	}
 	
+	/* **************************************************************************
+	 * Methods to access traversal context
+	 * **************************************************************************/
 	
+	public Graph getTraversalContext() {
+		return completeGraphDatabase.getTraversalContext();
+	}
 	
+	public void releaseTraversalContext() {
+		completeGraphDatabase.releaseTraversalContext();
+	}
+	
+	public void setTraversalContext(Graph traversalContext) {
+		completeGraphDatabase.setTraversalContext(traversalContext);
+	}
+
+	@Override
+	public Graph createPartialGraph(String hostname) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Graph loadRemotePartialGraph(String hostname, int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
 	
 }
