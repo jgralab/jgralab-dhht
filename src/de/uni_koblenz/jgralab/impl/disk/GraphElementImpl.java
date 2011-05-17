@@ -103,7 +103,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphElementImpl(Graph graph)  {
 		assert graph != null;
-		this.graphDatabase = ((CompleteGraphImpl)graph).getGraphDatabase();
+		this.graphDatabase = ((GraphImpl)graph).getGraphDatabase();
 	}
 
 

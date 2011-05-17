@@ -472,18 +472,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the id of this graph
 	 */
-	public String getCompleteGraphUid();
+	public String getUniqueGraphId();
 
-	/**
-	 * Sets the <code>id</code> of this Graph.
-	 * 
-	 * Precondition: id != null && id.equals(id.trim()) && !id.equals("")
-	 * 
-	 * @param id
-	 *            the new id
-	 */
-	// Method should be used internally only
-	// public void setId(String id);
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this
@@ -826,10 +816,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	public void writePartialGraphs(GraphIO graphIO);
 
-
-
-	public DiskStorageManager getDiskStorage();
-	
 	
 	/**
 	 * Checks if the given id <code>id</code> is the id of an local
@@ -847,6 +833,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public void setLoading(boolean b);
 
 	public GraphDatabase getGraphDatabase();
+
 
 
 	

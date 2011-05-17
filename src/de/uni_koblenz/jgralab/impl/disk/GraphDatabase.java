@@ -5,10 +5,15 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -18,11 +23,14 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 
@@ -33,7 +41,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * on the ids
  */
 
-public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
+public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	//Static parts 
 	/* Switches that toggle number of elements in a local partial graph
@@ -60,9 +68,11 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	
 	private Schema schema;
 	
-	protected CompleteOrPartialGraphImpl localGraph;
+	protected GraphImpl localGraph;
 	
 	protected final int localGraphId;
+	
+	protected final int parentDistributedGraphId;
 	
 	protected JGraLabServer server;
 	
@@ -71,6 +81,31 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	protected boolean loading = false;
 
 	protected long graphVersion = 0;
+	
+	
+	/**
+	 * List of vertices to be deleted by a cascading delete caused by deletion
+	 * of a composition "parent".
+	 */
+	private List<VertexImpl> deleteVertexList;
+	
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeVertexList;
+	
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeEdgeList;
+
+
+	/**
+	 * free index list for vertices
+	 */
+	protected FreeIndexList freeIncidenceList;
+	
 	
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
@@ -96,8 +131,6 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	 */
 	private int vCount;
 	
-	
-	
 	/**
 	 * maximum number of edges
 	 */
@@ -108,12 +141,8 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	 */
 	protected int eCount;
 	
-	/**
-	 * free index list for edges
-	 */
-	protected FreeIndexList freeEdgeList;
 	
-	
+	protected int iCount;
 	
 
 	private DiskStorageManager diskStorage;
@@ -137,7 +166,13 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	private Map<Integer, Reference<Incidence>> remoteIncidences;
 	
 	
-	protected GraphDatabase(CompleteOrPartialGraphImpl localGraph, Schema schema) {
+	protected GraphDatabase(GraphImpl localGraph, Schema schema) {
+		
+		setFreeVertexList(new FreeIndexList(10));
+		setFreeIncidenceList(new FreeIndexList(10));
+		setFreeEdgeList(new FreeIndexList(10));
+		setGraphVersion(0);
+		
 		// initialize graph, factory and schema
 		this.localGraph = localGraph;
 		localGraphId = localGraph.getPartialGraphId();
@@ -165,13 +200,13 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		
 		//register graph at server
 		server = JGraLabServerImpl.getLocalInstance();
-		server.registerGraph(localGraph.getCompleteGraphUid(), localGraph.getPartialGraphId(), this);
+		server.registerGraph(localGraph.getUniqueGraphId(), localGraph.getPartialGraphId(), this);
 	}
 	
 	protected GraphDatabase getGraphDatabase(int partialGraphId) {
 		if (partialGraphDatabases[partialGraphId] == null) {
 			//initialize new remote graph database
-			partialGraphDatabases[partialGraphId] = server.getRemoteInstance(getHostname(partialGraphId)).getGraph(localGraph.getCompleteGraphUid(), partialGraphId);
+			partialGraphDatabases[partialGraphId] = server.getRemoteInstance(getHostname(partialGraphId)).getGraph(localGraph.getUniqueGraphId(), partialGraphId);
 		}
 		return partialGraphDatabases[partialGraphId];
 	}
@@ -191,7 +226,8 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 	 */
 	public abstract void registerPartialGraph(int id, String hostname);
 	
-	public abstract Graph createPartialGraph(String hostname);
+
+	public abstract Graph createPartialGraph(Class<? extends Graph> graphClass, String hostname);
 	
 	/**
 	 * Loads the partial graph 
@@ -217,13 +253,7 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		if (partialGraphId == localGraphId)
 			return localGraph;
 		if (partialGraphs[partialGraphId] == null) {
-			if (partialGraphId == 0) {
-				//Proxy for complete graph,
-				//TODO change to factory call
-				partialGraphs[partialGraphId] = new PartialGraphImpl(partialGraphId, this);				
-			} else {
-				partialGraphs[partialGraphId] = new PartialGraphImpl(partialGraphId, this);	
-			}
+			partialGraphs[partialGraphId] = graphFactory.createGraphProxy(schema.getGraphClass().getM1Class(), localGraph.getUniqueGraphId() , partialGraphId, this);				
 		}
 		return partialGraphs[partialGraphId];
 	}
@@ -557,8 +587,8 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 							+ " already exists");
 				}
 				if (iId > iMax) {
-					throw new GraphException("vertex id " + iId
-							+ " is bigger than vSize");
+					throw new GraphException("incidence id " + iId
+							+ " is bigger than iSize");
 				}
 			} else {
 				throw new GraphException(
@@ -634,15 +664,6 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		
 	}
 
-	private void appendEdgeToESeq(EdgeImpl e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private int allocateEdgeIndex(int eId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	private boolean canAddGraphElement(int eId) {
 		// TODO Auto-generated method stub
@@ -677,9 +698,406 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 		
 	}
 	
+	/**
+	 * Deletes the edge from the internal structures of this graph.
+	 * 
+	 * @param edge
+	 *            an edge
+	 */
+	private void internalDeleteEdge(Edge edge) {
+		assert (edge != null) && edge.isValid() && containsEdge(edge);
+
+		EdgeImpl e = (EdgeImpl) edge;
+		internalEdgeDeleted(e);
+
+		Incidence inc = e.getFirstIncidence();
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		while (inc != null) {
+			vertices.add(inc.getVertex());
+			((VertexImpl) inc.getVertex())
+					.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+			inc = e.getFirstIncidence();
+		}
+		for (Vertex vertex : vertices) {
+			((VertexImpl) vertex).incidenceListModified();
+		}
+
+		removeEdgeFromESeq(e);
+
+	}
+
+
+	/**
+	 * Deletes all vertices in deleteVertexList from the internal structures of
+	 * this graph. Possibly, cascading deletes of child vertices occur when
+	 * parent vertices of Composition classes are deleted.
+	 */
+	private void internalDeleteVertex()  {
+		boolean edgeHasBeenDeleted = false;
+		while (!getDeleteVertexList().isEmpty()) {
+			VertexImpl v = getDeleteVertexList().remove(0);
+			assert (v != null) && v.isValid() && containsVertex(v);
+			internalVertexDeleted(v);
+			// delete all incident edges including incidence objects
+			Incidence inc = v.getFirstIncidence();
+
+			Set<EdgeImpl> edges = new HashSet<EdgeImpl>();
+			while (inc != null) {
+				EdgeImpl edge = (EdgeImpl) inc.getEdge();
+				boolean deleteEdge = false;
+				if (edge.isBinary()) {
+					BinaryEdge bedge = (BinaryEdge) edge;
+					if (bedge.getAlpha() == v) {
+						if (bedge.getOmegaSemantics() == IncidenceType.COMPOSITION) {
+							VertexImpl omega = (VertexImpl) bedge.getOmega();
+							if ((omega != v) && containsVertex(omega)
+									&& !getDeleteVertexList().contains(omega)) {
+								getDeleteVertexList().add(omega);
+								removeEdgeFromESeq((EdgeImpl) bedge);
+								edgeAfterDeleted(bedge);
+								deleteEdge = true;
+							}
+						}
+					} else if (bedge.getOmega() == v) {
+						if (bedge.getAlphaSemantics() == IncidenceType.COMPOSITION) {
+							VertexImpl alpha = (VertexImpl) bedge.getAlpha();
+							if ((alpha != v) && containsVertex(alpha)
+									&& !getDeleteVertexList().contains(alpha)) {
+								getDeleteVertexList().add(alpha);
+								removeEdgeFromESeq((EdgeImpl) bedge);
+								edgeAfterDeleted(bedge);
+								deleteEdge = true;
+							}
+						}
+					}
+				}
+				edgeHasBeenDeleted |= deleteEdge;
+				if (!deleteEdge) {
+					edges.add(edge);
+					edge.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+				}
+				inc = v.getFirstIncidence();
+			}
+			for (EdgeImpl edge : edges) {
+				edge.incidenceListModified();
+			}
+			removeVertexFromVSeq(v);
+			vertexAfterDeleted(v);
+		}
+		vertexListModified();
+		if (edgeHasBeenDeleted) {
+			edgeListModified();
+		}
+	}
+	
+	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
+		assert (targetEdge != null) && targetEdge.isValid()
+				&& containsEdge(targetEdge);
+		assert (movedEdge != null) && movedEdge.isValid()
+				&& containsEdge(movedEdge);
+		assert targetEdge != movedEdge;
+
+		if ((targetEdge == movedEdge)
+				|| (targetEdge.getNextEdge() == movedEdge)) {
+			return;
+		}
+
+		assert getFirstEdge() != getLastEdge();
+
+		// remove moved edge from eSeq
+		if (movedEdge == getFirstEdge()) {
+			setFirstEdge((EdgeImpl) movedEdge.getNextEdge());
+			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(null);
+		} else if (movedEdge == getLastEdge()) {
+			setLastEdge((EdgeImpl) movedEdge.getPreviousEdge());
+			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(null);
+		} else {
+			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(movedEdge
+					.getNextEdge());
+			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(movedEdge
+					.getPreviousEdge());
+		}
+
+		// insert moved edge in eSeq immediately after target
+		if (targetEdge == getLastEdge()) {
+			setLastEdge(movedEdge);
+			movedEdge.setNextEdge(null);
+		} else {
+			((EdgeImpl) targetEdge.getNextEdge()).setPreviousEdge(movedEdge);
+			movedEdge.setNextEdge(targetEdge.getNextEdge());
+		}
+		movedEdge.setPreviousEdge(targetEdge);
+		targetEdge.setNextEdge(movedEdge);
+		edgeListModified();
+	}
+	
+	
+	
+	/**
+	 * Modifies eSeq such that the movedEdge is immediately before the
+	 * targetEdge. Both edges need to be member of the same partial graph
+	 * 
+	 * @param targetEdge
+	 *            an edge
+	 * @param movedEdge
+	 *            the edge to be moved
+	 */
+	protected void putEdgeBeforeInGraph(int targetEdgeId, int movedEdgeId) {
+		assert (targetEdge != null) && targetEdge.isValid()
+				&& containsEdge(targetEdge);
+		assert (movedEdge != null) && movedEdge.isValid()
+				&& containsEdge(movedEdge);
+		assert targetEdge != movedEdge;
+
+		if ((targetEdge == movedEdge)
+				|| (targetEdge.getPreviousEdge() == movedEdge)) {
+			return;
+		}
+
+		assert getFirstEdge() != getLastEdge();
+
+		removeEdgeFromESeqWithoutDeletingIt(movedEdge);
+
+		// insert moved edge in eSeq immediately before target
+		if (targetEdge == getFirstEdge()) {
+			setFirstEdge(movedEdge);
+			movedEdge.setPreviousEdge(null);
+		} else {
+			EdgeImpl previousEdge = ((EdgeImpl) targetEdge.getPreviousEdge());
+			previousEdge.setNextEdge(movedEdge);
+			movedEdge.setPreviousEdge(previousEdge);
+		}
+		movedEdge.setNextEdge(targetEdge);
+		targetEdge.setPreviousEdge(movedEdge);
+		edgeListModified();
+	}
+
+	
+	
+	
+	
+	
+	/**
+	 * Modifies vSeq such that the movedVertex is immediately after the
+	 * targetVertex.
+	 * 
+	 * @param targetVertex
+	 *            a vertex
+	 * @param movedVertex
+	 *            the vertex to be moved
+	 */
+	protected void putVertexAfter(VertexImpl targetVertex,
+			VertexImpl movedVertex) {
+		assert (targetVertex != null) && targetVertex.isValid()
+				&& containsVertex(targetVertex);
+		assert (movedVertex != null) && movedVertex.isValid()
+				&& containsVertex(movedVertex);
+		assert targetVertex != movedVertex;
+
+		Vertex nextVertex = targetVertex.getNextVertex();
+		if ((targetVertex == movedVertex) || (nextVertex == movedVertex)) {
+			return;
+		}
+
+		assert getFirstVertex() != getLastVertex();
+
+		// remove moved vertex from vSeq
+		if (movedVertex == getFirstVertex()) {
+			VertexImpl newFirstVertex = (VertexImpl) movedVertex
+					.getNextVertex();
+			setFirstVertex(newFirstVertex);
+			newFirstVertex.setPreviousVertex(null);
+		} else if (movedVertex == getLastVertex()) {
+			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
+			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
+		} else {
+			((VertexImpl) movedVertex.getPreviousVertex())
+					.setNextVertex(movedVertex.getNextVertex());
+			((VertexImpl) movedVertex.getNextVertex())
+					.setPreviousVertex(movedVertex.getPreviousVertex());
+		}
+
+		// insert moved vertex in vSeq immediately after target
+		if (targetVertex == getLastVertex()) {
+			setLastVertex(movedVertex);
+			movedVertex.setNextVertex(null);
+		} else {
+			((VertexImpl) targetVertex.getNextVertex())
+					.setPreviousVertex(movedVertex);
+			movedVertex.setNextVertex(targetVertex.getNextVertex());
+		}
+		movedVertex.setPreviousVertex(targetVertex);
+		targetVertex.setNextVertex(movedVertex);
+		vertexListModified();
+	}
+
+	/**
+	 * Modifies vSeq such that the movedVertex is immediately before the
+	 * targetVertex.
+	 * 
+	 * @param targetVertex
+	 *            a vertex
+	 * @param movedVertex
+	 *            the vertex to be moved
+	 */
+	protected void putVertexBefore(VertexImpl targetVertex,	VertexImpl movedVertex) {
+		assert (targetVertex != null) && targetVertex.isValid()
+				&& containsVertex(targetVertex);
+		assert (movedVertex != null) && movedVertex.isValid()
+				&& containsVertex(movedVertex);
+		assert targetVertex != movedVertex;
+
+		Vertex prevVertex = targetVertex.getPreviousVertex();
+		if ((targetVertex == movedVertex) || (prevVertex == movedVertex)) {
+			return;
+		}
+
+		assert getFirstVertex() != getLastVertex();
+
+		// remove moved vertex from vSeq
+		if (movedVertex == getFirstVertex()) {
+			setFirstVertex((VertexImpl) movedVertex.getNextVertex());
+			((VertexImpl) movedVertex.getNextVertex()).setPreviousVertex(null);
+		} else if (movedVertex == getLastVertex()) {
+			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
+			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
+		} else {
+			((VertexImpl) movedVertex.getPreviousVertex())
+					.setNextVertex(movedVertex.getNextVertex());
+			((VertexImpl) movedVertex.getNextVertex())
+					.setPreviousVertex(movedVertex.getPreviousVertex());
+		}
+
+		// insert moved vertex in vSeq immediately before target
+		if (targetVertex == getFirstVertex()) {
+			setFirstVertex(movedVertex);
+			movedVertex.setPreviousVertex(null);
+		} else {
+			VertexImpl previousVertex = (VertexImpl) targetVertex
+					.getPreviousVertex();
+			previousVertex.setNextVertex(movedVertex);
+			movedVertex.setPreviousVertex(previousVertex);
+		}
+		movedVertex.setNextVertex(targetVertex);
+		targetVertex.setPreviousVertex(movedVertex);
+		vertexListModified();
+	}
+	
+	
+	/**
+	 * Removes the edge e from the global edge sequence of this graph.
+	 * 
+	 * @param e
+	 *            an edge
+	 */
+	protected void removeEdgeFromESeq(EdgeImpl e) {
+		assert e != null;
+		removeEdgeFromESeqWithoutDeletingIt(e);
+
+		// freeIndex(getFreeEdgeList(), e.getId());
+		freeEdgeIndex(e.getId());
+		e.setPreviousEdge(null);
+		e.setNextEdge(null);
+		localGraphDatabase.removeEdgeFromDatabase(e);
+		e.setId(0);
+		setECount(getECount() - 1);
+	}
+
+	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
+		if (e == getFirstEdge()) {
+			// delete at head of edge list
+			setFirstEdge((EdgeImpl) e.getNextEdge());
+			if (getFirstEdge() != null) {
+				((EdgeImpl) getFirstEdge()).setPreviousEdge(null);
+			}
+			if (e == getLastEdge()) {
+				// this edge was the only one...
+				setLastEdge(null);
+			}
+		} else if (e == getLastEdge()) {
+			// delete at tail of edge list
+			setLastEdge((EdgeImpl) e.getPreviousEdge());
+			if (getLastEdge() != null) {
+				((EdgeImpl) getLastEdge()).setNextEdge(null);
+			}
+		} else {
+			// delete somewhere in the middle
+			((EdgeImpl) e.getPreviousEdge()).setNextEdge(e.getNextEdge());
+			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e.getPreviousEdge());
+		}
+	}
+
+	/**
+	 * Removes the vertex v from the global vertex sequence of this graph.
+	 * 
+	 * @param v
+	 *            a vertex
+	 */
+	protected void removeVertexFromVSeq(VertexImpl v) {
+		assert v != null;
+		if (v == getFirstVertex()) {
+			// delete at head of vertex list
+			setFirstVertex((VertexImpl) v.getNextVertex());
+			if (getFirstVertex() != null) {
+				((VertexImpl) getFirstVertex()).setPreviousVertex(null);
+			}
+			if (v == getLastVertex()) {
+				// this vertex was the only one...
+				setLastVertex(null);
+			}
+		} else if (v == getLastVertex()) {
+			// delete at tail of vertex list
+			setLastVertex((VertexImpl) v.getPreviousVertex());
+			if (getLastVertex() != null) {
+				((VertexImpl) getLastVertex()).setNextVertex(null);
+			}
+		} else {
+			// delete somewhere in the middle
+			((VertexImpl) v.getPreviousVertex()).setNextVertex(v
+					.getNextVertex());
+			((VertexImpl) v.getNextVertex()).setPreviousVertex(v
+					.getPreviousVertex());
+		}
+		// freeIndex(getFreeVertexList(), v.getId());
+		freeVertexIndex(v.getId());
+		v.setPreviousVertex(null);
+		v.setNextVertex(null);
+		localGraphDatabase.removeVertexFromDatabase(v);
+		v.setId(0);
+		setVCount(getVCount() - 1);
+	}
+	
+	
+	protected void internalEdgeAdded(EdgeImpl e) {
+		notifyEdgeAdded(e);
+	}
+	
+	
+	protected void internalEdgeDeleted(EdgeImpl e) {
+		assert e != null;
+		notifyEdgeDeleted(e);
+	}
+	
+	protected void internalIncidenceAdded(IncidenceImpl i) {
+		notifyIncidenceAdded(i);
+	}
+	
+	protected void internalVertexAdded(VertexImpl v) {
+		notifyVertexAdded(v);
+	}
+
+	protected void internalVertexDeleted(VertexImpl v) {
+		assert v != null;
+		notifyVertexDeleted(v);
+	}
+	
+	
+	
+	
+	
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord(recordClass, localGraph);
 		try {
 			record.readComponentValues(io);
 		} catch (GraphIOException e) {
@@ -690,17 +1108,197 @@ public abstract class GraphDatabase implements Remote, GraphPropertyAccess {
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord(recordClass, localGraph);
 		record.setComponentValues(fields);
 		return record;
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord(recordClass, localGraph);
 		record.setComponentValues(components);
 		return record;
 	}
 	
+	
+	@Override
+	public <T> JGraLabSet<T> createSet() {
+		return new JGraLabSetImpl<T>();
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
+		return new JGraLabSetImpl<T>(collection);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity) {
+		return new JGraLabSetImpl<T>(initialCapacity);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
+		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public int getECount() {
+		return eCount;
+	}
+
+	public long getEdgeListVersion() {
+		return edgeListVersion;
+	}
+
+	public int getICount() {
+		return iCount;
+	}
+
+	public int getMaxECount() {
+		return eMax;
+	}
+
+	public int getMaxVCount() {
+		return vMax;
+	}
+	
+	/**
+	 * Use to allocate a <code>Vertex</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateVertexIndex(int currentId) {
+		int vId = freeVertexList.allocateIndex();
+		if (vId == 0) {
+			vId = freeVertexList.allocateIndex();
+		}
+		return vId;
+	}
+
+	/**
+	 * Use to allocate a <code>Edge</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateEdgeIndex(int currentId) {
+		int eId = freeEdgeList.allocateIndex();
+		if (eId == 0) {
+			eId = freeEdgeList.allocateIndex();
+		}
+		return eId;
+	}
+
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 * 
+	 * @param currentId
+	 *            needed for transaction support
+	 */
+	protected int allocateIncidenceIndex(int currentId) {
+		int iId = freeIncidenceList.allocateIndex();
+		return iId;
+	}
+	
+	
+	/**
+	 * Use to free an <code>Edge</code>-index
+	 * 
+	 * @param index
+	 */
+	protected void freeEdgeIndex(int index) {
+		freeEdgeList.freeIndex(index);
+	}
+
+
+	// ------------- GRAPH VARIABLES -------------
+	
+	/**
+	 * Use to free a <code>Vertex</code>-index.
+	 * 
+	 * @param index
+	 */
+	protected void freeVertexIndex(int index) {
+		freeVertexList.freeIndex(index);
+	}
+	
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
+
+
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+
+	
+	protected FreeIndexList getFreeVertexList() {
+		return freeVertexList;
+	}
+	
+	public int getIdOfParentDistributedGraph() {
+		return parentDistributedGraphId;
+	}
+	
+	/**
+	 * Appends the vertex v to the global vertex sequence of this graph.
+	 * 
+	 * @param v
+	 *            a vertex
+	 * @throws RemoteException 
+	 */
+	protected void appendVertexToVSeq(VertexImpl v) {
+		setVCount(getVCount() + 1);
+		if (getFirstVertex() == null) {
+			setFirstVertex(v);
+		}
+		if (getLastVertex() != null) {
+			((VertexImpl) getLastVertex()).setNextVertex(v);
+			v.setPreviousVertex(getLastVertex());
+		}
+		setLastVertex(v);
+	}
+	
+	
+	public int getVCount() {
+		return vCount;
+	}
+
+	/**
+	 * Appends the edge e to the global edge sequence of this graph.
+	 * 
+	 * @param e
+	 *            an edge
+	 * @throws RemoteException 
+	 */
+	protected void appendEdgeToESeq(EdgeImpl e) {
+		setECount(getECount() + 1);
+		if (getFirstEdge() == null) {
+			setFirstEdge(e);
+		}
+		if (getLastEdge() != null) {
+			((EdgeImpl) getLastEdge()).setNextEdge(e);
+			e.setPreviousEdge(getLastEdge());
+		}
+		setLastEdge(e);
+	}
+
+	public long getVertexListVersion() {
+		return vertexListVersion;
+	}
+
 
 }

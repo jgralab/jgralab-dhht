@@ -91,7 +91,7 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e, Direction dir) throws IOException {
 		this.id = id;
-		((CompleteGraphImpl) v.getGraph()).addIncidence(this);
+		((GraphImpl) v.getGraph()).addIncidence(this);
 		id = getId();
 		this.storage = v.storage.backgroundStorage.getIncidenceContainer(id);
 		setIncidentEdge(e);

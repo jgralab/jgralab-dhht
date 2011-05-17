@@ -63,7 +63,7 @@ public abstract class EdgeImpl extends
 	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
-	 * @param id
+	 * @param partialGraphId
 	 *            int the id of the edge
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
@@ -72,7 +72,7 @@ public abstract class EdgeImpl extends
 	protected EdgeImpl(int anId, Graph graph) throws IOException {
 		super(graph);
 		this.elementId = anId;
-		((CompleteGraphImpl) graph).addEdge(this);
+		((GraphImpl) graph).addEdge(this);
 		elementId = getId();
 		this.container = ((CompleteOrPartialGraphImpl) graph).getDiskStorage().getEdgeContainer(elementId);
 	}

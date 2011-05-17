@@ -217,7 +217,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @param traversalContext {@link Graph}
 	 */
 	protected void setTraversalContext(Graph traversalContext)  {
-		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(traversalContext);
+		((GraphImpl)getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
@@ -227,7 +227,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	@Override
 	public void useAsTraversalContext() {
-		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(this);
+		((GraphImpl)getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
@@ -1041,12 +1041,12 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getParentDistributedGraph();
+	public abstract Graph getParentDistributedGraph();
 
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getSuperordinateGraph();
+	public abstract Graph getSuperordinateGraph();
 
 	/**
 	 * @return the complete top-level DHHTGraph
@@ -1079,7 +1079,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @return
 	 */
 	Vertex getVertexObjectForId(int vid) {
-		return getDiskStorage().getVertexObject(vid);
+		return graphDatabase.getVertexObject(vid);
 	}
 	
 	/**
@@ -1090,7 +1090,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @return
 	 */
 	Vertex getEdgeObjectForId(int vid) {
-		return getDiskStorage().getVertexObject(vid);
+		return graphDatabase.getVertexObject(vid);
 	}
 	
 	

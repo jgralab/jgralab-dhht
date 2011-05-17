@@ -73,7 +73,7 @@ public abstract class EdgeImpl extends
 	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
-	 * @param id
+	 * @param partialGraphId
 	 *            int the id of the edge
 	 * @param graph
 	 *            {@link Graph} its corresponding graph

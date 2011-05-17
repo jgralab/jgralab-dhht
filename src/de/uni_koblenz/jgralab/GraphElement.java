@@ -61,15 +61,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int the id of this {@link GraphElement}.
 	 */
 	public int getId();
-	
-	/**
-	 * Returns the global id of this {@link GraphElement} as a combination of the partial graph id the 
-	 * element belongs to and its local id in that graph
-	 * 
-	 * @return int the global id of this {@link GraphElement}.
-	 */
-	public int getGlobalId();	
-	
+		
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present
@@ -103,6 +95,13 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return
 	 */
 	public Graph getContainingGraph();
+	
+	/**
+	 * Returns the graph directly containing this graph elements, e.g. the
+	 * subordinate or partial one  
+	 * @return
+	 */
+	public Graph getContainingPartialGraph();
 
 	/**
 	 * Returns the {@link GraphElement} in which this {@link GraphElement} is

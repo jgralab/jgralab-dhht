@@ -70,7 +70,7 @@ public abstract class VertexImpl extends
 	protected VertexImpl(int id, Graph graph) throws IOException {
 		super(graph);
 		this.id = id;
-		((CompleteGraphImpl) graph).addVertex(this);
+		((GraphImpl) graph).addVertex(this);
 		id = getId();
 		this.storage = graph.getDiskStorage().getVertexContainer(id);
 	}

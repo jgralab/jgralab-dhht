@@ -97,7 +97,7 @@ public abstract class CompleteGraphImpl extends CompleteOrPartialGraphImpl {
 	}
 
 	/**
-	 * @param id
+	 * @param partialGraphId
 	 *            this Graph's id
 	 * @param cls
 	 *            the GraphClass of this Graph

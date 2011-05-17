@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl;
@@ -51,15 +52,13 @@ public interface GraphFactory {
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraph(Class<? extends Graph> graphClass, String id,
-			int vMax, int eMax);
+	public Graph createGraph(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
 	
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id,
-			int vMax, int eMax);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
 
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
@@ -71,7 +70,14 @@ public interface GraphFactory {
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uid);
+	
+	/**
+	 * creates a local graph proxy object for an existing remote partial or global graph.
+	 * of the specified class. The returned object may be an instance of a subclass of the 
+	 * specified graphClass.
+	 */
+	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int id, GraphDatabase localDatabase);
 
 	/**
 	 * creates a View-Graph object for the specified class. The returned object

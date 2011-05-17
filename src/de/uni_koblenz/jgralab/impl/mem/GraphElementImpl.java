@@ -178,7 +178,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	/**
-	 * Sets {@link GraphElement#id}.
+	 * Sets {@link GraphElement#partialGraphId}.
 	 * 
 	 * @param id
 	 *            int an id
