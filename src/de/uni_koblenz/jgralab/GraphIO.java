@@ -65,7 +65,6 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphStorage;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
@@ -94,7 +93,6 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
-import de.uni_koblenz.jgralab.schema.impl.BinaryEdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
@@ -910,41 +908,50 @@ public class GraphIO {
 			}
 
 			if (nextE.getLocalGraph() == graph) {
-				eId = nextE.getId();
-				AttributedElementClass<?, ?> aec = nextE.getType();
+				if (onlyLocalGraph
+						&& nextE.isBinary()
+						&& isLocal(((BinaryEdge) nextE).getAlpha().getId(),
+								graph.getPartialGraphId())
+						&& isLocal(((BinaryEdge) nextE).getOmega().getId(),
+								graph.getPartialGraphId())) {
+					eId = nextE.getId();
+					AttributedElementClass<?, ?> aec = nextE.getType();
 
-				Package currentPackage = aec.getPackage();
-				if (currentPackage != oldPackage) {
-					write("Package");
-					space();
-					writeIdentifier(currentPackage.getQualifiedName());
-					write(";\n");
-					oldPackage = currentPackage;
-				}
-
-				write(Long.toString(eId));
-				space();
-				writeIdentifier(aec.getSimpleName());
-
-				// write OrderedTypedIncidences
-				write("<");
-				noSpace();
-				int edgeIncidenceCounter = 0;
-				for (Incidence i : nextE.getIncidences()) {
-					if (subGraph != null && !subGraph.isMarked(i.getVertex())) {
-						continue;
-					}
-					if (isLocal(i.getVertex().getId(), graph.getPartialGraphId())) {
-						writeSpace();
-						write(++edgeIncidenceCounter + ":"
-								+ i.getType().getRolename());
+					Package currentPackage = aec.getPackage();
+					if (currentPackage != oldPackage) {
+						write("Package");
 						space();
+						writeIdentifier(currentPackage.getQualifiedName());
+						write(";\n");
+						oldPackage = currentPackage;
 					}
-				}
-				write(">");
 
-				writeAttributesSigmaKappa(graph, nextE);
-				write(";\n");
+					write(Long.toString(eId));
+					space();
+					writeIdentifier(aec.getSimpleName());
+
+					// write OrderedTypedIncidences
+					write("<");
+					noSpace();
+					int edgeIncidenceCounter = 0;
+					for (Incidence i : nextE.getIncidences()) {
+						if (subGraph != null
+								&& !subGraph.isMarked(i.getVertex())) {
+							continue;
+						}
+						if (isLocal(i.getVertex().getId(),
+								graph.getPartialGraphId())) {
+							writeSpace();
+							write(++edgeIncidenceCounter + ":"
+									+ i.getType().getRolename());
+							space();
+						}
+					}
+					write(">");
+
+					writeAttributesSigmaKappa(graph, nextE);
+					write(";\n");
+				}
 			}
 			nextE = nextE.getNextEdge();
 
@@ -967,8 +974,7 @@ public class GraphIO {
 	}
 
 	private void writeAttributesSigmaKappa(Graph graph,
-			GraphElement<?, ?, ?> next), IOException,
-			GraphIOException {
+			GraphElement<?, ?, ?> next) throws IOException, GraphIOException {
 		space();
 		// write attributes
 		if (next.getType().hasAttributes()) {
@@ -980,7 +986,7 @@ public class GraphIO {
 		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
 				.getContainingElement();
 		if (containingElement != null
-				&& isLocal(containingElement.getId(), graph.getId())) {
+				&& isLocal(containingElement.getId(), graph.getPartialGraphId())) {
 			write(" sigma=");
 			write((containingElement instanceof Vertex ? "v" : "e")
 					+ containingElement.getId());
@@ -2946,16 +2952,17 @@ public class GraphIO {
 		Graph graph = null;
 		try {
 			// TODO adapt to partial graph loading
-			graph = (Graph) schema.getGraphCreateMethod(
-					implementationType).invoke(null,
-					new Object[] { graphId, maxV, maxE });
+			graph = (Graph) schema.getGraphCreateMethod(implementationType)
+					.invoke(null, new Object[] { graphId, maxV, maxE });
 		} catch (Exception e) {
 			throw new GraphIOException("can't create graph for class '"
 					+ gcName + "'", e);
 		}
-		graph.setLoading(true);
+		((GraphBaseImpl) graph).setLoading(true);
 		server = JGraLabServerImpl.getLocalInstance();
-		server.registerGraph(graph.getCompleteGraphUid(), Integer.toString(graph.getPartialGraphId()), graph.getGraphDatabase());
+		server.registerGraph(graph.getCompleteGraphUid(),
+				Integer.toString(graph.getPartialGraphId()),
+				graph.getGraphDatabase());
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
@@ -3005,7 +3012,7 @@ public class GraphIO {
 		// completeGraph = graph;
 		// }
 		createIncidences(graph, onlyLocalGraph);
-		if(onlyLocalGraph){
+		if (onlyLocalGraph) {
 			deleteIncompleteBinaryEdges(graph);
 		}
 		sortLambdaSequences(graph);
@@ -3017,13 +3024,13 @@ public class GraphIO {
 		if (pf != null) {
 			pf.finished();
 		}
-		graph.setLoading(false);
+		((GraphBaseImpl) graph).setLoading(false);
 		return graph;
 	}
 
 	private void deleteIncompleteBinaryEdges(Graph graph) {
-		for(Edge edge:graph.getEdges()){
-			if(edge.isBinary()&&edge.getDegree()!=2){
+		for (Edge edge : graph.getEdges()) {
+			if (edge.isBinary() && edge.getDegree() != 2) {
 				// binary edges have to have exactly two incidences
 				edge.delete();
 			}
@@ -3049,7 +3056,8 @@ public class GraphIO {
 			throws RemoteException {
 		for (Entry<Integer, Integer[]> incidence : incidenceInformation
 				.entrySet()) {
-			if (!onlyLocalGraph || isLocal(incidence.getKey(), graph.getId())) {
+			if (!onlyLocalGraph
+					|| isLocal(incidence.getKey(), graph.getPartialGraphId())) {
 				assert incidence.getValue().length == 2;
 				assert incidence.getValue()[0] != 0
 						&& incidence.getValue()[1] != 0;
@@ -3072,7 +3080,7 @@ public class GraphIO {
 		for (Entry<GraphElement<?, ?, ?>, String> sigma : sigmasOfGraphElement
 				.entrySet()) {
 			int parentId = Integer.parseInt(sigma.getValue().substring(1));
-			if (!onlyLocalGraph || isLocal(parentId, graph.getId())) {
+			if (!onlyLocalGraph || isLocal(parentId, graph.getPartialGraphId())) {
 				GraphElementImpl<?, ?, ?> parent;
 				if (sigma.getValue().startsWith("v")) {
 					parent = (GraphElementImpl<?, ?, ?>) graph
@@ -3278,11 +3286,7 @@ public class GraphIO {
 	private void parseIncidences(Edge edge) throws GraphIOException {
 		int lambdaSeqPosAtEdge = 0;
 		int eId = 0;
-		try {
-			eId = edge.getId();
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		eId = edge.getId();
 
 		match("<");
 		while (!lookAhead.equals(">")) {
@@ -3299,11 +3303,7 @@ public class GraphIO {
 
 	private void parseIncidencesAtVertex(Vertex v) throws GraphIOException {
 		int vId = 0;
-		try {
-			vId = v.getId();
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		vId = v.getId();
 		int lambdaSeqPosAtVertex = 0;
 
 		match("<");
