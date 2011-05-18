@@ -2947,18 +2947,18 @@ public class GraphIO {
 			pf.init(vCount + eCount);
 			interval = pf.getUpdateInterval();
 		}
+		server = JGraLabServerImpl.getLocalInstance();
 		Graph graph = null;
-		try {
-			// TODO adapt to partial graph loading
-			graph = (Graph) schema.getGraphCreateMethod(implementationType)
-					.invoke(null, new Object[] { graphId, maxV, maxE });
-		} catch (Exception e) {
-			throw new GraphIOException("can't create graph for class '"
-					+ gcName + "'", e);
-		}
+		// try {
+		// // TODO adapt to partial graph loading
+		// graph = (Graph) schema.getGraphCreateMethod(implementationType)
+		// .invoke(null, new Object[] { graphId, maxV, maxE });
+		// } catch (Exception e) {
+		// throw new GraphIOException("can't create graph for class '"
+		// + gcName + "'", e);
+		// }
 		((GraphBaseImpl) graph).setLoading(true);
 
-		server = JGraLabServerImpl.getLocalInstance();
 		server.registerGraph(graph.getCompleteGraphUid(),
 				Integer.toString(graph.getPartialGraphId()),
 				graph.getGraphDatabase());
@@ -3082,16 +3082,9 @@ public class GraphIO {
 	private void createPartialGraphs() throws GraphIOException, RemoteException {
 		graphBuffer = new HashMap<Integer, Graph>();
 		for (String[] pGraph : partialGraphs) {
-			JGraLabServer remoteServer = server.getRemoteInstance(pGraph[1]);
-			Graph g = remoteServer.getGraph(pGraph[0]);
-			if (g == null) {
-				g = server.loadGraph(filename, pf);
-				assert server.getGraph(pGraph[0]) == g;
-			}
-			graphBuffer.put(Integer.parseInt(pGraph[0]), g);
-			// TODO if (isCompleteGraph(g)) {
-			// completeGraph = g;
-			// }
+			JGraLabServerImpl remoteServer = (JGraLabServerImpl) server
+					.getRemoteInstance(pGraph[1]);
+			remoteServer.loadGraph(pGraph[0]);
 		}
 	}
 
