@@ -65,6 +65,7 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphStorage;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
@@ -93,6 +94,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 import de.uni_koblenz.jgralab.schema.impl.BasicDomainImpl;
+import de.uni_koblenz.jgralab.schema.impl.BinaryEdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
@@ -3003,6 +3005,9 @@ public class GraphIO {
 		// completeGraph = graph;
 		// }
 		createIncidences(graph, onlyLocalGraph);
+		if(onlyLocalGraph){
+			deleteIncompleteBinaryEdges(graph);
+		}
 		sortLambdaSequences(graph);
 		setSigmas(graph, onlyLocalGraph);
 
@@ -3014,6 +3019,15 @@ public class GraphIO {
 		}
 		graph.setLoading(false);
 		return graph;
+	}
+
+	private void deleteIncompleteBinaryEdges(Graph graph) {
+		for(Edge edge:graph.getEdges()){
+			if(edge.isBinary()&&edge.getDegree()!=2){
+				// binary edges have to have exactly two incidences
+				edge.delete();
+			}
+		}
 	}
 
 	private boolean isCompleteGraph(Graph graph) {
@@ -3030,7 +3044,6 @@ public class GraphIO {
 						.getPartialGraphId(elementId);
 	}
 
-	// TODO binary edges nur wenn beide Incidencen vorhanden sind!!!!
 	// TODO refaktorisiere mem und disk
 	private void createIncidences(Graph graph, boolean onlyLocalGraph)
 			throws RemoteException {
