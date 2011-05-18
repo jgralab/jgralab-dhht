@@ -66,15 +66,15 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return elementId & (MAX_NUMBER_OF_LOCAL_ELEMENTS);
 	}	
 	
-	private Schema schema;
+	private final Schema schema;
 	
-	protected GraphImpl localGraph;
+	protected final GraphImpl localGraph;
 	
 	protected final int localGraphId;
 	
 	protected final int parentDistributedGraphId;
 	
-	protected JGraLabServer server;
+	protected final JGraLabServer server;
 	
 	protected GraphFactory graphFactory;
 	
@@ -148,16 +148,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private DiskStorageManager diskStorage;
 	
 	/*
-	 * The list of local (proxy) objects for the remote graphs
+	 * The map of graph ids to the local (proxy) objects for the remote graphs
 	 */
-	private Graph[] partialGraphs;
+	private Map<Integer, Graph> partialGraphs;
 	
 	/* stores the graph databases for the partial graphs, these elements
 	 * may be local proxies for the remote elements automatically created by RMI
 	 */
-	protected GraphDatabase[] partialGraphDatabases;
-	
-//	private Map<Integer, ? extends Reference<GraphProxy>> remoteGraphs;
+	protected Map<Integer, RemoteGraphDatabaseAccess> partialGraphDatabases;
 	
 	protected Map<Integer, Reference<Vertex>> remoteVertices;
 	
@@ -166,11 +164,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private Map<Integer, Reference<Incidence>> remoteIncidences;
 	
 	
+	
+	
+	
 	protected GraphDatabase(GraphImpl localGraph, Schema schema) {
 		
-		setFreeVertexList(new FreeIndexList(10));
-		setFreeIncidenceList(new FreeIndexList(10));
-		setFreeEdgeList(new FreeIndexList(10));
+		freeVertexList = new FreeIndexList(10);
+		freeIncidenceList = new FreeIndexList(10);
+		freeEdgeList = new FreeIndexList(10);
 		setGraphVersion(0);
 		
 		// initialize graph, factory and schema
@@ -203,6 +204,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		server.registerGraph(localGraph.getUniqueGraphId(), localGraph.getPartialGraphId(), this);
 	}
 	
+	
 	protected GraphDatabase getGraphDatabase(int partialGraphId) {
 		if (partialGraphDatabases[partialGraphId] == null) {
 			//initialize new remote graph database
@@ -211,9 +213,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return partialGraphDatabases[partialGraphId];
 	}
 	
+	
 	protected abstract String getHostname(int id);
 	
-
 	protected abstract int getFreePartialGraphId();
 	
 	protected abstract void releasePartialGraphId(int partialGraphId);
@@ -586,10 +588,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 					throw new GraphException("incidence with id " + iId
 							+ " already exists");
 				}
-				if (iId > iMax) {
-					throw new GraphException("incidence id " + iId
-							+ " is bigger than iSize");
-				}
 			} else {
 				throw new GraphException(
 						"can not load an incidence with id <= 0");
@@ -608,6 +606,11 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		if (!isLoading()) {
 			internalIncidenceAdded(i);
 		}
+	}
+
+	private boolean containsIncidenceId(int iId) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**
@@ -630,10 +633,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		if (isLoading()) {
 			if (vId > 0) {
 				// the given vertex already has an id, try to use it
-				if (containsVertexId(vId)) {
-					throw new GraphException("vertex with id " + vId
-							+ " already exists");
-				}
 				if (vId > vMax) {
 					throw new GraphException("vertex id " + vId
 							+ " is bigger than vSize");
@@ -659,20 +658,17 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 
-	private void internalEdgeAdded(EdgeImpl e) {
-		// TODO Auto-generated method stub
-		
+	private boolean containsVertexId(int vId) {
+		return getVertexObject(vId) != null;
 	}
 
 
 	private boolean canAddGraphElement(int eId) {
-		// TODO Auto-generated method stub
-		return false;
+		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
 	}
 
 	private boolean containsEdgeId(int eId) {
-		// TODO Auto-generated method stub
-		return false;
+		return getEdgeObject(eId) != null;
 	}
 
 	boolean isLoading() {
@@ -689,7 +685,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public void removeEdgeFromDatabase(EdgeImpl e) {
 		int partialGraphId = getPartialGraphId(e.getId());
-
+		// TODO 
 	}
 
 	
@@ -726,6 +722,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	}
 
+
+	private boolean containsEdge(Edge edge) {
+		return getEdgeObject(edge.getId()) == edge;
+	}
 
 	/**
 	 * Deletes all vertices in deleteVertexList from the internal structures of
@@ -790,6 +790,15 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	private void vertexAfterDeleted(VertexImpl v) {
+		// TODO Notify all graph objects 
+		
+	}
+
+	private boolean containsVertex(Vertex vertex) {
+		return getVertexObject(vertex.getId()) == vertex;
+	}
+
 	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
@@ -842,7 +851,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	protected void putEdgeBeforeInGraph(int targetEdgeId, int movedEdgeId) {
+	public void putEdgeBeforeInGraph(int targetEdgeId, int movedEdgeId) {
+		Edge targetEdge = getEdgeObject(targetEdgeId);
+		Edge movedEdge = getEdgeObject(movedEdgeId);
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -856,19 +867,19 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 		assert getFirstEdge() != getLastEdge();
 
-		removeEdgeFromESeqWithoutDeletingIt(movedEdge);
+		removeEdgeFromESeqWithoutDeletingIt((EdgeImpl) movedEdge);
 
 		// insert moved edge in eSeq immediately before target
 		if (targetEdge == getFirstEdge()) {
 			setFirstEdge(movedEdge);
-			movedEdge.setPreviousEdge(null);
+			setPreviousEdge(movedEdge, null);
 		} else {
 			EdgeImpl previousEdge = ((EdgeImpl) targetEdge.getPreviousEdge());
 			previousEdge.setNextEdge(movedEdge);
-			movedEdge.setPreviousEdge(previousEdge);
+			setPreviousEdge(movedEdge, previousEdge);
 		}
-		movedEdge.setNextEdge(targetEdge);
-		targetEdge.setPreviousEdge(movedEdge);
+		setNextEdge(movedEdge, targetEdge);
+		setPreviousEdge(targetEdge, movedEdge);
 		edgeListModified();
 	}
 
@@ -876,6 +887,35 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	
 	
+	
+	private void setNextEdge(Edge movedEdge, Edge targetEdge) {
+		assert getPartialGraphId(movedEdge.getId()) == getPartialGraphId(targetEdge.getId());
+		diskStorage.setNextEdge(movedEdge, targetEdge);
+	}
+
+	private void setPreviousEdge(Edge movedEdge, Edge targetEdge) {
+		assert getPartialGraphId(movedEdge.getId()) == getPartialGraphId(targetEdge.getId());
+	}
+
+	private void setFirstEdge(Edge movedEdge) {
+		assert getPartialGraphId(movedEdge.getId()) == localGraphId;
+		
+	}
+	
+	private void setLastEdge(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private Edge getLastEdge() {
+		return getEdgeObject(lastEdge);
+	}
+
+	private Edge getFirstEdge() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 	/**
 	 * Modifies vSeq such that the movedVertex is immediately after the
@@ -886,8 +926,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param movedVertex
 	 *            the vertex to be moved
 	 */
-	protected void putVertexAfter(VertexImpl targetVertex,
-			VertexImpl movedVertex) {
+	protected void putVertexAfter(VertexImpl targetVertex, VertexImpl movedVertex) {
 		assert (targetVertex != null) && targetVertex.isValid()
 				&& containsVertex(targetVertex);
 		assert (movedVertex != null) && movedVertex.isValid()
@@ -998,10 +1037,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		freeEdgeIndex(e.getId());
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
-		localGraphDatabase.removeEdgeFromDatabase(e);
+		removeEdgeFromDatabase(e);
 		e.setId(0);
 		setECount(getECount() - 1);
 	}
+
+	private void setECount(int i) {
+		eCount = i;
+	}	
 
 	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
 		if (e == getFirstEdge()) {
@@ -1026,6 +1069,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e.getPreviousEdge());
 		}
 	}
+
+
 
 	/**
 	 * Removes the vertex v from the global vertex sequence of this graph.

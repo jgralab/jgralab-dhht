@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.io.File;
 import java.io.StringBufferInputStream;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -10,13 +11,14 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabServer;
-import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.impl.disk.CompleteOrPartialGraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 @SuppressWarnings("deprecation")
@@ -109,10 +111,16 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public GraphDatabase loadGraph(String filename, ProgressFunction pf)
-			throws GraphIOException {
-		return ((CompleteOrPartialGraphImpl)GraphIO.loadSchemaAndGraphFromFile(filename,
-				CodeGeneratorConfiguration.MINIMAL, pf)).getGraphDatabase();
+	public GraphDatabase loadGraph(String uid) throws GraphIOException {
+		GraphDatabase db = localGraphDatabases.get(uid);
+		if (db == null) {
+			File f = localFilesContainingGraphs.get(uid);
+			if (f == null)
+				throw new GraphException("There is no file registered containing a part of the graph identified by uid " + uid);
+			((GraphImpl) GraphIO.loadGraphFromFileWithStandardSupport(f.getAbsolutePath(), null)).getGraphDatabase();
+			localGraphDatabases.put(uid, db);
+		}
+		return db;
 	}
 
 	@Override
@@ -121,4 +129,50 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
+	public void registerLocalGraphDatabase(GraphDatabase localDb) {
+		if (!localGraphDatabases.containsKey(localDb.getUid()))
+			localGraphDatabases.put(localDb.getUniqueID(), localDb);
+	}
+	
+	
+
+	public void registerFileForUid(String uid, String fileName) {
+		localFilesContainingGraphs.put(uid, new File(fileName));
+	}	
+	
+
+	public void registerFileForUid(String uid, File file) {
+		localFilesContainingGraphs.put(uid, file);
+	}
+
+	@Override
+	public RemoteGraphDatabaseAccess getGraphDatabase(String uid) {
+		if (!localGraphDatabases.containsKey(uid))
+			loadGraph(uid);
+		return localGraphDatabases.get(uid);
+	}
+	
+	/**
+	 * Returns the graph database storing all data of all subgraphs belonging to the graph 
+	 * identified by uid
+	 * @param uid
+	 * @return
+	 */
+	public GraphDatabase getLocalGraphDatabase(String uid) {
+		return localGraphDatabases.get(uid);
+	}
+	
+	Map<String, GraphDatabase> localGraphDatabases = new HashMap<String, GraphDatabase>();
+	
+	Map<String, File> localFilesContainingGraphs = new HashMap<String, File>();
+	
+	
+	//load partial graph of local graph
+	
+	JGraLabServer remote = JGraLabServerImpl.getRemoteInstance(remoteURL);
+	GraphDatabase remoteDb = remote.getGraphDatabase(uid);
+
+ 	
 }

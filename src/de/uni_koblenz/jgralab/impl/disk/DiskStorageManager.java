@@ -28,7 +28,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author dbildh
  *
  */
-public final class DiskStorageManager implements GraphPropertyAccess {
+public final class DiskStorageManager {
 	
 	
 	/* Switches to toggle behaviour */

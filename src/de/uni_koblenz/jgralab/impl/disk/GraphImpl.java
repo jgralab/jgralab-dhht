@@ -222,7 +222,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e);
+		storingGraphDatabase.deleteEdge(e.getId());
 	}
 
 
@@ -462,56 +462,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 		return (T) storingGraphDatabase.createRecord(recordClass, components);
 	}
 	
-	
-	
-	
-	// ==============================================================
-	//  Callback-Methods
-	// ==============================================================
-	
-	
-	
-	
-	
-	/**
-	 * Callback function for triggered actions just after the vertex
-	 * <code>v</code> was deleted from this Graph. Override this method to
-	 * implement user-defined behaviour upon deletion of vertices. Note that any
-	 * changes to this graph are forbidden.
-	 * 
-	 * @param v
-	 *            the deleted vertex
-	 */
-	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
-
-	}
-	
-
-	/**
-	 * Callback function for triggered actions just after the edge
-	 * <code>e</code> was deleted from this Graph. Override this method to
-	 * implement user-defined behaviour upon deletion of edges. Note that any
-	 * changes to this graph are forbidden.
-	 * 
-	 * Needed for transaction support.
-	 * 
-	 * @param e
-	 *            the deleted Edge
-	 * @param oldAlpha
-	 *            the alpha-vertex before deletion
-	 * @param oldOmega
-	 *            the omega-vertex before deletion
-	 */
-	protected void edgeAfterDeleted(Edge edgeToBeDeleted) {
-
-	}
-	
-
-	@Override
-	public void loadingCompleted() {
 		
-	}
-	
 	
 	// ==============================================================
 	//  Methods to be used only internal

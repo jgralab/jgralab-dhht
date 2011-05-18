@@ -37,7 +37,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 
-import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -789,6 +788,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getGraphStructureChangedListenerCount();
 
+	@Deprecated
 	public GraphFactory getGraphFactory();
 
 	/**

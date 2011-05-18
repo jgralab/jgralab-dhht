@@ -13,7 +13,6 @@ import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * This interface defines all methods needed to access properties of the graph and its elements
@@ -27,6 +26,12 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public interface RemoteGraphDatabaseAccess extends Remote {
 
+	/**
+	 * Creates a vertex with the id globalVId
+	 * @param globalVId
+	 * @return
+	 */
+	public void createVertex(long globalVId);
 	
 
 	
@@ -37,39 +42,34 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param firstIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	public void setFirstIncidence(int elemId, int incidenceId);
+	public void setFirstIncidence(long elemId, long incidenceId);
 	
 	
-	public void setLastIncidence(int elemId, int incidenceId);
+	public void setLastIncidence(long elemId, long incidenceId);
 
 
-	public void incidenceListModified(int elemId);
+	public void incidenceListModified(long elemId);
 
 
-	public int getSigma(int elemId);
+	public int getSigma(long elemId);
 
 	
-	public void setSigma(int elementId, int sigmaId);
+	public void setSigma(long elementId, long sigmaId);
 	
 	
-	public int getKappa(int elementId); 
+	public int getKappa(long elementId); 
 	
-	public void setKappa(int elementId, int kappa);
+	public void setKappa(long elementId, int kappa);
 	
-	public void setIncidenceListVersion(int elementId, long incidenceListVersion);
+	public void setIncidenceListVersion(long elementId, long incidenceListVersion);
 
-	public long getIncidenceListVersion(int elementId);
-
-
-	public Schema getSchema();
+	public long getIncidenceListVersion(long elementId);
 	
-	public abstract void removeEdgeFromDatabase(EdgeImpl e);
+	public abstract void removeEdgeFromDatabase(long edgeId);
 
-	public abstract void removeVertexFromDatabase(VertexImpl v);
-
+	public abstract void removeVertexFromDatabase(long vertexId);
 
 	public int getIdOfParentDistributedGraph();
-
 
 	public void edgeListModified();
 
@@ -92,7 +92,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public int getVCount();
 
 
-	public void setVCount(int count);
+	public void setVCount(long count);
 
 
 	public void setLoading(boolean isLoading);
@@ -104,12 +104,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void deleteEdge(Edge e);
 
 
-
 	public void deleteVertex(Vertex v);
 	
-	
-	
-
 
 	public <T> JGraLabList<T> createList();
 	
@@ -156,18 +152,41 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
 
-	public void putEdgeAfterInGraph(int id, int id2);
+	/**
+	 * Puts the edge identified by <code>id2</code> directly after the edge 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor edge
+	 * @param id2 the global id of the edge to be moved
+	 */
+	public void putEdgeAfterInGraph(long id1, long id2);
 
+	/**
+	 * Puts the edge identified by <code>id2</code> directly after the edge 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor edge
+	 * @param id2 the global id of the edge to be moved
+	 */
+	public void putEdgeBeforeInGraph(long id1, long id2);
 
-	public void putEdgeBeforeInGraph(int id, int id2);
+	/**
+	 * Puts the vertex identified by <code>id2</code> directly before the vertex 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor vertex
+	 * @param id2 the global id of the vertex to be moved
+	 */
+	public void putVertexBeforeInGraph(long id1, long id2);
 
+	/**
+	 * Puts the vertex identified by <code>id2</code> directly after the vertex 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor vertex
+	 * @param id2 the global id of the vertex to be moved
+	 */
+	public void putVertexAfterInGraph(long id, long id2);
 
-	public void putVertexBeforeInGraph(int id, int id2);
-
-
-	public void putVertexAfterInGraph(int id, int id2);
-
-
+	/**
+	 * 
+	 */
 	public void vertexListModified();
 
 

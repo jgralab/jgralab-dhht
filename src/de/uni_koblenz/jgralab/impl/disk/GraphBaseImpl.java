@@ -71,14 +71,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
-	
-
-
-	// ------------- VERTEX LIST VARIABLES -------------
-
-	private int firstVertexId;
-	private int lastVertexId;
-
 	/**
 	 * number of vertices in the graph
 	 * @ 
@@ -87,7 +79,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	@Override
 	public Vertex getFirstVertex() {
-		return getVertexObjectForId(firstVertexId);
+		return getGraphDatabase.getVertexObject(firstVertexId);
 	}
 
 	@Override
@@ -111,13 +103,10 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 			this.lastVertexId = lastVertex.getId();
 	}
 
-	/**
-	 * Sets version of VSeq if it is different than previous version.
-	 * 
-	 * @param vertexListVersion
-	 *            Version of VSeq.
-	 */
-	// abstract protected void setVertexListVersion(long vertexListVersion);
+
+	
+	
+	
 
 	// ------------- EDGE LIST VARIABLES -------------
 
@@ -130,14 +119,15 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	abstract protected void setECount(int count);
 
+	
 	@Override
 	public Edge getFirstEdge() {
-		return getDiskStorage().getEdgeObject(firstEdgeId);
+		return getGraphDatabase().getEdgeObject(firstEdgeId);
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		return getDiskStorage().getEdgeObject(lastEdgeId);
+		return getGraphDatabase().getEdgeObject(lastEdgeId);
 	}
 
 	/**
@@ -1079,7 +1069,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @return
 	 */
 	Vertex getVertexObjectForId(int vid) {
-		return graphDatabase.getVertexObject(vid);
+		return getGraphDatabase().getVertexObject(vid);
 	}
 	
 	/**
@@ -1090,7 +1080,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @return
 	 */
 	Vertex getEdgeObjectForId(int vid) {
-		return graphDatabase.getVertexObject(vid);
+		return getGraphDatabase().getVertexObject(vid);
 	}
 	
 	
