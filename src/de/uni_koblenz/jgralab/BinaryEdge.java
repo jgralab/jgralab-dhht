@@ -3,8 +3,6 @@
  */
 package de.uni_koblenz.jgralab;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;

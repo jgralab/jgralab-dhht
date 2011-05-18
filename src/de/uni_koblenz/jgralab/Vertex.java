@@ -31,9 +31,6 @@
 
 package de.uni_koblenz.jgralab;
 
-
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -111,7 +108,8 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            of a subclass of <code>aM1VertexClass</code> are returned
 	 * @return {@link Vertex}
 	 */
-	public <T extends Vertex> T getNextVertex(Class<T> aM1VertexClass, boolean noSubclasses);
+	public <T extends Vertex> T getNextVertex(Class<T> aM1VertexClass,
+			boolean noSubclasses);
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the
@@ -159,7 +157,8 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            {@link Class} the next {@link Vertex} should have
 	 * @return {@link Vertex}
 	 */
-	public <T extends Vertex> T getNextVertex(Graph traversalContext, Class<T> aM1VertexClass);
+	public <T extends Vertex> T getNextVertex(Graph traversalContext,
+			Class<T> aM1VertexClass);
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the
@@ -175,7 +174,8 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	 *            of a subclass of <code>aVertexClass</code> are returned
 	 * @return {@link Vertex}
 	 */
-	public Vertex getNextVertex(Graph traversalContext, VertexClass aVertexClass, boolean noSubclasses);
+	public Vertex getNextVertex(Graph traversalContext,
+			VertexClass aVertexClass, boolean noSubclasses);
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the
