@@ -823,7 +823,7 @@ public class GraphIO {
 		if (onlyLocalGraph) {
 			write("{}");
 		} else {
-			graph.writePartialGraphs(this);
+			graph.savePartialGraphs(this);
 		}
 		if (graph.getType().hasAttributes()) {
 			writeSpace();

@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;

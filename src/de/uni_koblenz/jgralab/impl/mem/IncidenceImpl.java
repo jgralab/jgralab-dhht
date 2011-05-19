@@ -31,8 +31,6 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;

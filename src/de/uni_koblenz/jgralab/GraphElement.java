@@ -56,12 +56,16 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 		extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
-	 * Returns the local id of this {@link GraphElement}.
+	 * Returns the global id of this {@link GraphElement} consisting of 
+	 * - 12 bit partial graph id
+	 * - 20 bit subgraph id inside this partial graph
+	 * - 32 bit vertex or edge id inside the subgraph
 	 * 
 	 * @return int the id of this {@link GraphElement}.
 	 */
-	public int getId();
+	public long getId();
 		
+
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present

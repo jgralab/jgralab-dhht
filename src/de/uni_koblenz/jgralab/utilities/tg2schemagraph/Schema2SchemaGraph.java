@@ -44,7 +44,6 @@ import de.uni_koblenz.jgralab.grumlschema.domains.HasBaseDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
-import de.uni_koblenz.jgralab.grumlschema.impl.SchemaGraphImpl;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;

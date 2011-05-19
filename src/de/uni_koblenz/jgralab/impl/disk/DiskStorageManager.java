@@ -5,18 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
-import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
-import java.rmi.RemoteException;
 import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;

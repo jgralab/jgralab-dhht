@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -136,7 +135,7 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		return getId() - e.getId();
+		return (int) (getId() - e.getId());
 	}
 
 	@Override

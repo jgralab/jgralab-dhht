@@ -407,8 +407,8 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public String getCompleteGraphUid() {
-		throw new UnsupportedOperationException();
+	public String getUniqueGraphId() {
+		return getCompleteGraph().getUniqueGraphId();
 	}
 
 	@Override

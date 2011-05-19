@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.mem;
 
 import java.lang.ref.WeakReference;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -52,17 +51,15 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.JGraLabServerRemoteInterface;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
-import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.GraphInternalMethods;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -92,9 +89,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		return partialGraphId & localElementId;
 	}
 
-	// ------------- PARTIAL GRAPH VARIABLES ------------
-
-	protected List<PartialGraphImpl> partialGraphs = null;
 
 	// ------------- VERTEX LIST VARIABLES -------------
 
@@ -1031,35 +1025,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	protected abstract void setICount(int count);
 
-	@Override
-	public Graph createPartialGraph(String hostname) {
-		JGraLabServerRemoteInterface remote = JGraLabServerImpl.getLocalInstance()
-				.getRemoteInstance(hostname);
-		Schema s = remote.getSchema(getSchema().getQualifiedName());
-		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(
-				this);
-
-		if (partialGraphs == null) {
-			partialGraphs = new ArrayList<PartialGraphImpl>();
-		}
-		partialGraphs.add(partialGraph);
-
-		return partialGraph;
-	}
-
-	/**
-	 * 
-	 * @return the list of partial graphs directly and indirectly contained in
-	 *         this graph
-	 */
-	public List<PartialGraphImpl> getPartialGraphs() {
-		LinkedList<PartialGraphImpl> list = new LinkedList<PartialGraphImpl>();
-		for (PartialGraphImpl p : partialGraphs) {
-			list.add(p);
-			list.addAll(p.getPartialGraphs());
-		}
-		return list;
-	}
+	
 
 	@Override
 	public boolean containsEdge(Edge e) {
@@ -1082,14 +1048,12 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getParentDistributedGraph()
-			;
+	public abstract GraphBaseImpl getParentDistributedGraph();
 
 	/**
 	 * @return the distributed graph this graph belongs to
 	 */
-	public abstract GraphBaseImpl getSuperordinateGraph()
-			;
+	public abstract GraphBaseImpl getSuperordinateGraph();
 
 	/**
 	 * @return the complete top-level DHHTGraph
@@ -1113,9 +1077,14 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	@Override
-	public void writePartialGraphs(GraphIO graphIO) {
+	public void savePartialGraphs(GraphIO graphIO) {
 		throw new RuntimeException("Operation not yet implemented");
 	}
 
 	public abstract void setLoading(boolean b);
+
+	protected FreeIndexList getFreeIncidenceList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

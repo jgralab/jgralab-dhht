@@ -1056,7 +1056,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	public abstract boolean containsEdgeLocally(Edge e);
 	
 	@Override
-	public void writePartialGraphs(GraphIO graphIO) {
+	public void savePartialGraphs(GraphIO graphIO) {
 		throw new RuntimeException("Operation not yet implemented");
 	}
 

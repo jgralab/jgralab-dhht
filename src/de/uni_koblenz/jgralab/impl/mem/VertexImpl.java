@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -780,7 +779,7 @@ public abstract class VertexImpl extends
 	public int compareTo(Vertex v) {
 			assert isValid() && v.isValid();
 			assert getGraph() == v.getGraph();
-			return getId() - v.getId();
+			return (int) (getId() - v.getId());
 	}
 
 	@Override

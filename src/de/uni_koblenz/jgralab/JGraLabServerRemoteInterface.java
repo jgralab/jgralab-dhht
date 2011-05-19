@@ -2,7 +2,6 @@ package de.uni_koblenz.jgralab;
 
 import java.rmi.Remote;
 
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 
 public interface JGraLabServerRemoteInterface extends Remote {

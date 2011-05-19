@@ -194,7 +194,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param graphIO
 	 */
 	@Deprecated
-	public void writePartialGraphs(GraphIO graphIO);
+	public void savePartialGraphs(GraphIO graphIO);
 
 	
 	
@@ -938,10 +938,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public long getEdgeListVersion();
 	
 	
-	@Deprecated
+	/**
+	 * Retrieves that GraphFactory used to create elements of this graph
+	 * @return
+	 */
 	public GraphFactory getGraphFactory();
-
-	
 
 
 	

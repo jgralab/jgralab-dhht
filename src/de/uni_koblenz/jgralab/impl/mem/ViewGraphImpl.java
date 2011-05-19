@@ -458,8 +458,8 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public String getCompleteGraphUid() {
-		throw new UnsupportedOperationException();
+	public String getUniqueGraphId() {
+		return getViewedGraph().getUniqueGraphId();
 	}
 
 	@Override
@@ -708,7 +708,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 	
 	@Override
-	public void writePartialGraphs(GraphIO graphIO) {
+	public void savePartialGraphs(GraphIO graphIO) {
 		throw new UnsupportedOperationException();
 	}
 	

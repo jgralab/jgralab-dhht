@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
-import java.rmi.RemoteException;
 import java.util.Comparator;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -173,7 +172,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public final int getId() {
+	public final long getId() {
 		return id;
 	}
 
@@ -639,10 +638,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		}
 	}
 
-	@Override
-	public final int getGlobalId() {
-		return GraphBaseImpl.getGlobalId(getLocalGraph().getPartialGraphId(), id);
-	}
+
 
 	@Override
 	public final Graph getLocalGraph() {

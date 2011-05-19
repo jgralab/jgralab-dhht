@@ -710,7 +710,7 @@ public abstract class ViewGraphImpl implements Graph,
 	
 
 	@Override
-	public void writePartialGraphs(GraphIO graphIO) {
+	public void savePartialGraphs(GraphIO graphIO) {
 		throw new UnsupportedOperationException();
 	}
 }
