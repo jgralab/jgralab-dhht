@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.JGraLabServerRemoteInterface;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
 public class CompleteGraphDatabase extends GraphDatabase {
@@ -67,7 +67,7 @@ public class CompleteGraphDatabase extends GraphDatabase {
 
 	public Graph createPartialGraph(GraphClass gc, String hostname) {
 		int partialGraphId = getFreePartialGraphId();
-		JGraLabServer remoteServer = server.getRemoteInstance(hostname);
+		JGraLabServerRemoteInterface remoteServer = server.getRemoteInstance(hostname);
 		GraphDatabase p = remoteServer.createGraph(gc.getId(), localGraph.getCompleteGraphUid(), partialGraphId, this.hostnames[0]);
 		partialGraphDatabases[partialGraphId] = p;
 		return p.getGraphObject(partialGraphId); 

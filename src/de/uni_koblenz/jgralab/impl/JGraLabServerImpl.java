@@ -14,7 +14,7 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.JGraLabServerRemoteInterface;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
@@ -23,7 +23,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 @SuppressWarnings("deprecation")
 public class JGraLabServerImpl extends UnicastRemoteObject implements
-		JGraLabServer {
+		JGraLabServerRemoteInterface {
 
 	/**
 	 * 
@@ -41,7 +41,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		Naming.bind(JGRALAB_SERVER_IDENTIFIER, this);
 	}
 
-	public static JGraLabServer getLocalInstance() {
+	public static JGraLabServerRemoteInterface getLocalInstance() {
 		try {
 			if (localInstance == null) {
 				localInstance = new JGraLabServerImpl();
@@ -54,9 +54,9 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public JGraLabServer getRemoteInstance(String hostname) {
+	public JGraLabServerRemoteInterface getRemoteInstance(String hostname) {
 		try {
-			JGraLabServer server = (JGraLabServer) Naming.lookup(hostname + "/"
+			JGraLabServerRemoteInterface server = (JGraLabServerRemoteInterface) Naming.lookup(hostname + "/"
 					+ JGRALAB_SERVER_IDENTIFIER);
 			return server;
 		} catch (MalformedURLException e) {
@@ -171,7 +171,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	
 	//load partial graph of local graph
 	
-	JGraLabServer remote = JGraLabServerImpl.getRemoteInstance(remoteURL);
+	JGraLabServerRemoteInterface remote = JGraLabServerImpl.getRemoteInstance(remoteURL);
 	GraphDatabase remoteDb = remote.getGraphDatabase(uid);
 
  	

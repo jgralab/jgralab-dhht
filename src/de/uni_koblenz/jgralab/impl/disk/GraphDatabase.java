@@ -23,6 +23,7 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.JGraLabServerRemoteInterface;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.PartialGraph;
 import de.uni_koblenz.jgralab.Record;
@@ -66,20 +67,45 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return elementId & (MAX_NUMBER_OF_LOCAL_ELEMENTS);
 	}	
 	
+	/**
+	 * The graph schema of the graph whose local subgraphs are managed by this GraphDatabase belongs to
+	 */
 	private final Schema schema;
 	
-	protected final GraphImpl localGraph;
+	/**
+	 * The local toplevel graph - either a global or partial one or a subordinate one
+	 */
+	protected final Graph localGraph;
 	
+	/**
+	 * The id of the local toplevel graph
+	 */
 	protected final int localGraphId;
 	
+	/**
+	 * The id of the distributed graph the local partial graph directly belongs to
+	 */
 	protected final int parentDistributedGraphId;
 	
-	protected final JGraLabServer server;
-	
+	/**
+	 * The local JGraLab server instance
+	 */
+	protected final JGraLabServer localJGraLabServer;
+
+	/**
+	 * The GraphFactory to create graphs and graph elements
+	 */
 	protected GraphFactory graphFactory;
 	
+	/**
+	 * true iff the local graph is currently loading
+	 */
 	protected boolean loading = false;
 
+	
+	/**
+	 * the local graph version
+	 */
 	protected long graphVersion = 0;
 	
 	
@@ -145,6 +171,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	protected int iCount;
 	
 
+	/**
+	 * The disk storage used to store local element on disk
+	 */
 	private DiskStorageManager diskStorage;
 	
 	/*

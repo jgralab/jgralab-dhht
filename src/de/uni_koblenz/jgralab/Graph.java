@@ -51,6 +51,18 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * Additionally, convenient methods for traversal, either based on separate
  * calls (getFirst/getNext) or on Iterables, can be used to traverse the graph.
  * 
+ * All graphs are identified by an unique graph id of type String which can be
+ * retrieved using the method <code>getUniqueGraphId()</code>. This unique id
+ * is the same for the complete DHHTGraph as well as for all its subgraphs 
+ * (partial graphs, subordinate graphs nested in edges and vertices, views on
+ * graphs and so on). Additionally, those subgraphs are identified by an 
+ * internal integer-id unique in the graph. This id encodes the partial graph and 
+ * thereby the station the subgraphs belongs to and the subgraph id local to that 
+ * partial graph. It is composed out of two parts, a 12 bit partial graph id and 
+ * a 20 bit local subordinate graph id.
+ * This id is also used in all vertices and eges to easily identify the subgraph
+ * they belong to.
+ *  
  * @author ist@uni-koblenz.de
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {

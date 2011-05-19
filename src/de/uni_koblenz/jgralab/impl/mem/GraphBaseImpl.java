@@ -52,7 +52,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.JGraLabServer;
+import de.uni_koblenz.jgralab.JGraLabServerRemoteInterface;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
@@ -1033,7 +1033,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	@Override
 	public Graph createPartialGraph(String hostname) {
-		JGraLabServer remote = JGraLabServerImpl.getLocalInstance()
+		JGraLabServerRemoteInterface remote = JGraLabServerImpl.getLocalInstance()
 				.getRemoteInstance(hostname);
 		Schema s = remote.getSchema(getSchema().getQualifiedName());
 		PartialGraphImpl partialGraph = s.getGraphFactory().createPartialGraph(
