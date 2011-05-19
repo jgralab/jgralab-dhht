@@ -2,6 +2,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -43,23 +44,18 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	/* Switches that toggle number of elements in a local partial graph
 	 * and number of partial graphs
 	 */
-	private final static int BITS_FOR_PARTIAL_GRAPH_MASK = 5;
+	private final static int BITS_FOR_PARTIAL_GRAPH_MASK = 12;
 	
 	/* Values that are calculated on the basis of BITS_FOR_PARTIAL_GRAPH_MASK */
 	
-	public final static int MAX_NUMBER_OF_LOCAL_ELEMENTS = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
-	
-	public final static int MAX_NUMBER_OF_LOCAL_INCIDENCES = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
-	
-	public static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = Integer.MAX_VALUE >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
-	
+	public final static int MAX_NUMBER_OF_LOCAL_GRAPHS = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
 
-	public static final int getPartialGraphId(int elementId) {
-		return elementId >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+	public static final int getPartialGraphId(int graphId) {
+		return graphId >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
 	}
 	
-	public static final int getElementIdInPartialGraph(int elementId) {
-		return elementId & (MAX_NUMBER_OF_LOCAL_ELEMENTS);
+	public static final int getSubgraphIdInPartialGraph(int globalSubgraphId) {
+		return globalSubgraphId & (MAX_NUMBER_OF_LOCAL_GRAPHS);
 	}	
 	
 	/**
@@ -72,6 +68,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected final Graph localGraph;
 	
+	/**
+	 * The unique id of the graph whose subgraphs are stored in this database 
+	 */
 	protected final String uniqueGraphId; 
 	
 	/**
@@ -183,11 +182,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected Map<Integer, RemoteGraphDatabaseAccess> partialGraphDatabases;
 	
-	protected Map<Integer, Reference<Vertex>> remoteVertices;
+	protected Map<Long, Reference<Vertex>> remoteVertices;
 	
-	protected Map<Integer, Reference<Edge>> remoteEdges;
+	protected Map<Long, Reference<Edge>> remoteEdges;
 	
-	private Map<Integer, Reference<Incidence>> remoteIncidences;
+	private Map<Long, Reference<Incidence>> remoteIncidences;
+	
+	protected Map<Integer, SoftReference<Graph>> localSubgraphs;
 	
 	public String getUniqueGraphId() {
 		return uniqueGraphId;
@@ -215,7 +216,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 
 
-		partialGraphs = new Graph[MAX_NUMBER_OF_PARTIAL_GRAPHS];
+		partialGraphs = new Map<String, Graph>();
 		partialGraphDatabases = new GraphDatabase[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		
 		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
