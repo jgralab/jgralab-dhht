@@ -72,6 +72,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected final Graph localGraph;
 	
+	protected final String uniqueGraphId; 
+	
 	/**
 	 * The id of the local toplevel graph
 	 */
@@ -187,6 +189,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	private Map<Integer, Reference<Incidence>> remoteIncidences;
 	
+	public String getUniqueGraphId() {
+		return uniqueGraphId;
+	}
 	
 	
 	

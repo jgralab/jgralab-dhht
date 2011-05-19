@@ -298,7 +298,7 @@ public class GraphIO {
 	// multiple identical strings are used as attribute values
 	private final HashMap<String, String> stringPool;
 
-	private JGraLabServerRemoteInterface server;
+	private RemoteJGraLabServer server;
 	private boolean isURL;
 
 	private GraphIO() {

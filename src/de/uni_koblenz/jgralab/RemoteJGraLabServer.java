@@ -4,29 +4,18 @@ import java.rmi.Remote;
 
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 
-public interface JGraLabServerRemoteInterface extends Remote {
+public interface RemoteJGraLabServer extends Remote {
 	
 	/**
 	 * Returns the GraphDatabase <code>graphDatabase</code> responsible for the 
 	 * storage of all graphs belonging to the complete graph identified by the 
-	 * given <code>uniqueGraphId</code> 
+	 * given <code>uniqueGraphId</code>. If there is no such graph database,
+	 * a new one will be created 
 	 * @param uniqueGraphId 
 	 * @param graphDatabase
 	 */
 	public RemoteGraphDatabaseAccess getGraphDatabase(String graphUid);
 
-
 	
-	
-
-	/**
-	 * Loads the graph database identified 
-	 * @param uid
-	 * @return
-	 * @throws GraphIOException
-	 */
-	//public GraphDatabase loadGraph(String uid) throws GraphIOException;
-	
-		
 	
 }

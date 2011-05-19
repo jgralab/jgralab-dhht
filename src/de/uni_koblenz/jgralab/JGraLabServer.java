@@ -3,7 +3,7 @@ package de.uni_koblenz.jgralab;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 
 
-public interface JGraLabServer extends JGraLabServerRemoteInterface {
+public interface JGraLabServer extends RemoteJGraLabServer {
 	
 	/**
 	 * Registers the GraphDatabase <code>graphDatabase</code> as local 
@@ -12,7 +12,7 @@ public interface JGraLabServer extends JGraLabServerRemoteInterface {
 	 * @param uniqueGraphId 
 	 * @param graphDatabase
 	 */
-	public void registerGraphDatabase(String graphId, GraphDatabase graphDatabase);
+	public void registerGraphDatabase(String uniqueGraphId, GraphDatabase graphDatabase);
 	
 	
 	/**
@@ -20,7 +20,7 @@ public interface JGraLabServer extends JGraLabServerRemoteInterface {
 	 * @param hostname the name of the remote host
 	 * @return
 	 */
-	public JGraLabServerRemoteInterface getRemoteInstance(String hostname);
+	public RemoteJGraLabServer getRemoteInstance(String hostname);
 	
 	
 	/**
@@ -28,7 +28,7 @@ public interface JGraLabServer extends JGraLabServerRemoteInterface {
 	 * @param uid
 	 * @param file
 	 */
-	public void registerFileForUid(String uid, String fileName);
+	public void registerFileForUid(String uniqueGraphId, String fileName);
 
 	
 
