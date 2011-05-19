@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -60,55 +61,25 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * thereby the station the subgraphs belongs to and the subgraph id local to that 
  * partial graph. It is composed out of two parts, a 12 bit partial graph id and 
  * a 20 bit local subordinate graph id.
- * This id is also used in all vertices and eges to easily identify the subgraph
- * they belong to.
+ * This id is also used in all vertices and edges to easily identify the subgraph
+ * they belong to. The following methods can be used to access the different kinds 
+ * of IDs. In the memory based implementation, the partial graph id will always be 
+ * 1 since this implementation variant does not support distribution at all.
+ * 
+ * - getUniqueGraphId()
+ * - getPartialGraphId()
+ * - getGlobalSubgraphId()
+ * - getLocalSubgraphId()
  *  
  * @author ist@uni-koblenz.de
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {
 
-	/**
-	 * @return {@link GraphElement} which contains this {@link Graph} or
-	 *         <code>null</code> if it is the complete {@link Graph} or a
-	 *         {@link ViewGraphImpl}
-	 */
-	public GraphElement<?, ?, ?> getContainingElement();
-
-	/**
-	 * @return {@link Graph} the distributed {@link Graph} this partial graph is
-	 *         a member of or this graph itself, it is not directly a member of
-	 *         a distributed graph
-	 */
-	public abstract Graph getParentDistributedGraph();
-
-	/**
-	 * @return {@link Graph} the superordinate {@link Graph} containing the
-	 *         element this graph is contained in as subordinate one or this
-	 *         graph, if it is not a subordinate one
-	 */
-	public abstract Graph getSuperordinateGraph();
-
-	/**
-	 * @return {@link Graph} the complete, top-level {@link Graph}
-	 */
-	public abstract Graph getCompleteGraph();
-
-	/**
-	 * 
-	 * @return {@link Graph} the graph viewed by this viewgraph or the graph
-	 *         itself if it is not a view
-	 */
-	public abstract Graph getViewedGraph();
-
-	/**
-	 * @see GraphElement#isVisible(int)
-	 * @param kappa
-	 *            <b>int</b>
-	 * @return {@link Graph} which contains all {@link GraphElement}s
-	 *         <code>ge</code> where <code>ge.isVisible(kappa)==true</code>.
-	 */
-	public Graph getView(int kappa);
-
+	
+	// ============================================================================
+	// Methods to manage the current traversal context 
+	// ============================================================================
+	
 	/**
 	 * @return {@link Graph} the current traversal context. It is not removed
 	 *         from the {@link Stack}.
@@ -124,7 +95,176 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Removes the current traversal context from the {@link Stack}.
 	 */
 	public void releaseTraversalContext();
+	
+	
+	// ============================================================================
+	// Methods to access hierarchy and distribution
+	//
+	// - General methods
+	// - Nesting hierarchy
+	// - Visibility layering
+	// - Distribution
+	// - Graph IDs
+	// ============================================================================
+	
+	/**
+	 * @return {@link Graph} the complete, top-level {@link Graph}
+	 */
+	public abstract Graph getCompleteGraph();
+	
+	/**
+	 * @return true if this graph is a part of <code>other</code> either
+	 *         directly as a subordinate or partial one or indirectly by its
+	 *         parent
+	 */
+	public boolean isPartOfGraph(Graph other);
 
+	
+	
+	/**
+	 * @return {@link GraphElement} which contains this {@link Graph} or
+	 *         <code>null</code> if it is the complete {@link Graph} or a
+	 *         {@link ViewGraphImpl}
+	 */
+	public GraphElement<?, ?, ?> getContainingElement();
+
+	/**
+	 * @return {@link Graph} the superordinate {@link Graph} containing the
+	 *         element this graph is contained in as subordinate one or this
+	 *         graph, if it is not a subordinate one
+	 */
+	public abstract Graph getSuperordinateGraph();
+
+	
+	
+	/**
+	 * @see GraphElement#isVisible(int)
+	 * @param kappa
+	 *            <b>int</b>
+	 * @return {@link Graph} which contains all {@link GraphElement}s
+	 *         <code>ge</code> where <code>ge.isVisible(kappa)==true</code>.
+	 */
+	public Graph getView(int kappa);
+
+	/**
+	 * 
+	 * @return {@link Graph} the graph viewed by this viewgraph or the graph
+	 *         itself if it is not a view
+	 */
+	public abstract Graph getViewedGraph();
+	
+	
+	
+	/**
+	 * @return {@link Graph} the distributed {@link Graph} this partial graph is
+	 *         a member of or this graph itself, it is not directly a member of
+	 *         a distributed graph
+	 */
+	public abstract Graph getParentDistributedGraph();
+	
+
+	/**
+	 * Adds a partial graph on the given host to the sequence of partial graphs
+	 * and returns a local proxy
+	 * 
+	 * @param hostname
+	 *            name of the host running the remote JGraLab instance
+	 * @return a local proxy object for the created partial graph
+	 * @throws RemoteException 
+	 */
+	public Graph createPartialGraph(String hostname);
+
+	
+	/**
+	 * Retrieves the list of all partial graphs of this (partial) graph
+	 * @return
+	 */
+	public List<? extends Graph> getPartialGraphs();
+	
+
+	/**
+	 * Retrieves the partial graph with the given id partialGraphId
+	 */
+	@Deprecated
+	public Graph getPartialGraph(int partialGraphId);
+	
+	
+	/**
+	 * Saves the partila graphs of this graph
+	 * @param graphIO
+	 */
+	@Deprecated
+	public void writePartialGraphs(GraphIO graphIO);
+
+	
+	
+	
+	// ============================================================================
+	// Methods to access ids
+	// ============================================================================
+	
+	
+	/**
+	 * Returns the <code>id</code> of this Graph. JGraLab assigns a 128 bit
+	 * random id to all Graphs upon creation. This initial id is most likely
+	 * (but not guaranteed) unique.
+	 * 
+	 * @return the id of this graph
+	 */
+	public String getUniqueGraphId();
+	
+	
+	/**
+	 * @return the global id of this subgraph unique in the complete graph and
+	 *          consisting of 12 bit for the partial graph id and 20 bit of the
+	 *          subordinate graph id inside this partial graph 
+	 */
+	public int getGlobalSubgraphId();
+	
+	
+	/**
+	 * @return the local id of this subgraph unique in the local partial graph
+	 */
+	public int getLocalSubgraphId();
+	
+	
+	/**
+	 * @return the id of this partial or complete graph, the complete graph has 
+	 *         the id 1
+	 */
+	public int getPartialGraphId();
+	
+	
+	
+	
+
+	/**
+	 * Checks if the given id <code>id</code> is the id of an local
+	 * element or a remote one
+	 * @return true if <code>id</code> is a local id 
+	 */
+	public boolean isLocalElementId(long id);
+
+
+
+
+
+
+	/**
+	 * Retrieves the GraphDatabase this graph is stored in
+	 * @return
+	 */
+	public GraphDatabase getGraphDatabase();
+
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to access vertices and edges of the graph
+	// ============================================================================
+	
+	
 	/**
 	 * Creates a vertex the specified class <code>cls</code> and adds the new
 	 * vertex to this Graph.
@@ -153,78 +293,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega);
 
-	/**
-	 * Checks whether this graph is currently being loaded.
-	 * 
-	 * @return true if the graph is currently being loaded
-	 */
-	public boolean isLoading();
-
-	/**
-	 * Callback method: Called immediately after loading of this graph is
-	 * completed. Overwrite this method to perform user defined operations after
-	 * loading a graph.
-	 */
-	public void loadingCompleted();
-
-	/**
-	 * Checks whether this graph has changed with respect to the given
-	 * <code>previousVersion</code>. Every change in the graph, e.g. adding,
-	 * creating and reordering of edges and vertices or changes of attributes of
-	 * the graph, an edge or a vertex are treated as a change.
-	 * 
-	 * @param previousVersion
-	 *            The version to check against
-	 * @return <code>true</code> if the internal graph version of the graph is
-	 *         different from the <code>previousVersion</code>.
-	 */
-	public boolean isGraphModified(long previousVersion);
-
-	/**
-	 * Returns the version counter of this graph.
-	 * 
-	 * @return the graph version
-	 * @see #isGraphModified(long)
-	 */
-	public long getGraphVersion();
-
-	/**
-	 * Checks if the vertex sequence of this has changed with respect to the
-	 * given <code>previousVersion</code>. Changes in the vertex sequence are
-	 * creation and deletion as well as reordering of vertices, but not changes
-	 * of attribute values.
-	 * 
-	 * @return <code>true</code> if the vertex list version of this graph is
-	 *         different from <code>previousVersion</code>.
-	 */
-	public boolean isVertexListModified(long previousVersion);
-
-	/**
-	 * Returns the version counter of the vertex sequence of this graph.
-	 * 
-	 * @return the vertex sequence version
-	 * @see #isVertexListModified(long)
-	 */
-	public long getVertexListVersion();
-
-	/**
-	 * Checks if the edge sequence of this has changed with respect to the given
-	 * <code>previousVersion</code>. Changes in the edge sequence are creation
-	 * and deletion as well as reordering of edges, but not changes of attribute
-	 * values.
-	 * 
-	 * @return <code>true</code> if the edge list version of this graph is
-	 *         different from <code>previousVersion</code>.
-	 */
-	public boolean isEdgeListModified(long edgeListVersion);
-
-	/**
-	 * Returns the version counter of the edge sequence of this graph.
-	 * 
-	 * @return the edge sequence version
-	 * @see #isEdgeListModified(long)
-	 */
-	public long getEdgeListVersion();
 
 	/**
 	 * @return true if this graph contains the given vertex <code>v</code>.
@@ -234,7 +302,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	/**
 	 * @return true if this graph contains the given edge <code>e</code>.
 	 */
-	boolean containsEdge(Edge e);
+	public boolean containsEdge(Edge e);
 
 	/**
 	 * Removes the vertex <code>v</code> from the vertex sequence of this graph.
@@ -477,16 +545,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public int getICount();
 
 	/**
-	 * Returns the <code>id</code> of this Graph. JGraLab assigns a 128 bit
-	 * random id to all Graphs upon creation. This initial id is most likely
-	 * (but not guaranteed) unique.
-	 * 
-	 * @return the id of this graph
-	 */
-	public String getUniqueGraphId();
-
-
-	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this
 	 * {@link Graph} in the order determined by the edge sequence.
 	 * 
@@ -712,8 +770,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param loadFactor
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor);
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity, float loadFactor);
 
 	/**
 	 * Generic creation of records.
@@ -733,8 +790,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param io
 	 * @return
 	 */
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields);
+	public <T extends Record> T createRecord(Class<T> recordClass, Map<String, Object> fields);
 
 	/**
 	 * 
@@ -744,8 +800,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components);
+	public <T extends Record> T createRecord(Class<T> recordClass, Object... components);
 
 	/**
 	 * Sorts the vertex sequence according to the given comparator in ascending
@@ -800,52 +855,93 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getGraphStructureChangedListenerCount();
 
+	
+	/**
+	 * Checks whether this graph is currently being loaded.
+	 * 
+	 * @return true if the graph is currently being loaded
+	 */
+	public boolean isLoading();
+	
+	
+	/**
+	 * Sets the loading flag of this graph
+	 * @param b
+	 */
+	public void setLoading(boolean b);
+
+
+	/**
+	 * Callback method: Called immediately after loading of this graph is
+	 * completed. Overwrite this method to perform user defined operations after
+	 * loading a graph.
+	 */
+	public void loadingCompleted();
+
+	/**
+	 * Checks whether this graph has changed with respect to the given
+	 * <code>previousVersion</code>. Every change in the graph, e.g. adding,
+	 * creating and reordering of edges and vertices or changes of attributes of
+	 * the graph, an edge or a vertex are treated as a change.
+	 * 
+	 * @param previousVersion
+	 *            The version to check against
+	 * @return <code>true</code> if the internal graph version of the graph is
+	 *         different from the <code>previousVersion</code>.
+	 */
+	public boolean isGraphModified(long previousVersion);
+
+	/**
+	 * Returns the version counter of this graph.
+	 * 
+	 * @return the graph version
+	 * @see #isGraphModified(long)
+	 */
+	public long getGraphVersion();
+
+	/**
+	 * Checks if the vertex sequence of this has changed with respect to the
+	 * given <code>previousVersion</code>. Changes in the vertex sequence are
+	 * creation and deletion as well as reordering of vertices, but not changes
+	 * of attribute values.
+	 * 
+	 * @return <code>true</code> if the vertex list version of this graph is
+	 *         different from <code>previousVersion</code>.
+	 */
+	public boolean isVertexListModified(long previousVersion);
+
+	/**
+	 * Returns the version counter of the vertex sequence of this graph.
+	 * 
+	 * @return the vertex sequence version
+	 * @see #isVertexListModified(long)
+	 */
+	public long getVertexListVersion();
+
+	/**
+	 * Checks if the edge sequence of this has changed with respect to the given
+	 * <code>previousVersion</code>. Changes in the edge sequence are creation
+	 * and deletion as well as reordering of edges, but not changes of attribute
+	 * values.
+	 * 
+	 * @return <code>true</code> if the edge list version of this graph is
+	 *         different from <code>previousVersion</code>.
+	 */
+	public boolean isEdgeListModified(long edgeListVersion);
+
+	/**
+	 * Returns the version counter of the edge sequence of this graph.
+	 * 
+	 * @return the edge sequence version
+	 * @see #isEdgeListModified(long)
+	 */
+	public long getEdgeListVersion();
+	
+	
 	@Deprecated
 	public GraphFactory getGraphFactory();
 
-	/**
-	 * @return true if this graph is a part of <code>other</code> either
-	 *         directly as a subordinate or partial one or indirectly by its
-	 *         parent
-	 */
-	public boolean isPartOfGraph(Graph other);
-
-	/**
-	 * @returns the ID of this partial or complete graph.
-	 */
-	public int getPartialGraphId();
-
-	/**
-	 * Adds a partial graph on the given host to the sequence of partial graphs
-	 * and returns a local proxy
-	 * 
-	 * @param hostname
-	 *            name of the host running the remote JGraLab instance
-	 * @return a local proxy object for the created partial graph
-	 * @throws RemoteException 
-	 */
-	public Graph createPartialGraph(String hostname);
-
-	public void writePartialGraphs(GraphIO graphIO);
-
 	
-	/**
-	 * Checks if the given id <code>id</code> is the id of an local
-	 * element or a remote one
-	 */
-	public boolean isIdOfLocalElement(int id);
-
-	/**
-	 * Retrieves the partial graph with the given id partialGraphId
-	 */
-	public Graph getPartialGraph(int partialGraphId);
-
-	public Collection<? extends Graph> getPartialGraphs();
-
-	public void setLoading(boolean b);
-
-	public GraphDatabase getGraphDatabase();
-
 
 
 	
