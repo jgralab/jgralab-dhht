@@ -399,6 +399,37 @@ public final class DiskStorageManager {
 	}
 	
 	
+	
+	public void setVertexStorageSaved(int id) {
+		vertexStorageSaved.set(id);		
+	}
+	
+	public  boolean isVertexStorageSaved(int id) {
+		boolean b = vertexStorageSaved.get(id);
+		vertexStorageSaved.set(id, false);
+		return b;		
+	}
+	
+	public void setEdgeStorageSaved(int id) {
+		edgeStorageSaved.set(id);		
+	}
+	
+	public boolean isEdgeStorageSaved(int id) {
+		boolean b = edgeStorageSaved.get(id);
+		edgeStorageSaved.set(id, false);
+		return b;		
+	}
+
+	public void setIncidenceStorageSaved(int id) {
+		incidenceStorageSaved.set(id);		
+	}
+	
+	public  boolean isIncidenceStorageSaved(int id) {
+		boolean b = incidenceStorageSaved.get(id);
+		incidenceStorageSaved.set(id, false);
+		return b;		
+	}
+	
 	private final GraphElementContainer getElementContainer(int id) {
 		if (id >0)
 			return getVertexContainer(id);
@@ -715,9 +746,20 @@ public final class DiskStorageManager {
 			}	
 	}
 
+	
+	
+	/**
+	 * Store and remove vertices
+	 * @param v
+	 */
+	
+	private int getLocalId(long id) {
+		return graphDatabase.getLocalElementId(id);
+	}
+	
 
 	public void storeVertex(VertexImpl v) {
-		int vId = v.getId();
+		int vId = getLocalId(v.getId());
 		VertexContainer storage = getVertexContainer(vId);
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
@@ -728,7 +770,7 @@ public final class DiskStorageManager {
 	}
 
 	public void storeEdge(EdgeImpl e) {
-		int eId = e.getId();
+		int eId = getLocalId(e.getId());
 		EdgeContainer storage = getEdgeContainer(eId);
 		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
@@ -747,107 +789,121 @@ public final class DiskStorageManager {
 	}
 	
 
-	public void removeEdgeFromBackgroundStorage(EdgeImpl e) {
-		EdgeContainer storage = getEdgeContainer(e.getId());
-		int id = getElementIdInContainer(e.getId());
+	public void removeEdgeFromDiskStorage(int edgeId) {
+		EdgeContainer storage = getEdgeContainer(edgeId);
+		int id = getElementIdInContainer(edgeId);
 		storage.edges[id] = null;
 		storage.types[id] = 0;
 	}
 
 
-	public void removeVertexFromDatabase(VertexImpl v) {
-		VertexContainer storage = getVertexContainer(v.getId());
-		int id = getElementIdInContainer(v.getId());
+	public void removeVertexFromDiskStorage(int vertexId) {
+		VertexContainer storage = getVertexContainer(vertexId);
+		int id = getElementIdInContainer(vertexId);
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
 	}
 	
 	
-	public void removeIncidenceFromBackgroundStorage(IncidenceImpl i) {
-		IncidenceContainer storage = getIncidenceContainer(i.getId());
-		int id = getElementIdInContainer(i.getId());
+	public void removeIncidenceFromDiskStorage(int incId) {
+		IncidenceContainer storage = getIncidenceContainer(incId);
+		int id = getElementIdInContainer(incId);
 		storage.incidences[id] = null;
 		storage.types[id] = 0;
 	}
 
-	public void setVertexStorageSaved(int id) {
-		vertexStorageSaved.set(id);		
-	}
-	
-	public  boolean isVertexStorageSaved(int id) {
-		boolean b = vertexStorageSaved.get(id);
-		vertexStorageSaved.set(id, false);
-		return b;		
-	}
-	
-	public void setEdgeStorageSaved(int id) {
-		edgeStorageSaved.set(id);		
-	}
-	
-	public boolean isEdgeStorageSaved(int id) {
-		boolean b = edgeStorageSaved.get(id);
-		edgeStorageSaved.set(id, false);
-		return b;		
-	}
 
-	public void setIncidenceStorageSaved(int id) {
-		incidenceStorageSaved.set(id);		
-	}
-	
-	public  boolean isIncidenceStorageSaved(int id) {
-		boolean b = incidenceStorageSaved.get(id);
-		incidenceStorageSaved.set(id, false);
-		return b;		
-	}
 
 	
 	
 	
 	
 	/*
-	 * Methods to access and modify Vseq and Eseq
+	 * Methods to access and modify Vseq, Eseq and Iseq
 	 */
-	public void setFirstIncidence(int elemId, int incidenceId) {
+	
+	
+	// VSeq
+	
+	public void setNextVertexId(int vId, long nextVId) {
+		getVertexContainer(getContainerId(vId)).nextElementInGraphId[getElementIdInContainer(vId)] = nextVId;
+	}
+	
+	public long getNextVertexId(int vId) {
+		return getVertexContainer(getContainerId(vId)).nextElementInGraphId[getElementIdInContainer(vId)];
+	}
+	
+	public void setPreviousVertexId(int vId, long nextVId) {
+		getVertexContainer(getContainerId(vId)).nextElementInGraphId[getElementIdInContainer(vId)] = nextVId;
+	}
+	
+	public long getPreviousVertexId(int vId) {
+		return getVertexContainer(getContainerId(vId)).nextElementInGraphId[getElementIdInContainer(vId)];
+	}
+	
+	//Eseq
+	
+	public void setNextEdgeId(int eId, long nextEId) {
+		getEdgeContainer(getContainerId(eId)).nextElementInGraphId[getElementIdInContainer(eId)] = nextEId;
+	}
+	
+	public long getNextEdgeId(int eId) {
+		return getEdgeContainer(getContainerId(eId)).nextElementInGraphId[getElementIdInContainer(eId)];
+	}
+	
+	public void setPreviousEdgeId(int eId, long nextEId) {
+		getEdgeContainer(getContainerId(eId)).nextElementInGraphId[getElementIdInContainer(eId)] = nextEId;
+	}
+	
+	public long getPreviousEdgeId(int eId) {
+		return getEdgeContainer(getContainerId(eId)).nextElementInGraphId[getElementIdInContainer(eId)];
+	}
+	
+	
+	//Iseq	
+	
+	public void setFirstIncidenceId(int elemId, long incidenceId) {
 		getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
 	}
 	
-	public void setLastIncidence(int elemId, int incidenceId) {
+	public void setLastIncidenceId(int elemId, long incidenceId) {
 		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
 	}
 
+	public long getFirstIncidenceId(int elemId) {
+		return getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
+	}
+	
+	public long  getLastIncidenceId(int elemId) {
+		return getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)];
+	}
+	
+	
 	public void incidenceListModified(int elemId) {
 		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)]++;
 	}
+	
+	// hierarchy
 
-
-	public int getSigmaId(int localElemId) {
-		if (localElemId < 0) {
-			return getEdgeContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)];
-		} else {
-			return getVertexContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)];
-		}
+	public long getSigmaId(int localElemId) {
+		return getElementContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)];
 	}
-
 
 	public void setSigmaId(int localElemId, long sigmaId) {
-		if (localElemId < 0) {
-			getEdgeContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
-		} else {
-			getVertexContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
-		}
+		getElementContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+	}
+	
+	public int getKappa(int localElemId) {
+		return getElementContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
 	}
 
-	@Override
-	public int getKappa(int elementId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setKappa(int localElemId, int kappa) {
+		getElementContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = kappa;
 	}
-
-	@Override
-	public void setKappa(int elementId, int kappa) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+	
+	// distribution
+	
 	
 
 	

@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +24,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
-import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
@@ -63,6 +63,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public static final int getSubgraphIdInPartialGraph(int globalSubgraphId) {
 		return globalSubgraphId & (MAX_NUMBER_OF_LOCAL_GRAPHS);
 	}	
+	
+	public static final int getLocalElementId(long elementId) {
+		return (int) elementId;
+	}
 	
 	/**
 	 * The graph schema of the graph whose local subgraphs are managed by this GraphDatabase belongs to
@@ -183,7 +187,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	private Map<Integer, Reference<Graph>> subgraphObjects;
 	
-	private Map<Integer, Reference<GraphData>> localSubgraphData;
+	private ArrayList<GraphData> localSubgraphData;
 
 	
 	private class GraphData {
@@ -195,6 +199,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		long parentDistributedGraphId;
 	}
 	
+	private GraphData getGraphData(int localSubgraphId) {
+		GraphData data = localSubgraphData.get(localSubgraphId);
+		if (data.firstVertexId != 0 && data.lastVertexId == 0) {
+			//initialize graph data
+		}
+		return data;
+	}
 	
 	
 	/* stores the graph databases for the remote graphs, these elements
@@ -242,7 +253,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 
 		subgraphObjects = new HashMap<Integer, Reference<Graph>>();
-		localSubgraphData = new HashMap<Integer, Reference<GraphData>>();
+		localSubgraphData = new ArrayList<GraphData>();
 		
 		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccess>();
 		
@@ -266,6 +277,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public String getUniqueGraphId() {
 		return uniqueGraphId;
 	}
+	
 	
 	
 	
@@ -389,7 +401,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public Vertex getVertexObject(long id) {
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return diskStorage.getVertexObject(id);
+			return diskStorage.getVertexObject(getLocalElementId(id));
 		}
 		Reference<Vertex> ref = remoteVertices.get(id);
 		Vertex proxy = null;
@@ -415,7 +427,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public Edge getEdgeObject(long id) {
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return diskStorage.getEdgeObject(id);
+			return diskStorage.getEdgeObject(getLocalElementId(id));
 		}
 		Reference<Edge> ref = remoteEdges.get(id);
 		Edge proxy = null;
@@ -441,7 +453,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public Incidence getIncidenceObject(long id) {
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return diskStorage.getIncidenceObject(id);
+			return diskStorage.getIncidenceObject(getLocalElementId(id));
 		}
 		Reference<Incidence> ref = remoteIncidences.get(id);
 		Incidence proxy = null;
@@ -518,15 +530,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 
-
-	public int getSigma(int elemId) {
-		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localPartialGraphId)
-			return diskStorage.getSigma(elemId);
-		else
-			return getGraphDatabase(partialGraphId).getSigma(elemId);
-	}
-
 	/**
 	 * Returns an object (Vertex or Edge) representing the GraphElement
 	 * identified by the given global id
@@ -549,7 +552,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public void setSigma(int elementId, int sigmaId) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId == localPartialGraphId)
-			diskStorage.setSigma(elementId, sigmaId);
+			diskStorage.setSigmaId(elementId, sigmaId);
 		else
 			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
 	}
@@ -856,7 +859,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 
-	private boolean containsEdge(Edge edge) {
+	boolean containsEdge(Edge edge) {
 		return getEdgeObject(edge.getId()) == edge;
 	}
 
@@ -928,7 +931,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 
-	private boolean containsVertex(Vertex vertex) {
+	boolean containsVertex(Vertex vertex) {
 		return getVertexObject(vertex.getId()) == vertex;
 	}
 
@@ -984,9 +987,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param movedEdge
 	 *            the edge to be moved
 	 */
-	public void putEdgeBeforeInGraph(int targetEdgeId, int movedEdgeId) {
-		Edge targetEdge = getEdgeObject(targetEdgeId);
-		Edge movedEdge = getEdgeObject(movedEdgeId);
+	public void putEdgeBeforeInGraph(EdgeImpl e, EdgeImpl edgeImpl) {
+		Edge targetEdge = getEdgeObject(e);
+		Edge movedEdge = getEdgeObject(edgeImpl);
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
@@ -1049,6 +1052,11 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return null;
 	}
 
+	public Incidence connect(Class<? extends Incidence> incClass, Vertex vertex, Edge edge) {
+		return null;
+	}
+	
+	
 	
 	/**
 	 * Modifies vSeq such that the movedVertex is immediately after the
@@ -1060,10 +1068,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 *            the vertex to be moved
 	 */
 	protected void putVertexAfter(VertexImpl targetVertex, VertexImpl movedVertex) {
-		assert (targetVertex != null) && targetVertex.isValid()
-				&& containsVertex(targetVertex);
-		assert (movedVertex != null) && movedVertex.isValid()
-				&& containsVertex(movedVertex);
+		assert (targetVertex != null) && targetVertex.isValid()	&& containsVertex(targetVertex);
+		assert (movedVertex != null) && movedVertex.isValid() && containsVertex(movedVertex);
 		assert targetVertex != movedVertex;
 
 		Vertex nextVertex = targetVertex.getNextVertex();
@@ -1075,8 +1081,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 		// remove moved vertex from vSeq
 		if (movedVertex == getFirstVertex()) {
-			VertexImpl newFirstVertex = (VertexImpl) movedVertex
-					.getNextVertex();
+			VertexImpl newFirstVertex = (VertexImpl) movedVertex.getNextVertex();
 			setFirstVertex(newFirstVertex);
 			newFirstVertex.setPreviousVertex(null);
 		} else if (movedVertex == getLastVertex()) {
@@ -1101,6 +1106,18 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		movedVertex.setPreviousVertex(targetVertex);
 		targetVertex.setNextVertex(movedVertex);
 		vertexListModified();
+	}
+
+	private long getLastVertexId(int localSubgraphId) {
+		GraphData data = getGraphData(localSubgraphId);
+		return data.firstVertexId;
+	}
+
+
+
+	private long getFirstVertexId(int localSubgraphId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -1477,6 +1494,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public long getVertexListVersion() {
 		return vertexListVersion;
 	}
+
+	public DiskStorageManager getDiskStorage() {
+		return diskStorage;
+	}
+
+
 
 
 }

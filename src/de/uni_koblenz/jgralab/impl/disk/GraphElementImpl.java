@@ -71,7 +71,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * The global id of this {@link GraphElement}.
 	 */
-	protected int elementId;
+	protected long elementId;
+	
+	protected abstract void setId(long id);
+	
+	protected final int getLocalId() {
+		return (int) elementId;
+	}
+	
 	
 
 	/**
@@ -79,21 +86,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * the data of this vertex
 	 */
 	protected GraphDatabase graphDatabase;
-		
-	
-	
-	protected abstract void setId(int id);
 
 	
-	//TODO Move to concrete classes VertexLocalImpl and EdgeLocalImpl 
-	
-	protected GraphElementContainer container;
-
-
 	/**
 	 * The id of the subordinate graph nested in this element
 	 */
-	protected Graph subordinateGraph;
+	protected int subordinateGraphId;
 
 	/**
 	 * Creates a new {@link GraphElement} which belongs to <code>graph</code>.
@@ -101,9 +99,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected GraphElementImpl(Graph graph)  {
-		assert graph != null;
-		this.graphDatabase = ((GraphImpl)graph).getGraphDatabase();
+	protected GraphElementImpl(GraphDatabase graphDatabase)  {
+		this.graphDatabase = graphDatabase;
 	}
 
 
@@ -518,7 +515,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
 	 */
 	 final boolean isSubordinateGraphObjectAlreadyCreated() {
-		return subordinateGraph != null;
+		return subordinateGraphId != 0;
 	}
 
 	/**

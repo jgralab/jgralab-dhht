@@ -60,6 +60,8 @@ public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 
+	public EdgeContainer container;
+
 	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
@@ -69,19 +71,16 @@ public abstract class EdgeImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException 
 	 */
-	protected EdgeImpl(int anId, Graph graph) throws IOException {
-		super(graph);
-		this.elementId = anId;
-		((GraphImpl) graph).addEdge(this);
-		elementId = getId();
-		this.container = ((CompleteOrPartialGraphImpl) graph).getDiskStorage().getEdgeContainer(elementId);
+	protected EdgeImpl(long id, GraphDatabase graphDatabase) throws IOException {
+		super(graphDatabase);
+		this.elementId = id;
+		this.container = graphDatabase.getDiskStorage().getEdgeContainer(getLocalId());
 	}
 	
-
-	protected EdgeImpl(int anId, EdgeContainer storage, Graph graph) {
-		super(graph);
-		setId(anId);
-		this.storage = storage;
+	protected EdgeImpl(long id, GraphDatabase graphDatabase, EdgeContainer container) throws IOException {
+		super(graphDatabase);
+		this.elementId = id;
+		this.container = container;
 	}
 	
 	
@@ -97,7 +96,7 @@ public abstract class EdgeImpl extends
 	
 
 	@Override
-	public final int getId() {
+	public final long getId() {
 		return -elementId;
 	}
 	
@@ -128,7 +127,7 @@ public abstract class EdgeImpl extends
 	 * @throws RemoteException 
 	 */
 	protected final void setNextEdge(Edge nextEdge) {
-		storage.nextElementInGraphId[getIdInStorage(id)] = nextEdge.getId();
+		container.nextElementInGraphId[getIdInStorage(elementId)] = nextEdge.getId();
 	}
 
 	/**
@@ -140,13 +139,13 @@ public abstract class EdgeImpl extends
 	 * @throws RemoteException 
 	 */
 	protected final void setPreviousEdge(Edge prevEdge) {
-		storage.previousElementInGraphId[getIdInStorage(id)] = prevEdge.getId();
+		container.previousElementInGraphId[getIdInStorage(elementId)] = prevEdge.getId();
 	}
 
 	@Override
 	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
-		Edge nextEdge = getEdgeFromBg(storage.nextElementInGraphId[getIdInStorage(id)]); 
+		Edge nextEdge = graphDatabase.getEdgeObject(container.nextElementInGraphId[getIdInStorage(elementId)]); 
 		if (nextEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(nextEdge))) {
 			return null;
 		} else {
@@ -157,7 +156,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
-		Edge previousEdge = getEdgeFromBg(storage.previousElementInGraphId[getIdInStorage(id)]);
+		Edge previousEdge = graphDatabase.getEdgeObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
 		if (previousEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(previousEdge))) {
 			return null;
 		} else {
@@ -277,7 +276,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeAfterInGraph((EdgeImpl) e, this);
+		graphDatabase.putEdgeAfterInGraph((EdgeImpl) e, this);
 	}
 
 	@Override
@@ -288,7 +287,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeBeforeInGraph((EdgeImpl) e, this);
+		graphDatabase.putEdgeBeforeInGraph((EdgeImpl) e, this);
 	}
 	
 	
@@ -305,9 +304,9 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
+		Incidence firstIncidence = graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsVertex(firstIncidence.getVertex()))) {
-			firstIncidence = getIncidenceFromBg(((IncidenceImpl)firstIncidence).storage.nextIncidenceAtEdgeId[getIdInStorage(((IncidenceImpl)firstIncidence).getId())]);
+			firstIncidence = firstIncidence.getNextIncidenceAtEdge();
 		}
 		return firstIncidence;
 	}
@@ -321,18 +320,18 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
 		assert isValid();
-		Incidence i = getIncidenceFromBg(storage.firstIncidenceId[getIdInStorage(id)]);
+		Incidence i = graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		if (traversalContext==null) {
 			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtEdgeId[getIdInStorage(((IncidenceImpl)i).getId())]);
+					i = i.getNextIncidenceAtEdge();
 			}		
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && ((!traversalContext.containsVertex(i.getVertex())) || (direction != i.getDirection())))
-					i = getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtEdgeId[getIdInStorage(((IncidenceImpl)i).getId())]);
+					i = i.getNextIncidenceAtEdge();
 			} else {
 				while ((i != null) && (!traversalContext.containsVertex(i.getVertex())))
-					i = getIncidenceFromBg(((IncidenceImpl)i).storage.nextIncidenceAtEdgeId[getIdInStorage(((IncidenceImpl)i).getId())]);
+					i = i.getNextIncidenceAtEdge();
 			}
 		}
 		return i;
@@ -407,12 +406,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
-//		if (storage.lastIncidenceId[getIdInStorage(id)] == 0) {
-//			System.out.println("Last incidence: " +  storage.lastIncidenceId[getIdInStorage(id)]);
-//			System.out.println("First incidence: " + storage.firstIncidenceId[getIdInStorage(id)]);
-//			System.out.println("Edge: " + id);
-//		}	
-		Incidence lastIncidence = getIncidenceFromBg(storage.lastIncidenceId[getIdInStorage(id)]);
+		Incidence lastIncidence = graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
 		} else {
@@ -421,7 +415,10 @@ public abstract class EdgeImpl extends
 	}
 	
 
-	
+	private int getIdInStorage(long elementId) {
+		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
+	}
+
 	@Override
 	public final Iterable<Incidence> getIncidences() {
 		assert isValid();
@@ -808,7 +805,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
-		return getSchema().getGraphFactory().createIncidenceDiskBasedStorage(incidenceClass, 0, elemToConnect, this);
+		return (T) graphDatabase.connect(incidenceClass, elemToConnect, this); 
 	}
 
 	@Override
@@ -880,7 +877,7 @@ public abstract class EdgeImpl extends
 
 		incidenceListModified();
 		((EdgeImpl) other).incidenceListModified();
-		graph.edgeListModified();
+		graphDatabase.edgeListModified();
 		return v;
 	}
 
@@ -1254,15 +1251,23 @@ public abstract class EdgeImpl extends
 	protected final void addFirstSubordinateVertex(Vertex appendix) {
 		return;
 	}
-	
-	@Override
-	public final Graph getSubordinateGraph() {
-		if (subOrdinateGraph == null) {
-			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
-		}
-		return subOrdinateGraph;
-	}
 
+	
+	/* **********************************************************
+	 * Access sigma information
+	 * **********************************************************/
+
+	@Override
+	public Graph getSubordinateGraph() {
+		if (subordinateGraphId == 0) {
+			Graph subordinateGraph = graphDatabase.getGraphFactory().createSubordinateGraph(this);
+			subordinateGraphId = subordinateGraph.getGlobalSubgraphId();
+			return subordinateGraph;
+		} else {
+			return graphDatabase.getGraphObject(subordinateGraphId);
+		}
+	}
+	
 
 
 
@@ -1286,24 +1291,24 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		return getId() - e.getId();
+		return (int) (getId() - e.getId());
 	}
 
 	@Override
 	public final boolean isValid() {
-		return graph.containsEdge(this);
+		return graphDatabase.containsEdge(this);
 	}
 	
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		graph.deleteEdge(this);
+		graphDatabase.deleteEdge(this);
 	}
 	
 	@Override
 	public String toString() {
 		assert isValid();	
-		return "+e" + id + ": " + getType().getQualifiedName();
+		return "+e" + elementId + ": " + getType().getQualifiedName();
 	}
 
 	
