@@ -2,7 +2,6 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -36,6 +35,12 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * A GraphDatabase stores one local complete or partial graph and provides an uniform access to 
  * all partial graphs of the distributed graph the store belongs to and all its elements based
  * on the ids
+ * 
+ * TODO: Fields such as firstVertexId in (Subordinate)Graph may be represented directly in the
+ * respective objects, since the objects are created and removed on demand and stored only locally,
+ * but the distributed access and update must be considered
+ * -> If the same graph classes should be used to represent the original elements and its proxies,
+ *    all fields need to be saved only inside graph database
  */
 
 public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
@@ -76,7 +81,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	/**
 	 * The id of the local toplevel graph
 	 */
-	protected final int localGraphId;
+	protected final int localPartialGraphId;
 	
 	/**
 	 * The id of the distributed graph the local partial graph directly belongs to
@@ -164,6 +169,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	protected int eCount;
 	
 	
+	/**
+	 * current number of incidences
+	 */
 	protected int iCount;
 	
 
@@ -173,40 +181,59 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private DiskStorageManager diskStorage;
 	
 	/*
-	 * The map of graph ids to the local (proxy) objects for the remote graphs
+	 * The map of global subgraph ids to the local representation objects. Those may be
+	 * either objects representing a local subgraph or (proxy) objects representing
+	 * remote subgraphs
 	 */
-	private Map<Integer, Graph> partialGraphs;
+	private Map<Integer, Reference<Graph>> subgraphObjects;
 	
-	/* stores the graph databases for the partial graphs, these elements
+	private Map<Integer, Reference<GraphData>> localSubgraphData;
+
+	
+	private class GraphData {
+		long firstVertexId;
+		long lastVertexId;
+		long firstEdgeId;
+		long lastEdgeId;
+		long containingElementId;
+		long parentDistributedGraphId;
+	}
+	
+	
+	
+	/* stores the graph databases for the remote graphs, these elements
 	 * may be local proxies for the remote elements automatically created by RMI
+	 * Map key is the 12-bit partial graph id.
 	 */
 	protected Map<Integer, RemoteGraphDatabaseAccess> partialGraphDatabases;
 	
+	/**
+	 * Maps the global element id to the local proxy object representing the
+	 * remote vertex
+	 */
 	protected Map<Long, Reference<Vertex>> remoteVertices;
 	
 	protected Map<Long, Reference<Edge>> remoteEdges;
 	
 	private Map<Long, Reference<Incidence>> remoteIncidences;
+
 	
-	protected Map<Integer, SoftReference<Graph>> localSubgraphs;
-	
-	public String getUniqueGraphId() {
-		return uniqueGraphId;
-	}
-	
-	
-	
-	
-	protected GraphDatabase(GraphImpl localGraph, Schema schema) {
-		
+	/**
+	 * Creates a new graph database to store all local subgraphs of the 
+	 * complete graph identified by the given <code>uniqueGraphId</code>.
+	 * All those local subgraphs have the same <code>partialGraphId</code>
+	 * and belong to the specified <code>schema</code>.
+	 * @param schema the schema of the graph whose subgraphs are represented 
+	 *        by this graph database 
+	 * @param uniqueGraphId the unique id of the graph
+	 * @param partialGraphId the common partial graph id of all local subgraphs
+	 */
+	protected GraphDatabase(Schema schema, String uniqueGraphId, int partialGraphId) {
 		freeVertexList = new FreeIndexList(10);
 		freeIncidenceList = new FreeIndexList(10);
 		freeEdgeList = new FreeIndexList(10);
-		setGraphVersion(0);
-		
-		// initialize graph, factory and schema
-		this.localGraph = localGraph;
-		localGraphId = localGraph.getPartialGraphId();
+
+		localPartialGraphId = localGraph.getPartialGraphId();
 		graphFactory = schema.getGraphFactory();
 		
 		try {
@@ -215,24 +242,32 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			throw new RuntimeException(e);
 		}
 
-
-		partialGraphs = new Map<String, Graph>();
-		partialGraphDatabases = new GraphDatabase[MAX_NUMBER_OF_PARTIAL_GRAPHS];
+		subgraphObjects = new HashMap<Integer, Reference<Graph>>();
+		localSubgraphData = new HashMap<Integer, Reference<GraphData>>();
+		
+		partialGraphDatabases = new Map<Integer, RemoteGraphDatabaseAccess>();
 		
 		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
-		remoteVertices  = new HashMap<Integer, Reference<Vertex>>();
-		remoteEdges = new HashMap<Integer, Reference<Edge>>();
-		remoteIncidences = new HashMap<Integer, Reference<Incidence>>();
+		remoteVertices  = new HashMap<Long, Reference<Vertex>>();
+		remoteEdges = new HashMap<Long, Reference<Edge>>();
+		remoteIncidences = new HashMap<Long, Reference<Incidence>>();
 		
 		//initialize fields
 		graphVersion = -1;
 		vCount =0;
-		
+		setGraphVersion(0);
 		
 		//register graph at server
-		server = JGraLabServerImpl.getLocalInstance();
-		server.registerGraph(localGraph.getUniqueGraphId(), localGraph.getPartialGraphId(), this);
+		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
+		localJGraLabServer.registerGraph(localGraph.getUniqueGraphId(), localGraph.getPartialGraphId(), this);
 	}
+	
+	
+	
+	public String getUniqueGraphId() {
+		return uniqueGraphId;
+	}
+	
 	
 	
 	protected GraphDatabase getGraphDatabase(int partialGraphId) {
@@ -282,12 +317,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @return
 	 */
 	public Graph getGraphObject(int partialGraphId) {
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			return localGraph;
-		if (partialGraphs[partialGraphId] == null) {
-			partialGraphs[partialGraphId] = graphFactory.createGraphProxy(schema.getGraphClass().getM1Class(), localGraph.getUniqueGraphId() , partialGraphId, this);				
+		if (remoteSubgraphs[partialGraphId] == null) {
+			remoteSubgraphs[partialGraphId] = graphFactory.createGraphProxy(schema.getGraphClass().getM1Class(), localGraph.getUniqueGraphId() , partialGraphId, this);				
 		}
-		return partialGraphs[partialGraphId];
+		return remoteSubgraphs[partialGraphId];
 	}
 
 	/**
@@ -296,7 +331,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public Vertex getVertexObject(int id) {
 		int partialGraphId = getPartialGraphId(id);
-		if (partialGraphId == localGraphId) {
+		if (partialGraphId == localPartialGraphId) {
 			return diskStorage.getVertexObject(id);
 		}
 		Reference<Vertex> ref = remoteVertices.get(id);
@@ -327,7 +362,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public Edge getEdgeObject(int id) {
 		int partialGraphId = getPartialGraphId(id);
-		if (partialGraphId == localGraphId) {
+		if (partialGraphId == localPartialGraphId) {
 			return diskStorage.getEdgeObject(id);
 		}
 		Reference<Edge> ref = remoteEdges.get(id);
@@ -358,7 +393,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public Incidence getIncidenceObject(int id) {
 		int partialGraphId = getPartialGraphId(id);
-		if (partialGraphId == localGraphId) {
+		if (partialGraphId == localPartialGraphId) {
 			return diskStorage.getIncidenceObject(id);
 		}
 		Reference<Incidence> ref = remoteIncidences.get(id);
@@ -394,7 +429,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	public int getLocalGraphId() {
-		return localGraphId;
+		return localPartialGraphId;
 	}
 	
 
@@ -417,7 +452,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public void setFirstIncidence(int elemId, int incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.setFirstIncidence(elemId, incidenceId);
 		else
 			getGraphDatabase(partialGraphId).setFirstIncidence(elemId, incidenceId);
@@ -425,7 +460,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	public void setLastIncidence(int elemId, int incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.setLastIncidence(elemId, incidenceId);
 		else
 			getGraphDatabase(partialGraphId).setLastIncidence(elemId, incidenceId);
@@ -434,7 +469,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public void incidenceListModified(int elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.incidenceListModified(elemId);
 		else
 			getGraphDatabase(partialGraphId).incidenceListModified(elemId);
@@ -444,7 +479,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public int getSigma(int elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			return diskStorage.getSigma(elemId);
 		else
 			return getGraphDatabase(partialGraphId).getSigma(elemId);
@@ -471,7 +506,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public void setSigma(int elementId, int sigmaId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.setSigma(elementId, sigmaId);
 		else
 			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
@@ -481,7 +516,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	public int getKappa(int elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			return diskStorage.getKappa(elementId);
 		else
 			return getGraphDatabase(partialGraphId).getKappa(elementId);
@@ -490,7 +525,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	public void setKappa(int elementId, int kappa) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.setKappa(elementId, kappa);
 		else
 			getGraphDatabase(partialGraphId).setKappa(elementId, kappa);
@@ -500,7 +535,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public void setIncidenceListVersion(int elementId, long incidenceListVersion) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			diskStorage.setIncidenceListVersion(elementId, incidenceListVersion);
 		else
 			getGraphDatabase(partialGraphId).getKappa(elementId);
@@ -509,7 +544,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public long getIncidenceListVersion(int elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localGraphId)
+		if (partialGraphId == localPartialGraphId)
 			return diskStorage.getIncidenceListVersion(elementId);
 		else
 			return getGraphDatabase(partialGraphId).getIncidenceListVersion(elementId);
@@ -928,7 +963,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	private void setFirstEdge(Edge movedEdge) {
-		assert getPartialGraphId(movedEdge.getId()) == localGraphId;
+		assert getPartialGraphId(movedEdge.getId()) == localPartialGraphId;
 		
 	}
 	

@@ -8,11 +8,10 @@ public interface JGraLabServer extends RemoteJGraLabServer {
 	/**
 	 * Registers the GraphDatabase <code>graphDatabase</code> as local 
 	 * database responsible for the storage of all graphs belonging 
-	 * to the complete graph identified by the given <code>uniqueGraphId</code> 
-	 * @param uniqueGraphId 
-	 * @param graphDatabase
+	 * to the complete graph identified by their common uniqueGraphId
+	 * @param graphDatabase the graph database to be registered
 	 */
-	public void registerGraphDatabase(String uniqueGraphId, GraphDatabase graphDatabase);
+	public void registerLocalGraphDatabase(GraphDatabase graphDatabase);
 	
 	
 	/**
@@ -30,7 +29,7 @@ public interface JGraLabServer extends RemoteJGraLabServer {
 	 */
 	public void registerFileForUid(String uniqueGraphId, String fileName);
 
-	
+
 
 	
 }

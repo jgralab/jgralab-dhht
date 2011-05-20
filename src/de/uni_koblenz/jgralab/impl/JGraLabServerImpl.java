@@ -40,7 +40,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 		Naming.bind(JGRALAB_SERVER_IDENTIFIER, this);
 	}
 
-	public static RemoteJGraLabServer getLocalInstance() {
+	public static JGraLabServer getLocalInstance() {
 		try {
 			if (localInstance == null) {
 				localInstance = new JGraLabServerImpl();
@@ -80,6 +80,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 	}
 
 	
+	@Override
 	public void registerLocalGraphDatabase(GraphDatabase localDb) {
 		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId()))
 			localGraphDatabases.put(localDb.getUniqueGraphId(), localDb);
@@ -112,10 +113,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 		return localGraphDatabases.get(uid);
 	}
 	
-	@Override
-	public void registerGraphDatabase(String graphId, GraphDatabase graphDatabase) {
-		localGraphDatabases.put(graphId, graphDatabase);
-	}
+	
 
  	
 }
