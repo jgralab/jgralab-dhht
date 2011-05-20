@@ -220,7 +220,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e.getId());
+		storingGraphDatabase.deleteEdge(e);
 	}
 
 	@Override

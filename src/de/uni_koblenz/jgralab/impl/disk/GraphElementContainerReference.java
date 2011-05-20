@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.ref.ReferenceQueue;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -15,15 +16,15 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 	
 	int[] kappa;
 	
-	int[] sigmaId;
+	long[] sigmaId;
 	
-	int[] nextElementInGraphId;
+	long[] nextElementInGraphId;
 	
-	int[] previousElementInGraphId;
+	long[] previousElementInGraphId;
 	
-	int[] firstIncidenceId;
+	long[] firstIncidenceId;
 	
-	int[] lastIncidenceId;
+	long[] lastIncidenceId;
 	
 	AttributeContainer[] attributes;
 	
@@ -51,11 +52,11 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
    		container.incidenceListVersion = incidenceListVersion= new long[DiskStorageManager.CONTAINER_SIZE];
    		container.kappa = kappa= new int[DiskStorageManager.CONTAINER_SIZE];
-  		container.sigmaId = sigmaId= new int[DiskStorageManager.CONTAINER_SIZE];
-   		container.nextElementInGraphId = nextElementInGraphId= new int[DiskStorageManager.CONTAINER_SIZE];
-   		container.previousElementInGraphId = previousElementInGraphId= new int[DiskStorageManager.CONTAINER_SIZE];
-   		container.firstIncidenceId = firstIncidenceId= new int[DiskStorageManager.CONTAINER_SIZE];
-   		container.lastIncidenceId = lastIncidenceId= new int[DiskStorageManager.CONTAINER_SIZE];
+  		container.sigmaId = sigmaId= new long[DiskStorageManager.CONTAINER_SIZE];
+   		container.nextElementInGraphId = nextElementInGraphId= new long[DiskStorageManager.CONTAINER_SIZE];
+   		container.previousElementInGraphId = previousElementInGraphId= new long[DiskStorageManager.CONTAINER_SIZE];
+   		container.firstIncidenceId = firstIncidenceId= new long[DiskStorageManager.CONTAINER_SIZE];
+   		container.lastIncidenceId = lastIncidenceId= new long[DiskStorageManager.CONTAINER_SIZE];
    		read(input);
 	}
 	
@@ -103,17 +104,20 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 
 	
 	void read(FileChannel channel) throws IOException {
-		IntBuffer ib = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9).asIntBuffer();
+		MappedByteBuffer bb = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9);
 		if (types == null)
 			throw new RuntimeException("Types is null");
+		IntBuffer ib = bb.asIntBuffer();
 		ib.get(types);
-		//ib.get( incidenceListVersion.);
 		ib.get(kappa);
-		ib.get(sigmaId);
-		ib.get(nextElementInGraphId);
-		ib.get(previousElementInGraphId);
-		ib.get(firstIncidenceId);
-		ib.get(lastIncidenceId);
+		
+		LongBuffer lb = bb.asLongBuffer(); 
+		lb.get(sigmaId);
+		lb.get(nextElementInGraphId);
+		lb.get(previousElementInGraphId);
+		lb.get(firstIncidenceId);
+		lb.get(lastIncidenceId);
+		lb.get(incidenceListVersion);
 	}	
 	
 
@@ -122,17 +126,15 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		IntBuffer ib = bb.asIntBuffer();
 		ib.clear();
 		ib.put(types);
-		//ib.put( incidenceListVersion.);
 		ib.put(kappa);
-		ib.put(sigmaId);
-		ib.put(nextElementInGraphId);
-		ib.put(previousElementInGraphId);
-		ib.put(firstIncidenceId);
-		ib.put(lastIncidenceId);
+		
+		LongBuffer lb = bb.asLongBuffer(); 
+		lb.put(sigmaId);
+		lb.put(nextElementInGraphId);
+		lb.put(previousElementInGraphId);
+		lb.put(firstIncidenceId);
+		lb.put(lastIncidenceId);
+		lb.put(incidenceListVersion);
 
-		//System.out.print("Forcing vertex channel .... ");
-		//bb.force();
-		//channel.force(true);
-		//System.out.println("...successfull");
 	}
 }

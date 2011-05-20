@@ -36,6 +36,7 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
@@ -58,19 +59,14 @@ public interface GraphFactory {
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
-
-	/**
-	 * creates a Graph-object for the specified class. The returned object may
-	 * be an instance of a subclass of the specified graphClass.
-	 */
 	public Graph createGraph(Class<? extends Graph> graphClass, String id);
 	
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
+	 * @param graphDatabase 
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uid);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, GraphDatabase graphDatabase);
 	
 	/**
 	 * creates a local graph proxy object for an existing remote partial or global graph.
@@ -149,11 +145,21 @@ public interface GraphFactory {
 	 */
 	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g);
 	
+	
+	
+	public Edge reloadEdge(Class<? extends Edge> edgeClass, int id, GraphDatabase graphDatabase, EdgeContainer container);
+
+	public Incidence reloadIncidence(Class<? extends Incidence> incidenceClass, int id,	IncidenceContainer container);
+
+	public Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id, GraphDatabase graphDatabase, VertexContainer container);
+
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vertexClass, int id,	Graph g);
+	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	
+
 
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned
@@ -192,8 +198,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T createIncidenceDiskBasedStorage(Class<T> incidenceClass,
-			int id, Vertex v, Edge e);
+	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
@@ -218,9 +223,11 @@ public interface GraphFactory {
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, int id, Graph g,
-			Vertex alpha, Vertex omega);
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
+	
+	
+	
 	public void setGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends Graph> implementationClass);
@@ -274,19 +281,8 @@ public interface GraphFactory {
 	public void setRecordImplementationClass(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
 
-	public Edge reloadEdge(Class<? extends Edge> edgeClass, int id, Graph g,
-			EdgeContainer container);
 
-	public Incidence reloadIncidence(Class<? extends Incidence> incidenceClass, int id,
-			IncidenceContainer container);
 
-	Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id, Graph g,
-			VertexContainer container);
 
-	Edge createEdgeProxy(Class<? extends Edge> edgeClass, int id, Graph g);
-	
-	Vertex createVertexProxy(Class<? extends Vertex> vertexClass, int id, Graph g);
-	
-	Incidence createIncidenceProxy(Class<? extends Incidence> incidenceClass, int id, Graph g);
 
 }

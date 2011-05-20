@@ -191,5 +191,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public void setGraphVersion(long graphVersion);
+
+
+
+	public int getVertexTypeId(long id);
+	
+	public int getEdgeTypeId(long id);
+	
+	public int getIncidenceTypeId(long id);
 	
 }

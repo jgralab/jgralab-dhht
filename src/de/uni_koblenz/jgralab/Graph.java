@@ -70,7 +70,15 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * - getPartialGraphId()
  * - getGlobalSubgraphId()
  * - getLocalSubgraphId()
- *  
+ * 
+ * A graph may be created using the following process:
+ *   - Load, create or instantiate a schema
+ *   - Call schema.createMyGraph(StorageVariant) to create an graph of type MyGraph 
+ *   - Internally, createMyGraph will
+ *     - determine a random unique id for the graph
+ *     - create a local graph database to store the graph
+ *     - register the graph database at the local JGraLabServer
+ *     - create and return a Graph object
  * @author ist@uni-koblenz.de
  */
 public interface Graph extends AttributedElement<GraphClass, Graph> {

@@ -12,11 +12,11 @@ public abstract class GraphElementContainer extends StorageContainer {
 		super(id, size, backgroundStorage);
 		incidenceListVersion = new long[size];
 		kappa = new int[size];
-		sigmaId = new int[size];
-		nextElementInGraphId = new int[size];
-		previousElementInGraphId = new int[size];
-		firstIncidenceId = new int[size];
-		lastIncidenceId = new int[size];
+		sigmaId = new long[size];
+		nextElementInGraphId = new long[size];
+		previousElementInGraphId = new long[size];
+		firstIncidenceId = new long[size];
+		lastIncidenceId = new long[size];
 	}
 	
 	public GraphElementContainer() {
@@ -27,15 +27,15 @@ public abstract class GraphElementContainer extends StorageContainer {
 	
 	int[] kappa;
 	
-	int[] sigmaId;
+	long[] sigmaId;
 	
-	int[] nextElementInGraphId;
+	long[] nextElementInGraphId;
 	
-	int[] previousElementInGraphId;
+	long[] previousElementInGraphId;
 	
-	int[] firstIncidenceId;
+	long[] firstIncidenceId;
 	
-	int[] lastIncidenceId;
+	long[] lastIncidenceId;
 	
 	AttributeContainer[] attributes;
 	

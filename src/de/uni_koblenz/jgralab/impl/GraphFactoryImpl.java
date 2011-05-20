@@ -261,17 +261,6 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass,
-			String id, int vMax, int eMax) {
-		try {
-			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id,
-					vMax, eMax);
-			return g;
-		} catch (Exception ex) {
-			throw new M1ClassAccessException("Cannot create graph of class "
-					+ graphClass.getCanonicalName(), ex);
-		}
-	}
 
 	public Graph createGraph(Class<? extends Graph> graphClass, String id) {
 		try {
@@ -284,11 +273,9 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass,
-			String id) {
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass) {
 		try {
-			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(id,
-					1000, 1000);
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance();
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -438,8 +425,8 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Graph> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { String.class, int.class, int.class };
-				graphMapForMemBasedImpl.put(originalClass,
+				Class<?>[] params = { };
+				graphMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(

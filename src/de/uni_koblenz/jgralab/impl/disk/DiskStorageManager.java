@@ -18,7 +18,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
  * This class realizes the storage of vertices, edges and incidences on the disk. All
- * methods may be used only with local objects
+ * methods may be used only with local objects and local ids.
  * @author dbildh
  *
  */
@@ -42,9 +42,9 @@ public final class DiskStorageManager {
 	
 	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32-(BITS_FOR_ELEMENT_MASK+1)); //= 00000011 11111111 in binary, 10 bit = 1024 elements per container
 	
-	static final int ELEMENT_CONTAINER_COUNT = GraphDatabase.MAX_NUMBER_OF_LOCAL_ELEMENTS >> BITS_FOR_ELEMENT_MASK;
+	static final int ELEMENT_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK+2);
 	
-	static final int INCIDENCE_CONTAINER_COUNT = GraphDatabase.MAX_NUMBER_OF_LOCAL_INCIDENCES >> BITS_FOR_ELEMENT_MASK;
+	static final int INCIDENCE_CONTAINER_COUNT = Integer.MAX_VALUE >> BITS_FOR_ELEMENT_MASK;
 	
 	static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
 		
@@ -145,7 +145,7 @@ public final class DiskStorageManager {
 	
 	
 	public DiskStorageManager(GraphDatabase database) throws FileNotFoundException {
-		schema = graph.getSchema();
+		schema = database.getSchema();
 		this.graphDatabase = database;
 		this.factory = database.getGraphFactory();
 		randomId = Long.toString(System.currentTimeMillis());
@@ -479,7 +479,7 @@ public final class DiskStorageManager {
 			Vertex v = container.vertices[idInStorage];
 			if (v == null) {
 				Class<? extends Vertex> c = (Class<? extends Vertex>) schema.getM1ClassForId(type);
-				v = factory.reloadVertex(c, id, graph, container);
+				v = factory.reloadVertex(c, id, graphDatabase, container);
 				container.vertices[idInStorage] = v;
 			}	
 			return v;
@@ -594,7 +594,7 @@ public final class DiskStorageManager {
 				//element is typed, so return either the existing vertex or create a new one
 				Edge e = container.edges[idInStorage];
 				if (e == null) {
-					e = factory.reloadEdge((Class<? extends Edge>) schema.getM1ClassForId(type), id, graph, container);
+					e = factory.reloadEdge((Class<? extends Edge>) schema.getM1ClassForId(type), id, graphDatabase, container);
 					container.edges[idInStorage] = e;
 				}
 				return e;
@@ -705,7 +705,7 @@ public final class DiskStorageManager {
 				//element is typed, so return either the existing vertex or create a new one
 				Incidence i = container.incidences[idInStorage];
 				if (i == null) {
-					Class<?> c = graph.getSchema().getM1ClassForId(type);
+					Class<?> c = graphDatabase.getSchema().getM1ClassForId(type);
 					i = factory.reloadIncidence((Class<? extends Incidence>) schema.getM1ClassForId(type), id, container);
 					container.incidences[idInStorage] = i;
 				}
@@ -721,8 +721,8 @@ public final class DiskStorageManager {
 		VertexContainer storage = getVertexContainer(vId);
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
-		v.storage = storage;
-		storage.types[id] = graph.getSchema().getClassId(v.getType());
+		v.container = storage;
+		storage.types[id] = graphDatabase.getSchema().getClassId(v.getType());
 		AttributeContainer[] containerArray = getVertexAttributeContainerArray(getContainerId(vId));
 		containerArray[id] = v.getAttributeContainer();
 	}
@@ -732,8 +732,8 @@ public final class DiskStorageManager {
 		EdgeContainer storage = getEdgeContainer(eId);
 		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
-		e.storage = storage;
-		storage.types[id] = graph.getSchema().getClassId(e.getType());
+		e.container = storage;
+		storage.types[id] = graphDatabase.getSchema().getClassId(e.getType());
 		AttributeContainer[] containerArray = getEdgeAttributeContainerArray(getContainerId(eId));
 		containerArray[id] = e.getAttributeContainer();
 	}
@@ -743,7 +743,7 @@ public final class DiskStorageManager {
 		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = i;
 		i.storage = storage;
-		storage.types[id] = graph.getSchema().getClassId(i.getType());
+		storage.types[id] = graphDatabase.getSchema().getClassId(i.getType());
 	}
 	
 
@@ -819,16 +819,22 @@ public final class DiskStorageManager {
 		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)]++;
 	}
 
-	@Override
-	public int getSigma(int elemId) {
-		// TODO Auto-generated method stub
-		return 0;
+
+	public int getSigmaId(int localElemId) {
+		if (localElemId < 0) {
+			return getEdgeContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)];
+		} else {
+			return getVertexContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)];
+		}
 	}
 
-	@Override
-	public void setSigma(int elementId, int sigmaId) {
-		// TODO Auto-generated method stub
-		
+
+	public void setSigmaId(int localElemId, long sigmaId) {
+		if (localElemId < 0) {
+			getEdgeContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+		} else {
+			getVertexContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+		}
 	}
 
 	@Override

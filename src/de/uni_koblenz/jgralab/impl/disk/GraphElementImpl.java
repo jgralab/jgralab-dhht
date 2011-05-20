@@ -87,7 +87,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	//TODO Move to concrete classes VertexLocalImpl and EdgeLocalImpl 
 	
-	//protected GraphElementContainer container;
+	protected GraphElementContainer container;
 
 
 	/**
