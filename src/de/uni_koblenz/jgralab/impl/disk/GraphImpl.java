@@ -64,25 +64,6 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	private final String uid;
 
 	/**
-	 * The id of this complete or partial graph identifying it in the complete
-	 * graph
-	 */
-	protected int partialGraphId;
-
-	/**
-	 * the graph database that stores this graph and manages all connections to
-	 * all partial graphs
-	 */
-	protected GraphDatabase localGraphDatabase;
-
-	/**
-	 * The property access providing direct access to the data of this graph,
-	 * either it is the local disk storage of the local graph database or the
-	 * remote graph database
-	 */
-	protected RemoteGraphDatabaseAccess storingGraphDatabase;
-
-	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
 	 * @param id

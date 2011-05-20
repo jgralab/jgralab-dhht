@@ -14,30 +14,30 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	 */
 	private static final long serialVersionUID = -8155387019211417812L;
 
-	protected BinaryEdgeImpl(int anId, Graph graph) throws IOException {
-		super(anId, graph);
+	protected BinaryEdgeImpl(int anId, GraphDatabase graphDatabase) throws IOException {
+		super(anId, graphDatabase);
 	}
 	
-	protected BinaryEdgeImpl(int anId, de.uni_koblenz.jgralab.impl.disk.EdgeContainer storage, Graph graph) throws IOException {
-		super(anId, storage, graph);
+	protected BinaryEdgeImpl(int anId, GraphDatabase graphDatabase, EdgeContainer container) throws IOException {
+		super(anId, graphDatabase, container);
 	}
 	
 
 	@Override
 	public Vertex getAlpha() {
-		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.VERTEX_TO_EDGE) {
-			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
+		if (graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.VERTEX_TO_EDGE) {
+			return graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
 		} else {
-			return storage.backgroundStorage.getIncidenceObject(storage.lastIncidenceId[id]).getVertex();
+			return graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
 		}
 	}
 
 	@Override
 	public Vertex getOmega() {
-		if (storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getDirection() == Direction.EDGE_TO_VERTEX) {
-			return storage.backgroundStorage.getIncidenceObject(storage.firstIncidenceId[id]).getVertex();
+		if (graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.EDGE_TO_VERTEX) {
+			return graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
 		} else {
-			return storage.backgroundStorage.getIncidenceObject(storage.lastIncidenceId[id]).getVertex();
+			return graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
 		}
 	}
 

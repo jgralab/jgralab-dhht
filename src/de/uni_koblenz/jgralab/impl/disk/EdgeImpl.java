@@ -415,7 +415,7 @@ public abstract class EdgeImpl extends
 	}
 	
 
-	private int getIdInStorage(long elementId) {
+	protected int getIdInStorage(long elementId) {
 		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
 	}
 

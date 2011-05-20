@@ -72,19 +72,51 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	/**
+	 * the graph database that stores this graph and manages all connections to
+	 * all partial graphs
+	 */
+	protected GraphDatabase localGraphDatabase;
+
+	/**
+	 * The property access providing direct access to the data of this graph,
+	 * either it is the local disk storage of the local graph database or the
+	 * remote graph database
+	 */
+	protected RemoteGraphDatabaseAccess storingGraphDatabase;
+	
+
+	/**
+	 * The id of this complete or partial graph identifying it in the complete
+	 * graph
+	 */
+	protected int globalSubgraphId;
+	
+	
+	
+	protected GraphBaseImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId ) {
+		this.localGraphDatabase = localGraphDatabase;
+		this.storingGraphDatabase = storingGraphDatabase;
+		this.globalSubgraphId = globalSubgraphId;
+	}
+	
+
+	
+	/**
 	 * number of vertices in the graph
 	 * @ 
 	 */
-	abstract protected void setVCount(int count);
+	protected void setVCount(int count) {
+		localGraphDatabase.setVCount(globalSubgraphId, count);
+	}
 
 	@Override
 	public Vertex getFirstVertex() {
-		return getGraphDatabase.getVertexObject(firstVertexId);
+		return localGraphDatabase.getVertexObject(storingGraphDatabase.getFirstVertexId(globalSubgraphId));
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		return getVertexObjectForId(lastVertexId);
+		return localGraphDatabase.getVertexObject(storingGraphDatabase.getLastVertexId(globalSubgraphId));
 	}
 
 	/**

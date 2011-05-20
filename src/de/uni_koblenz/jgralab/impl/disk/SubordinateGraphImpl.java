@@ -66,19 +66,6 @@ public abstract class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
 		GraphStructureChangedListener {
 
-	private GraphElement<?, ?, ?> containingElement;
-
-	// TODO: Check if the respective methods are really
-	// needed in the graph interface and how to ensure, that
-	// the variables reflect the number of elements in the subgraphs
-	// implemented methods of GraphStructureChangeListener to react on adding/deletion of vertices
-
-	private int vCount;
-
-	private int eCount;
-
-	private int iCount;
-
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
 		return containingElement;
