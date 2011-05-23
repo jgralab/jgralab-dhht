@@ -31,9 +31,12 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
+
+import sun.util.calendar.LocalGregorianCalendar;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
@@ -63,37 +66,37 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public abstract class SubordinateGraphImpl extends
-		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
+		GraphBaseImpl implements
 		GraphStructureChangedListener {
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
-		return containingElement;
+		return localGraphDatabase.getGraphElementObject(storingGraphDatabase.getContainingElementId(globalSubgraphId));
 	}
 
 	@Override
 	public int getVCount() {
-		return vCount;
+		return storingGraphDatabase.getVCount(globalSubgraphId);
 	}
 
 	@Override
 	public int getECount() {
-		return eCount;
+		return storingGraphDatabase.getECount(globalSubgraphId);
 	}
 
 	@Override
 	protected void setVCount(int count) {
-		vCount = count;
+		storingGraphDatabase.setVCount(globalSubgraphId, count);
 	}
 
 	@Override
 	protected void setECount(int count) {
-		eCount = count;
+		storingGraphDatabase.setECount(globalSubgraphId, count);
 	}
 
 	@Override
 	protected void setICount(int count) {
-		iCount = count;
+		storingGraphDatabase.setICount(globalSubgraphId, count);
 	}
 
 	@Override
@@ -106,183 +109,99 @@ public abstract class SubordinateGraphImpl extends
 		return getSuperordinateGraph().getEdgeListVersion();
 	}
 
-	/**
-	 * TODO GraphClass == containingElement.getType()?
-	 * 
-	 * @param containingVertex
-	 *            {@link Vertex} which contains this subordinate graph
-	 */
-	protected SubordinateGraphImpl(Vertex containingVertex)
-			 {
-		super(containingVertex.getGraph().getType());
-		initializeCommonFields(containingVertex);
-//System.out.println("Initialozing subordinate graph " + this);
-		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
-				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current = current.getNextVertex((Graph)null)) {
-			if (getFirstVertex() == null) {
-				setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-			}
-			//System.out.println("  Iterating vertex " + current);
-			setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-			vCount++;
-		}
-//System.out.println("Iterating edges");
-		// initialize edges
-		Edge current = containingVertex.getGraph().getFirstEdge();
-		while (current != null
-				&& !((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement)) {
-			current = current.getNextEdge();
-		}
-		if (current != null) {
-			setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-			do {
-				setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-				setECount(getECount() + 1);
-				setICount(getICount() + current.getDegree());
-				current = current.getNextEdge();
-			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?>) current)
-							.isChildOf(containingElement));
-		}
-		getCompleteGraph().addGraphStructureChangedListener(this);
+	
+	public SubordinateGraphImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId) {
+		super(localGraphDatabase, storingGraphDatabase, globalSubgraphId);
 	}
-
-	/**
-	 * TODO GraphClass == containingElement.getType()?
-	 * 
-	 * @param containingEdge
-	 *            {@link Edge} which contains this subordinate graph
-	 */
-	protected SubordinateGraphImpl(Edge containingEdge) {
-		super(containingEdge.getGraph().getType());
-		initializeCommonFields(containingEdge);
-
-		// initialize edges
-		for (Edge current = containingEdge.getNextEdge(); current != null
-				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current.getNextEdge()) {
-			if (getFirstEdge() == null) {
-				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-			}
-			setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-			eCount++;
-			iCount += current.getDegree();
-		}
-
-		// initialize vertices
-		Vertex current = containingEdge.getGraph().getFirstVertex();
-		while (current != null
-				&& !((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement)) {
-			current = current.getNextVertex();
-		}
-		if (current != null) {
-			setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-			do {
-				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-				setVCount(getVCount() + 1);
-				current = current.getNextVertex();
-			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?>) current)
-							.isChildOf(containingElement));
-		}
-		getCompleteGraph().addGraphStructureChangedListener(this);
-	}
-
-	private void initializeCommonFields(GraphElement<?, ?, ?> containingElement) {
-		this.containingElement = containingElement;
-	}
+	
+	
+	
 
 	@Override
 	public <T> JGraLabList<T> createList() {
-		return containingElement.getGraph().createList();
+		return storingGraphDatabase.createList();
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection)
 			 {
-		return containingElement.getGraph().createList(collection);
+		return storingGraphDatabase.createList(collection);
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity)
 			 {
-		return containingElement.getGraph().createList(initialCapacity);
+		return storingGraphDatabase.createList(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		return containingElement.getGraph().createSet();
+		return storingGraphDatabase.createSet();
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection)
 			 {
-		return containingElement.getGraph().createSet(collection);
+		return storingGraphDatabase.createSet(collection);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity)
 			 {
-		return containingElement.getGraph().createSet(initialCapacity);
+		return storingGraphDatabase.createSet(initialCapacity);
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor)
 			 {
-		return containingElement.getGraph().createSet(initialCapacity,
-				loadFactor);
+		return storingGraphDatabase.createSet(initialCapacity, loadFactor);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		return containingElement.getGraph().createMap();
+		return storingGraphDatabase.createMap();
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map)
 			 {
-		return containingElement.getGraph().createMap(map);
+		return storingGraphDatabase.createMap(map);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity)
 			 {
-		return containingElement.getGraph().createMap(initialCapacity);
+		return storingGraphDatabase.createMap(initialCapacity);
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		return containingElement.getGraph().createMap(initialCapacity,
+		return storingGraphDatabase.createMap(initialCapacity,
 				loadFactor);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
 			 {
-		return containingElement.getGraph().createRecord(recordClass, io);
+		return storingGraphDatabase.createRecord(recordClass, io);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		return containingElement.getGraph().createRecord(recordClass, fields);
+		return storingGraphDatabase.createRecord(recordClass, fields);
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		return containingElement.getGraph().createRecord(recordClass,
-				components);
+		return storingGraphDatabase.createRecord(recordClass, components);
 	}
 
 	@Override
 	public Graph getView(int kappa) {
-		return containingElement.getGraph().getGraphFactory()
-				.createViewGraph(this, kappa);
+		return localGraphDatabase.createViewGraph(this, kappa);
 	}
 
 	@Override
@@ -294,7 +213,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
-		return containingElement.writeAttributeValueToString(attributeName);
+		throw new UnsupportedOperationException("writeAttributeValues may not be called on a SubordinateGraph");
 	}
 
 	@Override
@@ -310,13 +229,13 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException {
-		return containingElement.getAttribute(name);
+		return getContainingElement().getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException, RemoteException {
-		containingElement.setAttribute(name, data);
+		getContainingElement().setAttribute(name, data);
 	}
 
 	@Override
@@ -344,7 +263,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void deleteVertex(Vertex v) {
 		if (containsVertex(v)) {
-			containingElement.getGraph().deleteVertex(v);
+			storingGraphDatabase.deleteVertex(v.getId());
 		} else {
 			throw new GraphException("The subordinate graph of "
 					+ getContainingElement().getId()
@@ -355,7 +274,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
-			containingElement.getGraph().deleteEdge(e);
+			storingGraphDatabase.deleteEdge(e.getId());
 		} else {
 			throw new GraphException("The subordinate graph of "
 					+ getContainingElement().getId()
@@ -364,8 +283,8 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
-		Vertex v = containingElement.getGraph().getVertex(id);
+	public Vertex getVertex(long id) {
+		Vertex v = localGraphDatabase.getVertexObject(id);
 		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
 			return v;
 		} else {
@@ -374,8 +293,8 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Edge getEdge(int id) {
-		Edge e = containingElement.getGraph().getEdge(id);
+	public Edge getEdge(long id) {
+		Edge e =  localGraphDatabase.getEdgeObject(id);
 		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
 			return e;
 		} else {
@@ -393,10 +312,6 @@ public abstract class SubordinateGraphImpl extends
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public String getCompleteGraphUid() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public void defragment() {
@@ -405,21 +320,21 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public Schema getSchema() {
-		return containingElement.getGraph().getSchema();
+		return localGraphDatabase.getSchema();
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
 		T edge = super.createEdge(cls, alpha, omega);
-		containingElement.addSubordinateElement(edge);
+		getContainingElement().addSubordinateElement(edge);
 		return edge;
 	}
 
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
 		T edge = super.createEdge(cls);
-		containingElement.addSubordinateElement(edge);
+		getContainingElement().addSubordinateElement(edge);
 		return edge;
 	}
 
@@ -427,13 +342,13 @@ public abstract class SubordinateGraphImpl extends
 	public <T extends Vertex> T createVertex(Class<T> cls)
 			 {
 		T vertex = super.createVertex(cls);
-		containingElement.addSubordinateElement(vertex);
+		getContainingElement().addSubordinateElement(vertex);
 		return vertex;
 	}
 
 	@Override
 	public int getICount() {
-		return iCount;
+		return localGraphDatabase.getICount(globalSubgraphId);
 	}
 
 	@Override
@@ -514,13 +429,13 @@ public abstract class SubordinateGraphImpl extends
 			setVCount(getVCount() + 1);
 			if (v.getPreviousVertex() == getContainingElement()) {
 				// this is a new first vertex
-				setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
+				setFirstVertex((VertexImpl) v);
 				if (getLastVertex() == null) {
-					setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
+					setLastVertex((VertexImpl) v);
 				}
 			} else if (v.getPreviousVertex() == getLastVertex()) {
 				// this is a new last vertex
-				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v);
+				setLastVertex((VertexImpl) v);
 			}
 		}
 	}
@@ -535,10 +450,10 @@ public abstract class SubordinateGraphImpl extends
 				setFirstVertex(null);
 			} else {
 				if (getLastVertex() == v) {
-					setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v.getPreviousVertex());
+					setLastVertex((VertexImpl) v.getPreviousVertex());
 				}
 				if (getFirstVertex() == v) {
-					setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) v.getNextVertex());
+					setFirstVertex((VertexImpl) v.getNextVertex());
 				}
 			}
 		}
@@ -550,12 +465,12 @@ public abstract class SubordinateGraphImpl extends
 			setECount(getECount() + 1);
 			if (e.getPreviousEdge() == getContainingElement()) {
 				// this is a new first edge
-				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
+				setFirstEdge((EdgeImpl) e);
 				if (getLastEdge() == null) {
-					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
+					setLastEdge((EdgeImpl) e);
 				} else if (e.getPreviousEdge() == getLastEdge()) {
 					// this is a new last edge
-					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e);
+					setLastEdge((EdgeImpl) e);
 				}
 			}
 		}
@@ -571,10 +486,10 @@ public abstract class SubordinateGraphImpl extends
 				setFirstEdge(null);
 			} else {
 				if (getLastEdge() == e) {
-					setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e.getPreviousEdge());
+					setLastEdge((EdgeImpl) e.getPreviousEdge());
 				}
 				if (getFirstEdge() == e) {
-					setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e.getNextEdge());
+					setFirstEdge((EdgeImpl) e.getNextEdge());
 				}
 			}
 		}

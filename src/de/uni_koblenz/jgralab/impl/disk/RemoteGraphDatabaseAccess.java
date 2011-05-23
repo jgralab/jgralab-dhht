@@ -77,7 +77,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void graphModified();
 
 
-	public int getECount();
+	public int getECount(int globalSubgraphId);
 
 
 	public int getMaxECount();
@@ -89,10 +89,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public long getVertexListVersion();
 
 
-	public int getVCount();
+	public int getVCount(int globalSubgraphId);
 
 
-	public void setVCount(long count);
+	public void setVCount(long count, int count2);
 
 
 	public void setLoading(boolean isLoading);
@@ -269,5 +269,22 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public long getLastVertexId(int globalSubgraphId);
+
+
+	/**
+	 *
+	 * @param globalSubgraphId
+	 * @return the id of the element (positive for vertices, negative for edges)
+	 * containing the graph identified by its <code>globalSubgraphId</code> 
+	 */
+	public long getContainingElementId(int globalSubgraphId);
+
+
+
+	public void setECount(int globalSubgraphId, int count);
+
+
+
+	public void setICount(int globalSubgraphId, int count);
 	
 }

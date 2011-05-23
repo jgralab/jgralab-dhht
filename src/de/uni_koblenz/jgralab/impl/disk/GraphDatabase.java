@@ -1367,7 +1367,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return edgeListVersion;
 	}
 
-	public int getICount() {
+	public int getICount(int globalSubgraphId) {
 		return iCount;
 	}
 
@@ -1554,5 +1554,101 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 
+	public Graph createViewGraph(SubordinateGraphImpl subordinateGraphImpl,
+			int kappa) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	/**
+	 * TODO GraphClass == containingElement.getType()?
+	 * 
+	 * @param containingVertex
+	 *            {@link Vertex} which contains this subordinate graph
+	 */
+	//TODO: Move logics to GraphDb
+	protected createSubordinateGraphImpl(Vertex containingVertex) {
+		super(containingVertex.getGraph().getType());
+		initializeCommonFields(containingVertex);
+//System.out.println("Initialozing subordinate graph " + this);
+		for (Vertex current = containingVertex.getNextVertex((Graph) null); 
+		     current != null && ((GraphElementImpl<?, ?, ?>) current).isChildOf(getContainingElement()); 
+		     current = current.getNextVertex((Graph)null)) {
+			if (getFirstVertex() == null) {
+				setFirstVertex((VertexImpl) current);
+			}
+			//System.out.println("  Iterating vertex " + current);
+			setLastVertex((VertexImpl) current);
+			setVCount(getVCount()+1);
+		}
+//System.out.println("Iterating edges");
+		// initialize edges
+		Edge current = containingVertex.getGraph().getFirstEdge();
+		while (current != null
+				&& !((GraphElementImpl<?, ?, ?>) current).isChildOf(getContainingElement())) {
+			current = current.getNextEdge();
+		}
+		if (current != null) {
+			setFirstEdge((EdgeImpl) current);
+			do {
+				setLastEdge((EdgeImpl) current);
+				setECount(getECount() + 1);
+				setICount(getICount() + current.getDegree());
+				current = current.getNextEdge();
+			} while (current != null
+					&& ((GraphElementImpl<?, ?, ?>) current)
+							.isChildOf(containingElement));
+		}
+		getCompleteGraph().addGraphStructureChangedListener(this);
+	}
+
+	/**
+	 * TODO GraphClass == containingElement.getType()?
+	 * 
+	 * @param containingEdge
+	 *            {@link Edge} which contains this subordinate graph
+	 */
+	//TODO: Move logics to GraphDb
+	protected createSubordinateGraphImpl(Edge containingEdge) {
+		super(containingEdge.getGraph().getType());
+		initializeCommonFields(containingEdge);
+
+		// initialize edges
+		for (Edge current = containingEdge.getNextEdge(); current != null
+				&& ((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement); current.getNextEdge()) {
+			if (getFirstEdge() == null) {
+				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
+			}
+			setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
+			eCount++;
+			iCount += current.getDegree();
+		}
+
+		// initialize vertices
+		Vertex current = containingEdge.getGraph().getFirstVertex();
+		while (current != null
+				&& !((GraphElementImpl<?, ?, ?>) current)
+						.isChildOf(containingElement)) {
+			current = current.getNextVertex();
+		}
+		if (current != null) {
+			setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
+			do {
+				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
+				setVCount(getVCount() + 1);
+				current = current.getNextVertex();
+			} while (current != null
+					&& ((GraphElementImpl<?, ?, ?>) current)
+							.isChildOf(containingElement));
+		}
+		getCompleteGraph().addGraphStructureChangedListener(this);
+	}
+
+	private void initializeCommonFields(GraphElement<?, ?, ?> containingElement) {
+		this.containingElement = containingElement;
+	}
+	
 
 }

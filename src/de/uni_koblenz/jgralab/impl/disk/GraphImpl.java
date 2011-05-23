@@ -234,7 +234,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public int getVCount() {
-		return storingGraphDatabase.getVCount();
+		return storingGraphDatabase.getVCount(globalSubgraphId);
 	}
 
 	@Override
