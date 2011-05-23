@@ -41,6 +41,7 @@ import java.util.NoSuchElementException;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtEdge;
@@ -109,12 +110,12 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getNextEdge() {
 		assert isValid();
-		return getNextEdge(getGraph().getTraversalContext());
+		return getNextEdge(localGraphDatabase.getTraversalContext());
 	}
 	
 	@Override
 	public final Edge getPreviousEdge() {
-		return getPreviousEdge(getGraph().getTraversalContext());
+		return getPreviousEdge(localGraphDatabase.getTraversalContext());
 	}
 	
 
@@ -145,7 +146,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
-		Edge nextEdge = graphDatabase.getEdgeObject(container.nextElementInGraphId[getIdInStorage(elementId)]); 
+		Edge nextEdge = localGraphDatabase.getEdgeObject(container.nextElementInGraphId[getIdInStorage(elementId)]); 
 		if (nextEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(nextEdge))) {
 			return null;
 		} else {
@@ -156,7 +157,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
-		Edge previousEdge = graphDatabase.getEdgeObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
+		Edge previousEdge = localGraphDatabase.getEdgeObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
 		if (previousEdge == null || ((traversalContext != null) && !traversalContext.containsEdge(previousEdge))) {
 			return null;
 		} else {
@@ -168,14 +169,14 @@ public abstract class EdgeImpl extends
 	public final Edge getNextEdge(Class<? extends Edge> edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
-		return getNextEdge(getGraph().getTraversalContext(), edgeClass, false);
+		return getNextEdge(localGraphDatabase.getTraversalContext(), edgeClass, false);
 	}
 
 	@Override
 	public final Edge getNextEdge(Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
-		return getNextEdge(getGraph().getTraversalContext(), m1EdgeClass,
+		return getNextEdge(localGraphDatabase.getTraversalContext(), m1EdgeClass,
 				noSubclasses);
 	}
 
@@ -210,7 +211,7 @@ public abstract class EdgeImpl extends
 	public final Edge getNextEdge(EdgeClass edgeClass) {
 		assert edgeClass != null;
 		assert isValid();
-		return getNextEdge(getGraph().getTraversalContext(),
+		return getNextEdge(localGraphDatabase.getTraversalContext(),
 				edgeClass.getM1Class(), false);
 	}
 
@@ -218,7 +219,7 @@ public abstract class EdgeImpl extends
 	public final Edge getNextEdge(EdgeClass edgeClass, boolean noSubclasses) {
 		assert edgeClass != null;
 		assert isValid();
-		return getNextEdge(getGraph().getTraversalContext(),
+		return getNextEdge(localGraphDatabase.getTraversalContext(),
 				edgeClass.getM1Class(), noSubclasses);
 	}
 
@@ -276,7 +277,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graphDatabase.putEdgeAfterInGraph((EdgeImpl) e, this);
+		localGraphDatabase.putEdgeAfter(e.getId(), this.getId());
 	}
 
 	@Override
@@ -287,7 +288,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graphDatabase.putEdgeBeforeInGraph((EdgeImpl) e, this);
+		localGraphDatabase.putEdgeBefore(e.getId(), this.getId());
 	}
 	
 	
@@ -299,12 +300,12 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	public final Incidence getFirstIncidence() {
-		return getFirstIncidence(getGraph().getTraversalContext());
+		return getFirstIncidence(localGraphDatabase.getTraversalContext());
 	}
 	
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		Incidence firstIncidence = localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsVertex(firstIncidence.getVertex()))) {
 			firstIncidence = firstIncidence.getNextIncidenceAtEdge();
 		}
@@ -314,13 +315,13 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
-		return getFirstIncidence(getGraph().getTraversalContext(), direction);
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(), direction);
 	}
 	
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
 		assert isValid();
-		Incidence i = graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		Incidence i = localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		if (traversalContext==null) {
 			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
 					i = i.getNextIncidenceAtEdge();
@@ -340,7 +341,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getFirstIncidence(boolean thisIncidence,	IncidenceType... incidentTypes) {
 		assert isValid();
-		return getFirstIncidence(getGraph().getTraversalContext(),
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
 				thisIncidence, incidentTypes);
 	}
 	
@@ -369,7 +370,7 @@ public abstract class EdgeImpl extends
 			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(getGraph().getTraversalContext(),
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
 				anIncidenceClass, direction, noSubclasses);
 	}
 
@@ -399,24 +400,19 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	public final Incidence getLastIncidence() {
-		return getLastIncidence(getGraph().getTraversalContext());
+		return getLastIncidence(localGraphDatabase.getTraversalContext());
 	}
 
 	
 
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
-		Incidence lastIncidence = graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
+		Incidence lastIncidence = localGraphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
 		} else {
 			return lastIncidence.getPreviousIncidenceAtEdge(traversalContext);
 		}
-	}
-	
-
-	protected int getIdInStorage(long elementId) {
-		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
 	}
 
 	@Override
@@ -803,9 +799,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final <T extends Incidence> T connect(Class<T> incidenceClass,
-			Vertex elemToConnect) {
-		return (T) graphDatabase.connect(incidenceClass, elemToConnect, this); 
+	public final <T extends Incidence> T connect(Class<T> incidenceClass, Vertex elemToConnect) {
+		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase.connect(getSchema().getClassId(incidenceClass), elemToConnect.getId(), this.getId())); 
 	}
 
 	@Override
@@ -849,12 +844,12 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final List<? extends Edge> getAdjacences(IncidenceClass ic) {
-		return getAdjacences(getGraph().getTraversalContext(), ic);
+		return getAdjacences(localGraphDatabase.getTraversalContext(), ic);
 	}
 
 	@Override
 	public final List<? extends Edge> getAdjacences(String role) {
-		return getAdjacences(getGraph().getTraversalContext(),
+		return getAdjacences(localGraphDatabase.getTraversalContext(),
 				getIncidenceClassForRolename(role));
 	}
 	
@@ -877,7 +872,7 @@ public abstract class EdgeImpl extends
 
 		incidenceListModified();
 		((EdgeImpl) other).incidenceListModified();
-		graphDatabase.edgeListModified();
+		storingGraphDatabase.edgeListModified();
 		return v;
 	}
 
@@ -893,14 +888,14 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final int getDegree() {
-		return getDegree(getGraph().getTraversalContext());
+		return getDegree(localGraphDatabase.getTraversalContext());
 	}
 
 	@Override
 	public final int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
@@ -908,13 +903,13 @@ public abstract class EdgeImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, direction,
+		return getDegree(localGraphDatabase.getTraversalContext(), ic, direction,
 				noSubClasses);
 	}
 
 	@Override
 	public final int getDegree(Direction direction) {
-		return getDegree(getGraph().getTraversalContext(), direction);
+		return getDegree(localGraphDatabase.getTraversalContext(), direction);
 	}
 
 	@Override
@@ -1008,7 +1003,7 @@ public abstract class EdgeImpl extends
 	public final int getDegree(IncidenceClass ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
@@ -1016,7 +1011,7 @@ public abstract class EdgeImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(getGraph().getTraversalContext(), ic, direction,
+		return getDegree(localGraphDatabase.getTraversalContext(), ic, direction,
 				noSubClasses);
 	}
 
@@ -1260,16 +1255,28 @@ public abstract class EdgeImpl extends
 	@Override
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
-			Graph subordinateGraph = graphDatabase.getGraphFactory().createSubordinateGraph(this);
-			subordinateGraphId = subordinateGraph.getGlobalSubgraphId();
-			return subordinateGraph;
-		} else {
-			return graphDatabase.getGraphObject(subordinateGraphId);
-		}
+			subordinateGraphId = storingGraphDatabase.createSubordinateGraph(this.getId());
+		} 
+		return localGraphDatabase.getGraphObject(subordinateGraphId);
+	}
+	
+	@Override
+	public GraphElement<?, ?, ?> getSigma() {
+		return localGraphDatabase.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
+	}
+	
+	
+	public int getKappa() {
+		return container.kappa[getIdInStorage(elementId)];
 	}
 	
 
-
+	public void setKappa(int kappa) {
+		assert getType().getAllowedMaxKappa() >= kappa
+				&& getType().getAllowedMinKappa() <= kappa;
+		container.kappa[getIdInStorage(elementId)] = kappa;
+	}	
+	
 
 	/**
 	 * Checks if this {@link Edge} is a binary edge. An edge is called binary,
@@ -1296,13 +1303,13 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final boolean isValid() {
-		return graphDatabase.containsEdge(this);
+		return storingGraphDatabase.containsEdge(this.getId());
 	}
 	
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		graphDatabase.deleteEdge(this);
+		storingGraphDatabase.deleteEdge(this.getId());
 	}
 	
 	@Override

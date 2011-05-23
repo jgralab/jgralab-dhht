@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.util.Collection;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Incidence;
@@ -12,7 +11,7 @@ import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
-import de.uni_koblenz.jgralab.Vertex;
+
 
 /**
  * This interface defines all methods needed to access properties of the graph and its elements
@@ -101,10 +100,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public long getEdgeListVersion();
 
 
-	public void deleteEdge(Edge e);
+	public void deleteEdge(long edgeId);
 
 
-	public void deleteVertex(Vertex v);
+	public void deleteVertex(long VertexId);
 	
 
 	public <T> JGraLabList<T> createList();
@@ -199,5 +198,30 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public int getEdgeTypeId(long id);
 	
 	public int getIncidenceTypeId(long id);
+
+
+    /**
+     * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
+     * between the vertex identified by <code>vertexId</code> and the edge identified by <code>edgeId</code>.
+     * The method creates the local incidence object on the graph database storing the edge and updates
+     * the lambda sequences of edge and vertex
+     * @param incidenceClassId
+     * @param vertexId
+     * @param edgeId
+     * @return
+     */
+	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
+
+
+	/**
+	 * Creates a new subordinate graph for the element identified by the given id
+	 * @param id
+	 * @return
+	 */
+	public int createSubordinateGraph(long id);
+
+
+
+	public boolean containsEdge(long id);
 	
 }

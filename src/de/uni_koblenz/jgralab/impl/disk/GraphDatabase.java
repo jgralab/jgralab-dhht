@@ -196,14 +196,22 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		long firstEdgeId;
 		long lastEdgeId;
 		long containingElementId;
-		long parentDistributedGraphId;
+		int parentDistributedGraphId;
+		int subgraphId;
 	}
 	
 	private GraphData getGraphData(int localSubgraphId) {
 		GraphData data = localSubgraphData.get(localSubgraphId);
-		if (data.firstVertexId != 0 && data.lastVertexId == 0) {
-			//initialize graph data
-		}
+		return data;
+	}
+	
+	
+	public GraphData getAndInitializeSubordinateGraph(long containingGraphElementId) {
+		GraphData data = new GraphData();
+		data.subgraphId = this.localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK) + localSubgraphData.size(); 
+		localSubgraphData.add(data);
+		data.containingElementId = containingGraphElementId;
+		data.parentDistributedGraphId = getPartialGraphId(containingGraphElementId);
 		return data;
 	}
 	
@@ -504,12 +512,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param firstIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	public void setFirstIncidence(int elemId, int incidenceId) {
-		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localPartialGraphId)
-			diskStorage.setFirstIncidence(elemId, incidenceId);
-		else
-			getGraphDatabase(partialGraphId).setFirstIncidence(elemId, incidenceId);
+	public void setFirstIncidence(long elementId, long incidenceId) {
+		
 	}
 	
 	public void setLastIncidence(int elemId, int incidenceId) {
@@ -536,7 +540,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param elemId
 	 * @return
 	 */
-	public GraphElement<?, ?, ?> getGraphElementObject(int elemId) {
+	public GraphElement<?, ?, ?> getGraphElementObject(long elemId) {
 		if (elemId < 0)
 			return getEdgeObject(-elemId);
 		else
@@ -1124,6 +1128,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * Modifies vSeq such that the movedVertex is immediately before the
 	 * targetVertex.
 	 * 
+	 * GlobalOperation
+	 * 
 	 * @param targetVertex
 	 *            a vertex
 	 * @param movedVertex
@@ -1499,7 +1505,50 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return diskStorage;
 	}
 
+	/**
+	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
+	 * directly before the vertex identified by targetVertexId
+	 * @param targetVertexId global id of the target vertex
+	 * @param movedVertexId global id of the vertex to be moved
+	 */
+	public void putVertexBefore(long targetVertexId, long movedVertexId) {
+		// TODO Auto-generated method stub
+		
+	}
 
+	/**
+	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
+	 * directly after the vertex identified by targetVertexId
+	 * @param targetVertexId global id of the target vertex
+	 * @param movedVertexId global id of the vertex to be moved
+	 */
+	public void putVertexAfter(long targetVertexId, long movedVertexId)  {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
+	 * directly after the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
+	 */
+	public void putEdgeAfter(long targetEdgeId, long movedEdgeId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	/**
+	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
+	 * directly before the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
+	 */
+	public void putEdgeBefore(long targetEdgeId, long movedEdgeId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 }

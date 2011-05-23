@@ -45,6 +45,7 @@ import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.ProgressFunction;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
@@ -479,6 +480,8 @@ public interface Schema extends Comparable<Schema> {
 	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
 
 	public Integer getClassId(TypedElementClass<?, ?> schemaClass);
+	
+	public Integer getClassId(Class<? extends TypedElement> schemaClass);
 
 	public Class<?> getM1ClassForId(Integer id);
 
