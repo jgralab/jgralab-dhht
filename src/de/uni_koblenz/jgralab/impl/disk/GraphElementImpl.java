@@ -206,7 +206,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl}
 	 */
 	final void setFirstIncidence(IncidenceImpl lastIncidence) {
-		storingDiskStorage.setFirstIncidence(elementId, lastIncidence.id);
+		storingDiskStorage.setFirstIncidence(elementId, lastIncidence.getId());
 	}
 
 
@@ -218,7 +218,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl}
 	 */
 	final void setLastIncidence(IncidenceImpl lastIncidence) {
-		storingDiskStorage.setLastIncidence(elementId, lastIncidence.id);
+		storingDiskStorage.setLastIncidence(elementId, lastIncidence.getId());
 	}
 
 	

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -413,7 +414,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
+	public Vertex getVertex(long id) {
 		Vertex v = viewedGraph.getVertex(id);
 		if (v.isVisible(lowestVisibleKappaLevel)) {
 			return v;
@@ -423,7 +424,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Edge getEdge(int id) {
+	public Edge getEdge(long id) {
 		Edge e = viewedGraph.getEdge(id);
 		if (e.isVisible(lowestVisibleKappaLevel)) {
 			return e;
@@ -457,10 +458,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return iCount;
 	}
 
-	@Override
-	public String getCompleteGraphUid() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public Iterable<Edge> getEdges() {
@@ -704,13 +701,51 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	
-	public DiskStorageManager getDiskStorage() {
-		return viewedGraph.getDiskStorage();
-	}
-	
 
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<? extends Graph> getPartialGraphs() {
+		return viewedGraph.getPartialGraphs();
+	}
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		return viewedGraph.getPartialGraph(partialGraphId);
+	}
+
+	@Override
+	public String getUniqueGraphId() {
+		return viewedGraph.getUniqueGraphId();
+	}
+
+	@Override
+	public int getGlobalSubgraphId() {
+		return viewedGraph.getGlobalSubgraphId();
+	}
+
+	@Override
+	public int getLocalSubgraphId() {
+		return viewedGraph.getLocalSubgraphId();
+	}
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return viewedGraph.isLocalElementId(id);
+	}
+
+	@Override
+	public GraphDatabase getGraphDatabase() {
+		return viewedGraph.getGraphDatabase();
+	}
+
+
+
+	@Override
+	public void setLoading(boolean b) {
+		viewedGraph.setLoading(b);
 	}
 }
