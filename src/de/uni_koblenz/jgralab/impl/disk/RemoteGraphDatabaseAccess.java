@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Incidence;
@@ -223,5 +224,50 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public boolean containsEdge(long id);
+
+
+
+	public long getGraphVersion();
+
+
+
+	public boolean isLoading();
+
+
+
+	public int createPartialGraph(Class<? extends Graph> m1Class,
+			String hostname);
+
+
+
+	public void setFirstVertexId(int globalSubgraphId, long id);
+
+
+
+	public void setLastVertexId(int globalSubgraphId, long id);
+
+
+
+	public long getFirstEdge(int globalSubgraphId);
+
+
+
+	public long getLastEdge(int globalSubgraphId);
+
+
+
+	public void setFirstEdgeId(int globalSubgraphId, long id);
+
+
+
+	public void setLastEdgeId(int globalSubgraphId, long id);
+
+
+
+	public long getFirstVertexId(int globalSubgraphId);
+
+
+
+	public long getLastVertexId(int globalSubgraphId);
 	
 }

@@ -92,6 +92,19 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	protected int globalSubgraphId;
 	
 	
+	public int getGlobalSubgraphId() {
+		return globalSubgraphId;
+	}
+	
+	public int getLocalSubgraphId() {
+		return GraphDatabase.getSubgraphIdInPartialGraph(globalSubgraphId);
+	}
+	
+	public int getPartialGraphId() {
+		return GraphDatabase.getPartialGraphId(globalSubgraphId);
+	}
+	
+	
 	
 	protected GraphBaseImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId ) {
 		this.localGraphDatabase = localGraphDatabase;
@@ -124,7 +137,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setFirstVertex(VertexImpl firstVertex) {
 		if (firstVertex != null)
-			this.firstVertexId = firstVertex.getId();
+			storingGraphDatabase.setFirstVertexId(globalSubgraphId, firstVertex.getId());
 	}
 
 	/**
@@ -132,7 +145,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setLastVertex(VertexImpl lastVertex) {
 		if (lastVertex != null)
-			this.lastVertexId = lastVertex.getId();
+			storingGraphDatabase.setLastVertexId(globalSubgraphId, lastVertex.getId());
 	}
 
 
@@ -142,8 +155,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	// ------------- EDGE LIST VARIABLES -------------
 
-	private int firstEdgeId;
-	private int lastEdgeId;
 
 	/**
 	 * number of edges in the graph
@@ -154,12 +165,12 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	@Override
 	public Edge getFirstEdge() {
-		return getGraphDatabase().getEdgeObject(firstEdgeId);
+		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdge(globalSubgraphId));
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		return getGraphDatabase().getEdgeObject(lastEdgeId);
+		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdge(globalSubgraphId));
 	}
 
 	/**
@@ -167,7 +178,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setFirstEdge(EdgeImpl firstEdge) {
 		if (firstEdge != null)
-			this.firstEdgeId = firstEdge.getId();
+			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, firstEdge.getId());
 	}
 
 	/**
@@ -175,7 +186,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setLastEdge(EdgeImpl lastEdge) {
 		if (lastEdge != null)
-			this.lastEdgeId = lastEdge.getId();
+			storingGraphDatabase.setLastEdgeId(globalSubgraphId, lastEdge.getId());
 	}
 
 	/**

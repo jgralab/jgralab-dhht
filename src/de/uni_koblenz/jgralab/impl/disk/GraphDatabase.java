@@ -56,8 +56,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	public final static int MAX_NUMBER_OF_LOCAL_GRAPHS = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
 
-	public static final int getPartialGraphId(long id) {
-		return (int) id >> (64-BITS_FOR_PARTIAL_GRAPH_MASK);
+	public static final int getPartialGraphId(long globalElementId) {
+		return (int) globalElementId >> (64-BITS_FOR_PARTIAL_GRAPH_MASK);
+	}
+	
+	public static final int getPartialGraphId(int globalSubgraphId) {
+		return (int) globalSubgraphId >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
 	}
 	
 	public static final int getSubgraphIdInPartialGraph(int globalSubgraphId) {
@@ -811,7 +815,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return getEdgeObject(eId) != null;
 	}
 
-	boolean isLoading() {
+	public boolean isLoading() {
 		return loading;
 	}
 
@@ -819,8 +823,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		this.loading = isLoading;
 	}
 
-	public void setVCount(int count) {
-		vCount = count;
+	public void setVCount(int localSubgraphId, int count) {
+		getGraphData(localSubgraphId).vCount = count; 
 	}
 
 	public void removeEdgeFromDatabase(EdgeImpl e) {

@@ -75,7 +75,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 			GraphDatabase localDatabase, RemoteGraphDatabaseAccess graphData) {
 		super(cls);
 		this.uid = graphId;
-		this.partialGraphId = partialGraphId;
+		this.globalSubgraphId = partialGraphId;
 		this.localGraphDatabase = localDatabase;
 		this.storingGraphDatabase = graphData;
 	}
@@ -101,20 +101,22 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public long getGraphVersion() {
-		return localGraphDatabase.getGraphVersion();
+		return storingGraphDatabase.getGraphVersion();
 	}
 
 	@Override
 	public boolean isLoading() {
-		return localGraphDatabase.isLoading();
+		return storingGraphDatabase.isLoading();
 	}
 
 	@Override
+	@Deprecated
 	public GraphDatabase getGraphDatabase() {
 		return localGraphDatabase;
 	}
 
 	@Override
+	@Deprecated
 	public GraphFactory getGraphFactory() {
 		return localGraphDatabase.getGraphFactory();
 	}
@@ -125,19 +127,18 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getPartialGraphId() {
-		return partialGraphId;
-	}
-
-	@Override
-	public GraphBaseImpl getSuperordinateGraph() {
-		return this;
+	public Graph getSuperordinateGraph() {
+		if (globalSubgraphId == 1) {
+			return this;
+		} else {
+			return getParentDistributedGraph();
+		}
 	}
 
 	@Override
 	public Graph createPartialGraph(String hostname) {
-		return localGraphDatabase.createPartialGraph(this.getGraphClass()
-				.getM1Class(), hostname);
+		int pgId = storingGraphDatabase.createPartialGraph(this.getGraphClass().getM1Class(), hostname);
+		return localGraphDatabase.getGraphObject(pgId);
 	}
 
 	@Override
@@ -201,13 +202,13 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e);
+		storingGraphDatabase.deleteEdge(e.getId());
 	}
 
 	@Override
 	public void deleteVertex(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
-		storingGraphDatabase.deleteVertex(v);
+		storingGraphDatabase.deleteVertex(v.getId());
 	}
 
 	@Override
