@@ -986,8 +986,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	/**
 	 * @return the ID of this incidence which is unique in the graph
 	 */
-	public int getId();
+	public long getId();
 
-	public Graph getLocalGraph();
 
 }
