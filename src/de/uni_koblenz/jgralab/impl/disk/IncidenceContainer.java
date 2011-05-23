@@ -6,12 +6,12 @@ public class IncidenceContainer extends StorageContainer {
 	
 	public IncidenceContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		super(id, size, backgroundStorage);
-		vertexId = new int[size];
-		edgeId = new int[size];
-		nextIncidenceAtVertexId = new int[size];
-		previousIncidenceAtVertexId = new int[size];
-		nextIncidenceAtEdgeId = new int[size];
-		previousIncidenceAtEdgeId = new int[size];
+		vertexId = new long[size];
+		edgeId = new long[size];
+		nextIncidenceAtVertexId = new long[size];
+		previousIncidenceAtVertexId = new long[size];
+		nextIncidenceAtEdgeId = new long[size];
+		previousIncidenceAtEdgeId = new long[size];
 		direction = new boolean[size];
 		incidences = new Incidence[size];
 	}
@@ -22,17 +22,17 @@ public class IncidenceContainer extends StorageContainer {
 	}
 	
 	
-	int[] vertexId;
+	long[] vertexId;
 	
-	int[] edgeId;
+	long[] edgeId;
 	
-	int[] nextIncidenceAtVertexId;
+	long[] nextIncidenceAtVertexId;
 	
-	int[] previousIncidenceAtVertexId;
+	long[] previousIncidenceAtVertexId;
 
-	int[] nextIncidenceAtEdgeId;
+	long[] nextIncidenceAtEdgeId;
 	
-	int[] previousIncidenceAtEdgeId;
+	long[] previousIncidenceAtEdgeId;
 	
 	boolean[] direction;
 	

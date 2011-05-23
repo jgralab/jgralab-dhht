@@ -31,12 +31,9 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
-
-import sun.util.calendar.LocalGregorianCalendar;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;

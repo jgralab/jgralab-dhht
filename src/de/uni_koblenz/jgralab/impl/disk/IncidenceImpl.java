@@ -52,81 +52,32 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class IncidenceImpl implements Incidence {
 
-	IncidenceContainer storage;
+	private IncidenceContainer storage;
 	
-	private final Incidence getIncidenceFromBg(int id) {
-		return storage.backgroundStorage.getIncidenceObject(id);
-	}
+	private GraphDatabase localGraphDatabase;
 	
-	private final Vertex getVertexFromBg(int id) {
-		return storage.backgroundStorage.getVertexObject(id);
-	}
+	private RemoteGraphDatabaseAccess storingGraphDatabase;
 	
-	private final Edge getEdgeFromBg(int id) {
-		return storage.backgroundStorage.getEdgeObject(id);
-	}
-	
-	private final int getIdInStorage(int id) {
-		return id & DiskStorageManager.CONTAINER_MASK; //BackgroundStorage.getElementIdInStorage(id);
-	}
-	
-	protected IncidenceImpl(int id, IncidenceContainer storage) {
+	private long globalId;
+
+	protected IncidenceImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, IncidenceContainer storage, long globalId) {
+		this.localGraphDatabase = localGraphDatabase;
+		this.storingGraphDatabase = storingGraphDatabase;
 		this.storage = storage;
-		this.id = id;
+		this.globalId = globalId;
 	}
 	
 	
-	/**
-	 * Creates a new instance of IncidenceImpl and appends it to the lambda
-	 * sequences of <code>v</code> and <code>e</code>.
-	 * 
-	 * @param id  the id of this incidence 
-	 * 
-	 * @param v
-	 *            {@link Vertex}
-	 * @param e
-	 *            {@link Edge}
-	 * @throws IOException 
-	 */
-	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e, Direction dir) throws IOException {
-		this.id = id;
-		((GraphImpl) v.getGraph()).addIncidence(this);
-		id = getId();
-		this.storage = v.storage.backgroundStorage.getIncidenceContainer(id);
-		setIncidentEdge(e);
-		setIncidentVertex(v);
-		setDirection(dir);
-
-		// add this incidence to the sequence of incidences of v
-		if (v.getFirstIncidence() == null) {
-			// v has no incidences
-			v.setFirstIncidence(this);
-			v.setLastIncidence(this);
-		} else {
-			((IncidenceImpl) v.getLastIncidence()).setNextIncidenceAtVertex(this);
-			setPreviousIncidenceAtVertex((IncidenceImpl) v.getLastIncidence());
-			v.setLastIncidence(this);
-		}
-
-		v.incidenceListModified();
-
-		// add this incidence to the sequence of incidences of e
-		if (e.getFirstIncidence() == null) {
-			// v has no incidences
-			e.setFirstIncidence(this);
-			e.setLastIncidence(this);
-		} else {
-			((IncidenceImpl) e.getLastIncidence()).setNextIncidenceAtEdge(this);
-			setPreviousIncidenceAtEdge((IncidenceImpl) e.getLastIncidence());
-			e.setLastIncidence(this);
-		}
-//		if (getNextIncidenceAtEdge() != null)
-//			throw new RemoteException();
-		if (getNextIncidenceAtVertex() != null)
-			throw new RuntimeException("id: " + id + " next id:" + getNextIncidenceAtVertex().getId() );
-		e.incidenceListModified();
+	protected final int getIdInStorage(long elementId) {
+		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
 	}
 
+	
+	@Override
+	public Edge getEdge() {
+		return storingGraphDatabase.getIncidentEdgeId(globalId);
+	}
+	
 
 	void setIncidentVertex(VertexImpl incidentVertex) {
 		storage.vertexId[getIdInStorage(id)] = incidentVertex.getId();

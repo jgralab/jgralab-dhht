@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -1350,7 +1352,58 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	
 	
-	
+	public void connect() {
+		/**
+		 * Creates a new instance of IncidenceImpl and appends it to the lambda
+		 * sequences of <code>v</code> and <code>e</code>.
+		 * 
+		 * @param id  the id of this incidence 
+		 * 
+		 * @param v
+		 *            {@link Vertex}
+		 * @param e
+		 *            {@link Edge}
+		 * @throws IOException 
+		 */
+		protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e, Direction dir) throws IOException {
+			this.id = id;
+			((GraphImpl) v.getGraph()).addIncidence(this);
+			id = getId();
+			this.storage = v.storage.backgroundStorage.getIncidenceContainer(id);
+			setIncidentEdge(e);
+			setIncidentVertex(v);
+			setDirection(dir);
+
+			// add this incidence to the sequence of incidences of v
+			if (v.getFirstIncidence() == null) {
+				// v has no incidences
+				v.setFirstIncidence(this);
+				v.setLastIncidence(this);
+			} else {
+				((IncidenceImpl) v.getLastIncidence()).setNextIncidenceAtVertex(this);
+				setPreviousIncidenceAtVertex((IncidenceImpl) v.getLastIncidence());
+				v.setLastIncidence(this);
+			}
+
+			v.incidenceListModified();
+
+			// add this incidence to the sequence of incidences of e
+			if (e.getFirstIncidence() == null) {
+				// v has no incidences
+				e.setFirstIncidence(this);
+				e.setLastIncidence(this);
+			} else {
+				((IncidenceImpl) e.getLastIncidence()).setNextIncidenceAtEdge(this);
+				setPreviousIncidenceAtEdge((IncidenceImpl) e.getLastIncidence());
+				e.setLastIncidence(this);
+			}
+//			if (getNextIncidenceAtEdge() != null)
+//				throw new RemoteException();
+			if (getNextIncidenceAtVertex() != null)
+				throw new RuntimeException("id: " + id + " next id:" + getNextIncidenceAtVertex().getId() );
+			e.incidenceListModified();
+		}
+	}
 	
 	
 	

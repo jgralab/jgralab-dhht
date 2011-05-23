@@ -504,7 +504,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *            the id of the vertex (must be > 0)
 	 * @return the Vertex, or null if no such vertex exists
 	 */
-	public Vertex getVertex(int id);
+	public Vertex getVertex(long id);
 
 	/**
 	 * Returns the oriented Edge with the specified <code>id</code> if such an
@@ -515,7 +515,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *            the id of the edge (must be != 0)
 	 * @return the Edge, or null if no such edge exists
 	 */
-	public Edge getEdge(int id);
+	public Edge getEdge(long id);
 
 	/**
 	 * The maximum number of vertices that can be stored in the graph before the

@@ -213,7 +213,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public int getECount() {
-		return storingGraphDatabase.getECount();
+		return storingGraphDatabase.getECount(globalSubgraphId);
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public Edge getEdge(int eId) {
+	public Edge getEdge(long eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
 		return localGraphDatabase.getEdgeObject(eId);
 	}
@@ -243,7 +243,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public Vertex getVertex(int vId) {
+	public Vertex getVertex(long vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
 		return localGraphDatabase.getVertexObject(vId);
 	}
@@ -255,7 +255,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public int getICount() {
-		return localGraphDatabase.getICount();
+		return localGraphDatabase.getICount(globalSubgraphId);
 	}
 
 	/**
@@ -423,7 +423,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	protected void setVCount(int count) {
-		storingGraphDatabase.setVCount(count);
+		storingGraphDatabase.setVCount(globalSubgraphId, count);
 	}
 
 	/**
