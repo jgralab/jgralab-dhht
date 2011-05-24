@@ -258,8 +258,8 @@ public final class DiskStorageManager {
 		return elementId >> BITS_FOR_ELEMENT_MASK & Integer.MAX_VALUE;
 	}
 	
-	private static final int getElementIdInContainer(int elementId) {
-		return elementId & CONTAINER_MASK & Integer.MAX_VALUE;
+	private static final int getElementIdInContainer(long l) {
+		return ((int)l) & CONTAINER_MASK & Integer.MAX_VALUE;
 	}
 	
 	
@@ -754,7 +754,7 @@ public final class DiskStorageManager {
 	 */
 	
 	private int getLocalId(long id) {
-		return graphDatabase.getLocalElementId(id);
+		return GraphDatabase.getLocalElementId(id);
 	}
 	
 
@@ -781,25 +781,28 @@ public final class DiskStorageManager {
 	}
 
 	public void storeIncidence(IncidenceImpl i) {
-		IncidenceContainer storage = getIncidenceContainer(i.getId());
+		int iId = getLocalId(i.getId());
+		IncidenceContainer storage = getIncidenceContainer(iId);
 		int id = getElementIdInContainer(i.getId());
 		storage.incidences[id] = i;
-		i.storage = storage;
+		i.container = storage;
 		storage.types[id] = graphDatabase.getSchema().getClassId(i.getType());
 	}
 	
 
-	public void removeEdgeFromDiskStorage(int edgeId) {
-		EdgeContainer storage = getEdgeContainer(edgeId);
-		int id = getElementIdInContainer(edgeId);
+	public void removeEdgeFromDiskStorage(long edgeId) {
+		int eId = getLocalId(edgeId);
+		EdgeContainer storage = getEdgeContainer(eId);
+		int id = getElementIdInContainer(eId);
 		storage.edges[id] = null;
 		storage.types[id] = 0;
 	}
 
 
-	public void removeVertexFromDiskStorage(int vertexId) {
-		VertexContainer storage = getVertexContainer(vertexId);
-		int id = getElementIdInContainer(vertexId);
+	public void removeVertexFromDiskStorage(long vertexId) {
+		int vId = getLocalId(vertexId);
+		VertexContainer storage = getVertexContainer(vId);
+		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
 	}

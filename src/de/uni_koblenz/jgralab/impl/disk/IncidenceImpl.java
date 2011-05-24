@@ -49,8 +49,6 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public abstract class IncidenceImpl implements Incidence {
-
-	private IncidenceContainer storage;
 	
 	private GraphDatabase localGraphDatabase;
 	
@@ -58,10 +56,12 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	private long id;
 
-	protected IncidenceImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, IncidenceContainer storage, long globalId) {
+	public IncidenceContainer container;
+
+	protected IncidenceImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, IncidenceContainer container, long globalId) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
-		this.storage = storage;
+		this.container = container;
 		this.id = globalId;
 	}
 	
@@ -72,38 +72,38 @@ public abstract class IncidenceImpl implements Incidence {
 
 
 	void setIncidentVertex(VertexImpl incidentVertex) {
-		storage.vertexId[getIdInStorage(id)] = incidentVertex.getId();
+		container.vertexId[getIdInStorage(id)] = incidentVertex.getId();
 	}
 
 	void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
-		storage.nextIncidenceAtVertexId[getIdInStorage(id)] = nextIncidenceAtVertex.getId();
+		container.nextIncidenceAtVertexId[getIdInStorage(id)] = nextIncidenceAtVertex.getId();
 	}
 
 	void setPreviousIncidenceAtVertex(IncidenceImpl previousIncidenceAtVertex) {
-		storage.previousIncidenceAtVertexId[getIdInStorage(id)] = previousIncidenceAtVertex.getId();
+		container.previousIncidenceAtVertexId[getIdInStorage(id)] = previousIncidenceAtVertex.getId();
 	}
 
 	void setIncidentEdge(EdgeImpl edgeImpl) {
-		storage.edgeId[getIdInStorage(id)] = edgeImpl.getId();
+		container.edgeId[getIdInStorage(id)] = edgeImpl.getId();
 	}
 
 	void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
-		storage.nextIncidenceAtEdgeId[getIdInStorage(id)] = nextIncidenceAtEdge.getId();
+		container.nextIncidenceAtEdgeId[getIdInStorage(id)] = nextIncidenceAtEdge.getId();
 	}
 
 	void setPreviousIncidenceAtEdge(IncidenceImpl previousIncidenceAtEdge) {
-		storage.previousIncidenceAtEdgeId[getIdInStorage(id)] = previousIncidenceAtEdge.getId();
+		container.previousIncidenceAtEdgeId[getIdInStorage(id)] = previousIncidenceAtEdge.getId();
 	}
 
 	void setDirection(Direction direction) {
 		assert direction != null;
 		assert direction != Direction.BOTH;
-		storage.direction[getIdInStorage(id)] = (direction == Direction.EDGE_TO_VERTEX);
+		container.direction[getIdInStorage(id)] = (direction == Direction.EDGE_TO_VERTEX);
 	}
 
 	@Override
 	public Direction getDirection() {
-		return storage.direction[getIdInStorage(id)] ? Direction.EDGE_TO_VERTEX : Direction.VERTEX_TO_EDGE;
+		return container.direction[getIdInStorage(id)] ? Direction.EDGE_TO_VERTEX : Direction.VERTEX_TO_EDGE;
 	}
 
 	@Override
@@ -114,17 +114,17 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Edge getEdge() {
-		return localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]);
+		return localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]);
 	}
 
 	@Override
 	public Vertex getVertex() {
-		return localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]);
+		return localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]);
 	}
 
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtEdgeId[getIdInStorage(id)]);
+		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtEdgeId[getIdInStorage(id)]);
 		while ((traversalContext != null) && (currentIncidence != null) && (!traversalContext.containsVertex(currentIncidence.getVertex())))
 			currentIncidence = currentIncidence.getNextIncidenceAtEdge();
 		return currentIncidence;
@@ -132,7 +132,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtVertexId[getIdInStorage(id)]);
+		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtVertexId[getIdInStorage(id)]);
 		while ((traversalContext != null) && (currentIncidence != null) && (!traversalContext.containsEdge(currentIncidence.getEdge())))
 			currentIncidence = currentIncidence.getNextIncidenceAtVertex();
 		return currentIncidence;
@@ -141,7 +141,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(storage.previousIncidenceAtEdgeId[getIdInStorage(id)]);
+		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(container.previousIncidenceAtEdgeId[getIdInStorage(id)]);
 		while ((traversalContext != null) && (currentIncidence != null) && (!traversalContext.containsVertex(currentIncidence.getVertex())))
 			currentIncidence = currentIncidence.getPreviousIncidenceAtEdge();
 		return currentIncidence;
@@ -149,7 +149,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(storage.previousIncidenceAtVertexId[getIdInStorage(id)]);
+		Incidence currentIncidence = localGraphDatabase.getIncidenceObject(container.previousIncidenceAtVertexId[getIdInStorage(id)]);
 		while ((traversalContext != null) && (currentIncidence != null) && (!traversalContext.containsEdge(currentIncidence.getEdge())))
 			currentIncidence = currentIncidence.getPreviousIncidenceAtVertex();
 		return currentIncidence;
@@ -157,23 +157,23 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]));
-		return localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]).getIncidentEdges(traversalContext, getDirection());
+		assert getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]));
+		return localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]).getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]));
-		return localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]).getIncidentEdges(traversalContext, getDirection().getOppositeDirection());
+		assert getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]));
+		return localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]).getIncidentEdges(traversalContext, getDirection().getOppositeDirection());
 	}
 
 	@Override
 	public Vertex getThis(Graph traversalContext) {
-		if (!localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]).isBinary()) {
+		if (!localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]).isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
-		} else if (getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]))) {
-			return localGraphDatabase.getVertexObject(storage.vertexId[getIdInStorage(id)]);
+		} else if (getGraph().getTraversalContext().containsVertex(localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]))) {
+			return localGraphDatabase.getVertexObject(container.vertexId[getIdInStorage(id)]);
 		} else {
 			return null;
 		}
@@ -181,13 +181,13 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsEdge(localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]));
-		return localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]).getIncidentVertices(traversalContext, getDirection());
+		assert getGraph().getTraversalContext().containsEdge(localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]));
+		return localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]).getIncidentVertices(traversalContext, getDirection());
 	}
 
 	@Override
 	public Vertex getThat(Graph traversalContext) {
-		Edge incidentEdge = localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]);
+		Edge incidentEdge = localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]);
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
@@ -208,10 +208,14 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsEdge(localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]));
-		return localGraphDatabase.getEdgeObject(storage.edgeId[getIdInStorage(id)]).getIncidentVertices(traversalContext, getDirection().getOppositeDirection());
+		assert getGraph().getTraversalContext().containsEdge(localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]));
+		return localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]).getIncidentVertices(traversalContext, getDirection().getOppositeDirection());
 	}
 
+	/*
+	 * TODO: Move logics of putBefore/putAfter operations to storing graph database (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.Incidence#putBeforeAtVertex(de.uni_koblenz.jgralab.Incidence)
+	 */
 	@Override
 	public void putBeforeAtVertex(Incidence i) {
 		assert i != null;
@@ -423,7 +427,7 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge() {
 		if (getGraph().getTraversalContext() == null) {
-			return localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtEdgeId[getIdInStorage(id)]);
+			return localGraphDatabase.getIncidenceObject(container.nextIncidenceAtEdgeId[getIdInStorage(id)]);
 		} else {
 			return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 		}	
@@ -432,10 +436,10 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtEdgeId[getIdInStorage(id)]);
+			Incidence i = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtEdgeId[getIdInStorage(id)]);
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection()))
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtEdge().getId());	
+					i.getNextIncidenceAtEdge();
 			} 
 			return i;
 		} else {
@@ -525,18 +529,18 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext, Direction direction) {
-		Incidence i = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtEdgeId[getIdInStorage(id)]);
+		Incidence i = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtEdgeId[getIdInStorage(id)]);
 		if (traversalContext==null) {
 			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtEdge().getId());
+					i = i.getNextIncidenceAtEdge();
 			}		
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && ((!traversalContext.containsVertex(i.getVertex())) || (direction != i.getDirection())))
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtEdge().getId());
+					i = i.getNextIncidenceAtEdge();
 			} else {
 				while ((i != null) && (!traversalContext.containsVertex(i.getVertex())))
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtEdge().getId());
+					i = i.getNextIncidenceAtEdge();
 			}
 			
 		}
@@ -658,10 +662,10 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtVertexId[getIdInStorage(id)]);
+			Incidence i = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtVertexId[getIdInStorage(id)]);
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection())) {
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtVertex().getId());
+					i = i.getNextIncidenceAtVertex();
 				}	
 			} 
 			return i;
@@ -747,18 +751,18 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext, Direction direction) {
-		Incidence i = localGraphDatabase.getIncidenceObject(storage.nextIncidenceAtVertexId[getIdInStorage(id)]);
+		Incidence i = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtVertexId[getIdInStorage(id)]);
 		if (traversalContext==null) {
 			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtVertex().getId());
+					i = i.getNextIncidenceAtVertex();
 			}		
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && ((!traversalContext.containsEdge(i.getEdge())) || (direction != i.getDirection())))
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtVertex().getId());
+					i = i.getNextIncidenceAtVertex();
 			} else {
 				while ((i != null) && (!traversalContext.containsEdge(i.getEdge())))
-					i = localGraphDatabase.getIncidenceObject(((IncidenceImpl)i).getNextIncidenceAtVertex().getId());
+					i = i.getNextIncidenceAtVertex();
 			}
 			
 		}

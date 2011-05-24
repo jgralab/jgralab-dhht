@@ -32,6 +32,7 @@ public class EdgeContainerReference extends GraphElementContainerReference<EdgeC
 	
 	
 	/* creates a new reference to a freshly created container */
+	@SuppressWarnings("unchecked")
 	public EdgeContainerReference(EdgeContainer container, ReferenceQueue queue) {
 		super(container, queue);
 	}

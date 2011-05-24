@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
 public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
@@ -25,19 +24,19 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 
 	@Override
 	public Vertex getAlpha() {
-		if (graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.VERTEX_TO_EDGE) {
-			return graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
+		if (localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.VERTEX_TO_EDGE) {
+			return localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
 		} else {
-			return graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
+			return localGraphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
 		}
 	}
 
 	@Override
 	public Vertex getOmega() {
-		if (graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.EDGE_TO_VERTEX) {
-			return graphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
+		if (localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getDirection() == Direction.EDGE_TO_VERTEX) {
+			return localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]).getVertex();
 		} else {
-			return graphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
+			return localGraphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]).getVertex();
 		}
 	}
 

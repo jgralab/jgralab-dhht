@@ -798,6 +798,7 @@ public abstract class EdgeImpl extends
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass, Vertex elemToConnect) {
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase.connect(getSchema().getClassId(incidenceClass), elemToConnect.getId(), this.getId())); 
