@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
@@ -29,6 +28,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -663,52 +663,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			edgeId = convertToGlobalId(allocateEdgeIndex());
 		}
 		//instantiate object
-		Edge e = graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
-		addEdgeToGraph(e);
-		return e.getId();
-	}
-	
-
-	/**
-	 * Adds an edge to the local graph. If the edge id is 0, a valid id is set,
-	 * otherwise the edge's current id is used if possible. Should only be used
-	 * by m1-Graphs derived from Graph. To create a new Edge as user, use the
-	 * appropriate methods from the derived Graphs like
-	 * <code>createStreet(...)</code>
-	 * 
-	 * @param newEdge
-	 *            Edge to add
-	 * @throws RemoteException 
-	 * @throws GraphException
-	 *             an edge with same id already exists in graph, id of edge
-	 *             greater than possible count of edges in graph
-	 */
-	protected void addEdgeToGraph(Edge newEdge) {
-		assert newEdge != null;
-		assert (newEdge.getSchema() == getSchema()) : "The schemas of newEdge and this graph don't match!";
-		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
-
-		EdgeImpl e = (EdgeImpl) newEdge;
-
-		long eId = e.getId();
-		if (isLoading()) {
-			if (eId > 0) {
-				// the given edge already has an id, try to use it
-				if (containsEdgeId(eId)) {
-					throw new GraphException("edge with id " + e.getId()
-							+ " already exists");
-				}
-			} else {
-				throw new GraphException("can not load an edge with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(eId)) {
-				throw new GraphException("can not add an edge with id " + eId);
-			}
-			eId = allocateEdgeIndex();
-			assert eId != 0;
-			e.setId(eId);
-		}
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
 		diskStorage.storeEdge(e);
 		appendEdgeToESeq(e);
 
@@ -716,7 +671,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			edgeListModified();
 			internalEdgeAdded(e);
 		}
+		return e.getId();
 	}
+
 	
 	/*
 	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is
@@ -748,9 +705,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 				throw new GraphException("can not add an incidence with iId "
 						+ iId);
 			}
-			iId = allocateIncidenceIndex();
+			int intId = allocateIncidenceIndex();
 			assert iId != 0;
-			i.setId(convertToGlobalId(iId));
+			i.setId(convertToGlobalId(intId));
 			
 		}
 		diskStorage.storeIncidence(i);
@@ -1048,14 +1005,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 
-	private Edge getLastEdge() {
-		return getEdgeObject(lastEdge);
-	}
-
-	private Edge getFirstEdge() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	public Incidence connect(Class<? extends Incidence> incClass, Vertex vertex, Edge edge) {
 		return null;
@@ -1344,26 +1294,40 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	
+	/**
+	 * Connects the specified vertex <code>v</code> to the speficied edge <code>e</code> by an
+	 * incidence of class <code>cls</code> and sets the incidence's id to the next locally 
+	 * available incidence id
+	 * @param cls
+	 * @param vertex
+	 * @param edge
+	 */
+	public long connect(Class<? extends Incidence> cls, Vertex v, Edge e) {
+		return connect(cls, v, e, 0);
+	}
 	
-	
-	
-	public void connect() {
-		/**
-		 * Creates a new instance of IncidenceImpl and appends it to the lambda
-		 * sequences of <code>v</code> and <code>e</code>.
-		 * 
-		 * @param id  the id of this incidence 
-		 * 
-		 * @param v
-		 *            {@link Vertex}
-		 * @param e
-		 *            {@link Edge}
-		 * @throws IOException 
-		 */
-		protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e, Direction dir) throws IOException {
-			this.id = id;
-			((GraphImpl) v.getGraph()).addIncidence(this);
-			id = getId();
+	/**
+	 * Connects the specified vertex <code>v</code> to the speficied edge <code>e</code> by an
+	 * incidence of class <code>cls</code> and sets the incidence's id to <code>id</code>
+	 * @param cls
+	 * @param vertex
+	 * @param edge
+	 * @param id
+	 */
+	public long connect(Class<? extends Incidence> cls, Vertex v, Edge e, long id) {	
+		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(schema.getClassId(cls));
+		Direction dir = incClass.getDirection();
+		
+		//check id 
+		
+		
+	    //call graph factory to create object
+		Incidence newInc = graphFactory.createIncidenceDiskBasedStorage(cls, id, graphDatabase, remoteDatabase)
+		
+		//append created incidence to lambda sequences of vertex and edge
+		
+		
+		//
 			this.storage = v.storage.backgroundStorage.getIncidenceContainer(id);
 			setIncidentEdge(e);
 			setIncidentVertex(v);
