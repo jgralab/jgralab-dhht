@@ -204,6 +204,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		long containingElementId;
 		int parentDistributedGraphId;
 		int subgraphId;
+		public int vCount;
 	}
 	
 	private GraphData getGraphData(int localSubgraphId) {
@@ -427,7 +428,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			//create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Vertex> vc = getVertexType(id);
-			proxy = graphFactory.createVertexDiskBasedStorage(vc, id, this, remoteDatabase);
+			proxy = graphFactory.createVertexProxy(vc, id, this, remoteDatabase);
 			ref = new WeakReference<Vertex>(proxy);
 			remoteVertices.put(id, ref);
 		} 
@@ -452,8 +453,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		if (proxy == null) {
 			//create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
-			Class<? extends Edge> vc = getEdgeType(id);
-			proxy = graphFactory.createEdgeDiskBasedStorage(vc, id, this, remoteDatabase);
+			Class<? extends Edge> ec = getEdgeType(id);
+			proxy = graphFactory.createEdgeProxy(ec, id, this, remoteDatabase);
 			ref = new WeakReference<Edge>(proxy);
 			remoteEdges.put(id, ref);
 		} 
@@ -645,17 +646,26 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return createEdge(edgeClassId, 0);
 	}
 	
+	
+	public long convertToGlobalId(int localId) {
+		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+		return l + localId;
+	}
+	
 	@Override
 	public long createEdge(int edgeClassId, long edgeId) {
-		//instantiate object
-		Edge e = graphFactory.createEdgeDiskBasedStorage(schema.getM1ClassForId(edgeClassId), this, this);
-		
 		//set id
 		if (edgeId != 0) {
-			if (isLoading()) {
-				
-			}
+			if (!isLoading()) {
+				throw new GraphException("Cannot add an edge with a predefined id outside the graph loading");
+			} 
+		} else {
+			edgeId = convertToGlobalId(allocateEdgeIndex());
 		}
+		//instantiate object
+		Edge e = graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
+		addEdgeToGraph(e);
+		return e.getId();
 	}
 	
 
@@ -721,7 +731,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected void addIncidence(Incidence newIncidence) {
 		IncidenceImpl i = (IncidenceImpl) newIncidence;
-		int iId = i.getId();
+		long iId = i.getId();
 		if (isLoading()) {
 			if (iId > 0) {
 				// the given vertex already has an id, try to use it
@@ -738,9 +748,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 				throw new GraphException("can not add an incidence with iId "
 						+ iId);
 			}
-			iId = allocateIncidenceIndex(iId);
+			iId = allocateIncidenceIndex();
 			assert iId != 0;
-			i.setId(iId);
+			i.setId(convertToGlobalId(iId));
 			
 		}
 		diskStorage.storeIncidence(i);
@@ -749,7 +759,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 
-	private boolean containsIncidenceId(int iId) {
+	private boolean containsIncidenceId(long iId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -824,16 +834,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		getGraphData(localSubgraphId).vCount = count; 
 	}
 
-	public void removeEdgeFromDatabase(EdgeImpl e) {
-		int partialGraphId = getPartialGraphId(e.getId());
-		// TODO 
-	}
-
-	
-	public void removeVertexFromDatabase(VertexImpl v) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	/**
 	 * Deletes the edge from the internal structures of this graph.

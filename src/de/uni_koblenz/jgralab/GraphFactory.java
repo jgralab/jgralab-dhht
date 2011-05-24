@@ -151,9 +151,9 @@ public interface GraphFactory {
 	 */
 	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabase localGraphDatabase);
 
-	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass, long id, GraphDatabase graphDatabase, VertexContainer container);
+	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
 	
-	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabase localGraphDatabase, VertexContainer container);
 	
 	
 	
@@ -169,11 +169,6 @@ public interface GraphFactory {
 	 */
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega);
 	
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, int id, Graph g);
 	
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
