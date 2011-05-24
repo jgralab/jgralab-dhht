@@ -233,7 +233,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase);
 
 	public Incidence createIncidenceProxy(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 

@@ -1319,10 +1319,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		Direction dir = incClass.getDirection();
 		
 		//check id 
-		
-		
+		if (id != 0) {
+			if (!isLoading())
+				throw new GraphException("Incidences with a defined id may only be created during graph loading");
+		} else {
+			id = convertToGlobalId(allocateIncidenceIndex());
+		}	
 	    //call graph factory to create object
-		Incidence newInc = graphFactory.createIncidenceDiskBasedStorage(cls, id, graphDatabase, remoteDatabase)
+		Incidence newInc = graphFactory.createIncidenceDiskBasedStorage(cls, id, this);
 		
 		//append created incidence to lambda sequences of vertex and edge
 		
@@ -1418,11 +1422,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	/**
 	 * Use to allocate a <code>Incidence</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
 	 */
-	protected int allocateIncidenceIndex(int currentId) {
+	protected int allocateIncidenceIndex() {
 		int iId = freeIncidenceList.allocateIndex();
 		return iId;
 	}

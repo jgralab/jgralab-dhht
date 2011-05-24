@@ -510,7 +510,7 @@ public final class DiskStorageManager {
 			Vertex v = container.vertices[idInStorage];
 			if (v == null) {
 				Class<? extends Vertex> c = (Class<? extends Vertex>) schema.getM1ClassForId(type);
-				v = factory.reloadVertex(c, id, graphDatabase, container);
+				v = factory.reloadLocalVertex(c, id, graphDatabase, container);
 				container.vertices[idInStorage] = v;
 			}	
 			return v;
@@ -625,7 +625,7 @@ public final class DiskStorageManager {
 				//element is typed, so return either the existing vertex or create a new one
 				Edge e = container.edges[idInStorage];
 				if (e == null) {
-					e = factory.reloadEdge((Class<? extends Edge>) schema.getM1ClassForId(type), id, graphDatabase, container);
+					e = factory.reloadLocalEdge((Class<? extends Edge>) schema.getM1ClassForId(type), id, graphDatabase, container);
 					container.edges[idInStorage] = e;
 				}
 				return e;
@@ -737,7 +737,7 @@ public final class DiskStorageManager {
 				Incidence i = container.incidences[idInStorage];
 				if (i == null) {
 					Class<?> c = graphDatabase.getSchema().getM1ClassForId(type);
-					i = factory.reloadIncidence((Class<? extends Incidence>) schema.getM1ClassForId(type), id, container);
+					i = factory.reloadLocalIncidence((Class<? extends Incidence>) schema.getM1ClassForId(type), id, graphDatabase, container);
 					container.incidences[idInStorage] = i;
 				}
 				return i;
