@@ -1328,6 +1328,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	    //call graph factory to create object
 		Incidence newInc = graphFactory.createIncidenceDiskBasedStorage(cls, id, this);
 		
+		//set incident edge and vertex ids of incidence 
+		
+		
 		//append created incidence to lambda sequences of vertex and edge
 		
 		

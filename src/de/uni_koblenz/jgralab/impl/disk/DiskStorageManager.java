@@ -612,11 +612,7 @@ public final class DiskStorageManager {
 	}	
 	
 	
-	/**
-	 * TODO: Use GraphFactory to instantiate right element objects
-	 * @param id
-	 * @return
-	 */
+
 	public final Edge getEdgeObject(int id) {
 			EdgeContainer container = getEdgeContainer(id);
 			int idInStorage = getElementIdInContainer(id);
