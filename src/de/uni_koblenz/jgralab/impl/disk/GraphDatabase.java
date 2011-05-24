@@ -333,9 +333,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public abstract void registerRemotePartialGraph(int id, String hostname);
 	
 	/**
-	 * Creates a new partial graph on the given hostname
+	 * Creates a new partial graph on the given hostname and returns the globalSubgraphId of that
+	 * partial graph
 	 */
-	public abstract Graph createPartialGraph(Class<? extends Graph> graphClass, String hostname);
+	public abstract int createPartialGraph(Class<? extends Graph> graphClass, String hostname);
 	
 	
 	/**
@@ -525,7 +526,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public void setLastIncidence(int elemId, int incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		if (partialGraphId == localPartialGraphId)
-			diskStorage.setLastIncidence(elemId, incidenceId);
+			diskStorage.setLastIncidenceId(elemId, incidenceId);
 		else
 			getGraphDatabase(partialGraphId).setLastIncidence(elemId, incidenceId);
 	}
@@ -605,31 +606,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return graphAccesses[pgId];
 	}
 	
-	public void setIncidenceListVersion(GraphElement element, long incidenceListVersion) {
-		int partialGraphId = getPartialGraphId(element.getId());
-		
-		if (partialGraphId == localPartialGraphId)
-			diskStorage.setIncidenceListVersion(elementId, incidenceListVersion);
-		else
-			getGraphDatabase(partialGraphId).setIncidenceListVersion(elementId, incidenceListVersion);
-	}
-	
-	public void setIncidenceListVersion(long elementId, long incidenceListVersion) {
-		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
-			diskStorage.setIncidenceListVersion(elementId, incidenceListVersion);
-		else
-			getGraphDatabase(partialGraphId).setIncidenceListVersion(elementId, incidenceListVersion);
-	}
-	
-
-	public long getIncidenceListVersion(long elementId) {
-		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
-			return diskStorage.getIncidenceListVersion(elementId);
-		else
-			return getGraphDatabase(partialGraphId).getIncidenceListVersion(elementId);
-	}
 	
 	public abstract void edgeListModified();
 	
@@ -663,10 +639,29 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public void setGraphVersion(long graphVersion2) {
 		this.graphVersion = graphVersion2;		
 	}
+	
+	@Override
+	public long createEdge(int edgeClassId) {
+		return createEdge(edgeClassId, 0);
+	}
+	
+	@Override
+	public long createEdge(int edgeClassId, long edgeId) {
+		//instantiate object
+		Edge e = graphFactory.createEdgeDiskBasedStorage(schema.getM1ClassForId(edgeClassId), this, this);
+		
+		//set id
+		if (edgeId != 0) {
+			if (isLoading()) {
+				
+			}
+		}
+	}
+	
 
 	/**
-	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
-	 * otherwise the edges current id is used if possible. Should only be used
+	 * Adds an edge to the local graph. If the edge id is 0, a valid id is set,
+	 * otherwise the edge's current id is used if possible. Should only be used
 	 * by m1-Graphs derived from Graph. To create a new Edge as user, use the
 	 * appropriate methods from the derived Graphs like
 	 * <code>createStreet(...)</code>
@@ -678,14 +673,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 *             an edge with same id already exists in graph, id of edge
 	 *             greater than possible count of edges in graph
 	 */
-	protected void addEdge(Edge newEdge) {
+	protected void addEdgeToGraph(Edge newEdge) {
 		assert newEdge != null;
 		assert (newEdge.getSchema() == getSchema()) : "The schemas of newEdge and this graph don't match!";
 		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
 
 		EdgeImpl e = (EdgeImpl) newEdge;
 
-		int eId = e.getId();
+		long eId = e.getId();
 		if (isLoading()) {
 			if (eId > 0) {
 				// the given edge already has an id, try to use it
@@ -700,7 +695,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			if (!canAddGraphElement(eId)) {
 				throw new GraphException("can not add an edge with id " + eId);
 			}
-			eId = allocateEdgeIndex(eId);
+			eId = allocateEdgeIndex();
 			assert eId != 0;
 			e.setId(eId);
 		}
@@ -804,16 +799,16 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 
-	private boolean containsVertexId(int vId) {
-		return getVertexObject(vId) != null;
+	private boolean containsVertexId(long eId) {
+		return getVertexObject(eId) != null;
 	}
 
 
-	private boolean canAddGraphElement(int eId) {
+	private boolean canAddGraphElement(long eId) {
 		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
 	}
 
-	private boolean containsEdgeId(int eId) {
+	private boolean containsEdgeId(long eId) {
 		return getEdgeObject(eId) != null;
 	}
 
@@ -1448,11 +1443,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	/**
 	 * Use to allocate a <code>Edge</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
 	 */
-	protected int allocateEdgeIndex(int currentId) {
+	protected int allocateEdgeIndex() {
 		int eId = freeEdgeList.allocateIndex();
 		if (eId == 0) {
 			eId = freeEdgeList.allocateIndex();

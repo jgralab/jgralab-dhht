@@ -145,22 +145,63 @@ public interface GraphFactory {
 	 */
 	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g);
 	
-	
-	
-	public Edge reloadEdge(Class<? extends Edge> edgeClass, int id, GraphDatabase graphDatabase, EdgeContainer container);
-
-	public Incidence reloadIncidence(Class<? extends Incidence> incidenceClass, int id,	IncidenceContainer container);
-
-	public Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id, GraphDatabase graphDatabase, VertexContainer container);
-
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabase localGraphDatabase);
+
+	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass, long id, GraphDatabase graphDatabase, VertexContainer container);
 	
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	
+	
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g);
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega);
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, int id, Graph g);
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase);
+
+	
+	/**
+	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 
+	 * an instance of the class defined by <code>setEdgeImplementationClass</code> for the interface defined by <code>edgeClass</code>
+	 */
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+
+	
+	
+	/**
+	 * reloads an local edge from disk storage and initializes the implementation class specified for
+	 * that edge class 
+	 * @param edgeClass
+	 * @param id
+	 * @param graphDatabase
+	 * @return
+	 */
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, EdgeContainer container);
 
 
+	
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned
 	 * object may be an instance of a subclass of the specified
@@ -178,8 +219,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
-			int id, Vertex v, Edge e);
+	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,	int id, Vertex v, Edge e);
 	
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned
@@ -200,31 +240,12 @@ public interface GraphFactory {
 	 */
 	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g);
-	
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, int id, Graph g);
+	public Incidence createIncidenceProxy(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
-			Vertex alpha, Vertex omega);
+	public Incidence reloadLocalIncidence(Class<? extends Incidence> incidenceClass, long id, GraphDatabase graphDatabase, IncidenceContainer container);
 	
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
-
+	
+	
 	
 	
 	

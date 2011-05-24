@@ -316,8 +316,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		}
 	}
 
-	protected Edge internalCreateEdge(Class<? extends Edge> cls)
-			 {
+	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
 		return getGraphFactory().createEdge(cls, 0, this);
 	}
 

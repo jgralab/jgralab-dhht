@@ -283,8 +283,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega) {
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega) {
 		try {
 			T edge = (T) internalCreateEdge(cls);
 			IncidenceClass fromClass = null;
@@ -328,14 +327,13 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 			if (exception instanceof GraphException) {
 				throw (GraphException) exception;
 			} else {
-				throw new GraphException("Error creating edge of class "
-						+ cls.getName(), exception);
+				throw new GraphException("Error creating edge of class " + cls.getName(), exception);
 			}
 		}
 	}
 
 	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
-		return getGraphFactory().createEdge(cls, 0, this);
+		return localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(cls)));
 	}
 
 	/**

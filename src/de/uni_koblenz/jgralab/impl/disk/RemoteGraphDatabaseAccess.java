@@ -286,5 +286,32 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public void setICount(int globalSubgraphId, int count);
+
+
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph
+	 * @param edgeClassId
+	 * @return the global id of the newly created edge
+	 */
+	public long createEdge(int edgeClassId);
+	
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph, the edge id is set to the given id. This method may
+	 * be called only during loading a (partial) graph
+	 * @param edgeClassId the id identifying the edge class
+	 * @param edgeId the global edge id
+	 * @return the global id of the newly created edge
+	 */
+	public long createEdge(int edgeClassId, long edgeId);
+	
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph
+	 * @param edgeClassId
+	 * @return the global id of the newly created edge
+	 */
+	public long createVertex(int edgeClassId);
 	
 }
