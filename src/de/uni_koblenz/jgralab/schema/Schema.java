@@ -480,8 +480,8 @@ public interface Schema extends Comparable<Schema> {
 	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
 
 	public Integer getClassId(TypedElementClass<?, ?> schemaClass);
-	
-	public Integer getClassId(Class<? extends TypedElement> schemaClass);
+
+	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass);
 
 	public Class<?> getM1ClassForId(Integer id);
 
