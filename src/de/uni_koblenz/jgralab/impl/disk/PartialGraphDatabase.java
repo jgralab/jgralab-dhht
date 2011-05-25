@@ -4,72 +4,79 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
 public class PartialGraphDatabase extends GraphDatabase {
-	
-	private CompleteGraphDatabase completeGraphDatabase;
-		
-	protected PartialGraphDatabase(PartialGraphImpl localGraph, String hosenameOfCompleteGraph) {
+
+	private final CompleteGraphDatabase completeGraphDatabase;
+
+	protected PartialGraphDatabase(PartialGraphImpl localGraph,
+			String hosenameOfCompleteGraph) {
 		super(localGraph);
-		completeGraphDatabase = (CompleteGraphDatabase) server.getRemoteInstance(hosenameOfCompleteGraph).getGraph(localGraph.getCompleteGraphUid(), 0);
+		completeGraphDatabase = (CompleteGraphDatabase) server
+				.getRemoteInstance(hosenameOfCompleteGraph).getGraph(
+						localGraph.getCompleteGraphUid(), 0);
 	}
 
 	@Override
-	protected String getHostname(int id) {
+	public String getHostname(int id) {
 		return completeGraphDatabase.getHostname(id);
 	}
-	
-	
+
 	@Override
 	public int getFreePartialGraphId() {
 		return completeGraphDatabase.getFreePartialGraphId();
 	}
 
-
 	@Override
 	public void registerPartialGraph(int id, String hostname) {
 		completeGraphDatabase.registerPartialGraph(id, hostname);
 	}
-	
+
 	public void releasePartialGraphId(int partialGraphId) {
 		completeGraphDatabase.releasePartialGraphId(partialGraphId);
 	}
-	
+
 	public Graph createPartialGraph(GraphClass gc, String hostname) {
 		return completeGraphDatabase.createPartialGraph(gc, hostname);
 	}
-
 
 	@Override
 	public void deletePartialGraph(int partialGraphId) {
 		completeGraphDatabase.deletePartialGraph(partialGraphId);
 	}
-	
+
+	@Override
 	public void edgeListModified() {
 		edgeListVersion++;
 		completeGraphDatabase.edgeListModified();
 	}
-	
+
+	@Override
 	public void vertexListModified() {
 		vertexListVersion++;
 		completeGraphDatabase.vertexListModified();
 	}
-	
+
+	@Override
 	public void graphModified() {
 		graphVersion++;
 		completeGraphDatabase.graphModified();
 	}
-	
+
 	/* **************************************************************************
 	 * Methods to access traversal context
-	 * **************************************************************************/
-	
+	 * *************************************************************************
+	 */
+
+	@Override
 	public Graph getTraversalContext() {
 		return completeGraphDatabase.getTraversalContext();
 	}
-	
+
+	@Override
 	public void releaseTraversalContext() {
 		completeGraphDatabase.releaseTraversalContext();
 	}
-	
+
+	@Override
 	public void setTraversalContext(Graph traversalContext) {
 		completeGraphDatabase.setTraversalContext(traversalContext);
 	}
@@ -86,7 +93,4 @@ public class PartialGraphDatabase extends GraphDatabase {
 		return null;
 	}
 
-
-
-	
 }

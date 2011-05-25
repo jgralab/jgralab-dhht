@@ -165,7 +165,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	/**
 	 * current number of vertices
 	 */
-	private int vCount;
+	private final int vCount;
 	
 	/**
 	 * maximum number of edges
@@ -190,13 +190,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * either objects representing a local subgraph or (proxy) objects representing
 	 * remote subgraphs
 	 */
-	private Map<Integer, Reference<Graph>> subgraphObjects;
+	private final Map<Integer, Reference<Graph>> subgraphObjects;
 	
 	/**
 	 * Data of local subordinate graphs such as first and last elements, number of elements
 	 * and so on
 	 */
-	private ArrayList<GraphData> localSubgraphData;
+	private final ArrayList<GraphData> localSubgraphData;
 
 	
 	private class GraphData {
@@ -244,7 +244,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	protected Map<Long, Reference<Edge>> remoteEdges;
 	
-	private Map<Long, Reference<Incidence>> remoteIncidences;
+	private final Map<Long, Reference<Incidence>> remoteIncidences;
 
 	
 	/**
@@ -329,7 +329,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param id
 	 * @return the hostname of the station containing the partial graph with the given id
 	 */
-	protected abstract String getHostname(int partialGraphId);
+	public abstract String getHostname(int partialGraphId);
 	
 	/**
 	 * Retrieves a free partial graph id
@@ -565,50 +565,56 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public void setFirstIncidence(long elementId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setFirstIncidenceId(getLocalElementId(elementId), incidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(elementId, incidenceId);
+		}
 	}
 	
 	public void setLastIncidence(int elemId, int incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setLastIncidenceId(getLocalElementId(elemId), incidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(elemId, incidenceId);
+		}
 	}
 
 	public void setNextIncidenceAtVertex(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setNextIncidenceAtVertexId(getLocalElementId(globalIncidenceId), nextIncidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+		}
 	}
 	
 	public void setPreviousIncidenceAtVertex(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setPreviousIncidenceAtVertexId(getLocalElementId(globalIncidenceId), nextIncidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+		}
 	}
 	
 	public void setNextIncidenceAtEdge(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setNextIncidenceAtEdgeId(getLocalElementId(globalIncidenceId), nextIncidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+		}
 	}
 	
 	public void setPreviousIncidenceAtEdge(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setPreviousIncidenceAtEdgeId(getLocalElementId(globalIncidenceId), nextIncidenceId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+		}
 	}
 	
 
@@ -616,10 +622,11 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	public void incidenceListModified(int elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.incidenceListModified(elemId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).incidenceListModified(elemId);
+		}
 	}
 
 
@@ -630,10 +637,11 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @return
 	 */
 	public GraphElement<?, ?, ?> getGraphElementObject(long elemId) {
-		if (elemId < 0)
+		if (elemId < 0) {
 			return getEdgeObject(-elemId);
-		else
+		} else {
 			return getVertexObject(elemId);
+		}
 	}
 
 	/**
@@ -644,28 +652,31 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	public void setSigma(int elementId, int sigmaId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setSigmaId(elementId, sigmaId);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
+		}
 	}
 	
 	
 	public int getKappa(int elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			return localDiskStorage.getKappa(elementId);
-		else
+		} else {
 			return getGraphDatabase(partialGraphId).getKappa(elementId);
+		}
 	}
 	
 	
 	public void setKappa(int elementId, int kappa) {
 		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId)
+		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setKappa(elementId, kappa);
-		else
+		} else {
 			getGraphDatabase(partialGraphId).setKappa(elementId, kappa);
+		}
 	}
 	
 //	/**
@@ -1607,8 +1618,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 		//check id 
 		if (id != 0) {
-			if (!isLoading())
+			if (!isLoading()) {
 				throw new GraphException("Incidences with a defined id may only be created during graph loading");
+			}
 		} else {
 			id = convertToGlobalId(allocateIncidenceIndex());
 		}	
@@ -1648,8 +1660,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			}
 //			if (getNextIncidenceAtEdge() != null)
 //				throw new RemoteException();
-			if (getNextIncidenceAtVertex() != null)
+			if (getNextIncidenceAtVertex() != null) {
 				throw new RuntimeException("id: " + id + " next id:" + getNextIncidenceAtVertex().getId() );
+			}
 			e.incidenceListModified();
 		}
 	}
