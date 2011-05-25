@@ -2886,10 +2886,10 @@ public class GraphIO {
 					+ ") exceeds maximum number of edges (" + maxE + ")");
 		}
 
-		incidencesAtEdge = new HashMap<Integer, ArrayList<Integer>>();
-		incidencesAtVertex = new HashMap<Integer, ArrayList<Integer>>();
-		incidenceTypes = new HashMap<Integer, String>();
-		incidenceInformation = new HashMap<Integer, Integer[]>();
+		incidencesAtEdge = new HashMap<Long, ArrayList<Long>>();
+		incidencesAtVertex = new HashMap<Long, ArrayList<Long>>();
+		incidenceTypes = new HashMap<Long, String>();
+		incidenceInformation = new HashMap<Long, Long[]>();
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
@@ -2988,8 +2988,7 @@ public class GraphIO {
 	// TODO refactoring of mem and disk
 	private void createIncidences(Graph graph, boolean onlyLocalGraph)
 			throws RemoteException {
-		for (Entry<Integer, Integer[]> incidence : incidenceInformation
-				.entrySet()) {
+		for (Entry<Long, Long[]> incidence : incidenceInformation.entrySet()) {
 			if (!onlyLocalGraph
 					|| isLocal(incidence.getKey(), graph.getPartialGraphId())) {
 				assert incidence.getValue().length == 2;
@@ -3063,7 +3062,7 @@ public class GraphIO {
 		// sort lambda sequence at vertices
 		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();
-			for (Integer incidenceId : incidencesAtVertex.get(v.getId())) {
+			for (Long incidenceId : incidencesAtVertex.get(v.getId())) {
 				if (incidenceId == null) {
 					continue;
 				}
@@ -3083,7 +3082,7 @@ public class GraphIO {
 		// sort lambda sequence at edges
 		for (Edge e : graph.getEdges()) {
 			Incidence firstUnsorted = e.getFirstIncidence();
-			for (Integer incidenceId : incidencesAtEdge.get(e.getId())) {
+			for (Long incidenceId : incidencesAtEdge.get(e.getId())) {
 				if (incidenceId == null) {
 					continue;
 				}
