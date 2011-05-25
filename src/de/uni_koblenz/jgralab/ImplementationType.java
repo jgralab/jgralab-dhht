@@ -31,5 +31,5 @@
 package de.uni_koblenz.jgralab;
 
 public enum ImplementationType {
-	STANDARD, TRANSACTION, SAVEMEM, DATABASE;
+	DISK, MEMORY;
 }
