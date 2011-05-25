@@ -21,6 +21,7 @@ import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.JGraLabSet;
@@ -184,6 +185,16 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 
 
+	/**
+	 * Listeners listining on changes of this graph
+	 */
+	private List<GraphStructureChangedListener> graphStructureChangedListeners = new ArrayList<GraphStructureChangedListener>();
+	
+	private List<GraphStructureChangedListener> getGraphStructureChangeListeners() {
+		return graphStructureChangedListeners;
+	}
+	
+	
 	
 	/**
 	 * The map of global subgraph ids to the local representation objects. Those may be
@@ -232,7 +243,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * may be local proxies for the remote elements automatically created by RMI
 	 * Map key is the 12-bit partial graph id.
 	 */
-	protected Map<Integer, RemoteGraphDatabaseAccess> partialGraphDatabases;
+	protected Map<Integer, RemoteGraphDatabaseAccessWithInternalMethods> partialGraphDatabases;
 	
 	protected Map<Integer, RemoteDiskStorageAccess> remoteDiskStorages;
 	
@@ -277,7 +288,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		subgraphObjects = new HashMap<Integer, Reference<Graph>>();
 		localSubgraphData = new ArrayList<GraphData>();
 		
-		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccess>();
+		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccessWithInternalMethods>();
 		
 		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
 		remoteVertices  = new HashMap<Long, Reference<Vertex>>();
@@ -310,7 +321,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		RemoteGraphDatabaseAccess remoteAccess = partialGraphDatabases.get(partialGraphId);
 		if (remoteAccess == null) {
 			remoteAccess = localJGraLabServer.getRemoteInstance(getHostname(partialGraphId)).getGraphDatabase(uniqueGraphId);
-			partialGraphDatabases.put(partialGraphId, remoteAccess);
+			partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) remoteAccess);
 		}
 		return remoteAccess;
 	}
@@ -1436,149 +1447,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private boolean containsIncidenceId(long iId) {
 		return getIncidenceObject(iId) != null;
 	}
-	
-	public Incidence connect(Class<? extends Incidence> incClass, Vertex vertex, Edge edge) {
-		return null;
-	}
-	
-
-
-	protected void addIncidence(Incidence newIncidence) {
-		IncidenceImpl i = (IncidenceImpl) newIncidence;
-		long iId = i.getId();
-		if (isLoading()) {
-			if (iId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsIncidenceId(iId)) {
-					throw new GraphException("incidence with id " + iId
-							+ " already exists");
-				}
-			} else {
-				throw new GraphException(
-						"can not load an incidence with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(iId)) {
-				throw new GraphException("can not add an incidence with iId "
-						+ iId);
-			}
-			int intId = allocateIncidenceIndex();
-			assert iId != 0;
-			i.setId(convertToGlobalId(intId));
-			
-		}
-		localDiskStorage.storeIncidence(i);
-		if (!isLoading()) {
-			internalIncidenceAdded(i);
-		}
-	}
-	
-	
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-	
-
-	
-
-
-	
-	
-	
-
-	
-	
-	
-	
-
-
-	
-	
-	
-	protected void internalEdgeAdded(EdgeImpl e) {
-		notifyEdgeAdded(e);
-	}
-	
-	
-	protected void internalEdgeDeleted(EdgeImpl e) {
-		assert e != null;
-		notifyEdgeDeleted(e);
-	}
-	
-	protected void internalIncidenceAdded(IncidenceImpl i) {
-		notifyIncidenceAdded(i);
-	}
-	
-	protected void internalVertexAdded(VertexImpl v) {
-		notifyVertexAdded(v);
-	}
-
-	protected void internalVertexDeleted(VertexImpl v) {
-		assert v != null;
-		notifyVertexDeleted(v);
-	}
-	
-	
-	
-	
-	
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
-		try {
-			record.readComponentValues(io);
-		} catch (GraphIOException e) {
-			e.printStackTrace();
-		}
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
-		record.setComponentValues(fields);
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
-		record.setComponentValues(components);
-		return record;
-	}
-	
-	
-	@Override
-	public <T> JGraLabSet<T> createSet() {
-		return new JGraLabSetImpl<T>();
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return new JGraLabSetImpl<T>(collection);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return new JGraLabSetImpl<T>(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
-	}
 
 	
 	/**
@@ -1653,6 +1521,194 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			e.incidenceListModified();
 		}
 	}
+
+
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceImpl i = (IncidenceImpl) newIncidence;
+		long iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+			} else {
+				throw new GraphException(
+						"can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId "
+						+ iId);
+			}
+			int intId = allocateIncidenceIndex();
+			assert iId != 0;
+			i.setId(convertToGlobalId(intId));
+			
+		}
+		localDiskStorage.storeIncidence(i);
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
+	
+	
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+	
+
+	
+
+
+	
+	
+	
+
+	protected void notifyEdgeAdded(long edgeId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyEdgeAdded(edgeId);
+		}	
+	}
+	
+	protected void notifyEdgeDeleted(long edgeId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyEdgeDeleted(edgeId);
+		}	
+	}
+	
+	public void internalNotifyEdgeAdded(long edgeId) {
+		Edge o = getEdgeObject(edgeId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.edgeAdded(o);  
+		}	
+	}
+	
+	public void internalNotifyEdgeDeleted(long edgeId) {
+		Edge o = getEdgeObject(edgeId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.edgeDeleted(o);  
+		}	
+	}
+	
+	protected void notifyVertexAdded(long vertexId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyVertexAdded(vertexId);
+		}	
+	}
+	
+	protected void notifyVertexDeleted(long vertexId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyVertexDeleted(vertexId);
+		}	
+	}
+	
+	public void internalNotifyVertexAdded(long vertexId) {
+		Vertex o = getVertexObject(vertexId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.vertexAdded(o);  
+		}	
+	}
+	
+	public void internalNotifyVertexDeleted(long vertexId) {
+		Vertex o = getVertexObject(vertexId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.vertexDeleted(o);  
+		}	
+	}
+	
+	protected void notifyIncidenceAdded(long incidenceId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyIncidenceAdded(incidenceId);
+		}	
+	}
+	
+	protected void notifyIncidenceDeleted(long incidenceId) {
+		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
+			gdb.internalNotifyIncidenceDeleted(incidenceId);
+		}	
+	}
+	
+	public void internalNotifyIncidenceAdded(long incidenceId) {
+		Incidence o = getIncidenceObject(incidenceId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.incidenceAdded(o);  
+		}	
+	}
+	
+	public void internalNotifyIncidenceDeleted(long incidenceId) {
+		Incidence o = getIncidenceObject(incidenceId);
+		for (GraphStructureChangedListener l : graphStructureChangedListeners) {
+			l.incidenceDeleted(o);  
+		}	
+	}
+
+	
+	
+	
+	
+	
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
+		T record = graphFactory.createRecord(recordClass, localGraph);
+		try {
+			record.readComponentValues(io);
+		} catch (GraphIOException e) {
+			e.printStackTrace();
+		}
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
+		T record = graphFactory.createRecord(recordClass, localGraph);
+		record.setComponentValues(fields);
+		return record;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
+		T record = graphFactory.createRecord(recordClass, localGraph);
+		record.setComponentValues(components);
+		return record;
+	}
+	
+	
+	@Override
+	public <T> JGraLabSet<T> createSet() {
+		return new JGraLabSetImpl<T>();
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
+		return new JGraLabSetImpl<T>(collection);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity) {
+		return new JGraLabSetImpl<T>(initialCapacity);
+	}
+
+	@Override
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
+		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
+	}
+
+	
+	
 	
 	
 	
