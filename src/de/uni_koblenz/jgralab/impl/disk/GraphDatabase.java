@@ -970,62 +970,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 
-	/**
-	 * Modifies vSeq such that the movedVertex is immediately after the
-	 * targetVertex.
-	 * 
-	 * @param targetVertex
-	 *            a vertex
-	 * @param movedVertex
-	 *            the vertex to be moved
-	 */
-	protected void putVertexAfter(VertexImpl targetVertex, VertexImpl movedVertex) {
-		assert (targetVertex != null) && targetVertex.isValid()	&& containsVertex(targetVertex);
-		assert (movedVertex != null) && movedVertex.isValid() && containsVertex(movedVertex);
-		assert targetVertex != movedVertex;
 
-	}	
 		
-	public void putVertexAfter(long targetVertexId, long movedVertexId) {	
-		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
-		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
 		
-		Vertex nextVertex = targetVertex.getNextVertex();
-		if ((targetVertex == movedVertex) || (nextVertex == movedVertex)) {
-			return;
-		}
-
-		assert getFirstVertex() != getLastVertex();
-
-		// remove moved vertex from vSeq
-		if (movedVertex == getFirstVertex()) {
-			VertexImpl newFirstVertex = (VertexImpl) movedVertex.getNextVertex();
-			setFirstVertex(newFirstVertex);
-			newFirstVertex.setPreviousVertex(null);
-		} else if (movedVertex == getLastVertex()) {
-			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
-			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
-		} else {
-			((VertexImpl) movedVertex.getPreviousVertex())
-					.setNextVertex(movedVertex.getNextVertex());
-			((VertexImpl) movedVertex.getNextVertex())
-					.setPreviousVertex(movedVertex.getPreviousVertex());
-		}
-
-		// insert moved vertex in vSeq immediately after target
-		if (targetVertex == getLastVertex()) {
-			setLastVertex(movedVertex);
-			movedVertex.setNextVertex(null);
-		} else {
-			((VertexImpl) targetVertex.getNextVertex())
-					.setPreviousVertex(movedVertex);
-			movedVertex.setNextVertex(targetVertex.getNextVertex());
-		}
-		movedVertex.setPreviousVertex(targetVertex);
-		targetVertex.setNextVertex(movedVertex);
-		vertexListModified();
-	}
-	
 	/**
 	 * Modifies vSeq such that the movedVertex is immediately before the
 	 * targetVertex.
@@ -1043,7 +990,17 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		assert (movedVertex != null) && movedVertex.isValid()
 				&& containsVertex(movedVertex);
 		assert targetVertex != movedVertex;
+		putVertexBefore(targetVertex.getId(), movedVertex.getId());
+		
+	}
 
+	/**
+	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
+	 * directly before the vertex identified by targetVertexId
+	 * @param targetVertexId global id of the target vertex
+	 * @param movedVertexId global id of the vertex to be moved
+	 */
+	public void putVertexBefore(long targetVertexId, long movedVertexId) {
 		Vertex prevVertex = targetVertex.getPreviousVertex();
 		if ((targetVertex == movedVertex) || (prevVertex == movedVertex)) {
 			return;
@@ -1078,19 +1035,26 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		movedVertex.setNextVertex(targetVertex);
 		targetVertex.setPreviousVertex(movedVertex);
 		vertexListModified();
-	}
-
-	/**
-	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
-	 * directly before the vertex identified by targetVertexId
-	 * @param targetVertexId global id of the target vertex
-	 * @param movedVertexId global id of the vertex to be moved
-	 */
-	public void putVertexBefore(long targetVertexId, long movedVertexId) {
-		// TODO Auto-generated method stub
 		
 	}
 
+	
+	/**
+	 * Modifies vSeq such that the movedVertex is immediately after the
+	 * targetVertex.
+	 * 
+	 * @param targetVertex
+	 *            a vertex
+	 * @param movedVertex
+	 *            the vertex to be moved
+	 */
+	protected void putVertexAfter(VertexImpl targetVertex, VertexImpl movedVertex) {
+		assert (targetVertex != null) && targetVertex.isValid()	&& containsVertex(targetVertex);
+		assert (movedVertex != null) && movedVertex.isValid() && containsVertex(movedVertex);
+		assert targetVertex != movedVertex;
+
+	}	
+	
 	/**
 	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
 	 * directly after the vertex identified by targetVertexId
@@ -1098,7 +1062,44 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param movedVertexId global id of the vertex to be moved
 	 */
 	public void putVertexAfter(long targetVertexId, long movedVertexId)  {
-		// TODO Auto-generated method stub
+		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
+		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
+		
+	
+		Vertex nextVertex = targetVertex.getNextVertex();
+		if ((targetVertex == movedVertex) || (nextVertex == movedVertex)) {
+			return;
+		}
+
+		assert getFirstVertex() != getLastVertex();
+
+		// remove moved vertex from vSeq
+		if (movedVertex == getFirstVertex()) {
+			VertexImpl newFirstVertex = (VertexImpl) movedVertex.getNextVertex();
+			setFirstVertex(newFirstVertex);
+			newFirstVertex.setPreviousVertex(null);
+		} else if (movedVertex == getLastVertex()) {
+			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
+			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
+		} else {
+			((VertexImpl) movedVertex.getPreviousVertex())
+					.setNextVertex(movedVertex.getNextVertex());
+			((VertexImpl) movedVertex.getNextVertex())
+					.setPreviousVertex(movedVertex.getPreviousVertex());
+		}
+
+		// insert moved vertex in vSeq immediately after target
+		if (targetVertex == getLastVertex()) {
+			setLastVertex(movedVertex);
+			movedVertex.setNextVertex(null);
+		} else {
+			((VertexImpl) targetVertex.getNextVertex())
+					.setPreviousVertex(movedVertex);
+			movedVertex.setNextVertex(targetVertex.getNextVertex());
+		}
+		movedVertex.setPreviousVertex(targetVertex);
+		targetVertex.setNextVertex(movedVertex);
+		vertexListModified();
 		
 	}
 	
