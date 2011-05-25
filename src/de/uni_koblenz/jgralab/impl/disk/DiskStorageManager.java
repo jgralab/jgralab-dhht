@@ -868,6 +868,22 @@ public final class DiskStorageManager {
 	public void setLastIncidenceId(int elemId, long incidenceId) {
 		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
 	}
+	
+	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
+	
+	public void setPreviousIncidenceAtVertexId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
+	
+	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
+	
+	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
 
 	public long getFirstIncidenceId(int elemId) {
 		return getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
