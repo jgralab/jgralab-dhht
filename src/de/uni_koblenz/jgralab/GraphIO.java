@@ -113,7 +113,6 @@ public class GraphIO {
 	public static String TGRAPH_COMPRESSED_FILE_EXTENSION = ".dhhtg.gz";
 
 	private static String filename;
-	private static ProgressFunction pf;
 
 	/**
 	 * A {@link FilenameFilter} that accepts TG files.
@@ -1397,7 +1396,6 @@ public class GraphIO {
 			}
 
 			GraphIO.filename = filename;
-			GraphIO.pf = pf;
 			return loadGraphFromStream(inputStream, schema, pf,
 					implementationType, false);
 
@@ -3040,7 +3038,7 @@ public class GraphIO {
 	private void createPartialGraphs() throws GraphIOException, RemoteException {
 		graphBuffer = new HashMap<Integer, Graph>();
 		for (String[] pGraph : partialGraphs) {
-			JGraLabServerImpl remoteServer = ((JGraLabServerImpl) server)
+			JGraLabServerImpl remoteServer = (JGraLabServerImpl) ((JGraLabServerImpl) server)
 					.getRemoteInstance(pGraph[1]);
 			remoteServer.loadGraph(pGraph[0]);
 		}
