@@ -18,8 +18,8 @@ import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 
-
-public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabServer {
+public class JGraLabServerImpl extends UnicastRemoteObject implements
+		JGraLabServer {
 
 	/**
 	 * 
@@ -29,14 +29,13 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 	private static final String JGRALAB_SERVER_IDENTIFIER = "JGraLabServer";
 
 	private static JGraLabServerImpl localInstance = null;
-	
-	private Map<String, GraphDatabase> localGraphDatabases = new HashMap<String, GraphDatabase>();
-	
-	private Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
-	
-	
 
-	private JGraLabServerImpl() throws RemoteException, MalformedURLException,	AlreadyBoundException {
+	private final Map<String, GraphDatabase> localGraphDatabases = new HashMap<String, GraphDatabase>();
+
+	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
+
+	private JGraLabServerImpl() throws RemoteException, MalformedURLException,
+			AlreadyBoundException {
 		Naming.bind(JGRALAB_SERVER_IDENTIFIER, this);
 	}
 
@@ -55,8 +54,8 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 	@Override
 	public RemoteJGraLabServer getRemoteInstance(String hostname) {
 		try {
-			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming.lookup(hostname + "/"
-					+ JGRALAB_SERVER_IDENTIFIER);
+			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
+					.lookup(hostname + "/" + JGRALAB_SERVER_IDENTIFIER);
 			return server;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Error in URL", e);
@@ -67,53 +66,49 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements JGraLabSer
 		}
 	}
 
-
-
 	public GraphDatabase loadGraph(String uid) throws GraphIOException {
 		GraphDatabase db = localGraphDatabases.get(uid);
 		if (db == null) {
 			String filename = localFilesContainingGraphs.get(uid);
-			((GraphImpl) GraphIO.loadGraphFromFileWithStandardSupport(filename, null)).getGraphDatabase();
+			((GraphImpl) GraphIO.loadGraphFromFileWithDiskSupport(filename,
+					null)).getGraphDatabase();
 			localGraphDatabases.put(uid, db);
 		}
 		return db;
 	}
 
-	
 	@Override
 	public void registerLocalGraphDatabase(GraphDatabase localDb) {
-		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId()))
+		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId())) {
 			localGraphDatabases.put(localDb.getUniqueGraphId(), localDb);
+		}
 	}
-	
 
 	public void registerFileForUid(String uid, String fileName) {
 		localFilesContainingGraphs.put(uid, fileName);
-	}	
-
+	}
 
 	@Override
 	public RemoteGraphDatabaseAccess getGraphDatabase(String uid) {
-		if (!localGraphDatabases.containsKey(uid))
+		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);
 			} catch (GraphIOException e) {
 				throw new GraphException(e);
 			}
+		}
 		return localGraphDatabases.get(uid);
 	}
-	
+
 	/**
-	 * Returns the graph database storing all data of all subgraphs belonging to the graph 
-	 * identified by uid
+	 * Returns the graph database storing all data of all subgraphs belonging to
+	 * the graph identified by uid
+	 * 
 	 * @param uid
 	 * @return
 	 */
 	public GraphDatabase getLocalGraphDatabase(String uid) {
 		return localGraphDatabases.get(uid);
 	}
-	
-	
 
- 	
 }
