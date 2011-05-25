@@ -58,7 +58,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * The implementation of a <code>SubordninateGraph</code> accessing attributes
  * without versioning.
  * 
- * TODO: firstEdge and firstVertex, respectively, are not needed but may be determined by the containing element
+ * TODO: firstEdge and firstVertex, respectively, are not needed but may be
+ * determined by the containing element
  * 
  * @author ist@uni-koblenz.de
  */
@@ -71,7 +72,8 @@ public abstract class SubordinateGraphImpl extends
 	// TODO: Check if the respective methods are really
 	// needed in the graph interface and how to ensure, that
 	// the variables reflect the number of elements in the subgraphs
-	// implemented methods of GraphStructureChangeListener to react on adding/deletion of vertices
+	// implemented methods of GraphStructureChangeListener to react on
+	// adding/deletion of vertices
 
 	private int vCount;
 
@@ -125,22 +127,22 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
-	protected SubordinateGraphImpl(Vertex containingVertex)
-			 {
+	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getType());
 		initializeCommonFields(containingVertex);
-//System.out.println("Initialozing subordinate graph " + this);
+		// System.out.println("Initialozing subordinate graph " + this);
 		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
 				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current = current.getNextVertex((Graph)null)) {
+						.isChildOf(containingElement); current = current
+				.getNextVertex((Graph) null)) {
 			if (getFirstVertex() == null) {
 				setFirstVertex((VertexImpl) current);
 			}
-			//System.out.println("  Iterating vertex " + current);
+			// System.out.println("  Iterating vertex " + current);
 			setLastVertex((VertexImpl) current);
 			vCount++;
 		}
-//System.out.println("Iterating edges");
+		// System.out.println("Iterating edges");
 		// initialize edges
 		Edge current = containingVertex.getGraph().getFirstEdge();
 		while (current != null
@@ -214,14 +216,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection)
-			 {
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
 		return containingElement.getGraph().createList(collection);
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity)
-			 {
+	public <T> JGraLabList<T> createList(int initialCapacity) {
 		return containingElement.getGraph().createList(initialCapacity);
 	}
 
@@ -231,20 +231,17 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection)
-			 {
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
 		return containingElement.getGraph().createSet(collection);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity)
-			 {
+	public <T> JGraLabSet<T> createSet(int initialCapacity) {
 		return containingElement.getGraph().createSet(initialCapacity);
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor)
-			 {
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
 		return containingElement.getGraph().createSet(initialCapacity,
 				loadFactor);
 	}
@@ -255,14 +252,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map)
-			 {
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
 		return containingElement.getGraph().createMap(map);
 	}
 
 	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity)
-			 {
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
 		return containingElement.getGraph().createMap(initialCapacity);
 	}
 
@@ -274,8 +269,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
-			 {
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
 		return containingElement.getGraph().createRecord(recordClass, io);
 	}
 
@@ -313,16 +307,19 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
-		throw new UnsupportedOperationException("writeAttributeValues may not be called on a SubordinateGraph");
+		throw new UnsupportedOperationException(
+				"writeAttributeValues may not be called on a SubordinateGraph");
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		throw new UnsupportedOperationException("writeAttributeValues may not be called on a SubordinateGraph");
+		throw new UnsupportedOperationException(
+				"writeAttributeValues may not be called on a SubordinateGraph");
 	}
 
 	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException {
+	public Object getAttribute(String name) throws NoSuchAttributeException,
+			RemoteException {
 		return containingElement.getAttribute(name);
 	}
 
@@ -377,7 +374,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Vertex getVertex(int id) {
+	public Vertex getVertex(long id) {
 		Vertex v = containingElement.getGraph().getVertex(id);
 		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
 			return v;
@@ -387,7 +384,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Edge getEdge(int id) {
+	public Edge getEdge(long id) {
 		Edge e = containingElement.getGraph().getEdge(id);
 		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
 			return e;
@@ -437,8 +434,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls)
-			 {
+	public <T extends Vertex> T createVertex(Class<T> cls) {
 		T vertex = super.createVertex(cls);
 		containingElement.addSubordinateElement(vertex);
 		return vertex;
@@ -621,31 +617,30 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public int compareTo(Graph arg0) {
-			if (getCompleteGraph() == arg0) {
-				// each graph is smaller than the complete graph
-				return -1;
-			} else if (arg0.getContainingElement() != null) {
-				// this is a SubordinateGraphImpl
-				GraphElement<?, ?, ?> ce = arg0.getContainingElement();
-				boolean isArg0Vertex = ce instanceof Vertex;
-				boolean isThisVertex = getContainingElement() instanceof Vertex;
-				if (isArg0Vertex && isThisVertex) {
-					// both are vertices
-					return ((Vertex) getContainingElement())
-							.compareTo((Vertex) ce);
-				} else if (!isArg0Vertex && !isThisVertex) {
-					// both are edges
-					return ((Edge) getContainingElement()).compareTo((Edge) ce);
-				} else {
-					// the subordinate graph of a vertex is greater
-					return isThisVertex ? 1 : -1;
-				}
+		if (getCompleteGraph() == arg0) {
+			// each graph is smaller than the complete graph
+			return -1;
+		} else if (arg0.getContainingElement() != null) {
+			// this is a SubordinateGraphImpl
+			GraphElement<?, ?, ?> ce = arg0.getContainingElement();
+			boolean isArg0Vertex = ce instanceof Vertex;
+			boolean isThisVertex = getContainingElement() instanceof Vertex;
+			if (isArg0Vertex && isThisVertex) {
+				// both are vertices
+				return ((Vertex) getContainingElement()).compareTo((Vertex) ce);
+			} else if (!isArg0Vertex && !isThisVertex) {
+				// both are edges
+				return ((Edge) getContainingElement()).compareTo((Edge) ce);
 			} else {
-				// this is a ViewGraphImpl or PartialGraphImpl
-				return -arg0.compareTo(this);
+				// the subordinate graph of a vertex is greater
+				return isThisVertex ? 1 : -1;
 			}
+		} else {
+			// this is a ViewGraphImpl or PartialGraphImpl
+			return -arg0.compareTo(this);
+		}
 	}
-	
+
 	@Override
 	public int getPartialGraphId() {
 		return getCompleteGraph().getPartialGraphId();

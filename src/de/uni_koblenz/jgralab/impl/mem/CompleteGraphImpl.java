@@ -60,6 +60,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -134,25 +135,26 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 		graphFactory = cls.getSchema().getGraphFactory();
 		id = GraphBaseImpl.PARTIAL_GRAPH_MASK;
-		partialGraphIds = new LinkedList<Integer>();
+		partialGraphIds = new LinkedList<Long>();
 		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK + 1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
-			partialGraphIds.add(i);
+			partialGraphIds.add((long) i);
 		}
 
 		expandVertexArray(vMax);
 		setDeleteVertexList(new LinkedList<VertexImpl>());
 
 		expandEdgeArray(eMax);
-		expandIncidenceArray(vMax+eMax);
+		expandIncidenceArray(vMax + eMax);
 	}
 
 	/**
 	 * 
 	 */
-	private List<Integer> partialGraphIds = null;
+	private List<Long> partialGraphIds = null;
 
 	/**
-	 * The id of this complete or partial graph identifying it in the complete graph  
+	 * The id of this complete or partial graph identifying it in the complete
+	 * graph
 	 */
 	protected int id;
 
@@ -262,16 +264,16 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	private IncidenceImpl[] incidenceArray;
 
-	public int allocateFreePartialGraphId() {
+	public long allocateFreePartialGraphId() {
 		if (partialGraphIds.isEmpty()) {
 			throw new GraphException("No free partial graph ID available");
 		}
 		return partialGraphIds.remove(0);
 	}
 
-
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
 
@@ -330,20 +332,15 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public Edge getEdge(int eId) {
+	public Edge getEdge(long eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
 		try {
-			return getEdgeArray()[eId];
+			return getEdgeArray()[(int) eId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#getId()
-	 */
 	@Override
 	public String getUniqueGraphId() {
 		return uid;
@@ -351,8 +348,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getTraversalContext() {
-		if (traversalContextMap == null)
+		if (traversalContextMap == null) {
 			return null;
+		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
 			return this;
@@ -361,16 +359,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#getVertex(int)
-	 */
 	@Override
-	public Vertex getVertex(int vId) {
+	public Vertex getVertex(long vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
 		try {
-			return getVertexArray()[vId];
+			return getVertexArray()[(int) vId];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
@@ -410,7 +403,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * this graph. Possibly, cascading deletes of child vertices occur when
 	 * parent vertices of Composition classes are deleted.
 	 */
-	private void internalDeleteVertex()  {
+	private void internalDeleteVertex() {
 		boolean edgeHasBeenDeleted = false;
 		while (!getDeleteVertexList().isEmpty()) {
 			VertexImpl v = getDeleteVertexList().remove(0);
@@ -620,7 +613,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * @param movedVertex
 	 *            the vertex to be moved
 	 */
-	protected void putVertexBefore(VertexImpl targetVertex,	VertexImpl movedVertex) {
+	protected void putVertexBefore(VertexImpl targetVertex,
+			VertexImpl movedVertex) {
 		assert (targetVertex != null) && targetVertex.isValid()
 				&& containsVertex(targetVertex);
 		assert (movedVertex != null) && movedVertex.isValid()
@@ -665,15 +659,18 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public void releaseTraversalContext() {
-		if (traversalContextMap == null)
+		if (traversalContextMap == null) {
 			return;
-		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
+		}
+		Stack<Graph> stack = this.traversalContextMap.get(Thread
+				.currentThread());
 		if (stack != null) {
 			stack.pop();
 			if (stack.isEmpty()) {
 				traversalContextMap.remove(Thread.currentThread());
-				if (traversalContextMap.isEmpty())
+				if (traversalContextMap.isEmpty()) {
 					traversalContextMap = null;
+				}
 			}
 		}
 	}
@@ -690,7 +687,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 		// freeIndex(getFreeEdgeList(), e.getId());
 		freeEdgeIndex((int) e.getId());
-		getEdgeArray()[(int)e.getId()] = null;
+		getEdgeArray()[(int) e.getId()] = null;
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
 		e.setId(0);
@@ -753,8 +750,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					.getPreviousVertex());
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
-		freeVertexIndex((int)v.getId());
-		getVertexArray()[(int)v.getId()] = null;
+		freeVertexIndex((int) v.getId());
+		getVertexArray()[(int) v.getId()] = null;
 		v.setPreviousVertex(null);
 		v.setNextVertex(null);
 		v.setId(0);
@@ -787,9 +784,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
-		if (this.traversalContextMap == null)
+		if (this.traversalContextMap == null) {
 			this.traversalContextMap = new HashMap<Thread, Stack<Graph>>();
-		Stack<Graph> stack = this.traversalContextMap.get(Thread.currentThread());
+		}
+		Stack<Graph> stack = this.traversalContextMap.get(Thread
+				.currentThread());
 		if (stack == null) {
 			stack = new Stack<Graph>();
 			this.traversalContextMap.put(Thread.currentThread(), stack);
@@ -828,7 +827,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public int getPartialGraphId() {
-		return id;
+		return GraphDatabase.getPartialGraphId(id);
 	}
 
 	@Override
@@ -926,12 +925,16 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return vId;
 	}
 
+	@Override
 	public boolean containsVertexLocally(Vertex v) {
-		return (v != null) && (v.getGraph() == this) && (getVertexArray()[((VertexImpl) v).id] == v);
+		return (v != null) && (v.getGraph() == this)
+				&& (getVertexArray()[((VertexImpl) v).id] == v);
 	}
 
+	@Override
 	public boolean containsEdgeLocally(Edge e) {
-		return (e != null) && (e.getGraph() == this) && (getEdgeArray()[((EdgeImpl) e).id] == e);
+		return (e != null) && (e.getGraph() == this)
+				&& (getEdgeArray()[((EdgeImpl) e).id] == e);
 	}
 
 	/**
@@ -943,7 +946,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param newEdge
 	 *            Edge to add
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 * @throws GraphException
 	 *             an edge with same id already exists in graph, id of edge
 	 *             greater than possible count of edges in graph
@@ -952,9 +955,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		assert newEdge != null;
 		assert (newEdge.getSchema() == schema) : "The schemas of newEdge and this graph don't match!";
 		assert (newEdge.getGraph() == this) : "The graph of  newEdge and this graph don't match!";
-	
+
 		EdgeImpl e = (EdgeImpl) newEdge;
-	
+
 		int eId = (int) e.getId();
 		if (isLoading()) {
 			if (eId > 0) {
@@ -978,9 +981,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			assert eId != 0;
 			e.setId(eId);
 		}
-	
+
 		appendEdgeToESeq(e);
-	
+
 		if (!isLoading()) {
 			edgeListModified();
 			internalEdgeAdded(e);
@@ -989,8 +992,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	protected void addIncidence(Incidence newIncidence) {
 		IncidenceImpl i = (IncidenceImpl) newIncidence;
-	
-		int iId = i.getId();
+
+		int iId = (int) i.getId();
 		if (isLoading()) {
 			if (iId > 0) {
 				// the given vertex already has an id, try to use it
@@ -1015,7 +1018,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			assert iId != 0;
 			i.setId(iId);
 		}
-	
+
 		if (!isLoading()) {
 			internalIncidenceAdded(i);
 		}
@@ -1036,7 +1039,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void addVertex(Vertex newVertex) {
 		VertexImpl v = (VertexImpl) newVertex;
-	
+
 		int vId = (int) v.getId();
 		if (isLoading()) {
 			if (vId > 0) {
@@ -1060,9 +1063,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			assert vId != 0;
 			v.setId(vId);
 		}
-	
+
 		appendVertexToVSeq(v);
-	
+
 		if (!isLoading()) {
 			vertexListModified();
 			internalVertexAdded(v);
@@ -1070,8 +1073,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	/**
-	 * Checks if the edge id eId is valid and if there is an such an edge locally in
-	 * this graph.
+	 * Checks if the edge id eId is valid and if there is an such an edge
+	 * locally in this graph.
 	 * 
 	 * @param eId
 	 *            an edge id
@@ -1094,8 +1097,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	/**
-	 * Checks if the vertex id vId is valid and if there is an such a vertex locally in
-	 * this graph.
+	 * Checks if the vertex id vId is valid and if there is an such a vertex
+	 * locally in this graph.
 	 * 
 	 * @param vId
 	 *            a vertex id
@@ -1159,7 +1162,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public void loadingCompleted() {
-	
+
 	}
 
 	/**
@@ -1167,6 +1170,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param isLoading
 	 */
+	@Override
 	public void setLoading(boolean isLoading) {
 		loading = isLoading;
 	}
@@ -1233,6 +1237,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		this.freeVertexList = freeVertexList;
 	}
 
+	@Override
 	protected void setICount(int count) {
 		iCount = count;
 	}
@@ -1364,13 +1369,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		freeVertexList.freeIndex(index);
 	}
 
+	@Override
 	protected abstract FreeIndexList getFreeIncidenceList();
 
-	
-
-
 	// ------------- GRAPH VARIABLES -------------
-	
+
 	/**
 	 * Changes the size of the edge array of this graph to newSize.
 	 * 
@@ -1452,7 +1455,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		vMax = newSize;
 		notifyMaxVertexCountIncreased(newSize);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1553,7 +1556,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			System.gc();
 		}
 	}
-	
+
 	@Override
 	public <T> JGraLabList<T> createList() {
 		return new JGraLabListImpl<T>();
@@ -1616,8 +1619,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		record.setComponentValues(components);
 		return record;
 	}
-	
-	
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
@@ -1634,14 +1635,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return new JGraLabSetImpl<T>(initialCapacity);
 	}
 
-
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
 		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
 	}
 
-
-	
 	/**
 	 * Computes new size of vertex and edge array depending on the current size.
 	 * Up to 256k elements, the size is doubled. Between 256k and 1M elements,
@@ -1654,10 +1652,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected int computeNewSize(int n) {
 		return n >= 1048576 ? n + 131072 : n >= 262144 ? n + 262144 : n + n;
 	}
-
-
-
-
 
 	/**
 	 * Notifies all registered <code>GraphStructureChangedListener</code> that
@@ -1688,8 +1682,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					newValue);
 		}
 	}
-
-
 
 	/**
 	 * Notifies all registered <code>GraphStructureChangedListener</code> that
@@ -1750,12 +1742,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					newValue);
 		}
 	}
-	
+
 	public Graph getViewedGraph() {
 		return this;
 	}
-	
-	
+
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
 		throw new RuntimeException("Operation not yet implemented");
