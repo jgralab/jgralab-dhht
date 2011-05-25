@@ -26,15 +26,229 @@ import de.uni_koblenz.jgralab.Record;
 
 public interface RemoteGraphDatabaseAccess extends Remote {
 
+	/* =====================================================
+	 * Methods to access graph database properties
+	 * ===================================================== */
+	
+	public RemoteDiskStorageAccess getDiskStorage();
+	
+	/* =====================================================
+	 * Methods to access graph properties
+	 * ===================================================== */
+	
+	/**
+	 * Returns the id of the type of the subgraph identified by the given <code>subgraphId</code>
+	 * @return
+	 */
+	public int getGraphTypeId(int subgraphId);
+	
+	public int getIdOfParentDistributedGraph();
+	
+	public void graphModified();
+	
+	public long getGraphVersion();
+	
+	public void setGraphVersion(long graphVersion);
+
+
+	public void setLoading(boolean isLoading);
+	
+	public boolean isLoading();
+	
+	public int createPartialGraph(Class<? extends Graph> m1Class,
+			String hostname);
+
+	/**
+	 *
+	 * @param globalSubgraphId
+	 * @return the id of the element (positive for vertices, negative for edges)
+	 * containing the graph identified by its <code>globalSubgraphId</code> 
+	 */
+	public long getContainingElementId(int globalSubgraphId);
+	
+	/* =====================================================
+	 * Methods to access properties common for edges and vertices
+	 * ===================================================== */
+	
+	public int getSigma(long elemId);
+	
+	public void setSigma(long elementId, long sigmaId);
+	
+	public int getKappa(long elementId); 
+	
+	public void setKappa(long elementId, int kappa);
+
+	public long getIncidenceListVersion(long elementId);
+	
+	public void setIncidenceListVersion(long elementId, long incidenceListVersion);
+
+	
+	
+	/* =====================================================
+	 * Methods to access vertex sequence
+	 * ===================================================== */
+	
+	public int getMaxVCount();
+
+
+	public long getVertexListVersion();
+
+
+	public int getVCount(int globalSubgraphId);
+
+
+	public void setVCount(long count, int count2);
+	
+	
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph
+	 * @param edgeClassId
+	 * @return the global id of the newly created edge
+	 */
+	public long createVertex(int edgeClassId);
+	
 	/**
 	 * Creates a vertex with the id globalVId
 	 * @param globalVId
 	 * @return
 	 */
-	public void createVertex(long globalVId);
+	public void createVertex(int edgeClassId, long globalVId);
+		
+	public void deleteVertex(long globalVertexId);
+	
+	/**
+	 * Puts the vertex identified by <code>id2</code> directly before the vertex 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor vertex
+	 * @param id2 the global id of the vertex to be moved
+	 */
+	public void putVertexBefore(long id1, long id2);
+
+	/**
+	 * Puts the vertex identified by <code>id2</code> directly after the vertex 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor vertex
+	 * @param id2 the global id of the vertex to be moved
+	 */
+	public void putVertexAfter(long id, long id2);
+
+	/**
+	 * 
+	 */
+	public void vertexListModified();
+	
+	public int getVertexTypeId(long id);
 	
 
+	public long getFirstVertexId(int globalSubgraphId);
+
+
+
+	public long getLastVertexId(int globalSubgraphId);
 	
+	
+	public void setFirstVertexId(int globalSubgraphId, long id);
+
+
+
+	public void setLastVertexId(int globalSubgraphId, long id);
+	
+	/* =====================================================
+	 * Methods to access edge sequence
+	 * ===================================================== */
+
+	
+	public void edgeListModified();
+
+	public long getEdgeListVersion();
+	
+	public int getECount(int globalSubgraphId);
+	
+	public void setECount(int globalSubgraphId, int count);
+
+	public int getMaxECount();
+
+	
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph
+	 * @param edgeClassId
+	 * @return the global id of the newly created edge
+	 */
+	public long createEdge(int edgeClassId);
+	
+	/**
+	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
+	 * and adds it to the graph, the edge id is set to the given id. This method may
+	 * be called only during loading a (partial) graph
+	 * @param edgeClassId the id identifying the edge class
+	 * @param edgeId the global edge id
+	 * @return the global id of the newly created edge
+	 */
+	public long createEdge(int edgeClassId, long edgeId);
+	
+	
+	public void deleteEdge(long globalEdgeId);
+	
+	/**
+	 * Puts the edge identified by <code>id2</code> directly after the edge 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor edge
+	 * @param id2 the global id of the edge to be moved
+	 */
+	public void putEdgeAfter(long id1, long id2);
+
+	/**
+	 * Puts the edge identified by <code>id2</code> directly after the edge 
+	 * identified by <code>id1</code>
+	 * @param id1 the global id of the anchor edge
+	 * @param id2 the global id of the edge to be moved
+	 */
+	public void putEdgeBefore(long id1, long id2);
+	
+	
+	public int getEdgeTypeId(long id);
+	
+	/**
+	 * Creates a new subordinate graph for the element identified by the given id
+	 * @param id
+	 * @return
+	 */
+	public int createSubordinateGraph(long id);
+
+
+
+	public boolean containsEdge(long id);
+
+
+
+	public long getFirstEdge(int globalSubgraphId);
+
+
+
+	public long getLastEdge(int globalSubgraphId);
+
+
+
+	public void setFirstEdgeId(int globalSubgraphId, long id);
+
+
+
+	public void setLastEdgeId(int globalSubgraphId, long id);
+	
+	
+	/* =====================================================
+	 * Methods to access Lambda sequence
+	 * ===================================================== */
+	
+
+
+	public void setICount(int globalSubgraphId, int count);
+
+
+	public long getICount(int globalSubgraphId);
+
 	/**
 	 * Sets the first {@link Incidence} of this {@link GraphElement} to
 	 * <code>firstIncidence</code>.
@@ -51,61 +265,28 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void incidenceListModified(long elemId);
 
 
-	public int getSigma(long elemId);
-
-	
-	public void setSigma(long elementId, long sigmaId);
-	
-	
-	public int getKappa(long elementId); 
-	
-	public void setKappa(long elementId, int kappa);
-	
-	public void setIncidenceListVersion(long elementId, long incidenceListVersion);
-
-	public long getIncidenceListVersion(long elementId);
-	
-	public abstract void removeEdgeFromDatabase(long edgeId);
-
-	public abstract void removeVertexFromDatabase(long vertexId);
-
-	public int getIdOfParentDistributedGraph();
-
-	public void edgeListModified();
+	public int getIncidenceTypeId(long id);
 
 
-	public void graphModified();
+    /**
+     * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
+     * between the vertex identified by <code>vertexId</code> and the edge identified by <code>edgeId</code>.
+     * The method creates the local incidence object on the graph database storing the edge and updates
+     * the lambda sequences of edge and vertex
+     * @param incidenceClassId
+     * @param vertexId
+     * @param edgeId
+     * @return
+     */
+	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
 
 
-	public int getECount(int globalSubgraphId);
 
 
-	public int getMaxECount();
 
-
-	public int getMaxVCount();
-
-
-	public long getVertexListVersion();
-
-
-	public int getVCount(int globalSubgraphId);
-
-
-	public void setVCount(long count, int count2);
-
-
-	public void setLoading(boolean isLoading);
-
-
-	public long getEdgeListVersion();
-
-
-	public void deleteEdge(long edgeId);
-
-
-	public void deleteVertex(long VertexId);
-	
+	/* =====================================================
+	 * Methods to access domains
+	 * ===================================================== */
 
 	public <T> JGraLabList<T> createList();
 	
@@ -152,177 +333,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
 
-	/**
-	 * Puts the edge identified by <code>id2</code> directly after the edge 
-	 * identified by <code>id1</code>
-	 * @param id1 the global id of the anchor edge
-	 * @param id2 the global id of the edge to be moved
-	 */
-	public void putEdgeAfterInGraph(long id1, long id2);
-
-	/**
-	 * Puts the edge identified by <code>id2</code> directly after the edge 
-	 * identified by <code>id1</code>
-	 * @param id1 the global id of the anchor edge
-	 * @param id2 the global id of the edge to be moved
-	 */
-	public void putEdgeBeforeInGraph(long id1, long id2);
-
-	/**
-	 * Puts the vertex identified by <code>id2</code> directly before the vertex 
-	 * identified by <code>id1</code>
-	 * @param id1 the global id of the anchor vertex
-	 * @param id2 the global id of the vertex to be moved
-	 */
-	public void putVertexBeforeInGraph(long id1, long id2);
-
-	/**
-	 * Puts the vertex identified by <code>id2</code> directly after the vertex 
-	 * identified by <code>id1</code>
-	 * @param id1 the global id of the anchor vertex
-	 * @param id2 the global id of the vertex to be moved
-	 */
-	public void putVertexAfterInGraph(long id, long id2);
-
-	/**
-	 * 
-	 */
-	public void vertexListModified();
-
-
-	public void setGraphVersion(long graphVersion);
-
-
-
-	public int getVertexTypeId(long id);
 	
-	public int getEdgeTypeId(long id);
-	
-	public int getIncidenceTypeId(long id);
-
-
-    /**
-     * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
-     * between the vertex identified by <code>vertexId</code> and the edge identified by <code>edgeId</code>.
-     * The method creates the local incidence object on the graph database storing the edge and updates
-     * the lambda sequences of edge and vertex
-     * @param incidenceClassId
-     * @param vertexId
-     * @param edgeId
-     * @return
-     */
-	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
-
-
-	/**
-	 * Creates a new subordinate graph for the element identified by the given id
-	 * @param id
-	 * @return
-	 */
-	public int createSubordinateGraph(long id);
-
-
-
-	public boolean containsEdge(long id);
-
-
-
-	public long getGraphVersion();
-
-
-
-	public boolean isLoading();
-
-
-
-	public int createPartialGraph(Class<? extends Graph> m1Class,
-			String hostname);
-
-
-
-	public void setFirstVertexId(int globalSubgraphId, long id);
-
-
-
-	public void setLastVertexId(int globalSubgraphId, long id);
-
-
-
-	public long getFirstEdge(int globalSubgraphId);
-
-
-
-	public long getLastEdge(int globalSubgraphId);
-
-
-
-	public void setFirstEdgeId(int globalSubgraphId, long id);
-
-
-
-	public void setLastEdgeId(int globalSubgraphId, long id);
-
-
-
-	public long getFirstVertexId(int globalSubgraphId);
-
-
-
-	public long getLastVertexId(int globalSubgraphId);
-
-
-	/**
-	 *
-	 * @param globalSubgraphId
-	 * @return the id of the element (positive for vertices, negative for edges)
-	 * containing the graph identified by its <code>globalSubgraphId</code> 
-	 */
-	public long getContainingElementId(int globalSubgraphId);
-
-
-
-	public void setECount(int globalSubgraphId, int count);
-
-
-
-	public void setICount(int globalSubgraphId, int count);
-
-
-	/**
-	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
-	 * and adds it to the graph
-	 * @param edgeClassId
-	 * @return the global id of the newly created edge
-	 */
-	public long createEdge(int edgeClassId);
-	
-	/**
-	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
-	 * and adds it to the graph, the edge id is set to the given id. This method may
-	 * be called only during loading a (partial) graph
-	 * @param edgeClassId the id identifying the edge class
-	 * @param edgeId the global edge id
-	 * @return the global id of the newly created edge
-	 */
-	public long createEdge(int edgeClassId, long edgeId);
-	
-	/**
-	 * Creates an edge of the edge class identified by its id <code>edgeClassId</code>
-	 * and adds it to the graph
-	 * @param edgeClassId
-	 * @return the global id of the newly created edge
-	 */
-	public long createVertex(int edgeClassId);
-
-
-	/**
-	 * Returns the id of the type of the subgraph identified by the given <code>subgraphId</code>
-	 * @return
-	 */
-	public int getGraphTypeId(int subgraphId);
-
-
-
-	public RemoteDiskStorageAccess getDiskStorage();
 	
 }
