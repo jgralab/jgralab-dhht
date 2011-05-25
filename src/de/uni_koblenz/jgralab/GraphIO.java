@@ -2966,7 +2966,7 @@ public class GraphIO {
 		sortLambdaSequences(graph);
 		setSigmas(graph, onlyLocalGraph);
 
-		if (isCompleteGraph(graph)) {
+		if (graph.getPartialGraphId() == 1) {
 			((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 		}
 		if (pf != null) {
@@ -2989,8 +2989,7 @@ public class GraphIO {
 	private void createIncidences(Graph graph, boolean onlyLocalGraph)
 			throws RemoteException {
 		for (Entry<Long, Long[]> incidence : incidenceInformation.entrySet()) {
-			if (!onlyLocalGraph
-					|| isLocal(incidence.getKey(), graph.getPartialGraphId())) {
+			if (!onlyLocalGraph || graph.isLocalElementId(incidence.getKey())) {
 				assert incidence.getValue().length == 2;
 				assert incidence.getValue()[0] != 0
 						&& incidence.getValue()[1] != 0;
@@ -3012,8 +3011,8 @@ public class GraphIO {
 			throws NumberFormatException, RemoteException {
 		for (Entry<GraphElement<?, ?, ?>, String> sigma : sigmasOfGraphElement
 				.entrySet()) {
-			int parentId = Integer.parseInt(sigma.getValue().substring(1));
-			if (!onlyLocalGraph || isLocal(parentId, graph.getPartialGraphId())) {
+			long parentId = Long.parseLong(sigma.getValue().substring(1));
+			if (!onlyLocalGraph || graph.isLocalElementId(parentId)) {
 				GraphElementImpl<?, ?, ?> parent;
 				if (sigma.getValue().startsWith("v")) {
 					parent = (GraphElementImpl<?, ?, ?>) graph
@@ -3030,7 +3029,7 @@ public class GraphIO {
 	private void createPartialGraphs() throws GraphIOException, RemoteException {
 		graphBuffer = new HashMap<Integer, Graph>();
 		for (String[] pGraph : partialGraphs) {
-			JGraLabServerImpl remoteServer = (JGraLabServerImpl) server
+			JGraLabServerImpl remoteServer = ((JGraLabServerImpl) server)
 					.getRemoteInstance(pGraph[1]);
 			remoteServer.loadGraph(pGraph[0]);
 		}
