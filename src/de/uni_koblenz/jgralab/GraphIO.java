@@ -66,8 +66,6 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphElementImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -204,8 +202,6 @@ public class GraphIO {
 
 	private int bufferSize;
 
-	private Map<Integer, Graph> graphBuffer;
-
 	private ArrayList<String[]> partialGraphs;
 
 	/**
@@ -297,7 +293,7 @@ public class GraphIO {
 	// multiple identical strings are used as attribute values
 	private final HashMap<String, String> stringPool;
 
-	private RemoteJGraLabServer server;
+	private JGraLabServer server;
 	private boolean isURL;
 
 	private GraphIO() {
@@ -765,7 +761,12 @@ public class GraphIO {
 	private void saveGraph(Graph graph, ProgressFunction pf,
 			BooleanGraphMarker subGraph, boolean onlyLocalGraph)
 			throws IOException, GraphIOException {
-		if (!(graph instanceof GraphImpl)) {
+		ImplementationType type = null;
+		if (graph instanceof GraphImpl) {
+			type = ImplementationType.DISK;
+		} else if (graph instanceof CompleteGraphImpl) {
+			type = ImplementationType.MEMORY;
+		} else {
 			throw new GraphIOException(
 					"You can only save a complete graph or a PartialGraph");
 		}
@@ -776,8 +777,8 @@ public class GraphIO {
 		schema = graph.getSchema();
 		saveSchema(schema);
 
-		if (!onlyLocalGraph) {
-			for (Graph pgraph : ((GraphImpl) graph).getPartialGraphs()) {
+		if (!onlyLocalGraph && type == ImplementationType.DISK) {
+			for (Graph pgraph : graph.getPartialGraphs()) {
 				((GraphImpl) pgraph).saveGraph(filename, pf, subGraph);
 			}
 		}
@@ -819,7 +820,7 @@ public class GraphIO {
 				+ vCount + " " + eCount + ")");
 		space();
 		writeSpace();
-		if (onlyLocalGraph) {
+		if (onlyLocalGraph || type == ImplementationType.MEMORY) {
 			write("{}");
 		} else {
 			savePartialGraphs(graph);
@@ -870,8 +871,7 @@ public class GraphIO {
 					}
 					if (!onlyLocalGraph
 							|| graph.isLocalElementId(nextI.getId())) {
-						writeSpace();
-						write(Long.toString(nextI.getId()));
+						writeLong(nextI.getId());
 					}
 				}
 				write(">");
@@ -1466,7 +1466,8 @@ public class GraphIO {
 			// the schema class was not found, probably schema.commit-method was
 			// not called, or schema package was not included into classpath
 			throw new GraphIOException(
-					"Unable to load a graph which belongs to the schema because the Java-classes for this schema have not yet been created."
+					"Unable to load a graph which belongs to the schema"
+							+ " because the Java-classes for this schema have not yet been created."
 							+ " Use Schema.commit(..) to create them!", e);
 		} catch (Exception e) {
 			throw new GraphIOException("Exception while loading graph.", e);
@@ -2905,21 +2906,32 @@ public class GraphIO {
 			pf.init(vCount + eCount);
 			interval = pf.getUpdateInterval();
 		}
-		server = JGraLabServerImpl.getLocalInstance();
 		Graph graph = null;
-		// try {
-		// // TODO adapt to partial graph loading
-		// graph = (Graph) schema.getGraphCreateMethod(implementationType)
-		// .invoke(null, new Object[] { graphId, maxV, maxE });
-		// } catch (Exception e) {
-		// throw new GraphIOException("can't create graph for class '"
-		// + gcName + "'", e);
-		// }
-		((GraphBaseImpl) graph).setLoading(true);
+		try {
+			graph = (Graph) schema.getGraphCreateMethod(implementationType)
+					.invoke(null, new Object[] { graphId, maxV, maxE });
+		} catch (Exception e) {
+			throw new GraphIOException("can't create graph for class '"
+					+ gcName + "'", e);
+		}
 
-		server.registerGraph(graph.getUniqueGraphId(),
-				Integer.toString(graph.getPartialGraphId()),
-				graph.getGraphDatabase());
+		if (implementationType == ImplementationType.MEMORY) {
+			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)
+					.setLoading(true);
+		} else {
+			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
+					.setLoading(true);
+			server = JGraLabServerImpl.getLocalInstance();
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabase gd = null;
+			// TODO how to handle complete graphs
+			if (graph.getPartialGraphId() == 1) {
+				// TODO create CompleteGraphDataBase
+			} else {
+				// TODO create PartialGraphDataBase
+			}
+			server.registerLocalGraphDatabase(gd);
+		}
+
 		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
@@ -2958,30 +2970,33 @@ public class GraphIO {
 			}
 		}
 
-		if (!onlyLocalGraph) {
+		if (implementationType == ImplementationType.DISK && !onlyLocalGraph) {
 			createPartialGraphs();
 		}
-		// TODO set complete graph if it is not the complete
-		// adjust fields for incidences
-		// if (!isCompleteGraph(graph)) {
-		// // ((PartialGraphImpl)graph).s
-		// } else {
-		// completeGraph = graph;
-		// }
-		createIncidences(graph, onlyLocalGraph);
+		createIncidences(graph, onlyLocalGraph, implementationType);
 		if (onlyLocalGraph) {
 			deleteIncompleteBinaryEdges(graph);
 		}
 		sortLambdaSequences(graph);
-		setSigmas(graph, onlyLocalGraph);
+		setSigmas(graph, onlyLocalGraph, implementationType);
 
 		if (graph.getPartialGraphId() == 1) {
-			((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+			if (implementationType == ImplementationType.MEMORY) {
+				((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+			} else {
+				((GraphImpl) graph).setGraphVersion(graphVersion);
+			}
 		}
 		if (pf != null) {
 			pf.finished();
 		}
-		((GraphBaseImpl) graph).setLoading(false);
+		if (implementationType == ImplementationType.MEMORY) {
+			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)
+					.setLoading(false);
+		} else {
+			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
+					.setLoading(false);
+		}
 		return graph;
 	}
 
@@ -2994,9 +3009,8 @@ public class GraphIO {
 		}
 	}
 
-	// TODO refactoring of mem and disk
-	private void createIncidences(Graph graph, boolean onlyLocalGraph)
-			throws RemoteException {
+	private void createIncidences(Graph graph, boolean onlyLocalGraph,
+			ImplementationType implementationType) throws RemoteException {
 		for (Entry<Long, Long[]> incidence : incidenceInformation.entrySet()) {
 			if (!onlyLocalGraph || graph.isLocalElementId(incidence.getKey())) {
 				assert incidence.getValue().length == 2;
@@ -3004,43 +3018,46 @@ public class GraphIO {
 						&& incidence.getValue()[1] != 0;
 				Vertex v = graph.getVertex(incidence.getValue()[0]);
 				Edge e = graph.getEdge(incidence.getValue()[1]);
-				Incidence i = graph
-						.getSchema()
-						.getGraphFactory()
-						.createIncidence(
-								e.getIncidenceClassForRolename(
-										incidenceTypes.get(incidence.getKey()))
-										.getM1Class(), incidence.getKey(), v, e);
-				incidences.put(incidence.getKey(), i);
+				e.connect(e.getIncidenceClassForRolename(incidenceTypes
+						.get(incidence.getKey())), v);
+				incidences.put(incidence.getKey(), e.getLastIncidence());
 			}
 		}
 	}
 
-	private void setSigmas(Graph graph, boolean onlyLocalGraph)
+	private void setSigmas(Graph graph, boolean onlyLocalGraph,
+			ImplementationType implementationType)
 			throws NumberFormatException, RemoteException {
 		for (Entry<GraphElement<?, ?, ?>, String> sigma : sigmasOfGraphElement
 				.entrySet()) {
 			long parentId = Long.parseLong(sigma.getValue().substring(1));
-			if (!onlyLocalGraph || graph.isLocalElementId(parentId)) {
-				GraphElementImpl<?, ?, ?> parent;
+			if (implementationType == ImplementationType.MEMORY
+					|| !onlyLocalGraph || graph.isLocalElementId(parentId)) {
+				GraphElement<?, ?, ?> parent;
 				if (sigma.getValue().startsWith("v")) {
-					parent = (GraphElementImpl<?, ?, ?>) graph
-							.getVertex(parentId);
+					parent = graph.getVertex(parentId);
 				} else {
-					parent = (GraphElementImpl<?, ?, ?>) graph
-							.getEdge(parentId);
+					parent = graph.getEdge(parentId);
 				}
-				((GraphElementImpl<?, ?, ?>) sigma.getKey()).setSigma(parent);
+				if (implementationType == ImplementationType.MEMORY) {
+					((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) sigma
+							.getKey())
+							.setSigma((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) parent);
+				} else {
+					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) sigma
+							.getKey())
+							.setSigma((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) parent);
+				}
 			}
 		}
 	}
 
 	private void createPartialGraphs() throws GraphIOException, RemoteException {
-		graphBuffer = new HashMap<Integer, Graph>();
 		for (String[] pGraph : partialGraphs) {
-			JGraLabServerImpl remoteServer = (JGraLabServerImpl) ((JGraLabServerImpl) server)
+			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
 					.getRemoteInstance(pGraph[1]);
 			remoteServer.loadGraph(pGraph[0]);
+			// TODO how to handle complete graphs
 		}
 	}
 
@@ -3141,15 +3158,22 @@ public class GraphIO {
 		parseIncidencesAtVertex(vertex);
 		vertex.readAttributeValues(this);
 		parseSigma(vertex);
-		parseKappa(vertex);
+		parseKappa(vertex, implementationType);
 		match(";");
 	}
 
-	private void parseKappa(GraphElement<?, ?, ?> ge) throws GraphIOException,
+	private void parseKappa(GraphElement<?, ?, ?> ge,
+			ImplementationType implementationType) throws GraphIOException,
 			RemoteException {
 		match("kappa");
 		match("=");
-		((GraphElementImpl<?, ?, ?>) ge).setKappa(matchInteger());
+		if (implementationType == ImplementationType.MEMORY) {
+			((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) ge)
+					.setKappa(matchInteger());
+		} else {
+			((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) ge)
+					.setKappa(matchInteger());
+		}
 	}
 
 	private void parseSigma(GraphElement<?, ?, ?> ge) throws GraphIOException {
@@ -3157,7 +3181,7 @@ public class GraphIO {
 			match("sigma");
 			match("=");
 			boolean isVertex = lookAhead.startsWith("v");
-			int idOfSigma = matchInteger();
+			long idOfSigma = matchLong();
 			sigmasOfGraphElement.put(ge, (isVertex ? "v" : "e") + idOfSigma);
 		}
 	}
@@ -3183,7 +3207,7 @@ public class GraphIO {
 		parseIncidences(edge);
 		edge.readAttributeValues(this);
 		parseSigma(edge);
-		parseKappa(edge);
+		parseKappa(edge, implementationType);
 		match(";");
 	}
 
