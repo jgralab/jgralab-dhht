@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
+import java.math.BigInteger;
 import java.util.Comparator;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -68,6 +69,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
+	
 	/**
 	 * Generated Serial Version UID
 	 */

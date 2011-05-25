@@ -320,5 +320,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @return
 	 */
 	public int getGraphTypeId(int subgraphId);
+
+
+
+	public RemoteDiskStorageAccess getDiskStorage();
 	
 }
