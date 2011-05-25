@@ -668,25 +668,29 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			getGraphDatabase(partialGraphId).setKappa(elementId, kappa);
 	}
 	
-	/**
-	 * To be implemented by RemoteDatabaseAccess as well as the DiskBasedStorages
-	 * @author dbildh
-	 *
-	 */
-	private class GraphAccessById {
-		
+//	/**
+//	 * To be implemented by RemoteDatabaseAccess as well as the DiskBasedStorages
+//	 * @author dbildh
+//	 *
+//	 */
+//	private class GraphAccessById {
+//		
+//	}
+//	
+//	private GraphAccessById[] graphAccesses;
+//	
+//	private final GraphAccessById getGraphAccessForElement(long elementId) {
+//		int pgId = getPartialGraphId(elementId);
+//		if (graphAccesses[pgId] == null) {
+//			//load direct graph access
+//		}
+//		return graphAccesses[pgId];
+//	}
+//	
+	
+	public DiskStorageManager getDiskStorage() {
+		return localDiskStorage;
 	}
-	
-	private GraphAccessById[] graphAccesses;
-	
-	private final GraphAccessById getGraphAccessForElement(long elementId) {
-		int pgId = getPartialGraphId(elementId);
-		if (graphAccesses[pgId] == null) {
-			//load direct graph access
-		}
-		return graphAccesses[pgId];
-	}
-	
 	
 	public abstract void edgeListModified();
 	
@@ -741,6 +745,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * Methods to access Vseq 
 	 * **************************************************************************/
 	
+	public long getVertexListVersion() {
+		return vertexListVersion;
+	}
+	
 	public int getVCount() {
 		return vCount;
 	}
@@ -752,6 +760,33 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public int getMaxVCount() {
 		return vMax;
 	}
+	
+	/**
+	 * Use to free a <code>Vertex</code>-index.
+	 * 
+	 * @param index
+	 */
+	protected void freeVertexIndex(int index) {
+		freeVertexList.freeIndex(index);
+	}
+	
+	protected FreeIndexList getFreeVertexList() {
+		return freeVertexList;
+	}
+	
+	
+	/**
+	 * Use to allocate a <code>Vertex</code>-index.
+	 */
+	protected int allocateVertexIndex() {
+		int vId = freeVertexList.allocateIndex();
+		if (vId == 0) {
+			vId = freeVertexList.allocateIndex();
+		}
+		return vId;
+	}
+	
+	
 	
 	private boolean containsVertexId(long vId) {
 		return getVertexObject(vId) != null;
@@ -788,17 +823,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	
 
-	
-	/**
-	 * Use to allocate a <code>Vertex</code>-index.
-	 */
-	protected int allocateVertexIndex() {
-		int vId = freeVertexList.allocateIndex();
-		if (vId == 0) {
-			vId = freeVertexList.allocateIndex();
-		}
-		return vId;
-	}
+
 	
 	public long createVertex(int vertexClassId, long vertexId) {
 		//set id
@@ -1044,6 +1069,27 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		vertexListModified();
 	}
 
+	/**
+	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
+	 * directly before the vertex identified by targetVertexId
+	 * @param targetVertexId global id of the target vertex
+	 * @param movedVertexId global id of the vertex to be moved
+	 */
+	public void putVertexBefore(long targetVertexId, long movedVertexId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
+	 * directly after the vertex identified by targetVertexId
+	 * @param targetVertexId global id of the target vertex
+	 * @param movedVertexId global id of the vertex to be moved
+	 */
+	public void putVertexAfter(long targetVertexId, long movedVertexId)  {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	private void setNextVertex(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
@@ -1163,6 +1209,28 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 	/**
+	 * Appends the edge e to the global edge sequence of this graph.
+	 * 
+	 * @param e
+	 *            an edge
+	 * @throws RemoteException 
+	 */
+	protected void appendEdgeToESeq(EdgeImpl e) {
+		setECount(getECount() + 1);
+		if (getFirstEdge() == null) {
+			setFirstEdge(e);
+		}
+		if (getLastEdge() != null) {
+			((EdgeImpl) getLastEdge()).setNextEdge(e);
+			e.setPreviousEdge(getLastEdge());
+		}
+		setLastEdge(e);
+	}
+
+
+
+	
+	/**
 	 * Removes the edge e from the global edge sequence of this graph.
 	 * 
 	 * @param e
@@ -1235,9 +1303,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	}
 	
-	
-	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		assert (targetEdgeId != null) && targetEdge.isValid()	&& containsEdge(targetEdge);
+	/**
+	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
+	 * directly after the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
+	 */
+	protected void putEdgeAfter(EdgeImpl targetEdge, EdgeImpl movedEdge) {
+		assert (targetEdge != null) && targetEdge.isValid()	&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid() && containsEdge(movedEdge);
 		putEdgeAfter(targetEdge.getId(), movedEdge.getId());
 	}	
@@ -1283,15 +1356,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	
 	/**
-	 * Modifies eSeq such that the movedEdge is immediately before the
-	 * targetEdge. Both edges need to be member of the same partial graph
-	 * 
-	 * @param targetEdge
-	 *            an edge
-	 * @param movedEdge
-	 *            the edge to be moved
+	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
+	 * directly before the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
 	 */
-	public void putEdgeBeforeInGraph(EdgeImpl e, EdgeImpl edgeImpl) {
+	public void putEdgeBefore(long targetEdgeId,  long movedEdgeId) {
 		Edge targetEdge = getEdgeObject(e);
 		Edge movedEdge = getEdgeObject(edgeImpl);
 		assert (targetEdge != null) && targetEdge.isValid()
@@ -1323,8 +1393,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		edgeListModified();
 	}
 
+		
 	
-
 	private void setNextEdge(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
@@ -1593,14 +1663,28 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 
 
-	public int getICount(int globalSubgraphId) {
-		return iCount;
+
+	
+	
+
+
+
+	
+	
+	
+	/**
+	 * Use to free an <code>Edge</code>-index
+	 * 
+	 * @param index
+	 */
+	protected void freeEdgeIndex(int index) {
+		freeEdgeList.freeIndex(index);
 	}
-
-
-
-
-
+	
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
+	
 	/**
 	 * Use to allocate a <code>Edge</code>-index.
 	 */
@@ -1612,6 +1696,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return eId;
 	}
 
+
+
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+	
 	/**
 	 * Use to allocate a <code>Incidence</code>-index.
 	 */
@@ -1620,41 +1710,17 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return iId;
 	}
 	
-	
-	/**
-	 * Use to free an <code>Edge</code>-index
-	 * 
-	 * @param index
-	 */
-	protected void freeEdgeIndex(int index) {
-		freeEdgeList.freeIndex(index);
+	public int getICount(int globalSubgraphId) {
+		return iCount;
 	}
 
 
-	// ------------- GRAPH VARIABLES -------------
-	
-	/**
-	 * Use to free a <code>Vertex</code>-index.
-	 * 
-	 * @param index
-	 */
-	protected void freeVertexIndex(int index) {
-		freeVertexList.freeIndex(index);
-	}
-	
-	protected FreeIndexList getFreeEdgeList() {
-		return freeEdgeList;
-	}
 
 
-	protected FreeIndexList getFreeIncidenceList() {
-		return freeIncidenceList;
-	}
+
+
 
 	
-	protected FreeIndexList getFreeVertexList() {
-		return freeVertexList;
-	}
 	
 	public int getIdOfParentDistributedGraph() {
 		return parentDistributedGraphId;
@@ -1662,77 +1728,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 
 
-	/**
-	 * Appends the edge e to the global edge sequence of this graph.
-	 * 
-	 * @param e
-	 *            an edge
-	 * @throws RemoteException 
-	 */
-	protected void appendEdgeToESeq(EdgeImpl e) {
-		setECount(getECount() + 1);
-		if (getFirstEdge() == null) {
-			setFirstEdge(e);
-		}
-		if (getLastEdge() != null) {
-			((EdgeImpl) getLastEdge()).setNextEdge(e);
-			e.setPreviousEdge(getLastEdge());
-		}
-		setLastEdge(e);
-	}
 
-	public long getVertexListVersion() {
-		return vertexListVersion;
-	}
-
-	public DiskStorageManager getDiskStorage() {
-		return localDiskStorage;
-	}
-
-	/**
-	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
-	 * directly before the vertex identified by targetVertexId
-	 * @param targetVertexId global id of the target vertex
-	 * @param movedVertexId global id of the vertex to be moved
-	 */
-	public void putVertexBefore(long targetVertexId, long movedVertexId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * Global methods, changes Vseq so that the vertex identified by movedVertexId is 
-	 * directly after the vertex identified by targetVertexId
-	 * @param targetVertexId global id of the target vertex
-	 * @param movedVertexId global id of the vertex to be moved
-	 */
-	public void putVertexAfter(long targetVertexId, long movedVertexId)  {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
-	 * directly after the edge identified by targetEdgeId
-	 * @param targetEdgeId global id of the target edge
-	 * @param movedEdgeId global id of the edge to be moved
-	 */
-	public void putEdgeAfter(long targetEdgeId, long movedEdgeId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	/**
-	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
-	 * directly before the edge identified by targetEdgeId
-	 * @param targetEdgeId global id of the target edge
-	 * @param movedEdgeId global id of the edge to be moved
-	 */
-	public void putEdgeBefore(long targetEdgeId, long movedEdgeId) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	public Graph createViewGraph(SubordinateGraphImpl subordinateGraphImpl,
 			int kappa) {
@@ -1790,9 +1786,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 *            {@link Edge} which contains this subordinate graph
 	 */
 	//TODO: Move logics to GraphDb
-	protected createSubordinateGraphImpl(Edge containingEdge) {
-		super(containingEdge.getGraph().getType());
-		initializeCommonFields(containingEdge);
+	protected long createSubordinateGraphImpl(Edge containingEdge) {
+		//super(containingEdge.getGraph().getType());
+	//	initializeCommonFields(containingEdge);
 
 		// initialize edges
 		for (Edge current = containingEdge.getNextEdge(); current != null
@@ -1826,9 +1822,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		getCompleteGraph().addGraphStructureChangedListener(this);
 	}
 
-	private void initializeCommonFields(GraphElement<?, ?, ?> containingElement) {
-		this.containingElement = containingElement;
-	}
-	
+
 
 }
