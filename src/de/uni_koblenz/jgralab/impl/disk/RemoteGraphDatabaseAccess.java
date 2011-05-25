@@ -113,7 +113,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param globalVId
 	 * @return
 	 */
-	public void createVertex(int edgeClassId, long globalVId);
+	public long createVertex(int edgeClassId, long globalVId);
 		
 	public void deleteVertex(long globalVertexId);
 	
