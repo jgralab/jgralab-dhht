@@ -216,7 +216,7 @@ public class GraphIO {
 	 * <code>incidencesAtEdge.get(i).get(j)</code> = id of the {@link Incidence}
 	 * at position j in the lambda sequence at the vertex
 	 */
-	private Map<Integer, ArrayList<Integer>> incidencesAtEdge;
+	private Map<Long, ArrayList<Long>> incidencesAtEdge;
 
 	/**
 	 * Stores the information about incidences at the vertices.<br>
@@ -225,19 +225,19 @@ public class GraphIO {
 	 * <code>incidencesAtVertex.get(i).get(j)</code> = id of the
 	 * {@link Incidence} at position j in the lambda sequence at the vertex
 	 */
-	private Map<Integer, ArrayList<Integer>> incidencesAtVertex;
+	private Map<Long, ArrayList<Long>> incidencesAtVertex;
 
 	/**
 	 * Stores the information about incidences and their types.<br>
 	 * <code>incidenceTypes.get(i)</code> = the type of the Incidence with id i.
 	 */
-	private Map<Integer, String> incidenceTypes;
+	private Map<Long, String> incidenceTypes;
 
 	/**
 	 * Stores the Incidences.<br>
 	 * <code>incidences.get(i)</code> = the Incidence with id i.
 	 */
-	private Map<Integer, Incidence> incidences;
+	private Map<Long, Incidence> incidences;
 
 	/**
 	 * Stores the incidence information of incidences.<br>
@@ -245,7 +245,7 @@ public class GraphIO {
 	 * <code>incidenceInformation.get(i)[1]</code> = id of incidence edge<br>
 	 * i = full id of incidence
 	 */
-	private Map<Integer, Integer[]> incidenceInformation;
+	private Map<Long, Long[]> incidenceInformation;
 
 	/**
 	 * The value is the sigma information of the graph element.
@@ -783,8 +783,8 @@ public class GraphIO {
 			}
 		}
 
-		int eId;
-		int vId;
+		long eId;
+		long vId;
 
 		// progress bar for graph
 		long graphElements = 0, currentCount = 0, interval = 1;
@@ -855,7 +855,7 @@ public class GraphIO {
 			}
 
 			if (nextV.getLocalGraph() == graph) {
-				write(Integer.toString(vId));
+				write(Long.toString(vId));
 				space();
 				writeIdentifier(aec.getSimpleName());
 
@@ -870,9 +870,9 @@ public class GraphIO {
 						continue;
 					}
 					if (!onlyLocalGraph
-							|| graph.isIdOfLocalElement(nextI.getId())) {
+							|| graph.isLocalElementId(nextI.getId())) {
 						writeSpace();
-						write(Integer.toString(nextI.getId()));
+						write(Long.toString(nextI.getId()));
 					}
 				}
 				write(">");
@@ -905,9 +905,9 @@ public class GraphIO {
 
 			if (nextE.getLocalGraph() == graph) {
 				if (!nextE.isBinary()
-						|| (graph.isIdOfLocalElement(((BinaryEdge) nextE)
+						|| (graph.isLocalElementId(((BinaryEdge) nextE)
 								.getAlpha().getId()) && graph
-								.isIdOfLocalElement(((BinaryEdge) nextE)
+								.isLocalElementId(((BinaryEdge) nextE)
 										.getOmega().getId()))) {
 					eId = nextE.getId();
 					AttributedElementClass<?, ?> aec = nextE.getType();
@@ -935,8 +935,7 @@ public class GraphIO {
 							continue;
 						}
 						if (!onlyLocalGraph
-								|| graph.isIdOfLocalElement(i.getVertex()
-										.getId())) {
+								|| graph.isLocalElementId(i.getVertex().getId())) {
 							writeSpace();
 							write(++edgeIncidenceCounter + ":"
 									+ i.getType().getRolename());
@@ -983,8 +982,8 @@ public class GraphIO {
 		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
 				.getContainingElement();
 		if (containingElement != null
-				&& (!onlyLocalGraph || graph
-						.isIdOfLocalElement(containingElement.getId()))) {
+				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
+						.getId()))) {
 			write(" sigma=");
 			write((containingElement instanceof Vertex ? "v" : "e")
 					+ containingElement.getId());
@@ -1219,13 +1218,13 @@ public class GraphIO {
 			throws GraphIOException {
 		try {
 			logger.finer("Loading graph " + filename);
-			return loadGraphFromFileWithStandardSupport(filename, null, pf);
+			return loadGraphFromFileWithMemorySupport(filename, null, pf);
 		} catch (GraphIOException ex) {
 			if (ex.getCause() instanceof ClassNotFoundException) {
 				logger.fine("Compiled schema classes were not found, so load and compile the schema first.");
 				Schema s = loadSchemaFromFile(filename);
 				s.compile(config);
-				return loadGraphFromFileWithStandardSupport(filename, s, pf);
+				return loadGraphFromFileWithMemorySupport(filename, s, pf);
 			} else {
 				throw ex;
 			}
@@ -1247,10 +1246,9 @@ public class GraphIO {
 	 *             if an IOException occurs or the compiled schema classes can
 	 *             not be loaded
 	 */
-	public static Graph loadGraphFromFileWithStandardSupport(String filename,
+	public static Graph loadGraphFromFileWithMemorySupport(String filename,
 			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf,
-				ImplementationType.STANDARD);
+		return loadGraphFromFile(filename, null, pf, ImplementationType.MEMORY);
 	}
 
 	/**
@@ -1271,62 +1269,14 @@ public class GraphIO {
 	 *             if an IOException occurs or the compiled schema classes can
 	 *             not be loaded
 	 */
-	public static Graph loadGraphFromFileWithStandardSupport(String filename,
+	public static Graph loadGraphFromFileWithMemorySupport(String filename,
 			Schema schema, ProgressFunction pf) throws GraphIOException {
 		return loadGraphFromFile(filename, schema, pf,
-				ImplementationType.STANDARD);
+				ImplementationType.MEMORY);
 	}
 
 	/**
-	 * Loads a graph with transaction support from the file
-	 * <code>filename</code>. When the <code>filename</code> ends with
-	 * <code>.gz</code>, it is assumed that the input is GZIP compressed,
-	 * otherwise uncompressed plain text. A {@link ProgressFunction}
-	 * <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithTransactionSupport(
-			String filename, ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf,
-				ImplementationType.TRANSACTION);
-	}
-
-	/**
-	 * Loads a graph with transaction support from the file
-	 * <code>filename</code>. When the <code>filename</code> ends with
-	 * <code>.gz</code>, it is assumed that the input is GZIP compressed,
-	 * otherwise uncompressed plain text. A {@link ProgressFunction}
-	 * <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param schema
-	 *            the schema (must be the same schema as in the TG file read by
-	 *            the InputStream), may be <code>null</code>
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithTransactionSupport(
-			String filename, Schema schema, ProgressFunction pf)
-			throws GraphIOException {
-		return loadGraphFromFile(filename, schema, pf,
-				ImplementationType.TRANSACTION);
-	}
-
-	/**
-	 * Loads a graph with savemem support from the file <code>filename</code>.
+	 * Loads a graph with standard support from the file <code>filename</code>.
 	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
 	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
 	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
@@ -1340,13 +1290,13 @@ public class GraphIO {
 	 *             if an IOException occurs or the compiled schema classes can
 	 *             not be loaded
 	 */
-	public static Graph loadGraphFromFileWithSavememSupport(String filename,
+	public static Graph loadGraphFromFileWithDiskSupport(String filename,
 			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf, ImplementationType.SAVEMEM);
+		return loadGraphFromFile(filename, null, pf, ImplementationType.DISK);
 	}
 
 	/**
-	 * Loads a graph with savemem support from the file <code>filename</code>.
+	 * Loads a graph with standard support from the file <code>filename</code>.
 	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
 	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
 	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
@@ -1363,10 +1313,9 @@ public class GraphIO {
 	 *             if an IOException occurs or the compiled schema classes can
 	 *             not be loaded
 	 */
-	public static Graph loadGraphFromFileWithSavememSupport(String filename,
+	public static Graph loadGraphFromFileWithDiskSupport(String filename,
 			Schema schema, ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, schema, pf,
-				ImplementationType.SAVEMEM);
+		return loadGraphFromFile(filename, schema, pf, ImplementationType.DISK);
 	}
 
 	/**
@@ -1380,7 +1329,7 @@ public class GraphIO {
 	@Deprecated
 	public static Graph loadGraphFromFile(String filename, ProgressFunction pf)
 			throws GraphIOException {
-		return loadGraphFromFileWithStandardSupport(filename, pf);
+		return loadGraphFromFileWithMemorySupport(filename, pf);
 	}
 
 	/**
@@ -1395,7 +1344,7 @@ public class GraphIO {
 	@Deprecated
 	public static Graph loadGraphFromFile(String filename, Schema schema,
 			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFileWithStandardSupport(filename, schema, pf);
+		return loadGraphFromFileWithMemorySupport(filename, schema, pf);
 	}
 
 	/**
@@ -3036,7 +2985,7 @@ public class GraphIO {
 		}
 	}
 
-	// TODO refaktorisiere mem und disk
+	// TODO refactoring of mem and disk
 	private void createIncidences(Graph graph, boolean onlyLocalGraph)
 			throws RemoteException {
 		for (Entry<Integer, Integer[]> incidence : incidenceInformation
@@ -3165,7 +3114,7 @@ public class GraphIO {
 
 	private void vertexDesc(Graph graph, ImplementationType implementationType)
 			throws GraphIOException, RemoteException {
-		int vId = vId();
+		long vId = vId();
 		String vcName = className();
 		Vertex vertex;
 		Method createMethod;
@@ -3208,7 +3157,7 @@ public class GraphIO {
 
 	private void edgeDesc(Graph graph, ImplementationType implementationType)
 			throws GraphIOException, RemoteException {
-		int eId = eId();
+		long eId = eId();
 		String ecName = className();
 		Edge edge;
 		Method createMethod;
@@ -3231,29 +3180,24 @@ public class GraphIO {
 		match(";");
 	}
 
-	private int eId() throws GraphIOException {
-		int eId = matchInteger();
+	private long eId() throws GraphIOException {
+		long eId = matchLong();
 		if (eId == 0) {
 			throw new GraphIOException("Invalid edge id " + eId + ".");
 		}
 		return eId;
 	}
 
-	private int iId() throws GraphIOException {
-		int iId = matchInteger();
+	private long iId() throws GraphIOException {
+		long iId = matchLong();
 		if (iId == 0) {
 			throw new GraphIOException("Invalid incidence id " + iId + ".");
 		}
 		return iId;
 	}
 
-	private String className() throws GraphIOException {
-		String[] qn = matchQualifiedName(true);
-		return toQNameString(qn);
-	}
-
-	private int vId() throws GraphIOException {
-		int vId = matchInteger();
+	private long vId() throws GraphIOException {
+		long vId = matchLong();
 		if (vId <= 0) {
 			throw new GraphIOException("Invalid vertex id " + vId + ".");
 		} else {
@@ -3261,52 +3205,55 @@ public class GraphIO {
 		}
 	}
 
+	private String className() throws GraphIOException {
+		String[] qn = matchQualifiedName(true);
+		return toQNameString(qn);
+	}
+
 	private void parseIncidences(Edge edge) throws GraphIOException {
 		int lambdaSeqPosAtEdge = 0;
-		int eId = 0;
-		eId = edge.getId();
+		long eId = edge.getId();
 
 		match("<");
 		while (!lookAhead.equals(">")) {
 			lambdaSeqPosAtEdge++;
-			int incidenceId = matchInteger();
+			long incidenceId = matchLong();
 			match(":");
 			String incidenceName = matchSimpleName(false);
 			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge,
-					new Integer(incidenceId));
+					new Long(incidenceId));
 			incidenceTypes.put(incidenceId, incidenceName);
 			setIncidence(eId, incidenceId, false);
 		}
 	}
 
 	private void parseIncidencesAtVertex(Vertex v) throws GraphIOException {
-		int vId = 0;
-		vId = v.getId();
+		long vId = v.getId();
 		int lambdaSeqPosAtVertex = 0;
 
 		match("<");
 		while (!lookAhead.equals(">")) {
 			lambdaSeqPosAtVertex++;
-			int iId = iId();
+			long iId = iId();
 			addToIncidenceList(incidencesAtVertex, vId, lambdaSeqPosAtVertex,
-					iId);
+					new Long(iId));
 			setIncidence(vId, iId, true);
 		}
 		match();
 	}
 
-	private void setIncidence(int gElemId, int incidenceId, boolean isVertex) {
-		Integer[] incidenceInfo = incidenceInformation.get(incidenceId);
+	private void setIncidence(long gElemId, long incidenceId, boolean isVertex) {
+		Long[] incidenceInfo = incidenceInformation.get(incidenceId);
 		if (incidenceInfo == null) {
-			incidenceInfo = new Integer[2];
+			incidenceInfo = new Long[2];
 			incidenceInformation.put(incidenceId, incidenceInfo);
 		}
 		incidenceInfo[isVertex ? 0 : 1] = gElemId;
 	}
 
 	private <V> void addToIncidenceList(
-			Map<Integer, ArrayList<V>> incidencesAtGraphElement,
-			int graphElementId, int posInLambdaSequence, V incidentElement)
+			Map<Long, ArrayList<V>> incidencesAtGraphElement,
+			long graphElementId, int posInLambdaSequence, V incidentElement)
 			throws GraphIOException {
 		ArrayList<V> lambdaSequence = incidencesAtGraphElement
 				.get(graphElementId);
