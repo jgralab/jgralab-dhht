@@ -76,10 +76,15 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 	public long convertToGlobalId(int localId) {
-		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+		long l = localPartialGraphId << (64-BITS_FOR_PARTIAL_GRAPH_MASK);
 		return l + localId;
 	}
 	
+	
+	public long convertToGlobalSubgraphId(int localId) {
+		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+		return l + localId;
+	}
 	
 	/**
 	 * The graph schema of the graph whose local subgraphs are managed by this GraphDatabase belongs to
@@ -762,6 +767,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
 	}
 	
+	public int getIdOfParentDistributedGraph() {
+		return parentDistributedGraphId;
+	}
+	
 	
 	/* **************************************************************************
 	 * Methods to access Vseq 
@@ -823,30 +832,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}	
 	
 
-	
-	/**
-	 * Appends the vertex v to the global vertex sequence of this graph.
-	 * 
-	 * @param v
-	 *            a vertex
-	 * @throws RemoteException 
-	 */
-	protected void appendVertexToVSeq(VertexImpl v) {
-		setVCount(getVCount() + 1);
-		if (getFirstVertex() == null) {
-			setFirstVertex(v);
-		}
-		if (getLastVertex() != null) {
-			((VertexImpl) getLastVertex()).setNextVertex(v);
-			v.setPreviousVertex(getLastVertex());
-		}
-		setLastVertex(v);
-	}
-	
-	
 
-
-	
 	public long createVertex(int vertexClassId, long vertexId) {
 		//set id
 		if (isLoading()) {
@@ -864,7 +850,21 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		//instantiate object
 		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage((Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId), vertexId, this);
 		localDiskStorage.storeVertex(v);
-		appendVertexToVSeq(v);
+
+		int toplevelSubgraphId = convertToGlobalId(0);
+		
+		getGraphData(0).vCount++;
+			if (getFirstVertexId(local) == 0) {
+				setFirstVertexId(0, vertexId);
+			}
+			if (getLastVertexId(0) != 0) {
+				setNextVertexId(getLastVertexId(0), vertexId);
+				((VertexImpl) getLastVertex()).setNextVertex(v);
+				v.setPreviousVertex(getLastVertex());
+			}
+			setLastVertex(v);
+		}
+		
 		
 		if (!isLoading()) {
 			vertexListModified();
@@ -1198,6 +1198,30 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return getEdgeObject(edge.getId()) == edge;
 	}
 
+	/**
+	 * Use to free an <code>Edge</code>-index
+	 * 
+	 * @param index
+	 */
+	protected void freeEdgeIndex(int index) {
+		freeEdgeList.freeIndex(index);
+	}
+	
+	protected FreeIndexList getFreeEdgeList() {
+		return freeEdgeList;
+	}
+	
+	/**
+	 * Use to allocate a <code>Edge</code>-index.
+	 */
+	protected int allocateEdgeIndex() {
+		int eId = freeEdgeList.allocateIndex();
+		if (eId == 0) {
+			eId = freeEdgeList.allocateIndex();
+		}
+		return eId;
+	}
+
 
 	
 	@Override
@@ -1461,6 +1485,22 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
+	
+	/**
+	 * Use to allocate a <code>Incidence</code>-index.
+	 */
+	protected int allocateIncidenceIndex() {
+		int iId = freeIncidenceList.allocateIndex();
+		return iId;
+	}
+	
+	public int getICount(int globalSubgraphId) {
+		return iCount;
+	}
+	
 	/**
 	 * Connects the specified vertex <code>v</code> to the speficied edge <code>e</code> by an
 	 * incidence of class <code>cls</code> and sets the incidence's id to the next locally 
@@ -1515,7 +1555,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			setLastIncidence(v.getId(), id);
 		}
 
-			v.incidenceListModified();
+			incidenceListModified(v.getId());
 
 			// add this incidence to the sequence of incidences of e
 			if (e.getFirstIncidence() == null) {
@@ -1742,47 +1782,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	
 	
-	/**
-	 * Use to free an <code>Edge</code>-index
-	 * 
-	 * @param index
-	 */
-	protected void freeEdgeIndex(int index) {
-		freeEdgeList.freeIndex(index);
-	}
-	
-	protected FreeIndexList getFreeEdgeList() {
-		return freeEdgeList;
-	}
-	
-	/**
-	 * Use to allocate a <code>Edge</code>-index.
-	 */
-	protected int allocateEdgeIndex() {
-		int eId = freeEdgeList.allocateIndex();
-		if (eId == 0) {
-			eId = freeEdgeList.allocateIndex();
-		}
-		return eId;
-	}
 
 
 
-	protected FreeIndexList getFreeIncidenceList() {
-		return freeIncidenceList;
-	}
-	
-	/**
-	 * Use to allocate a <code>Incidence</code>-index.
-	 */
-	protected int allocateIncidenceIndex() {
-		int iId = freeIncidenceList.allocateIndex();
-		return iId;
-	}
-	
-	public int getICount(int globalSubgraphId) {
-		return iCount;
-	}
+
 
 
 
@@ -1792,9 +1795,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	
 	
-	public int getIdOfParentDistributedGraph() {
-		return parentDistributedGraphId;
-	}
+
 	
 
 

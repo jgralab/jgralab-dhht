@@ -2917,7 +2917,7 @@ public class GraphIO {
 		// }
 		((GraphBaseImpl) graph).setLoading(true);
 
-		server.registerGraph(graph.getCompleteGraphUid(),
+		server.registerGraph(graph.getUniqueGraphId(),
 				Integer.toString(graph.getPartialGraphId()),
 				graph.getGraphDatabase());
 		readPartialGraphs(graph);
