@@ -22,7 +22,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author dbildh
  *
  */
-public final class DiskStorageManager {
+public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	
 	
 	/* Switches to toggle behaviour */
@@ -927,7 +927,9 @@ public final class DiskStorageManager {
 	public int getIncidenceTypeId(int localIncidenceId) {
 		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
 	}
-	
+
+
+
 	
 	
 

@@ -1,15 +1,46 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-public interface RemoteDiskStorageAccess {
+import java.rmi.Remote;
 
-	public void setFirstIncidence(long elementId, long l);
+/**
+ * Remote interface of DiskStorage used to access properties of the stored elements
+ * @author dbildh
+ *
+ */
+public interface RemoteDiskStorageAccess extends Remote {
 
-	public void setLastIncidence(long elementId, long id);
+	public void setFirstIncidenceId(int localElementId, long l);
 
-	public int getSigma(long elementId);
+	public void setLastIncidenceId(int localElementId, long id);
+	
+	public void setNextEdgeId(int localEdgeId, long nextEdgeId);
+	
+	public void setPreviousEdgeId(int localEdgeId, long previousEdgeId);
+	
+	public void setNextVertexId(int localVertexId, long nextVertexId);
+	
+	public void setPreviousVertexId(int localVertexId, long previousVertexId);
+	
+	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncId);
+	
+	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId);
+	
+	public void setPreviousIncidenceAtVertexId(int localIncidenceId, long previousIncId);
+	
+	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long previousIncId);
 
-	public int getKappa(long elementId);
+	public long getSigmaId(int localElementId);
+	
+	public void setSigmaId(int localElementId, long globalSigmaId);
 
-	public void setKappa(long elementId, int kappa);
+	public int getKappa(int localIncidenceId);
+
+	public void setKappa(int localIncidenceId, int kappa);
+	
+	public int getVertexTypeId(int localVertexId);
+	
+	public int getEdgeTypeId(int localEdgeId);
+	
+	public int getIncidenceTypeId(int localIncidenceId);
 
 }

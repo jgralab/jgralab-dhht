@@ -716,131 +716,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		this.graphVersion = graphVersion2;		
 	}
 	
-	
-	/* **************************************************************************
-	 * Methods to access Vseq and Eseq
-	 * **************************************************************************/
-	
-	
-	/* **************************************************************************
-	 * Methods to access Vseq and Eseq
-	 * **************************************************************************/
-	
-
-	
-	@Override
-	public long createEdge(int edgeClassId) {
-		return createEdge(edgeClassId, 0);
-	}
-	
-	
-
-	
-	@Override
-	public long createEdge(int edgeClassId, long edgeId) {
-		//set id
-		if (edgeId != 0) {
-			if (!isLoading()) {
-				throw new GraphException("Cannot add an edge with a predefined id outside the graph loading");
-			} 
-		} else {
-			edgeId = convertToGlobalId(allocateEdgeIndex());
-		}
-		//instantiate object
-		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
-		diskStorage.storeEdge(e);
-		appendEdgeToESeq(e);
-
-		if (!isLoading()) {
-			edgeListModified();
-			internalEdgeAdded(e);
-		}
-		return e.getId();
-	}
-
-
-	private boolean containsIncidenceId(long iId) {
-		return getIncidenceObject(iId) != null;
-	}
-
-
-	protected void addVertex(Vertex newVertex) {
-		VertexImpl v = (VertexImpl) newVertex;
-
-		int vId = v.getId();
-		if (isLoading()) {
-			if (vId > 0) {
-				// the given vertex already has an id, try to use it
-				if (vId > vMax) {
-					throw new GraphException("vertex id " + vId
-							+ " is bigger than vSize");
-				}
-			} else {
-				throw new GraphException("can not load a vertex with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(vId)) {
-				throw new GraphException("can not add a vertex with vId " + vId);
-			}
-			vId = allocateVertexIndex(vId);
-			assert vId != 0;
-			v.setId(vId);
-		}
-		diskStorage.storeVertex(v);
-		appendVertexToVSeq(v);
-
-		if (!isLoading()) {
-			vertexListModified();
-			internalVertexAdded(v);
-		}
-	}
-	
-
-	
-	protected void addIncidence(Incidence newIncidence) {
-		IncidenceImpl i = (IncidenceImpl) newIncidence;
-		long iId = i.getId();
-		if (isLoading()) {
-			if (iId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsIncidenceId(iId)) {
-					throw new GraphException("incidence with id " + iId
-							+ " already exists");
-				}
-			} else {
-				throw new GraphException(
-						"can not load an incidence with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(iId)) {
-				throw new GraphException("can not add an incidence with iId "
-						+ iId);
-			}
-			int intId = allocateIncidenceIndex();
-			assert iId != 0;
-			i.setId(convertToGlobalId(intId));
-			
-		}
-		diskStorage.storeIncidence(i);
-		if (!isLoading()) {
-			internalIncidenceAdded(i);
-		}
-	}
-	
-	
-	private boolean containsVertexId(long eId) {
-		return getVertexObject(eId) != null;
-	}
-
-
-	private boolean canAddGraphElement(long eId) {
-		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
-	}
-
-	private boolean containsEdgeId(long eId) {
-		return getEdgeObject(eId) != null;
-	}
-
 	public boolean isLoading() {
 		return loading;
 	}
@@ -848,43 +723,56 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public void setLoading(boolean isLoading) {
 		this.loading = isLoading;
 	}
-
+	
+	private boolean canAddGraphElement(long eId) {
+		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
+	}
+	
+	
+	/* **************************************************************************
+	 * Methods to access Vseq 
+	 * **************************************************************************/
+	
 	public void setVCount(int localSubgraphId, int count) {
 		getGraphData(localSubgraphId).vCount = count; 
 	}
-
 	
-	/**
-	 * Deletes the edge from the internal structures of this graph.
-	 * 
-	 * @param edge
-	 *            an edge
-	 */
-	private void internalDeleteEdge(Edge edge) {
-		assert (edge != null) && edge.isValid() && containsEdge(edge);
-
-		EdgeImpl e = (EdgeImpl) edge;
-		internalEdgeDeleted(e);
-
-		Incidence inc = e.getFirstIncidence();
-		Set<Vertex> vertices = new HashSet<Vertex>();
-		while (inc != null) {
-			vertices.add(inc.getVertex());
-			((VertexImpl) inc.getVertex())
-					.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
-			inc = e.getFirstIncidence();
-		}
-		for (Vertex vertex : vertices) {
-			((VertexImpl) vertex).incidenceListModified();
-		}
-
-		removeEdgeFromESeq(e);
-
+	private boolean containsVertexId(long vId) {
+		return getVertexObject(vId) != null;
 	}
+	
+	boolean containsVertex(Vertex vertex) {
+		return getVertexObject(vertex.getId()) == vertex;
+	}
+	
+	public long createVertex(int vertexClassId) {
+		return createVertex(vertexClassId, 0);
+	}	
+	
+	public long createVertex(int vertexClassId, long vertexId) {
+		//set id
+		if (isLoading()) {
+			if (vertexId == 0) {
+				throw new GraphException("Cannot add a vertex without a predefined id during graph loading");
+			} 
+		} else {
+			if (vertexId == 0) {
+				vertexId =  convertToGlobalId(allocateVertexIndex());
+			} else {
+				throw new GraphException("Cannot add a vertex with a predefined id outside the graph loading");
+			}
+		}
 
-
-	boolean containsEdge(Edge edge) {
-		return getEdgeObject(edge.getId()) == edge;
+		//instantiate object
+		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage((Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId), vertexId, this);
+		diskStorage.storeVertex(v);
+		appendVertexToVSeq(v);
+		
+		if (!isLoading()) {
+			vertexListModified();
+			internalVertexAdded(v);
+		}
+		return v.getId();
 	}
 
 	/**
@@ -955,10 +843,88 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 
-	boolean containsVertex(Vertex vertex) {
-		return getVertexObject(vertex.getId()) == vertex;
+
+	
+	
+
+	
+	
+	
+	/* **************************************************************************
+	 * Methods to access Eseq
+	 * **************************************************************************/
+	
+
+
+	private boolean containsEdgeId(long eId) {
+		return getEdgeObject(eId) != null;
+	}
+	
+	boolean containsEdge(Edge edge) {
+		return getEdgeObject(edge.getId()) == edge;
 	}
 
+	
+	@Override
+	public long createEdge(int edgeClassId) {
+		return createEdge(edgeClassId, 0);
+	}
+	
+	@Override
+	public long createEdge(int edgeClassId, long edgeId) {
+		//set id
+		if (isLoading()) {
+			if (edgeId == 0) {
+				throw new GraphException("Cannot add an edge without a predefined id during graph loading");
+			} 
+		} else {
+			if (edgeId == 0) {
+				edgeId =  convertToGlobalId(allocateVertexIndex());
+			} else {
+				throw new GraphException("Cannot add an edge with a predefined id outside the graph loading");
+			}
+		}
+		//instantiate object
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
+		diskStorage.storeEdge(e);
+		appendEdgeToESeq(e);
+
+		if (!isLoading()) {
+			edgeListModified();
+			internalEdgeAdded(e);
+		}
+		return e.getId();
+	}
+	
+	/**
+	 * Deletes the edge from the internal structures of this graph.
+	 * 
+	 * @param edge
+	 *            an edge
+	 */
+	private void internalDeleteEdge(Edge edge) {
+		assert (edge != null) && edge.isValid() && containsEdge(edge);
+
+		EdgeImpl e = (EdgeImpl) edge;
+		internalEdgeDeleted(e);
+
+		Incidence inc = e.getFirstIncidence();
+		Set<Vertex> vertices = new HashSet<Vertex>();
+		while (inc != null) {
+			vertices.add(inc.getVertex());
+			((VertexImpl) inc.getVertex())
+					.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+			inc = e.getFirstIncidence();
+		}
+		for (Vertex vertex : vertices) {
+			((VertexImpl) vertex).incidenceListModified();
+		}
+
+		removeEdgeFromESeq(e);
+
+	}
+	
+	
 	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
@@ -1044,15 +1010,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	
-	
-	
-	
-	
-	private void setNextEdge(Edge movedEdge, Edge targetEdge) {
-		assert getPartialGraphId(movedEdge.getId()) == getPartialGraphId(targetEdge.getId());
-		int tgtId = targetEdge.getId();
-		int 
-		setNextEdgeId(movedEdge.getId())
+
+	private void setNextEdge(long modifiedEdgeId, long nextIdId) {
+		int partialGraphId = getPartialGraphId(modifiedEdgeId);
+		RemoteDiskStorageManager diskStore = getDiskStorageManager(partialGraphId);
+		diskStore.setNextEdge(getLocalElementId(modifiedEdgeId), getLocalElementId(nextEdgeId));
+			
 	}
 
 	private void setPreviousEdge(Edge movedEdge, Edge targetEdge) {
@@ -1068,6 +1031,65 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+	
+	/* **************************************************************************
+	 * Methods to access Lambda sequences
+	 * **************************************************************************/
+
+	private boolean containsIncidenceId(long iId) {
+		return getIncidenceObject(iId) != null;
+	}
+
+
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceImpl i = (IncidenceImpl) newIncidence;
+		long iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+			} else {
+				throw new GraphException(
+						"can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId "
+						+ iId);
+			}
+			int intId = allocateIncidenceIndex();
+			assert iId != 0;
+			i.setId(convertToGlobalId(intId));
+			
+		}
+		diskStorage.storeIncidence(i);
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
+	
+	
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+	
 
 	
 
@@ -1460,11 +1482,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	/**
 	 * Use to allocate a <code>Vertex</code>-index.
-	 * 
-	 * @param currentId
-	 *            needed for transaction support
 	 */
-	protected int allocateVertexIndex(int currentId) {
+	protected int allocateVertexIndex() {
 		int vId = freeVertexList.allocateIndex();
 		if (vId == 0) {
 			vId = freeVertexList.allocateIndex();
