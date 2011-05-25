@@ -313,5 +313,12 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @return the global id of the newly created edge
 	 */
 	public long createVertex(int edgeClassId);
+
+
+	/**
+	 * Returns the id of the type of the subgraph identified by the given <code>subgraphId</code>
+	 * @return
+	 */
+	public int getGraphTypeId(int subgraphId);
 	
 }

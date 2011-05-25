@@ -74,6 +74,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return (int) elementId;
 	}
 	
+	public long convertToGlobalId(int localId) {
+		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+		return l + localId;
+	}
+	
+	
 	/**
 	 * The graph schema of the graph whose local subgraphs are managed by this GraphDatabase belongs to
 	 */
@@ -98,6 +104,11 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * The local JGraLab server instance
 	 */
 	protected final JGraLabServer localJGraLabServer;
+	
+	/**
+	 * The disk storage used to store local element on disk
+	 */
+	private DiskStorageManager diskStorage;
 
 	/**
 	 * The GraphFactory to create graphs and graph elements
@@ -108,14 +119,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * true iff the local graph is currently loading
 	 */
 	protected boolean loading = false;
-
 	
 	/**
 	 * the local graph version
 	 */
 	protected long graphVersion = 0;
-	
-	
+		
 	/**
 	 * List of vertices to be deleted by a cascading delete caused by deletion
 	 * of a composition "parent".
@@ -127,19 +136,16 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected FreeIndexList freeVertexList;
 	
-
 	/**
 	 * free index list for vertices
 	 */
 	protected FreeIndexList freeEdgeList;
 
-
 	/**
 	 * free index list for vertices
 	 */
 	protected FreeIndexList freeIncidenceList;
-	
-	
+		
 	/**
 	 * Holds the version of the vertex sequence. For every modification (e.g.
 	 * adding/deleting a vertex or changing the vertex sequence) this version
@@ -173,26 +179,26 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * current number of edges
 	 */
 	protected int eCount;
-	
-	
+		
 	/**
 	 * current number of incidences
 	 */
 	protected int iCount;
 	
 
-	/**
-	 * The disk storage used to store local element on disk
-	 */
-	private DiskStorageManager diskStorage;
+
 	
-	/*
+	/**
 	 * The map of global subgraph ids to the local representation objects. Those may be
 	 * either objects representing a local subgraph or (proxy) objects representing
 	 * remote subgraphs
 	 */
 	private Map<Integer, Reference<Graph>> subgraphObjects;
 	
+	/**
+	 * Data of local subordinate graphs such as first and last elements, number of elements
+	 * and so on
+	 */
 	private ArrayList<GraphData> localSubgraphData;
 
 	
@@ -204,7 +210,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		long containingElementId;
 		int parentDistributedGraphId;
 		int subgraphId;
-		public int vCount;
+		int vCount;
+		int eCount;
+		int typeId;
 	}
 	
 	private GraphData getGraphData(int localSubgraphId) {
@@ -294,6 +302,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 	
+	/* ===============================================================
+	 * Methods to access partial graphs
+	   =============================================================== */
 	
 	
 	protected RemoteGraphDatabaseAccess getGraphDatabase(int partialGraphId) {
@@ -381,13 +392,39 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return (Class<? extends Incidence>) schema.getM1ClassForId(getIncidenceTypeId(elementId));
 	}
 	
-	protected abstract int getGraphTypeId(int subgraphId);
+	public int getGraphTypeId(int subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+		}	
+		return getGraphData(subgraphId).typeId;
+	}
 	
-	public abstract int getVertexTypeId(long vertexId);
+	public int getVertexTypeId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getVertexTypeId(vertexId);
+		}	
+		return diskStorage.getVertexTypeId(getLocalElementId(vertexId));
+	}	
 	
-	public abstract int getEdgeTypeId(long edgeId);
+	public int getEdgeTypeId(long edgeId) {
+		int partialGraphId = getPartialGraphId(edgeId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getEdgeTypeId(edgeId);
+		}	
+		return diskStorage.getEdgeTypeId(getLocalElementId(edgeId));
+	}	
 	
-	public abstract int getIncidenceTypeId(long incidenceId);
+	
+	public int getIncidenceTypeId(long incidenceId) {
+		int partialGraphId = getPartialGraphId(incidenceId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getIncidenceTypeId(incidenceId);
+		}	
+		return diskStorage.getIncidenceTypeId(getLocalElementId(incidenceId));
+	}	
+	
 	
 	
 	//Methods to access Graph, vertex, edge and incidence objects
@@ -480,16 +517,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			//create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Incidence> vc = getIncidenceType(id);
-			proxy = graphFactory.createIncidenceDiskBasedStorage(vc, id, this, remoteDatabase);
+			proxy = graphFactory.createIncidenceDiskBasedStorage(vc, id, this);
 			ref = new WeakReference<Incidence>(proxy);
 			remoteIncidences.put(id, ref);
 		} 
 		return proxy;
 	}
 	
-	
-	
-	// Methods to access vsed
+
 	int getFirstVertex(int partialGraphId) {
 		return 0;
 	}
@@ -606,7 +641,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		else
 			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
 	}
-
 	
 	
 	public int getKappa(int elementId) {
@@ -659,14 +693,17 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * Methods to access traversal context
 	 * **************************************************************************/
 	
-
-	
 	public abstract Graph getTraversalContext();
 	
 	public abstract void releaseTraversalContext();
 	
 	public abstract void setTraversalContext(Graph traversalContext);
 
+	
+	/* **************************************************************************
+	 * Methods to access graph properties
+	 * **************************************************************************/
+	
 	public GraphFactory getGraphFactory() {
 		return graphFactory;
 	}
@@ -679,16 +716,25 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		this.graphVersion = graphVersion2;		
 	}
 	
+	
+	/* **************************************************************************
+	 * Methods to access Vseq and Eseq
+	 * **************************************************************************/
+	
+	
+	/* **************************************************************************
+	 * Methods to access Vseq and Eseq
+	 * **************************************************************************/
+	
+
+	
 	@Override
 	public long createEdge(int edgeClassId) {
 		return createEdge(edgeClassId, 0);
 	}
 	
 	
-	public long convertToGlobalId(int localId) {
-		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
-		return l + localId;
-	}
+
 	
 	@Override
 	public long createEdge(int edgeClassId, long edgeId) {
@@ -712,66 +758,12 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return e.getId();
 	}
 
-	
-	/*
-	 * Adds a incidence to this graph. If the incidence's id is 0, a valid id is
-	 * set, otherwise the incidence's current id is used if possible. Should
-	 * only be used by m1-Graphs derived from Graph. To create a new Incidence
-	 * as user, use the appropriate <code>connect(...)</code>-methods from the
-	 * GraphElements
-	 * 
-	 * @param newIncidence the Incidence to add
-	 * 
-	 * @throws GraphException if a incidence with the same id already exists
-	 */
-	protected void addIncidence(Incidence newIncidence) {
-		IncidenceImpl i = (IncidenceImpl) newIncidence;
-		long iId = i.getId();
-		if (isLoading()) {
-			if (iId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsIncidenceId(iId)) {
-					throw new GraphException("incidence with id " + iId
-							+ " already exists");
-				}
-			} else {
-				throw new GraphException(
-						"can not load an incidence with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(iId)) {
-				throw new GraphException("can not add an incidence with iId "
-						+ iId);
-			}
-			int intId = allocateIncidenceIndex();
-			assert iId != 0;
-			i.setId(convertToGlobalId(intId));
-			
-		}
-		diskStorage.storeIncidence(i);
-		if (!isLoading()) {
-			internalIncidenceAdded(i);
-		}
-	}
 
 	private boolean containsIncidenceId(long iId) {
-		// TODO Auto-generated method stub
-		return false;
+		return getIncidenceObject(iId) != null;
 	}
 
-	/**
-	 * Adds a vertex to this graph. If the vertex' id is 0, a valid id is set,
-	 * otherwise the vertex' current id is used if possible. Should only be used
-	 * by m1-Graphs derived from Graph. To create a new Vertex as user, use the
-	 * appropriate methods from the derived Graphs like
-	 * <code>createStreet(...)</code>
-	 * 
-	 * @param newVertex
-	 *            the Vertex to add
-	 * 
-	 * @throws GraphException
-	 *             if a vertex with the same id already exists
-	 */
+
 	protected void addVertex(Vertex newVertex) {
 		VertexImpl v = (VertexImpl) newVertex;
 
@@ -804,6 +796,38 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 
+	
+	protected void addIncidence(Incidence newIncidence) {
+		IncidenceImpl i = (IncidenceImpl) newIncidence;
+		long iId = i.getId();
+		if (isLoading()) {
+			if (iId > 0) {
+				// the given vertex already has an id, try to use it
+				if (containsIncidenceId(iId)) {
+					throw new GraphException("incidence with id " + iId
+							+ " already exists");
+				}
+			} else {
+				throw new GraphException(
+						"can not load an incidence with id <= 0");
+			}
+		} else {
+			if (!canAddGraphElement(iId)) {
+				throw new GraphException("can not add an incidence with iId "
+						+ iId);
+			}
+			int intId = allocateIncidenceIndex();
+			assert iId != 0;
+			i.setId(convertToGlobalId(intId));
+			
+		}
+		diskStorage.storeIncidence(i);
+		if (!isLoading()) {
+			internalIncidenceAdded(i);
+		}
+	}
+	
+	
 	private boolean containsVertexId(long eId) {
 		return getVertexObject(eId) != null;
 	}
@@ -1026,7 +1050,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	private void setNextEdge(Edge movedEdge, Edge targetEdge) {
 		assert getPartialGraphId(movedEdge.getId()) == getPartialGraphId(targetEdge.getId());
-		diskStorage.setNextEdge(movedEdge, targetEdge);
+		int tgtId = targetEdge.getId();
+		int 
+		setNextEdgeId(movedEdge.getId())
 	}
 
 	private void setPreviousEdge(Edge movedEdge, Edge targetEdge) {

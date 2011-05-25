@@ -895,7 +895,7 @@ public final class DiskStorageManager {
 	
 	
 	public void incidenceListModified(int elemId) {
-		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)]++;
+		getElementContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)]++;
 	}
 	
 	// hierarchy
@@ -913,14 +913,21 @@ public final class DiskStorageManager {
 	}
 
 	public void setKappa(int localElemId, int kappa) {
-		getElementContainer(getContainerId(-localElemId)).sigmaId[getElementIdInContainer(localElemId)] = kappa;
+		getElementContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)] = kappa;
+	}
+
+	public int getVertexTypeId(int localVertexId) {
+		return getVertexContainer(getContainerId(localVertexId)).types[getElementIdInContainer(localVertexId)];
 	}
 	
+	public int getEdgeTypeId(int localEdgeId) {
+		return getEdgeContainer(getContainerId(localEdgeId)).types[getElementIdInContainer(localEdgeId)];
+	}
 	
-	// distribution
+	public int getIncidenceTypeId(int localIncidenceId) {
+		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
+	}
 	
-	
-
 	
 	
 
