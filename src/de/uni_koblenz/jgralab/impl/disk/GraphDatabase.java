@@ -81,9 +81,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 	
-	public long convertToGlobalSubgraphId(int localId) {
-		long l = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
-		return l + localId;
+	public int convertToGlobalSubgraphId(int localId) {
+		int i = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
+		return i + localId;
 	}
 	
 	/**
@@ -757,6 +757,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	public boolean isLoading() {
 		return loading;
+		
 	}
 
 	public void setLoading(boolean isLoading) {
@@ -851,26 +852,25 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage((Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId), vertexId, this);
 		localDiskStorage.storeVertex(v);
 
-		int toplevelSubgraphId = convertToGlobalId(0);
+		int toplevelSubgraphId = convertToGlobalSubgraphId(0);
 		
 		getGraphData(0).vCount++;
-			if (getFirstVertexId(local) == 0) {
-				setFirstVertexId(0, vertexId);
+			if (getFirstVertexId(toplevelSubgraphId) == 0) {
+				setFirstVertexId(toplevelSubgraphId, vertexId);
 			}
-			if (getLastVertexId(0) != 0) {
-				setNextVertexId(getLastVertexId(0), vertexId);
-				((VertexImpl) getLastVertex()).setNextVertex(v);
-				v.setPreviousVertex(getLastVertex());
+			if (getLastVertexId(toplevelSubgraphId) != 0) {
+				setNextVertexId(getLastVertexId(toplevelSubgraphId), vertexId);
+				setPreviousVertexId(vertexId, getLastVertexId(toplevelSubgraphId));
 			}
-			setLastVertex(v);
-		}
+			setLastVertexId(toplevelSubgraphId, vertexId);
+		
 		
 		
 		if (!isLoading()) {
 			vertexListModified();
-			internalVertexAdded(v);
+			notifyVertexAdded(vertexId);
 		}
-		return v.getId();
+		return vertexId;
 	}
 
 	/**
@@ -1114,13 +1114,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 	}
 	
-	private void setNextVertex(long modifiedVertexId, long nextVertexId) {
+	private void setNextVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
 		diskStore.setNextVertexId(getLocalElementId(modifiedVertexId), nextVertexId);
 	}
 
-	private void setPreviousVertex(long modifiedVertexId, long nextVertexId) {
+	private void setPreviousVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
 		diskStore.setPreviousVertexId(getLocalElementId(modifiedVertexId), nextVertexId);
