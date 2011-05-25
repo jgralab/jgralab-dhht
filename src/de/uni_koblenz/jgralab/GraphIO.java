@@ -973,7 +973,8 @@ public class GraphIO {
 		for (Graph pgraph : graph.getPartialGraphs()) {
 			writeLong(pgraph.getGlobalSubgraphId());
 			write("-");
-			// TODO write url of pgraph
+			write(graph.getGraphDatabase().getHostname(
+					pgraph.getGlobalSubgraphId()));
 		}
 		write("}");
 	}
