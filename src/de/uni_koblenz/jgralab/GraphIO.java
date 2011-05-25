@@ -823,7 +823,7 @@ public class GraphIO {
 		if (onlyLocalGraph) {
 			write("{}");
 		} else {
-			graph.savePartialGraphs(this);
+			savePartialGraphs(graph);
 		}
 		if (graph.getType().hasAttributes()) {
 			writeSpace();
@@ -966,6 +966,16 @@ public class GraphIO {
 		if (pf != null) {
 			pf.finished();
 		}
+	}
+
+	private void savePartialGraphs(Graph graph) throws IOException {
+		write("{");
+		for (Graph pgraph : graph.getPartialGraphs()) {
+			writeLong(pgraph.getGlobalSubgraphId());
+			write("-");
+			// TODO write url of pgraph
+		}
+		write("}");
 	}
 
 	private void writeAttributesSigmaKappa(Graph graph,
