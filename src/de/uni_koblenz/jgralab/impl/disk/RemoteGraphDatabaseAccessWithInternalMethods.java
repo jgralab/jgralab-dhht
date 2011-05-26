@@ -51,7 +51,11 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 */
 	public void internalNotifyIncidenceDeleted(long incidenceId);
 
-	public Object removeVertexFromVSeq(long vertexId);
+	
+	
+	public void removeVertexFromVSeq(long vertexId);
+
+	public void removeEdgeFromESeq(long edgeId);
 
 
 	

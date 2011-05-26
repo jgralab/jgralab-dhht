@@ -217,15 +217,15 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 
-	public boolean containsEdge(long id);
+	public boolean containsEdgeId(long id);
 
 
 
-	public long getFirstEdge(int globalSubgraphId);
+	public long getFirstEdgeId(int globalSubgraphId);
 
 
 
-	public long getLastEdge(int globalSubgraphId);
+	public long getLastEdgeId(int globalSubgraphId);
 
 
 

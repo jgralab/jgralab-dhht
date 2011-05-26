@@ -1029,6 +1029,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param targetVertexId global id of the target vertex
 	 * @param movedVertexId global id of the vertex to be moved
 	 */
+	@Override
 	public void putVertexAfter(long targetVertexId, long movedVertexId)  {
 		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
 		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
@@ -1158,7 +1159,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return edgeListVersion;
 	}
 
-	private boolean containsEdgeId(long eId) {
+	public boolean containsEdgeId(long eId) {
 		return getEdgeObject(eId) != null;
 	}
 	
@@ -1208,112 +1209,57 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return createEdge(edgeClassId, 0);
 	}
 	
-	@Override
 	public long createEdge(int edgeClassId, long edgeId) {
 		//set id
 		if (isLoading()) {
 			if (edgeId == 0) {
-				throw new GraphException("Cannot add an edge without a predefined id during graph loading");
+				throw new GraphException("Cannot add a edge without a predefined id during graph loading");
 			} 
 		} else {
 			if (edgeId == 0) {
-				edgeId =  convertToGlobalId(allocateVertexIndex());
+				edgeId =  convertToGlobalId(allocateEdgeIndex());
 			} else {
-				throw new GraphException("Cannot add an edge with a predefined id outside the graph loading");
+				throw new GraphException("Cannot add a edge with a predefined id outside the graph loading");
 			}
 		}
-		//instantiate object
-		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
-		localDiskStorage.storeEdge(e);
-		appendEdgeToESeq(e);
 
+		//instantiate object
+		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
+		localDiskStorage.storeEdge(v);
+
+		int toplevelSubgraphId = convertToGlobalSubgraphId(1);
+		
+		getGraphData(0).vCount++;
+			if (getFirstEdgeId(toplevelSubgraphId) == 0) {
+				setFirstEdgeId(toplevelSubgraphId, edgeId);
+			}
+			if (getLastEdgeId(toplevelSubgraphId) != 0) {
+				setNextEdgeId(getLastEdgeId(toplevelSubgraphId), edgeId);
+				setPreviousEdgeId(edgeId, getLastEdgeId(toplevelSubgraphId));
+			}
+			setLastEdgeId(toplevelSubgraphId, edgeId);
+		
+		
+		
 		if (!isLoading()) {
 			edgeListModified();
-			internalEdgeAdded(e);
+			notifyEdgeAdded(edgeId);
 		}
-		return e.getId();
+		return edgeId;
 	}
 	
-	/**
-	 * Appends the edge e to the global edge sequence of this graph.
-	 * 
-	 * @param e
-	 *            an edge
-	 * @throws RemoteException 
-	 */
-	protected void appendEdgeToESeq(EdgeImpl e) {
-		setECount(getECount() + 1);
-		if (getFirstEdge() == null) {
-			setFirstEdge(e);
-		}
-		if (getLastEdge() != null) {
-			((EdgeImpl) getLastEdge()).setNextEdge(e);
-			e.setPreviousEdge(getLastEdge());
-		}
-		setLastEdge(e);
-		
-	}
 
-
-
-	
-	/**
-	 * Removes the edge e from the global edge sequence of this graph.
-	 * 
-	 * @param l
-	 *            an edge
-	 */
-	protected void removeEdgeFromESeq(long l) {
-		assert l != null;
-		removeEdgeFromESeqWithoutDeletingIt(l);
-
-		// freeIndex(getFreeEdgeList(), e.getId());
-		freeEdgeIndex(l.getId());
-		l.setPreviousEdge(null);
-		l.setNextEdge(null);
-		removeEdgeFromDatabase(l);
-		l.setId(0);
-		setECount(getECount() - 1);
-	}
-
-
-	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
-		if (e == getFirstEdge()) {
-			// delete at head of edge list
-			setFirstEdge((EdgeImpl) e.getNextEdge());
-			if (getFirstEdge() != null) {
-				((EdgeImpl) getFirstEdge()).setPreviousEdge(null);
-			}
-			if (e == getLastEdge()) {
-				// this edge was the only one...
-				setLastEdge(null);
-			}
-		} else if (e == getLastEdge()) {
-			// delete at tail of edge list
-			setLastEdge((EdgeImpl) e.getPreviousEdge());
-			if (getLastEdge() != null) {
-				((EdgeImpl) getLastEdge()).setNextEdge(null);
-			}
-		} else {
-			// delete somewhere in the middle
-			((EdgeImpl) e.getPreviousEdge()).setNextEdge(e.getNextEdge());
-			((EdgeImpl) e.getNextEdge()).setPreviousEdge(e.getPreviousEdge());
-		}
-	}
-
-	
 	/**
 	 * Deletes the edge from the internal structures of this graph.
 	 * 
 	 * @param edge
 	 *            an edge
 	 */
-	private void internalDeleteEdge(Edge edge) {
-		assert (edge != null) && edge.isValid() && containsEdge(edge);
-
-		EdgeImpl e = (EdgeImpl) edge;
-		internalEdgeDeleted(e);
-
+	public void deleteEdge(long edgeId) {
+		assert (edgeId != 0) && containsEdgeId(edgeId);
+		
+		Edge e = getEdgeObject(edgeId);
+		
 		Incidence inc = e.getFirstIncidence();
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		while (inc != null) {
@@ -1326,9 +1272,65 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			((VertexImpl) vertex).incidenceListModified();
 		}
 
-		removeEdgeFromESeq(e);
+		removeEdgeFromESeq(edgeId);
 
 	}
+	
+
+
+	
+	/**
+	 * Removes the edge v from the global edge sequence of this graph.
+	 * @param edgeId
+	 *            a edge
+	 */
+	protected void removeEdgeFromESeq(long edgeId) {
+		assert edgeId != 0;
+		int partialGraphId = getPartialGraphId(edgeId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).removeEdgeFromESeq(edgeId);
+			return;
+		}	
+		
+		//TODO: instead of the toplevel graph, the lowest subgraph the edge is 
+		//      contained in needs to be determined. Because of the restrictions to 
+		//      the ordering v may be only the first edge of the lowest graph 
+		//      it is contained in
+		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		
+		//if current edge is the first or last one in the local graph,
+		//the respecitive values need to be set to its next or previous edge 
+		long firstV = getFirstEdgeId(toplevelGraphId);
+		long lastV = getLastEdgeId(toplevelGraphId);
+		long nextV = getNextEdgeId(edgeId);
+		long prevV = getPreviousEdgeId(edgeId);
+		
+		if (firstV == edgeId) {
+			setFirstEdgeId(toplevelGraphId, nextV);
+		}	
+		if (lastV == edgeId) {
+			setLastEdgeId(toplevelGraphId, prevV);
+		}	
+
+		
+		//next and previous pointer of previous and next edge need to be set
+		//in any case (only exception: its the globally first or last edge)
+		if (prevV != 0)
+			setNextEdgeId(prevV, nextV);
+		if (nextV != 0)
+			setPreviousEdgeId(prevV, nextV);
+	
+		
+		//remove edge from storage
+		freeEdgeIndex(getLocalElementId(edgeId));
+		setPreviousEdgeId(edgeId, 0);
+		setNextEdgeId(edgeId, 0);
+		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
+		getDiskStorage().removeEdgeFromDiskStorage(getLocalElementId(edgeId));
+		notifyEdgeDeleted(edgeId);
+	}
+
+	
 	
 
 	/**
@@ -1834,7 +1836,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
 		try {
 			record.readComponentValues(io);
 		} catch (GraphIOException e) {
@@ -1845,14 +1847,14 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
 		record.setComponentValues(fields);
 		return record;
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
-		T record = graphFactory.createRecord(recordClass, localGraph);
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
 		record.setComponentValues(components);
 		return record;
 	}
