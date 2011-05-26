@@ -116,18 +116,9 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Vertex vertex);
-	
-	/**
-	 * creates a Subordinate-Graph object for the specified class. The returned
-	 * object may be an instance of a subclass of the specified graphClass.
-	 * 
-	 * @param elem
-	 * @return
-	 * @throws RemoteException 
-	 */
 	public SubordinateGraphImpl createSubordinateGraph(Edge edge);
 	
+	
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
 	 * object may be an instance of a subclass of the specified graphClass.
@@ -136,7 +127,8 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(Edge edge);
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(long elementId);
+	
 
 	
 	/**

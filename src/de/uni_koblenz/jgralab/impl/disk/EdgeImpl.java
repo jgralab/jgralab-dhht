@@ -60,7 +60,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
-
 	public EdgeContainer container;
 
 	/**
@@ -1304,7 +1303,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final boolean isValid() {
-		return storingGraphDatabase.containsEdge(this.getId());
+		return storingGraphDatabase.containsEdgeId(this.getId());
 	}
 	
 	@Override

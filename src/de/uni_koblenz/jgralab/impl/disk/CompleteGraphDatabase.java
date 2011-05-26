@@ -18,8 +18,7 @@ public class CompleteGraphDatabase extends GraphDatabase {
 
 	private final List<Integer> freePartialGraphIds;
 
-	protected CompleteGraphDatabase(CompleteOrPartialGraphImpl localGraph,
-			String hostname) {
+	protected CompleteGraphDatabase(CompleteOrPartialGraphImpl localGraph, String hostname) {
 		super(localGraph);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		hostnames[0] = hostname;

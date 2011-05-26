@@ -1844,7 +1844,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
 		int localGraphId = allocateSubgraphId();
 		int globalGraphId = convertToGlobalSubgraphId(localGraphId);
-		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(m1Class, globalGraphId);
+		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(globalGraphId);
 		
 		GraphData data = getGraphData(localGraphId);
 		data.containingElementId = elementId;
