@@ -966,35 +966,42 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 		int toplevelGraphId = convertToGlobalSubgraphId(1);
 		
-		assert getFirstVertexId(toplevelGraphId) != getLastVertex(toplevelGraphId);
+		assert getFirstVertexId(toplevelGraphId) != getLastVertexId(toplevelGraphId);
 
+		long firstV = getFirstVertexId(toplevelGraphId);
+		long lastV = getLastVertexId(toplevelGraphId);
+		long mvdNextV = getNextVertexId(movedVertexId);
+		long mvdPrevV = getPreviousVertexId(movedVertexId);
+		
 		// remove moved vertex from vSeq
-		if (movedVertexId == getFirstVertexId(toplevelGraphId)) {
-			long nextVId = getNextVertexId(movedVertexId);
-			setFirstVertexId(toplevelGraphId, nextVId);
-			setPreviousVertexId(nextVId, getPreviousVertexId(movedVertexId));
-		} else if (movedVertex == getLastVertex()) {
-			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
-			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
-		} else {
-			((VertexImpl) movedVertex.getPreviousVertex())
-					.setNextVertex(movedVertex.getNextVertex());
-			((VertexImpl) movedVertex.getNextVertex())
-					.setPreviousVertex(movedVertex.getPreviousVertex());
+		if (movedVertexId == firstV) {
+			setFirstVertexId(toplevelGraphId, mvdNextV);
+		} 
+		if (movedVertexId == lastV) {
+			setLastVertexId(toplevelGraphId, mvdPrevV);
+		}
+		if (mvdPrevV != 0) {
+			setNextVertexId(mvdPrevV, mvdNextV);
+		}	
+		if (mvdNextV != 0) {
+			setPreviousVertexId(mvdNextV, mvdPrevV);
+		}
+		
+		// insert moved vertex in vSeq immediately before target
+		else if (targetVertexId == firstV) {
+			setFirstVertexId(toplevelGraphId, movedVertexId);
+		}	
+		
+
+		long tgtPrevV = getPreviousVertexId(targetVertexId);
+		
+		setPreviousVertexId(movedVertexId, tgtPrevV);
+		setNextVertexId(movedVertexId, targetVertexId);
+		setPreviousVertexId(targetVertexId, movedVertexId);
+		if (tgtPrevV != 0) {
+			setNextVertexId(tgtPrevV, movedVertexId);
 		}
 
-		// insert moved vertex in vSeq immediately before target
-		if (targetVertex == getFirstVertex()) {
-			setFirstVertex(movedVertex);
-			movedVertex.setPreviousVertex(null);
-		} else {
-			VertexImpl previousVertex = (VertexImpl) targetVertex
-					.getPreviousVertex();
-			previousVertex.setNextVertex(movedVertex);
-			movedVertex.setPreviousVertex(previousVertex);
-		}
-		movedVertex.setNextVertex(targetVertex);
-		targetVertex.setPreviousVertex(movedVertex);
 		vertexListModified();
 		
 	}
@@ -1027,39 +1034,50 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		assert (targetVertexId != 0) && (containsVertexId(targetVertexId));
 		
 	
-		Vertex nextVertex = targetVertex.getNextVertex();
-		if ((targetVertex == movedVertex) || (nextVertex == movedVertex)) {
+		long prevVertexId = getPreviousVertexId(targetVertexId);
+
+		if ((targetVertexId == movedVertexId) || (prevVertexId == movedVertexId)) {
 			return;
 		}
 
-		assert getFirstVertex() != getLastVertex();
+		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		
+		assert getFirstVertexId(toplevelGraphId) != getLastVertexId(toplevelGraphId);
 
+		long firstV = getFirstVertexId(toplevelGraphId);
+		long lastV = getLastVertexId(toplevelGraphId);
+		long mvdNextV = getNextVertexId(movedVertexId);
+		long mvdPrevV = getPreviousVertexId(movedVertexId);
+		
 		// remove moved vertex from vSeq
-		if (movedVertex == getFirstVertex()) {
-			VertexImpl newFirstVertex = (VertexImpl) movedVertex.getNextVertex();
-			setFirstVertex(newFirstVertex);
-			newFirstVertex.setPreviousVertex(null);
-		} else if (movedVertex == getLastVertex()) {
-			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
-			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
-		} else {
-			((VertexImpl) movedVertex.getPreviousVertex())
-					.setNextVertex(movedVertex.getNextVertex());
-			((VertexImpl) movedVertex.getNextVertex())
-					.setPreviousVertex(movedVertex.getPreviousVertex());
+		if (movedVertexId == firstV) {
+			setFirstVertexId(toplevelGraphId, mvdNextV);
+		} 
+		if (movedVertexId == lastV) {
+			setLastVertexId(toplevelGraphId, mvdPrevV);
+		}
+		if (mvdPrevV != 0) {
+			setNextVertexId(mvdPrevV, mvdNextV);
+		}	
+		if (mvdNextV != 0) {
+			setPreviousVertexId(mvdNextV, mvdPrevV);
+		}
+		
+		// insert moved vertex in vSeq immediately after target
+		else if (targetVertexId == lastV) {
+			setLastVertexId(toplevelGraphId, movedVertexId);
+		}	
+		
+
+		long tgtNextV = getNextVertexId(targetVertexId);
+		
+		setNextVertexId(movedVertexId, tgtNextV);
+		setPreviousVertexId(movedVertexId, targetVertexId);
+		setNextVertexId(targetVertexId, movedVertexId);
+		if (tgtNextV != 0) {
+			setPreviousVertexId(tgtNextV, movedVertexId);
 		}
 
-		// insert moved vertex in vSeq immediately after target
-		if (targetVertex == getLastVertex()) {
-			setLastVertex(movedVertex);
-			movedVertex.setNextVertex(null);
-		} else {
-			((VertexImpl) targetVertex.getNextVertex())
-					.setPreviousVertex(movedVertex);
-			movedVertex.setNextVertex(targetVertex.getNextVertex());
-		}
-		movedVertex.setPreviousVertex(targetVertex);
-		targetVertex.setNextVertex(movedVertex);
 		vertexListModified();
 		
 	}
