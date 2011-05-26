@@ -9,18 +9,33 @@ import java.rmi.Remote;
  */
 public interface RemoteDiskStorageAccess extends Remote {
 
-	public void setFirstIncidenceId(int localElementId, long l);
-
-	public void setLastIncidenceId(int localElementId, long id);
-	
-	public void setNextEdgeId(int localEdgeId, long nextEdgeId);
-	
-	public void setPreviousEdgeId(int localEdgeId, long previousEdgeId);
+	public long getNextVertexId(int localVertexId);
 	
 	public void setNextVertexId(int localVertexId, long nextVertexId);
 	
+	public long getPreviousVertexId(int localVertexId);
+	
 	public void setPreviousVertexId(int localVertexId, long previousVertexId);
 	
+	
+	public long getNextEdgeId(int localEdgeId);
+	
+	public void setNextEdgeId(int localEdgeId, long nextEdgeId);
+	
+	public long getPreviousEdgeId(int localEdgeId);
+	
+	public void setPreviousEdgeId(int localEdgeId, long previousEdgeId);
+	
+	
+	public long getFirstIncidenceId(int localElementId);
+	
+	public void setFirstIncidenceId(int localElementId, long l);
+	
+	public long getLastIncidenceId(int localElementId);
+
+	public void setLastIncidenceId(int localElementId, long id);
+	
+
 	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncId);
 	
 	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId);
@@ -29,6 +44,7 @@ public interface RemoteDiskStorageAccess extends Remote {
 	
 	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long previousIncId);
 
+	
 	public long getSigmaId(int localElementId);
 	
 	public void setSigmaId(int localElementId, long globalSigmaId);

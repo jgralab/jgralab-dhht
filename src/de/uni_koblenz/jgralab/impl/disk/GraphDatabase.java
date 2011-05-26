@@ -324,10 +324,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	   =============================================================== */
 	
 	
-	protected RemoteGraphDatabaseAccess getGraphDatabase(int partialGraphId) {
-		RemoteGraphDatabaseAccess remoteAccess = partialGraphDatabases.get(partialGraphId);
+	protected RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(int partialGraphId) {
+		RemoteGraphDatabaseAccessWithInternalMethods remoteAccess = partialGraphDatabases.get(partialGraphId);
 		if (remoteAccess == null) {
-			remoteAccess = localJGraLabServer.getRemoteInstance(getHostname(partialGraphId)).getGraphDatabase(uniqueGraphId);
+			remoteAccess = (RemoteGraphDatabaseAccessWithInternalMethods) localJGraLabServer.getRemoteInstance(getHostname(partialGraphId)).getGraphDatabase(uniqueGraphId);
 			partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) remoteAccess);
 		}
 		return remoteAccess;
@@ -704,11 +704,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public long getVertexListVersion() {
 		return vertexListVersion;
 	}
-	
-	public int getVCount() {
-		return vCount;
-	}
-	
+		
 	public void setVCount(int localSubgraphId, int count) {
 		getGraphData(localSubgraphId).vCount = count; 
 	}
@@ -867,55 +863,73 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	
+	private long getNextVertexId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
+		diskStore.getNextVertexId(getLocalElementId(vertexId));
+	}
+	
+	private long getPreviousVertexId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
+		diskStore.getPreviousVertexId(getLocalElementId(vertexId));
+	}
+	
+	
 	/**
 	 * Removes the vertex v from the global vertex sequence of this graph.
-	 * 
 	 * @param vertexId
 	 *            a vertex
 	 */
 	protected void removeVertexFromVSeq(long vertexId) {
 		assert vertexId != 0;
+		int partialGraphId = getPartialGraphId(vertexId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).removeVertexFromVSeq(vertexId);
+			return;
+		}	
+		
+		//TODO: instead of the toplevel graph, the lowest subgraph the vertex is 
+		//      contained in needs to be determined. Because of the restrictions to 
+		//      the ordering v may be only the first vertex of the lowest graph 
+		//      it is contained in
 		int toplevelGraphId = convertToGlobalSubgraphId(1);
-		if (vertexId == getFirstVertexId(toplevelGraphId)) {
-			// delete at head of vertex list
-			setFirstVertexId(toplevelGraphId, getNextVertexId(vertexId));
-			if (getFirstVertex() != null) {
-				((VertexImpl) getFirstVertex()).setPreviousVertex(null);
-			}
-			if (vertexId == getLastVertex()) {
-				// this vertex was the only one...
-				setLastVertex(null);
-			}
-		} else if (vertexId == getLastVertex()) {
-			// delete at tail of vertex list
-			setLastVertex((VertexImpl) vertexId.getPreviousVertex());
-			if (getLastVertex() != null) {
-				((VertexImpl) getLastVertex()).setNextVertex(null);
-			}
-		} else {
-			// delete somewhere in the middle
-			((VertexImpl) vertexId.getPreviousVertex()).setNextVertex(vertexId
-					.getNextVertex());
-			((VertexImpl) vertexId.getNextVertex()).setPreviousVertex(vertexId
-					.getPreviousVertex());
-		}
-		// freeIndex(getFreeVertexList(), v.getId());
-		freeVertexIndex(vertexId.getId());
-		vertexId.setPreviousVertex(null);
-		vertexId.setNextVertex(null);
-		localGraphDatabase.removeVertexFromDatabase(vertexId);
-		vertexId.setId(0);
-		setVCount(getVCount() - 1);
+		
+		//if current vertex is the first or last one in the local graph,
+		//the respecitive values need to be set to its next or previous vertex 
+		long firstV = getFirstVertexId(toplevelGraphId);
+		long lastV = getLastVertexId(toplevelGraphId);
+		long nextV = getNextVertexId(vertexId);
+		long prevV = getPreviousVertexId(vertexId);
+		
+		if (firstV == vertexId) {
+			setFirstVertexId(toplevelGraphId, nextV);
+		}	
+		if (lastV == vertexId) {
+			setLastVertexId(toplevelGraphId, prevV);
+		}	
+
+		
+		//next and previous pointer of previous and next vertex need to be set
+		//in any case (only exception: its the globally first or last vertex)
+		if (prevV != 0)
+			setNextVertexId(prevV, nextV);
+		if (nextV != 0)
+			setPreviousVertexId(prevV, nextV);
+	
+		
+		//remove vertex from storage
+		freeVertexIndex(getLocalElementId(vertexId));
+		setPreviousVertexId(vertexId, 0);
+		setNextVertexId(vertexId, 0);
+		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
+		getDiskStorage().removeVertexFromDiskStorage(getLocalElementId(vertexId));
+		notifyVertexDeleted(vertexId);
 	}
 	
-	private void vertexAfterDeleted(VertexImpl v) {
-		// TODO Notify all graph objects 
-		
-	}
 
 
-		
-		
 	/**
 	 * Modifies vSeq such that the movedVertex is immediately before the
 	 * targetVertex.
@@ -944,17 +958,21 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param movedVertexId global id of the vertex to be moved
 	 */
 	public void putVertexBefore(long targetVertexId, long movedVertexId) {
-		Vertex prevVertex = targetVertex.getPreviousVertex();
-		if ((targetVertex == movedVertex) || (prevVertex == movedVertex)) {
+		long prevVertexId = getPreviousVertexId(targetVertexId);
+
+		if ((targetVertexId == movedVertexId) || (prevVertexId == movedVertexId)) {
 			return;
 		}
 
-		assert getFirstVertex() != getLastVertex();
+		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		
+		assert getFirstVertexId(toplevelGraphId) != getLastVertex(toplevelGraphId);
 
 		// remove moved vertex from vSeq
-		if (movedVertex == getFirstVertex()) {
-			setFirstVertex((VertexImpl) movedVertex.getNextVertex());
-			((VertexImpl) movedVertex.getNextVertex()).setPreviousVertex(null);
+		if (movedVertexId == getFirstVertexId(toplevelGraphId)) {
+			long nextVId = getNextVertexId(movedVertexId);
+			setFirstVertexId(toplevelGraphId, nextVId);
+			setPreviousVertexId(nextVId, getPreviousVertexId(movedVertexId));
 		} else if (movedVertex == getLastVertex()) {
 			setLastVertex((VertexImpl) movedVertex.getPreviousVertex());
 			((VertexImpl) movedVertex.getPreviousVertex()).setNextVertex(null);
@@ -1154,7 +1172,18 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return eId;
 	}
 
-
+	private long getNextEdgeId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
+		diskStore.getNextEdgeId(getLocalElementId(vertexId));
+	}
+	
+	private long getPreviousEdgeId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
+		diskStore.getPreviousEdgeId(getLocalElementId(vertexId));
+	}
+	
 	
 	@Override
 	public long createEdge(int edgeClassId) {

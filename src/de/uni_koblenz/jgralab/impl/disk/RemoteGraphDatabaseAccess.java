@@ -150,8 +150,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 	public void setFirstVertexId(int globalSubgraphId, long id);
 
-
-
 	public void setLastVertexId(int globalSubgraphId, long id);
 	
 	/* =====================================================
@@ -236,6 +234,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public void setLastEdgeId(int globalSubgraphId, long id);
+
+	
 	
 	
 	/* =====================================================

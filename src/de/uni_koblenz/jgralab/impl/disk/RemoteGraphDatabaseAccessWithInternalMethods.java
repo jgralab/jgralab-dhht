@@ -21,6 +21,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * returns.
 	 */
 	public void internalNotifyVertexDeleted(long vertexId);
+
 	
 	/**
 	 * Notifies this graph database that the edge identified by its global edge id
@@ -49,5 +50,9 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * returns.
 	 */
 	public void internalNotifyIncidenceDeleted(long incidenceId);
+
+	public Object removeVertexFromVSeq(long vertexId);
+
+
 	
 }

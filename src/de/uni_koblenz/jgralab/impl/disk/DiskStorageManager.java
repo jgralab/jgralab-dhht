@@ -786,19 +786,17 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 	
 
-	public void removeEdgeFromDiskStorage(long edgeId) {
-		int eId = getLocalId(edgeId);
-		EdgeContainer storage = getEdgeContainer(eId);
-		int id = getElementIdInContainer(eId);
+	public void removeEdgeFromDiskStorage(int edgeId) {
+		EdgeContainer storage = getEdgeContainer(edgeId);
+		int id = getElementIdInContainer(edgeId);
 		storage.edges[id] = null;
 		storage.types[id] = 0;
 	}
 
 
-	public void removeVertexFromDiskStorage(long vertexId) {
-		int vId = getLocalId(vertexId);
-		VertexContainer storage = getVertexContainer(vId);
-		int id = getElementIdInContainer(vId);
+	public void removeVertexFromDiskStorage(int vertexId) {
+		VertexContainer storage = getVertexContainer(vertexId);
+		int id = getElementIdInContainer(vertexId);
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
 	}
