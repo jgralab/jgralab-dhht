@@ -79,8 +79,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	public long convertToGlobalId(int localId) {
 		long l = localPartialGraphId << (64-BITS_FOR_PARTIAL_GRAPH_MASK);
 		return l + localId;
-	}
-	
+	}	
 	
 	public int convertToGlobalSubgraphId(int localId) {
 		int i = localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK);
@@ -164,30 +163,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 */
 	protected long edgeListVersion;
 
-	/**
-	 * maximum number of vertices
-	 */
-	protected int vMax;
-
-	/**
-	 * current number of vertices
-	 */
-	private final int vCount;
-	
-	/**
-	 * maximum number of edges
-	 */
-	protected int eMax;
-	
-	/**
-	 * current number of edges
-	 */
-	protected int eCount;
-		
-	/**
-	 * current number of incidences
-	 */
-	protected int iCount;
 	
 
 
@@ -232,6 +207,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private GraphData getGraphData(int localSubgraphId) {
 		GraphData data = localSubgraphData.get(localSubgraphId);
 		return data;
+	}
+		
+	private int allocateSubgraphId() {
+		return localSubgraphData.size();
 	}
 	
 	
@@ -304,7 +283,6 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		
 		//initialize fields
 		graphVersion = -1;
-		vCount =0;
 		setGraphVersion(0);
 
 		//register graph database at server
@@ -710,7 +688,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 	
 	public int getMaxVCount() {
-		return vMax;
+		return Integer.MAX_VALUE;
 	}
 	
 	/**
@@ -867,13 +845,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private long getNextVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
-		diskStore.getNextVertexId(getLocalElementId(vertexId));
+		return diskStore.getNextVertexId(getLocalElementId(vertexId));
 	}
 	
 	private long getPreviousVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
-		diskStore.getPreviousVertexId(getLocalElementId(vertexId));
+		return diskStore.getPreviousVertexId(getLocalElementId(vertexId));	
 	}
 	
 	
@@ -1142,17 +1120,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	/* **************************************************************************
 	 * Methods to access Eseq
 	 * **************************************************************************/
-	
-	public int getECount() {
-		return eCount;
-	}
-	
-	private void setECount(int i) {
-		eCount = i;
-	}	
-	
+			
 	public int getMaxECount() {
-		return eMax;
+		return Integer.MAX_VALUE;
 	}
 
 	public long getEdgeListVersion() {
@@ -1194,13 +1164,13 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	private long getNextEdgeId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
-		diskStore.getNextEdgeId(getLocalElementId(vertexId));
+		return diskStore.getNextEdgeId(getLocalElementId(vertexId));
 	}
 	
 	private long getPreviousEdgeId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
-		diskStore.getPreviousEdgeId(getLocalElementId(vertexId));
+		return diskStore.getPreviousEdgeId(getLocalElementId(vertexId));
 	}
 	
 	
@@ -1540,10 +1510,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		int iId = freeIncidenceList.allocateIndex();
 		return iId;
 	}
-	
-	public long getICount(int globalSubgraphId) {
-		return iCount;
-	}
+
 	
 	/**
 	 * Sets the first {@link Incidence} of this {@link GraphElement} to
@@ -1691,42 +1658,17 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 
 		incidenceListModified(vertexId);
+		
+		
+		localDiskStorage.storeIncidence(newInc);
+		if (!isLoading()) {
+			notifyIncidenceAdded(incId);
+		}
 		return incId;
 	}
 
 
 
-
-	protected void addIncidence(Incidence newIncidence) {
-		IncidenceImpl i = (IncidenceImpl) newIncidence;
-		long iId = i.getId();
-		if (isLoading()) {
-			if (iId > 0) {
-				// the given vertex already has an id, try to use it
-				if (containsIncidenceId(iId)) {
-					throw new GraphException("incidence with id " + iId
-							+ " already exists");
-				}
-			} else {
-				throw new GraphException(
-						"can not load an incidence with id <= 0");
-			}
-		} else {
-			if (!canAddGraphElement(iId)) {
-				throw new GraphException("can not add an incidence with iId "
-						+ iId);
-			}
-			int intId = allocateIncidenceIndex();
-			assert iId != 0;
-			i.setId(convertToGlobalId(intId));
-			
-		}
-		localDiskStorage.storeIncidence(i);
-		if (!isLoading()) {
-			internalIncidenceAdded(i);
-		}
-	}
-	
 	
 
 
@@ -1882,47 +1824,9 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
 
 
-
-
-	
-	
-
-
-
-	
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-	
-	
-
-	
-
-
-
-
-	public Graph createViewGraph(SubordinateGraphImpl subordinateGraphImpl,
-			int kappa) {
+	public Graph createViewGraph(Graph g, int kappa) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -1934,84 +1838,26 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
-	//TODO: Move logics to GraphDb
-	protected createSubordinateGraphImpl(Vertex containingVertex) {
-		super(containingVertex.getGraph().getType());
-		initializeCommonFields(containingVertex);
-//System.out.println("Initialozing subordinate graph " + this);
-		for (Vertex current = containingVertex.getNextVertex((Graph) null); 
-		     current != null && ((GraphElementImpl<?, ?, ?>) current).isChildOf(getContainingElement()); 
-		     current = current.getNextVertex((Graph)null)) {
-			if (getFirstVertex() == null) {
-				setFirstVertex((VertexImpl) current);
-			}
-			//System.out.println("  Iterating vertex " + current);
-			setLastVertex((VertexImpl) current);
-			setVCount(getVCount()+1);
-		}
-//System.out.println("Iterating edges");
-		// initialize edges
-		Edge current = containingVertex.getGraph().getFirstEdge();
-		while (current != null
-				&& !((GraphElementImpl<?, ?, ?>) current).isChildOf(getContainingElement())) {
-			current = current.getNextEdge();
-		}
-		if (current != null) {
-			setFirstEdge((EdgeImpl) current);
-			do {
-				setLastEdge((EdgeImpl) current);
-				setECount(getECount() + 1);
-				setICount(getICount() + current.getDegree());
-				current = current.getNextEdge();
-			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?>) current)
-							.isChildOf(containingElement));
-		}
-		getCompleteGraph().addGraphStructureChangedListener(this);
+
+	public int createSubordinateGraph(long elementId) {
+		//get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+		int localGraphId = allocateSubgraphId();
+		int globalGraphId = convertToGlobalSubgraphId(localGraphId);
+		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(m1Class, globalGraphId);
+		
+		GraphData data = getGraphData(localGraphId);
+		data.containingElementId = elementId;
+		data.parentDistributedGraphId = localPartialGraphId;
+		data.subgraphId = globalGraphId;
+		data.typeId = schema.getClassId(m1Class);
+		data.vCount = 0;
+		data.eCount = 0;
+		localSubgraphData.add(data);
+		return globalGraphId;
 	}
 
-	/**
-	 * TODO GraphClass == containingElement.getType()?
-	 * 
-	 * @param containingEdge
-	 *            {@link Edge} which contains this subordinate graph
-	 */
-	//TODO: Move logics to GraphDb
-	protected long createSubordinateGraphImpl(Edge containingEdge) {
-		//super(containingEdge.getGraph().getType());
-	//	initializeCommonFields(containingEdge);
 
-		// initialize edges
-		for (Edge current = containingEdge.getNextEdge(); current != null
-				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current.getNextEdge()) {
-			if (getFirstEdge() == null) {
-				setFirstEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-			}
-			setLastEdge((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) current);
-			eCount++;
-			iCount += current.getDegree();
-		}
-
-		// initialize vertices
-		Vertex current = containingEdge.getGraph().getFirstVertex();
-		while (current != null
-				&& !((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement)) {
-			current = current.getNextVertex();
-		}
-		if (current != null) {
-			setFirstVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-			do {
-				setLastVertex((de.uni_koblenz.jgralab.impl.mem.VertexImpl) current);
-				setVCount(getVCount() + 1);
-				current = current.getNextVertex();
-			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?>) current)
-							.isChildOf(containingElement));
-		}
-		getCompleteGraph().addGraphStructureChangedListener(this);
-	}
 
 
 
