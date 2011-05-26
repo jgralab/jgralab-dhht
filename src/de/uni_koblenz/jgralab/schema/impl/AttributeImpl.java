@@ -72,10 +72,6 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 
 	private Object defaultValue;
 
-	private Object defaultTransactionValue;
-
-	private boolean defaultTransactionValueComputed;
-
 	private boolean defaultValueComputed;
 
 	/**

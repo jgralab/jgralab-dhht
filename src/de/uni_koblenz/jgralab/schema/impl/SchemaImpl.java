@@ -62,6 +62,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.ProgressFunction;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.codegenerator.BinaryEdgeCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.ClassFileAbstraction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGenerator;
@@ -156,10 +157,8 @@ public class SchemaImpl implements Schema {
 	 * this schema are generated. The impl package is child of the package for
 	 * Schema.
 	 */
-	public static final String IMPLSTDPACKAGENAME = "impl.std";
-	public static final String IMPLTRANSPACKAGENAME = "impl.trans";
-	public static final String IMPLDATABASEPACKAGENAME = "impl.db";
-	public static final String IMPLSAVEMEMPACKAGENAME = "impl.savemem";
+	public static final String IMPLDISKPACKAGENAME = "impl.disk";
+	public static final String IMPLMEMORYPACKAGENAME = "impl.mem";
 
 	static final Class<?>[] VERTEX_CLASS_CREATE_SIGNATURE = { int.class };
 
@@ -326,22 +325,7 @@ public class SchemaImpl implements Schema {
 
 	private CodeGeneratorConfiguration createDefaultConfig() {
 		CodeGeneratorConfiguration out = new CodeGeneratorConfiguration();
-		// TODO Add SAVEMEM.
-		if (java.lang.Package.getPackage(packagePrefix + ". "
-				+ IMPLSTDPACKAGENAME) == null) {
-			out.setStandardSupport(false);
-		}
-		if (java.lang.Package.getPackage(packagePrefix + ". "
-				+ IMPLTRANSPACKAGENAME) != null) {
-			out.setTransactionSupport(true);
-		}
-		if (java.lang.Package.getPackage(packagePrefix + ". "
-				+ IMPLDATABASEPACKAGENAME) != null) {
-			out.setDatabaseSupport(true);
-		}
-
 		return out.withMethodsForSubclassesSupport();
-		// TODO: Monte, check for the other values :-)
 	}
 
 	void addDomain(Domain dom) {
@@ -1142,22 +1126,16 @@ public class SchemaImpl implements Schema {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private Class<? extends Graph> getGraphClassImpl(
-			ImplementationType implementationType) {
+	private Class<? extends Graph> getGraphClassImpl(ImplementationType implementationType) {
 		String implClassName = packagePrefix + ".";
 		// determine package
 		switch (implementationType) {
-		case STANDARD:
-			implClassName += IMPLSTDPACKAGENAME;
+		case DISK:
+			implClassName += IMPLDISKPACKAGENAME;
 			break;
-		case TRANSACTION:
-			implClassName += IMPLTRANSPACKAGENAME;
+		case MEMORY:
+			implClassName += IMPLMEMORYPACKAGENAME;
 			break;
-		case SAVEMEM:
-			implClassName += IMPLSAVEMEMPACKAGENAME;
-			break;
-		case DATABASE:
-			implClassName += IMPLDATABASEPACKAGENAME;
 		default:
 			throw new SchemaException("Implementation type "
 					+ implementationType + " not supported yet.");
@@ -1394,6 +1372,12 @@ public class SchemaImpl implements Schema {
 		typedElementClasses.add(clazz);
 		int id = typedElementClasses.size();
 		clazz.setId(id);
+	}
+
+	@Override
+	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

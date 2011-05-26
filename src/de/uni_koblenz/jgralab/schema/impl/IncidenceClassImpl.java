@@ -109,14 +109,6 @@ public class IncidenceClassImpl extends
 	 * The class object representing the generated interface for this
 	 * AttributedElementClass
 	 */
-	private Class<? extends Incidence> m1Class;
-
-	/**
-	 * The class object representing the implementation class for this
-	 * AttributedElementClass. This may be either the generated class or a
-	 * subclass of this
-	 */
-	private Class<? extends Incidence> m1ImplementationClass;
 
 	@Override
 	public GraphElementClass<?, ?> getOtherGraphElementClass(
