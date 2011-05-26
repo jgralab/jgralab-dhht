@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.HashMap;
 
 import de.uni_koblenz.jgralab.AttributedElement;
@@ -69,7 +68,7 @@ public abstract class MapGraphMarker<T extends AttributedElement<?, ?>, O>
 	/**
 	 * Creates a new GraphMarker
 	 */
-	protected MapGraphMarker(Graph g) throws RemoteException {
+	protected MapGraphMarker(Graph g) {
 		super(g);
 		tempAttributeMap = new HashMap<T, O>();
 	}
@@ -83,7 +82,7 @@ public abstract class MapGraphMarker<T extends AttributedElement<?, ?>, O>
 	 * @return the object that marks the given element or <code>null</code> if
 	 *         the given element is not marked in this marking.
 	 */
-	public O getMark(T elem) throws RemoteException {
+	public O getMark(T elem) {
 		if (elem == null) {
 			return null;
 		}
@@ -102,7 +101,7 @@ public abstract class MapGraphMarker<T extends AttributedElement<?, ?>, O>
 	 * @return The previous element the given graph element has been marked
 	 *         with, <code>null</code> if the given element has not been marked.
 	 */
-	public O mark(T elem, O value) throws RemoteException {
+	public O mark(T elem, O value) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -149,14 +148,14 @@ public abstract class MapGraphMarker<T extends AttributedElement<?, ?>, O>
 	}
 
 	@Override
-	public boolean isMarked(T elem) throws RemoteException {
+	public boolean isMarked(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
-	public boolean removeMark(T elem) throws RemoteException {
+	public boolean removeMark(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.remove(elem) != null;

@@ -41,12 +41,12 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 
-	public DoubleEdgeMarker(Graph graph) throws RemoteException {
+	public DoubleEdgeMarker(Graph graph) {
 		super(graph, graph.getMaxECount() + 1);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e) {
 		removeMark(e);
 	}
 
@@ -69,17 +69,17 @@ public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 	}
 
 	@Override
-	public double mark(Edge edge, double value) throws RemoteException {
+	public double mark(Edge edge, double value) {
 		return super.mark(edge, value);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) throws RemoteException {
+	public boolean isMarked(Edge edge) {
 		return super.isMarked(edge);
 	}
 
 	@Override
-	public double getMark(Edge edge) throws RemoteException {
+	public double getMark(Edge edge) {
 		return super.getMark(edge);
 	}
 

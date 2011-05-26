@@ -42,7 +42,7 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 		GraphStructureChangedAdapterWithAutoRemove {
 	protected final Graph graph;
 
-	protected AbstractGraphMarker(Graph graph) throws RemoteException {
+	protected AbstractGraphMarker(Graph graph) {
 		this.graph = graph;
 		// register the graph marker at the graph
 		graph.addGraphStructureChangedListener(this);
@@ -55,7 +55,7 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	 *            the graph element to check.
 	 * @return true if the given <code>graphElement</code> is marked.
 	 */
-	public abstract boolean isMarked(T graphElement) throws RemoteException;
+	public abstract boolean isMarked(T graphElement);
 
 	/**
 	 * Unmarks the given <code>graphElement</code>.
@@ -66,43 +66,43 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	 *         unmarked.
 	 * @throws RemoteException 
 	 */
-	public abstract boolean removeMark(T graphElement) throws RemoteException;
+	public abstract boolean removeMark(T graphElement);
 
 	/**
 	 * Returns the number of marked graph elements.
 	 * 
 	 * @return the number of marked graph elements.
 	 */
-	public abstract int size() throws RemoteException;
+	public abstract int size();
 
 	/**
 	 * Checks if this graph marker is empty.
 	 * 
 	 * @return true if this graph marker is empty.
 	 */
-	public abstract boolean isEmpty() throws RemoteException;
+	public abstract boolean isEmpty();
 
 	/**
 	 * Unmarks all marked graph elements.
 	 */
-	public abstract void clear() throws RemoteException;
+	public abstract void clear();
 
-	public Graph getGraph() throws RemoteException {
+	public Graph getGraph() {
 		return graph;
 	}
 
-	public abstract Iterable<T> getMarkedElements() throws RemoteException;
+	public abstract Iterable<T> getMarkedElements();
 
 	@Override
-	public abstract void edgeDeleted(Edge e) throws RemoteException;
+	public abstract void edgeDeleted(Edge e);
 
 	@Override
-	public abstract void maxEdgeCountIncreased(int newValue) throws RemoteException;
+	public abstract void maxEdgeCountIncreased(int newValue);
 
 	@Override
-	public abstract void maxVertexCountIncreased(int newValue) throws RemoteException;
+	public abstract void maxVertexCountIncreased(int newValue);
 
 	@Override
-	public abstract void vertexDeleted(Vertex v) throws RemoteException;
+	public abstract void vertexDeleted(Vertex v);
 
 }

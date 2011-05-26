@@ -30,8 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
@@ -53,7 +51,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	protected int marked;
 	protected long version;
 
-	protected ArrayGraphMarker(Graph graph, int size) throws RemoteException {
+	protected ArrayGraphMarker(Graph graph, int size) {
 		super(graph);
 		temporaryAttributes = new Object[size];
 		marked = 0;
@@ -73,14 +71,14 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	}
 
 	@Override
-	public boolean isMarked(T graphElement) throws RemoteException {
+	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		return temporaryAttributes[graphElement.getId()] != null;
 	}
 
-	public O getMark(T graphElement) throws RemoteException {
+	public O getMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -99,7 +97,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	 * @return The previous element the given graph element has been marked
 	 *         with, <code>null</code> if the given element has not been marked.
 	 */
-	public O mark(T graphElement, O value) throws RemoteException {
+	public O mark(T graphElement, O value) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -117,7 +115,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	}
 
 	@Override
-	public boolean removeMark(T graphElement) throws RemoteException {
+	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));

@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.BitSet;
 
 import de.uni_koblenz.jgralab.Graph;
@@ -57,7 +56,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	 * 
 	 * @param graph
 	 */
-	protected BitSetGraphMarker(Graph graph) throws RemoteException {
+	protected BitSetGraphMarker(Graph graph) {
 		super(graph);
 		marks = new BitSet();
 	}
@@ -70,7 +69,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	 * @return false if the given <code>graphElement</code> has already been
 	 *         marked.
 	 */
-	public boolean mark(T graphElement) throws RemoteException {
+	public boolean mark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -81,7 +80,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public boolean removeMark(T graphElement) throws RemoteException {
+	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
@@ -107,7 +106,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public boolean isMarked(T graphElement) throws RemoteException {
+	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));

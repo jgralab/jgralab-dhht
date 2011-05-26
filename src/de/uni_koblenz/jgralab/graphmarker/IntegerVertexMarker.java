@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class IntegerVertexMarker extends IntegerGraphMarker<Vertex> {
 
-	public IntegerVertexMarker(Graph graph) throws RemoteException {
+	public IntegerVertexMarker(Graph graph) {
 		super(graph, graph.getMaxVCount() + 1);
 	}
 
@@ -64,7 +64,7 @@ public class IntegerVertexMarker extends IntegerGraphMarker<Vertex> {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		removeMark(v);
 	}
 

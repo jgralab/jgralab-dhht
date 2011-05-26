@@ -41,12 +41,12 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 
-	public IntegerEdgeMarker(Graph graph) throws RemoteException {
+	public IntegerEdgeMarker(Graph graph) {
 		super(graph, graph.getMaxECount() + 1);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e) {
 		removeMark(e);
 	}
 
@@ -69,17 +69,17 @@ public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 	}
 
 	@Override
-	public int mark(Edge edge, int value) throws RemoteException {
+	public int mark(Edge edge, int value) {
 		return super.mark(edge, value);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) throws RemoteException {
+	public boolean isMarked(Edge edge) {
 		return super.isMarked(edge);
 	}
 
 	@Override
-	public int getMark(Edge edge) throws RemoteException {
+	public int getMark(Edge edge) {
 		return super.getMark(edge);
 	}
 

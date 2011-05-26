@@ -41,12 +41,12 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class BitSetVertexMarker extends BitSetGraphMarker<Vertex> {
 
-	public BitSetVertexMarker(Graph graph) throws RemoteException {
+	public BitSetVertexMarker(Graph graph) {
 		super(graph);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		removeMark(v);
 	}
 

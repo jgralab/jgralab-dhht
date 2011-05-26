@@ -46,12 +46,12 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e) {
 		removeMark(e);
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
+	public void maxEdgeCountIncreased(int newValue) {
 		newValue++;
 		if (newValue > temporaryAttributes.length) {
 			expand(newValue);
@@ -59,12 +59,12 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) throws RemoteException {
+	public void maxVertexCountIncreased(int newValue) {
 		// do nothing
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		// do nothing
 	}
 
@@ -117,11 +117,7 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 									MODIFIED_ERROR_MESSAGE);
 						}
 						Edge next;
-						try {
-							next = graph.getEdge(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

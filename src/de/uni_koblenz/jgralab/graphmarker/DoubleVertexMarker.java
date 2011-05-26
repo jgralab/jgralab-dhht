@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class DoubleVertexMarker extends DoubleGraphMarker<Vertex> {
 
-	public DoubleVertexMarker(Graph graph) throws RemoteException {
+	public DoubleVertexMarker(Graph graph) {
 		super(graph, graph.getMaxVCount() + 1);
 	}
 
@@ -64,7 +64,7 @@ public class DoubleVertexMarker extends DoubleGraphMarker<Vertex> {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		removeMark(v);
 	}
 

@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -41,7 +40,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class LongVertexMarker extends LongGraphMarker<Vertex> {
 
-	public LongVertexMarker(Graph graph) throws RemoteException {
+	public LongVertexMarker(Graph graph) {
 		super(graph, graph.getMaxVCount() + 1);
 	}
 
@@ -64,7 +63,7 @@ public class LongVertexMarker extends LongGraphMarker<Vertex> {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		removeMark(v);
 	}
 
@@ -101,11 +100,7 @@ public class LongVertexMarker extends LongGraphMarker<Vertex> {
 									MODIFIED_ERROR_MESSAGE);
 						}
 						Vertex next;
-						try {
-							next = graph.getVertex(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}

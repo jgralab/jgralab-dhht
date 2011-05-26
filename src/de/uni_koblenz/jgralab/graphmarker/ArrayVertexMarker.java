@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -48,7 +47,7 @@ import de.uni_koblenz.jgralab.Vertex;
  */
 public class ArrayVertexMarker<O> extends ArrayGraphMarker<Vertex, O> {
 
-	public ArrayVertexMarker(Graph graph) throws RemoteException {
+	public ArrayVertexMarker(Graph graph) {
 		super(graph, graph.getMaxVCount() + 1);
 	}
 
@@ -58,12 +57,12 @@ public class ArrayVertexMarker<O> extends ArrayGraphMarker<Vertex, O> {
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) throws RemoteException {
+	public void maxEdgeCountIncreased(int newValue) {
 		// do nothing
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) throws RemoteException {
+	public void maxVertexCountIncreased(int newValue) {
 		newValue++;
 		if (newValue > temporaryAttributes.length) {
 			expand(newValue);
@@ -71,7 +70,7 @@ public class ArrayVertexMarker<O> extends ArrayGraphMarker<Vertex, O> {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v) {
 		removeMark(v);
 	}
 
@@ -108,11 +107,7 @@ public class ArrayVertexMarker<O> extends ArrayGraphMarker<Vertex, O> {
 									MODIFIED_ERROR_MESSAGE);
 						}
 						Vertex next;
-						try {
-							next = graph.getVertex(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}
