@@ -1251,6 +1251,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 			e.setPreviousEdge(getLastEdge());
 		}
 		setLastEdge(e);
+		
 	}
 
 
@@ -1329,111 +1330,173 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 
 	}
 	
+
 	/**
-	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
-	 * directly after the edge identified by targetEdgeId
-	 * @param targetEdgeId global id of the target edge
-	 * @param movedEdgeId global id of the edge to be moved
+	 * Modifies vSeq such that the movedEdge is immediately before the
+	 * targetEdge.
+	 * 
+	 * GlobalOperation
+	 * 
+	 * @param targetEdge
+	 *            a edge
+	 * @param movedEdge
+	 *            the edge to be moved
 	 */
-	protected void putEdgeAfter(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		assert (targetEdge != null) && targetEdge.isValid()	&& containsEdge(targetEdge);
-		assert (movedEdge != null) && movedEdge.isValid() && containsEdge(movedEdge);
-		putEdgeAfter(targetEdge.getId(), movedEdge.getId());
-	}	
-		
-	protected void putEdgeAfter(long targetEdgeId, long movedEdgeId) {
-		assert (targetEdgeId != 0) && containsEdgeId(targetEdgeId);
-		assert (movedEdgeId != 0) &&  containsEdge(movedEdgeId);
-		assert targetEdge != movedEdge;
-
-		if ((targetEdge == movedEdge) || (targetEdge.getNextEdge() == movedEdge)) {
-			return;
-		}
-
-		assert getFirstEdge() != getLastEdge();
-
-		// remove moved edge from eSeq
-		if (movedEdge == getFirstEdge()) {
-			setFirstEdge((EdgeImpl) movedEdge.getNextEdge());
-			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(null);
-		} else if (movedEdge == getLastEdge()) {
-			setLastEdge((EdgeImpl) movedEdge.getPreviousEdge());
-			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(null);
-		} else {
-			((EdgeImpl) movedEdge.getPreviousEdge()).setNextEdge(movedEdge
-					.getNextEdge());
-			((EdgeImpl) movedEdge.getNextEdge()).setPreviousEdge(movedEdge
-					.getPreviousEdge());
-		}
-
-		// insert moved edge in eSeq immediately after target
-		if (targetEdge == getLastEdge()) {
-			setLastEdge(movedEdge);
-			movedEdge.setNextEdge(null);
-		} else {
-			((EdgeImpl) targetEdge.getNextEdge()).setPreviousEdge(movedEdge);
-			movedEdge.setNextEdge(targetEdge.getNextEdge());
-		}
-		movedEdge.setPreviousEdge(targetEdge);
-		targetEdge.setNextEdge(movedEdge);
-		edgeListModified();
-	}
-	
-	
-	
-	/**
-	 * Global methods, changes Eseq so that the edge identified by movedEdgeId is 
-	 * directly before the edge identified by targetEdgeId
-	 * @param targetEdgeId global id of the target edge
-	 * @param movedEdgeId global id of the edge to be moved
-	 */
-	public void putEdgeBefore(long targetEdgeId,  long movedEdgeId) {
-		Edge targetEdge = getEdgeObject(e);
-		Edge movedEdge = getEdgeObject(edgeImpl);
+	protected void putEdgeBefore(EdgeImpl targetEdge,	EdgeImpl movedEdge) {
 		assert (targetEdge != null) && targetEdge.isValid()
 				&& containsEdge(targetEdge);
 		assert (movedEdge != null) && movedEdge.isValid()
 				&& containsEdge(movedEdge);
 		assert targetEdge != movedEdge;
+		putEdgeBefore(targetEdge.getId(), movedEdge.getId());
+		
+	}
 
-		if ((targetEdge == movedEdge)
-				|| (targetEdge.getPreviousEdge() == movedEdge)) {
+	/**
+	 * Global methods, changes Vseq so that the edge identified by movedEdgeId is 
+	 * directly before the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
+	 */
+	public void putEdgeBefore(long targetEdgeId, long movedEdgeId) {
+		long prevEdgeId = getPreviousEdgeId(targetEdgeId);
+
+		if ((targetEdgeId == movedEdgeId) || (prevEdgeId == movedEdgeId)) {
 			return;
 		}
 
-		assert getFirstEdge() != getLastEdge();
+		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		
+		assert getFirstEdgeId(toplevelGraphId) != getLastEdgeId(toplevelGraphId);
 
-		removeEdgeFromESeqWithoutDeletingIt((EdgeImpl) movedEdge);
-
-		// insert moved edge in eSeq immediately before target
-		if (targetEdge == getFirstEdge()) {
-			setFirstEdge(movedEdge);
-			setPreviousEdge(movedEdge, null);
-		} else {
-			EdgeImpl previousEdge = ((EdgeImpl) targetEdge.getPreviousEdge());
-			previousEdge.setNextEdge(movedEdge);
-			setPreviousEdge(movedEdge, previousEdge);
+		long firstV = getFirstEdgeId(toplevelGraphId);
+		long lastV = getLastEdgeId(toplevelGraphId);
+		long mvdNextV = getNextEdgeId(movedEdgeId);
+		long mvdPrevV = getPreviousEdgeId(movedEdgeId);
+		
+		// remove moved edge from vSeq
+		if (movedEdgeId == firstV) {
+			setFirstEdgeId(toplevelGraphId, mvdNextV);
+		} 
+		if (movedEdgeId == lastV) {
+			setLastEdgeId(toplevelGraphId, mvdPrevV);
 		}
-		setNextEdge(movedEdge, targetEdge);
-		setPreviousEdge(targetEdge, movedEdge);
+		if (mvdPrevV != 0) {
+			setNextEdgeId(mvdPrevV, mvdNextV);
+		}	
+		if (mvdNextV != 0) {
+			setPreviousEdgeId(mvdNextV, mvdPrevV);
+		}
+		
+		// insert moved edge in vSeq immediately before target
+		else if (targetEdgeId == firstV) {
+			setFirstEdgeId(toplevelGraphId, movedEdgeId);
+		}	
+		
+
+		long tgtPrevV = getPreviousEdgeId(targetEdgeId);
+		
+		setPreviousEdgeId(movedEdgeId, tgtPrevV);
+		setNextEdgeId(movedEdgeId, targetEdgeId);
+		setPreviousEdgeId(targetEdgeId, movedEdgeId);
+		if (tgtPrevV != 0) {
+			setNextEdgeId(tgtPrevV, movedEdgeId);
+		}
+
 		edgeListModified();
+		
 	}
 
+	
+	/**
+	 * Modifies vSeq such that the movedEdge is immediately after the
+	 * targetEdge.
+	 * 
+	 * @param targetEdge
+	 *            a edge
+	 * @param movedEdge
+	 *            the edge to be moved
+	 */
+	protected void putEdgeAfter(EdgeImpl targetEdge, EdgeImpl movedEdge) {
+		assert (targetEdge != null) && targetEdge.isValid()	&& containsEdge(targetEdge);
+		assert (movedEdge != null) && movedEdge.isValid() && containsEdge(movedEdge);
+		assert targetEdge != movedEdge;
+
+	}	
+	
+	/**
+	 * Global methods, changes Vseq so that the edge identified by movedEdgeId is 
+	 * directly after the edge identified by targetEdgeId
+	 * @param targetEdgeId global id of the target edge
+	 * @param movedEdgeId global id of the edge to be moved
+	 */
+	public void putEdgeAfter(long targetEdgeId, long movedEdgeId)  {
+		assert (targetEdgeId != 0) && (containsEdgeId(targetEdgeId));
+		assert (targetEdgeId != 0) && (containsEdgeId(targetEdgeId));
 		
 	
-	private void setNextEdge(long modifiedEdgeId, long nextEdgeId) {
+		long prevEdgeId = getPreviousEdgeId(targetEdgeId);
+
+		if ((targetEdgeId == movedEdgeId) || (prevEdgeId == movedEdgeId)) {
+			return;
+		}
+
+		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		
+		assert getFirstEdgeId(toplevelGraphId) != getLastEdgeId(toplevelGraphId);
+
+		long firstV = getFirstEdgeId(toplevelGraphId);
+		long lastV = getLastEdgeId(toplevelGraphId);
+		long mvdNextV = getNextEdgeId(movedEdgeId);
+		long mvdPrevV = getPreviousEdgeId(movedEdgeId);
+		
+		// remove moved edge from vSeq
+		if (movedEdgeId == firstV) {
+			setFirstEdgeId(toplevelGraphId, mvdNextV);
+		} 
+		if (movedEdgeId == lastV) {
+			setLastEdgeId(toplevelGraphId, mvdPrevV);
+		}
+		if (mvdPrevV != 0) {
+			setNextEdgeId(mvdPrevV, mvdNextV);
+		}	
+		if (mvdNextV != 0) {
+			setPreviousEdgeId(mvdNextV, mvdPrevV);
+		}
+		
+		// insert moved edge in vSeq immediately after target
+		else if (targetEdgeId == lastV) {
+			setLastEdgeId(toplevelGraphId, movedEdgeId);
+		}	
+		
+
+		long tgtNextE = getNextEdgeId(targetEdgeId);
+		
+		setNextEdgeId(movedEdgeId, tgtNextE);
+		setPreviousEdgeId(movedEdgeId, targetEdgeId);
+		setNextEdgeId(targetEdgeId, movedEdgeId);
+		if (tgtNextE != 0) {
+			setPreviousEdgeId(tgtNextE, movedEdgeId);
+		}
+
+		edgeListModified();
+		
+	}
+		
+	
+	private void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
 		diskStore.setNextEdgeId(getLocalElementId(modifiedEdgeId), nextEdgeId);
 	}
 
-	private void setPreviousEdge(long modifiedEdgeId, long nextEdgeId) {
+	private void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getRemoteDiskStorage(partialGraphId);
 		diskStore.setPreviousEdgeId(getLocalElementId(modifiedEdgeId), nextEdgeId);
 	}
 
-	private void setFirstEdge(int subgraphId, long edgeId) {
+	public void setFirstEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
@@ -1443,7 +1506,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
-	private void setLastEdge(int subgraphId, long edgeId) {
+	public void setLastEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
@@ -1476,7 +1539,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return iId;
 	}
 	
-	public int getICount(int globalSubgraphId) {
+	public long getICount(int globalSubgraphId) {
 		return iCount;
 	}
 	
