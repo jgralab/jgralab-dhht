@@ -9,7 +9,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
-public class CompleteGraphDatabase extends GraphDatabase {
+public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	/*
 	 * Stores the hostnames of the partial graphs
@@ -66,7 +66,7 @@ public class CompleteGraphDatabase extends GraphDatabase {
 	public Graph createPartialGraph(GraphClass gc, String hostname) {
 		int partialGraphId = getFreePartialGraphId();
 		RemoteJGraLabServer remoteServer = server.getRemoteInstance(hostname);
-		GraphDatabase p = remoteServer.createGraph(gc.getId(),
+		GraphDatabaseBaseImpl p = remoteServer.createGraph(gc.getId(),
 				localGraph.getCompleteGraphUid(), partialGraphId,
 				this.hostnames[0]);
 		partialGraphDatabases[partialGraphId] = p;

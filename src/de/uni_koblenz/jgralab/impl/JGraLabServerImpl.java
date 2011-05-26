@@ -14,7 +14,7 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 
@@ -30,7 +30,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 
 	private static JGraLabServerImpl localInstance = null;
 
-	private final Map<String, GraphDatabase> localGraphDatabases = new HashMap<String, GraphDatabase>();
+	private final Map<String, GraphDatabaseBaseImpl> localGraphDatabases = new HashMap<String, GraphDatabaseBaseImpl>();
 
 	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
 
@@ -66,8 +66,8 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		}
 	}
 
-	public GraphDatabase loadGraph(String uid) throws GraphIOException {
-		GraphDatabase db = localGraphDatabases.get(uid);
+	public GraphDatabaseBaseImpl loadGraph(String uid) throws GraphIOException {
+		GraphDatabaseBaseImpl db = localGraphDatabases.get(uid);
 		if (db == null) {
 			String filename = localFilesContainingGraphs.get(uid);
 			((GraphImpl) GraphIO.loadGraphFromFileWithDiskSupport(filename,
@@ -78,7 +78,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 
 	@Override
-	public void registerLocalGraphDatabase(GraphDatabase localDb) {
+	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl localDb) {
 		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId())) {
 			localGraphDatabases.put(localDb.getUniqueGraphId(), localDb);
 		}
@@ -107,7 +107,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	 * @param uid
 	 * @return
 	 */
-	public GraphDatabase getLocalGraphDatabase(String uid) {
+	public GraphDatabaseBaseImpl getLocalGraphDatabase(String uid) {
 		return localGraphDatabases.get(uid);
 	}
 

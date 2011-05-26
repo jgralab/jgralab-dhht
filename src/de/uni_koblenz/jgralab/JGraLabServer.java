@@ -1,6 +1,6 @@
 package de.uni_koblenz.jgralab;
 
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
 
 public interface JGraLabServer extends RemoteJGraLabServer {
@@ -11,7 +11,7 @@ public interface JGraLabServer extends RemoteJGraLabServer {
 	 * to the complete graph identified by their common uniqueGraphId
 	 * @param graphDatabase the graph database to be registered
 	 */
-	public void registerLocalGraphDatabase(GraphDatabase graphDatabase);
+	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl graphDatabase);
 	
 	
 	/**

@@ -31,7 +31,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Methods to access graph database properties
 	 * ===================================================== */
 	
-	public RemoteDiskStorageAccess getDiskStorage();
+	public RemoteDiskStorageAccess getLocalDiskStorage();
 	
 	/* =====================================================
 	 * Methods to access graph properties
@@ -46,11 +46,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public int getIdOfParentDistributedGraph();
 	
 	public void graphModified();
-	
-	public long getGraphVersion();
-	
-	public void setGraphVersion(long graphVersion);
-
 
 	public void setLoading(boolean isLoading);
 	
@@ -288,8 +283,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void setIncidentEdgeId(long incId, long edgeId);
 
 	public void setIncidentVertexId(long incId, long vertexId);
-	
-	public void setDirection(long incId, Direction direction);
 	
     /**
      * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>

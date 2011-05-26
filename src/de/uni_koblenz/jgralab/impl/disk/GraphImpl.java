@@ -72,7 +72,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 *            the GraphClass of this Graph
 	 */
 	protected GraphImpl(String graphId, GraphClass cls, int partialGraphId,
-			GraphDatabase localDatabase, RemoteGraphDatabaseAccess graphData) {
+			GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess graphData) {
 		super(cls);
 		this.uid = graphId;
 		this.globalSubgraphId = partialGraphId;
@@ -111,7 +111,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	@Deprecated
-	public GraphDatabase getGraphDatabase() {
+	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return localGraphDatabase;
 	}
 

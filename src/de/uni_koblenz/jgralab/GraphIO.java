@@ -2922,7 +2922,7 @@ public class GraphIO {
 			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
 					.setLoading(true);
 			server = JGraLabServerImpl.getLocalInstance();
-			de.uni_koblenz.jgralab.impl.disk.GraphDatabase gd = null;
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
 			// TODO how to handle complete graphs
 			if (graph.getPartialGraphId() == 1) {
 				// TODO create CompleteGraphDataBase

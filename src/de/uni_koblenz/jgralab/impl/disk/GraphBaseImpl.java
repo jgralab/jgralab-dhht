@@ -75,7 +75,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * the graph database that stores this graph and manages all connections to
 	 * all partial graphs
 	 */
-	protected GraphDatabase localGraphDatabase;
+	protected GraphDatabaseBaseImpl localGraphDatabase;
 
 	/**
 	 * The property access providing direct access to the data of this graph,
@@ -89,24 +89,24 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * The id of this complete or partial graph identifying it in the complete
 	 * graph
 	 */
-	protected int globalSubgraphId;
+	protected long globalSubgraphId;
 	
 	
-	public int getGlobalSubgraphId() {
+	public long getGlobalSubgraphId() {
 		return globalSubgraphId;
 	}
 	
 	public int getLocalSubgraphId() {
-		return GraphDatabase.getSubgraphIdInPartialGraph(globalSubgraphId);
+		return GraphDatabaseBaseImpl.convertToLocalSubgraphId(globalSubgraphId);
 	}
 	
 	public int getPartialGraphId() {
-		return GraphDatabase.getPartialGraphId(globalSubgraphId);
+		return GraphDatabaseBaseImpl.getPartialGraphId(globalSubgraphId);
 	}
 	
 	
 	
-	protected GraphBaseImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId ) {
+	protected GraphBaseImpl(GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId ) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
 		this.globalSubgraphId = globalSubgraphId;
@@ -1048,7 +1048,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		return list;
 	}
 
-	public abstract GraphDatabase getGraphDatabase();
+	public abstract GraphDatabaseBaseImpl getGraphDatabase();
 
 
 	@Override

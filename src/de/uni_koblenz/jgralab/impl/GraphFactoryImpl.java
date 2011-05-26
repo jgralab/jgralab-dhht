@@ -45,7 +45,7 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
@@ -283,7 +283,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 	
-	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int partialGraphId, GraphDatabase database) {
+	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int partialGraphId, GraphDatabaseBaseImpl database) {
 		try {
 			Graph g = graphProxyMapForDiskBasedImpl.get(graphClass).newInstance(uid, partialGraphId, database);
 			return g;

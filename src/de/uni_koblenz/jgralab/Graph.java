@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -262,7 +262,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Retrieves the GraphDatabase this graph is stored in
 	 * @return
 	 */
-	public GraphDatabase getGraphDatabase();
+	public GraphDatabaseBaseImpl getGraphDatabase();
 
 	
 	

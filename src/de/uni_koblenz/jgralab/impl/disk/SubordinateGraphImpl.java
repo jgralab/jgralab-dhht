@@ -107,7 +107,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	
-	public SubordinateGraphImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId) {
+	public SubordinateGraphImpl(GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId) {
 		super(localGraphDatabase, storingGraphDatabase, globalSubgraphId);
 	}
 	

@@ -87,13 +87,13 @@ public abstract class VertexImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException 
 	 */
-	protected VertexImpl(long id, GraphDatabase localGraphDatabase) throws IOException {
+	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase) throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
-		this.container = localGraphDatabase.getDiskStorage().getVertexContainer(getLocalId());
+		this.container = localGraphDatabase.getLocalDiskStorage().getVertexContainer(getLocalId());
 	}
 	
-	protected VertexImpl(long id, GraphDatabase localGraphDatabase, VertexContainer container) throws IOException {
+	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase, VertexContainer container) throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
 		this.container = container;

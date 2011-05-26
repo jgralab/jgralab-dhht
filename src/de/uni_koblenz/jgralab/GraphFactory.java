@@ -34,7 +34,7 @@ package de.uni_koblenz.jgralab;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
@@ -66,14 +66,14 @@ public interface GraphFactory {
 	 * be an instance of a subclass of the specified graphClass.
 	 * @param graphDatabase 
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, GraphDatabase graphDatabase);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, GraphDatabaseBaseImpl graphDatabase);
 	
 	/**
 	 * creates a local graph proxy object for an existing remote partial or global graph.
 	 * of the specified class. The returned object may be an instance of a subclass of the 
 	 * specified graphClass.
 	 */
-	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int id, GraphDatabase localDatabase);
+	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int id, GraphDatabaseBaseImpl localDatabase);
 
 	/**
 	 * creates a View-Graph object for the specified class. The returned object
@@ -141,11 +141,11 @@ public interface GraphFactory {
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabase localGraphDatabase);
+	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vc, long id, GraphDatabaseBaseImpl localGraphDatabase);
 
-	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
 	
-	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabase localGraphDatabase, VertexContainer container);
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl localGraphDatabase, VertexContainer container);
 	
 	
 	
@@ -166,14 +166,14 @@ public interface GraphFactory {
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase);
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase);
 
 	
 	/**
 	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 
 	 * an instance of the class defined by <code>setEdgeImplementationClass</code> for the interface defined by <code>edgeClass</code>
 	 */
-	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
 	
 	
@@ -185,7 +185,7 @@ public interface GraphFactory {
 	 * @param graphDatabase
 	 * @return
 	 */
-	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabase graphDatabase, EdgeContainer container);
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container);
 
 
 	
@@ -225,11 +225,11 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase);
+	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabaseBaseImpl graphDatabase);
 
-	public Incidence createIncidenceProxy(Class<? extends Incidence> ic, long id, GraphDatabase graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public Incidence createIncidenceProxy(Class<? extends Incidence> ic, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
-	public Incidence reloadLocalIncidence(Class<? extends Incidence> incidenceClass, long id, GraphDatabase graphDatabase, IncidenceContainer container);
+	public Incidence reloadLocalIncidence(Class<? extends Incidence> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container);
 	
 	
 	

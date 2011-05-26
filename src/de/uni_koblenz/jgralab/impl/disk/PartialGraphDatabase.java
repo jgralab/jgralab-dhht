@@ -3,7 +3,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
-public class PartialGraphDatabase extends GraphDatabase {
+public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final CompleteGraphDatabase completeGraphDatabase;
 

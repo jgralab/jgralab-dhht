@@ -50,7 +50,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class IncidenceImpl implements Incidence {
 	
-	private GraphDatabase localGraphDatabase;
+	private GraphDatabaseBaseImpl localGraphDatabase;
 	
 	private RemoteGraphDatabaseAccess storingGraphDatabase;
 	
@@ -58,7 +58,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public IncidenceContainer container;
 
-	protected IncidenceImpl(GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, IncidenceContainer container, long globalId) {
+	protected IncidenceImpl(GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, IncidenceContainer container, long globalId) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
 		this.container = container;

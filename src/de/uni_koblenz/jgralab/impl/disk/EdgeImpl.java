@@ -71,13 +71,13 @@ public abstract class EdgeImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException 
 	 */
-	protected EdgeImpl(long id, GraphDatabase graphDatabase) throws IOException {
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getDiskStorage().getEdgeContainer(getLocalId());
+		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(getLocalId());
 	}
 	
-	protected EdgeImpl(long id, GraphDatabase graphDatabase, EdgeContainer container) throws IOException {
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
 		this.container = container;

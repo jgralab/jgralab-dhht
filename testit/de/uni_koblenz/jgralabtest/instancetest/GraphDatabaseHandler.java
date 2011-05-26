@@ -15,7 +15,7 @@ public class GraphDatabaseHandler {
 	private static final String password = "secret";
 
 
-	protected GraphDatabase graphDatabase;
+	protected GraphDatabaseBaseImpl graphDatabase;
 
 	public GraphDatabaseHandler() {
 		
@@ -23,7 +23,7 @@ public class GraphDatabaseHandler {
 	
 	public void connectToDatabase() {
 		try {
-			graphDatabase = GraphDatabase.openGraphDatabase(url
+			graphDatabase = GraphDatabaseBaseImpl.openGraphDatabase(url
 					+ databaseName, userName, password);
 		} catch (GraphDatabaseException e) {
 			// TODO Auto-generated catch block
@@ -152,7 +152,7 @@ public class GraphDatabaseHandler {
 		}
 	}
 
-	public GraphDatabase getGraphDatabase() {
+	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return graphDatabase;
 	}
 	

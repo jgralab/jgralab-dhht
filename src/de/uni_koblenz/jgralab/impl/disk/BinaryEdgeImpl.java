@@ -13,11 +13,11 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 	 */
 	private static final long serialVersionUID = -8155387019211417812L;
 
-	protected BinaryEdgeImpl(int anId, GraphDatabase graphDatabase) throws IOException {
+	protected BinaryEdgeImpl(int anId, GraphDatabaseBaseImpl graphDatabase) throws IOException {
 		super(anId, graphDatabase);
 	}
 	
-	protected BinaryEdgeImpl(int anId, GraphDatabase graphDatabase, EdgeContainer container) throws IOException {
+	protected BinaryEdgeImpl(int anId, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) throws IOException {
 		super(anId, graphDatabase, container);
 	}
 	

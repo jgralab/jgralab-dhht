@@ -82,7 +82,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 //	
 	private GraphFactory factory;
 	
-	private GraphDatabase graphDatabase;
+	private GraphDatabaseBaseImpl graphDatabase;
 	
 	private int vertexStorageCount = 0;
 	
@@ -144,7 +144,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	private int incidenceReuseQueueSize = 0;
 	
 	
-	public DiskStorageManager(GraphDatabase database) throws FileNotFoundException {
+	public DiskStorageManager(GraphDatabaseBaseImpl database) throws FileNotFoundException {
 		schema = database.getSchema();
 		this.graphDatabase = database;
 		this.factory = database.getGraphFactory();
@@ -750,7 +750,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 */
 	
 	private int getLocalId(long id) {
-		return GraphDatabase.getLocalElementId(id);
+		return GraphDatabaseBaseImpl.getLocalElementId(id);
 	}
 	
 

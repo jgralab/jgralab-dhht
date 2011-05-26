@@ -738,7 +738,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public GraphDatabase getGraphDatabase() {
+	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return viewedGraph.getGraphDatabase();
 	}
 

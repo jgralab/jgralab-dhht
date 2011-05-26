@@ -88,7 +88,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * Local GraphDatabase to retrieve objects representing
 	 * graphs and graph elements 
 	 */
-	protected GraphDatabase localGraphDatabase;
+	protected GraphDatabaseBaseImpl localGraphDatabase;
 	
 	/**
 	 * Local or Remote GraphDatabase storing the element
@@ -111,7 +111,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected GraphElementImpl(GraphDatabase graphDatabase)  {
+	protected GraphElementImpl(GraphDatabaseBaseImpl graphDatabase)  {
 		this.localGraphDatabase = graphDatabase;
 	}
 
@@ -129,12 +129,12 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final Graph getGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabase.getPartialGraphId(elementId));
+		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getPartialGraphId(elementId));
 	}
 	
 	@Override
 	public final Graph getLocalGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabase.getPartialGraphId(elementId));
+		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getPartialGraphId(elementId));
 	}
 	
 	@Override

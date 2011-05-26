@@ -48,28 +48,24 @@ import de.uni_koblenz.jgralab.schema.Schema;
  *    all fields need to be saved only inside graph database
  */
 
-public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
+public abstract class GraphDatabaseBaseImpl implements RemoteGraphDatabaseAccess, GraphDatabaseInternalMethods {
 	
 	//Static parts 
 	/* Switches that toggle number of elements in a local partial graph
 	 * and number of partial graphs
 	 */
-	private final static int BITS_FOR_PARTIAL_GRAPH_MASK = 12;
+	private final static int BITS_FOR_PARTIAL_GRAPH_MASK = 32;
 	
 	/* Values that are calculated on the basis of BITS_FOR_PARTIAL_GRAPH_MASK */
 	
 	public final static int MAX_NUMBER_OF_LOCAL_GRAPHS = Integer.MAX_VALUE >> BITS_FOR_PARTIAL_GRAPH_MASK;
 
-	public static final int getPartialGraphId(long globalElementId) {
-		return (int) globalElementId >> (64-BITS_FOR_PARTIAL_GRAPH_MASK);
+	public static final int getPartialGraphId(long globalSubgraphId) {
+		return (int) globalSubgraphId >> (64-BITS_FOR_PARTIAL_GRAPH_MASK);
 	}
 	
-	public static final int getPartialGraphId(int globalSubgraphId) {
-		return (int) globalSubgraphId >> (32-BITS_FOR_PARTIAL_GRAPH_MASK);
-	}
-	
-	public static final int convertToLocalSubgraphId(int globalSubgraphId) {
-		return globalSubgraphId & (MAX_NUMBER_OF_LOCAL_GRAPHS);
+	public static final int convertToLocalSubgraphId(long globalSubgraphId) {
+		return (int) (globalSubgraphId & (MAX_NUMBER_OF_LOCAL_GRAPHS));
 	}	
 	
 	public static final int getLocalElementId(long elementId) {
@@ -253,7 +249,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param uniqueGraphId the unique id of the graph
 	 * @param partialGraphId the common partial graph id of all local subgraphs
 	 */
-	protected GraphDatabase(Schema schema, String uniqueGraphId, int partialGraphId, int parentDistributedGraphId) {
+	protected GraphDatabaseBaseImpl(Schema schema, String uniqueGraphId, int partialGraphId, int parentDistributedGraphId) {
 		freeVertexList = new FreeIndexList(10);
 		freeIncidenceList = new FreeIndexList(10);
 		freeEdgeList = new FreeIndexList(10);
@@ -314,7 +310,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	protected RemoteDiskStorageAccess getRemoteDiskStorage(int partialGraphId) {
 		RemoteDiskStorageAccess remoteAccess = remoteDiskStorages.get(partialGraphId);
 		if (remoteAccess == null) {
-			remoteAccess = getGraphDatabase(partialGraphId).getDiskStorage();
+			remoteAccess = getGraphDatabase(partialGraphId).getLocalDiskStorage();
 			remoteDiskStorages.put(partialGraphId, remoteAccess);
 		}
 		return remoteAccess;
@@ -562,67 +558,55 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 
-	/**
-	 * Sets the sigma value of the element identified by <code>elementId</code>
-	 * to the value <code>sigmaId</code>. Both values are signed, negative values
-	 * identify edges while positve ones identify vertices as in all other methods
-	 * of this class 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setSigma(int, int)
 	 */
-	public void setSigma(int elementId, int sigmaId) {
-		int partialGraphId = getPartialGraphId(elementId);
+	@Override
+	public void setSigma(long globalElementId, int sigmaId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = getLocalElementId(globalElementId);
 		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setSigmaId(elementId, sigmaId);
+			localDiskStorage.setSigmaId(localElementId, sigmaId);
 		} else {
-			getGraphDatabase(partialGraphId).setSigma(elementId, sigmaId);
+			getRemoteDiskStorage(partialGraphId).setSigmaId(localElementId, sigmaId);
+		}
+	}
+	
+	@Override
+	public int getKappa(long globalElementId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = getLocalElementId(globalElementId);
+		if (partialGraphId == localPartialGraphId) {
+			return localDiskStorage.getKappa(localElementId);
+		} else {
+			return getGraphDatabase(partialGraphId).getKappa(localElementId);
 		}
 	}
 	
 	
-	public int getKappa(int elementId) {
-		int partialGraphId = getPartialGraphId(elementId);
+
+	@Override
+	public void setKappa(long globalElementId, int kappa) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = getLocalElementId(globalElementId);
 		if (partialGraphId == localPartialGraphId) {
-			return localDiskStorage.getKappa(elementId);
+			localDiskStorage.setKappa(localElementId, kappa);
 		} else {
-			return getGraphDatabase(partialGraphId).getKappa(elementId);
+			getGraphDatabase(partialGraphId).setKappa(localElementId, kappa);
 		}
 	}
+
 	
-	
-	public void setKappa(int elementId, int kappa) {
-		int partialGraphId = getPartialGraphId(elementId);
-		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setKappa(elementId, kappa);
-		} else {
-			getGraphDatabase(partialGraphId).setKappa(elementId, kappa);
-		}
-	}
-	
-//	/**
-//	 * To be implemented by RemoteDatabaseAccess as well as the DiskBasedStorages
-//	 * @author dbildh
-//	 *
-//	 */
-//	private class GraphAccessById {
-//		
-//	}
-//	
-//	private GraphAccessById[] graphAccesses;
-//	
-//	private final GraphAccessById getGraphAccessForElement(long elementId) {
-//		int pgId = getPartialGraphId(elementId);
-//		if (graphAccesses[pgId] == null) {
-//			//load direct graph access
-//		}
-//		return graphAccesses[pgId];
-//	}
-//	
-	
-	public DiskStorageManager getDiskStorage() {
+	public DiskStorageManager getLocalDiskStorage() {
 		return localDiskStorage;
 	}
 	
 	public abstract void edgeListModified();
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#vertexListModified()
+	 */
+	@Override
 	public abstract void vertexListModified();
 	
 	public abstract void graphModified();
@@ -631,7 +615,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	
 
 	/* **************************************************************************
-	 * Methods to access traversal context
+	 * Methods to access traversal context will be implemented by the two subclasses
+	 * CompleteGraphDatabase and LocalGraphDatabase
 	 * **************************************************************************/
 	
 	public abstract Graph getTraversalContext();
@@ -653,15 +638,20 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return graphVersion;
 	}
 
-	public void setGraphVersion(long graphVersion2) {
-		this.graphVersion = graphVersion2;		
-	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#isLoading()
+	 */
+	@Override
 	public boolean isLoading() {
 		return loading;
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setLoading(boolean)
+	 */
+	@Override
 	public void setLoading(boolean isLoading) {
 		this.loading = isLoading;
 	}
@@ -683,6 +673,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		return vertexListVersion;
 	}
 		
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setVCount(int, int)
+	 */
+	@Override
 	public void setVCount(int localSubgraphId, int count) {
 		getGraphData(localSubgraphId).vCount = count; 
 	}
@@ -902,7 +896,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		setPreviousVertexId(vertexId, 0);
 		setNextVertexId(vertexId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getDiskStorage().removeVertexFromDiskStorage(getLocalElementId(vertexId));
+		getLocalDiskStorage().removeVertexFromDiskStorage(getLocalElementId(vertexId));
 		notifyVertexDeleted(vertexId);
 	}
 	
@@ -1083,6 +1077,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setFirstVertexId(int, long)
+	 */
+	@Override
 	public void setFirstVertexId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
@@ -1104,6 +1102,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setLastVertexId(int, long)
+	 */
+	@Override
 	public void setLastVertexId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
@@ -1296,7 +1298,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		setPreviousEdgeId(edgeId, 0);
 		setNextEdgeId(edgeId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getDiskStorage().removeEdgeFromDiskStorage(getLocalElementId(edgeId));
+		getLocalDiskStorage().removeEdgeFromDiskStorage(getLocalElementId(edgeId));
 		notifyEdgeDeleted(edgeId);
 	}
 
@@ -1468,6 +1470,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		diskStore.setPreviousEdgeId(getLocalElementId(modifiedEdgeId), nextEdgeId);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setFirstEdgeId(int, long)
+	 */
+	@Override
 	public void setFirstEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
@@ -1478,6 +1484,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setLastEdgeId(int, long)
+	 */
+	@Override
 	public void setLastEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
@@ -1512,13 +1522,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	}
 
 	
-	/**
-	 * Sets the first {@link Incidence} of this {@link GraphElement} to
-	 * <code>firstIncidence</code>.
-	 * 
-	 * @param firstIncidence
-	 *            {@link IncidenceImpl}
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setFirstIncidenceId(long, long)
 	 */
+	@Override
 	@Override
 	public void setFirstIncidenceId(long elementId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(elementId);
@@ -1529,6 +1536,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setLastIncidenceId(long, long)
+	 */
+	@Override
 	@Override
 	public void setLastIncidenceId(long elemId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
@@ -1539,6 +1550,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setNextIncidenceIdAtVertexId(long, long)
+	 */
+	@Override
 	@Override
 	public void setNextIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
@@ -1549,6 +1564,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setPreviousIncidenceIdAtVertexId(long, long)
+	 */
+	@Override
 	@Override
 	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
@@ -1559,6 +1578,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setNextIncidenceAtEdge(long, long)
+	 */
+	@Override
 	public void setNextIncidenceAtEdge(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId == localPartialGraphId) {
@@ -1568,6 +1591,10 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setPreviousIncidenceAtEdge(long, long)
+	 */
+	@Override
 	public void setPreviousIncidenceAtEdge(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId == localPartialGraphId) {
