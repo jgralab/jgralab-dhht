@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -256,18 +257,40 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param firstIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	public void setFirstIncidence(long elemId, long incidenceId);
+	public void setFirstIncidenceId(long elemId, long incidenceId);
 	
 	
-	public void setLastIncidence(long elemId, long incidenceId);
+	public void setLastIncidenceId(long elemId, long incidenceId);
+	
+	public long getFirstIncidenceId(long elemId);
+	
+	
+	public long getLastIncidenceId(long elemId);
+	
+	
+	public void setNextIncidenceIdAtVertexId(long incId, long prevId);
+	
+	
+	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId);
+	
+	
+	public void setNextIncidenceIdAtEdgeId(long incId, long nextId);
+	
+	
+	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId);
 
 
 	public void incidenceListModified(long elemId);
 
 
 	public int getIncidenceTypeId(long id);
+	
+	public void setIncidentEdgeId(long incId, long edgeId);
 
-
+	public void setIncidentVertexId(long incId, long vertexId);
+	
+	public void setDirection(long incId, Direction direction);
+	
     /**
      * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
      * between the vertex identified by <code>vertexId</code> and the edge identified by <code>edgeId</code>.
@@ -331,6 +354,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
+
+	long connect(Class<? extends Incidence> cls, long vertexId, long edgeId,
+			long incId);
 
 
 	

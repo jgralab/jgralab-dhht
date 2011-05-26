@@ -1552,39 +1552,43 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param firstIncidence
 	 *            {@link IncidenceImpl}
 	 */
-	public void setFirstIncidence(long elementId, long incidenceId) {
+	@Override
+	public void setFirstIncidenceId(long elementId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setFirstIncidenceId(getLocalElementId(elementId), incidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(elementId, incidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(elementId, incidenceId);
 		}
 	}
 	
-	public void setLastIncidence(int elemId, int incidenceId) {
+	@Override
+	public void setLastIncidenceId(long elemId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setLastIncidenceId(getLocalElementId(elemId), incidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(elemId, incidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(elemId, incidenceId);
 		}
 	}
 
-	public void setNextIncidenceAtVertex(long globalIncidenceId, long nextIncidenceId) {
+	@Override
+	public void setNextIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setNextIncidenceAtVertexId(getLocalElementId(globalIncidenceId), nextIncidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
 		}
 	}
 	
-	public void setPreviousIncidenceAtVertex(long globalIncidenceId, long nextIncidenceId) {
+	@Override
+	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setPreviousIncidenceAtVertexId(getLocalElementId(globalIncidenceId), nextIncidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
 		}
 	}
 	
@@ -1593,7 +1597,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setNextIncidenceAtEdgeId(getLocalElementId(globalIncidenceId), nextIncidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
 		}
 	}
 	
@@ -1602,7 +1606,7 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.setPreviousIncidenceAtEdgeId(getLocalElementId(globalIncidenceId), nextIncidenceId);
 		} else {
-			getGraphDatabase(partialGraphId).setLastIncidence(globalIncidenceId, nextIncidenceId);
+			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
 		}
 	}
 	
@@ -1626,8 +1630,8 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param vertex
 	 * @param edge
 	 */
-	public long connect(Class<? extends Incidence> cls, Vertex v, Edge e) {
-		return connect(cls, v, e, 0);
+	public long connect(Class<? extends Incidence> cls, long vertexId, long edgeId) {
+		return connect(cls, vertexId, edgeId, 0);
 	}
 	
 	/**
@@ -1638,59 +1642,56 @@ public abstract class GraphDatabase implements RemoteGraphDatabaseAccess {
 	 * @param edge
 	 * @param id
 	 */
-	public long connect(Class<? extends Incidence> cls, Vertex v, Edge e, long id) {	
+	@Override
+	public long connect(Class<? extends Incidence> cls, long vertexId, long edgeId, long incId) {	
 		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(schema.getClassId(cls));
 		Direction dir = incClass.getDirection();
 		
 		//check id 
-		if (id != 0) {
+		if (incId != 0) {
 			if (!isLoading()) {
 				throw new GraphException("Incidences with a defined id may only be created during graph loading");
 			}
 		} else {
-			id = convertToGlobalId(allocateIncidenceIndex());
+			incId = convertToGlobalId(allocateIncidenceIndex());
 		}	
 	    //call graph factory to create object
-		IncidenceImpl newInc = (IncidenceImpl) graphFactory.createIncidenceDiskBasedStorage(cls, id, this);
+		IncidenceImpl newInc = (IncidenceImpl) graphFactory.createIncidenceDiskBasedStorage(cls, incId, this);
 		
 		//set incident edge and vertex ids of incidence 
-		newInc.setIncidentEdge((EdgeImpl) e);
-		newInc.setIncidentVertex((VertexImpl) v);
-		newInc.setDirection(dir);
+		setIncidentEdgeId(incId, edgeId);
+		setIncidentVertexId(incId, vertexId);
+		setDirection(incId, dir);
 		
 		//append created incidence to lambda sequences of vertex and edge
 		
 		// add this incidence to the sequence of incidences of v
-		if (v.getFirstIncidence() == null) {
+		if (getFirstIncidenceId(vertexId) == 0) {
 			// v has no incidences
-			this.setFirstIncidence(v.getId(), id);
-			this.setLastIncidence(v.getId(), id);
+			setFirstIncidenceId(vertexId, incId);
+			setLastIncidenceId(vertexId, incId);
 		} else {
-			
-			((IncidenceImpl) v.getLastIncidence()).setNextIncidenceAtVertex(newInc);
-			newInc.setPreviousIncidenceAtVertex((IncidenceImpl) v.getLastIncidence());
-			setLastIncidence(v.getId(), id);
+			long lastIncId = getLastIncidenceId(vertexId);
+			setNextIncidenceIdAtVertexId(lastIncId, incId);
+			setPreviousIncidenceIdAtVertexId(incId, lastIncId);
+			setLastIncidenceId(vertexId, incId);
 		}
 
-			incidenceListModified(v.getId());
+		incidenceListModified(vertexId);
 
-			// add this incidence to the sequence of incidences of e
-			if (e.getFirstIncidence() == null) {
-				// v has no incidences
-				e.setFirstIncidence(this);
-				e.setLastIncidence(this);
-			} else {
-				((IncidenceImpl) e.getLastIncidence()).setNextIncidenceAtEdge(this);
-				setPreviousIncidenceAtEdge((IncidenceImpl) e.getLastIncidence());
-				e.setLastIncidence(this);
-			}
-//			if (getNextIncidenceAtEdge() != null)
-//				throw new RemoteException();
-			if (getNextIncidenceAtVertex() != null) {
-				throw new RuntimeException("id: " + id + " next id:" + getNextIncidenceAtVertex().getId() );
-			}
-			e.incidenceListModified();
+		if (getFirstIncidenceId(-edgeId) == 0) {
+			// v has no incidences
+			setFirstIncidenceId(-edgeId, incId);
+			setLastIncidenceId(-edgeId, incId);
+		} else {
+			long lastIncId = getLastIncidenceId(-edgeId);
+			setNextIncidenceIdAtEdgeId(lastIncId, incId);
+			setPreviousIncidenceIdAtEdgeId(incId, lastIncId);
+			setLastIncidenceId(-edgeId, incId);
 		}
+
+		incidenceListModified(vertexId);
+		return incId;
 	}
 
 
