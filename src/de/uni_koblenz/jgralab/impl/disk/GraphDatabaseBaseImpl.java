@@ -1300,8 +1300,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 
 
 	public Graph createViewGraph(Graph g, int kappa) {
-		// TODO Auto-generated method stub
-		return null;
+		return graphFactory.createViewGraphDiskBasedStorage(g, kappa);
 	}
 
 

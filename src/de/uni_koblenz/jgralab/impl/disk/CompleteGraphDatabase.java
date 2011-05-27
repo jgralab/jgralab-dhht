@@ -52,7 +52,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		}
 	}
 
-	@Override
+
 	public void releasePartialGraphId(int partialGraphId) {
 		freePartialGraphIds.add(partialGraphId);
 	}
@@ -75,12 +75,10 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	public Graph createPartialGraph(GraphClass gc, String hostname) {
 		int partialGraphId = getFreePartialGraphId();
-		RemoteJGraLabServer remoteServer = server.getRemoteInstance(hostname);
-		GraphDatabaseBaseImpl p = remoteServer.createGraph(gc.getId(),
-				localGraph.getCompleteGraphUid(), partialGraphId,
-				this.hostnames[0]);
-		partialGraphDatabases[partialGraphId] = p;
-		return p.getGraphObject(partialGraphId);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p); 
+		return getGraphObject(convertToGlobalId(1));
 	}
 
 	@Override
@@ -123,11 +121,13 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
-			return getCompleteGraphObject();
+			return getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
 		} else {
 			return stack.peek();
 		}
 	}
+
+
 
 	@Override
 	public void releaseTraversalContext() {
