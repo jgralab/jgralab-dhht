@@ -210,12 +210,12 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getECount() {
+	public long getECount() {
 		return storingGraphDatabase.getECount(globalSubgraphId);
 	}
 
 	@Override
-	public int getMaxECount() {
+	public long getMaxECount() {
 		return storingGraphDatabase.getMaxECount();
 	}
 
@@ -236,7 +236,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		return storingGraphDatabase.getMaxVCount();
 	}
 
@@ -252,7 +252,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getICount() {
+	public long getICount() {
 		return localGraphDatabase.getICount(globalSubgraphId);
 	}
 
@@ -266,8 +266,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 *            the edge to be moved
 	 */
 	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeAfterInGraph(targetEdge.getId(),
-				movedEdge.getId());
+		storingGraphDatabase.putEdgeAfter(targetEdge.getId(), movedEdge.getId());
 	}
 
 	/**
@@ -280,8 +279,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 *            the edge to be moved
 	 */
 	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeBeforeInGraph(targetEdge.getId(),
-				movedEdge.getId());
+		storingGraphDatabase.putEdgeBefore(targetEdge.getId(), movedEdge.getId());
 	}
 
 	/**
@@ -295,8 +293,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexAfterInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexAfterInGraph(targetVertex.getId(),
-				movedVertex.getId());
+		storingGraphDatabase.putVertexAfter(targetVertex.getId(), movedVertex.getId());
 	}
 
 	/**
@@ -310,8 +307,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexBeforeInGraph(targetVertex.getId(),
-				movedVertex.getId());
+		storingGraphDatabase.putVertexBefore(targetVertex.getId(), movedVertex.getId());
 	}
 
 	// ==============================================================

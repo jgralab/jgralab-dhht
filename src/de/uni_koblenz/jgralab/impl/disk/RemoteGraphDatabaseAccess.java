@@ -252,10 +252,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 
 
-	public void setICount(int globalSubgraphId, int count);
+	public void setICount(long globalSubgraphId, int count);
 
 
-	public long getICount(int globalSubgraphId);
+	public long getICount(long globalSubgraphId);
 
 	/**
 	 * Sets the first {@link Incidence} of this {@link GraphElement} to
@@ -362,6 +362,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	long connect(Class<? extends Incidence> cls, long vertexId, long edgeId,
 			long incId);
+
+	public void setGraphVersion(long graphVersion);
 
 
 
