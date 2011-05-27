@@ -212,205 +212,26 @@ public abstract class IncidenceImpl implements Incidence {
 		return localGraphDatabase.getEdgeObject(container.edgeId[getIdInStorage(id)]).getIncidentVertices(traversalContext, getDirection().getOppositeDirection());
 	}
 
-	/*
-	 * TODO: Move logics of putBefore/putAfter operations to storing graph database (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.Incidence#putBeforeAtVertex(de.uni_koblenz.jgralab.Incidence)
-	 */
-	@Override
-	public void putBeforeAtVertex(Incidence i) {
-		assert i != null;
-		assert i != this;
-		assert getGraph() == i.getGraph();
-
-		Incidence prevIncidence = i.getPreviousIncidenceAtVertex();
-		if ((i == this) || (prevIncidence == this)) {
-			return;
-		}
-
-		assert i.getVertex().getFirstIncidence() != i.getVertex()
-				.getLastIncidence();
-
-		// remove this incidence from the sequence of incidences at the vertex
-		if (this == getVertex().getFirstIncidence()) {
-			((VertexImpl) getVertex())
-					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
-				((IncidenceImpl) getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex(null);
-		} else if (this == getVertex().getLastIncidence()) {
-			((VertexImpl) getVertex())
-					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
-			((IncidenceImpl) getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
-		} else {
-			((IncidenceImpl) getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
-				((IncidenceImpl) getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
-		}
-
-		// insert moved incidence in the sequence of incidences at the vertex
-		// immediately before i
-		if (i == getVertex().getFirstIncidence()) {
-			((VertexImpl) getVertex()).setFirstIncidence(this);
-			setPreviousIncidenceAtVertex(null);
-		} else {
-			IncidenceImpl previousIncidence = (IncidenceImpl) i
-					.getPreviousIncidenceAtVertex();
-			previousIncidence.setNextIncidenceAtVertex(this);
-			setPreviousIncidenceAtVertex(previousIncidence);
-		}
-		setNextIncidenceAtVertex((IncidenceImpl) i);
-		((IncidenceImpl) i).setPreviousIncidenceAtVertex(this);
-
-		((VertexImpl) getVertex()).incidenceListModified();
-	}
-
 	@Override
 	public void putAfterAtVertex(Incidence i) {
-		assert i != null;
-		assert i != this;
-		assert getGraph() == i.getGraph();
-
-		Incidence nextIncidence = i.getNextIncidenceAtVertex();
-		if ((i == this) || (nextIncidence == this)) {
-			return;
-		}
-
-		assert i.getVertex().getLastIncidence() != i.getVertex()
-				.getFirstIncidence();
-
-		// remove this incidence from the sequence of incidences at the vertex
-		if (this == getVertex().getFirstIncidence()) {
-			((VertexImpl) getVertex())
-					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtVertex());
-				((IncidenceImpl) getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex(null);
-		} else if (this == getVertex().getLastIncidence()) {
-			((VertexImpl) getVertex())
-					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtVertex());
-			((IncidenceImpl) getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
-		} else {
-			((IncidenceImpl) getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) getNextIncidenceAtVertex());
-				((IncidenceImpl) getNextIncidenceAtVertex())
-						.setPreviousIncidenceAtVertex((IncidenceImpl) getPreviousIncidenceAtVertex());
-		}
-
-		// insert moved incidence in the sequence of incidences at the vertex
-		// immediately after i
-		if (i == getVertex().getLastIncidence()) {
-			((VertexImpl) getVertex()).setLastIncidence(this);
-			setNextIncidenceAtVertex(null);
-		} else {
-			IncidenceImpl nxtIncidence = (IncidenceImpl) i
-					.getNextIncidenceAtVertex();
-			setNextIncidenceAtVertex(nxtIncidence);
-			nxtIncidence.setPreviousIncidenceAtVertex(this);
-		}
-		((IncidenceImpl) i).setNextIncidenceAtVertex(this);
-		setPreviousIncidenceAtVertex((IncidenceImpl) i);
-
-		((VertexImpl) getVertex()).incidenceListModified();
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getId());
 	}
 
 	@Override
-	public void putBeforeAtEdge(Incidence i) {
-		assert i != null;
-		assert i != this;
-		assert getGraph() == i.getGraph();
-
-		Incidence prevIncidence = i.getPreviousIncidenceAtEdge();
-		if ((i == this) || (prevIncidence == this)) {
-			return;
-		}
-
-		assert i.getEdge().getFirstIncidence() != i.getEdge()
-				.getLastIncidence();
-
-		// remove this incidence from the sequence of incidences at the vertex
-		if (this == getEdge().getFirstIncidence()) {
-			((EdgeImpl) getEdge())
-					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
-			((IncidenceImpl) getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge(null);
-		} else if (this == getEdge().getLastIncidence()) {
-			((EdgeImpl) getEdge())
-					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
-			((IncidenceImpl) getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge(null);
-		} else {
-			((IncidenceImpl) getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
-			((IncidenceImpl) getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
-		}
-
-		// insert moved incidence in the sequence of incidences at the vertex
-		// immediately before i
-		if (i == getEdge().getFirstIncidence()) {
-			((EdgeImpl) getEdge()).setFirstIncidence(this);
-			setPreviousIncidenceAtEdge(null);
-		} else {
-			IncidenceImpl previousIncidence = (IncidenceImpl) i
-					.getPreviousIncidenceAtEdge();
-			previousIncidence.setNextIncidenceAtEdge(this);
-			setPreviousIncidenceAtEdge(previousIncidence);
-		}
-		setNextIncidenceAtEdge((IncidenceImpl) i);
-		((IncidenceImpl) i).setPreviousIncidenceAtEdge(this);
-		((EdgeImpl) getEdge()).incidenceListModified();
-	}
-
-	@Override
-	public void putAfterAtEdge(Incidence i) {
-		assert i != null;
-		assert i != this;
-		assert getGraph() == i.getGraph();
-
-		Incidence nextIncidence = i.getNextIncidenceAtEdge();
-		if ((i == this) || (nextIncidence == this)) {
-			return;
-		}
-
-		assert i.getEdge().getLastIncidence() != i.getEdge()
-				.getFirstIncidence();
-
-		// remove this incidence from the sequence of incidences at the vertex
-		if (this == getEdge().getFirstIncidence()) {
-			((EdgeImpl) getEdge())
-					.setFirstIncidence((IncidenceImpl) getNextIncidenceAtEdge());
-			((IncidenceImpl) getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge(null);
-		} else if (this == getEdge().getLastIncidence()) {
-			((EdgeImpl) getEdge())
-					.setLastIncidence((IncidenceImpl) getPreviousIncidenceAtEdge());
-			((IncidenceImpl) getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge(null);
-		} else {
-			((IncidenceImpl) getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge((IncidenceImpl) getNextIncidenceAtEdge());
-			((IncidenceImpl) getNextIncidenceAtEdge())
-						.setPreviousIncidenceAtEdge((IncidenceImpl) getPreviousIncidenceAtEdge());
-		}
-
-		// insert moved incidence in the sequence of incidences at the vertex
-		// immediately after i
-		if (i == getEdge().getLastIncidence()) {
-			((EdgeImpl) getEdge()).setLastIncidence(this);
-			setNextIncidenceAtEdge(null);
-		} else {
-			IncidenceImpl nxtIncidence = (IncidenceImpl) i
-					.getNextIncidenceAtEdge();
-			setNextIncidenceAtEdge(nxtIncidence);
-			nxtIncidence.setPreviousIncidenceAtEdge(this);
-		}
-		((IncidenceImpl) i).setNextIncidenceAtEdge(this);
-		setPreviousIncidenceAtEdge((IncidenceImpl) i);
-
-		((EdgeImpl) getEdge()).incidenceListModified();
+	public void putBeforeAtVertex(Incidence i) {
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getId());
 	}
 	
+	@Override
+	public void putAfterAtEdge(Incidence i) {
+		storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getId());
+	}
+	
+	@Override
+	public void putBeforeAtEdge(Incidence i) {
+		storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getId());
+	}
+
 	
 	@Override
 	public long getId() {
