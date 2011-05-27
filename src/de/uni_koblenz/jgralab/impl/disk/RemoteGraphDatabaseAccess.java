@@ -363,6 +363,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void incidenceListModified(long elementId);
 
+	void registerPartialGraph(int id, String hostname);
+
 
 
 

@@ -1304,6 +1304,13 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		return null;
 	}
 
+
+
+	public Graph loadRemotePartialGraph(String hostname, int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 
 
