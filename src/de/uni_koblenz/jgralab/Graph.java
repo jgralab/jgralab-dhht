@@ -523,7 +523,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the maximum number of vertices
 	 */
-	public int getMaxVCount();
+	public long getMaxVCount();
 
 	/**
 	 * The maximum number of edges that can be stored in the graph before the
@@ -531,26 +531,26 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the maximum number of edges
 	 */
-	public int getMaxECount();
+	public long getMaxECount();
 
 	/**
 	 * Returns the number of vertices in this Graph.
 	 * 
 	 * @return the number of vertices
 	 */
-	public int getVCount();
+	public long getVCount();
 
 	/**
 	 * Returns the number of edges in this Graph.
 	 * 
 	 * @return the number of edges
 	 */
-	public int getECount();
+	public long getECount();
 
 	/**
 	 * @return the number of incidences in this graph
 	 */
-	public int getICount();
+	public long getICount();
 
 	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this

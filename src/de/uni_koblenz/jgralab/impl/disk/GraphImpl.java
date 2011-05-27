@@ -143,8 +143,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getParentDistributedGraph() {
-		return localGraphDatabase.getGraphObject(storingGraphDatabase
-				.getIdOfParentDistributedGraph());
+		return localGraphDatabase.getGraphObject(storingGraphDatabase.getIdOfParentDistributedGraph());
 	}
 
 	@Override
@@ -154,8 +153,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getView(int kappa) {
-		return localGraphDatabase.getGraphFactory()
-				.createViewGraph(this, kappa);
+		return localGraphDatabase.getGraphFactory().createViewGraph(this, kappa);
 	}
 
 	public Graph getViewedGraph() {
@@ -233,7 +231,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getVCount() {
+	public long getVCount() {
 		return storingGraphDatabase.getVCount(globalSubgraphId);
 	}
 

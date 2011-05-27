@@ -143,12 +143,35 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 */
 	protected long edgeListVersion;
 	
+	
+	/**
+	 * Remote GraphDatabases of the distributed graph
+	 */
+	protected Map<Integer, RemoteGraphDatabaseAccessWithInternalMethods> partialGraphDatabases;
+	
+	protected final Map<Integer, RemoteDiskStorageAccess> remoteDiskStorages;
+	
 	/**
 	 * The map of global subgraph ids to the local representation objects. Those may be
 	 * either objects representing a local subgraph or (proxy) objects representing
 	 * remote subgraphs
 	 */
-	protected final Map<Integer, Reference<Graph>> subgraphObjects;
+	protected final Map<Long, Reference<Graph>> subgraphObjects;
+	
+	/**
+	 * Maps the global element id to the local proxy object representing the
+	 * remote vertex
+	 */
+	protected final Map<Long, Reference<Vertex>> remoteVertices;
+	protected final Map<Long, Reference<Edge>> remoteEdges;
+	protected final Map<Long, Reference<Incidence>> remoteIncidences;
+	
+	
+	
+	/* ==================================================================================
+	 * Graph listeners
+	 * ================================================================================== */
+	
 	
 	/**
 	 * Listeners listining on changes of this graph
@@ -171,6 +194,10 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	
 	
 	
+	/* ==================================================================================
+	 * Constructur and basic methods to access subgraphs
+	 * ================================================================================== */
+	
 	
 	public GraphDatabaseElementaryMethods( Schema schema, String uniqueGraphId, int parentSubgraphId, int localPartialGraphId) {
 		this.uniqueGraphId = uniqueGraphId;
@@ -190,48 +217,81 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		this.deleteVertexList = new LinkedList<Vertex>();
 		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
 		localSubgraphData = new ArrayList<GraphData>();
-		subgraphObjects = new HashMap<Integer, Reference<Graph>>();
+		subgraphObjects = new HashMap<Long, Reference<Graph>>();
 		remoteVertices = new HashMap<Long, Reference<Vertex>>();
 		remoteEdges = new HashMap<Long, Reference<Edge>>();
 		remoteIncidences = new HashMap<Long, Reference<Incidence>>();
 	}
 	
 	
-	
-	
-	
-	
-	
-	
 	/**
-	 * Remote GraphDatabases of the distributed graph
+	 * @param localSubgraphId
+	 * @return the graph data object storing the data of the local
+	 * subgraph identified by <code>localSubgraphId</code>
 	 */
-	protected Map<Integer, RemoteGraphDatabaseAccessWithInternalMethods> partialGraphDatabases;
-
-	
-	
 	protected GraphData getGraphData(int localSubgraphId) {
 		GraphData data = localSubgraphData.get(localSubgraphId);
 		return data;
 	}
 
-	protected int allocateSubgraphId() {
+	/**
+	 * Allocates and returns a free local subgraph id
+	 */
+	protected int allocateLocalSubgraphId() {
 		return localSubgraphData.size();
 	}
 
-	protected final Map<Integer, RemoteDiskStorageAccess> remoteDiskStorages;
 	/**
-	 * Maps the global element id to the local proxy object representing the
-	 * remote vertex
+	 * Retrieves the hostname that stores all subgraphs with the given partial graph id 
+	 * @param id
+	 * @return the hostname of the station containing the partial graph with the given id
 	 */
-	protected final Map<Long, Reference<Vertex>> remoteVertices;
-	protected final Map<Long, Reference<Edge>> remoteEdges;
-	protected final Map<Long, Reference<Incidence>> remoteIncidences;
+	public abstract String getHostname(int partialGraphId);
 
+	/**
+	 * Retrieves a free partial graph id
+	 * @return a free and currently unused partial graph id
+	 */
+	protected abstract int getFreePartialGraphId();
+	
 
+	@Override
 	public String getUniqueGraphId() {
 		return uniqueGraphId;
 	}
+	
+	public int getLocalPartialGraphId() {
+		return localPartialGraphId;
+	}
+	
+	public int getIdOfParentDistributedGraph() {
+		return parentSubgraphId;
+	}
+	
+	public GraphFactory getGraphFactory() {
+		return graphFactory;
+	}
+
+	public long getGraphVersion() {
+		return graphVersion;
+	}
+
+	@Override
+	public boolean isLoading() {
+		return loading;
+		
+	}
+
+	@Override
+	public void setLoading(boolean isLoading) {
+		this.loading = isLoading;
+	}
+
+	protected boolean canAddGraphElement(long eId) {
+		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
+	}
+
+
 
 	protected RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(int partialGraphId) {
 		RemoteGraphDatabaseAccessWithInternalMethods remoteAccess = partialGraphDatabases.get(partialGraphId);
@@ -250,28 +310,30 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		}
 		return remoteAccess;
 	}
+	
+	public DiskStorageManager getLocalDiskStorage() {
+		return localDiskStorage;
+	}
 
-	/**
-	 * Retrieves the hostname that stores all subgraphs with the given partial graph id 
-	 * @param id
-	 * @return the hostname of the station containing the partial graph with the given id
-	 */
-	public abstract String getHostname(int partialGraphId);
 
-	/**
-	 * Retrieves a free partial graph id
-	 * @return a free and currently unused partial graph id
-	 */
-	protected abstract int getFreePartialGraphId();
+	public Schema getSchema() {
+		return schema;
+	}
+
+	
+	/* ==================================================================================
+	 * Methods to access types and type ids
+	 * ================================================================================== */
+
 
 	/**
 	 * Returns the type of the graph identified by the global subgraph id
-	 * @param subgraphId
+	 * @param globalSubgraphId
 	 * @return the type of the 
 	 */
 	@SuppressWarnings("unchecked")
-	protected Class<? extends Graph> getGraphType(int subgraphId) {
-		return (Class<? extends Graph>) schema.getM1ClassForId(getGraphTypeId(subgraphId));
+	protected Class<? extends Graph> getGraphType(long globalSubgraphId) {
+		return (Class<? extends Graph>) schema.getM1ClassForId(getGraphTypeId(globalSubgraphId));
 	}
 
 	/**
@@ -304,12 +366,13 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		return (Class<? extends Incidence>) schema.getM1ClassForId(getIncidenceTypeId(elementId));
 	}
 
-	public int getGraphTypeId(int subgraphId) {
-		int partialGraphId = getPartialGraphId(subgraphId);
+	public int getGraphTypeId(long globalSubgraphId) {
+		int partialGraphId = getPartialGraphId(globalSubgraphId);
+		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+			return getGraphDatabase(partialGraphId).getGraphTypeId(localSubgraphId);
 		}	
-		return getGraphData(subgraphId).typeId;
+		return getGraphData(localSubgraphId).typeId;
 	}
 
 	public int getVertexTypeId(long vertexId) {
@@ -326,13 +389,18 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(incidenceId);
 		return getDiskStorageForPartialGraph(partialGraphId).getIncidenceTypeId(convertToLocalId(incidenceId));
 	}
+	
+	
+	/* ==================================================================================
+	 * Methods to access local and proxy objects for graphs and their elements
+	 * ================================================================================== */
 
 	/**
 	 * Retrieves a Graph object (local or proxy) that represents the (partial) (sub) graph identified by the given id
 	 * @param partialGraphId
 	 * @return
 	 */
-	public Graph getGraphObject(int globalSubgraphId) {
+	public Graph getGraphObject(long globalSubgraphId) {
 		Reference<Graph> ref = subgraphObjects.get(globalSubgraphId);
 		Graph g = null;
 		if (ref != null) {
@@ -343,6 +411,29 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 			subgraphObjects.put(globalSubgraphId, new WeakReference<Graph>(g));
 		}
 		return g;
+	}
+//
+//	/**
+//	 * 
+//	 * @return
+//	 */
+//	@Override
+//	public Graph getCompleteGraphObject() {
+//		return getGraphObject(0);
+//	}
+
+	/**
+	 * Returns an object (Vertex or Edge) representing the GraphElement
+	 * identified by the given global id
+	 * @param elemId
+	 * @return
+	 */
+	public GraphElement<?, ?, ?> getGraphElementObject(long elemId) {
+		if (elemId < 0) {
+			return getEdgeObject(-elemId);
+		} else {
+			return getVertexObject(elemId);
+		}
 	}
 
 	/**
@@ -420,32 +511,19 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		return proxy;
 	}
 
-	public int getLocalGraphId() {
-		return localPartialGraphId;
-	}
 
-	public Schema getSchema() {
-		return schema;
-	}
+	/* =====================================================
+	 * Methods to access properties common for edges and vertices
+	 * ===================================================== */
 
-	public Graph getCompleteGraphObject() {
-		return getGraphObject(0);
+	
+	@Override
+	public long getSigma(long globalElementId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		return getDiskStorageForPartialGraph(partialGraphId).getSigmaId(localElementId);
 	}
-
-	/**
-	 * Returns an object (Vertex or Edge) representing the GraphElement
-	 * identified by the given global id
-	 * @param elemId
-	 * @return
-	 */
-	public GraphElement<?, ?, ?> getGraphElementObject(long elemId) {
-		if (elemId < 0) {
-			return getEdgeObject(-elemId);
-		} else {
-			return getVertexObject(elemId);
-		}
-	}
-
+	
 	@Override
 	public void setSigma(long globalElementId, long globalSigmaId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
@@ -467,39 +545,72 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		getGraphDatabase(partialGraphId).setKappa(localElementId, kappa);
 	}
 
-	public DiskStorageManager getLocalDiskStorage() {
-		return localDiskStorage;
-	}
+	
 
-	public GraphFactory getGraphFactory() {
-		return graphFactory;
+	
+	
+	
+	/* =====================================================
+	 * Methods to access vertex sequence
+	 * ===================================================== */
+	
+	public long getVCount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
+			return remoteDb.getVCount(subgraphId);
+		} else {
+			return getGraphData(convertToLocalId(subgraphId)).vertexCount;
+		}
 	}
-
-	public long getGraphVersion() {
-		return graphVersion;
-	}
-
-	@Override
-	public boolean isLoading() {
-		return loading;
-		
-	}
-
-	@Override
-	public void setLoading(boolean isLoading) {
-		this.loading = isLoading;
-	}
-
-	protected boolean canAddGraphElement(long eId) {
-		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
-	}
-
-	public int getIdOfParentDistributedGraph() {
-		return parentSubgraphId;
-	}
-
+	
+	
 	public int getMaxVCount() {
 		return Integer.MAX_VALUE;
+	}
+	
+	@Override
+	public long getFirstVertexId(int subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
+			return remoteDb.getFirstVertexId(subgraphId);
+		} else {
+			return getGraphData(convertToLocalId(subgraphId)).firstVertexId;
+		}
+	}
+
+	@Override
+	public void setFirstVertexId(int subgraphId, long edgeId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
+			remoteDb.setFirstVertexId(subgraphId, edgeId);
+		} else {
+			getGraphData(convertToLocalId(subgraphId)).firstVertexId = edgeId;
+		}
+	}
+
+	@Override
+	public long getLastVertexId(int subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
+			return remoteDb.getLastVertexId(subgraphId);
+		} else {
+			return getGraphData(convertToLocalId(subgraphId)).lastVertexId;
+		}
+	}
+
+
+	public void setLastVertexId(int subgraphId, long edgeId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
+			remoteDb.setLastVertexId(subgraphId, edgeId);
+		} else {
+			getGraphData(convertToLocalId(subgraphId)).lastVertexId = edgeId;
+		}
 	}
 
 	protected long getNextVertexId(long vertexId) {
@@ -526,68 +637,76 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		diskStore.setPreviousVertexId(convertToLocalId(modifiedVertexId), nextVertexId);
 	}
 
-	public long getFirstVertexId(int subgraphId) {
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public long getFirstEdgeId(int subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getFirstVertexId(subgraphId);
+			return remoteDb.getFirstEdgeId(subgraphId);
 		} else {
-			return getGraphData(convertToLocalId(subgraphId)).firstVertexId;
+			return getGraphData(convertToLocalId(subgraphId)).firstEdgeId;
 		}
 	}
 
 	@Override
-	public void setFirstVertexId(int subgraphId, long edgeId) {
+	public void setFirstEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setFirstVertexId(subgraphId, edgeId);
+			remoteDb.setFirstEdgeId(subgraphId, edgeId);
 		} else {
-			getGraphData(convertToLocalId(subgraphId)).firstVertexId = edgeId;
+			getGraphData(convertToLocalId(subgraphId)).firstEdgeId = edgeId;
 		}
 	}
 
-	public long getLastVertexId(int subgraphId) {
+	@Override
+	public long getLastEdgeId(int subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getLastVertexId(subgraphId);
+			return remoteDb.getLastEdgeId(subgraphId);
 		} else {
-			return getGraphData(convertToLocalId(subgraphId)).lastVertexId;
+			return getGraphData(convertToLocalId(subgraphId)).lastEdgeId;
 		}
 	}
 
-
-	public void setLastVertexId(int subgraphId, long edgeId) {
+	@Override
+	public void setLastEdgeId(int subgraphId, long edgeId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setLastVertexId(subgraphId, edgeId);
+			remoteDb.setLastEdgeId(subgraphId, edgeId);
 		} else {
-			getGraphData(convertToLocalId(subgraphId)).lastVertexId = edgeId;
+			getGraphData(convertToLocalId(subgraphId)).lastEdgeId = edgeId;
 		}
 	}
 
-	public int getMaxECount() {
-		return Integer.MAX_VALUE;
-	}
 
-	protected long getNextEdgeId(long vertexId) {
-		int partialGraphId = getPartialGraphId(vertexId);
+	@Override
+	public long getNextEdgeId(long edgeId) {
+		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getNextEdgeId(convertToLocalId(vertexId));
+		return diskStore.getNextEdgeId(convertToLocalId(edgeId));
 	}
-
-	protected long getPreviousEdgeId(long vertexId) {
-		int partialGraphId = getPartialGraphId(vertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getPreviousEdgeId(convertToLocalId(vertexId));
-	}
-
+	
 	protected void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		diskStore.setNextEdgeId(convertToLocalId(modifiedEdgeId), nextEdgeId);
+	}
+
+	@Override
+	public long getPreviousEdgeId(long edgeId) {
+		int partialGraphId = getPartialGraphId(edgeId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getPreviousEdgeId(convertToLocalId(edgeId));
 	}
 
 	protected void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
@@ -595,6 +714,16 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		diskStore.setPreviousEdgeId(convertToLocalId(modifiedEdgeId), nextEdgeId);
 	}
+	
+	
+	
+
+
+	
+	
+	
+	
+	
 
 	protected boolean containsIncidenceId(long iId) {
 		return getIncidenceObject(iId) != null;
@@ -609,51 +738,36 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 
 
 	@Override
-	public void setLastIncidenceId(long elemId, long incidenceId) {
-		int partialGraphId = getPartialGraphId(elemId);
-		getDiskStorageForPartialGraph(partialGraphId).setLastIncidenceId(convertToLocalId(elemId), incidenceId);
+	public void setLastIncidenceId(long elementId, long incidenceId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		getDiskStorageForPartialGraph(partialGraphId).setLastIncidenceId(convertToLocalId(elementId), incidenceId);
 	}
 
 
 	@Override
 	public void setNextIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setNextIncidenceAtVertexId(convertToLocalId(globalIncidenceId), nextIncidenceId);
-		} else {
-			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
-		}
+		getDiskStorageForPartialGraph(partialGraphId).setNextIncidenceAtVertexId(convertToLocalId(globalIncidenceId), nextIncidenceId);
 	}
 
 
 	@Override
 	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setPreviousIncidenceAtVertexId(convertToLocalId(globalIncidenceId), nextIncidenceId);
-		} else {
-			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
-		}
+		getDiskStorageForPartialGraph(partialGraphId).setPreviousIncidenceAtVertexId(convertToLocalId(globalIncidenceId), nextIncidenceId);
+		
 	}
 
 	@Override
 	public void setNextIncidenceIdAtEdgeId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setNextIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
-		} else {
-			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
-		}
+		getDiskStorageForPartialGraph(partialGraphId).setNextIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
 	}
 
 	@Override
 	public void setPreviousIncidenceIdAtEdgeId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		if (partialGraphId == localPartialGraphId) {
-			localDiskStorage.setPreviousIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
-		} else {
-			getGraphDatabase(partialGraphId).setLastIncidenceId(globalIncidenceId, nextIncidenceId);
-		}
+		getDiskStorageForPartialGraph(partialGraphId).setPreviousIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
 	}
 
 }

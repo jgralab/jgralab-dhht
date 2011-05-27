@@ -443,7 +443,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	@Override
-	abstract public int getVCount();
+	abstract public long getVCount();
 
 	@Override
 	abstract public long getVertexListVersion();

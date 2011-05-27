@@ -37,6 +37,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Methods to access graph properties
 	 * ===================================================== */
 	
+	public String getUniqueGraphId();
+
+	public long getGraphVersion();
+
+	
 	/**
 	 * Returns the id of the type of the subgraph identified by the given <code>subgraphId</code>
 	 * @return
@@ -66,7 +71,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Methods to access properties common for edges and vertices
 	 * ===================================================== */
 	
-	public int getSigma(long elemId);
+	public long getSigma(long elemId);
 	
 	public void setSigma(long elementId, long sigmaId);
 	
@@ -90,10 +95,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public long getVertexListVersion();
 
 
-	public int getVCount(int globalSubgraphId);
+	public long getVCount(long subgraphId);
 
 
-	public void setVCount(long count, int count2);
+	public void setVCount(long count, long count2);
 	
 	
 	/**
@@ -159,9 +164,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long getEdgeListVersion();
 	
-	public int getECount(int globalSubgraphId);
+	public int getECount(long globalSubgraphId);
 	
-	public void setECount(int globalSubgraphId, int count);
+	public void setECount(long globalSubgraphId, long count);
 
 	public int getMaxECount();
 
@@ -233,8 +238,12 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public void setLastEdgeId(int globalSubgraphId, long id);
-
 	
+
+	public long getNextEdgeId(long edgeId);
+
+
+	public long getPreviousEdgeId(long edgeId);
 	
 	
 	/* =====================================================
@@ -353,6 +362,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	long connect(Class<? extends Incidence> cls, long vertexId, long edgeId,
 			long incId);
+
+
 
 
 	

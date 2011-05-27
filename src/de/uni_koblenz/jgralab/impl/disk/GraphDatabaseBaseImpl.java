@@ -1148,7 +1148,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	public int createSubordinateGraph(long elementId) {
 		//get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
-		int localGraphId = allocateSubgraphId();
+		int localGraphId = allocateLocalSubgraphId();
 		int globalGraphId = convertToGlobalSubgraphId(localGraphId);
 		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(globalGraphId);
 		
