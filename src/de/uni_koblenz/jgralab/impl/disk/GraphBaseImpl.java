@@ -104,14 +104,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		return GraphDatabaseBaseImpl.getPartialGraphId(globalSubgraphId);
 	}
 	
-	
-	
-	protected GraphBaseImpl(GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId ) {
-		this.localGraphDatabase = localGraphDatabase;
-		this.storingGraphDatabase = storingGraphDatabase;
-		this.globalSubgraphId = globalSubgraphId;
-	}
-	
 
 	
 	/**

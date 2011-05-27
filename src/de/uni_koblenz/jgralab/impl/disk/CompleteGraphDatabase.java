@@ -1,12 +1,19 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.JGraLabList;
+import de.uni_koblenz.jgralab.JGraLabMap;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 
 public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
@@ -18,7 +25,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final List<Integer> freePartialGraphIds;
 
-	protected CompleteGraphDatabase(CompleteOrPartialGraphImpl localGraph, String hostname) {
+	protected CompleteGraphDatabase(CompleteGraphImpl localGraph, String hostname) {
 		super(localGraph);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		hostnames[0] = hostname;
@@ -166,6 +173,208 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	public Graph loadRemotePartialGraph(String hostname, int id) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public int getGraphTypeId(int subgraphId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getContainingElementId(int globalSubgraphId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getIncidenceListVersion(long elementId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setIncidenceListVersion(long elementId,
+			long incidenceListVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setVCount(long count, long count2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getECount(long globalSubgraphId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setECount(long globalSubgraphId, long count) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getMaxECount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getICount(long globalSubgraphId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getFirstIncidenceId(long elemId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getLastIncidenceId(long elemId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getNextIncidenceIdAtVertexId(long incId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getNextIncidenceIdAtEdgeId(long incId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getPreviousIncidenceIdAtEdgeId(long incId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long connect(Integer incidenceClassId, long vertexId, long edgeId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setDirection(long incId, Direction dir) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteIncidence(long id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(int initialCapacity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
+			float loadFactor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setGraphVersion(long graphVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void incidenceListModified(long elementId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setIncidentEdgeId(long incId, long edgeId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setIncidentVertexId(long incId, long vertexId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerRemotePartialGraph(int id, String hostname) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int createPartialGraph(Class<? extends Graph> graphClass,
+			String hostname) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

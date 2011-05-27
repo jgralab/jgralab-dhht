@@ -48,7 +48,6 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
-import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -64,20 +63,15 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	private final String uid;
 
 	/**
-	 * Creates a graph of the given GraphClass with the given id
+	 * Creates a graph 
 	 * 
 	 * @param id
 	 *            this Graph's id
-	 * @param cls
-	 *            the GraphClass of this Graph
 	 */
-	protected GraphImpl(String graphId, GraphClass cls, int partialGraphId,
+	protected GraphImpl(String graphId, long partialGraphId,
 			GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess graphData) {
-		super(cls);
+		super(partialGraphId, localDatabase, graphData);
 		this.uid = graphId;
-		this.globalSubgraphId = partialGraphId;
-		this.localGraphDatabase = localDatabase;
-		this.storingGraphDatabase = graphData;
 	}
 
 	// ==============================================================
