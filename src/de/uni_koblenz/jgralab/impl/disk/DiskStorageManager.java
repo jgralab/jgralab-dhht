@@ -10,6 +10,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.util.BitSet;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
@@ -933,12 +934,5 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	public int getIncidenceTypeId(int localIncidenceId) {
 		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
 	}
-
-
-
-	
-	
-
-	
 	
 }

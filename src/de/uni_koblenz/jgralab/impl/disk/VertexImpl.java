@@ -878,44 +878,7 @@ public abstract class VertexImpl extends
 		storingGraphDatabase.deleteIncidence(i.getId());
 	}
 
-	@Override
-	//TODO: Move to storing graph database
-	protected void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
-		assert i != null;
-		assert i.getVertex() == this;
-		if (i == getFirstIncidence()) {
-			// delete at head of incidence list
-			setFirstIncidence((IncidenceImpl) i.getNextIncidenceAtVertex());
-			if (getFirstIncidence() != null) {
-				((IncidenceImpl) getFirstIncidence())
-						.setPreviousIncidenceAtVertex(null);
-			}
-			if (i == getLastIncidence()) {
-				// this incidence was the only one...
-				setLastIncidence(null);
-			}
-		} else if (i == getLastIncidence()) {
-			// delete at tail of incidence list
-			setLastIncidence((IncidenceImpl) i.getPreviousIncidenceAtVertex());
-			if (getLastIncidence() != null) {
-				((IncidenceImpl) getLastIncidence())
-						.setNextIncidenceAtVertex(null);
-			}
-		} else {
-			// delete somewhere in the middle
-			((IncidenceImpl) i.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) i
-							.getNextIncidenceAtVertex());
-			((IncidenceImpl) i.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex((IncidenceImpl) i
-							.getPreviousIncidenceAtVertex());
-		}
-		// delete incidence
-		i.setIncidentVertex(null);
-		i.setNextIncidenceAtVertex(null);
-		i.setPreviousIncidenceAtVertex(null);
-		incidenceListModified();
-	}
+	
 
 	@Override
 	//TODO: Move to storing graph database

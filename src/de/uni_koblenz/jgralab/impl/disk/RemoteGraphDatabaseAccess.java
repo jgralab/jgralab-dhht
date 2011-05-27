@@ -263,6 +263,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 	public void putIncidenceIdBeforeAtVertexId(long id, long id2);
+	
+	public void putIncidenceIdBeforeAtEdgeId(long targetId, long movedId);
+
+	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId);
+	
 
 	public long getNextIncidenceIdAtVertexId(long incId);
 	

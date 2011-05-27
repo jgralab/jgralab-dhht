@@ -55,8 +55,8 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		localSubgraphData.add(data);
 		data.containingElementId = containingGraphElementId;
 
-		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
-
+		//Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+		
 		data.typeId = schema.getClassId(m1Class);
 		data.vertexCount = 0;
 		data.edgeCount = 0;
@@ -927,96 +927,91 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 			return;
 		}
 		
-		long vertexId = getConnectedVertex(targetId);
+		long vertexId = getConnectedVertexId(targetId);
+		
+		long previousId = getPreviousIncidenceIdAtVertexId(movedId);
+		long nextId = getNextIncidenceIdAtVertexId(movedId);
 
 		// remove moved incidence from lambdaSeq
-		if (movedId == getFirstIncidenceId()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved
-					.getPreviousIncidenceAtVertex());
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
+		if (movedId == getFirstIncidenceId(vertexId)) {
+			setFirstIncidenceId(vertexId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, 0);
+		} else if (movedId == getLastIncidenceId(vertexId)) {
+			setLastIncidenceId(vertexId, previousId);
+			setNextIncidenceIdAtVertexId(previousId, 0);
 		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
-							.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-							.getPreviousIncidenceAtVertex());
+			setNextIncidenceIdAtVertexId(previousId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, previousId);
 		}
 
+		long tgtNextId = getNextIncidenceIdAtVertexId(targetId);
 		// insert moved incidence in lambdaSeq immediately after target
-		if (target == getLastIncidence()) {
-			setLastIncidence(moved);
-			moved.setNextIncidenceAtVertex(null);
+		if (targetId == getLastIncidenceId(vertexId)) {
+			setLastIncidenceId(vertexId, movedId);
 		} else {
-			((IncidenceImpl) target.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(moved);
-			moved.setNextIncidenceAtVertex((IncidenceImpl) target
-					.getNextIncidenceAtVertex());
+			setPreviousIncidenceIdAtVertexId(tgtNextId, movedId);
 		}
-		moved.setPreviousIncidenceAtVertex(target);
-		target.setNextIncidenceAtVertex(moved);
-		incidenceListModified();
+		setPreviousIncidenceIdAtVertexId(movedId, targetId);
+		setNextIncidenceIdAtVertexId(movedId, tgtNextId);
+		setNextIncidenceIdAtVertexId(targetId, movedId);
+		incidenceListModified(vertexId);
 	}
 
+	
 	@Override
-	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
+	public void putIncidenceIdBeforeAtVertexId(long targetId, long movedId) {
+		assert (targetId != 0) && (movedId != 0);
+		//assert  target.getThis() == moved.getThis();
 
-		if ((target == moved)
-				|| (target.getPreviousIncidenceAtVertex() == moved)) {
+		if ((targetId == movedId) || (getNextIncidenceIdAtVertexId(targetId) == movedId)) {
 			return;
 		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidence() != getLastIncidence();
+		
+		long vertexId = getConnectedVertexId(targetId);
+		
+		long previousId = getPreviousIncidenceIdAtVertexId(movedId);
+		long nextId = getNextIncidenceIdAtVertexId(movedId);
 
 		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidence()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved
-					.getPreviousIncidenceAtVertex());
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
+		if (movedId == getFirstIncidenceId(vertexId)) {
+			setFirstIncidenceId(vertexId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, 0);
+		} else if (movedId == getLastIncidenceId(vertexId)) {
+			setLastIncidenceId(vertexId, previousId);
+			setNextIncidenceIdAtVertexId(previousId, 0);
 		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
-							.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-							.getPreviousIncidenceAtVertex());
+			setNextIncidenceIdAtVertexId(previousId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, previousId);
 		}
 
-		// insert moved incidence in lambdaSeq immediately before target
-		if (target == getFirstIncidence()) {
-			setFirstIncidence(moved);
-			moved.setPreviousIncidenceAtVertex(null);
+		long tgtPreviousId = getPreviousIncidenceIdAtVertexId(targetId);
+		// insert moved incidence in lambdaSeq immediately after target
+		if (targetId == getFirstIncidenceId(vertexId)) {
+			setFirstIncidenceId(vertexId, movedId);
 		} else {
-			IncidenceImpl previousIncidence = (IncidenceImpl) target
-					.getPreviousIncidenceAtVertex();
-			previousIncidence.setNextIncidenceAtVertex(moved);
-			moved.setPreviousIncidenceAtVertex(previousIncidence);
+			setNextIncidenceIdAtVertexId(tgtPreviousId, movedId);
 		}
-		moved.setNextIncidenceAtVertex(target);
-		target.setPreviousIncidenceAtVertex(moved);
-		incidenceListModified();
+		setNextIncidenceIdAtVertexId(movedId, targetId);
+		setPreviousIncidenceIdAtVertexId(movedId, tgtPreviousId);
+		setPreviousIncidenceIdAtVertexId(targetId, movedId);
+		incidenceListModified(vertexId);
+	}
+	
+	private long getConnectedVertexId(long incidenceId) {
+		int partialGraphId = getPartialGraphId(incidenceId);
+		return getDiskStorageForPartialGraph(partialGraphId).getConnectedVertexId(convertToLocalId(incidenceId));
 	}
 
+	private long getConnectedEdgeId(long incidenceId) {
+		int partialGraphId = getPartialGraphId(incidenceId);
+		return getDiskStorageForPartialGraph(partialGraphId).getConnectedEdgeId(convertToLocalId(incidenceId));
+	}
+
+
+/*
 	@Override
 	//TODO: Move to storing graph database
-	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
+	protected void appendIncidenceToLambdaSeq(long elementId, long incidenceId) {
 		assert i != null;
 		assert i.getVertex() != this;
 		i.setIncidentVertex(this);
@@ -1033,11 +1028,144 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	}
 
 
-
+*/
 	
 
 
+	@Override
+	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId) {
+		assert (targetId != 0) && (movedId != 0);
+		//assert  target.getThis() == moved.getThis();
 
+		if ((targetId == movedId) || (getNextIncidenceIdAtEdgeId(targetId) == movedId)) {
+			return;
+		}
+		
+		long edgeId = -getConnectedEdgeId(targetId);
+		
+		long previousId = getPreviousIncidenceIdAtEdgeId(movedId);
+		long nextId = getNextIncidenceIdAtEdgeId(movedId);
+
+		// remove moved incidence from lambdaSeq
+		if (movedId == getFirstIncidenceId(edgeId)) {
+			setFirstIncidenceId(edgeId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, 0);
+		} else if (movedId == getLastIncidenceId(edgeId)) {
+			setLastIncidenceId(edgeId, previousId);
+			setNextIncidenceIdAtEdgeId(previousId, 0);
+		} else {
+			setNextIncidenceIdAtEdgeId(previousId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+		}
+
+		long tgtNextId = getNextIncidenceIdAtEdgeId(targetId);
+		// insert moved incidence in lambdaSeq immediately after target
+		if (targetId == getLastIncidenceId(edgeId)) {
+			setLastIncidenceId(edgeId, movedId);
+		} else {
+			setPreviousIncidenceIdAtEdgeId(tgtNextId, movedId);
+		}
+		setPreviousIncidenceIdAtEdgeId(movedId, targetId);
+		setNextIncidenceIdAtEdgeId(movedId, tgtNextId);
+		setNextIncidenceIdAtEdgeId(targetId, movedId);
+		incidenceListModified(edgeId);
+	}
+
+	
+	@Override
+	public void putIncidenceIdBeforeAtEdgeId(long targetId, long movedId) {
+		assert (targetId != 0) && (movedId != 0);
+		//assert  target.getThis() == moved.getThis();
+
+		if ((targetId == movedId) || (getNextIncidenceIdAtEdgeId(targetId) == movedId)) {
+			return;
+		}
+		
+		long edgeId = -getConnectedEdgeId(targetId);
+		
+		long previousId = getPreviousIncidenceIdAtEdgeId(movedId);
+		long nextId = getNextIncidenceIdAtEdgeId(movedId);
+
+		// remove moved incidence from lambdaSeq
+		if (movedId == getFirstIncidenceId(edgeId)) {
+			setFirstIncidenceId(-edgeId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, 0);
+		} else if (movedId == getLastIncidenceId(edgeId)) {
+			setLastIncidenceId(edgeId, previousId);
+			setNextIncidenceIdAtEdgeId(previousId, 0);
+		} else {
+			setNextIncidenceIdAtEdgeId(previousId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+		}
+
+		long tgtPreviousId = getPreviousIncidenceIdAtEdgeId(targetId);
+		// insert moved incidence in lambdaSeq immediately after target
+		if (targetId == getFirstIncidenceId(edgeId)) {
+			setFirstIncidenceId(edgeId, movedId);
+		} else {
+			setNextIncidenceIdAtEdgeId(tgtPreviousId, movedId);
+		}
+		setNextIncidenceIdAtEdgeId(movedId, targetId);
+		setPreviousIncidenceIdAtEdgeId(movedId, tgtPreviousId);
+		setPreviousIncidenceIdAtEdgeId(targetId, movedId);
+		incidenceListModified(edgeId);
+	}
+	
+
+	protected void removeIncidenceFromLambdaSeqAtVertex(long incidenceId) {
+		assert incidenceId != 0;
+		long vertexId = getConnectedVertexId(incidenceId);
+		
+		long previousId = getPreviousIncidenceIdAtVertexId(incidenceId);
+		long nextId = getNextIncidenceIdAtVertexId(incidenceId);
+
+		// remove moved incidence from lambdaSeq
+		if (incidenceId == getFirstIncidenceId(vertexId)) {
+			setFirstIncidenceId(vertexId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, 0);
+		} else if (incidenceId == getLastIncidenceId(vertexId)) {
+			setLastIncidenceId(vertexId, previousId);
+			setNextIncidenceIdAtVertexId(previousId, 0);
+		} else {
+			setNextIncidenceIdAtVertexId(previousId, nextId);
+			setPreviousIncidenceIdAtVertexId(nextId, previousId);
+		}
+
+		// delete incidence
+		setIncidentVertexId(incidenceId, 0);
+		setNextIncidenceIdAtVertexId(incidenceId, 0);
+		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
+		incidenceListModified(vertexId);
+	}
+	
+	protected void removeIncidenceFromLambdaSeqAtEdge(long incidenceId) {
+		assert incidenceId != 0;
+		long edgeId = -getConnectedEdgeId(incidenceId);
+		
+		long previousId = getPreviousIncidenceIdAtEdgeId(incidenceId);
+		long nextId = getNextIncidenceIdAtEdgeId(incidenceId);
+
+		// remove moved incidence from lambdaSeq
+		if (incidenceId == getFirstIncidenceId(edgeId)) {
+			setFirstIncidenceId(edgeId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, 0);
+		} else if (incidenceId == getLastIncidenceId(edgeId)) {
+			setLastIncidenceId(edgeId, previousId);
+			setNextIncidenceIdAtEdgeId(previousId, 0);
+		} else {
+			setNextIncidenceIdAtEdgeId(previousId, nextId);
+			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+		}
+
+		// delete incidence
+		setIncidentEdgeId(incidenceId, 0);
+		setNextIncidenceIdAtEdgeId(incidenceId, 0);
+		setPreviousIncidenceIdAtEdgeId(incidenceId, 0);
+		incidenceListModified(edgeId);
+	}
+	
+	
+	
 
 	protected void notifyEdgeAdded(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases.values()) {
