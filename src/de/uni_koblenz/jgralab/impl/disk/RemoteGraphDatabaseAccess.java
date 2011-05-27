@@ -144,16 +144,16 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public int getVertexTypeId(long id);
 	
 
-	public long getFirstVertexId(int globalSubgraphId);
+	public long getFirstVertexId(long globalSubgraphId);
 
 
 
-	public long getLastVertexId(int globalSubgraphId);
+	public long getLastVertexId(long globalSubgraphId);
 	
 	
-	public void setFirstVertexId(int globalSubgraphId, long id);
+	public void setFirstVertexId(long globalSubgraphId, long id);
 
-	public void setLastVertexId(int globalSubgraphId, long id);
+	public void setLastVertexId(long globalSubgraphId, long id);
 	
 	/* =====================================================
 	 * Methods to access edge sequence
@@ -225,19 +225,19 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 
 
-	public long getFirstEdgeId(int globalSubgraphId);
+	public long getFirstEdgeId(long globalSubgraphId);
 
 
 
-	public long getLastEdgeId(int globalSubgraphId);
+	public long getLastEdgeId(long globalSubgraphId);
 
 
 
-	public void setFirstEdgeId(int globalSubgraphId, long id);
+	public void setFirstEdgeId(long globalSubgraphId, long id);
 
 
 
-	public void setLastEdgeId(int globalSubgraphId, long id);
+	public void setLastEdgeId(long globalSubgraphId, long id);
 	
 
 	public long getNextEdgeId(long edgeId);
