@@ -435,14 +435,13 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	@Override
-	abstract public int getVCount();
+	abstract public long getVCount();
 
 	@Override
 	abstract public long getVertexListVersion();
 
 	@Override
-	public boolean isEdgeListModified(long edgeListVersion)
-			 {
+	public boolean isEdgeListModified(long edgeListVersion) {
 		return getEdgeListVersion() != edgeListVersion;
 	}
 
@@ -452,8 +451,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	@Override
-	public boolean isVertexListModified(long previousVersion)
-			 {
+	public boolean isVertexListModified(long previousVersion) {
 		return getVertexListVersion() != previousVersion;
 	}
 

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -219,10 +220,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id
 	 * @return
 	 */
-	public int createSubordinateGraph(long id);
-
-
-
+	public long createSubordinateGraph(long id);
 
 
 	public long getFirstEdgeId(long globalSubgraphId);
@@ -364,6 +362,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 			long incId);
 
 	public void setGraphVersion(long graphVersion);
+
+	void setDirection(long incId, Direction dir);
 
 
 

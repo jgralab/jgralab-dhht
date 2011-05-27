@@ -72,10 +72,11 @@ public abstract class ViewGraphImpl implements Graph,
 	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
-		setECount(viewedGraph.getECount());
-		setICount(viewedGraph.getICount());
-		setVCount(viewedGraph.getVCount());
 		viewedGraph.addGraphStructureChangedListener(this);
+		//TODO: set count values the first time they are accessed by traversing the graph 
+		vCount = (int) viewedGraph.getVCount();
+		eCount = (int) viewedGraph.getECount();
+		iCount = (int) viewedGraph.getICount();
 	}
 
 	protected void setECount(int eCount) {
@@ -426,27 +427,27 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int getMaxECount() {
+	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int getVCount() {
+	public long getVCount() {
 		return vCount;
 	}
 
 	@Override
-	public int getECount() {
+	public long getECount() {
 		return eCount;
 	}
 
 	@Override
-	public int getICount() {
+	public long getICount() {
 		return iCount;
 	}
 
@@ -598,28 +599,28 @@ public abstract class ViewGraphImpl implements Graph,
 	@Override
 	public void vertexAdded(Vertex v) {
 		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
+			vCount++;
 		}
 	}
 
 	@Override
 	public void vertexDeleted(Vertex v) {
 		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
+			vCount--;
 		}
 	}
 
 	@Override
 	public void edgeAdded(Edge e) {
 		if (containsEdge(e)) {
-			setECount(getECount() + 1);
+			eCount++;
 		}
 	}
 
 	@Override
 	public void edgeDeleted(Edge e) {
 		if (containsEdge(e)) {
-			setECount(getECount() + 1);
+			eCount--;
 		}
 	}
 
@@ -638,14 +639,14 @@ public abstract class ViewGraphImpl implements Graph,
 	@Override
 	public void incidenceAdded(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
+			iCount++;
 		}
 	}
 
 	@Override
 	public void incidenceDeleted(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
+			iCount--;
 		}
 	}
 

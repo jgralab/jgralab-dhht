@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.Remote;
 
+import de.uni_koblenz.jgralab.Direction;
+
 /**
  * Remote interface of DiskStorage used to access properties of the stored elements
  * @author dbildh
@@ -58,5 +60,7 @@ public interface RemoteDiskStorageAccess extends Remote {
 	public int getEdgeTypeId(int localEdgeId);
 	
 	public int getIncidenceTypeId(int localIncidenceId);
+
+	public void setDirection(int convertToLocalId, Direction dir);
 
 }

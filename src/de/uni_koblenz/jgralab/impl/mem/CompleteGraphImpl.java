@@ -691,7 +691,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
 		e.setId(0);
-		setECount(getECount() - 1);
+		eCount--;
 	}
 
 	protected void removeEdgeFromESeqWithoutDeletingIt(EdgeImpl e) {
@@ -755,7 +755,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		v.setPreviousVertex(null);
 		v.setNextVertex(null);
 		v.setId(0);
-		setVCount(getVCount() - 1);
+		vCount--;
 	}
 
 	protected void setDeleteVertexList(List<VertexImpl> deleteVertexList) {
@@ -1116,7 +1116,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void appendEdgeToESeq(EdgeImpl e) {
 		getEdgeArray()[e.id] = e;
-		setECount(getECount() + 1);
+		eCount++;
 		if (getFirstEdge() == null) {
 			setFirstEdge(e);
 		}
@@ -1135,7 +1135,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void appendVertexToVSeq(VertexImpl v) {
 		getVertexArray()[v.id] = v;
-		setVCount(getVCount() + 1);
+		vCount++;
 		if (getFirstVertex() == null) {
 			setFirstVertex(v);
 		}
@@ -1175,11 +1175,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		loading = isLoading;
 	}
 
-	@Override
-	protected void setVCount(int count) {
-		vCount = count;
-	}
-
 	protected void setVertexArray(VertexImpl[] vertex) {
 		this.vertexArray = vertex;
 	}
@@ -1200,11 +1195,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@Override
 	protected void setLastVertex(VertexImpl lastVertex) {
 		this.lastVertex = lastVertex;
-	}
-
-	@Override
-	protected void setECount(int count) {
-		eCount = count;
 	}
 
 	protected void setEdgeArray(EdgeImpl[] edge) {
@@ -1274,7 +1264,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getVCount() {
+	public long getVCount() {
 		return vCount;
 	}
 
@@ -1315,7 +1305,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getICount() {
+	public long getICount() {
 		return iCount;
 	}
 
@@ -1337,17 +1327,17 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public int getMaxECount() {
+	public long getMaxECount() {
 		return eMax;
 	}
 
 	@Override
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		return vMax;
 	}
 
 	@Override
-	public int getECount() {
+	public long getECount() {
 		return eCount;
 	}
 
@@ -1482,7 +1472,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					--vId;
 				}
 			}
-			int newVMax = getVCount() == 0 ? 1 : getVCount();
+			int newVMax = (int) (getVCount() == 0 ? 1 : getVCount());
 			if (newVMax != vMax) {
 				vMax = newVMax;
 				VertexImpl[] newVertex = new VertexImpl[vMax + 1];
@@ -1512,7 +1502,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					--eId;
 				}
 			}
-			int newEMax = getECount() == 0 ? 1 : getECount();
+			int newEMax = (int) (getECount() == 0 ? 1 : getECount());
 			if (newEMax != eMax) {
 				eMax = newEMax;
 				EdgeImpl[] newEdge = new EdgeImpl[eMax + 1];
@@ -1543,7 +1533,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					--iId;
 				}
 			}
-			int newIMax = getICount() == 0 ? 1 : getICount();
+			int newIMax = (int) (getICount() == 0 ? 1 : getICount());
 			if (newIMax != iMax) {
 				iMax = newIMax;
 				IncidenceImpl[] newIncidence = new IncidenceImpl[iMax + 1];

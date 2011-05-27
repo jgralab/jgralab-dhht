@@ -227,7 +227,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *          consisting of 12 bit for the partial graph id and 20 bit of the
 	 *          subordinate graph id inside this partial graph 
 	 */
-	public int getGlobalSubgraphId();
+	public long getGlobalSubgraphId();
 	
 	
 	/**

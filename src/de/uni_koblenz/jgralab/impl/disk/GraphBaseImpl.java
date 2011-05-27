@@ -97,7 +97,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 	
 	public int getLocalSubgraphId() {
-		return GraphDatabaseBaseImpl.convertToLocalSubgraphId(globalSubgraphId);
+		return GraphDatabaseBaseImpl.convertToLocalId(globalSubgraphId);
 	}
 	
 	public int getPartialGraphId() {
@@ -165,29 +165,14 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	@Override
 	public Edge getFirstEdge() {
-		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdge(globalSubgraphId));
+		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdgeId(globalSubgraphId));
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdge(globalSubgraphId));
+		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdgeId(globalSubgraphId));
 	}
 
-	/**
-	 * holds the id of the first edge in Eseq
-	 */
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		if (firstEdge != null)
-			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, firstEdge.getId());
-	}
-
-	/**
-	 * holds the id of the last edge in Eseq
-	 */
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		if (lastEdge != null)
-			storingGraphDatabase.setLastEdgeId(globalSubgraphId, lastEdge.getId());
-	}
 
 	/**
 	 * Sets version of ESeq.
@@ -195,7 +180,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @param edgeListVersion
 	 *            Version to set.
 	 */
-	// abstract protected void setEdgeListVersion(long edgeListVersion);
+
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -234,14 +219,9 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected GraphBaseImpl(GraphClass cls) {
-		setFirstVertex(null);
-		setLastVertex(null);
-		setVCount(0);
-
-		setFirstEdge(null);
-		setLastEdge(null);
-		setECount(0);
+	protected GraphBaseImpl(GraphClass cls, GraphDatabase localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {
+		super(cls);
+		
 	}
 
 	/*
@@ -717,16 +697,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			setFirstEdge(out.first);
-			setLastEdge(out.last);
+			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getId());
+			storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getId());
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				setFirstEdge(out.first);
-				setLastEdge(out.last);
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getId());
+				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getId());
 				edgeListModified();
 				return;
 			}

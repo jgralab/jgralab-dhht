@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -44,7 +45,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * Retrieves the partial graph id of the given globalSubgraphOrElementId, this
 	 * is the highbyte of the long value.
 	 */
-	protected static final int getPartialGraphId(long globalSubgraphOrElementId) {
+	public static final int getPartialGraphId(long globalSubgraphOrElementId) {
 		return (int) (globalSubgraphOrElementId >> 32);
 	}
 
@@ -52,7 +53,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * Retrieves the local id of the given globalSubgraphOrElementId, this
 	 * is the lowbyte of the long value.
 	 */
-	public final int convertToLocalId(long globalSubgraphOrElementId) {
+	public final static int convertToLocalId(long globalSubgraphOrElementId) {
 		return (int) globalSubgraphOrElementId;
 	}
 	
@@ -107,7 +108,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * List of vertices to be deleted by a cascading delete caused by deletion
 	 * of a composition "parent".
 	 */
-	protected final List<Vertex> deleteVertexList;
+	protected final List<Long> deleteVertexList;
 	
 	/**
 	 * free index list for vertices
@@ -214,7 +215,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		this.freeVertexList = new FreeIndexList(Integer.MAX_VALUE);
 		this.freeEdgeList = new FreeIndexList(Integer.MAX_VALUE);
 		this.freeIncidenceList = new FreeIndexList(Integer.MAX_VALUE);
-		this.deleteVertexList = new LinkedList<Vertex>();
+		this.deleteVertexList = new LinkedList<Long>();
 
 		localSubgraphData = new ArrayList<GraphData>();
 		subgraphObjects = new HashMap<Long, Reference<Graph>>();
@@ -780,6 +781,12 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	public void setPreviousIncidenceIdAtEdgeId(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		getDiskStorageForPartialGraph(partialGraphId).setPreviousIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
+	}
+	
+	@Override
+	public void setDirection(long globalIncidenceId, Direction dir) {
+		int partialGraphId = getPartialGraphId(globalIncidenceId);
+		getDiskStorageForPartialGraph(partialGraphId).setDirection(convertToLocalId(globalIncidenceId), dir);
 	}
 
 }

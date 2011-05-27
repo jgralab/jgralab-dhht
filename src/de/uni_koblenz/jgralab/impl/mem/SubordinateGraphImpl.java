@@ -87,12 +87,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getVCount() {
+	public long getVCount() {
 		return vCount;
 	}
 
 	@Override
-	public int getECount() {
+	public long getECount() {
 		return eCount;
 	}
 
@@ -154,8 +154,8 @@ public abstract class SubordinateGraphImpl extends
 			setFirstEdge((EdgeImpl) current);
 			do {
 				setLastEdge((EdgeImpl) current);
-				setECount(getECount() + 1);
-				setICount(getICount() + current.getDegree());
+				eCount++;
+				iCount += current.getDegree();
 				current = current.getNextEdge();
 			} while (current != null
 					&& ((GraphElementImpl<?, ?, ?>) current)
@@ -197,7 +197,7 @@ public abstract class SubordinateGraphImpl extends
 			setFirstVertex((VertexImpl) current);
 			do {
 				setLastVertex((VertexImpl) current);
-				setVCount(getVCount() + 1);
+				vCount++;
 				current = current.getNextVertex();
 			} while (current != null
 					&& ((GraphElementImpl<?, ?, ?>) current)
@@ -394,12 +394,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int getMaxECount() {
+	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -441,7 +441,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getICount() {
+	public long getICount() {
 		return iCount;
 	}
 
@@ -520,7 +520,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void vertexAdded(Vertex v) {
 		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
+			vCount++;
 			if (v.getPreviousVertex() == getContainingElement()) {
 				// this is a new first vertex
 				setFirstVertex((VertexImpl) v);
@@ -537,7 +537,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void vertexDeleted(Vertex v) {
 		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
+			vCount--;
 			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
 				// this was the last vertex
 				setLastVertex(null);
@@ -556,7 +556,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void edgeAdded(Edge e) {
 		if (containsEdge(e)) {
-			setECount(getECount() + 1);
+			eCount++;
 			if (e.getPreviousEdge() == getContainingElement()) {
 				// this is a new first edge
 				setFirstEdge((EdgeImpl) e);
@@ -573,7 +573,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void edgeDeleted(Edge e) {
 		if (containsEdge(e)) {
-			setECount(getECount() + 1);
+			eCount--;
 			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
 				// this was the last edge
 				setLastEdge(null);
@@ -604,14 +604,14 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public void incidenceAdded(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
+			iCount++;
 		}
 	}
 
 	@Override
 	public void incidenceDeleted(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
+			iCount--;
 		}
 	}
 
