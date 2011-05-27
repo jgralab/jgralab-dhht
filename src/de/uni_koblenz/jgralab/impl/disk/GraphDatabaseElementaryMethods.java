@@ -783,10 +783,10 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		getDiskStorageForPartialGraph(partialGraphId).setPreviousIncidenceAtEdgeId(convertToLocalId(globalIncidenceId), nextIncidenceId);
 	}
 	
-	@Override
-	public void setDirection(long globalIncidenceId, Direction dir) {
-		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		getDiskStorageForPartialGraph(partialGraphId).setDirection(convertToLocalId(globalIncidenceId), dir);
-	}
+//	@Override
+//	public void setDirection(long globalIncidenceId, Direction dir) {
+//		int partialGraphId = getPartialGraphId(globalIncidenceId);
+//		getDiskStorageForPartialGraph(partialGraphId).setDirection(convertToLocalId(globalIncidenceId), dir);
+//	}
 
 }

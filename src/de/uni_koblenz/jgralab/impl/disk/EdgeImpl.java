@@ -505,160 +505,6 @@ public abstract class EdgeImpl extends
 	
 
 	
-
-	@Override
-	protected final void appendIncidenceToLambdaSeq(IncidenceImpl i) {
-		assert i != null;
-		assert i.getEdge() != this;
-		i.setIncidentEdge(this);
-		i.setNextIncidenceAtEdge(null);
-		if (getFirstIncidence() == null) {
-			setFirstIncidence(i);
-		}
-		if (getLastIncidence() != null) {
-			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtEdge(i);
-			i.setPreviousIncidenceAtEdge((IncidenceImpl) getLastIncidence());
-		}
-		setLastIncidence(i);
-		incidenceListModified();
-	}
-	
-	@Override
-	protected final void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
-		assert i != null;
-		assert i.getEdge() == this;
-		if (i == getFirstIncidence()) {
-			// delete at head of incidence list
-			setFirstIncidence((IncidenceImpl) i.getNextIncidenceAtEdge());
-			if (getFirstIncidence() != null) {
-				((IncidenceImpl) getFirstIncidence())
-						.setPreviousIncidenceAtEdge(null);
-			}
-			if (i == getLastIncidence()) {
-				// this incidence was the only one...
-				setLastIncidence(null);
-			}
-		} else if (i == getLastIncidence()) {
-			// delete at tail of incidence list
-			setLastIncidence((IncidenceImpl) i.getPreviousIncidenceAtEdge());
-			if (getLastIncidence() != null) {
-				((IncidenceImpl) getLastIncidence())
-						.setNextIncidenceAtEdge(null);
-			}
-		} else {
-			// delete somewhere in the middle
-			((IncidenceImpl) i.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge((IncidenceImpl) i
-							.getNextIncidenceAtEdge());
-			((IncidenceImpl) i.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge((IncidenceImpl) i
-							.getPreviousIncidenceAtEdge());
-		}
-		// delete incidence
-		i.setIncidentEdge(null);
-		i.setNextIncidenceAtEdge(null);
-		i.setPreviousIncidenceAtEdge(null);
-		incidenceListModified();
-	}
-
-	@Override
-	protected final void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved) || (target.getNextIncidenceAtEdge() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidence() != getLastIncidence();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidence()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
-			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
-			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge(null);
-		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
-							.getNextIncidenceAtEdge());
-			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge((IncidenceImpl) moved
-							.getPreviousIncidenceAtEdge());
-		}
-
-		// insert moved incidence in lambdaSeq immediately after target
-		if (target == getLastIncidence()) {
-			setLastIncidence(moved);
-			moved.setNextIncidenceAtEdge(null);
-		} else {
-			((IncidenceImpl) target.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge(moved);
-			moved.setNextIncidenceAtEdge((IncidenceImpl) target
-					.getNextIncidenceAtEdge());
-		}
-		moved.setPreviousIncidenceAtEdge(target);
-		target.setNextIncidenceAtEdge(moved);
-		incidenceListModified();
-	}
-
-	@Override
-	protected final void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved) || (target.getPreviousIncidenceAtEdge() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidence() != getLastIncidence();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidence()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtEdge());
-			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved.getPreviousIncidenceAtEdge());
-			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge(null);
-		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtEdge((IncidenceImpl) moved
-							.getNextIncidenceAtEdge());
-			((IncidenceImpl) moved.getNextIncidenceAtEdge())
-					.setPreviousIncidenceAtEdge((IncidenceImpl) moved
-							.getPreviousIncidenceAtEdge());
-		}
-
-		// insert moved incidence in lambdaSeq immediately before target
-		if (target == getFirstIncidence()) {
-			setFirstIncidence(moved);
-			moved.setPreviousIncidenceAtEdge(null);
-		} else {
-			IncidenceImpl previousIncidence = (IncidenceImpl) target
-					.getPreviousIncidenceAtEdge();
-			previousIncidence.setNextIncidenceAtEdge(moved);
-			moved.setPreviousIncidenceAtEdge(previousIncidence);
-		}
-		moved.setNextIncidenceAtEdge(target);
-		target.setPreviousIncidenceAtEdge(moved);
-		incidenceListModified();
-	}
-
 	
 	@Override
 	public final void sortIncidences(Comparator<Incidence> comp) {
@@ -730,17 +576,17 @@ public abstract class EdgeImpl extends
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			setFirstIncidence(out.first);
-			setLastIncidence(out.last);
+			storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
+			storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				setFirstIncidence(out.first);
-				setLastIncidence(out.last);
-				incidenceListModified();
+				storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
+				storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+				storingGraphDatabase.incidenceListModified(elementId);
 				return;
 			}
 
@@ -870,8 +716,7 @@ public abstract class EdgeImpl extends
 		connect(incidentIc, v);
 		v.connect(adjacentIc, other);
 
-		incidenceListModified();
-		((EdgeImpl) other).incidenceListModified();
+
 		storingGraphDatabase.edgeListModified();
 		return v;
 	}

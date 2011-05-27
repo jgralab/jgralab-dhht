@@ -951,17 +951,17 @@ public abstract class VertexImpl extends
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			setFirstIncidence(out.first);
-			setLastIncidence(out.last);
+			storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
+			storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				setFirstIncidence(out.first);
-				setLastIncidence(out.last);
-				incidenceListModified();
+				storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
+				storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+				storingGraphDatabase.incidenceListModified(elementId);
 				return;
 			}
 
@@ -1080,8 +1080,6 @@ public abstract class VertexImpl extends
 		e.connect(incidentIc, this);
 		e.connect(adjacentIc, other);
 
-		incidenceListModified();
-		((VertexImpl) other).incidenceListModified();
 		localGraphDatabase.edgeListModified();
 		return e;
 	}

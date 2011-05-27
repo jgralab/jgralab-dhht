@@ -280,6 +280,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 	public long getPreviousIncidenceIdAtEdgeId(long incId);
 
+	public void setFirstIncidenceId(long elementId, long id);
+
+	public void setLastIncidenceId(long elementId, long id);
+
 
 
 	public int getIncidenceTypeId(long id);
@@ -356,6 +360,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 			long incId);
 
 	public void setGraphVersion(long graphVersion);
+
+	public void incidenceListModified(long elementId);
+
 
 
 
