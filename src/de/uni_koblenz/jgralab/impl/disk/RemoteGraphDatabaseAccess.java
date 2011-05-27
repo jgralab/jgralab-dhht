@@ -4,7 +4,7 @@ import java.rmi.Remote;
 import java.util.Collection;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Direction;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -113,6 +113,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 		
 	public void deleteVertex(long globalVertexId);
 	
+	public boolean containsVertexId(long id);
+	
 	/**
 	 * Puts the vertex identified by <code>id2</code> directly before the vertex 
 	 * identified by <code>id1</code>
@@ -185,6 +187,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 	public void deleteEdge(long globalEdgeId);
 	
+	public boolean containsEdgeId(long id);
+	
+	
 	/**
 	 * Puts the edge identified by <code>id2</code> directly after the edge 
 	 * identified by <code>id1</code>
@@ -212,8 +217,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public int createSubordinateGraph(long id);
 
 
-
-	public boolean containsEdgeId(long id);
 
 
 
