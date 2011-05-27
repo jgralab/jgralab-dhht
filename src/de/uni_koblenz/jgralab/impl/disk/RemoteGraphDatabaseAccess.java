@@ -48,7 +48,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 */
 	public int getGraphTypeId(int subgraphId);
 	
-	public int getIdOfParentDistributedGraph();
+	public long getIdOfParentDistributedGraph();
 	
 	public void graphModified();
 

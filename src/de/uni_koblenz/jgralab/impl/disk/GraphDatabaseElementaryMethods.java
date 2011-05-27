@@ -81,7 +81,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	/**
 	 * The id of the complete or subgraph the local partial graph directly belongs to
 	 */
-	protected final int parentSubgraphId;
+	protected final long parentSubgraphId;
 	
 	/**
 	 * The local JGraLab server instance
@@ -199,7 +199,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * ================================================================================== */
 	
 	
-	public GraphDatabaseElementaryMethods( Schema schema, String uniqueGraphId, int parentSubgraphId, int localPartialGraphId) {
+	public GraphDatabaseElementaryMethods( Schema schema, String uniqueGraphId, long parentSubgraphId, int localPartialGraphId) {
 		this.uniqueGraphId = uniqueGraphId;
 		this.schema = schema;
 		this.parentSubgraphId = parentSubgraphId;
@@ -215,12 +215,19 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		this.freeEdgeList = new FreeIndexList(Integer.MAX_VALUE);
 		this.freeIncidenceList = new FreeIndexList(Integer.MAX_VALUE);
 		this.deleteVertexList = new LinkedList<Vertex>();
-		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
+
 		localSubgraphData = new ArrayList<GraphData>();
 		subgraphObjects = new HashMap<Long, Reference<Graph>>();
 		remoteVertices = new HashMap<Long, Reference<Vertex>>();
 		remoteEdges = new HashMap<Long, Reference<Edge>>();
 		remoteIncidences = new HashMap<Long, Reference<Incidence>>();
+		//initialize fields
+		graphVersion = -1;
+		setGraphVersion(0);
+
+		//register graph database at server
+		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
+		localJGraLabServer.registerLocalGraphDatabase((GraphDatabaseBaseImpl) this); 
 	}
 	
 	
@@ -234,12 +241,12 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		return data;
 	}
 
-	/**
-	 * Allocates and returns a free local subgraph id
-	 */
-	protected int allocateLocalSubgraphId() {
-		return localSubgraphData.size();
-	}
+//	/**
+//	 * Allocates and returns a free local subgraph id
+//	 */
+//	protected int allocateLocalSubgraphId() {
+//		return localSubgraphData.size();
+//	}
 
 	/**
 	 * Retrieves the hostname that stores all subgraphs with the given partial graph id 
@@ -264,7 +271,8 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		return localPartialGraphId;
 	}
 	
-	public int getIdOfParentDistributedGraph() {
+	@Override
+	public long getIdOfParentDistributedGraph() {
 		return parentSubgraphId;
 	}
 	

@@ -44,10 +44,9 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	
 	public GraphData getAndInitializeSubordinateGraph(long containingGraphElementId) {
 		GraphData data = new GraphData();
-		data.subgraphId = this.localPartialGraphId << (32-BITS_FOR_PARTIAL_GRAPH_MASK) + localSubgraphData.size(); 
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size()); 
 		localSubgraphData.add(data);
 		data.containingElementId = containingGraphElementId;
-		data.parentDistributedGraphId = getPartialGraphId(containingGraphElementId);
 		return data;
 	}
 	
@@ -62,41 +61,8 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	 * @param uniqueGraphId the unique id of the graph
 	 * @param partialGraphId the common partial graph id of all local subgraphs
 	 */
-	protected GraphDatabaseBaseImpl(Schema schema, String uniqueGraphId, int partialGraphId, int parentDistributedGraphId) {
-		freeVertexList = new FreeIndexList(10);
-		freeIncidenceList = new FreeIndexList(10);
-		freeEdgeList = new FreeIndexList(10);
-
-		this.uniqueGraphId = uniqueGraphId;
-		this.schema = schema;
-		localPartialGraphId = partialGraphId;
-		graphFactory = schema.getGraphFactory();
-		this.parentDistributedGraphId = parentDistributedGraphId;
-		
-		try {
-			localDiskStorage = new DiskStorageManager(this);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-
-		subgraphObjects = new HashMap<Integer, Reference<Graph>>();
-		localSubgraphData = new ArrayList<GraphData>();
-		deleteVertexList = new LinkedList<Long>();
-		
-		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccessWithInternalMethods>();
-		
-		//remoteGraphs = new HashMap<Integer, WeakReference<Graph>>();
-		remoteVertices  = new HashMap<Long, Reference<Vertex>>();
-		remoteEdges = new HashMap<Long, Reference<Edge>>();
-		remoteIncidences = new HashMap<Long, Reference<Incidence>>();
-		
-		//initialize fields
-		graphVersion = -1;
-		setGraphVersion(0);
-
-		//register graph database at server
-		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
-		localJGraLabServer.registerLocalGraphDatabase(this); 
+	protected GraphDatabaseBaseImpl(Schema schema, String uniqueGraphId, long parentDistributedGraphId, int partialGraphId) {
+		super(schema, uniqueGraphId, parentDistributedGraphId, partialGraphId);
 	}
 	
 	
@@ -155,14 +121,6 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	public long getVertexListVersion() {
 		return vertexListVersion;
 	}
-		
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBasicMethods#setVCount(int, int)
-	 */
-	@Override
-	public void setVCount(int localSubgraphId, int count) {
-		getGraphData(localSubgraphId).vCount = count; 
-	}
 	
 	/**
 	 * Use to free a <code>Vertex</code>-index.
@@ -191,11 +149,11 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	
 	
 	
-	boolean containsVertexId(long vId) {
+	public boolean containsVertexId(long vId) {
 		return getVertexObject(vId) != null;
 	}
 	
-	boolean containsVertex(Vertex vertex) {
+	public boolean containsVertex(Vertex vertex) {
 		return getVertexObject(vertex.getId()) == vertex;
 	}
 	
@@ -223,9 +181,9 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage((Class<? extends Vertex>) schema.getM1ClassForId(vertexClassId), vertexId, this);
 		localDiskStorage.storeVertex(v);
 
-		int toplevelSubgraphId = convertToGlobalSubgraphId(1);
+		long toplevelSubgraphId = convertToGlobalId(1);
 		
-		getGraphData(0).vCount++;
+		getGraphData(0).vertexCount++;
 			if (getFirstVertexId(toplevelSubgraphId) == 0) {
 				setFirstVertexId(toplevelSubgraphId, vertexId);
 			}
@@ -332,7 +290,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		//      contained in needs to be determined. Because of the restrictions to 
 		//      the ordering v may be only the first vertex of the lowest graph 
 		//      it is contained in
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		//if current vertex is the first or last one in the local graph,
 		//the respecitive values need to be set to its next or previous vertex 
@@ -402,7 +360,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 			return;
 		}
 
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		assert getFirstVertexId(toplevelGraphId) != getLastVertexId(toplevelGraphId);
 
@@ -479,7 +437,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 			return;
 		}
 
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		assert getFirstVertexId(toplevelGraphId) != getLastVertexId(toplevelGraphId);
 
@@ -580,9 +538,9 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage((Class<? extends Edge>) schema.getM1ClassForId(edgeClassId), edgeId, this);
 		localDiskStorage.storeEdge(v);
 
-		int toplevelSubgraphId = convertToGlobalSubgraphId(1);
+		int toplevelSubgraphId = convertToGlobalId(1);
 		
-		getGraphData(0).vCount++;
+		getGraphData(0).vertexCount++;
 			if (getFirstEdgeId(toplevelSubgraphId) == 0) {
 				setFirstEdgeId(toplevelSubgraphId, edgeId);
 			}
@@ -649,7 +607,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		//      contained in needs to be determined. Because of the restrictions to 
 		//      the ordering v may be only the first edge of the lowest graph 
 		//      it is contained in
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		//if current edge is the first or last one in the local graph,
 		//the respecitive values need to be set to its next or previous edge 
@@ -720,7 +678,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 			return;
 		}
 
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		assert getFirstEdgeId(toplevelGraphId) != getLastEdgeId(toplevelGraphId);
 
@@ -796,7 +754,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 			return;
 		}
 
-		int toplevelGraphId = convertToGlobalSubgraphId(1);
+		int toplevelGraphId = convertToGlobalId(1);
 		
 		assert getFirstEdgeId(toplevelGraphId) != getLastEdgeId(toplevelGraphId);
 
@@ -1085,7 +1043,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalId(1)));
 		try {
 			record.readComponentValues(io);
 		} catch (GraphIOException e) {
@@ -1096,14 +1054,14 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalId(1)));
 		record.setComponentValues(fields);
 		return record;
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
-		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalSubgraphId(1)));
+		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalId(1)));
 		record.setComponentValues(components);
 		return record;
 	}
@@ -1149,7 +1107,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		//get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
 		int localGraphId = allocateLocalSubgraphId();
-		int globalGraphId = convertToGlobalSubgraphId(localGraphId);
+		int globalGraphId = convertToGlobalId(localGraphId);
 		Graph subordinateGraph = graphFactory.createSubordinateGraphDiskBasedStorage(globalGraphId);
 		
 		GraphData data = getGraphData(localGraphId);
@@ -1157,7 +1115,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		data.parentDistributedGraphId = localPartialGraphId;
 		data.subgraphId = globalGraphId;
 		data.typeId = schema.getClassId(m1Class);
-		data.vCount = 0;
+		data.vertexCount = 0;
 		data.eCount = 0;
 		localSubgraphData.add(data);
 		return globalGraphId;
