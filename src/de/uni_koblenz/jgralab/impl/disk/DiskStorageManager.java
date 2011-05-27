@@ -750,7 +750,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 */
 	
 	private int getLocalId(long id) {
-		return GraphDatabaseBaseImpl.getLocalElementId(id);
+		return GraphDatabaseBaseImpl.convertToLocalId(id);
 	}
 	
 
@@ -887,13 +887,21 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
 	}
 	
-	public long  getLastIncidenceId(int elemId) {
+	public long getLastIncidenceId(int elemId) {
 		return getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)];
 	}
 	
 	
 	public void incidenceListModified(int elemId) {
 		getElementContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)]++;
+	}
+	
+	public long getConnectedVertexId(int incidenceId) {
+		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
+	}
+	
+	public long getConnectedEdgeId(int incidenceId) {
+		return getIncidenceContainer(getContainerId(incidenceId)).edgeId[getElementIdInContainer(incidenceId)];
 	}
 	
 	// hierarchy

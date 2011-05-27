@@ -866,123 +866,16 @@ public abstract class VertexImpl extends
 		storingGraphDatabase.deleteVertex(this.getId());
 	}
 
-	@Override
-	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved) || (target.getNextIncidenceAtVertex() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidence() != getLastIncidence();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidence()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved
-					.getPreviousIncidenceAtVertex());
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
-		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
-							.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-							.getPreviousIncidenceAtVertex());
-		}
-
-		// insert moved incidence in lambdaSeq immediately after target
-		if (target == getLastIncidence()) {
-			setLastIncidence(moved);
-			moved.setNextIncidenceAtVertex(null);
-		} else {
-			((IncidenceImpl) target.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(moved);
-			moved.setNextIncidenceAtVertex((IncidenceImpl) target
-					.getNextIncidenceAtVertex());
-		}
-		moved.setPreviousIncidenceAtVertex(target);
-		target.setNextIncidenceAtVertex(moved);
-		incidenceListModified();
+	public void putIncidenceAfter(Incidence target, Incidence moved) {
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getId(), moved.getId());
 	}
-
-	@Override
-	protected void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
-		assert (target != null) && (moved != null);
-		assert target.getGraph() == moved.getGraph();
-		assert target.getGraph() == getGraph();
-		assert target.getThis() == moved.getThis();
-		assert target != moved;
-
-		if ((target == moved)
-				|| (target.getPreviousIncidenceAtVertex() == moved)) {
-			return;
-		}
-
-		// there are at least 2 incidences in the incidence list
-		// such that firstIncidence != lastIncidence
-		assert getFirstIncidence() != getLastIncidence();
-
-		// remove moved incidence from lambdaSeq
-		if (moved == getFirstIncidence()) {
-			setFirstIncidence((IncidenceImpl) moved.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex(null);
-		} else if (moved == getLastIncidence()) {
-			setLastIncidence((IncidenceImpl) moved
-					.getPreviousIncidenceAtVertex());
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex(null);
-		} else {
-			((IncidenceImpl) moved.getPreviousIncidenceAtVertex())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
-							.getNextIncidenceAtVertex());
-			((IncidenceImpl) moved.getNextIncidenceAtVertex())
-					.setPreviousIncidenceAtVertex((IncidenceImpl) moved
-							.getPreviousIncidenceAtVertex());
-		}
-
-		// insert moved incidence in lambdaSeq immediately before target
-		if (target == getFirstIncidence()) {
-			setFirstIncidence(moved);
-			moved.setPreviousIncidenceAtVertex(null);
-		} else {
-			IncidenceImpl previousIncidence = (IncidenceImpl) target
-					.getPreviousIncidenceAtVertex();
-			previousIncidence.setNextIncidenceAtVertex(moved);
-			moved.setPreviousIncidenceAtVertex(previousIncidence);
-		}
-		moved.setNextIncidenceAtVertex(target);
-		target.setPreviousIncidenceAtVertex(moved);
-		incidenceListModified();
+	
+	public void putIncidenceBefore(Incidence target, Incidence moved) {
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getId(), moved.getId());
 	}
-
-	@Override
-	//TODO: Move to storing graph database
-	protected void appendIncidenceToLambdaSeq(IncidenceImpl i) {
-		assert i != null;
-		assert i.getVertex() != this;
-		i.setIncidentVertex(this);
-		i.setNextIncidenceAtVertex(null);
-		if (getFirstIncidence() == null) {
-			setFirstIncidence(i);
-		}
-		if (getLastIncidence() != null) {
-			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtVertex(i);
-			i.setPreviousIncidenceAtVertex((IncidenceImpl) getLastIncidence());
-		}
-		setLastIncidence(i);
-		incidenceListModified();
+	
+	public void deleteIncidence(Incidence i) {
+		storingGraphDatabase.deleteIncidence(i.getId());
 	}
 
 	@Override

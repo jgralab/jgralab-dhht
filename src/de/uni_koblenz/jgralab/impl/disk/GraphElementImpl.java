@@ -103,7 +103,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	/**
 	 * The id of the subordinate graph nested in this element
 	 */
-	protected int subordinateGraphId;
+	protected long subordinateGraphId;
 
 	/**
 	 * Creates a new {@link GraphElement} which belongs to <code>graph</code>.
@@ -139,7 +139,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	@Override
 	public final Graph getCompleteGraph() {
-		return localGraphDatabase.getCompleteGraphObject();
+		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
 	}
 	
 
@@ -175,15 +175,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 
 	/**
-	 * Must be called by all methods which manipulate the incidence list of this
-	 * {@link GraphElement}.
-	 */
-	public final void incidenceListModified() {
-		assert isValid();
-		storingGraphDatabase.incidenceListModified(elementId);
-	}
-
-	/**
 	 * Checks if the list of {@link Incidence}s has changed with respect to the
 	 * given <code>incidenceListVersion</code>.
 	 * 
@@ -197,29 +188,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return (this.getIncidenceListVersion() != incidenceListVersion);
 	}
 	
-	
-	/**
-	 * Sets the first {@link Incidence} of this {@link GraphElement} to
-	 * <code>lastIncidence</code>.
-	 * 
-	 * @param lastIncidence
-	 *            {@link IncidenceImpl}
-	 */
-	final void setFirstIncidence(IncidenceImpl lastIncidence) {
-		storingDiskStorage.setFirstIncidenceId(elementId, lastIncidence.getId());
-	}
-
-
-	/**
-	 * Sets the last {@link Incidence} of this {@link GraphElement} to
-	 * <code>lastIncidence</code>.
-	 * 
-	 * @param lastIncidence
-	 *            {@link IncidenceImpl}
-	 */
-	final void setLastIncidence(IncidenceImpl lastIncidence) {
-		storingDiskStorage.setLastIncidenceId(elementId, lastIncidence.getId());
-	}
 
 	
 	@Override
@@ -545,7 +513,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase.getGraphElementObject(storingDiskStorage.getSigma(elementId));
+		return localGraphDatabase.getGraphElementObject(storingDiskStorage.getSigmaId(GraphDatabaseBaseImpl.convertToLocalId(elementId)));
 	}
 	
 
@@ -570,7 +538,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	@Override
 	public int getKappa() {
-		return storingDiskStorage.getKappa(elementId);
+		return storingDiskStorage.getKappa(GraphDatabaseBaseImpl.convertToLocalId(elementId));
 	}
 	
 	/**
@@ -583,7 +551,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storingDiskStorage.setKappa(elementId, kappa);
+		storingDiskStorage.setKappa(GraphDatabaseBaseImpl.convertToLocalId(elementId), kappa);
 	}	
 
 	@Override

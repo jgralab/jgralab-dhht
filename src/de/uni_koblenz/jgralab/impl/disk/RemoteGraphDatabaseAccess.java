@@ -7,7 +7,6 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
@@ -250,49 +249,37 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 
 
-	public void setICount(long globalSubgraphId, int count);
 
 
 	public long getICount(long globalSubgraphId);
 
-	/**
-	 * Sets the first {@link Incidence} of this {@link GraphElement} to
-	 * <code>firstIncidence</code>.
-	 * 
-	 * @param firstIncidence
-	 *            {@link IncidenceImpl}
-	 */
-	public void setFirstIncidenceId(long elemId, long incidenceId);
 	
-	
-	public void setLastIncidenceId(long elemId, long incidenceId);
 	
 	public long getFirstIncidenceId(long elemId);
 	
-	
 	public long getLastIncidenceId(long elemId);
-	
-	
-	public void setNextIncidenceIdAtVertexId(long incId, long prevId);
-	
-	
-	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId);
-	
-	
-	public void setNextIncidenceIdAtEdgeId(long incId, long nextId);
-	
-	
-	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId);
+
+	public void putIncidenceIdAfterAtVertexId(long id, long id2);
 
 
-	public void incidenceListModified(long elemId);
+	public void putIncidenceIdBeforeAtVertexId(long id, long id2);
+
+	public long getNextIncidenceIdAtVertexId(long incId);
+	
+	
+	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId);
+	
+	
+	public long getNextIncidenceIdAtEdgeId(long incId);
+	
+	
+	public long getPreviousIncidenceIdAtEdgeId(long incId);
+
 
 
 	public int getIncidenceTypeId(long id);
 	
-	public void setIncidentEdgeId(long incId, long edgeId);
 
-	public void setIncidentVertexId(long incId, long vertexId);
 	
     /**
      * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
@@ -307,7 +294,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
 
 
+	void setDirection(long incId, Direction dir);
 
+	public void deleteIncidence(long id);
 
 
 	/* =====================================================
@@ -363,7 +352,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void setGraphVersion(long graphVersion);
 
-	void setDirection(long incId, Direction dir);
+
 
 
 

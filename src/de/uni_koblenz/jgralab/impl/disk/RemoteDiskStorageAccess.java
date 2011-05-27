@@ -63,4 +63,8 @@ public interface RemoteDiskStorageAccess extends Remote {
 
 	public void setDirection(int convertToLocalId, Direction dir);
 
+	public long getConnectedVertex(int convertToLocalId);
+	
+	public long getConnectedEdge(int convertToLocalId);
+
 }
