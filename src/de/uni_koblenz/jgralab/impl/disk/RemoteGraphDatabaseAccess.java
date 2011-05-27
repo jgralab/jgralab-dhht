@@ -65,7 +65,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @return the id of the element (positive for vertices, negative for edges)
 	 * containing the graph identified by its <code>globalSubgraphId</code> 
 	 */
-	public long getContainingElementId(int globalSubgraphId);
+	public long getContainingElementId(long globalSubgraphId);
 	
 	/* =====================================================
 	 * Methods to access properties common for edges and vertices

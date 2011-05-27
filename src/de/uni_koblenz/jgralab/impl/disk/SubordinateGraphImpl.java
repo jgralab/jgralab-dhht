@@ -65,6 +65,10 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class SubordinateGraphImpl extends
 		GraphBaseImpl implements
 		GraphStructureChangedListener {
+	
+	public SubordinateGraphImpl(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {
+		super(globalSubgraphId, localGraphDatabase, storingGraphDatabase);
+	}
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -72,29 +76,15 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getVCount() {
+	public long getVCount() {
 		return storingGraphDatabase.getVCount(globalSubgraphId);
 	}
 
 	@Override
-	public int getECount() {
+	public long getECount() {
 		return storingGraphDatabase.getECount(globalSubgraphId);
 	}
 
-	@Override
-	protected void setVCount(int count) {
-		storingGraphDatabase.setVCount(globalSubgraphId, count);
-	}
-
-	@Override
-	protected void setECount(int count) {
-		storingGraphDatabase.setECount(globalSubgraphId, count);
-	}
-
-	@Override
-	protected void setICount(int count) {
-		storingGraphDatabase.setICount(globalSubgraphId, count);
-	}
 
 	@Override
 	public long getVertexListVersion() {
@@ -106,13 +96,7 @@ public abstract class SubordinateGraphImpl extends
 		return getSuperordinateGraph().getEdgeListVersion();
 	}
 
-	
-	public SubordinateGraphImpl(GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase, int globalSubgraphId) {
-		super(localGraphDatabase, storingGraphDatabase, globalSubgraphId);
-	}
-	
-	
-	
+
 
 	@Override
 	public <T> JGraLabList<T> createList() {
@@ -300,12 +284,12 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public int getMaxECount() {
+	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -344,7 +328,7 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public int getICount() {
+	public long getICount() {
 		return localGraphDatabase.getICount(globalSubgraphId);
 	}
 
@@ -420,103 +404,107 @@ public abstract class SubordinateGraphImpl extends
 		return getSuperordinateGraph().getM1Class();
 	}
 
-	@Override
-	public void vertexAdded(Vertex v) {
-		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
-			if (v.getPreviousVertex() == getContainingElement()) {
-				// this is a new first vertex
-				setFirstVertex((VertexImpl) v);
-				if (getLastVertex() == null) {
-					setLastVertex((VertexImpl) v);
-				}
-			} else if (v.getPreviousVertex() == getLastVertex()) {
-				// this is a new last vertex
-				setLastVertex((VertexImpl) v);
-			}
-		}
-	}
+	/* TODO: The relevant fields need to be updated during creation/deletion inside the graph db */
+	
+//	@Override
+//	public void vertexAdded(Vertex v) {
+//		if (containsVertex(v)) {
+//			storingGraphDatabase.increaseVertexCount(globalSubgraphId);
+//			if (v.getPreviousVertex() == getContainingElement()) {
+//				// this is a new first vertex
+//				setFirstVertex((VertexImpl) v);
+//				if (getLastVertex() == null) {
+//					setLastVertex((VertexImpl) v);
+//				}
+//			} else if (v.getPreviousVertex() == getLastVertex()) {
+//				// this is a new last vertex
+//				setLastVertex((VertexImpl) v);
+//			}
+//		}
+//	}
+	
 
-	@Override
-	public void vertexDeleted(Vertex v) {
-		if (containsVertex(v)) {
-			setVCount(getVCount() + 1);
-			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
-				// this was the last vertex
-				setLastVertex(null);
-				setFirstVertex(null);
-			} else {
-				if (getLastVertex() == v) {
-					setLastVertex((VertexImpl) v.getPreviousVertex());
-				}
-				if (getFirstVertex() == v) {
-					setFirstVertex((VertexImpl) v.getNextVertex());
-				}
-			}
-		}
-	}
 
-	@Override
-	public void edgeAdded(Edge e) {
-		if (containsEdge(e)) {
-			setECount(getECount() + 1);
-			if (e.getPreviousEdge() == getContainingElement()) {
-				// this is a new first edge
-				setFirstEdge((EdgeImpl) e);
-				if (getLastEdge() == null) {
-					setLastEdge((EdgeImpl) e);
-				} else if (e.getPreviousEdge() == getLastEdge()) {
-					// this is a new last edge
-					setLastEdge((EdgeImpl) e);
-				}
-			}
-		}
-	}
+//	@Override
+//	public void vertexDeleted(Vertex v) {
+//		if (containsVertex(v)) {
+//			storingGraphDatabase.decreaseVertexCount(globalSubgraphId);
+//			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
+//				// this was the last vertex
+//				setLastVertex(null);
+//				setFirstVertex(null);
+//			} else {
+//				if (getLastVertex() == v) {
+//					setLastVertex((VertexImpl) v.getPreviousVertex());
+//				}
+//				if (getFirstVertex() == v) {
+//					setFirstVertex((VertexImpl) v.getNextVertex());
+//				}
+//			}
+//		}
+//	}
+//
+//	@Override
+//	public void edgeAdded(Edge e) {
+//		if (containsEdge(e)) {
+//			storingGraphDatabase.increaseEdgeCount(globalSubgraphId);
+//			if (e.getPreviousEdge() == getContainingElement()) {
+//				// this is a new first edge
+//				setFirstEdge((EdgeImpl) e);
+//				if (getLastEdge() == null) {
+//					setLastEdge((EdgeImpl) e);
+//				} else if (e.getPreviousEdge() == getLastEdge()) {
+//					// this is a new last edge
+//					setLastEdge((EdgeImpl) e);
+//				}
+//			}
+//		}
+//	}
+//
+//	@Override
+//	public void edgeDeleted(Edge e) {
+//		if (containsEdge(e)) {
+//			storingGraphDatabase.decreaseEdgeCount(globalSubgraphId);
+//			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
+//				// this was the last edge
+//				setLastEdge(null);
+//				setFirstEdge(null);
+//			} else {
+//				if (getLastEdge() == e) {
+//					setLastEdge((EdgeImpl) e.getPreviousEdge());
+//				}
+//				if (getFirstEdge() == e) {
+//					setFirstEdge((EdgeImpl) e.getNextEdge());
+//				}
+//			}
+//		}
+//	}
 
-	@Override
-	public void edgeDeleted(Edge e) {
-		if (containsEdge(e)) {
-			setECount(getECount() + 1);
-			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
-				// this was the last edge
-				setLastEdge(null);
-				setFirstEdge(null);
-			} else {
-				if (getLastEdge() == e) {
-					setLastEdge((EdgeImpl) e.getPreviousEdge());
-				}
-				if (getFirstEdge() == e) {
-					setFirstEdge((EdgeImpl) e.getNextEdge());
-				}
-			}
-		}
-	}
-
-	@Override
-	public void maxVertexCountIncreased(int newValue) {
-	}
-
-	@Override
-	public void maxEdgeCountIncreased(int newValue) {
-	}
-
-	@Override
-	public void maxIncidenceCountIncreased(int newValue) {
-	}
-
-	@Override
-	public void incidenceAdded(Incidence i) {
-		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
-		}
-	}
-
-	@Override
-	public void incidenceDeleted(Incidence i) {
-		if (containsEdge(i.getEdge())) {
-			setICount(getICount() + 1);
-		}
-	}
+//	@Override
+//	public void maxVertexCountIncreased(int newValue) {
+//	}
+//
+//	@Override
+//	public void maxEdgeCountIncreased(int newValue) {
+//	}
+//
+//	@Override
+//	public void maxIncidenceCountIncreased(int newValue) {
+//	}
+//
+//	@Override
+//	public void incidenceAdded(Incidence i) {
+//		if (containsEdge(i.getEdge())) {
+//			setICount(getICount() + 1);
+//		}
+//	}
+//
+//	@Override
+//	public void incidenceDeleted(Incidence i) {
+//		if (containsEdge(i.getEdge())) {
+//			setICount(getICount() + 1);
+//		}
+//	}
 
 	@Override
 	public int compareTo(Graph arg0) {
