@@ -15,8 +15,11 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
+
+	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
 
 	/*
 	 * Stores the hostnames of the partial graphs
@@ -25,8 +28,8 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final List<Integer> freePartialGraphIds;
 
-	protected CompleteGraphDatabase(CompleteGraphImpl localGraph, String hostname) {
-		super(localGraph);
+	public CompleteGraphDatabase(Schema schema, String uniqueGraphId, String hostname) {
+		super(schema, uniqueGraphId, 0, 1); 
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		hostnames[0] = hostname;
 		freePartialGraphIds = new LinkedList<Integer>();
