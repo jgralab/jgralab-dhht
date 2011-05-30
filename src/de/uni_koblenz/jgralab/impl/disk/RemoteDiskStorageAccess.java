@@ -96,6 +96,10 @@ public interface RemoteDiskStorageAccess extends Remote {
 	
 	public void increaseIncidenceListVersion(int elementId);
 
+	public void setIncidenceVertexId(int convertToLocalId, long vertexId);
+
+	public void setIncidenteEdgeId(int convertToLocalId, long edgeId);
+
 
 
 

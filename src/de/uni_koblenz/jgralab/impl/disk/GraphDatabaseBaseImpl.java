@@ -20,6 +20,8 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.JGraLabList;
+import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
@@ -910,6 +912,27 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		}
 		return incId;
 	}
+	
+	@Override
+	public void setIncidentEdgeId(long incId, long edgeId) {
+		int partialGraphId = getPartialGraphId(incId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		diskStore.setIncidenteEdgeId(convertToLocalId(incId), edgeId);
+	}
+
+	@Override
+	public void setIncidentVertexId(long incId, long vertexId) {
+		int partialGraphId = getPartialGraphId(incId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		diskStore.setIncidenceVertexId(convertToLocalId(incId), vertexId);
+	}
+
+	@Override
+	public long connect(int incidenceClassId, long vertexId, long edgeId) {
+		Class<? extends Incidence> incClass = (Class<? extends Incidence>) schema.getM1ClassForId(incidenceClassId);
+		return connect(incClass, vertexId, edgeId);
+	}
+
 
 
 
@@ -1256,12 +1279,6 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		return record;
 	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, getGraphObject(convertToGlobalId(1)));
-		record.setComponentValues(fields);
-		return record;
-	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
@@ -1306,6 +1323,64 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	}
 
 	
+	
+	
+	@Override
+	public <T> JGraLabList<T> createList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(int initialCapacity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
+			float loadFactor) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 

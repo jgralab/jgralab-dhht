@@ -79,7 +79,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long getIncidenceListVersion(long elementId);
 	
-	public void increaseIncidenceListVersion(long elementId);
+	//public void increaseIncidenceListVersion(long elementId);
 
 	
 	
@@ -298,7 +298,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
      * @param edgeId
      * @return
      */
-	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
+	public long connect(int incidenceClassId, long vertexId, long edgeId);
 
 
 	public void deleteIncidence(long id);

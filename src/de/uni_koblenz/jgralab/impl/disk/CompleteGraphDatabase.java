@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.Record;
@@ -285,11 +286,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 
 
-	@Override
-	public long connect(Integer incidenceClassId, long vertexId, long edgeId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public void deleteIncidence(long id) {
@@ -300,61 +296,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	
 	
 
-	@Override
-	public <T> JGraLabList<T> createList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void setGraphVersion(long graphVersion) {
@@ -369,26 +310,19 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		// TODO Auto-generated method stub
 		
 	}
+//
+//
+//	@Override
+//	public void increaseIncidenceListVersion(long elementId) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 
-	@Override
-	public void increaseIncidenceListVersion(long elementId) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
-	@Override
-	public void setIncidentEdgeId(long incId, long edgeId) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void setIncidentVertexId(long incId, long vertexId) {
-		// TODO Auto-generated method stub
-		
-	}
+
 
 
 
