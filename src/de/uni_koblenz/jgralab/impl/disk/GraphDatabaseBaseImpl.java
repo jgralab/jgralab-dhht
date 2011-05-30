@@ -1026,18 +1026,16 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	}
 
 
-/*
+
 	@Override
-	//TODO: Move to storing graph database
-	protected void appendIncidenceToLambdaSeq(long elementId, long incidenceId) {
-		assert i != null;
-		assert i.getVertex() != this;
-		i.setIncidentVertex(this);
-		i.setNextIncidenceAtVertex(null);
-		if (getFirstIncidence() == null) {
-			setFirstIncidence(i);
+	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId) {
+		assert incidenceId !=0;
+		setIncidentEdgeId(incidenceId, edgeId);
+		setNextIncidenceIdAtEdgeId(incidenceId, 0);
+		if (getFirstIncidenceId(edgeId) == 0) {
+			setFirstIncidenceId(edgeId, incidenceId);
 		}
-		if (getLastIncidence() != null) {
+		if (getLastIncidenceId(edgeId) != 0) {
 			((IncidenceImpl) getLastIncidence()).setNextIncidenceAtVertex(i);
 			i.setPreviousIncidenceAtVertex((IncidenceImpl) getLastIncidence());
 		}
@@ -1046,9 +1044,60 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	}
 
 
-*/
-	
 
+	
+	@Override
+	public long getLastIncidenceId(long elemId) {
+		int partialGraphId = getPartialGraphId(elemId);
+		return getDiskStorageForPartialGraph(partialGraphId).getLastIncidenceId(convertToLocalId(elemId));
+	}
+
+
+
+	public void removeIncidenceFromLambdaSeqOfEdge(long incidenceId) {
+		long edgeId = getConnectedEdgeId(incidenceId);
+		int partialGraphId = getPartialGraphId(edgeId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).removeIncidenceFromLambdaSeqOfEdge(incidenceId);
+			return;
+		} else {
+			long previousId = getPreviousIncidenceIdAtEdgeId(incidenceId);
+			long nextId = getNextIncidenceIdAtEdgeId(incidenceId);
+			if (incidenceId == getFirstIncidenceId(-edgeId)) {
+				setFirstIncidenceId(-edgeId, nextId);
+				setPreviousIncidenceIdAtEdgeId(nextId, 0);
+			} else if (incidenceId == getLastIncidenceId(-edgeId)) {
+				setLastIncidenceId(-edgeId, previousId);
+				setNextIncidenceIdAtEdgeId(previousId, 0);
+			} else {
+				setNextIncidenceIdAtEdgeId(previousId, nextId);
+				setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+			}
+		}
+	}
+	
+	public void removeIncidenceFromLambdaSeqOfVertex(long incidenceId) {
+		long vertexId = getConnectedVertexId(incidenceId);
+		int partialGraphId = getPartialGraphId(vertexId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).removeIncidenceFromLambdaSeqOfVertex(incidenceId);
+			return;
+		} else {
+			long previousId = getPreviousIncidenceIdAtVertexId(incidenceId);
+			long nextId = getNextIncidenceIdAtVertexId(incidenceId);
+			if (incidenceId == getFirstIncidenceId(vertexId)) {
+				setFirstIncidenceId(vertexId, nextId);
+				setPreviousIncidenceIdAtEdgeId(nextId, 0);
+			} else if (incidenceId == getLastIncidenceId(vertexId)) {
+				setLastIncidenceId(vertexId, previousId);
+				setNextIncidenceIdAtVertexId(previousId, 0);
+			} else {
+				setNextIncidenceIdAtVertexId(previousId, nextId);
+				setPreviousIncidenceIdAtVertexId(nextId, previousId);
+			}
+		}
+	}
+	
 
 	@Override
 	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId) {
