@@ -85,6 +85,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	
 	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId);
 
+	
 	public void setIncidentEdgeId(long incId, long edgeId);
 
 	public void setIncidentVertexId(long incId, long vertexId);

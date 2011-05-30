@@ -99,7 +99,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 
 	@Override
-	public int getGraphTypeId(int subgraphId) {
+	public int getGraphTypeId(long subgraphId) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -298,6 +298,26 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 			String hostname) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void increaseIncidenceListVersion(long elementId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void increaseIncidenceListVersion(long elementId,
+			long incidenceListVersion) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -20,7 +20,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
-
+ 
 	/*
 	 * Stores the hostnames of the partial graphs
 	 */
@@ -72,13 +72,14 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 					+ id + " registered");
 		}
 	}
-
-	public Graph createPartialGraph(GraphClass gc, String hostname) {
+	
+	@Override
+	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
 		int partialGraphId = getFreePartialGraphId();
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
 		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p); 
-		return getGraphObject(convertToGlobalId(1));
+		return getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
 	}
 
 	@Override
@@ -101,6 +102,13 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	@Override
 	public void graphModified() {
 		graphVersion++;
+	}
+	
+	@Override
+	public void incidenceListModified(long elementId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		diskStore.increaseIncidenceListVersion(convertToLocalId(elementId));
 	}
 
 	/* **************************************************************************
@@ -166,17 +174,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		graphVersion++;
 	}
 
-	@Override
-	public Graph createPartialGraph(String hostname) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Graph loadRemotePartialGraph(String hostname, int id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public int getGraphTypeId(long subgraphId) {
@@ -203,13 +200,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		return diskStore.getIncidenceListVersion(convertToLocalId(elementId));
 	}
 
-	@Override
-	public void increaseIncidenceListVersion(long elementId,
-			long incidenceListVersion) {
-		int partialGraphId = getPartialGraphId(elementId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.increaseIncidenceListVersion(convertToLocalId(elementId));
-	}
 
 	@Override
 	public void setVCount(long subgraphId, long count) {
@@ -294,6 +284,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		return diskStore.getPreviousIncidenceIdAtEdgeId(convertToLocalId(incId));
 	}
 
+
 	@Override
 	public long connect(Integer incidenceClassId, long vertexId, long edgeId) {
 		// TODO Auto-generated method stub
@@ -301,16 +292,13 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 
 	@Override
-	public void setDirection(long incId, Direction dir) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void deleteIncidence(long id) {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
 
 	@Override
 	public <T> JGraLabList<T> createList() {
@@ -370,15 +358,25 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	@Override
 	public void setGraphVersion(long graphVersion) {
+		this.graphVersion = graphVersion;
+	}
+
+
+
+
+	@Override
+	public void registerRemotePartialGraph(int id, String hostname) {
 		// TODO Auto-generated method stub
 		
 	}
 
+
 	@Override
-	public void incidenceListModified(long elementId) {
+	public void increaseIncidenceListVersion(long elementId) {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 	@Override
 	public void setIncidentEdgeId(long incId, long edgeId) {
@@ -392,25 +390,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		
 	}
 
-	@Override
-	public void registerRemotePartialGraph(int id, String hostname) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int createPartialGraph(Class<? extends Graph> graphClass,
-			String hostname) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setIncidenceListVersion(long elementId,
-			long incidenceListVersion) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 }

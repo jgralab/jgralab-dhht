@@ -2,7 +2,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.Remote;
 
-import de.uni_koblenz.jgralab.Direction;
+
 
 /**
  * Remote interface of DiskStorage used to access properties of the stored elements
@@ -95,8 +95,7 @@ public interface RemoteDiskStorageAccess extends Remote {
 	public long getIncidenceListVersion(int elementId);
 	
 	public void increaseIncidenceListVersion(int elementId);
-	
-	
+
 
 
 

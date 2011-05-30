@@ -96,12 +96,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 	 */
 	public abstract void registerRemotePartialGraph(int id, String hostname);
 	
-	/**
-	 * Creates a new partial graph on the given hostname and returns the globalSubgraphId of that
-	 * partial graph
-	 */
-	public abstract int createPartialGraph(Class<? extends Graph> graphClass, String hostname);
-	
+
 	
 	public abstract void edgeListModified();
 	
@@ -877,7 +872,7 @@ public abstract class GraphDatabaseBaseImpl extends GraphDatabaseElementaryMetho
 		//set incident edge and vertex ids of incidence 
 		setIncidentEdgeId(incId, edgeId);
 		setIncidentVertexId(incId, vertexId);
-		setDirection(incId, dir);
+	//	setDirection(incId, dir);
 		
 		//append created incidence to lambda sequences of vertex and edge
 		

@@ -4,8 +4,6 @@ import java.rmi.Remote;
 import java.util.Collection;
 import java.util.Map;
 
-
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Incidence;
@@ -56,7 +54,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 	public boolean isLoading();
 	
-	public int createPartialGraph(Class<? extends Graph> m1Class,
+	public long createPartialGraph(Class<? extends Graph> m1Class,
 			String hostname);
 
 	/**
@@ -81,7 +79,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long getIncidenceListVersion(long elementId);
 	
-	public void setIncidenceListVersion(long elementId, long incidenceListVersion);
+	public void increaseIncidenceListVersion(long elementId);
 
 	
 	
@@ -288,7 +286,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public int getIncidenceTypeId(long id);
 	
-
+	public void incidenceListModified(long elementId);
 	
     /**
      * Creates a new incidence of the IncidenceClass identified by the id <code>incidenceClassId</code>
@@ -302,8 +300,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
      */
 	public long connect(Integer incidenceClassId, long vertexId, long edgeId);
 
-
-	void setDirection(long incId, Direction dir);
 
 	public void deleteIncidence(long id);
 
@@ -361,13 +357,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void setGraphVersion(long graphVersion);
 
-	public void incidenceListModified(long elementId);
+
 
 	public void registerPartialGraph(int id, String hostname);
 
-	public Graph createPartialGraph(String hostname);
+//	public Graph createPartialGraph(String hostname);
 
-    public void increaseIncidenceListVersion(long elementId, long incidenceListVersion);
+    //public void increaseIncidenceListVersion(long elementId, long incidenceListVersion);
 
 
 
