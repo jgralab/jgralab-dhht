@@ -179,52 +179,68 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 
 	@Override
-	public int getGraphTypeId(int subgraphId) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public int getGraphTypeId(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).typeId;
+ 	}
 
 	@Override
-	public long getContainingElementId(int globalSubgraphId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getContainingElementId(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).containingElementId;
 	}
 
 	@Override
 	public long getIncidenceListVersion(long elementId) {
-		// TODO Auto-generated method stub
-		return 0;
+		int partialGraphId = getPartialGraphId(elementId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getIncidenceListVersion(convertToLocalId(elementId));
 	}
 
 	@Override
-	public void setIncidenceListVersion(long elementId,
+	public void increaseIncidenceListVersion(long elementId,
 			long incidenceListVersion) {
-		// TODO Auto-generated method stub
-		
+		int partialGraphId = getPartialGraphId(elementId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		diskStore.increaseIncidenceListVersion(convertToLocalId(elementId));
 	}
 
 	@Override
-	public void setVCount(long count, long count2) {
-		// TODO Auto-generated method stub
-		
+	public void setVCount(long subgraphId, long count) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setVCount(subgraphId, count);
+		}
+		getGraphData(convertToLocalId(subgraphId)).vertexCount = count;
 	}
 
 	@Override
-	public int getECount(long globalSubgraphId) {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getECount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getECount(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).edgeCount;
 	}
 
 	@Override
-	public void setECount(long globalSubgraphId, long count) {
-		// TODO Auto-generated method stub
-		
+	public void setECount(long subgraphId, long count) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setECount(subgraphId, count);
+		}
+		getGraphData(convertToLocalId(subgraphId)).edgeCount = count;
 	}
 
 	@Override
 	public int getMaxECount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
@@ -379,5 +395,13 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public void setIncidenceListVersion(long elementId,
+			long incidenceListVersion) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

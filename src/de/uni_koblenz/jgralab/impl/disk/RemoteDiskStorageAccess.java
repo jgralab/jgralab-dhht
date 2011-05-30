@@ -61,8 +61,12 @@ public interface RemoteDiskStorageAccess extends Remote {
 	
 	public int getIncidenceTypeId(int localIncidenceId);
 
-	public long getConnectedVertexId(int convertToLocalId);
+	public long getConnectedVertexId(int incidenceId);
 	
-	public long getConnectedEdgeId(int convertToLocalId);
+	public long getConnectedEdgeId(int incidenceId);
+
+	public long getIncidenceListVersion(int elementId);
+	
+	public void increaseIncidenceListVersion(int elementId);
 
 }

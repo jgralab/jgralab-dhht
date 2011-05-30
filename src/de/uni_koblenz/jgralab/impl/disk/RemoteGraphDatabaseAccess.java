@@ -46,7 +46,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Returns the id of the type of the subgraph identified by the given <code>subgraphId</code>
 	 * @return
 	 */
-	public int getGraphTypeId(int subgraphId);
+	public int getGraphTypeId(long subgraphId);
 	
 	public long getIdOfParentDistributedGraph();
 	
@@ -89,7 +89,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Methods to access vertex sequence
 	 * ===================================================== */
 	
-	public int getMaxVCount();
+	public long getMaxVCount();
 
 
 	public long getVertexListVersion();
@@ -164,11 +164,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long getEdgeListVersion();
 	
-	public int getECount(long globalSubgraphId);
+	public long getECount(long globalSubgraphId);
 	
 	public void setECount(long globalSubgraphId, long count);
 
-	public int getMaxECount();
+	public long getMaxECount();
 
 	
 	/**
@@ -363,7 +363,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void incidenceListModified(long elementId);
 
-	void registerPartialGraph(int id, String hostname);
+	public void registerPartialGraph(int id, String hostname);
+
+	public Graph createPartialGraph(String hostname);
+
+    public void increaseIncidenceListVersion(long elementId, long incidenceListVersion);
 
 
 
