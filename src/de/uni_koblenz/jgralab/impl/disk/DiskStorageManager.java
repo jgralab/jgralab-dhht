@@ -430,15 +430,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		incidenceStorageSaved.set(id, false);
 		return b;		
 	}
-	
-	private final GraphElementContainer getElementContainer(int id) {
-		if (id >0)
-			return getVertexContainer(id);
-		else
-			return getEdgeContainer(id);
-	}
-	
-	
+
 	
 	private final VertexContainer reloadVertexStorage(int storageId) {
 		while (!isVertexStorageSaved(storageId)) {
@@ -858,71 +850,182 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 	
 	
-	//Iseq	
+	//Iseq at vertices	
 	
-	public void setFirstIncidenceId(int elemId, long incidenceId) {
-		getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	@Override
+	public long getFirstIncidenceIdAtVertexId(int elemId) {
+		return getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
+	}
+
+	@Override
+	public void setFirstIncidenceIdAtVertexId(int elemId, long incidenceId) {
+		getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
 	}
 	
-	public void setLastIncidenceId(int elemId, long incidenceId) {
-		getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	@Override
+	public long getLastIncidenceIdAtVertexId(int elemId) {
+		return getVertexContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)];
 	}
 	
+	@Override
+	public void setLastIncidenceIdAtVertexId(int elemId, long incidenceId) {
+		getVertexContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	}
+	
+	@Override
+	public long getNextIncidenceIdAtVertexId(int localIncidenceId) {
+		return getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)];
+	}
+	
+	@Override
 	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncidenceId) {
 		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
 	}
 	
+	@Override
+	public long getPreviousIncidenceIdAtVertexId(int localIncidenceId) {
+		return getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)];
+	}
+	
+	@Override
 	public void setPreviousIncidenceAtVertexId(int localIncidenceId, long nextIncidenceId) {
 		getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
 	}
 	
-	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
-		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	@Override
+	public long getIncidenceListVersionOfVertexId(int elemId) {
+		return getVertexContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)];
 	}
 	
-	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
-		getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
-	}
-
-	public long getFirstIncidenceId(int elemId) {
-		return getElementContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
+	@Override
+	public void increaseIncidenceListVersionOfVertexId(int elemId) {
+		getVertexContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)]++;
 	}
 	
-	public long getLastIncidenceId(int elemId) {
-		return getElementContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)];
-	}
-	
-	
-	public void incidenceListModified(int elemId) {
-		getElementContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)]++;
-	}
-	
+	@Override
 	public long getConnectedVertexId(int incidenceId) {
 		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
 	}
 	
+	@Override
+	public void setConnectedVertexId(int incidenceId, long vertexId) {
+		getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)] = vertexId;
+	}
+	
+	
+	//Iseq at edges
+	
+	@Override
+	public long getFirstIncidenceIdAtEdgeId(int elemId) {
+		return getEdgeContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
+	}
+
+	@Override
+	public void setFirstIncidenceIdAtEdgeId(int elemId, long incidenceId) {
+		getEdgeContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	}
+	
+	@Override
+	public long getLastIncidenceIdAtEdgeId(int elemId) {
+		return getEdgeContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)];
+	}
+	
+	@Override
+	public void setLastIncidenceIdAtEdgeId(int elemId, long incidenceId) {
+		getEdgeContainer(getContainerId(elemId)).lastIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
+	}
+	
+	@Override
+	public long getNextIncidenceIdAtEdgeId(int localIncidenceId) {
+		return getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)];
+	}
+	
+	@Override
+	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
+	
+	@Override
+	public long getPreviousIncidenceIdAtEdgeId(int localIncidenceId) {
+		return getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)];
+	}
+	
+	@Override
+	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long nextIncidenceId) {
+		getIncidenceContainer(getContainerId(localIncidenceId)).previousIncidenceAtEdgeId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
+	}
+	
+	@Override
+	public long getIncidenceListVersionOfEdgeId(int elemId) {
+		return getEdgeContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)];
+	}
+	
+	@Override
+	public void increaseIncidenceListVersionOfEdgeId(int elemId) {
+		getEdgeContainer(getContainerId(elemId)).incidenceListVersion[getElementIdInContainer(elemId)]++;
+	}
+	
+	@Override
 	public long getConnectedEdgeId(int incidenceId) {
-		return getIncidenceContainer(getContainerId(incidenceId)).edgeId[getElementIdInContainer(incidenceId)];
+		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
 	}
 	
-	// hierarchy
-
-	public long getSigmaId(int localElemId) {
-		return getElementContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)];
-	}
-
-	public void setSigmaId(int localElemId, long sigmaId) {
-		getElementContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+	
+	@Override
+	public void setConnectedEdgeId(int incidenceId, long edgeId) {
+		getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)] = edgeId;
 	}
 	
-	public int getKappa(int localElemId) {
-		return getElementContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
+		
+
+	
+	// hierarchy of vertices
+
+	@Override
+	public long getSigmaIdOfVertexId(int localElemId) {
+		return getVertexContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)];
 	}
 
-	public void setKappa(int localElemId, int kappa) {
-		getElementContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)] = kappa;
+	@Override
+	public void setSigmaIdOfVertexId(int localElemId, long sigmaId) {
+		getVertexContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+	}
+	
+	public int getKappaOfVertexId(int localElemId) {
+		return getVertexContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
 	}
 
+	public void setKappaOfVertexId(int localElemId, int kappa) {
+		getVertexContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)] = kappa;
+	}
+
+	
+	
+	// hierarchy of edges
+
+	@Override
+	public long getSigmaIdOfEdgeId(int localElemId) {
+		return getEdgeContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)];
+	}
+
+	@Override
+	public void setSigmaIdOfEdgeId(int localElemId, long sigmaId) {
+		getEdgeContainer(getContainerId(localElemId)).sigmaId[getElementIdInContainer(localElemId)] = sigmaId;
+	}
+	
+	public int getKappaOfEdgeId(int localElemId) {
+		return getEdgeContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
+	}
+
+	@Override
+	public void setKappaOfEdgeId(int localElemId, int kappa) {
+		getEdgeContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)] = kappa;
+	}
+	
+
+	
+	// types
+	
 	public int getVertexTypeId(int localVertexId) {
 		return getVertexContainer(getContainerId(localVertexId)).types[getElementIdInContainer(localVertexId)];
 	}
@@ -934,5 +1037,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	public int getIncidenceTypeId(int localIncidenceId) {
 		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
 	}
+
+
+
+
 	
 }

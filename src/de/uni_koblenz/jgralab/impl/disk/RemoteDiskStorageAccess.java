@@ -15,15 +15,21 @@ public interface RemoteDiskStorageAccess extends Remote {
 	 * Methods to access hierarchy 
 	 * ======================================================== */
 	
-	public long getSigmaId(int localElementId);
+	public long getSigmaIdOfVertexId(int localElementId);
 	
-	public void setSigmaId(int localElementId, long globalSigmaId);
+	public void setSigmaIdOfVertexId(int localElementId, long globalSigmaId);
 
-	public int getKappa(int localIncidenceId);
+	public int getKappaOfVertexId(int localIncidenceId);
 
-	public void setKappa(int localIncidenceId, int kappa);
+	public void setKappaOfVertexId(int localIncidenceId, int kappa);
 	
+	public long getSigmaIdOfEdgeId(int localElementId);
+	
+	public void setSigmaIdOfEdgeId(int localElementId, long globalSigmaId);
 
+	public int getKappaOfEdgeId(int localIncidenceId);
+
+	public void setKappaOfEdgeId(int localIncidenceId, int kappa);
 	
 	
 	/* ========================================================
@@ -60,49 +66,59 @@ public interface RemoteDiskStorageAccess extends Remote {
 	 * Methods to access incidences 
 	 * ======================================================== */
 	
-	public long getFirstIncidenceId(int localElementId);
+	public long getFirstIncidenceIdAtVertexId(int localElementId);
 	
-	public void setFirstIncidenceId(int localElementId, long l);
+	public void setFirstIncidenceIdAtVertexId(int localElementId, long l);
 	
-	public long getLastIncidenceId(int localElementId);
+	public long getLastIncidenceIdAtVertexId(int localElementId);
 
-	public void setLastIncidenceId(int localElementId, long id);
-	
-
-	
+	public void setLastIncidenceIdAtVertexId(int localElementId, long id);
+		
 	public long getNextIncidenceIdAtVertexId(int convertToLocalId);
 
-	public long getNextIncidenceIdAtEdgeId(int convertToLocalId);
-	
 	public long getPreviousIncidenceIdAtVertexId(int convertToLocalId);
-
-	public long getPreviousIncidenceIdAtEdgeId(int convertToLocalId);
 	
 	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncId);
 	
-	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId);
-	
 	public void setPreviousIncidenceAtVertexId(int localIncidenceId, long previousIncId);
+	
+	public long getConnectedVertexId(int incidenceId);
+	
+	public void setConnectedVertexId(int convertToLocalId, long vertexId);
+	
+	public long getIncidenceListVersionOfVertexId(int elementId);
+	
+	public void increaseIncidenceListVersionOfVertexId(int elementId);
+	
+	
+	public long getFirstIncidenceIdAtEdgeId(int localElementId);
+	
+	public void setFirstIncidenceIdAtEdgeId(int localElementId, long l);
+	
+	public long getLastIncidenceIdAtEdgeId(int localElementId);
+
+	public void setLastIncidenceIdAtEdgeId(int localElementId, long id);
+	
+	public long getNextIncidenceIdAtEdgeId(int convertToLocalId);
+	
+	public long getPreviousIncidenceIdAtEdgeId(int convertToLocalId);
+		
+	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId);
 	
 	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long previousIncId);
 
-	public int getIncidenceTypeId(int localIncidenceId);
-
-	public long getConnectedVertexId(int incidenceId);
-	
 	public long getConnectedEdgeId(int incidenceId);
-
-	public long getIncidenceListVersion(int elementId);
 	
-	public void increaseIncidenceListVersion(int elementId);
+	public void setConnectedEdgeId(int convertToLocalId, long edgeId);
+	
+	public long getIncidenceListVersionOfEdgeId(int elementId);
+	
+	public void increaseIncidenceListVersionOfEdgeId(int elementId);
+	
+	
 
-	public void setIncidenceVertexId(int convertToLocalId, long vertexId);
-
-	public void setIncidenteEdgeId(int convertToLocalId, long edgeId);
-
-
-
-
+	public int getIncidenceTypeId(int localIncidenceId);
+	
 
 
 }
