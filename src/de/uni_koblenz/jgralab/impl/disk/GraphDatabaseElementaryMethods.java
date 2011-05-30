@@ -31,6 +31,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		long lastEdgeId;
 		long edgeCount;
 		long vertexCount;
+		long incidenceCount;
 		long containingElementId;
 		int typeId;
 	}
@@ -574,7 +575,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	}
 	
 	
-	public int getMaxVCount() {
+	public long getMaxVCount() {
 		return Integer.MAX_VALUE;
 	}
 	
