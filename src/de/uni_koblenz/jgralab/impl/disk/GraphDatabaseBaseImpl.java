@@ -1284,6 +1284,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		incidenceListModified(edgeId);
 	}
 
+	public void setDirectionAtIncidenceId(long id, Direction direction) {
+		// TODO Auto-generated method stub
+
+	}
+
 	protected void notifyEdgeAdded(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {

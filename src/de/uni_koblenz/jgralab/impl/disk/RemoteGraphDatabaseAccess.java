@@ -332,4 +332,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
+	/*
+	 * ===================================================== Methods to access
+	 * Incidences =====================================================
+	 */
+
+	public long getEdgeIdAtIncidenceId(long id);
+
+	public long getVertexIdAtIncidenceId(long id);
+
 }
