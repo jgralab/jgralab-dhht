@@ -1061,26 +1061,32 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	@Override
 	public long getNextIncidenceIdAtVertexId(long incId) {
-		// TODO Auto-generated method stub
-		return 0;
+		int partialGraphId = getPartialGraphId(incId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getNextIncidenceIdAtVertexId(convertToLocalId(incId));
 	}
 
 	@Override
 	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId) {
-		// TODO Auto-generated method stub
-		return 0;
+		int partialGraphId = getPartialGraphId(globalIncidenceId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore
+				.getPreviousIncidenceIdAtVertexId(convertToLocalId(globalIncidenceId));
 	}
 
 	@Override
 	public long getNextIncidenceIdAtEdgeId(long incId) {
-		// TODO Auto-generated method stub
-		return 0;
+		int partialGraphId = getPartialGraphId(incId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getNextIncidenceIdAtEdgeId(convertToLocalId(incId));
 	}
 
 	@Override
 	public long getPreviousIncidenceIdAtEdgeId(long incId) {
-		// TODO Auto-generated method stub
-		return 0;
+		int partialGraphId = getPartialGraphId(incId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore
+				.getPreviousIncidenceIdAtEdgeId(convertToLocalId(incId));
 	}
 
 	@Override
