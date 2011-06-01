@@ -63,13 +63,14 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	private final String uid;
 
 	/**
-	 * Creates a graph 
+	 * Creates a graph
 	 * 
 	 * @param id
 	 *            this Graph's id
 	 */
 	protected GraphImpl(String graphId, long partialGraphId,
-			GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess graphData) {
+			GraphDatabaseBaseImpl localDatabase,
+			RemoteGraphDatabaseAccess graphData) {
 		super(partialGraphId, localDatabase, graphData);
 		this.uid = graphId;
 	}
@@ -131,13 +132,15 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph createPartialGraph(String hostname) {
-		int pgId = storingGraphDatabase.createPartialGraph(this.getGraphClass().getM1Class(), hostname);
+		long pgId = storingGraphDatabase.createPartialGraph(this
+				.getGraphClass().getM1Class(), hostname);
 		return localGraphDatabase.getGraphObject(pgId);
 	}
 
 	@Override
 	public Graph getParentDistributedGraph() {
-		return localGraphDatabase.getGraphObject(storingGraphDatabase.getIdOfParentDistributedGraph());
+		return localGraphDatabase.getGraphObject(storingGraphDatabase
+				.getIdOfParentDistributedGraph());
 	}
 
 	@Override
@@ -147,7 +150,8 @@ public abstract class GraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getView(int kappa) {
-		return localGraphDatabase.getGraphFactory().createViewGraph(this, kappa);
+		return localGraphDatabase.getGraphFactory()
+				.createViewGraph(this, kappa);
 	}
 
 	public Graph getViewedGraph() {
@@ -260,7 +264,8 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 *            the edge to be moved
 	 */
 	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeAfter(targetEdge.getId(), movedEdge.getId());
+		storingGraphDatabase
+				.putEdgeAfter(targetEdge.getId(), movedEdge.getId());
 	}
 
 	/**
@@ -273,7 +278,8 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 *            the edge to be moved
 	 */
 	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeBefore(targetEdge.getId(), movedEdge.getId());
+		storingGraphDatabase.putEdgeBefore(targetEdge.getId(),
+				movedEdge.getId());
 	}
 
 	/**
@@ -287,7 +293,8 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexAfterInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexAfter(targetVertex.getId(), movedVertex.getId());
+		storingGraphDatabase.putVertexAfter(targetVertex.getId(),
+				movedVertex.getId());
 	}
 
 	/**
@@ -301,7 +308,8 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexBefore(targetVertex.getId(), movedVertex.getId());
+		storingGraphDatabase.putVertexBefore(targetVertex.getId(),
+				movedVertex.getId());
 	}
 
 	// ==============================================================
