@@ -52,19 +52,13 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * Implementation of all methods of the interface {@link Vertex} which are
  * independent of the fields of a specific VertexImpl.
  * 
- * Example:
- * getNextVertex():
- * local:
- * public Vertex getNextVertex() {
- *   long nextId = container.nextVertex[getLocalId(this.elementId)];
- *   return localGraphDb.getVertexObject(nextId); 
- * }
+ * Example: getNextVertex(): local: public Vertex getNextVertex() { long nextId
+ * = container.nextVertex[getLocalId(this.elementId)]; return
+ * localGraphDb.getVertexObject(nextId); }
  * 
- * remote:
- * public Vertex getNextVertex() {
- *   long nextId = remoteDiskStorage.getNextVertex(getLocalId(this.elementId)];
- *   return localGraphDb.getVertexObject(nextId);
- * }
+ * remote: public Vertex getNextVertex() { long nextId =
+ * remoteDiskStorage.getNextVertex(getLocalId(this.elementId)]; return
+ * localGraphDb.getVertexObject(nextId); }
  * 
  * 
  * @author ist@uni-koblenz.de
@@ -73,8 +67,6 @@ public abstract class VertexImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
 	VertexContainer container;
-	
-	
 
 	/**
 	 * Creates a new {@link Vertex} instance.
@@ -83,47 +75,49 @@ public abstract class VertexImpl extends
 	 *            int the id of the vertex
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase) throws IOException {
+	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase)
+			throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
-		this.container = localGraphDatabase.getLocalDiskStorage().getVertexContainer(getLocalId());
+		this.container = localGraphDatabase.getLocalDiskStorage()
+				.getVertexContainer(getLocalId());
 	}
-	
-	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase, VertexContainer container) throws IOException {
+
+	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase,
+			VertexContainer container) throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
 		this.container = container;
 	}
-	
-	
+
 	/* **********************************************************
-	 *  Access id
-	 * **********************************************************/
-	
+	 * Access id *********************************************************
+	 */
+
+	@Override
 	protected final void setId(long id) {
 		assert id >= 0;
 		this.elementId = id;
 	}
-	
 
 	@Override
 	public final long getId() {
 		return elementId;
 	}
-	
-	
+
 	/* **********************************************************
-	 * Access next and previous elements in Vseq 
-	 * **********************************************************/
-	
+	 * Access next and previous elements in Vseq
+	 * *********************************************************
+	 */
+
 	@Override
 	public Vertex getNextVertex() {
 		assert isValid();
 		return getNextVertex(localGraphDatabase.getTraversalContext());
 	}
-	
+
 	@Override
 	public Vertex getPreviousVertex() {
 		assert isValid();
@@ -135,57 +129,74 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (container.nextElementInGraphId[getIdInStorage(elementId)] == 0) {
 			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(localGraphDatabase.getVertexObject(container.nextElementInGraphId[getIdInStorage(elementId)]))) {
-			return localGraphDatabase.getVertexObject(container.nextElementInGraphId[getIdInStorage(elementId)]);
+		} else if ((traversalContext == null)
+				|| traversalContext
+						.containsVertex(localGraphDatabase
+								.getVertexObject(container.nextElementInGraphId[getIdInStorage(elementId)]))) {
+			return localGraphDatabase
+					.getVertexObject(container.nextElementInGraphId[getIdInStorage(elementId)]);
 		} else {
-			return localGraphDatabase.getVertexObject(container.nextElementInGraphId[getIdInStorage(elementId)]).getNextVertex(traversalContext);
+			return localGraphDatabase.getVertexObject(
+					container.nextElementInGraphId[getIdInStorage(elementId)])
+					.getNextVertex(traversalContext);
 		}
 	}
-
-
 
 	@Override
 	public Vertex getPreviousVertex(Graph traversalContext) {
 		assert isValid();
 		if (container.previousElementInGraphId[getIdInStorage(elementId)] == 0) {
 			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(localGraphDatabase.getVertexObject(container.previousElementInGraphId[getIdInStorage(elementId)]))) {
-			return localGraphDatabase.getVertexObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
+		} else if ((traversalContext == null)
+				|| traversalContext
+						.containsVertex(localGraphDatabase
+								.getVertexObject(container.previousElementInGraphId[getIdInStorage(elementId)]))) {
+			return localGraphDatabase
+					.getVertexObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
 		} else {
-			return localGraphDatabase.getVertexObject(container.previousElementInGraphId[getIdInStorage(elementId)]).getPreviousVertex(traversalContext);
+			return localGraphDatabase
+					.getVertexObject(
+							container.previousElementInGraphId[getIdInStorage(elementId)])
+					.getPreviousVertex(traversalContext);
 		}
 	}
-	
+
 	@Override
 	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(localGraphDatabase.getTraversalContext(), vertexClass, false);
+		return getNextVertex(localGraphDatabase.getTraversalContext(),
+				vertexClass, false);
 	}
 
 	@Override
-	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass, boolean noSubclasses) {
+	public <T extends Vertex> T getNextVertex(Class<T> m1VertexClass,
+			boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
-		return getNextVertex(localGraphDatabase.getTraversalContext(), m1VertexClass, noSubclasses);
+		return getNextVertex(localGraphDatabase.getTraversalContext(),
+				m1VertexClass, noSubclasses);
 	}
 
 	@Override
 	public Vertex getNextVertex(VertexClass vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(localGraphDatabase.getTraversalContext(), vertexClass.getM1Class(), false);
+		return getNextVertex(localGraphDatabase.getTraversalContext(),
+				vertexClass.getM1Class(), false);
 	}
 
 	@Override
 	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(localGraphDatabase.getTraversalContext(), vertexClass.getM1Class(), noSubclasses);
+		return getNextVertex(localGraphDatabase.getTraversalContext(),
+				vertexClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
-	public <T extends Vertex> T getNextVertex(Graph traversalContext, Class<T> vertexClass) {
+	public <T extends Vertex> T getNextVertex(Graph traversalContext,
+			Class<T> vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass, false);
@@ -193,7 +204,8 @@ public abstract class VertexImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Vertex> T getNextVertex(Graph traversalContext, Class<T> m1VertexClass, boolean noSubclasses) {
+	public <T extends Vertex> T getNextVertex(Graph traversalContext,
+			Class<T> m1VertexClass, boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
 		VertexImpl v = (VertexImpl) getNextVertex();
@@ -220,12 +232,13 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public Vertex getNextVertex(Graph traversalContext,	VertexClass vertexClass, boolean noSubclasses) {
+	public Vertex getNextVertex(Graph traversalContext,
+			VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
 		assert isValid();
 		return getNextVertex(vertexClass.getM1Class(), noSubclasses);
 	}
-	
+
 	/**
 	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of
 	 * all vertices in the graph.
@@ -234,7 +247,8 @@ public abstract class VertexImpl extends
 	 *            {@link Vertex}which should be put after this {@link Vertex}
 	 */
 	protected void setNextVertex(Vertex nextVertex) {
-		container.nextElementInGraphId[getIdInStorage(elementId)] = nextVertex.getId();
+		container.nextElementInGraphId[getIdInStorage(elementId)] = nextVertex
+				.getId();
 	}
 
 	/**
@@ -245,9 +259,10 @@ public abstract class VertexImpl extends
 	 *            {@link Vertex}which should be put before this {@link Vertex}
 	 */
 	protected void setPreviousVertex(Vertex prevVertex) {
-		container.previousElementInGraphId[getIdInStorage(elementId)] = prevVertex.getId();
+		container.previousElementInGraphId[getIdInStorage(elementId)] = prevVertex
+				.getId();
 	}
-	
+
 	@Override
 	public boolean isBefore(Vertex v) {
 		assert v != null;
@@ -295,90 +310,110 @@ public abstract class VertexImpl extends
 		assert isValid() && v.isValid();
 		localGraphDatabase.putVertexAfter(v.getId(), this.getId());
 	}
-	
-	
+
 	/* **********************************************************
-	 * Access first and last element in Lambda_seq 
-	 * **********************************************************/
-	
+	 * Access first and last element in Lambda_seq
+	 * *********************************************************
+	 */
+
 	@Override
 	public final Incidence getFirstIncidence() {
 		return getFirstIncidence(localGraphDatabase.getTraversalContext());
 	}
-	
+
 	@Override
 	public Incidence getLastIncidence() {
 		return getLastIncidence(localGraphDatabase.getTraversalContext());
 	}
-	
-	
+
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
-		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			firstIncidence = firstIncidence.getNextIncidenceAtVertex();  
+		// Incidence firstIncidence = localGraphDatabase
+		// .getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		Incidence firstIncidence = localGraphDatabase
+				.getIncidenceObject(localGraphDatabase
+						.getFirstIncidenceIdAtVertexId(elementId));
+		while ((firstIncidence != null) && (traversalContext != null)
+				&& (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
+			firstIncidence = firstIncidence.getNextIncidenceAtVertex();
 		}
 		return firstIncidence;
 	}
 
-	
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) {
-		Incidence lastIncidence = localGraphDatabase.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
-		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
+		// Incidence lastIncidence = localGraphDatabase
+		// .getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
+		Incidence lastIncidence = localGraphDatabase
+				.getIncidenceObject(localGraphDatabase
+						.getLastIncidenceIdAtVertexId(elementId));
+		if ((lastIncidence == null) || (traversalContext == null)
+				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
 		} else {
 			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
 		}
 	}
 
-	
-
 	@Override
 	public final Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(), direction);
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
+				direction);
 	}
-	
-	
+
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
+	public final Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction) {
 		assert isValid();
-		Incidence i = localGraphDatabase.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
-		if (traversalContext==null) {
-			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = i.getNextIncidenceAtVertex(); 
-			}		
+		// Incidence i = localGraphDatabase
+		// .getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		Incidence i = localGraphDatabase.getIncidenceObject(localGraphDatabase
+				.getFirstIncidenceIdAtVertexId(elementId));
+		if (traversalContext == null) {
+			while (((i != null) && (direction != null)
+					&& (direction != Direction.BOTH) && (direction != i
+					.getDirection()))) {
+				i = i.getNextIncidenceAtVertex();
+			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
-				while ((i != null) && ((!traversalContext.containsEdge(i.getEdge())) || (direction != i.getDirection())))
-					i = i.getNextIncidenceAtVertex(); 
+				while ((i != null)
+						&& ((!traversalContext.containsEdge(i.getEdge())) || (direction != i
+								.getDirection()))) {
+					i = i.getNextIncidenceAtVertex();
+				}
 			} else {
-				while ((i != null) && (!traversalContext.containsEdge(i.getEdge())))
-					i = i.getNextIncidenceAtVertex(); 
+				while ((i != null)
+						&& (!traversalContext.containsEdge(i.getEdge()))) {
+					i = i.getNextIncidenceAtVertex();
+				}
 			}
-			
+
 		}
 		return i;
 	}
-		
 
 	@Override
-	public Incidence getFirstIncidence(boolean thisIncidence, IncidenceType... incidentTypes) {
+	public Incidence getFirstIncidence(boolean thisIncidence,
+			IncidenceType... incidentTypes) {
 		assert isValid();
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(), thisIncidence, incidentTypes);
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
+				thisIncidence, incidentTypes);
 	}
 
 	@Override
-	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,	Direction direction, boolean noSubclasses) {
+	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(), anIncidenceClass,
-				direction, noSubclasses);
+		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
+				anIncidenceClass, direction, noSubclasses);
 	}
 
 	@Override
-	public Incidence getFirstIncidence(Graph traversalContext, boolean thisIncidence, IncidenceType... incidentTypes) {
+	public Incidence getFirstIncidence(Graph traversalContext,
+			boolean thisIncidence, IncidenceType... incidentTypes) {
 		assert isValid();
 		Incidence i = getFirstIncidence();
 		if (incidentTypes.length == 0) {
@@ -402,7 +437,8 @@ public abstract class VertexImpl extends
 			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		Incidence currentIncidence = getFirstIncidence(traversalContext, direction);
+		Incidence currentIncidence = getFirstIncidence(traversalContext,
+				direction);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -413,15 +449,12 @@ public abstract class VertexImpl extends
 					return (T) currentIncidence;
 				}
 			}
-			currentIncidence = currentIncidence
-					.getNextIncidenceAtVertex(traversalContext, direction);
+			currentIncidence = currentIncidence.getNextIncidenceAtVertex(
+					traversalContext, direction);
 		}
 		return null;
 	}
 
-	
-	
-	
 	@Override
 	public Iterable<Incidence> getIncidences() {
 		assert isValid();
@@ -435,7 +468,8 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public <T extends Incidence> Iterable<T> getIncidences(Class<T> anIncidenceClass) {
+	public <T extends Incidence> Iterable<T> getIncidences(
+			Class<T> anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtVertex<T>(this, anIncidenceClass);
 	}
@@ -512,7 +546,8 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Incidence connect(String rolename, Edge elemToConnect) {
-		return elemToConnect.connect(getIncidenceClassForRolename(rolename), this);
+		return elemToConnect.connect(getIncidenceClassForRolename(rolename),
+				this);
 	}
 
 	@Override
@@ -526,43 +561,45 @@ public abstract class VertexImpl extends
 		return elemToConnect.connect(incidenceClass, this);
 	}
 
-	
 	/* **********************************************************
 	 * Access sigma and kappa information
-	 * **********************************************************/
+	 * *********************************************************
+	 */
 
 	@Override
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
-			Graph subordinateGraph = localGraphDatabase.getGraphFactory().createSubordinateGraph(this);
+			Graph subordinateGraph = localGraphDatabase.getGraphFactory()
+					.createSubordinateGraph(this);
 			subordinateGraphId = subordinateGraph.getGlobalSubgraphId();
 			return subordinateGraph;
 		} else {
 			return localGraphDatabase.getGraphObject(subordinateGraphId);
 		}
 	}
-	
+
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
+		return localGraphDatabase
+				.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
 	}
-	
-	
+
+	@Override
 	public int getKappa() {
 		return container.kappa[getIdInStorage(elementId)];
 	}
-	
+
+	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
 		container.kappa[getIdInStorage(elementId)] = kappa;
-	}	
-	
-	
+	}
+
 	/* **********************************************************
 	 * Access alpha and omega information
-	 * **********************************************************/
-	
+	 * *********************************************************
+	 */
 
 	@Override
 	public Iterable<Edge> getAlphaEdges() {
@@ -708,17 +745,11 @@ public abstract class VertexImpl extends
 		return new IncidentEdgeIterable<T>(traversalContext, this, anEdgeClass,
 				direction);
 	}
-	
-	
-	
-	
 
 	@Override
 	public boolean isValid() {
 		return localGraphDatabase.containsVertex(this);
 	}
-
-	
 
 	@Override
 	public int getDegree() {
@@ -734,14 +765,16 @@ public abstract class VertexImpl extends
 	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic, noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic,
+				noSubClasses);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic, noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic,
+				noSubClasses);
 	}
 
 	@Override
@@ -749,8 +782,8 @@ public abstract class VertexImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic, direction,
-				noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic,
+				direction, noSubClasses);
 	}
 
 	@Override
@@ -758,8 +791,8 @@ public abstract class VertexImpl extends
 			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic, direction,
-				noSubClasses);
+		return getDegree(localGraphDatabase.getTraversalContext(), ic,
+				direction, noSubClasses);
 	}
 
 	@Override
@@ -823,10 +856,12 @@ public abstract class VertexImpl extends
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction, noSubClasses);
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
 		while (i != null) {
 			++degree;
-			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,	noSubClasses);
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
+					noSubClasses);
 		}
 		return degree;
 	}
@@ -837,10 +872,12 @@ public abstract class VertexImpl extends
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
-		Incidence i = getFirstIncidence(traversalContext, ic, direction, noSubClasses);
+		Incidence i = getFirstIncidence(traversalContext, ic, direction,
+				noSubClasses);
 		while (i != null) {
 			++degree;
-			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,	noSubClasses);
+			i = i.getNextIncidenceAtVertex(traversalContext, ic, direction,
+					noSubClasses);
 		}
 		return degree;
 	}
@@ -865,156 +902,157 @@ public abstract class VertexImpl extends
 	}
 
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getId(), moved.getId());
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getId(),
+				moved.getId());
 	}
-	
+
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getId(), moved.getId());
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getId(),
+				moved.getId());
 	}
-	
+
 	public void deleteIncidence(Incidence i) {
 		storingGraphDatabase.deleteIncidence(i.getId());
 	}
 
-	
-
-//	@Override
-//	//TODO: Move to storing graph database
-//	public void sortIncidences(Comparator<Incidence> comp) {
-//		assert isValid();
-//
-//		if (getFirstIncidence() == null) {
-//			// no sorting required for empty incidence lists
-//			return;
-//		}
-//		class IncidenceList {
-//			IncidenceImpl first;
-//			IncidenceImpl last;
-//
-//			public void add(IncidenceImpl i) {
-//				if (first == null) {
-//					first = i;
-//					assert (last == null);
-//					last = i;
-//				} else {
-//					i.setPreviousIncidenceAtVertex(last);
-//					last.setNextIncidenceAtVertex(i);
-//					last = i;
-//				}
-//				i.setNextIncidenceAtVertex(null);
-//			}
-//
-//			public IncidenceImpl remove() {
-//				if (first == null) {
-//					throw new NoSuchElementException();
-//				}
-//				IncidenceImpl out;
-//				if (first == last) {
-//					out = first;
-//					first = null;
-//					last = null;
-//					return out;
-//				}
-//				out = first;
-//				first = (IncidenceImpl) out.getNextIncidenceAtVertex();
-//				first.setPreviousIncidenceAtVertex(null);
-//				return out;
-//			}
-//
-//			public boolean isEmpty() {
-//				assert ((first == null) == (last == null));
-//				return first == null;
-//			}
-//
-//		}
-//
-//		IncidenceList a = new IncidenceList();
-//		IncidenceList b = new IncidenceList();
-//		IncidenceList out = a;
-//
-//		// split
-//		IncidenceImpl last;
-//		IncidenceList l = new IncidenceList();
-//		l.first = (IncidenceImpl) getFirstIncidence();
-//		l.last = (IncidenceImpl) getLastIncidence();
-//
-//		out.add(last = l.remove());
-//		while (!l.isEmpty()) {
-//			IncidenceImpl current = l.remove();
-//			if (comp.compare(current, last) < 0) {
-//				out = (out == a) ? b : a;
-//			}
-//			out.add(current);
-//			last = current;
-//		}
-//		if (a.isEmpty() || b.isEmpty()) {
-//			out = a.isEmpty() ? b : a;
-//			storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
-//			storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-//			return;
-//		}
-//
-//		while (true) {
-//			if (a.isEmpty() || b.isEmpty()) {
-//				out = a.isEmpty() ? b : a;
-//				storingGraphDatabase.setFirstIncidenceOfVertexId(elementId, out.first.getId());
-//				storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-//				storingGraphDatabase.incidenceListModified(elementId);
-//				return;
-//			}
-//
-//			IncidenceList c = new IncidenceList();
-//			IncidenceList d = new IncidenceList();
-//			out = c;
-//
-//			last = null;
-//			while (!a.isEmpty() && !b.isEmpty()) {
-//				int compareAToLast = last != null ? comp.compare(a.first, last)
-//						: 0;
-//				int compareBToLast = last != null ? comp.compare(b.first, last)
-//						: 0;
-//
-//				if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
-//					if (comp.compare(a.first, b.first) <= 0) {
-//						out.add(last = a.remove());
-//					} else {
-//						out.add(last = b.remove());
-//					}
-//				} else if ((compareAToLast < 0) && (compareBToLast < 0)) {
-//					out = (out == c) ? d : c;
-//					last = null;
-//				} else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
-//					out.add(last = b.remove());
-//				} else {
-//					out.add(last = a.remove());
-//				}
-//			}
-//
-//			// copy rest of A
-//			while (!a.isEmpty()) {
-//				IncidenceImpl current = a.remove();
-//				if (comp.compare(current, last) < 0) {
-//					out = (out == c) ? d : c;
-//				}
-//				out.add(current);
-//				last = current;
-//			}
-//
-//			// copy rest of B
-//			while (!b.isEmpty()) {
-//				IncidenceImpl current = b.remove();
-//				if (comp.compare(current, last) < 0) {
-//					out = (out == c) ? d : c;
-//				}
-//				out.add(current);
-//				last = current;
-//			}
-//
-//			a = c;
-//			b = d;
-//		}
-//
-//	}
+	// @Override
+	// //TODO: Move to storing graph database
+	// public void sortIncidences(Comparator<Incidence> comp) {
+	// assert isValid();
+	//
+	// if (getFirstIncidence() == null) {
+	// // no sorting required for empty incidence lists
+	// return;
+	// }
+	// class IncidenceList {
+	// IncidenceImpl first;
+	// IncidenceImpl last;
+	//
+	// public void add(IncidenceImpl i) {
+	// if (first == null) {
+	// first = i;
+	// assert (last == null);
+	// last = i;
+	// } else {
+	// i.setPreviousIncidenceAtVertex(last);
+	// last.setNextIncidenceAtVertex(i);
+	// last = i;
+	// }
+	// i.setNextIncidenceAtVertex(null);
+	// }
+	//
+	// public IncidenceImpl remove() {
+	// if (first == null) {
+	// throw new NoSuchElementException();
+	// }
+	// IncidenceImpl out;
+	// if (first == last) {
+	// out = first;
+	// first = null;
+	// last = null;
+	// return out;
+	// }
+	// out = first;
+	// first = (IncidenceImpl) out.getNextIncidenceAtVertex();
+	// first.setPreviousIncidenceAtVertex(null);
+	// return out;
+	// }
+	//
+	// public boolean isEmpty() {
+	// assert ((first == null) == (last == null));
+	// return first == null;
+	// }
+	//
+	// }
+	//
+	// IncidenceList a = new IncidenceList();
+	// IncidenceList b = new IncidenceList();
+	// IncidenceList out = a;
+	//
+	// // split
+	// IncidenceImpl last;
+	// IncidenceList l = new IncidenceList();
+	// l.first = (IncidenceImpl) getFirstIncidence();
+	// l.last = (IncidenceImpl) getLastIncidence();
+	//
+	// out.add(last = l.remove());
+	// while (!l.isEmpty()) {
+	// IncidenceImpl current = l.remove();
+	// if (comp.compare(current, last) < 0) {
+	// out = (out == a) ? b : a;
+	// }
+	// out.add(current);
+	// last = current;
+	// }
+	// if (a.isEmpty() || b.isEmpty()) {
+	// out = a.isEmpty() ? b : a;
+	// storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
+	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+	// return;
+	// }
+	//
+	// while (true) {
+	// if (a.isEmpty() || b.isEmpty()) {
+	// out = a.isEmpty() ? b : a;
+	// storingGraphDatabase.setFirstIncidenceOfVertexId(elementId,
+	// out.first.getId());
+	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+	// storingGraphDatabase.incidenceListModified(elementId);
+	// return;
+	// }
+	//
+	// IncidenceList c = new IncidenceList();
+	// IncidenceList d = new IncidenceList();
+	// out = c;
+	//
+	// last = null;
+	// while (!a.isEmpty() && !b.isEmpty()) {
+	// int compareAToLast = last != null ? comp.compare(a.first, last)
+	// : 0;
+	// int compareBToLast = last != null ? comp.compare(b.first, last)
+	// : 0;
+	//
+	// if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
+	// if (comp.compare(a.first, b.first) <= 0) {
+	// out.add(last = a.remove());
+	// } else {
+	// out.add(last = b.remove());
+	// }
+	// } else if ((compareAToLast < 0) && (compareBToLast < 0)) {
+	// out = (out == c) ? d : c;
+	// last = null;
+	// } else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
+	// out.add(last = b.remove());
+	// } else {
+	// out.add(last = a.remove());
+	// }
+	// }
+	//
+	// // copy rest of A
+	// while (!a.isEmpty()) {
+	// IncidenceImpl current = a.remove();
+	// if (comp.compare(current, last) < 0) {
+	// out = (out == c) ? d : c;
+	// }
+	// out.add(current);
+	// last = current;
+	// }
+	//
+	// // copy rest of B
+	// while (!b.isEmpty()) {
+	// IncidenceImpl current = b.remove();
+	// if (comp.compare(current, last) < 0) {
+	// out = (out == c) ? d : c;
+	// }
+	// out.add(current);
+	// last = current;
+	// }
+	//
+	// a = c;
+	// b = d;
+	// }
+	//
+	// }
 
 	@Override
 	public List<? extends Vertex> getAdjacences(String role) {
@@ -1136,8 +1174,6 @@ public abstract class VertexImpl extends
 		// }
 	}
 
-
-
 	@Override
 	protected void addFirstSubordinateEdge(Edge appendix) {
 		return;
@@ -1147,6 +1183,5 @@ public abstract class VertexImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
-	
-	
+
 }
