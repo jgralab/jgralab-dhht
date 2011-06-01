@@ -801,8 +801,8 @@ public class GraphIO {
 		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " "
 				+ graph.getGraphVersion());
 		writeIdentifier(graph.getType().getQualifiedName());
-		int vCount = graph.getVCount();
-		int eCount = graph.getECount();
+		long vCount = graph.getVCount();
+		long eCount = graph.getECount();
 		// with a GraphMarker, v/eCount have to be restricted to the marked
 		// elements.
 		if (subGraph != null) {
@@ -973,7 +973,7 @@ public class GraphIO {
 			writeLong(pgraph.getGlobalSubgraphId());
 			write("-");
 			write(graph.getGraphDatabase().getHostname(
-					pgraph.getGlobalSubgraphId()));
+					pgraph.getPartialGraphId()));
 		}
 		write("}");
 	}
@@ -3056,7 +3056,7 @@ public class GraphIO {
 		for (String[] pGraph : partialGraphs) {
 			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
 					.getRemoteInstance(pGraph[1]);
-			remoteServer.loadGraph(pGraph[0]);
+			remoteServer.getGraphDatabase(pGraph[0]);
 			// TODO how to handle complete graphs
 		}
 	}
