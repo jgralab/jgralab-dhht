@@ -84,7 +84,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final Vertex addAdjacence(IncidenceClass incidentIc, IncidenceClass adjacentIc, Edge other) {
+	public final Vertex addAdjacence(IncidenceClass incidentIc,
+			IncidenceClass adjacentIc, Edge other) {
 		assert incidentIc != null;
 		assert adjacentIc != null;
 		assert isValid();
@@ -107,7 +108,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final Vertex addAdjacence(String incidentRole, String adjacentRole, Edge other) {
+	public final Vertex addAdjacence(String incidentRole, String adjacentRole,
+			Edge other) {
 		return addAdjacence(getIncidenceClassForRolename(incidentRole),
 				getIncidenceClassForRolename(adjacentRole), other);
 	}
@@ -142,11 +144,13 @@ public abstract class EdgeImpl extends
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 		int id = graph.allocateIncidenceIndex(0);
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,  id, elemToConnect, this);
+		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+				id, elemToConnect, this);
 	}
 
 	@Override
-	public final Incidence connect(IncidenceClass incidenceClass, Vertex elemToConnect) {
+	public final Incidence connect(IncidenceClass incidenceClass,
+			Vertex elemToConnect) {
 		return connect(incidenceClass.getM1Class(), elemToConnect);
 	}
 
@@ -162,7 +166,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final List<? extends Edge> getAdjacences(Graph traversalContext, IncidenceClass ic) {
+	public final List<? extends Edge> getAdjacences(Graph traversalContext,
+			IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
 		List<Edge> adjacences = new ArrayList<Edge>();
@@ -203,7 +208,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices(Class<? extends Vertex> aVertexClass) {
+	public final Iterable<Vertex> getAlphaVertices(
+			Class<? extends Vertex> aVertexClass) {
 		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
 				Direction.VERTEX_TO_EDGE);
 	}
@@ -240,15 +246,16 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
+	public final int getDegree(Class<? extends Incidence> ic,
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
-	public final int getDegree(Class<? extends Incidence> ic, Direction direction,
-			boolean noSubClasses) {
+	public final int getDegree(Class<? extends Incidence> ic,
+			Direction direction, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		return getDegree(getGraph().getTraversalContext(), ic, direction,
@@ -272,8 +279,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			boolean noSubClasses) {
+	public final int getDegree(Graph traversalContext,
+			Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -286,8 +293,9 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
-			Direction direction, boolean noSubClasses) {
+	public final int getDegree(Graph traversalContext,
+			Class<? extends Incidence> ic, Direction direction,
+			boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
 		int degree = 0;
@@ -377,8 +385,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
+	public final <T extends Incidence> T getFirstIncidence(
+			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(getGraph().getTraversalContext(),
@@ -391,12 +399,14 @@ public abstract class EdgeImpl extends
 		return getFirstIncidence(getGraph().getTraversalContext(), direction);
 	}
 
-
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
 		Incidence firstIncidence = firstIncidenceAtEdge;
-		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsVertex(firstIncidence.getVertex()))) {
-			firstIncidence = ((IncidenceImpl)firstIncidence).nextIncidenceAtEdge;
+		while ((firstIncidence != null)
+				&& (traversalContext != null)
+				&& (!traversalContext
+						.containsVertex(firstIncidence.getVertex()))) {
+			firstIncidence = ((IncidenceImpl) firstIncidence).nextIncidenceAtEdge;
 		}
 		return firstIncidence;
 	}
@@ -423,11 +433,13 @@ public abstract class EdgeImpl extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public final <T extends Incidence> T getFirstIncidence(Graph traversalContext,
-			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
+	public final <T extends Incidence> T getFirstIncidence(
+			Graph traversalContext, Class<T> anIncidenceClass,
+			Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		Incidence currentIncidence = getFirstIncidence(traversalContext, direction);
+		Incidence currentIncidence = getFirstIncidence(traversalContext,
+				direction);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -444,30 +456,35 @@ public abstract class EdgeImpl extends
 		return null;
 	}
 
-
-	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
+	public final Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction) {
 		assert isValid();
 		Incidence i = firstIncidenceAtEdge;
-		if (traversalContext==null) {
-			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
-			}		
+		if (traversalContext == null) {
+			while (((i != null) && (direction != null)
+					&& (direction != Direction.BOTH) && (direction != i
+					.getDirection()))) {
+				i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
-				while ((i != null) && ((!traversalContext.containsVertex(i.getVertex())) || (direction != i.getDirection())))
-					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
+				while ((i != null)
+						&& ((!traversalContext.containsVertex(i.getVertex())) || (direction != i
+								.getDirection()))) {
+					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+				}
 			} else {
-				while ((i != null) && (!traversalContext.containsVertex(i.getVertex())))
-					i = ((IncidenceImpl)i).nextIncidenceAtEdge;
+				while ((i != null)
+						&& (!traversalContext.containsVertex(i.getVertex()))) {
+					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+				}
 			}
-			
+
 		}
 		return i;
 	}
 
-	
 	@Override
 	public final Iterable<Incidence> getIncidences() {
 		assert isValid();
@@ -542,15 +559,16 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass) {
+	public final Iterable<Incidence> getIncidences(
+			IncidenceClass anIncidenceClass) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this,
 				anIncidenceClass.getM1Class());
 	}
 
 	@Override
-	public final Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
-			Direction direction) {
+	public final Iterable<Incidence> getIncidences(
+			IncidenceClass anIncidenceClass, Direction direction) {
 		assert isValid();
 		return new IncidenceIterableAtEdge<Incidence>(this,
 				anIncidenceClass.getM1Class(), direction);
@@ -636,12 +654,11 @@ public abstract class EdgeImpl extends
 		return getLastIncidence(getGraph().getTraversalContext());
 	}
 
-	
-
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
 		Incidence lastIncidence = lastIncidenceAtEdge;
-		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
+		if ((lastIncidence == null) || (traversalContext == null)
+				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
 		} else {
 			return lastIncidence.getPreviousIncidenceAtEdge(traversalContext);
@@ -690,14 +707,15 @@ public abstract class EdgeImpl extends
 	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
 		Edge nextEdge = nextEdgeInGraph;
-		if (nextEdge == null
-				|| ((traversalContext != null) && !traversalContext.containsEdge(nextEdge))) {
+		if (nextEdge == null) {
 			return null;
-		} else {
+		} else if ((traversalContext == null)
+				|| traversalContext.containsEdge(nextEdge)) {
 			return nextEdge;
+		} else {
+			return nextEdge.getNextEdge(traversalContext);
 		}
 	}
-	
 
 	@Override
 	public final Edge getNextEdge(Graph traversalContext,
@@ -805,7 +823,8 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Graph getSubordinateGraph() {
 		if (subOrdinateGraph == null) {
-			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
+			subOrdinateGraph = getLocalGraph().getGraphFactory()
+					.createSubordinateGraph(this);
 		}
 		return subOrdinateGraph;
 	}
@@ -882,7 +901,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	protected final void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
+	protected final void putIncidenceAfter(IncidenceImpl target,
+			IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
@@ -931,7 +951,8 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	protected final void putIncidenceBefore(IncidenceImpl target, IncidenceImpl moved) {
+	protected final void putIncidenceBefore(IncidenceImpl target,
+			IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
@@ -1075,7 +1096,6 @@ public abstract class EdgeImpl extends
 	public final void setFirstIncidence(IncidenceImpl firstIncidence) {
 		firstIncidenceAtEdge = firstIncidence;
 	}
-
 
 	@Override
 	public final void setLastIncidence(IncidenceImpl lastIncidence) {
@@ -1243,7 +1263,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public String toString() {
-		assert isValid();	
+		assert isValid();
 		return "+e" + id + ": " + getType().getQualifiedName();
 	}
 

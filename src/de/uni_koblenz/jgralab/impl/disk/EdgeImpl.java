@@ -146,12 +146,13 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		Edge nextEdge = localGraphDatabase
 				.getEdgeObject(container.nextElementInGraphId[getIdInStorage(elementId)]);
-		if (nextEdge == null
-				|| ((traversalContext != null) && !traversalContext
-						.containsEdge(nextEdge))) {
+		if (nextEdge == null) {
 			return null;
-		} else {
+		} else if ((traversalContext == null)
+				|| traversalContext.containsEdge(nextEdge)) {
 			return nextEdge;
+		} else {
+			return nextEdge.getNextEdge(traversalContext);
 		}
 	}
 
@@ -311,11 +312,8 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		// Incidence firstIncidence = localGraphDatabase
-		// .getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		Incidence firstIncidence = localGraphDatabase
-				.getIncidenceObject(localGraphDatabase
-						.getFirstIncidenceIdAtEdgeId(elementId));
+				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext
@@ -336,10 +334,8 @@ public abstract class EdgeImpl extends
 	public final Incidence getFirstIncidence(Graph traversalContext,
 			Direction direction) {
 		assert isValid();
-		// Incidence i = localGraphDatabase
-		// .getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
-		Incidence i = localGraphDatabase.getIncidenceObject(localGraphDatabase
-				.getFirstIncidenceIdAtEdgeId(elementId));
+		Incidence i = localGraphDatabase
+				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
@@ -432,11 +428,8 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
-		// Incidence lastIncidence = localGraphDatabase
-		// .getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		Incidence lastIncidence = localGraphDatabase
-				.getIncidenceObject(localGraphDatabase
-						.getLastIncidenceIdAtEdgeId(elementId));
+				.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		if ((lastIncidence == null) || (traversalContext == null)
 				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
