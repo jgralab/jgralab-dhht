@@ -55,7 +55,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeImpl extends
+public abstract class EdgeProxyImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 	public EdgeContainer container;
@@ -69,7 +69,7 @@ public abstract class EdgeImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase)
+	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase)
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
@@ -77,7 +77,7 @@ public abstract class EdgeImpl extends
 				getLocalId());
 	}
 
-	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase,
+	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase,
 			EdgeContainer container) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
@@ -124,8 +124,8 @@ public abstract class EdgeImpl extends
 	 * @throws RemoteException
 	 */
 	protected final void setNextEdge(Edge nextEdge) {
-		container.nextElementInGraphId[getIdInStorage(elementId)] = nextEdge
-				.getId();
+		((GraphDatabaseBaseImpl) storingGraphDatabase).setNextEdgeId(elementId,
+				nextEdge.getId());
 	}
 
 	/**
@@ -137,15 +137,15 @@ public abstract class EdgeImpl extends
 	 * @throws RemoteException
 	 */
 	protected final void setPreviousEdge(Edge prevEdge) {
-		container.previousElementInGraphId[getIdInStorage(elementId)] = prevEdge
-				.getId();
+		((GraphDatabaseBaseImpl) storingGraphDatabase).setPreviousEdgeId(
+				elementId, prevEdge.getId());
 	}
 
 	@Override
 	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
-		Edge nextEdge = localGraphDatabase
-				.getEdgeObject(container.nextElementInGraphId[getIdInStorage(elementId)]);
+		Edge nextEdge = localGraphDatabase.getEdgeObject(storingGraphDatabase
+				.getNextEdgeId(elementId));
 		if (nextEdge == null) {
 			return null;
 		} else if ((traversalContext == null)
@@ -160,7 +160,8 @@ public abstract class EdgeImpl extends
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
 		Edge previousEdge = localGraphDatabase
-				.getEdgeObject(container.previousElementInGraphId[getIdInStorage(elementId)]);
+				.getEdgeObject(storingGraphDatabase
+						.getPreviousEdgeId(elementId));
 		if (previousEdge == null
 				|| ((traversalContext != null) && !traversalContext
 						.containsEdge(previousEdge))) {
@@ -200,7 +201,7 @@ public abstract class EdgeImpl extends
 			Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
-		EdgeImpl e = (EdgeImpl) getNextEdge(traversalContext);
+		EdgeProxyImpl e = (EdgeProxyImpl) getNextEdge(traversalContext);
 		while (e != null) {
 			if (noSubclasses) {
 				if (m1EdgeClass == e.getM1Class()) {
@@ -211,7 +212,7 @@ public abstract class EdgeImpl extends
 					return e;
 				}
 			}
-			e = (EdgeImpl) e.getNextEdge(traversalContext);
+			e = (EdgeProxyImpl) e.getNextEdge(traversalContext);
 		}
 		return null;
 	}
@@ -256,9 +257,9 @@ public abstract class EdgeImpl extends
 		if (this == e) {
 			return false;
 		}
-		EdgeImpl next = (EdgeImpl) e.getNextEdge();
+		EdgeProxyImpl next = (EdgeProxyImpl) e.getNextEdge();
 		while ((next != null) && (next != this)) {
-			next = (EdgeImpl) next.getNextEdge();
+			next = (EdgeProxyImpl) next.getNextEdge();
 		}
 		return next != null;
 	}
@@ -313,7 +314,8 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
 		Incidence firstIncidence = localGraphDatabase
-				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(elementId));
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext
@@ -335,7 +337,8 @@ public abstract class EdgeImpl extends
 			Direction direction) {
 		assert isValid();
 		Incidence i = localGraphDatabase
-				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(elementId));
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
@@ -429,7 +432,8 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
 		Incidence lastIncidence = localGraphDatabase
-				.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
+				.getIncidenceObject(storingGraphDatabase
+						.getLastIncidenceIdAtEdgeId(elementId));
 		if ((lastIncidence == null) || (traversalContext == null)
 				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
@@ -1116,20 +1120,20 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase
-				.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
+		return localGraphDatabase.getGraphElementObject(localGraphDatabase
+				.getSigma(elementId));
 	}
 
 	@Override
 	public int getKappa() {
-		return container.kappa[getIdInStorage(elementId)];
+		return storingGraphDatabase.getKappa(elementId);
 	}
 
 	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		container.kappa[getIdInStorage(elementId)] = kappa;
+		storingGraphDatabase.setKappa(elementId, kappa);
 	}
 
 	/**
@@ -1157,13 +1161,13 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final boolean isValid() {
-		return storingGraphDatabase.containsEdgeId(this.getId());
+		return storingGraphDatabase.containsEdgeId(getId());
 	}
 
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteEdge(this.getId());
+		storingGraphDatabase.deleteEdge(getId());
 	}
 
 	@Override
