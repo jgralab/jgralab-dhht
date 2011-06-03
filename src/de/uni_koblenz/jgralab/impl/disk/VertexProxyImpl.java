@@ -66,8 +66,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class VertexProxyImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
-	VertexContainer container;
-
 	/**
 	 * Creates a new {@link Vertex} instance.
 	 * 
@@ -77,21 +75,13 @@ public abstract class VertexProxyImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected VertexProxyImpl(long id, GraphDatabaseBaseImpl localGraphDatabase)
+	protected VertexProxyImpl(long id, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
 			throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
-		this.container = localGraphDatabase.getLocalDiskStorage()
-				.getVertexContainer(getLocalId());
+		this.storingGraphDatabase = storingGraphDatabase;
 	}
 
-	protected VertexProxyImpl(long id,
-			GraphDatabaseBaseImpl localGraphDatabase, VertexContainer container)
-			throws IOException {
-		super(localGraphDatabase);
-		this.elementId = id;
-		this.container = container;
-	}
 
 	/* **********************************************************
 	 * Access id *********************************************************
@@ -570,20 +560,33 @@ public abstract class VertexProxyImpl extends
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase.getGraphElementObject(localGraphDatabase
-				.getSigma(elementId));
+		long sigmaId = storingGraphDatabase.getSigmaIdOfVertexId(elementId);
+		if (sigmaId < 0)
+			return localGraphDatabase.getEdgeObject(-sigmaId);
+		else
+			return localGraphDatabase.getVertexObject(sigmaId);
+	}
+	
+	@Override
+	public void setSigma(GraphElement<?, ?, ?> elem) {
+		long sigmaId = elem.getId();
+		if (elem instanceof Edge) {
+			storingGraphDatabase.setSigmaIdOfVertexId(elementId, -sigmaId);
+		} else {
+			storingGraphDatabase.setSigmaIdOfVertexId(elementId, sigmaId);
+		}
 	}
 
 	@Override
 	public int getKappa() {
-		return storingGraphDatabase.getKappa(elementId);
+		return storingGraphDatabase.getKappaOfVertexId(elementId);
 	}
 
-	@Override
+
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storingGraphDatabase.setKappa(elementId, kappa);
+		storingGraphDatabase.setKappaOfVertexId(elementId, kappa);
 	}
 
 	/* **********************************************************
@@ -1173,5 +1176,15 @@ public abstract class VertexProxyImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
+	
+	/**
+	 * @return long the internal incidence list version
+	 * @see #isIncidenceListModified(long)
+	 */
+	public final long getIncidenceListVersion() {
+		assert isValid();
+		return storingGraphDatabase.getIncidenceListVersionOfVertexId(elementId);
+	}
+	
 
 }

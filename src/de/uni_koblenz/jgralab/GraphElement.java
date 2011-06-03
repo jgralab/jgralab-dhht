@@ -1312,4 +1312,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public void addSubordinateElement(Edge appendix);
 
+
+
+	void setSigma(GraphElement<?, ?, ?> elem);
+
 }

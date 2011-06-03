@@ -58,8 +58,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class EdgeProxyImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
-	public EdgeContainer container;
-
 	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
@@ -69,20 +67,14 @@ public abstract class EdgeProxyImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase)
+	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(
-				getLocalId());
+		this.storingGraphDatabase = storingGraphDatabase;
 	}
 
-	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase,
-			EdgeContainer container) throws IOException {
-		super(graphDatabase);
-		this.elementId = id;
-		this.container = container;
-	}
+
 
 	/* **********************************************************
 	 * Access id, remember, the signed bit is used to encode that this object is
@@ -1113,27 +1105,41 @@ public abstract class EdgeProxyImpl extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			subordinateGraphId = storingGraphDatabase
-					.createSubordinateGraph(this.getId());
+					.createSubordinateGraphInEdge(this.getId());
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase.getGraphElementObject(localGraphDatabase
-				.getSigma(elementId));
+		long sigmaId = storingGraphDatabase.getSigmaIdOfEdgeId(elementId);
+		if (sigmaId < 0)
+			return localGraphDatabase.getEdgeObject(-sigmaId);
+		else
+			return localGraphDatabase.getVertexObject(sigmaId);
 	}
-
+	
+	@Override
+	public void setSigma(GraphElement<?, ?, ?> elem) {
+		long sigmaId = elem.getId();
+		if (elem instanceof Edge) {
+			storingGraphDatabase.setSigmaIdOfEdgeId(elementId, -sigmaId);
+		} else {
+			storingGraphDatabase.setSigmaIdOfEdgeId(elementId, sigmaId);
+		}
+	}
+	
+	
 	@Override
 	public int getKappa() {
-		return storingGraphDatabase.getKappa(elementId);
+		return storingGraphDatabase.getKappaOfEdgeId(elementId);
 	}
 
-	@Override
+
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storingGraphDatabase.setKappa(elementId, kappa);
+		storingGraphDatabase.setKappaOfEdgeId(elementId, kappa);
 	}
 
 	/**
@@ -1174,6 +1180,15 @@ public abstract class EdgeProxyImpl extends
 	public String toString() {
 		assert isValid();
 		return "+e" + elementId + ": " + getType().getQualifiedName();
+	}
+	
+	/**
+	 * @return long the internal incidence list version
+	 * @see #isIncidenceListModified(long)
+	 */
+	public final long getIncidenceListVersion() {
+		assert isValid();
+		return storingGraphDatabase.getIncidenceListVersionOfEdgeId(elementId);
 	}
 
 }

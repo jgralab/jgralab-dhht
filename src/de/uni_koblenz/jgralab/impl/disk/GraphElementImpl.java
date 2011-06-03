@@ -188,7 +188,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return (this.getIncidenceListVersion() != incidenceListVersion);
 	}
 	
-
+	public abstract long getIncidenceListVersion();
+	
 	
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
@@ -465,6 +466,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link Edge}
 	 */
 	protected abstract void addFirstSubordinateEdge(Edge appendix);
+	
 
 
 	/**
@@ -486,6 +488,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 					- kappaDifference);
 		}
 	}
+	
+	public abstract void setKappa(int kappa);
 
 	/**
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
@@ -510,50 +514,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		}
 	}
 
-	
-	@Override
-	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase.getGraphElementObject(storingDiskStorage.getSigmaId(GraphDatabaseBaseImpl.convertToLocalId(elementId)));
-	}
-	
-
-	
-	/**
-	 * Sets {@link #sigma} to <code>parent</code>.
-	 * 
-	 * @param newSigma
-	 *            {@link GraphElementImpl}
-	 */
-	public final void setSigma(GraphElementImpl<?, ?, ?> newSigma) {
-		assert newSigma != null;
-		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		if (newSigma instanceof Edge) {
-			localGraphDatabase.setSigma(elementId, -newSigma.getId());
-		} else {
-			localGraphDatabase.setSigma(elementId, newSigma.getId());
-		}
-	}
-
-	
-	
-	@Override
-	public int getKappa() {
-		return storingDiskStorage.getKappa(GraphDatabaseBaseImpl.convertToLocalId(elementId));
-	}
-	
-	/**
-	 * Sets {@link #kappa} only of this {@link GraphElement} to
-	 * <code>kappa</code>.
-	 * 
-	 * @param kappa
-	 *            <b>int</b>
-	 */
-	public void setKappa(int kappa) {
-		assert getType().getAllowedMaxKappa() >= kappa
-				&& getType().getAllowedMinKappa() <= kappa;
-		storingDiskStorage.setKappa(GraphDatabaseBaseImpl.convertToLocalId(elementId), kappa);
-	}	
-
 	@Override
 	public final boolean isVisible(int kappa) {
 		return getKappa() >= kappa; 
@@ -565,19 +525,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param incidenceListVersion
 	 *            long
 	 */
-	protected final void setIncidenceListVersion(long incidenceListVersion) {
-		localGraphDatabase.setIncidenceListVersion(elementId, incidenceListVersion);
-	}
+//	protected final void setIncidenceListVersion(long incidenceListVersion) {
+//		localGraphDatabase.setIncidenceListVersionOfVertexId(elementId, incidenceListVersion);
+//	}
 
-	/**
-	 * @return long the internal incidence list version
-	 * @see #isIncidenceListModified(long)
-	 */
-	final long getIncidenceListVersion() {
-		assert isValid();
-		return localGraphDatabase.getIncidenceListVersion(elementId);
-	}
-	
+
 
 	public abstract AttributeContainer getAttributeContainer();
 

@@ -92,12 +92,12 @@ public abstract class EdgeImpl extends
 
 	protected final void setId(int id) {
 		assert id >= 0;
-		this.elementId = -id;
+		this.elementId = id;
 	}
 
 	@Override
 	public final long getId() {
-		return -elementId;
+		return elementId;
 	}
 
 	/* ***********************************************************
@@ -1109,23 +1109,36 @@ public abstract class EdgeImpl extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			subordinateGraphId = storingGraphDatabase
-					.createSubordinateGraph(this.getId());
+					.createSubordinateGraphInEdge(this.getId());
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase
-				.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
+		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
+		if (sigmaId < 0)
+			return localGraphDatabase.getEdgeObject(-sigmaId);
+		else
+			return localGraphDatabase.getVertexObject(sigmaId);
 	}
 
+	@Override
+	public void setSigma(GraphElement<?, ?, ?> elem) {
+		long sigmaId = elem.getId();
+		if (elem instanceof Edge) {
+			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;
+		} else {
+			container.sigmaId[getIdInStorage(elementId)] = sigmaId;
+		}
+	}
+	
 	@Override
 	public int getKappa() {
 		return container.kappa[getIdInStorage(elementId)];
 	}
 
-	@Override
+
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -1171,5 +1184,15 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		return "+e" + elementId + ": " + getType().getQualifiedName();
 	}
+	
+	/**
+	 * @return long the internal incidence list version
+	 * @see #isIncidenceListModified(long)
+	 */
+	public final long getIncidenceListVersion() {
+		assert isValid();
+		return container.incidenceListVersion[getIdInStorage(elementId)];
+	}
+	
 
 }

@@ -572,16 +572,31 @@ public abstract class VertexImpl extends
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		return localGraphDatabase
-				.getGraphElementObject(container.sigmaId[getIdInStorage(elementId)]);
+		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
+		if (sigmaId < 0)
+			return localGraphDatabase.getEdgeObject(-sigmaId);
+		else
+			return localGraphDatabase.getVertexObject(sigmaId);
 	}
 
+	
+	@Override
+	public void setSigma(GraphElement<?, ?, ?> elem) {
+		long sigmaId = elem.getId();
+		if (elem instanceof Edge) {
+			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;
+		} else {
+			container.sigmaId[getIdInStorage(elementId)] = sigmaId;
+		}
+	}
+
+	
 	@Override
 	public int getKappa() {
 		return container.kappa[getIdInStorage(elementId)];
 	}
 
-	@Override
+
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -1175,5 +1190,15 @@ public abstract class VertexImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
+	
+	/**
+	 * @return long the internal incidence list version
+	 * @see #isIncidenceListModified(long)
+	 */
+	public final long getIncidenceListVersion() {
+		assert isValid();
+		return container.incidenceListVersion[getIdInStorage(elementId)];
+	}
+	
 
 }
