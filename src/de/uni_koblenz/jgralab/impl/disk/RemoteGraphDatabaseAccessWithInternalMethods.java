@@ -124,7 +124,12 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 
 
-	void setVCount(long subgraphId, long count);
+	public void setVCount(long subgraphId, long count);
+
+
+
+
+	public void graphModified(int graphId);
 
 
 }

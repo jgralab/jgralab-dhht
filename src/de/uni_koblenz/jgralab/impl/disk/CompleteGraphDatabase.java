@@ -106,10 +106,17 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 	
 	@Override
-	public void incidenceListModified(long elementId) {
+	public void incidenceListOfVertexModified(long elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.increaseIncidenceListVersion(convertToLocalId(elementId));
+		diskStore.increaseIncidenceListVersionOfVertexId(convertToLocalId(elementId));
+	}
+	
+	@Override
+	public void incidenceListOfEdgeModified(long elementId) {
+		int partialGraphId = getPartialGraphId(elementId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		diskStore.increaseIncidenceListVersionOfEdgeId(convertToLocalId(elementId));
 	}
 
 	/* **************************************************************************
@@ -171,6 +178,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	}
 
+	@Override
 	public void graphModified(int graphId) {
 		graphVersion++;
 	}
@@ -256,7 +264,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	public long getFirstIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getFirstIncidenceAtVertexId(convertToLocalId(vertexId));
+		return diskStore.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
 	}
 	
 	@Override
@@ -314,6 +322,62 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 //		// TODO Auto-generated method stub
 //		
 //	}
+
+	@Override
+	public long createSubordinateGraphInVertex(long id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long createSubordinateGraphInEdge(long id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void increaseVCount(long subgraphId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void decreaseVCount(long subgraphId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public long getEdgeIdAtIncidenceId(long id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getVertexIdAtIncidenceId(long id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long connect(int incidenceClassId, long vertexId, long edgeId,
+			long incId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void appendIncidenceToLambdaSeqOfVertex(long edgeId, long incidenceId) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 

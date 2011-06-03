@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Direction;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -523,39 +523,65 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 
 
 	/* =====================================================
-	 * Methods to access properties common for edges and vertices
+	 * Methods to access hierarchy
 	 * ===================================================== */
 
 	
 	@Override
-	public long getSigma(long globalElementId) {
+	public long getSigmaIdOfVertexId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		return getDiskStorageForPartialGraph(partialGraphId).getSigmaId(localElementId);
+		return getDiskStorageForPartialGraph(partialGraphId).getSigmaIdOfVertexId(localElementId);
 	}
 	
 	@Override
-	public void setSigma(long globalElementId, long globalSigmaId) {
+	public void setSigmaIdOfVertexId(long globalElementId, long globalSigmaId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		getDiskStorageForPartialGraph(partialGraphId).setSigmaId(localElementId, globalSigmaId);
+		getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfVertexId(localElementId, globalSigmaId);
 	}
-
-	@Override
-	public int getKappa(long globalElementId) {
-		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		return getGraphDatabase(partialGraphId).getKappa(localElementId);
-	}
-
-	@Override
-	public void setKappa(long globalElementId, int kappa) {
-		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		getGraphDatabase(partialGraphId).setKappa(localElementId, kappa);
-	}
-
 	
+	@Override
+	public long getSigmaIdOfEdgeId(long globalElementId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		return getDiskStorageForPartialGraph(partialGraphId).getSigmaIdOfEdgeId(localElementId);
+	}
+	
+	@Override
+	public void setSigmaIdOfEdgeId(long globalElementId, long globalSigmaId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfEdgeId(localElementId, globalSigmaId);
+	}
+
+	@Override
+	public int getKappaOfVertexId(long globalElementId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		return getGraphDatabase(partialGraphId).getKappaOfVertexId(localElementId);
+	}
+
+	@Override
+	public void setKappaOfVertexId(long globalElementId, int kappa) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		getGraphDatabase(partialGraphId).setKappaOfVertexId(localElementId, kappa);
+	}
+
+	@Override
+	public int getKappaOfEdgeId(long globalElementId) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		return getGraphDatabase(partialGraphId).getKappaOfEdgeId(localElementId);
+	}
+
+	@Override
+	public void setKappaOfEdgeId(long globalElementId, int kappa) {
+		int partialGraphId = getPartialGraphId(globalElementId);
+		int localElementId = convertToLocalId(globalElementId);
+		getGraphDatabase(partialGraphId).setKappaOfEdgeId(localElementId, kappa);
+	}
 
 	
 	
@@ -623,13 +649,13 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		}
 	}
 
-	protected long getNextVertexId(long vertexId) {
+	public long getNextVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getNextVertexId(convertToLocalId(vertexId));
 	}
 
-	protected long getPreviousVertexId(long vertexId) {
+	public long getPreviousVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getPreviousVertexId(convertToLocalId(vertexId));	
