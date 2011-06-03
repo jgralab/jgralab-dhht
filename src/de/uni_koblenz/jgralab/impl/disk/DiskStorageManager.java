@@ -1033,4 +1033,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
 	}
 
+	public void incidenceListOfVertexModified(long vertexId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

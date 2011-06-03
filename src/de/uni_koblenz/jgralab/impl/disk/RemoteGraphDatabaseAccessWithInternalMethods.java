@@ -122,4 +122,9 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	public void incidenceListOfEdgeModified(long edgeId);
 
 
+
+
+	void setVCount(long subgraphId, long count);
+
+
 }
