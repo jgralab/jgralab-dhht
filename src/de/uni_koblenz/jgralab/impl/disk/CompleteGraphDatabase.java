@@ -1,21 +1,14 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.JGraLabList;
-import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
-import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
@@ -288,40 +281,11 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		return diskStore.getLastIncidenceIdAtEdgeId(convertToLocalId(edgeId));
 	}
 
-
-
-
-
-	@Override
-	public void deleteIncidence(long id) {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	
-	
-
-
 	@Override
 	public void setGraphVersion(long graphVersion) {
 		this.graphVersion = graphVersion;
 	}
-
-
-
-
-	@Override
-	public void registerRemotePartialGraph(int id, String hostname) {
-		// TODO Auto-generated method stub
-		
-	}
-//
-//
-//	@Override
-//	public void increaseIncidenceListVersion(long elementId) {
-//		// TODO Auto-generated method stub
-//		
-//	}
 
 	@Override
 	public long createSubordinateGraphInVertex(long id) {
@@ -335,35 +299,12 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		return 0;
 	}
 
+
+
 	@Override
-	public void increaseVCount(long subgraphId) {
+	public void deleteIncidence(long id) {
 		// TODO Auto-generated method stub
 		
-	}
-
-	@Override
-	public void decreaseVCount(long subgraphId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public long getEdgeIdAtIncidenceId(long id) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getVertexIdAtIncidenceId(long id) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long connect(int incidenceClassId, long vertexId, long edgeId,
-			long incId) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -379,8 +320,11 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		
 	}
 
-
-
+	@Override
+	public void registerRemotePartialGraph(int id, String hostname) {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 

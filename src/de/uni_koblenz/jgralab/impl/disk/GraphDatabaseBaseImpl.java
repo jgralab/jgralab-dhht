@@ -833,6 +833,45 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 	}
 
+
+	
+	@Override
+	public void increaseVCount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId)
+			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
+		else
+			getGraphData(convertToLocalId(subgraphId)).vertexCount++;
+	}
+
+	@Override
+	public void decreaseVCount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId)
+			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
+		else
+			getGraphData(convertToLocalId(subgraphId)).vertexCount--;
+	}
+	
+	@Override
+	public void increaseECount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId)
+			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
+		else
+			getGraphData(convertToLocalId(subgraphId)).edgeCount++;
+	}
+
+	@Override
+	public void decreaseECount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId)
+			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
+		else
+			getGraphData(convertToLocalId(subgraphId)).edgeCount--;
+	}
+
+	
 	/**
 	 * Connects the specified vertex <code>v</code> to the speficied edge
 	 * <code>e</code> by an incidence of class <code>cls</code> and sets the
@@ -842,10 +881,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * @param vertex
 	 * @param edge
 	 */
-	public long connect(Class<? extends Incidence> cls, long vertexId,
-			long edgeId) {
-		return connect(cls, vertexId, edgeId, 0);
+	@Override
+	public long connect(int incidenceClassId, long vertexId, long edgeId) {
+		return connect(incidenceClassId, vertexId, edgeId, 0);
 	}
+
 
 	/**
 	 * Connects the specified vertex <code>v</code> to the speficied edge
@@ -858,10 +898,9 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * @param id
 	 */
 	@Override
-	public long connect(Class<? extends Incidence> cls, long vertexId,
-			long edgeId, long incId) {
-		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(schema
-				.getClassId(cls));
+	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) {
+		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(incidenceClassId);
+		Class<? extends Incidence> m1Class = incClass.getM1Class();
 		Direction dir = incClass.getDirection();
 
 		// check id
@@ -875,7 +914,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		// call graph factory to create object
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
-				.createIncidenceDiskBasedStorage(cls, incId, this);
+				.createIncidenceDiskBasedStorage(m1Class, incId, this);
 
 		// set incident edge and vertex ids of incidence
 		setIncidentEdgeId(incId, edgeId);
@@ -931,13 +970,22 @@ public abstract class GraphDatabaseBaseImpl extends
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		diskStore.setConnectedVertexId(convertToLocalId(incId), vertexId);
 	}
+	
+	@Override
+	public long getEdgeIdAtIncidenceId(long id) {
+		int partialGraphId = getPartialGraphId(id);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getConnectedEdgeId(convertToLocalId(id));
+	}
 
 	@Override
-	public long connect(int incidenceClassId, long vertexId, long edgeId) {
-		Class<? extends Incidence> incClass = (Class<? extends Incidence>) schema
-				.getM1ClassForId(incidenceClassId);
-		return connect(incClass, vertexId, edgeId);
+	public long getVertexIdAtIncidenceId(long id) {
+		int partialGraphId = getPartialGraphId(id);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getConnectedVertexId(convertToLocalId(id));
 	}
+
+
 
 	@Override
 	public void putIncidenceIdAfterAtVertexId(long targetId, long movedId) {

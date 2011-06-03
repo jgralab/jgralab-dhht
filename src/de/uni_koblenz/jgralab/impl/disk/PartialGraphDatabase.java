@@ -86,7 +86,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		completeGraphDatabase.setTraversalContext(traversalContext);
 	}
 
-
+	
+	
 	
 	
 }

@@ -122,6 +122,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void vertexListModified();
 
 	public long getVCount(long subgraphId);
+	
+	public void setVCount(long globalSubgraphId, long count);
 
 	public void increaseVCount(long subgraphId);
 
@@ -364,8 +366,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
-	long connect(Class<? extends Incidence> cls, long vertexId, long edgeId,
-			long incId);
+
+	void decreaseECount(long subgraphId);
+
+	void increaseECount(long subgraphId);
 
 
 
