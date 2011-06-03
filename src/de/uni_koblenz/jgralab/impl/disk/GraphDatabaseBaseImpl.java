@@ -36,14 +36,32 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	public static final long GLOBAL_GRAPH_ID = Integer.MAX_VALUE + 2;
 
-	public long createSubordinateGraph(long containingGraphElementId) {
+	public long createSubordinateGraphInVertex(long containingVertexId) {
 		// get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
 
 		GraphData data = new GraphData();
 		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
 		localSubgraphData.add(data);
-		data.containingElementId = containingGraphElementId;
+		data.containingElementId = containingVertexId;
+
+		// Graph subordinateGraph =
+		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+
+		data.typeId = schema.getClassId(m1Class);
+		data.vertexCount = 0;
+		data.edgeCount = 0;
+		return data.globalSubgraphId;
+	}
+	
+	public long createSubordinateGraphInEdge(long containingEdged) {
+		// get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
+		localSubgraphData.add(data);
+		data.containingElementId = - containingEdged;
 
 		// Graph subordinateGraph =
 		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
@@ -80,14 +98,6 @@ public abstract class GraphDatabaseBaseImpl extends
 	 */
 	public abstract void deletePartialGraph(int partialGraphId);
 
-	/**
-	 * Registers the partial graph with the given id <code>id</code> which is
-	 * stored on the host with the name <code>hostname</code>
-	 * 
-	 * @param id
-	 * @param hostname
-	 */
-	public abstract void registerRemotePartialGraph(int id, String hostname);
 
 	public abstract void edgeListModified();
 
@@ -901,7 +911,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) {
 		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(incidenceClassId);
 		Class<? extends Incidence> m1Class = incClass.getM1Class();
-		Direction dir = incClass.getDirection();
+		//Direction dir = incClass.getDirection();
 
 		// check id
 		if (incId != 0) {
@@ -1154,6 +1164,23 @@ public abstract class GraphDatabaseBaseImpl extends
 		setLastIncidenceIdAtEdgeId(edgeId, incidenceId);
 		incidenceListOfEdgeModified(edgeId);
 	}
+	
+	@Override
+	public void appendIncidenceToLambdaSeqOfVertex(long vertexId, long incidenceId) {
+		assert incidenceId != 0;
+		setIncidentVertexId(incidenceId, vertexId);
+		setNextIncidenceIdAtVertexId(incidenceId, 0);
+		if (getFirstIncidenceIdAtVertexId(vertexId) == 0) {
+			setFirstIncidenceIdAtVertexId(vertexId, incidenceId);
+		}
+		long lastIncidenceId = getLastIncidenceIdAtVertexId(vertexId);
+		if (lastIncidenceId != 0) {
+			setNextIncidenceIdAtVertexId(lastIncidenceId, incidenceId);
+			setPreviousIncidenceIdAtVertexId(incidenceId, lastIncidenceId);
+		}
+		setLastIncidenceIdAtVertexId(vertexId, incidenceId);
+		incidenceListOfVertexModified(vertexId);
+	}
 
 
 	public void removeIncidenceFromLambdaSeqOfEdge(long incidenceId) {
@@ -1177,6 +1204,11 @@ public abstract class GraphDatabaseBaseImpl extends
 				setPreviousIncidenceIdAtEdgeId(nextId, previousId);
 			}
 		}
+		// delete incidence
+		setIncidentEdgeId(incidenceId, 0);
+		setNextIncidenceIdAtEdgeId(incidenceId, 0);
+		setPreviousIncidenceIdAtEdgeId(incidenceId, 0);
+		incidenceListOfVertexModified(edgeId);
 	}
 
 	public void removeIncidenceFromLambdaSeqOfVertex(long incidenceId) {
@@ -1200,7 +1232,15 @@ public abstract class GraphDatabaseBaseImpl extends
 				setPreviousIncidenceIdAtVertexId(nextId, previousId);
 			}
 		}
+		// delete incidence
+		setIncidentVertexId(incidenceId, 0);
+		setNextIncidenceIdAtVertexId(incidenceId, 0);
+		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
+		incidenceListOfVertexModified(vertexId);
 	}
+	
+
+
 
 	@Override
 	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId) {
@@ -1282,62 +1322,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		incidenceListOfEdgeModified(edgeId);
 	}
 
-	protected void removeIncidenceFromLambdaSeqAtVertex(long incidenceId) {
-		assert incidenceId != 0;
-		long vertexId = getConnectedVertexId(incidenceId);
-
-		long previousId = getPreviousIncidenceIdAtVertexId(incidenceId);
-		long nextId = getNextIncidenceIdAtVertexId(incidenceId);
-
-		// remove moved incidence from lambdaSeq
-		if (incidenceId == getFirstIncidenceIdAtVertexId(vertexId)) {
-			setFirstIncidenceIdAtVertexId(vertexId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, 0);
-		} else if (incidenceId == getLastIncidenceIdAtVertexId(vertexId)) {
-			setLastIncidenceIdAtVertexId(vertexId, previousId);
-			setNextIncidenceIdAtVertexId(previousId, 0);
-		} else {
-			setNextIncidenceIdAtVertexId(previousId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, previousId);
-		}
-
-		// delete incidence
-		setIncidentVertexId(incidenceId, 0);
-		setNextIncidenceIdAtVertexId(incidenceId, 0);
-		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
-		incidenceListOfVertexModified(vertexId);
-	}
-
-	protected void removeIncidenceFromLambdaSeqAtEdge(long incidenceId) {
-		assert incidenceId != 0;
-		long edgeId = -getConnectedEdgeId(incidenceId);
-
-		long previousId = getPreviousIncidenceIdAtEdgeId(incidenceId);
-		long nextId = getNextIncidenceIdAtEdgeId(incidenceId);
-
-		// remove moved incidence from lambdaSeq
-		if (incidenceId == getFirstIncidenceIdAtEdgeId(edgeId)) {
-			setFirstIncidenceIdAtEdgeId(edgeId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, 0);
-		} else if (incidenceId == getLastIncidenceIdAtEdgeId(edgeId)) {
-			setLastIncidenceIdAtEdgeId(edgeId, previousId);
-			setNextIncidenceIdAtEdgeId(previousId, 0);
-		} else {
-			setNextIncidenceIdAtEdgeId(previousId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
-		}
-
-		// delete incidence
-		setIncidentEdgeId(incidenceId, 0);
-		setNextIncidenceIdAtEdgeId(incidenceId, 0);
-		setPreviousIncidenceIdAtEdgeId(incidenceId, 0);
-		incidenceListOfVertexModified(edgeId);
-	}
-
-	public void setDirectionAtIncidenceId(long id, Direction direction) {
-		// TODO Auto-generated method stub
-
-	}
 
 	protected void notifyEdgeAdded(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases

@@ -58,6 +58,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	 * @param id
 	 * @param hostname
 	 */
+	@Override
 	public void registerPartialGraph(int id, String hostname) {
 		if (hostnames[id] == null) {
 			hostnames[id] = hostname;
@@ -66,6 +67,8 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 					+ id + " registered");
 		}
 	}
+	
+
 	
 	@Override
 	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
@@ -280,6 +283,12 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getLastIncidenceIdAtEdgeId(convertToLocalId(edgeId));
 	}
+	
+	@Override
+	public void deleteIncidence(long id) {
+		removeIncidenceFromLambdaSeqOfEdge(id);
+		removeIncidenceFromLambdaSeqOfVertex(id);
+	}
 
 	
 	@Override
@@ -287,44 +296,12 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		this.graphVersion = graphVersion;
 	}
 
-	@Override
-	public long createSubordinateGraphInVertex(long id) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long createSubordinateGraphInEdge(long id) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 
 
-	@Override
-	public void deleteIncidence(long id) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public void appendIncidenceToLambdaSeqOfVertex(long edgeId, long incidenceId) {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void registerRemotePartialGraph(int id, String hostname) {
-		// TODO Auto-generated method stub
-		
-	}
 
 
 
