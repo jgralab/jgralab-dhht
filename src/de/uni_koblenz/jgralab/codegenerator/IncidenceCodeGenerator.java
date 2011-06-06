@@ -104,7 +104,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 		}
-
+		createGetDirectionMethod();
 		return code;
 	}
 
@@ -182,5 +182,17 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	}
 
 
+	private CodeBlock createGetDirectionMethod() {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("direction", aec.getDirection().toString());
+		if (currentCycle.isMemOrDiskImpl()) {
+			code.add("@Override",
+					 "public Direction getDirection() {",
+					 "\treturn #direction#;",
+					 "}");
+		}
+		return code;
+	}
+	
 	
 }

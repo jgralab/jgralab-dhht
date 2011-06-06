@@ -85,6 +85,25 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	public void setTraversalContext(Graph traversalContext) {
 		completeGraphDatabase.setTraversalContext(traversalContext);
 	}
+	
+	
+
+	@Override
+	public void incidenceListOfEdgeModified(long edgeId) {
+		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).incidenceListOfEdgeModified(edgeId);
+	}
+	
+	//graphmodified, edgelistemodified etc in base class, activating all partial graphs and calling their internalXXModified method
+
+	@Override
+	public void graphModified(int graphId) {
+		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).graphModified();
+	}
+
+	@Override
+	public void setGraphVersion(long graphVersion) {
+		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).setGraphVersion(graphVersion);
+	}
 
 	
 	

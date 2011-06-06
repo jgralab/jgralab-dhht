@@ -522,6 +522,12 @@ public abstract class GraphDatabaseBaseImpl extends
 	protected FreeIndexList getFreeEdgeList() {
 		return freeEdgeList;
 	}
+	
+	@Override
+	public long getMaxECount() {
+		return Integer.MAX_VALUE;
+	}
+
 
 	/**
 	 * Use to allocate a <code>Edge</code>-index.
@@ -966,6 +972,27 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		return incId;
 	}
+	
+	@Override
+	public void deleteIncidence(long id) {
+		removeIncidenceFromLambdaSeqOfEdge(id);
+		removeIncidenceFromLambdaSeqOfVertex(id);
+	}
+
+	
+	@Override
+	public long getIncidenceListVersionOfVertexId(long vertexId) {
+		int partialGraphId = getPartialGraphId(vertexId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getIncidenceListVersionOfEdgeId(convertToLocalId(vertexId));
+	}
+
+	@Override
+	public long getIncidenceListVersionOfEdgeId(long edgeId) {
+		int partialGraphId = getPartialGraphId(edgeId);
+		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		return diskStore.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
+	}
 
 	@Override
 	public void setIncidentEdgeId(long incId, long edgeId) {
@@ -1322,6 +1349,54 @@ public abstract class GraphDatabaseBaseImpl extends
 		incidenceListOfEdgeModified(edgeId);
 	}
 
+	
+	@Override
+	public long getContainingElementId(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getContainingElementId(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).containingElementId;
+	}
+
+
+
+	@Override
+	public void setVCount(long subgraphId, long count) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setVCount(subgraphId, count);
+		}
+		getGraphData(convertToLocalId(subgraphId)).vertexCount = count;
+	}
+
+	@Override
+	public long getECount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getECount(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).edgeCount;
+	}
+
+	@Override
+	public void setECount(long subgraphId, long count) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setECount(subgraphId, count);
+		}
+		getGraphData(convertToLocalId(subgraphId)).edgeCount = count;
+	}
+
+
+	@Override
+	public long getICount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getICount(subgraphId);
+		}
+		return getGraphData(convertToLocalId(subgraphId)).incidenceCount;
+	}
 
 	protected void notifyEdgeAdded(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases

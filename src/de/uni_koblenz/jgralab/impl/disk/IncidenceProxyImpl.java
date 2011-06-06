@@ -104,18 +104,7 @@ public abstract class IncidenceProxyImpl implements Incidence {
 						previousIncidenceAtEdge.getId());
 	}
 
-	void setDirection(Direction direction) {
-		assert direction != null;
-		assert direction != Direction.BOTH;
-		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setDirectionAtIncidenceId(id, direction);
-	}
 
-	@Override
-	public Direction getDirection() {
-		return ((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.getIncidenceObject(id).getDirection();
-	}
 
 	@Override
 	public Graph getGraph() {
