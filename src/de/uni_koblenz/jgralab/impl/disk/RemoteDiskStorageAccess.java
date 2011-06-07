@@ -84,7 +84,6 @@ public interface RemoteDiskStorageAccess extends Remote {
 	
 	public long getConnectedVertexId(int incidenceId);
 	
-	public void setConnectedVertexId(int convertToLocalId, long vertexId);
 	
 	public long getIncidenceListVersionOfVertexId(int elementId);
 	
@@ -108,8 +107,6 @@ public interface RemoteDiskStorageAccess extends Remote {
 	public void setPreviousIncidenceAtEdgeId(int localIncidenceId, long previousIncId);
 
 	public long getConnectedEdgeId(int incidenceId);
-	
-	public void setConnectedEdgeId(int convertToLocalId, long edgeId);
 	
 	public long getIncidenceListVersionOfEdgeId(int elementId);
 	

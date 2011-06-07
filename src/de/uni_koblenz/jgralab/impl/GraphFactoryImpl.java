@@ -47,6 +47,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
@@ -144,8 +145,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
-			Vertex alpha, Vertex omega) {
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega) {
 		try {
 			Edge e = binaryEdgeMapForMemBasedImpl.get(edgeClass).newInstance(
 					id, g, alpha, omega);
@@ -160,29 +160,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	@Override
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass,
-			int id, Graph g, Vertex alpha, Vertex omega) {
-		try {
-			Edge e = binaryEdgeMapForDiskBasedImpl.get(edgeClass).newInstance(
-					id, g, alpha, omega);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
 
 	@Override
-	public Edge reloadEdge(Class<? extends Edge> edgeClass, int id, Graph g,
-			EdgeContainer container) {
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
 		try {
 			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
-					id, container, g);
+					id, graphDatabase, container);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -213,12 +196,9 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, int id, Graph g) {
-
-		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
-		// cg.backgroundStorage.freeMem();
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase){
 		try {
-			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
+			Edge e = edgeMapForProxies.get(edgeClass).newInstance(id, graphDatabase, remoteDatabase);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -231,13 +211,9 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass,
-			int id, Graph g) {
-
-		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
-		// cg.backgroundStorage.freeMem();
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase) {
 		try {
-			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, g);
+			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, graphDatabase);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -313,12 +289,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public <T extends Incidence> T createIncidenceDiskBasedStorage(
-			Class<T> incidenceClass, int id, Vertex v, Edge e) {
+	public <T extends Incidence> T createIncidenceDiskBasedStorage(Class<? extends T> incidenceClass, long incidenceId, long vertexId, long edgeId, GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMapForDiskBasedImpl.get(incidenceClass)
-					.newInstance(id, v, e);
+					.newInstance(incidenceId, vertexId, edgeId);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -332,8 +307,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Incidence reloadIncidence(Class<? extends Incidence> incidenceClass,
-			int id, IncidenceContainer container) {
+	public <T extends Incidence> T  reloadLocalIncidence(Class<? extends T> incidenceClass, int id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
 		try {
 			Incidence i = incidenceMapForDiskStorageReloading.get(
 					incidenceClass).newInstance(id, container);

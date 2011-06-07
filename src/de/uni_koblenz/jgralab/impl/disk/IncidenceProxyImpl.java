@@ -56,14 +56,10 @@ public abstract class IncidenceProxyImpl implements Incidence {
 
 	private long id;
 
-	public IncidenceContainer container;
-
-	protected IncidenceProxyImpl(GraphDatabaseBaseImpl localGraphDatabase,
-			RemoteGraphDatabaseAccess storingGraphDatabase,
-			IncidenceContainer container, long globalId) {
+	protected IncidenceProxyImpl(long globalId, GraphDatabaseBaseImpl localGraphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
-		this.container = container;
 		this.id = globalId;
 	}
 

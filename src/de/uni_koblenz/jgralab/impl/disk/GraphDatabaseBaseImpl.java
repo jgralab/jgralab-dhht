@@ -930,7 +930,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		// call graph factory to create object
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
-				.createIncidenceDiskBasedStorage(m1Class, incId, this);
+				.createIncidenceDiskBasedStorage(m1Class, incId, vertexId, edgeId, this);
 
 		// set incident edge and vertex ids of incidence
 		setIncidentEdgeId(incId, edgeId);
@@ -992,20 +992,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
-	}
-
-	@Override
-	public void setIncidentEdgeId(long incId, long edgeId) {
-		int partialGraphId = getPartialGraphId(incId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setConnectedEdgeId(convertToLocalId(incId), edgeId);
-	}
-
-	@Override
-	public void setIncidentVertexId(long incId, long vertexId) {
-		int partialGraphId = getPartialGraphId(incId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setConnectedVertexId(convertToLocalId(incId), vertexId);
 	}
 	
 	@Override

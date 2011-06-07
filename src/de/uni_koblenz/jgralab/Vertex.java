@@ -499,4 +499,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
 	// public <T extends Vertex> Set<T> reachableVertices(Class<T> returnType,
 	// PathElement... pathElements);
 
+	
+
+	
 }

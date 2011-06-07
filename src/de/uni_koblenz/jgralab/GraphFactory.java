@@ -225,11 +225,11 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public Incidence createIncidenceDiskBasedStorage(Class<? extends Incidence> ic, long id, GraphDatabaseBaseImpl graphDatabase);
+	public <T extends Incidence> T createIncidenceDiskBasedStorage(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, GraphDatabaseBaseImpl graphDatabase);
 
-	public Incidence createIncidenceProxy(Class<? extends Incidence> ic, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public <T extends Incidence> T createIncidenceProxy(Class<? extends T> ic, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
-	public Incidence reloadLocalIncidence(Class<? extends Incidence> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container);
+	public <T extends Incidence> T  reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container);
 	
 	
 	
