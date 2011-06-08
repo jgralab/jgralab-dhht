@@ -1227,110 +1227,26 @@ public class GraphIO {
 	 *             not be loaded
 	 */
 	public static Graph loadSchemaAndGraphFromFile(String filename,
-			CodeGeneratorConfiguration config, ProgressFunction pf)
+			CodeGeneratorConfiguration config, ProgressFunction pf, ImplementationType implType)
 			throws GraphIOException {
 		try {
 			logger.finer("Loading graph " + filename);
-			return loadGraphFromFileWithMemorySupport(filename, null, pf);
+			return loadGraphFromFile(filename, null, pf, implType);
 		} catch (GraphIOException ex) {
 			if (ex.getCause() instanceof ClassNotFoundException) {
 				logger.fine("Compiled schema classes were not found, so load and compile the schema first.");
 				Schema s = loadSchemaFromFile(filename);
 				s.compile(config);
-				return loadGraphFromFileWithMemorySupport(filename, s, pf);
+				return loadGraphFromFile(filename, s, pf, implType);
 			} else {
 				throw ex;
 			}
 		}
 	}
 
-	/**
-	 * Loads a graph with standard support from the file <code>filename</code>.
-	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
-	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
-	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithMemorySupport(String filename,
-			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf, ImplementationType.MEMORY);
-	}
 
-	/**
-	 * Loads a graph with standard support from the file <code>filename</code>.
-	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
-	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
-	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param schema
-	 *            the schema (must be the same schema as in the TG file read by
-	 *            the InputStream), may be <code>null</code>
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithMemorySupport(String filename,
-			Schema schema, ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, schema, pf,
-				ImplementationType.MEMORY);
-	}
-
-	/**
-	 * Loads a graph with standard support from the file <code>filename</code>.
-	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
-	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
-	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithDiskSupport(String filename,
-			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf, ImplementationType.DISK);
-	}
-
-	/**
-	 * Loads a graph with standard support from the file <code>filename</code>.
-	 * When the <code>filename</code> ends with <code>.gz</code>, it is assumed
-	 * that the input is GZIP compressed, otherwise uncompressed plain text. A
-	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
-	 * 
-	 * @param filename
-	 *            the name of the TG file to be read
-	 * @param schema
-	 *            the schema (must be the same schema as in the TG file read by
-	 *            the InputStream), may be <code>null</code>
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @return the loaded graph
-	 * @throws GraphIOException
-	 *             if an IOException occurs or the compiled schema classes can
-	 *             not be loaded
-	 */
-	public static Graph loadGraphFromFileWithDiskSupport(String filename,
-			Schema schema, ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFile(filename, schema, pf, ImplementationType.DISK);
-	}
-
+	
+	
 	/**
 	 * Use {@link loadGraphFromFileWithStandardSupport} instead.
 	 * 
@@ -1339,25 +1255,9 @@ public class GraphIO {
 	 * @return
 	 * @throws GraphIOException
 	 */
-	@Deprecated
-	public static Graph loadGraphFromFile(String filename, ProgressFunction pf)
+	public static Graph loadGraphFromFile(String filename, ProgressFunction pf, ImplementationType implType)
 			throws GraphIOException {
-		return loadGraphFromFileWithMemorySupport(filename, pf);
-	}
-
-	/**
-	 * Use {@link loadGraphFromFileWithStandardSupport} instead.
-	 * 
-	 * @param filename
-	 * @param schema
-	 * @param pf
-	 * @return
-	 * @throws GraphIOException
-	 */
-	@Deprecated
-	public static Graph loadGraphFromFile(String filename, Schema schema,
-			ProgressFunction pf) throws GraphIOException {
-		return loadGraphFromFileWithMemorySupport(filename, schema, pf);
+		return loadGraphFromFile(filename, null, pf, implType);
 	}
 
 	/**

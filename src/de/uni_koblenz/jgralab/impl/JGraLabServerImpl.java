@@ -12,6 +12,7 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
@@ -72,8 +73,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		GraphDatabaseBaseImpl db = localGraphDatabases.get(uid);
 		if (db == null) {
 			String filename = localFilesContainingGraphs.get(uid);
-			((GraphImpl) GraphIO.loadGraphFromFileWithDiskSupport(filename,
-					null)).getGraphDatabase();
+			((GraphImpl) GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK)).getGraphDatabase();
 			localGraphDatabases.put(uid, db);
 		}
 		return db;
