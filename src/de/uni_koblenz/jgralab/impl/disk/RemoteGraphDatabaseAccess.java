@@ -6,7 +6,6 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
@@ -69,27 +68,25 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	/*
 	 * ====================================================================
-	 * Methods to access hierarchy 
+	 * Methods to access hierarchy
 	 * ====================================================================
 	 */
 
 	public long getSigmaIdOfVertexId(long globalVertexId);
-	
+
 	public long getSigmaIdOfEdgeId(long globalEdgeId);
-	
+
 	public void setSigmaIdOfVertexId(long globalVertexId, long globalSigmaId);
-	
+
 	public void setSigmaIdOfEdgeId(long globalEdgeId, long globalSigmaId);
-	
-	
+
 	public int getKappaOfVertexId(long elementId);
 
 	public void setKappaOfVertexId(long elementId, int kappa);
-	
+
 	public int getKappaOfEdgeId(long elementId);
 
 	public void setKappaOfEdgeId(long elementId, int kappa);
-
 
 	/**
 	 * Creates a new subordinate graph for the element identified by the given
@@ -99,7 +96,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @return
 	 */
 	public long createSubordinateGraphInVertex(long id);
-	
+
 	/**
 	 * Creates a new subordinate graph for the element identified by the given
 	 * id
@@ -122,7 +119,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void vertexListModified();
 
 	public long getVCount(long subgraphId);
-	
+
 	public void setVCount(long globalSubgraphId, long count);
 
 	public void increaseVCount(long subgraphId);
@@ -268,9 +265,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * ===================================================== Methods to access
 	 * Lambda sequence =====================================================
 	 */
-	
+
 	public long getIncidenceListVersionOfVertexId(long vertexId);
-	
+
 	public long getFirstIncidenceIdAtVertexId(long elemId);
 
 	public long getLastIncidenceIdAtVertexId(long elemId);
@@ -283,9 +280,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void putIncidenceIdBeforeAtVertexId(long id, long id2);
 
-	
 	public long getIncidenceListVersionOfEdgeId(long edgeId);
-	
+
 	public long getFirstIncidenceIdAtEdgeId(long elemId);
 
 	public long getLastIncidenceIdAtEdgeId(long elemId);
@@ -298,16 +294,14 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId);
 
-
 	public long getEdgeIdAtIncidenceId(long id);
 
 	public long getVertexIdAtIncidenceId(long id);
 
 	public long getICount(long globalSubgraphId);
-	
+
 	public int getIncidenceTypeId(long id);
-	
-	
+
 	/**
 	 * Creates a new incidence of the IncidenceClass identified by the id
 	 * <code>incidenceClassId</code> between the vertex identified by
@@ -329,7 +323,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	/*
 	 * =====================================================================
-	 * Methods to access domains 
+	 * Methods to access domains
 	 * =====================================================================
 	 */
 
@@ -366,16 +360,8 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
-
 	void decreaseECount(long subgraphId);
 
 	void increaseECount(long subgraphId);
-
-
-
-
-
-
-
 
 }

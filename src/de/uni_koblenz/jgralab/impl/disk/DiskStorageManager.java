@@ -221,7 +221,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	private final void writeStorage(FileChannel[] fileArray,
-			ContainerReference storage, String baseName) {
+			ContainerReference<?> storage, String baseName) {
 		try {
 			FileChannel channel = getChannel(fileArray, storage.id, baseName);
 			storage.write(channel);
@@ -233,7 +233,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	private final void writeAttributes(FileChannel[] fileArray,
-			GraphElementContainerReference storage, String baseName) {
+			GraphElementContainerReference<?> storage, String baseName) {
 		try {
 			FileChannel channel = getChannel(fileArray, storage.id, baseName);
 			storage.writeAttributes(channel);
@@ -968,7 +968,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
 	}
 
-
 	// hierarchy of vertices
 
 	@Override
@@ -1026,7 +1025,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	public void incidenceListOfVertexModified(long vertexId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

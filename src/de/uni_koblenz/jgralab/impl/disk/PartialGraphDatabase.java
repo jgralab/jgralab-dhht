@@ -1,23 +1,18 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.util.Collection;
-import java.util.Map;
-
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.JGraLabList;
-import de.uni_koblenz.jgralab.JGraLabMap;
-import de.uni_koblenz.jgralab.Record;
-import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final CompleteGraphDatabase completeGraphDatabase;
 
-	public PartialGraphDatabase(Schema schema, String uniqueGraphId, String hostnameOfCompleteGraph, int localPartialGraphId) {
-		super(schema, uniqueGraphId, 1, localPartialGraphId); 
-		completeGraphDatabase = (CompleteGraphDatabase) localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(uniqueGraphId);
+	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
+			String hostnameOfCompleteGraph, int localPartialGraphId) {
+		super(schema, uniqueGraphId, 1, localPartialGraphId);
+		completeGraphDatabase = (CompleteGraphDatabase) localJGraLabServer
+				.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
+						uniqueGraphId);
 	}
 
 	@Override
@@ -85,28 +80,29 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	public void setTraversalContext(Graph traversalContext) {
 		completeGraphDatabase.setTraversalContext(traversalContext);
 	}
-	
-	
 
 	@Override
 	public void incidenceListOfEdgeModified(long edgeId) {
-		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).incidenceListOfEdgeModified(edgeId);
+		getGraphDatabase(
+				getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID))
+				.incidenceListOfEdgeModified(edgeId);
 	}
-	
-	//graphmodified, edgelistemodified etc in base class, activating all partial graphs and calling their internalXXModified method
+
+	// graphmodified, edgelistemodified etc in base class, activating all
+	// partial graphs and calling their internalXXModified method
 
 	@Override
 	public void graphModified(int graphId) {
-		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).graphModified();
+		getGraphDatabase(
+				getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID))
+				.graphModified();
 	}
 
 	@Override
 	public void setGraphVersion(long graphVersion) {
-		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).setGraphVersion(graphVersion);
+		getGraphDatabase(
+				getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID))
+				.setGraphVersion(graphVersion);
 	}
 
-	
-	
-	
-	
 }
