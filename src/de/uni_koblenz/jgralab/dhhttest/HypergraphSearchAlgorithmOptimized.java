@@ -28,12 +28,8 @@ public class HypergraphSearchAlgorithmOptimized {
 				throw new RuntimeException("Cannot init algorithm, algorithm has already been used");
 			int vCount;
 			int eCount;
-			try {
-				vCount = graph.getVCount();
-				eCount = graph.getECount();
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
+			vCount = (int) graph.getVCount();
+			eCount = (int) graph.getECount();
 			parentVertexInc = new int[vCount+1];
 			parentEdgeInc = new int[eCount+1];
 			num = 0;
