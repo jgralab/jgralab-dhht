@@ -502,6 +502,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			// a new one
 			Vertex v = container.vertices[idInStorage];
 			if (v == null) {
+				@SuppressWarnings("unchecked")
 				Class<? extends Vertex> c = (Class<? extends Vertex>) schema
 						.getM1ClassForId(type);
 				v = factory.reloadLocalVertex(c, id, graphDatabase, container);
@@ -607,6 +608,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return storage;
 	}
 
+	@SuppressWarnings("unchecked")
 	public final Edge getEdgeObject(int id) {
 		EdgeContainer container = getEdgeContainer(id);
 		int idInStorage = getElementIdInContainer(id);
@@ -723,6 +725,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return storage;
 	}
 
+	@SuppressWarnings("unchecked")
 	public final Incidence getIncidenceObject(int id) {
 		if (id == 0) {
 			return null;
@@ -735,7 +738,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			// a new one
 			Incidence i = container.incidences[idInStorage];
 			if (i == null) {
-				Class<?> c = graphDatabase.getSchema().getM1ClassForId(type);
 				i = factory.reloadLocalIncidence(
 						(Class<? extends Incidence>) schema
 								.getM1ClassForId(type), id, graphDatabase,

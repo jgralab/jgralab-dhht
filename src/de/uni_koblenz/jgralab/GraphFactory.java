@@ -53,13 +53,13 @@ public interface GraphFactory {
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraph(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
 	
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraph(Class<? extends Graph> graphClass, String id);
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id);
 	
 	/**
 	 * creates a Graph-object for the specified class. The returned object may

@@ -143,9 +143,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				"*/",
-				"public #gcName# create#gcCamelName#(int vMax, int eMax) {",
-				((config.hasStandardSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, null, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# create#gcCamelName#InMem(int vMax, int eMax) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, null, vMax, eMax);",
 				"}",
 				"",
 				"/**",
@@ -270,64 +269,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"public void save#gcCamelName#(String filename, #gcName# #gcCamelName#, ProgressFunction pf) throws GraphIOException {",
 				"\tGraphIO.saveGraphToFile(filename, #gcCamelName#, pf);",
 				"}",
-				"",
-				// ---- file handling methods with savemem support ----
-				// TODO Currently redirect to STD methods. Extension needed?
-				"/**",
-				" * Loads a #gcName# graph with savemem support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithSavememSupport(String filename) throws GraphIOException {",
-				((config.hasSavememSupport()) ? "\treturn load#gcCamelName#WithSavememSupport(filename, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Loads a #gcName# graph with savemem support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @param pf a progress function to monitor graph loading",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithSavememSupport(String filename, ProgressFunction pf) throws GraphIOException {",
-				((config.hasSavememSupport()) ? "\tGraph graph = GraphIO.loadGraphFromFileWithSavememSupport(filename, pf);\n"
-						+ "\tif (!(graph instanceof #gcName#)) {\n"
-						+ "\t\tthrow new GraphIOException(\"Graph in file '\" + filename + \"' is not an instance of GraphClass #gcName#\");\n"
-						+ "\t}" + "\treturn (#gcName#) graph;"
-						: "\tthrow new UnsupportedOperationException(\"No Savemem support compiled.\");"),
-				"}",
-				// ---- file handling methods with transaction support ----
-				"/**",
-				" * Loads a #gcName# graph with transaction support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithTransactionSupport(String filename) throws GraphIOException {",
-				((config.hasTransactionSupport()) ? "\treturn load#gcCamelName#WithTransactionSupport(filename, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Loads a #gcName# graph with transaction support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @param pf a progress function to monitor graph loading",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithTransactionSupport(String filename, ProgressFunction pf) throws GraphIOException {",
-				((config.hasTransactionSupport()) ? "\tGraph graph = GraphIO.loadGraphFromFileWithTransactionSupport(filename, pf);\n"
-						+ "\tif (!(graph instanceof #gcName#)) {\n"
-						+ "\t\tthrow new GraphIOException(\"Graph in file '\" + filename + \"' is not an instance of GraphClass #gcName#\");\n"
-						+ "\t}" + "\treturn (#gcName#) graph;"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}");
+				""
+				);
 		code.setVariable("gcName", schema.getGraphClass().getQualifiedName());
 		code.setVariable("gcCamelName", camelCase(schema.getGraphClass()
 				.getQualifiedName()));

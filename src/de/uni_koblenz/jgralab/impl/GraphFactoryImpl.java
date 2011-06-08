@@ -35,6 +35,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
@@ -107,6 +108,12 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	 */
 	protected GraphFactoryImpl() {
 		this.createMapsForStandardSupport();
+	}
+	
+	public static String generateUniqueGraphId() {
+		long uidPart = System.currentTimeMillis();
+		Random r = new Random();
+		return uidPart + "-" + r.nextLong() + "-" + r.nextLong() + "-" + r.nextLong();
 	}
 
 	private void createMapsForStandardSupport() {
@@ -225,7 +232,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Graph createGraph(Class<? extends Graph> graphClass, String id,
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id,
 			int vMax, int eMax) {
 		try {
 			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
@@ -238,7 +245,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 
-	public Graph createGraph(Class<? extends Graph> graphClass, String id) {
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id) {
 		try {
 			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
 					1000, 1000);

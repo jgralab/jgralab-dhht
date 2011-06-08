@@ -762,14 +762,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		this.deleteVertexList = deleteVertexList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#setId(java.lang.String)
-	 */
-	protected void setUid(String uid) {
-		this.uid = uid;
-	}
 
 	/**
 	 * Changes the graph structure version, should be called whenever the
