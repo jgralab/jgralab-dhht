@@ -909,11 +909,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
 	}
 
-	@Override
-	public void setConnectedVertexId(int incidenceId, long vertexId) {
-		getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)] = vertexId;
-	}
-
 	// Iseq at edges
 
 	@Override
@@ -973,10 +968,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
 	}
 
-	@Override
-	public void setConnectedEdgeId(int incidenceId, long edgeId) {
-		getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)] = edgeId;
-	}
 
 	// hierarchy of vertices
 

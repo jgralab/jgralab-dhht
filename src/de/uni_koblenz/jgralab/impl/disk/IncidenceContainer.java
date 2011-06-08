@@ -12,7 +12,6 @@ public class IncidenceContainer extends StorageContainer {
 		previousIncidenceAtVertexId = new long[size];
 		nextIncidenceAtEdgeId = new long[size];
 		previousIncidenceAtEdgeId = new long[size];
-		direction = new boolean[size];
 		incidences = new Incidence[size];
 	}
 	
@@ -33,9 +32,7 @@ public class IncidenceContainer extends StorageContainer {
 	long[] nextIncidenceAtEdgeId;
 	
 	long[] previousIncidenceAtEdgeId;
-	
-	boolean[] direction;
-	
+		
 	transient Incidence[] incidences;
 
 

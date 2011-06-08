@@ -26,10 +26,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 	long[] nextIncidenceAtEdgeId;
 	
 	long[] previousIncidenceAtEdgeId;
-	
-	boolean[] direction;
-	
-	
+
 	
 	
 	public IncidenceContainerReference(IncidenceContainer container, ReferenceQueue queue) {
@@ -39,7 +36,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		types = container.types;
 		edgeId = container.edgeId;
 		vertexId = container.vertexId;
-		direction = container.direction;
 		nextIncidenceAtEdgeId = container.nextIncidenceAtEdgeId;
 		nextIncidenceAtVertexId = container.nextIncidenceAtVertexId;
 		previousIncidenceAtEdgeId = container.previousIncidenceAtEdgeId;
@@ -56,7 +52,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
    		container.edgeId = edgeId = new long[DiskStorageManager.CONTAINER_SIZE];
 		container.vertexId = vertexId = new long[DiskStorageManager.CONTAINER_SIZE];
-		container.direction = direction = new boolean[DiskStorageManager.CONTAINER_SIZE];
    		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new long[DiskStorageManager.CONTAINER_SIZE];
   		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new long[DiskStorageManager.CONTAINER_SIZE];
    		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = new long[DiskStorageManager.CONTAINER_SIZE];
@@ -73,7 +68,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		container.types = types = oldRef.types;
    		container.edgeId = edgeId = oldRef.edgeId;
 		container.vertexId = vertexId = oldRef.vertexId;
-		container.direction = direction = oldRef.direction;
   		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = oldRef.nextIncidenceAtEdgeId;
    		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = oldRef.nextIncidenceAtVertexId;
    		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId = oldRef.previousIncidenceAtEdgeId;
@@ -97,7 +91,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		container.types = types = oldRef.types;
    		container.edgeId = edgeId = oldRef.edgeId;
 		container.vertexId = vertexId = oldRef.vertexId;
-		container.direction = direction = oldRef.direction;
   		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = oldRef.nextIncidenceAtEdgeId;
    		container.nextIncidenceAtVertexId = nextIncidenceAtVertexId = oldRef.nextIncidenceAtVertexId;
    		container.previousIncidenceAtEdgeId = previousIncidenceAtEdgeId = oldRef.previousIncidenceAtEdgeId;
@@ -116,9 +109,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		lb.get(previousIncidenceAtVertexId);
 		IntBuffer ib = bb.asIntBuffer();
 		ib.get(types);
-		for (int i = 0; i<DiskStorageManager.CONTAINER_SIZE; i++) {
-			direction[i] = ib.get() == 1;
-		}
 		lb.clear();
 	}	
 	
@@ -139,9 +129,6 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		lb.put(previousIncidenceAtVertexId);
 		IntBuffer ib =bb.asIntBuffer();
 		ib.put(types);
-		for (int i = 0; i<DiskStorageManager.CONTAINER_SIZE; i++) {
-			ib.put(direction[i] ? 1 : 2);
-		}
 	}
 	
 	void nullify() {

@@ -307,9 +307,9 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public <T extends Incidence> T  reloadLocalIncidence(Class<? extends T> incidenceClass, int id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
+	public <T extends Incidence> T   reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
 		try {
-			Incidence i = incidenceMapForDiskStorageReloading.get(
+			T i = (T)incidenceMapForDiskStorageReloading.get(
 					incidenceClass).newInstance(id, container);
 			return i;
 		} catch (Exception ex) {
@@ -360,11 +360,10 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Vertex reloadVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g, VertexContainer container) {
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl graphDatabase, VertexContainer container) {
 		try {
 			Vertex v = vertexMapForDiskStorageReloading.get(vertexClass)
-					.newInstance(id, container, g);
+					.newInstance(id, graphDatabase, container);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -673,17 +672,16 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
-			Vertex vertex)  {
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInVertex(GraphDatabaseBaseImpl graphDatabase, long vertexId)  {
 		try {
+			Vertex vertex = graphDatabase.getVertexObject(vertexId);
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
+			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForVertexMapForDiskBasedImpl
 					.get(graphClass).newInstance(vertex);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
-					"Cannot create subordinate graph for elem of class "
-							+ vertex.getType().getQualifiedName(), ex);
+					"Cannot create subordinate graph for vertex " + vertexId, ex);
 		}
 	}
 
@@ -703,17 +701,16 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorage(
-			Edge vertex)  {
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInEdge(GraphDatabaseBaseImpl graphDatabase, long edgeId)  {
 		try {
-			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
-					.get(graphClass).newInstance(vertex);
+			Edge edge =graphDatabase.getEdgeObject(edgeId);
+			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();
+			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMapForDiskBasedImpl
+					.get(graphClass).newInstance(edge);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
-					"Cannot create subordinate graph for elem of class "
-							+ vertex.getType().getQualifiedName(), ex);
+					"Cannot create subordinate graph for edge " + edgeId, ex);
 		}
 	}
 

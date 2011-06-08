@@ -67,12 +67,8 @@ public abstract class IncidenceProxyImpl implements Incidence {
 		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
 	}
 
-	void setIncidentVertex(VertexImpl incidentVertex) {
-		((GraphDatabaseBaseImpl) storingGraphDatabase).setIncidentVertexId(id,
-				incidentVertex.getId());
-	}
-
-	void setNextIncidenceAtVertex(IncidenceProxyImpl nextIncidenceAtVertex) {
+	
+	void setNextIncidenceAtVertex(Incidence nextIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setNextIncidenceIdAtVertexId(id, nextIncidenceAtVertex.getId());
 	}
@@ -82,11 +78,6 @@ public abstract class IncidenceProxyImpl implements Incidence {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setPreviousIncidenceIdAtVertexId(id,
 						previousIncidenceAtVertex.getId());
-	}
-
-	void setIncidentEdge(EdgeImpl incidentEdge) {
-		((GraphDatabaseBaseImpl) storingGraphDatabase).setIncidentEdgeId(id,
-				incidentEdge.getId());
 	}
 
 	void setNextIncidenceAtEdge(IncidenceProxyImpl nextIncidenceAtEdge) {
@@ -868,6 +859,7 @@ public abstract class IncidenceProxyImpl implements Incidence {
 		}
 	}
 
+
 	public Incidence getThatIncidence() {
 		if (getEdge().isBinary()) {
 			return getEdge().getFirstIncidence() == this ? getEdge()
@@ -878,8 +870,12 @@ public abstract class IncidenceProxyImpl implements Incidence {
 		}
 	}
 
-	public void setId(int iId) {
-		this.id = iId;
+
+	@Override
+	public Graph getCompleteGraph() {
+		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
 	}
+
+
 
 }

@@ -66,21 +66,17 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 	
 	protected IncidenceImpl(GraphDatabaseBaseImpl localGraphDatabase, long globalId, long vertexId, long edgeId) {
-		ghjk TODO
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = localGraphDatabase;
-		this.container = container;
+		this.container = localGraphDatabase.getLocalDiskStorage().getIncidenceContainer(GraphDatabaseBaseImpl.convertToLocalId(globalId));
+		container.vertexId[getIdInStorage(id)] = vertexId;
+		container.edgeId[getIdInStorage(id)] = edgeId;
 		this.id = globalId;
 	}
 	
 	
 	protected final int getIdInStorage(long elementId) {
 		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
-	}
-
-
-	void setIncidentVertex(VertexImpl incidentVertex) {
-		container.vertexId[getIdInStorage(id)] = incidentVertex.getId();
 	}
 
 	void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
@@ -91,9 +87,6 @@ public abstract class IncidenceImpl implements Incidence {
 		container.previousIncidenceAtVertexId[getIdInStorage(id)] = previousIncidenceAtVertex.getId();
 	}
 
-	void setIncidentEdge(EdgeImpl edgeImpl) {
-		container.edgeId[getIdInStorage(id)] = edgeImpl.getId();
-	}
 
 	void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
 		container.nextIncidenceAtEdgeId[getIdInStorage(id)] = nextIncidenceAtEdge.getId();
@@ -103,16 +96,6 @@ public abstract class IncidenceImpl implements Incidence {
 		container.previousIncidenceAtEdgeId[getIdInStorage(id)] = previousIncidenceAtEdge.getId();
 	}
 
-	void setDirection(Direction direction) {
-		assert direction != null;
-		assert direction != Direction.BOTH;
-		container.direction[getIdInStorage(id)] = (direction == Direction.EDGE_TO_VERTEX);
-	}
-
-	@Override
-	public Direction getDirection() {
-		return container.direction[getIdInStorage(id)] ? Direction.EDGE_TO_VERTEX : Direction.VERTEX_TO_EDGE;
-	}
 
 	@Override
 	public Graph getGraph() {

@@ -99,8 +99,6 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	public void setNextIncidenceIdAtVertexId(long incId, long prevId);
 		
 	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId);
-	
-	public void setIncidentVertexId(long incId, long vertexId);
 
 	public void incidenceListOfVertexModified(long edgeId);
 	
@@ -112,8 +110,6 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	public void setNextIncidenceIdAtEdgeId(long incId, long nextId);
 		
 	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId);
-	
-	public void setIncidentEdgeId(long incId, long edgeId);
 	
 	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId);
 

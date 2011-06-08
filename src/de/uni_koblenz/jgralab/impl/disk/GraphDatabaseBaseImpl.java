@@ -932,11 +932,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
 				.createIncidenceDiskBasedStorage(m1Class, incId, vertexId, edgeId, this);
 
-		// set incident edge and vertex ids of incidence
-		setIncidentEdgeId(incId, edgeId);
-		setIncidentVertexId(incId, vertexId);
-		// setDirection(incId, dir);
-
 		// append created incidence to lambda sequences of vertex and edge
 
 		// add this incidence to the sequence of incidences of v
@@ -1164,7 +1159,6 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId) {
 		assert incidenceId != 0;
-		setIncidentEdgeId(incidenceId, edgeId);
 		setNextIncidenceIdAtEdgeId(incidenceId, 0);
 		if (getFirstIncidenceIdAtEdgeId(edgeId) == 0) {
 			setFirstIncidenceIdAtEdgeId(edgeId, incidenceId);
@@ -1181,7 +1175,6 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public void appendIncidenceToLambdaSeqOfVertex(long vertexId, long incidenceId) {
 		assert incidenceId != 0;
-		setIncidentVertexId(incidenceId, vertexId);
 		setNextIncidenceIdAtVertexId(incidenceId, 0);
 		if (getFirstIncidenceIdAtVertexId(vertexId) == 0) {
 			setFirstIncidenceIdAtVertexId(vertexId, incidenceId);
@@ -1218,7 +1211,6 @@ public abstract class GraphDatabaseBaseImpl extends
 			}
 		}
 		// delete incidence
-		setIncidentEdgeId(incidenceId, 0);
 		setNextIncidenceIdAtEdgeId(incidenceId, 0);
 		setPreviousIncidenceIdAtEdgeId(incidenceId, 0);
 		incidenceListOfVertexModified(edgeId);
@@ -1246,7 +1238,6 @@ public abstract class GraphDatabaseBaseImpl extends
 			}
 		}
 		// delete incidence
-		setIncidentVertexId(incidenceId, 0);
 		setNextIncidenceIdAtVertexId(incidenceId, 0);
 		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
 		incidenceListOfVertexModified(vertexId);
