@@ -30,6 +30,17 @@ public interface JGraLabServer extends RemoteJGraLabServer {
 	public void registerFileForUid(String uniqueGraphId, String fileName);
 
 
+	/**
+	 * 
+	 * @return the hostname of this server which has been set before by setHostname(...)
+	 */
+	public String getHostname();
+
+	/**
+	 * Sets the hostname on which this server listens to <code>host</code>
+	 */
+	public void setHostname(String host);
+	
 
 	
 }

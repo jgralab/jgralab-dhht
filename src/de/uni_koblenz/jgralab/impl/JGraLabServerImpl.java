@@ -29,6 +29,8 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	private static final String JGRALAB_SERVER_IDENTIFIER = "JGraLabServer";
 
 	private static JGraLabServerImpl localInstance = null;
+	
+	private String localHostname = "127.0.0.1";
 
 	private final Map<String, GraphDatabaseBaseImpl> localGraphDatabases = new HashMap<String, GraphDatabaseBaseImpl>();
 
@@ -109,6 +111,16 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	 */
 	public GraphDatabaseBaseImpl getLocalGraphDatabase(String uid) {
 		return localGraphDatabases.get(uid);
+	}
+
+	@Override
+	public String getHostname() {
+		return localHostname;
+	}
+
+	@Override
+	public void setHostname(String host) {
+		this.localHostname = host;
 	}
 
 }

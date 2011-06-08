@@ -66,7 +66,10 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
+import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -202,7 +205,7 @@ public class GraphIO {
 
 	private int bufferSize;
 
-	private ArrayList<String[]> partialGraphs;
+	private Map<Integer, String> partialGraphs;
 
 	/**
 	 * Stores the information about incidences at the edge<br>
@@ -798,7 +801,7 @@ public class GraphIO {
 		}
 
 		space();
-		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " "
+		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " " + graph.getPartialGraphId() + " " +
 				+ graph.getGraphVersion());
 		writeIdentifier(graph.getType().getQualifiedName());
 		long vCount = graph.getVCount();
@@ -2868,7 +2871,8 @@ public class GraphIO {
 			throws GraphIOException, RemoteException {
 		currentPackageName = "";
 		match("Graph");
-		String graphId = matchUtfString();
+		String uniqueGraphId = matchUtfString();
+		int partialGraphId = matchInteger();
 		long graphVersion = matchLong();
 
 		gcName = matchAndNext();
@@ -2909,7 +2913,7 @@ public class GraphIO {
 		Graph graph = null;
 		try {
 			graph = (Graph) schema.getGraphCreateMethod(implementationType)
-					.invoke(null, new Object[] { graphId, maxV, maxE });
+					.invoke(null, new Object[] { uniqueGraphId, maxV, maxE });
 		} catch (Exception e) {
 			throw new GraphIOException("can't create graph for class '"
 					+ gcName + "'", e);
@@ -2922,17 +2926,18 @@ public class GraphIO {
 			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
 					.setLoading(true);
 			server = JGraLabServerImpl.getLocalInstance();
+			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
 			// TODO how to handle complete graphs
 			if (graph.getPartialGraphId() == 1) {
-				// TODO create CompleteGraphDataBase
+				gd = new CompleteGraphDatabase(schema, uniqueGraphId, getLocalHostname());
 			} else {
-				// TODO create PartialGraphDataBase
+				gd = new PartialGraphDatabase(schema, uniqueGraphId, partialGraphs.get(GraphDatabaseBaseImpl.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)), partialGraphId);
 			}
 			server.registerLocalGraphDatabase(gd);
 		}
 
-		readPartialGraphs(graph);
+
 		graph.readAttributeValues(this);
 		match(";");
 
@@ -2971,7 +2976,7 @@ public class GraphIO {
 		}
 
 		if (implementationType == ImplementationType.DISK && !onlyLocalGraph) {
-			createPartialGraphs();
+			createPartialGraphs(uniqueGraphId);
 		}
 		createIncidences(graph, onlyLocalGraph, implementationType);
 		if (onlyLocalGraph) {
@@ -2998,6 +3003,11 @@ public class GraphIO {
 					.setLoading(false);
 		}
 		return graph;
+	}
+
+	private String getLocalHostname() {
+		// TODO Auto-generated method stub
+		return JGraLabServerImpl.getLocalInstance().getHostname();
 	}
 
 	private void deleteIncompleteBinaryEdges(Graph graph) {
@@ -3052,18 +3062,18 @@ public class GraphIO {
 		}
 	}
 
-	private void createPartialGraphs() throws GraphIOException, RemoteException {
-		for (String[] pGraph : partialGraphs) {
+	private void createPartialGraphs(String uniqueGraphId) throws GraphIOException, RemoteException {
+		for (Entry<Integer, String> pGraph : partialGraphs.entrySet()) {
 			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
-					.getRemoteInstance(pGraph[1]);
-			remoteServer.getGraphDatabase(pGraph[0]);
+					.getRemoteInstance(pGraph.getValue());
+			remoteServer.getGraphDatabase(uniqueGraphId);
 			// TODO how to handle complete graphs
 		}
 	}
 
 	private void readPartialGraphs(Graph graph) throws GraphIOException,
 			RemoteException {
-		partialGraphs = new ArrayList<String[]>();
+		partialGraphs = new  HashMap<Integer, String>();
 		match("{");
 		while (!lookAhead.equals("}")) {
 			int partialGraphId = matchInteger();
@@ -3073,8 +3083,7 @@ public class GraphIO {
 			match();
 			isURL = false;
 
-			partialGraphs.add(new String[] { Integer.toString(partialGraphId),
-					urlValue });
+			partialGraphs.put(partialGraphId, urlValue);
 
 			if (lookAhead.equals(",")) {
 				match(",");
