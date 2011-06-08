@@ -801,8 +801,8 @@ public class GraphIO {
 		}
 
 		space();
-		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " " + graph.getPartialGraphId() + " " +
-				+ graph.getGraphVersion());
+		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " "
+				+ graph.getPartialGraphId() + " " + +graph.getGraphVersion());
 		writeIdentifier(graph.getType().getQualifiedName());
 		long vCount = graph.getVCount();
 		long eCount = graph.getECount();
@@ -2928,15 +2928,19 @@ public class GraphIO {
 			server = JGraLabServerImpl.getLocalInstance();
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-			// TODO how to handle complete graphs
 			if (graph.getPartialGraphId() == 1) {
-				gd = new CompleteGraphDatabase(schema, uniqueGraphId, getLocalHostname());
+				gd = new CompleteGraphDatabase(schema, uniqueGraphId,
+						getLocalHostname());
 			} else {
-				gd = new PartialGraphDatabase(schema, uniqueGraphId, partialGraphs.get(GraphDatabaseBaseImpl.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)), partialGraphId);
+				gd = new PartialGraphDatabase(
+						schema,
+						uniqueGraphId,
+						partialGraphs.get(GraphDatabaseBaseImpl
+								.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)),
+						partialGraphId);
 			}
 			server.registerLocalGraphDatabase(gd);
 		}
-
 
 		graph.readAttributeValues(this);
 		match(";");
@@ -3006,7 +3010,6 @@ public class GraphIO {
 	}
 
 	private String getLocalHostname() {
-		// TODO Auto-generated method stub
 		return JGraLabServerImpl.getLocalInstance().getHostname();
 	}
 
@@ -3055,25 +3058,24 @@ public class GraphIO {
 							.setSigma((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) parent);
 				} else {
 					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) sigma
-							.getKey())
-							.setSigma((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) parent);
+							.getKey()).setSigma(parent);
 				}
 			}
 		}
 	}
 
-	private void createPartialGraphs(String uniqueGraphId) throws GraphIOException, RemoteException {
+	private void createPartialGraphs(String uniqueGraphId)
+			throws GraphIOException, RemoteException {
 		for (Entry<Integer, String> pGraph : partialGraphs.entrySet()) {
 			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
 					.getRemoteInstance(pGraph.getValue());
 			remoteServer.getGraphDatabase(uniqueGraphId);
-			// TODO how to handle complete graphs
 		}
 	}
 
 	private void readPartialGraphs(Graph graph) throws GraphIOException,
 			RemoteException {
-		partialGraphs = new  HashMap<Integer, String>();
+		partialGraphs = new HashMap<Integer, String>();
 		match("{");
 		while (!lookAhead.equals("}")) {
 			int partialGraphId = matchInteger();
