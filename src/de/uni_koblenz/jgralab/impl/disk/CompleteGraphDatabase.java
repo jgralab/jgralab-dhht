@@ -3,18 +3,16 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
- 
+
 	/*
 	 * Stores the hostnames of the partial graphs
 	 */
@@ -22,8 +20,9 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final List<Integer> freePartialGraphIds;
 
-	public CompleteGraphDatabase(Schema schema, String uniqueGraphId, String hostname) {
-		super(schema, uniqueGraphId, 0, 1); 
+	public CompleteGraphDatabase(Schema schema, String uniqueGraphId,
+			String hostname) {
+		super(schema, uniqueGraphId, 0, 1);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		hostnames[0] = hostname;
 		freePartialGraphIds = new LinkedList<Integer>();
@@ -46,7 +45,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		}
 	}
 
-
 	public void releasePartialGraphId(int partialGraphId) {
 		freePartialGraphIds.add(partialGraphId);
 	}
@@ -67,15 +65,16 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 					+ id + " registered");
 		}
 	}
-	
 
-	
 	@Override
 	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
 		int partialGraphId = getFreePartialGraphId();
-		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
-		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p); 
+		RemoteJGraLabServer remoteServer = localJGraLabServer
+				.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer
+				.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId,
+				(RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
 	}
 
@@ -100,19 +99,21 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	public void graphModified() {
 		graphVersion++;
 	}
-	
+
 	@Override
 	public void incidenceListOfVertexModified(long elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.increaseIncidenceListVersionOfVertexId(convertToLocalId(elementId));
+		diskStore
+				.increaseIncidenceListVersionOfVertexId(convertToLocalId(elementId));
 	}
-	
+
 	@Override
 	public void incidenceListOfEdgeModified(long elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.increaseIncidenceListVersionOfEdgeId(convertToLocalId(elementId));
+		diskStore
+				.increaseIncidenceListVersionOfEdgeId(convertToLocalId(elementId));
 	}
 
 	/* **************************************************************************
@@ -138,8 +139,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 			return stack.peek();
 		}
 	}
-
-
 
 	@Override
 	public void releaseTraversalContext() {
@@ -179,7 +178,6 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		graphVersion++;
 	}
 
-
 	@Override
 	public int getGraphTypeId(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
@@ -187,20 +185,16 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
 		}
 		return getGraphData(convertToLocalId(subgraphId)).typeId;
- 	}
+	}
 
-	
-
-	
-	
-	
 	@Override
 	public long getFirstIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
+		return diskStore
+				.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
 	}
-	
+
 	@Override
 	public long getFirstIncidenceIdAtEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
@@ -212,33 +206,20 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	public long getLastIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getLastIncidenceIdAtVertexId(convertToLocalId(vertexId));
+		return diskStore
+				.getLastIncidenceIdAtVertexId(convertToLocalId(vertexId));
 	}
-	
+
 	@Override
 	public long getLastIncidenceIdAtEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getLastIncidenceIdAtEdgeId(convertToLocalId(edgeId));
 	}
-	
 
-	
 	@Override
 	public void setGraphVersion(long graphVersion) {
 		this.graphVersion = graphVersion;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

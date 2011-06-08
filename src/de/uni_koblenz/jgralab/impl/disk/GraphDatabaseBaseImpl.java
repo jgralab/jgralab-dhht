@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
@@ -53,7 +52,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		data.edgeCount = 0;
 		return data.globalSubgraphId;
 	}
-	
+
 	public long createSubordinateGraphInEdge(long containingEdged) {
 		// get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
@@ -61,7 +60,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		GraphData data = new GraphData();
 		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
 		localSubgraphData.add(data);
-		data.containingElementId = - containingEdged;
+		data.containingElementId = -containingEdged;
 
 		// Graph subordinateGraph =
 		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
@@ -97,7 +96,6 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * @param partialGraphId
 	 */
 	public abstract void deletePartialGraph(int partialGraphId);
-
 
 	public abstract void edgeListModified();
 
@@ -522,12 +520,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	protected FreeIndexList getFreeEdgeList() {
 		return freeEdgeList;
 	}
-	
+
 	@Override
 	public long getMaxECount() {
 		return Integer.MAX_VALUE;
 	}
-
 
 	/**
 	 * Use to allocate a <code>Edge</code>-index.
@@ -845,49 +842,51 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.incidenceListOfVertexModified(vertexId);
 		} else {
-			getGraphDatabase(partialGraphId).incidenceListOfVertexModified(vertexId);
+			getGraphDatabase(partialGraphId).incidenceListOfVertexModified(
+					vertexId);
 		}
 	}
 
-
-	
 	@Override
 	public void increaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
-		if (partialGraphId != localPartialGraphId)
+		if (partialGraphId != localPartialGraphId) {
 			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
-		else
+		} else {
 			getGraphData(convertToLocalId(subgraphId)).vertexCount++;
+		}
 	}
 
 	@Override
 	public void decreaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
-		if (partialGraphId != localPartialGraphId)
+		if (partialGraphId != localPartialGraphId) {
 			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
-		else
+		} else {
 			getGraphData(convertToLocalId(subgraphId)).vertexCount--;
+		}
 	}
-	
+
 	@Override
 	public void increaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
-		if (partialGraphId != localPartialGraphId)
+		if (partialGraphId != localPartialGraphId) {
 			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
-		else
+		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount++;
+		}
 	}
 
 	@Override
 	public void decreaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
-		if (partialGraphId != localPartialGraphId)
+		if (partialGraphId != localPartialGraphId) {
 			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
-		else
+		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount--;
+		}
 	}
 
-	
 	/**
 	 * Connects the specified vertex <code>v</code> to the speficied edge
 	 * <code>e</code> by an incidence of class <code>cls</code> and sets the
@@ -902,7 +901,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		return connect(incidenceClassId, vertexId, edgeId, 0);
 	}
 
-
 	/**
 	 * Connects the specified vertex <code>v</code> to the speficied edge
 	 * <code>e</code> by an incidence of class <code>cls</code> and sets the
@@ -914,10 +912,12 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * @param id
 	 */
 	@Override
-	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) {
-		IncidenceClass incClass = (IncidenceClass) schema.getTypeForId(incidenceClassId);
+	public long connect(int incidenceClassId, long vertexId, long edgeId,
+			long incId) {
+		IncidenceClass incClass = (IncidenceClass) schema
+				.getTypeForId(incidenceClassId);
 		Class<? extends Incidence> m1Class = incClass.getM1Class();
-		//Direction dir = incClass.getDirection();
+		// Direction dir = incClass.getDirection();
 
 		// check id
 		if (incId != 0) {
@@ -930,7 +930,8 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		// call graph factory to create object
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
-				.createIncidenceDiskBasedStorage(m1Class, incId, vertexId, edgeId, this);
+				.createIncidenceDiskBasedStorage(m1Class, incId, vertexId,
+						edgeId, this);
 
 		// append created incidence to lambda sequences of vertex and edge
 
@@ -967,28 +968,29 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		return incId;
 	}
-	
+
 	@Override
 	public void deleteIncidence(long id) {
 		removeIncidenceFromLambdaSeqOfEdge(id);
 		removeIncidenceFromLambdaSeqOfVertex(id);
 	}
 
-	
 	@Override
 	public long getIncidenceListVersionOfVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getIncidenceListVersionOfEdgeId(convertToLocalId(vertexId));
+		return diskStore
+				.getIncidenceListVersionOfEdgeId(convertToLocalId(vertexId));
 	}
 
 	@Override
 	public long getIncidenceListVersionOfEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
+		return diskStore
+				.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
 	}
-	
+
 	@Override
 	public long getEdgeIdAtIncidenceId(long id) {
 		int partialGraphId = getPartialGraphId(id);
@@ -1002,8 +1004,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		return diskStore.getConnectedVertexId(convertToLocalId(id));
 	}
-
-
 
 	@Override
 	public void putIncidenceIdAfterAtVertexId(long targetId, long movedId) {
@@ -1171,9 +1171,10 @@ public abstract class GraphDatabaseBaseImpl extends
 		setLastIncidenceIdAtEdgeId(edgeId, incidenceId);
 		incidenceListOfEdgeModified(edgeId);
 	}
-	
+
 	@Override
-	public void appendIncidenceToLambdaSeqOfVertex(long vertexId, long incidenceId) {
+	public void appendIncidenceToLambdaSeqOfVertex(long vertexId,
+			long incidenceId) {
 		assert incidenceId != 0;
 		setNextIncidenceIdAtVertexId(incidenceId, 0);
 		if (getFirstIncidenceIdAtVertexId(vertexId) == 0) {
@@ -1187,7 +1188,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		setLastIncidenceIdAtVertexId(vertexId, incidenceId);
 		incidenceListOfVertexModified(vertexId);
 	}
-
 
 	public void removeIncidenceFromLambdaSeqOfEdge(long incidenceId) {
 		long edgeId = getConnectedEdgeId(incidenceId);
@@ -1242,9 +1242,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
 		incidenceListOfVertexModified(vertexId);
 	}
-	
-
-
 
 	@Override
 	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId) {
@@ -1326,17 +1323,15 @@ public abstract class GraphDatabaseBaseImpl extends
 		incidenceListOfEdgeModified(edgeId);
 	}
 
-	
 	@Override
 	public long getContainingElementId(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getContainingElementId(subgraphId);
+			return getGraphDatabase(partialGraphId).getContainingElementId(
+					subgraphId);
 		}
 		return getGraphData(convertToLocalId(subgraphId)).containingElementId;
 	}
-
-
 
 	@Override
 	public void setVCount(long subgraphId, long count) {
@@ -1364,7 +1359,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		getGraphData(convertToLocalId(subgraphId)).edgeCount = count;
 	}
-
 
 	@Override
 	public long getICount(long subgraphId) {
