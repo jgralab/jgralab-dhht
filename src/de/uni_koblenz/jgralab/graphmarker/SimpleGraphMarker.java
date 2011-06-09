@@ -53,9 +53,9 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class GraphMarker<O> extends MapGraphMarker<AttributedElement<?, ?>, O> {
+public class SimpleGraphMarker<O> extends MapGraphMarker<AttributedElement<?, ?>, O> {
 
-	public GraphMarker(Graph g) throws RemoteException {
+	public SimpleGraphMarker(Graph g) throws RemoteException {
 		super(g);
 	}
 

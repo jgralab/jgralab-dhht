@@ -39,7 +39,7 @@ import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRemove;
 import de.uni_koblenz.jgralab.Vertex;
 
 public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> extends
-		GraphStructureChangedAdapterWithAutoRemove {
+		GraphStructureChangedAdapterWithAutoRemove implements GraphMarker<T> {
 	protected final Graph graph;
 
 	protected AbstractGraphMarker(Graph graph) {
@@ -48,49 +48,48 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 		graph.addGraphStructureChangedListener(this);
 	}
 
-	/**
-	 * Checks if the given <code>graphElement</code> is marked.
-	 * 
-	 * @param graphElement
-	 *            the graph element to check.
-	 * @return true if the given <code>graphElement</code> is marked.
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#isMarked(T)
 	 */
+	@Override
 	public abstract boolean isMarked(T graphElement);
 
-	/**
-	 * Unmarks the given <code>graphElement</code>.
-	 * 
-	 * @param graphElement
-	 *            the graph element to unmark.
-	 * @return false if the given <code>graphElement</code> has already been
-	 *         unmarked.
-	 * @throws RemoteException 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#removeMark(T)
 	 */
+	@Override
 	public abstract boolean removeMark(T graphElement);
 
-	/**
-	 * Returns the number of marked graph elements.
-	 * 
-	 * @return the number of marked graph elements.
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#size()
 	 */
+	@Override
 	public abstract int size();
 
-	/**
-	 * Checks if this graph marker is empty.
-	 * 
-	 * @return true if this graph marker is empty.
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#isEmpty()
 	 */
+	@Override
 	public abstract boolean isEmpty();
 
-	/**
-	 * Unmarks all marked graph elements.
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#clear()
 	 */
+	@Override
 	public abstract void clear();
 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#getGraph()
+	 */
+	@Override
 	public Graph getGraph() {
 		return graph;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#getMarkedElements()
+	 */
+	@Override
 	public abstract Iterable<T> getMarkedElements();
 
 	@Override

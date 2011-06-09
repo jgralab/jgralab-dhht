@@ -120,7 +120,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.SimpleGraphMarker;
 import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.grumlschema.GrumlSchema;
@@ -238,7 +238,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link VertexClass} and {@link EdgeClass} vertices with a set of
 	 * XMI Ids of superclasses.
 	 */
-	private GraphMarker<Set<String>> generalizations;
+	private SimpleGraphMarker<Set<String>> generalizations;
 
 	/**
 	 * Keeps track of 'uml:Realization's (key = client id, value = set of
@@ -251,13 +251,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link Attribute} vertices with the XMI Id of its type if the type
 	 * can not be resolved at the time the Attribute is processed.
 	 */
-	private GraphMarker<String> attributeType;
+	private SimpleGraphMarker<String> attributeType;
 
 	/**
 	 * Marks {@link HasRecordDomainComponent} edges with the XMI Id of its type
 	 * if the type can not be resolved at the time the component is processed.
 	 */
-	private GraphMarker<String> recordComponentType;
+	private SimpleGraphMarker<String> recordComponentType;
 
 	/**
 	 * Maps qualified names of domains to the corresponding {@link Domain}
@@ -313,7 +313,7 @@ public class Rsa2Tg extends XmlProcessor {
 	/**
 	 * marks incidence classes with the set of redefined rolenames
 	 */
-	private GraphMarker<Set<String>> redefines;
+	private SimpleGraphMarker<Set<String>> redefines;
 
 	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
@@ -602,16 +602,16 @@ public class Rsa2Tg extends XmlProcessor {
 		xmiIdStack = new Stack<String>();
 		idMap = new HashMap<String, Vertex>();
 		packageStack = new Stack<Package>();
-		generalizations = new GraphMarker<Set<String>>(sg);
+		generalizations = new SimpleGraphMarker<Set<String>>(sg);
 		realizations = new HashMap<String, Set<String>>();
-		attributeType = new GraphMarker<String>(sg);
-		recordComponentType = new GraphMarker<String>(sg);
+		attributeType = new SimpleGraphMarker<String>(sg);
+		recordComponentType = new SimpleGraphMarker<String>(sg);
 		domainMap = new HashMap<String, Domain>();
 		preliminaryVertices = new HashSet<Vertex>();
 		ownedEnds = new HashSet<IncidenceClass>();
 		constraints = new HashMap<String, List<String>>();
 		comments = new HashMap<String, List<String>>();
-		redefines = new GraphMarker<Set<String>>(sg);
+		redefines = new SimpleGraphMarker<Set<String>>(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}

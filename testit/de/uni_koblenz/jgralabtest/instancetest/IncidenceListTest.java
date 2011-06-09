@@ -56,7 +56,7 @@ import org.junit.runners.Parameterized.Parameters;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.SimpleGraphMarker;
 import de.uni_koblenz.jgralabtest.tools.RandomBufferGeneric;
 
 @RunWith(Parameterized.class)
@@ -478,7 +478,7 @@ public class IncidenceListTest extends InstanceTest {
 		Node isolated = g.createNode();
 		commit(g);
 
-		final GraphMarker<Integer> marker = new GraphMarker<Integer>(g);
+		final SimpleGraphMarker<Integer> marker = new SimpleGraphMarker<Integer>(g);
 		Comparator<Edge> comp = new Comparator<Edge>() {
 
 			@Override
@@ -611,13 +611,13 @@ public class IncidenceListTest extends InstanceTest {
 		}
 	}
 
-	private void markInOrder(List<Link> links, final GraphMarker<Integer> marker) {
+	private void markInOrder(List<Link> links, final SimpleGraphMarker<Integer> marker) {
 		for (int i = 0; i < links.size(); i++) {
 			marker.mark(links.get(i), i);
 		}
 	}
 
-	private void markInverse(List<Link> links, final GraphMarker<Integer> marker) {
+	private void markInverse(List<Link> links, final SimpleGraphMarker<Integer> marker) {
 		for (int i = 0; i < links.size(); i++) {
 			marker.mark(links.get(i), links.size() - i);
 		}
