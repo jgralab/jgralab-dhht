@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;

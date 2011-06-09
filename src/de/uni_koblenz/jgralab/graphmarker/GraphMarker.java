@@ -49,5 +49,7 @@ public interface GraphMarker<T extends AttributedElement<?, ?>> {
 	public abstract Graph getGraph();
 
 	public abstract Iterable<T> getMarkedElements();
+	
+	
 
 }

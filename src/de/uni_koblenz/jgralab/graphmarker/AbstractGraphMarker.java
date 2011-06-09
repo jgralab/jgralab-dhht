@@ -30,16 +30,14 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRemove;
-import de.uni_koblenz.jgralab.Vertex;
 
 public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> extends
 		GraphStructureChangedAdapterWithAutoRemove implements GraphMarker<T> {
+	
+	
 	protected final Graph graph;
 
 	protected AbstractGraphMarker(Graph graph) {
@@ -49,36 +47,6 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	}
 
 	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#isMarked(T)
-	 */
-	@Override
-	public abstract boolean isMarked(T graphElement);
-
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#removeMark(T)
-	 */
-	@Override
-	public abstract boolean removeMark(T graphElement);
-
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#size()
-	 */
-	@Override
-	public abstract long size();
-
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#isEmpty()
-	 */
-	@Override
-	public abstract boolean isEmpty();
-
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#clear()
-	 */
-	@Override
-	public abstract void clear();
-
-	/* (non-Javadoc)
 	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#getGraph()
 	 */
 	@Override
@@ -86,22 +54,5 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 		return graph;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#getMarkedElements()
-	 */
-	@Override
-	public abstract Iterable<T> getMarkedElements();
-
-	@Override
-	public abstract void edgeDeleted(Edge e);
-
-	@Override
-	public abstract void maxEdgeCountIncreased(int newValue);
-
-	@Override
-	public abstract void maxVertexCountIncreased(int newValue);
-
-	@Override
-	public abstract void vertexDeleted(Vertex v);
 
 }

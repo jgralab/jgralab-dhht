@@ -35,11 +35,6 @@ import java.util.regex.Pattern;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.CollectionDomain;
 import de.uni_koblenz.jgralab.schema.Domain;

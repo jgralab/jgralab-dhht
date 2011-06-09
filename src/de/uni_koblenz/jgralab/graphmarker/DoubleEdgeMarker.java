@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -39,7 +38,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
+public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 
 	public DoubleEdgeMarker(Graph graph) {
 		super(graph, (int) (graph.getMaxECount() + 1));

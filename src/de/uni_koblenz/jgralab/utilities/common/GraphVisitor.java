@@ -31,8 +31,6 @@
 
 package de.uni_koblenz.jgralab.utilities.common;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;

@@ -5,25 +5,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
-public class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> implements GraphMarker<T> {
+public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends AbstractGraphMarker<T> {
 
-	enum GraphMarkerImplementationType {
-		ARRAY,
-		BITSET;
-	}
+//	enum GraphMarkerImplementationType {
+//		ARRAY,
+//		BITSET;
+//	}
 	
 	private static final int DEFAULT_PARTIAL_GRAPH_COUNT = 1000;
 	
-	private GraphMarkerImplementationType implementationTypeForLocalMarkers;
+	//private GraphMarkerImplementationType implementationTypeForLocalMarkers;
 	
-	private Graph markedGraph;
-	
-	private SimpleGraphMarker<T>[] localGraphMarkers;
+	private GraphMarker<T>[] localGraphMarkers;
 	
 	/**
 	 * Creates a new global graph marker marking the given graph and using the 
@@ -31,17 +28,17 @@ public class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> implements Graph
 	 * @param globalGraph the global graph to be marked
 	 * @param implementationType the impelemtation type to be used for the local markers
 	 */
-	public GlobalGraphMarker(Graph globalGraph, GraphMarkerImplementationType implementationType) {
-		implementationTypeForLocalMarkers = implementationType;
-		this.markedGraph = globalGraph;
-		localGraphMarkers = new SimpleGraphMarker[DEFAULT_PARTIAL_GRAPH_COUNT];
+	public GlobalGraphMarker(Graph globalGraph) {
+		super(globalGraph);
+		//implementationTypeForLocalMarkers = implementationType;
+		localGraphMarkers = new GraphMarker[DEFAULT_PARTIAL_GRAPH_COUNT];
 	}
 
 	@Override
 	public boolean isMarked(T graphElement) {
 		long elementId = graphElement.getId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
-		SimpleGraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
+		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker == null)
 			return false;
 		else return localMarker.isMarked(graphElement);  		
@@ -51,7 +48,7 @@ public class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> implements Graph
 	public boolean removeMark(T graphElement) {
 		long elementId = graphElement.getId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
-		SimpleGraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
+		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker == null)
 			return false;
 		else return localMarker.removeMark(graphElement);
@@ -84,28 +81,45 @@ public class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> implements Graph
 		}
 	}
 
-	@Override
-	public Graph getGraph() {
-		return markedGraph;
-	}
 
 	@Override
 	public Iterable<T> getMarkedElements() {
-		// TODO Auto-generated method stub
-		return null;
+		return new GlobalGraphMarkerIterable();
 	}
 	
 	
-	private class GlobalGraphMarkerIterable<T extends GraphElement<?,?,?>> implements Iterable<T> {
+	protected GraphMarker<T> getOrCreateMarkerForPartialGraph(T graphElement) {
+		long elementId = graphElement.getId();
+		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
+		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
+		if (localMarker == null) {
+			localMarker = createMarkerForPartialGraph();
+			localGraphMarkers[partialGraphId] = localMarker;
+		}	
+		return localMarker;
+	}
+	
+	
+	protected abstract GraphMarker<T> createMarkerForPartialGraph();
+	
+	
+	public void mark(T graphElement, Object value) {
+		GraphMarker<T> localMarker = getOrCreateMarkerForPartialGraph(graphElement);
+		localMarker.mark(graphElement, value);		
+	}
+	
+	
+	private class GlobalGraphMarkerIterable implements Iterable<T> {
+
 
 		@Override
 		public Iterator<T> iterator() {
-			return new GlobalGraphMarkerIterator<T>(this);
+			return new GlobalGraphMarkerIterator();
 		}
 		
 	}
 	
-	private class GlobalGraphMarkerIterator<T extends GraphElement<?,?,?>> implements Iterator<T> {
+	private class GlobalGraphMarkerIterator implements Iterator<T> {
 
 		private GlobalGraphMarker<T> graphMarker;
 		
@@ -113,8 +127,8 @@ public class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> implements Graph
 				
 		private Iterator<T> currentIterator;
 		
-		public GlobalGraphMarkerIterator(
-				GlobalGraphMarkerIterable<T> globalGraphMarkerIterable) {
+		@SuppressWarnings("unchecked")
+		public GlobalGraphMarkerIterator() {
 			localIterators = new LinkedList<Iterator<T>>();
 			for (int i=0; i<graphMarker.localGraphMarkers.length; i++) {
 				if (graphMarker.localGraphMarkers[i] != null)

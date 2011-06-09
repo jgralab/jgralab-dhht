@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralabtest.instancetest;
 import static org.junit.Assert.fail;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class GraphDatabaseHandler {
