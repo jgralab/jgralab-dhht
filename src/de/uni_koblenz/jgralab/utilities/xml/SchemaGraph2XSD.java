@@ -108,7 +108,7 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.ist.utilities.xml.IndentingXMLStreamWriter;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;
@@ -259,7 +259,7 @@ public class SchemaGraph2XSD {
 	/**
 	 * Marks all included vertex-, edge- and domain-types.
 	 */
-	private BooleanGraphMarker includes;
+	private LocalBooleanGraphMarker includes;
 
 	/**
 	 * Stream output for debug information about include oder excludes types.

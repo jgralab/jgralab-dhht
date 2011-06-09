@@ -47,8 +47,8 @@ import org.junit.runners.Parameterized.Parameters;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSubGraphMarker;
 import de.uni_koblenz.jgralabtest.instancetest.InstanceTest;
 
 @RunWith(Parameterized.class)
@@ -66,8 +66,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 	private MinimalGraph g;
 	private Node[] nodes;
 	private Link[] links;
-	private BooleanGraphMarker oldMarker;
-	private SubGraphMarker newMarker;
+	private LocalBooleanGraphMarker oldMarker;
+	private LocalSubGraphMarker newMarker;
 
 	public SubGraphMarkerTest(ImplementationType implementationType) {
 		super(implementationType);
@@ -94,8 +94,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 		createTransaction(g);
 
 		Random rng = new Random(16L);
-		oldMarker = new BooleanGraphMarker(g);
-		newMarker = new SubGraphMarker(g);
+		oldMarker = new LocalBooleanGraphMarker(g);
+		newMarker = new LocalSubGraphMarker(g);
 		nodes = new Node[VERTEX_COUNT];
 		for (int i = 1; i <= VERTEX_COUNT; i++) {
 			nodes[i - 1] = g.createNode();

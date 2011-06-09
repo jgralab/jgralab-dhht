@@ -62,8 +62,8 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.SimpleGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSimpleGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -77,7 +77,7 @@ public class Tg2xml extends GraphVisitor {
 	private final String schemaLocation;
 	private final OutputStream outputStream;
 	private final IndentingXMLStreamWriter writer;
-	private final SimpleGraphMarker<IncidencePositionMark> incidencePositionMarker;
+	private final LocalSimpleGraphMarker<IncidencePositionMark> incidencePositionMarker;
 
 	private static class IncidencePositionMark {
 		public int fseq, tseq;
@@ -89,7 +89,7 @@ public class Tg2xml extends GraphVisitor {
 			String nameSpacePrefix, String schemaLocation) throws IOException,
 			XMLStreamException {
 		super(graph);
-		incidencePositionMarker = new SimpleGraphMarker<IncidencePositionMark>(graph);
+		incidencePositionMarker = new LocalSimpleGraphMarker<IncidencePositionMark>(graph);
 
 		Schema schema = graph.getSchema();
 		String qualifiedName = schema.getQualifiedName();
@@ -109,7 +109,7 @@ public class Tg2xml extends GraphVisitor {
 				outputStream, "UTF-8"));
 	}
 
-	public Tg2xml(BufferedOutputStream outputStream, BooleanGraphMarker marker,
+	public Tg2xml(BufferedOutputStream outputStream, LocalBooleanGraphMarker marker,
 			String nameSpacePrefix, String schemaLocation) throws IOException,
 			XMLStreamException {
 		this(outputStream, marker.getGraph(), nameSpacePrefix, schemaLocation);

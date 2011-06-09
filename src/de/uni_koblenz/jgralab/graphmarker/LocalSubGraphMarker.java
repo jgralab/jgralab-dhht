@@ -50,18 +50,18 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
+public class LocalSubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 
 	// TODO maybe replace with BitSets
 
-	private final BitSetEdgeMarker edgeGraphMarker;
-	private final BitSetVertexMarker vertexGraphMarker;
+	private final LocalBitSetEdgeMarker edgeGraphMarker;
+	private final LocalBitSetVertexMarker vertexGraphMarker;
 	private long version;
 
-	public SubGraphMarker(Graph graph) throws RemoteException {
+	public LocalSubGraphMarker(Graph graph) throws RemoteException {
 		super(graph);
-		edgeGraphMarker = new BitSetEdgeMarker(graph);
-		vertexGraphMarker = new BitSetVertexMarker(graph);
+		edgeGraphMarker = new LocalBitSetEdgeMarker(graph);
+		vertexGraphMarker = new LocalBitSetVertexMarker(graph);
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 
 			@Override
 			public Iterator<GraphElement<?, ?, ?>> iterator() {
-				return new ArrayGraphMarkerIterator<GraphElement<?, ?, ?>>(
+				return new LocalArrayGraphMarkerIterator<GraphElement<?, ?, ?>>(
 						version) {
 
 					Iterator<Vertex> vertexIterator;
@@ -224,7 +224,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 
 					@Override
 					public GraphElement<?, ?, ?> next() {
-						if (version != SubGraphMarker.this.version) {
+						if (version != LocalSubGraphMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}

@@ -30,6 +30,7 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -38,68 +39,65 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class IntegerVertexMarker extends IntegerGraphMarker<Vertex> {
+public class LocalBitSetEdgeMarker extends LocalBitSetGraphMarker<Edge> {
 
-	public IntegerVertexMarker(Graph graph) {
-		super(graph, (int) (graph.getMaxVCount() + 1));
+	public LocalBitSetEdgeMarker(Graph graph) throws RemoteException {
+		super(graph);
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) {
+	public void edgeDeleted(Edge e)  {
+		removeMark(e);
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v)  {
 		// do nothing
 	}
 
 	@Override
-	public void maxEdgeCountIncreased(int newValue) {
-		// do nothing
+	public boolean mark(Edge edge)  {
+		return super.mark(edge);
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) {
-		newValue++;
-		if (newValue > temporaryAttributes.length) {
-			expand(newValue);
-		}
+	public boolean isMarked(Edge edge)  {
+		return super.isMarked(edge);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
-		removeMark(v);
-	}
-
-	@Override
-	public Iterable<Vertex> getMarkedElements() {
-		return new Iterable<Vertex>() {
+	public Iterable<Edge> getMarkedElements() {
+		return new Iterable<Edge>() {
 
 			@Override
-			public Iterator<Vertex> iterator() {
-				return new ArrayGraphMarkerIterator<Vertex>(version) {
+			public Iterator<Edge> iterator() {
+				return new LocalArrayGraphMarkerIterator<Edge>(version) {
 
 					@Override
 					public boolean hasNext() {
-						return index < temporaryAttributes.length;
+						return index < marks.size();
 					}
 
 					@Override
 					protected void moveIndex() {
-						int length = temporaryAttributes.length;
-						while (index < length
-								&& temporaryAttributes[index] == unmarkedValue) {
+						int length = marks.size();
+						while (index < length && !marks.get(index)) {
 							index++;
 						}
 					}
 
 					@Override
-					public Vertex next() {
+					public Edge next() {
 						if (!hasNext()) {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != IntegerVertexMarker.this.version) {
+						if (version != LocalBitSetEdgeMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Vertex next = graph.getVertex(index++);
+						
+						Edge next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

@@ -51,7 +51,7 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 
 public class GreqlServer extends Thread {
@@ -147,7 +147,7 @@ public class GreqlServer extends Thread {
 
 	private void saveAsDot(JValue val, String dotFileName) throws RemoteException {
 		Graph g = eval.getDatagraph();
-		BooleanGraphMarker marker = new BooleanGraphMarker(g);
+		LocalBooleanGraphMarker marker = new LocalBooleanGraphMarker(g);
 		markResultElements(val, marker);
 		for (Edge e : g.getEdges()) {
 			boolean incidencesMarked = true;
@@ -165,7 +165,7 @@ public class GreqlServer extends Thread {
 		//Tg2Dot.printGraphAsDot(marker, false, dotFileName);
 	}
 
-	private void markResultElements(JValue val, BooleanGraphMarker marker) throws RemoteException {
+	private void markResultElements(JValue val, LocalBooleanGraphMarker marker) throws RemoteException {
 		if (val.isCollection()) {
 			JValueCollection coll = val.toCollection();
 			for (JValue v : coll) {

@@ -64,7 +64,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
@@ -680,7 +680,7 @@ public class GraphIO {
 	 *             if an IOException occurs
 	 */
 	public static void saveGraphToFile(String filename,
-			BooleanGraphMarker subGraph, ProgressFunction pf)
+			LocalBooleanGraphMarker subGraph, ProgressFunction pf)
 			throws GraphIOException {
 		DataOutputStream out = null;
 		try {
@@ -749,7 +749,7 @@ public class GraphIO {
 	 *             if an IOException occurs
 	 */
 	public static void saveGraphToStream(DataOutputStream out,
-			BooleanGraphMarker subGraph, ProgressFunction pf,
+			LocalBooleanGraphMarker subGraph, ProgressFunction pf,
 			boolean onlyLocalGraph) throws GraphIOException {
 		try {
 			GraphIO io = new GraphIO();
@@ -762,7 +762,7 @@ public class GraphIO {
 	}
 
 	private void saveGraph(Graph graph, ProgressFunction pf,
-			BooleanGraphMarker subGraph, boolean onlyLocalGraph)
+			LocalBooleanGraphMarker subGraph, boolean onlyLocalGraph)
 			throws IOException, GraphIOException {
 		ImplementationType type = null;
 		if (graph instanceof GraphImpl) {

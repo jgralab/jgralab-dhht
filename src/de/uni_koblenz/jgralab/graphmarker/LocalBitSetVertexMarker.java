@@ -30,33 +30,70 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class ArrayGraphMarkerIterator<T extends GraphElement<?, ?, ?>>
-		implements Iterator<T> {
-	protected int index;
-	protected long version;
-	protected static String MODIFIED_ERROR_MESSAGE = "The graph marker was modified during current iteration.";
-	protected static String NO_MORE_ELEMENTS_ERROR_MESSAGE = "No more elements.";
+public class LocalBitSetVertexMarker extends LocalBitSetGraphMarker<Vertex> {
 
-	protected ArrayGraphMarkerIterator(long version) {
-		index = 0;
-		this.version = version;
-		moveIndex();
+	public LocalBitSetVertexMarker(Graph graph) {
+		super(graph);
 	}
 
-	protected abstract void moveIndex();
-
 	@Override
-	public abstract boolean hasNext();
-
-	@Override
-	public abstract T next();
-
-	@Override
-	public void remove() {
-		throw new UnsupportedOperationException("remove is not supported.");
+	public void vertexDeleted(Vertex v) {
+		removeMark(v);
 	}
+
+	@Override
+	public void edgeDeleted(Edge e) {
+		// do nothing
+	}
+
+	@Override
+	public Iterable<Vertex> getMarkedElements() {
+		return new Iterable<Vertex>() {
+
+			@Override
+			public Iterator<Vertex> iterator() {
+				return new LocalArrayGraphMarkerIterator<Vertex>(version) {
+
+					@Override
+					public boolean hasNext() {
+						return index < marks.size();
+					}
+
+					@Override
+					protected void moveIndex() {
+						int length = marks.size();
+						while (index < length && !marks.get(index)) {
+							index++;
+						}
+					}
+
+					@Override
+					public Vertex next() {
+						if (!hasNext()) {
+							throw new NoSuchElementException(
+									NO_MORE_ELEMENTS_ERROR_MESSAGE);
+						}
+						if (version != LocalBitSetVertexMarker.this.version) {
+							throw new ConcurrentModificationException(
+									MODIFIED_ERROR_MESSAGE);
+						}
+						Vertex next = graph.getVertex(index++);
+						moveIndex();
+						return next;
+					}
+				};
+
+			}
+
+		};
+	}
+
 }

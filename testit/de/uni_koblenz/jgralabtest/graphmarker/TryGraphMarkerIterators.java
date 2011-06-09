@@ -35,30 +35,30 @@ import java.util.Iterator;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.BitSetEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.BitSetVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.DoubleEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.DoubleVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBitSetEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBitSetVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalDoubleEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalDoubleVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalArrayEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalLongEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.LongVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalLongVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSubGraphMarker;
 
 public class TryGraphMarkerIterators {
-	private static ArrayVertexMarker<String> arrayVertexMarker;
+	private static LocalArrayVertexMarker<String> arrayVertexMarker;
 	private static LocalArrayEdgeMarker<String> arrayEdgeMarker;
-	private static IntegerVertexMarker integerVertexMarker;
-	private static IntegerEdgeMarker integerEdgeMarker;
-	private static DoubleVertexMarker doubleVertexMarker;
-	private static DoubleEdgeMarker doubleEdgeMarker;
-	private static LongVertexMarker longVertexMarker;
+	private static LocalIntegerVertexMarker integerVertexMarker;
+	private static LocalIntegerEdgeMarker integerEdgeMarker;
+	private static LocalDoubleVertexMarker doubleVertexMarker;
+	private static LocalDoubleEdgeMarker doubleEdgeMarker;
+	private static LocalLongVertexMarker longVertexMarker;
 	private static LocalLongEdgeMarker longEdgeMarker;
-	private static BitSetVertexMarker bitSetVertexMarker;
-	private static BitSetEdgeMarker bitSetEdgeMarker;
-	private static SubGraphMarker subGraphMarker;
+	private static LocalBitSetVertexMarker bitSetVertexMarker;
+	private static LocalBitSetEdgeMarker bitSetEdgeMarker;
+	private static LocalSubGraphMarker subGraphMarker;
 
 	public static void main(String[] args) {
 		MinimalGraph graph = MinimalSchema.instance().createMinimalGraph();
@@ -70,17 +70,17 @@ public class TryGraphMarkerIterators {
 		for (int i = 0; i < links.length; i++) {
 			links[i] = graph.createLink(nodes[i], nodes[10 - i - 1]);
 		}
-		arrayVertexMarker = new ArrayVertexMarker<String>(graph);
+		arrayVertexMarker = new LocalArrayVertexMarker<String>(graph);
 		arrayEdgeMarker = new LocalArrayEdgeMarker<String>(graph);
-		integerVertexMarker = new IntegerVertexMarker(graph);
-		integerEdgeMarker = new IntegerEdgeMarker(graph);
-		doubleVertexMarker = new DoubleVertexMarker(graph);
-		doubleEdgeMarker = new DoubleEdgeMarker(graph);
-		longVertexMarker = new LongVertexMarker(graph);
+		integerVertexMarker = new LocalIntegerVertexMarker(graph);
+		integerEdgeMarker = new LocalIntegerEdgeMarker(graph);
+		doubleVertexMarker = new LocalDoubleVertexMarker(graph);
+		doubleEdgeMarker = new LocalDoubleEdgeMarker(graph);
+		longVertexMarker = new LocalLongVertexMarker(graph);
 		longEdgeMarker = new LocalLongEdgeMarker(graph);
-		bitSetVertexMarker = new BitSetVertexMarker(graph);
-		bitSetEdgeMarker = new BitSetEdgeMarker(graph);
-		subGraphMarker = new SubGraphMarker(graph);
+		bitSetVertexMarker = new LocalBitSetVertexMarker(graph);
+		bitSetEdgeMarker = new LocalBitSetEdgeMarker(graph);
+		subGraphMarker = new LocalSubGraphMarker(graph);
 
 		applyIterators("No marks:");
 

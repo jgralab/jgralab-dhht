@@ -28,34 +28,49 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
+
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
+import java.util.HashMap;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.Vertex;
 
 /**
- * Marks directed graphs with arbitrary objects. In contrast to the marking
- * mechanism implemented by {@link SimpleGraphMarker}, in this case the edges are
- * marked taking their direction into account. That means, an incoming edge and
- * the same edge in the outgoing direction are marked independently
+ * This class can be used to "colorize" graphs, edges and vertices. If a
+ * algorithm only needs to distinguish between "marked" and "not marked", a look
+ * at the class <code>BooleanGraphMarker</code> may be reasonable. If a specific
+ * kind of marking is used, it may be reasonalbe to extends this GraphMarker. A
+ * example how that could be done is located in the tutorial in the class
+ * <code>DijkstraVertexMarker</code>.
+ * 
+ * This marker class allows a stricter limitation to specific
+ * <code>AttributedElement</code>s. For example a vertex function can be
+ * realized by<br/>
+ * <code>GenericGraphMarker vertexFunction = new GenericGraphMarker<Vertex,Object>();</code>
+ * <br/>
+ * <br/>
+ * 
+ * Edge functions can be created in analogy to vertex functions.
  * 
  * @author ist@uni-koblenz.de
  * 
- * @param <O>
  */
-public class DirectedGraphMarker<O> extends
-		MapGraphMarker<AttributedElement<?, ?>, O> {
+public abstract class LocalMapGraphMarker<T extends AttributedElement<?, ?>, O>
+		extends AbstractGraphMarker<T> {
+
+	/**
+	 * Stores the mapping between Graph, Edge or Vertex and the attribute
+	 */
+	protected HashMap<T, O> tempAttributeMap;
 
 	/**
 	 * Creates a new GraphMarker
 	 */
-	public DirectedGraphMarker(Graph g) throws RemoteException {
+	protected LocalMapGraphMarker(Graph g) {
 		super(g);
+		tempAttributeMap = new HashMap<T, O>();
 	}
 
 	/**
@@ -67,8 +82,7 @@ public class DirectedGraphMarker<O> extends
 	 * @return the object that marks the given element or <code>null</code> if
 	 *         the given element is not marked in this marking.
 	 */
-	@Override
-	public O getMark(AttributedElement<?, ?> elem)  {
+	public O getMark(T elem) {
 		if (elem == null) {
 			return null;
 		}
@@ -84,11 +98,10 @@ public class DirectedGraphMarker<O> extends
 	 *            the element (Graph, Vertex or Edge) to mark
 	 * @param value
 	 *            the object that should be used as marking
-	 * @return true on success, false if the given element already contains a
-	 *         marking
+	 * @return The previous element the given graph element has been marked
+	 *         with, <code>null</code> if the given element has not been marked.
 	 */
-	@Override
-	public O mark(AttributedElement<?, ?> elem, O value) {
+	public O mark(T elem, O value) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -96,28 +109,66 @@ public class DirectedGraphMarker<O> extends
 
 	}
 
+	/**
+	 * Returns the number of marked elements in this GraphMarker.
+	 * 
+	 * @return The number of marked elements.
+	 */
 	@Override
-	public void edgeDeleted(Edge e) {
-		tempAttributeMap.remove(e);
+	public long size() {
+		return tempAttributeMap.size();
+	}
+
+	/**
+	 * Returns <code>true</code> if nothing is marked by this GraphMarker.
+	 * 
+	 * @return <code>true</code> if no graph element is marked by this
+	 *         GraphMarker.
+	 */
+	@Override
+	public boolean isEmpty() {
+		return tempAttributeMap.isEmpty();
+	}
+
+	/**
+	 * Clears this GraphMarker such that no element is marked.
+	 */
+	@Override
+	public void clear() {
+		tempAttributeMap.clear();
+	}
+
+	/**
+	 * @return An {@link Iterable} of all {@link T}s in the {@link Graph} that
+	 *         are marked by this marker.
+	 */
+	@Override
+	public Iterable<T> getMarkedElements() {
+		return tempAttributeMap.keySet();
 	}
 
 	@Override
-	public boolean isMarked(AttributedElement<?, ?> elem) {
+	public boolean isMarked(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
-	public boolean removeMark(AttributedElement<?, ?> elem) {
+	public boolean removeMark(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.remove(elem) != null;
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
-		tempAttributeMap.remove(v);
+	public void maxEdgeCountIncreased(int newValue) {
+		// do nothing
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+		// do nothing
 	}
 
 }

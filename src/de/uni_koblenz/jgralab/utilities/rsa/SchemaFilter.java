@@ -34,7 +34,7 @@ import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.CollectionDomain;
 import de.uni_koblenz.jgralab.schema.Domain;
@@ -58,11 +58,11 @@ public class SchemaFilter {
 	private String[] patterns;
 	private PrintStream debugOutputStream;
 	private SchemaGraph schemaGraph;
-	private BooleanGraphMarker includes;
+	private LocalBooleanGraphMarker includes;
 	private boolean autoExclude;
 
-	public BooleanGraphMarker processPatterns() {
-		includes = new BooleanGraphMarker(schemaGraph);
+	public LocalBooleanGraphMarker processPatterns() {
+		includes = new LocalBooleanGraphMarker(schemaGraph);
 		if (patterns != null) {
 			// always include the GraphClass
 			includes.mark(schemaGraph);
@@ -182,7 +182,7 @@ public class SchemaFilter {
 	 * VertexClasses.
 	 */
 	private void explicitlyExcludeImplicitlyExcludedClasses() {
-		BooleanGraphMarker processed = new BooleanGraphMarker(schemaGraph);
+		LocalBooleanGraphMarker processed = new LocalBooleanGraphMarker(schemaGraph);
 		for (VertexClass currentVertexClass : schemaGraph
 				.getVertexClassVertices()) {
 			if (!processed.isMarked(currentVertexClass)
@@ -206,7 +206,7 @@ public class SchemaFilter {
 	 * @param currentGraphElementClass
 	 *            the GraphElementClass to exclude.
 	 */
-	private void excludeGraphElementClass(BooleanGraphMarker processed,
+	private void excludeGraphElementClass(LocalBooleanGraphMarker processed,
 			VertexClass currentGraphElementClass) {
 		processed.mark(currentGraphElementClass);
 		includes.removeMark(currentGraphElementClass);
@@ -225,7 +225,7 @@ public class SchemaFilter {
 	 * @param currentGraphElementClass
 	 *            the GraphElementClass to exclude.
 	 */
-	private void excludeGraphElementClass(BooleanGraphMarker processed,
+	private void excludeGraphElementClass(LocalBooleanGraphMarker processed,
 			EdgeClass currentGraphElementClass) {
 		processed.mark(currentGraphElementClass);
 		includes.removeMark(currentGraphElementClass);
@@ -347,7 +347,7 @@ public class SchemaFilter {
 	 * Excludes all VertexClasses that have only excluded subclasses.
 	 */
 	private void excludeUnnecessaryAbstractVertexClasses() {
-		BooleanGraphMarker processed = new BooleanGraphMarker(schemaGraph);
+		LocalBooleanGraphMarker processed = new LocalBooleanGraphMarker(schemaGraph);
 		for (VertexClass currentVertexClass : schemaGraph
 				.getVertexClassVertices()) {
 			if (currentVertexClass.is_abstract()) {
@@ -368,7 +368,7 @@ public class SchemaFilter {
 	 *            the VertexClass to check.
 	 * @return true if the given VertexClass should be excluded
 	 */
-	private boolean isVertexClassExcluded(BooleanGraphMarker processed,
+	private boolean isVertexClassExcluded(LocalBooleanGraphMarker processed,
 			VertexClass currentVertexClass) {
 		if (processed.isMarked(currentVertexClass)
 				|| !currentVertexClass.is_abstract()) {

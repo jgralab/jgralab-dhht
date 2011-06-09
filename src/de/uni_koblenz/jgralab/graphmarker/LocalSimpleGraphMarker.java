@@ -28,17 +28,34 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
+
 package de.uni_koblenz.jgralab.graphmarker;
 
 import java.rmi.RemoteException;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class MapEdgeMarker<O> extends MapGraphMarker<Edge, O> {
+/**
+ * This class can be used to "colorize" graphs, edges and vertices. If a
+ * algorithm only needs to distinguish between "marked" and "not marked", a look
+ * at the class <code>BooleanGraphMarker</code> may be reasonable. If a specific
+ * kind of marking is used, it may be reasonalbe to extends this GraphMarker. A
+ * example how that could be done is located in the tutorial in the class
+ * <code>DijkstraVertexMarker</code>.
+ * 
+ * This Marker only exists for compatibility reasons to older versions of
+ * JGraLab. The new marker class <code>GenericGraphMarker</code> allows a
+ * stricter limitation to specific <code>AttributedElement</code>s.
+ * 
+ * @author ist@uni-koblenz.de
+ * 
+ */
+public class LocalSimpleGraphMarker<O> extends LocalMapGraphMarker<AttributedElement<?, ?>, O> {
 
-	public MapEdgeMarker(Graph g) throws RemoteException {
+	public LocalSimpleGraphMarker(Graph g) throws RemoteException {
 		super(g);
 	}
 
@@ -49,7 +66,7 @@ public class MapEdgeMarker<O> extends MapGraphMarker<Edge, O> {
 
 	@Override
 	public void vertexDeleted(Vertex v) {
-		// do nothing
+		tempAttributeMap.remove(v);
 	}
 
 }

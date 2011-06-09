@@ -30,82 +30,33 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
-import java.util.ConcurrentModificationException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
 
-public class BitSetEdgeMarker extends BitSetGraphMarker<Edge> {
+public abstract class LocalArrayGraphMarkerIterator<T extends GraphElement<?, ?, ?>>
+		implements Iterator<T> {
+	protected int index;
+	protected long version;
+	protected static String MODIFIED_ERROR_MESSAGE = "The graph marker was modified during current iteration.";
+	protected static String NO_MORE_ELEMENTS_ERROR_MESSAGE = "No more elements.";
 
-	public BitSetEdgeMarker(Graph graph) throws RemoteException {
-		super(graph);
+	protected LocalArrayGraphMarkerIterator(long version) {
+		index = 0;
+		this.version = version;
+		moveIndex();
 	}
+
+	protected abstract void moveIndex();
 
 	@Override
-	public void edgeDeleted(Edge e)  {
-		removeMark(e);
-	}
+	public abstract boolean hasNext();
 
 	@Override
-	public void vertexDeleted(Vertex v)  {
-		// do nothing
-	}
+	public abstract T next();
 
 	@Override
-	public boolean mark(Edge edge)  {
-		return super.mark(edge);
+	public void remove() {
+		throw new UnsupportedOperationException("remove is not supported.");
 	}
-
-	@Override
-	public boolean isMarked(Edge edge)  {
-		return super.isMarked(edge);
-	}
-
-	@Override
-	public Iterable<Edge> getMarkedElements() {
-		return new Iterable<Edge>() {
-
-			@Override
-			public Iterator<Edge> iterator() {
-				return new ArrayGraphMarkerIterator<Edge>(version) {
-
-					@Override
-					public boolean hasNext() {
-						return index < marks.size();
-					}
-
-					@Override
-					protected void moveIndex() {
-						int length = marks.size();
-						while (index < length && !marks.get(index)) {
-							index++;
-						}
-					}
-
-					@Override
-					public Edge next() {
-						if (!hasNext()) {
-							throw new NoSuchElementException(
-									NO_MORE_ELEMENTS_ERROR_MESSAGE);
-						}
-						if (version != BitSetEdgeMarker.this.version) {
-							throw new ConcurrentModificationException(
-									MODIFIED_ERROR_MESSAGE);
-						}
-						
-						Edge next = graph.getEdge(index++);
-						moveIndex();
-						return next;
-					}
-				};
-
-			}
-
-		};
-	}
-
 }

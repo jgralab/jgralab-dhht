@@ -47,7 +47,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayVertexMarker;
 import de.uni_koblenz.jgralabtest.instancetest.InstanceTest;
 
 @RunWith(Parameterized.class)
@@ -119,7 +119,7 @@ public class ArrayGraphmarkerTest extends InstanceTest {
 	protected final int E = 4; // initial max edge count
 
 	private MinimalGraph g;
-	private ArrayVertexMarker<TestMarkerObject> marker;
+	private LocalArrayVertexMarker<TestMarkerObject> marker;
 
 	private Node v1;
 	private Node v2;
@@ -148,7 +148,7 @@ public class ArrayGraphmarkerTest extends InstanceTest {
 		g.createLink(v1, v2);
 		commit(g);
 
-		marker = new ArrayVertexMarker<TestMarkerObject>(g);
+		marker = new LocalArrayVertexMarker<TestMarkerObject>(g);
 		createTransaction(g);
 	}
 

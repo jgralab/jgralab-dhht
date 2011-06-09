@@ -46,7 +46,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -434,7 +434,7 @@ public class Tg2Dot extends Tg2Whatever {
 		t2d.printGraph();
 	}
 
-	public static void printGraphAsDot(BooleanGraphMarker marker,
+	public static void printGraphAsDot(LocalBooleanGraphMarker marker,
 			boolean reversedEdges, String outputFileName) {
 		Tg2Dot t2d = new Tg2Dot();
 		t2d.setGraphMarker(marker);

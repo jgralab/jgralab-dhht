@@ -38,15 +38,17 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class BitSetVertexMarker extends BitSetGraphMarker<Vertex> {
+/**
+ * This class is the generic vertex graph marker. It is used for temporary
+ * attributes on vertices which can be of an arbitrary type.
+ * 
+ * @author ist@uni-koblenz.de
+ * 
+ */
+public class LocalArrayVertexMarker<O> extends LocalArrayGraphMarker<Vertex, O> {
 
-	public BitSetVertexMarker(Graph graph) {
-		super(graph);
-	}
-
-	@Override
-	public void vertexDeleted(Vertex v) {
-		removeMark(v);
+	public LocalArrayVertexMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override
@@ -55,22 +57,41 @@ public class BitSetVertexMarker extends BitSetGraphMarker<Vertex> {
 	}
 
 	@Override
+	public void maxEdgeCountIncreased(int newValue) {
+		// do nothing
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+		newValue++;
+		if (newValue > temporaryAttributes.length) {
+			expand(newValue);
+		}
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v) {
+		removeMark(v);
+	}
+
+	@Override
 	public Iterable<Vertex> getMarkedElements() {
 		return new Iterable<Vertex>() {
 
 			@Override
 			public Iterator<Vertex> iterator() {
-				return new ArrayGraphMarkerIterator<Vertex>(version) {
+				return new LocalArrayGraphMarkerIterator<Vertex>(version) {
 
 					@Override
 					public boolean hasNext() {
-						return index < marks.size();
+						return index < temporaryAttributes.length;
 					}
 
 					@Override
 					protected void moveIndex() {
-						int length = marks.size();
-						while (index < length && !marks.get(index)) {
+						int length = temporaryAttributes.length;
+						while (index < length
+								&& temporaryAttributes[index] == null) {
 							index++;
 						}
 					}
@@ -81,11 +102,12 @@ public class BitSetVertexMarker extends BitSetGraphMarker<Vertex> {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != BitSetVertexMarker.this.version) {
+						if (version != LocalArrayVertexMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Vertex next = graph.getVertex(index++);
+						Vertex next;
+						next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}

@@ -47,7 +47,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public class BooleanGraphMarker extends
+public class LocalBooleanGraphMarker extends
 		AbstractGraphMarker<AttributedElement<?, ?>> {
 
 	private final HashSet<AttributedElement<?, ?>> markedElements;
@@ -56,7 +56,7 @@ public class BooleanGraphMarker extends
 	 * creates a new boolean graph marker
 	 * 
 	 */
-	public BooleanGraphMarker(Graph g) {
+	public LocalBooleanGraphMarker(Graph g) {
 		super(g);
 		markedElements = new HashSet<AttributedElement<?, ?>>();
 	}

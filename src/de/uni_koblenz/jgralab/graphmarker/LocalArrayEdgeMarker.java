@@ -89,7 +89,7 @@ public class LocalArrayEdgeMarker<O> extends LocalArrayGraphMarker<Edge, O> {
 
 			@Override
 			public Iterator<Edge> iterator() {
-				return new ArrayGraphMarkerIterator<Edge>(version) {
+				return new LocalArrayGraphMarkerIterator<Edge>(version) {
 
 					@Override
 					public boolean hasNext() {

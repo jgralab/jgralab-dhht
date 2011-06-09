@@ -38,31 +38,19 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-/**
- * This class is the generic vertex graph marker. It is used for temporary
- * attributes on vertices which can be of an arbitrary type.
- * 
- * @author ist@uni-koblenz.de
- * 
- */
-public class ArrayVertexMarker<O> extends LocalArrayGraphMarker<Vertex, O> {
+public class LocalDoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 
-	public ArrayVertexMarker(Graph graph) {
-		super(graph, (int) (graph.getMaxVCount() + 1));
+	public LocalDoubleEdgeMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
 	@Override
 	public void edgeDeleted(Edge e) {
-		// do nothing
+		removeMark(e);
 	}
 
 	@Override
 	public void maxEdgeCountIncreased(int newValue) {
-		// do nothing
-	}
-
-	@Override
-	public void maxVertexCountIncreased(int newValue) {
 		newValue++;
 		if (newValue > temporaryAttributes.length) {
 			expand(newValue);
@@ -70,17 +58,37 @@ public class ArrayVertexMarker<O> extends LocalArrayGraphMarker<Vertex, O> {
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) {
-		removeMark(v);
+	public void maxVertexCountIncreased(int newValue) {
+		// do nothing
 	}
 
 	@Override
-	public Iterable<Vertex> getMarkedElements() {
-		return new Iterable<Vertex>() {
+	public void vertexDeleted(Vertex v) {
+		// do nothing
+	}
+
+	@Override
+	public double mark(Edge edge, double value) {
+		return super.mark(edge, value);
+	}
+
+	@Override
+	public boolean isMarked(Edge edge) {
+		return super.isMarked(edge);
+	}
+
+	@Override
+	public double getMark(Edge edge) {
+		return super.getMark(edge);
+	}
+
+	@Override
+	public Iterable<Edge> getMarkedElements() {
+		return new Iterable<Edge>() {
 
 			@Override
-			public Iterator<Vertex> iterator() {
-				return new ArrayGraphMarkerIterator<Vertex>(version) {
+			public Iterator<Edge> iterator() {
+				return new LocalArrayGraphMarkerIterator<Edge>(version) {
 
 					@Override
 					public boolean hasNext() {
@@ -91,23 +99,23 @@ public class ArrayVertexMarker<O> extends LocalArrayGraphMarker<Vertex, O> {
 					protected void moveIndex() {
 						int length = temporaryAttributes.length;
 						while (index < length
-								&& temporaryAttributes[index] == null) {
+								&& Double.isNaN(temporaryAttributes[index])) {
 							index++;
 						}
 					}
 
 					@Override
-					public Vertex next() {
+					public Edge next() {
 						if (!hasNext()) {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != ArrayVertexMarker.this.version) {
+						if (version != LocalDoubleEdgeMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Vertex next;
-						next = graph.getVertex(index++);
+						Edge next;
+						next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

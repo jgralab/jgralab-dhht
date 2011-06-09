@@ -34,7 +34,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
+public abstract class LocalIntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		extends AbstractGraphMarker<T> {
 
 	private static final int DEFAULT_UNMARKED_VALUE = Integer.MIN_VALUE;
@@ -44,7 +44,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	protected int unmarkedValue;
 	protected long version;
 
-	protected IntegerGraphMarker(Graph graph, int size) {
+	protected LocalIntegerGraphMarker(Graph graph, int size) {
 		super(graph);
 		unmarkedValue = DEFAULT_UNMARKED_VALUE;
 		temporaryAttributes = createNewArray(size);

@@ -119,8 +119,8 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.SimpleGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSimpleGraphMarker;
 import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -230,7 +230,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link VertexClass} and {@link EdgeClass} vertices with a set of
 	 * XMI Ids of superclasses.
 	 */
-	private SimpleGraphMarker<Set<String>> generalizations;
+	private LocalSimpleGraphMarker<Set<String>> generalizations;
 
 	/**
 	 * Keeps track of 'uml:Realization's (key = client id, value = set of
@@ -243,13 +243,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link Attribute} vertices with the XMI Id of its type if the type
 	 * can not be resolved at the time the Attribute is processed.
 	 */
-	private SimpleGraphMarker<String> attributeType;
+	private LocalSimpleGraphMarker<String> attributeType;
 
 	/**
 	 * Marks {@link HasRecordDomainComponent} edges with the XMI Id of its type
 	 * if the type can not be resolved at the time the component is processed.
 	 */
-	private SimpleGraphMarker<String> recordComponentType;
+	private LocalSimpleGraphMarker<String> recordComponentType;
 
 	/**
 	 * Maps qualified names of domains to the corresponding {@link Domain}
@@ -305,7 +305,7 @@ public class Rsa2Tg extends XmlProcessor {
 	/**
 	 * marks incidence classes with the set of redefined rolenames
 	 */
-	private SimpleGraphMarker<Set<String>> redefines;
+	private LocalSimpleGraphMarker<Set<String>> redefines;
 
 	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
@@ -594,16 +594,16 @@ public class Rsa2Tg extends XmlProcessor {
 		xmiIdStack = new Stack<String>();
 		idMap = new HashMap<String, Vertex>();
 		packageStack = new Stack<Package>();
-		generalizations = new SimpleGraphMarker<Set<String>>(sg);
+		generalizations = new LocalSimpleGraphMarker<Set<String>>(sg);
 		realizations = new HashMap<String, Set<String>>();
-		attributeType = new SimpleGraphMarker<String>(sg);
-		recordComponentType = new SimpleGraphMarker<String>(sg);
+		attributeType = new LocalSimpleGraphMarker<String>(sg);
+		recordComponentType = new LocalSimpleGraphMarker<String>(sg);
 		domainMap = new HashMap<String, Domain>();
 		preliminaryVertices = new HashSet<Vertex>();
 		ownedEnds = new HashSet<IncidenceClass>();
 		constraints = new HashMap<String, List<String>>();
 		comments = new HashMap<String, List<String>>();
-		redefines = new SimpleGraphMarker<Set<String>>(sg);
+		redefines = new LocalSimpleGraphMarker<Set<String>>(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
@@ -1299,7 +1299,7 @@ public class Rsa2Tg extends XmlProcessor {
 				// superclass with correct rolename
 				IncidenceClass sup = null;
 				Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
-				BooleanGraphMarker m = new BooleanGraphMarker(sg);
+				LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
 				m.mark(inc);
 				q.offer(inc);
 				while (!q.isEmpty()) {

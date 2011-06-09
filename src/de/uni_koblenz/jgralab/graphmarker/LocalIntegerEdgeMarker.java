@@ -38,9 +38,9 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
+public class LocalIntegerEdgeMarker extends LocalIntegerGraphMarker<Edge> {
 
-	public DoubleEdgeMarker(Graph graph) {
+	public LocalIntegerEdgeMarker(Graph graph) {
 		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
@@ -68,7 +68,7 @@ public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 	}
 
 	@Override
-	public double mark(Edge edge, double value) {
+	public int mark(Edge edge, int value) {
 		return super.mark(edge, value);
 	}
 
@@ -78,7 +78,7 @@ public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 	}
 
 	@Override
-	public double getMark(Edge edge) {
+	public int getMark(Edge edge) {
 		return super.getMark(edge);
 	}
 
@@ -88,7 +88,7 @@ public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 
 			@Override
 			public Iterator<Edge> iterator() {
-				return new ArrayGraphMarkerIterator<Edge>(version) {
+				return new LocalArrayGraphMarkerIterator<Edge>(version) {
 
 					@Override
 					public boolean hasNext() {
@@ -99,7 +99,7 @@ public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 					protected void moveIndex() {
 						int length = temporaryAttributes.length;
 						while (index < length
-								&& Double.isNaN(temporaryAttributes[index])) {
+								&& temporaryAttributes[index] == unmarkedValue) {
 							index++;
 						}
 					}
@@ -110,12 +110,11 @@ public class DoubleEdgeMarker extends LocalDoubleGraphMarker<Edge> {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != DoubleEdgeMarker.this.version) {
+						if (version != LocalIntegerEdgeMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next;
-						next = graph.getEdge(index++);
+						Edge next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

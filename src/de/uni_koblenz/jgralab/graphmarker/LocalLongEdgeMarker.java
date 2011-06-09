@@ -38,7 +38,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class LocalLongEdgeMarker extends LongGraphMarker<Edge> {
+public class LocalLongEdgeMarker extends LocalLongGraphMarker<Edge> {
 
 	public LocalLongEdgeMarker(Graph graph) {
 		super(graph, (int) (graph.getMaxECount() + 1));
@@ -88,7 +88,7 @@ public class LocalLongEdgeMarker extends LongGraphMarker<Edge> {
 
 			@Override
 			public Iterator<Edge> iterator() {
-				return new ArrayGraphMarkerIterator<Edge>(version) {
+				return new LocalArrayGraphMarkerIterator<Edge>(version) {
 
 					@Override
 					public boolean hasNext() {

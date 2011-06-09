@@ -28,45 +28,87 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-/**
- * This class can be used to "colorize" graphs, edges and vertices. If a
- * algorithm only needs to distinguish between "marked" and "not marked", a look
- * at the class <code>BooleanGraphMarker</code> may be reasonable. If a specific
- * kind of marking is used, it may be reasonalbe to extends this GraphMarker. A
- * example how that could be done is located in the tutorial in the class
- * <code>DijkstraVertexMarker</code>.
- * 
- * This Marker only exists for compatibility reasons to older versions of
- * JGraLab. The new marker class <code>GenericGraphMarker</code> allows a
- * stricter limitation to specific <code>AttributedElement</code>s.
- * 
- * @author ist@uni-koblenz.de
- * 
- */
-public class SimpleGraphMarker<O> extends MapGraphMarker<AttributedElement<?, ?>, O> {
+public class LocalLongVertexMarker extends LocalLongGraphMarker<Vertex> {
 
-	public SimpleGraphMarker(Graph g) throws RemoteException {
-		super(g);
+	public LocalLongVertexMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override
 	public void edgeDeleted(Edge e) {
-		tempAttributeMap.remove(e);
+		// do nothing
+	}
+
+	@Override
+	public void maxEdgeCountIncreased(int newValue) {
+		// do nothing
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+		newValue++;
+		if (newValue > temporaryAttributes.length) {
+			expand(newValue);
+		}
 	}
 
 	@Override
 	public void vertexDeleted(Vertex v) {
-		tempAttributeMap.remove(v);
+		removeMark(v);
+	}
+
+	@Override
+	public Iterable<Vertex> getMarkedElements() {
+		return new Iterable<Vertex>() {
+
+			@Override
+			public Iterator<Vertex> iterator() {
+				return new LocalArrayGraphMarkerIterator<Vertex>(version) {
+
+					@Override
+					public boolean hasNext() {
+						return index < temporaryAttributes.length;
+					}
+
+					@Override
+					protected void moveIndex() {
+						int length = temporaryAttributes.length;
+						while (index < length
+								&& temporaryAttributes[index] == unmarkedValue) {
+							index++;
+						}
+					}
+
+					@Override
+					public Vertex next() {
+						if (!hasNext()) {
+							throw new NoSuchElementException(
+									NO_MORE_ELEMENTS_ERROR_MESSAGE);
+						}
+						if (version != LocalLongVertexMarker.this.version) {
+							throw new ConcurrentModificationException(
+									MODIFIED_ERROR_MESSAGE);
+						}
+						Vertex next;
+						next = graph.getVertex(index++);
+						moveIndex();
+						return next;
+					}
+				};
+
+			}
+
+		};
 	}
 
 }

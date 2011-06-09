@@ -46,7 +46,7 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -475,7 +475,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	public void saveGraph(String filename, ProgressFunction pf,
-			BooleanGraphMarker subGraph) throws GraphIOException {
+			LocalBooleanGraphMarker subGraph) throws GraphIOException {
 		if (subGraph != null) {
 			GraphIO.saveGraphToFile(filename, this, pf);
 		} else {

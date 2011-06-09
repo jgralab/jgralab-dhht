@@ -32,8 +32,8 @@ package de.uni_koblenz.jgralabtest.graphmarker;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.DoubleEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalDoubleEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerVertexMarker;
 
 public class TryGraphMarkers {
 
@@ -51,13 +51,13 @@ public class TryGraphMarkers {
 		Link l3 = graph.createLink(v4, v3);
 		Link l4 = graph.createLink(v4, v2);
 		Link l5 = graph.createLink(v1, v4);
-		IntegerVertexMarker marker1 = new IntegerVertexMarker(graph);
+		LocalIntegerVertexMarker marker1 = new LocalIntegerVertexMarker(graph);
 		marker1.mark(v1, 1);
 		marker1.mark(v2, 2);
 		marker1.mark(v3, 3);
 		marker1.mark(v4, 4);
 
-		DoubleEdgeMarker marker2 = new DoubleEdgeMarker(graph);
+		LocalDoubleEdgeMarker marker2 = new LocalDoubleEdgeMarker(graph);
 		marker2.mark(l1, 0.1);
 		marker2.mark(l2, 0.2);
 		marker2.mark(l3, 0.3);
@@ -79,7 +79,7 @@ public class TryGraphMarkers {
 	}
 
 	private static void printAllMarks(MinimalGraph graph,
-			IntegerVertexMarker marker1, DoubleEdgeMarker marker2) {
+			LocalIntegerVertexMarker marker1, LocalDoubleEdgeMarker marker2) {
 		for (Vertex current : graph.vertices()) {
 			System.out.println(current + " " + marker1.getMark(current));
 		}

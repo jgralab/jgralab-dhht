@@ -46,7 +46,7 @@ import de.uni_koblenz.jgralab.Vertex;
  *            the name of the graph element class used by this
  *            <code>BitSetGraphMarker</code>
  */
-public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
+public abstract class LocalBitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 		extends AbstractGraphMarker<T> {
 	protected final BitSet marks;
 	protected long version;
@@ -56,7 +56,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	 * 
 	 * @param graph
 	 */
-	protected BitSetGraphMarker(Graph graph) {
+	protected LocalBitSetGraphMarker(Graph graph) {
 		super(graph);
 		marks = new BitSet();
 	}

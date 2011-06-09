@@ -38,19 +38,24 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
+public class LocalIntegerVertexMarker extends LocalIntegerGraphMarker<Vertex> {
 
-	public IntegerEdgeMarker(Graph graph) {
-		super(graph, (int) (graph.getMaxECount() + 1));
+	public LocalIntegerVertexMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override
 	public void edgeDeleted(Edge e) {
-		removeMark(e);
+		// do nothing
 	}
 
 	@Override
 	public void maxEdgeCountIncreased(int newValue) {
+		// do nothing
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
 		newValue++;
 		if (newValue > temporaryAttributes.length) {
 			expand(newValue);
@@ -58,37 +63,17 @@ public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 	}
 
 	@Override
-	public void maxVertexCountIncreased(int newValue) {
-		// do nothing
-	}
-
-	@Override
 	public void vertexDeleted(Vertex v) {
-		// do nothing
+		removeMark(v);
 	}
 
 	@Override
-	public int mark(Edge edge, int value) {
-		return super.mark(edge, value);
-	}
-
-	@Override
-	public boolean isMarked(Edge edge) {
-		return super.isMarked(edge);
-	}
-
-	@Override
-	public int getMark(Edge edge) {
-		return super.getMark(edge);
-	}
-
-	@Override
-	public Iterable<Edge> getMarkedElements() {
-		return new Iterable<Edge>() {
+	public Iterable<Vertex> getMarkedElements() {
+		return new Iterable<Vertex>() {
 
 			@Override
-			public Iterator<Edge> iterator() {
-				return new ArrayGraphMarkerIterator<Edge>(version) {
+			public Iterator<Vertex> iterator() {
+				return new LocalArrayGraphMarkerIterator<Vertex>(version) {
 
 					@Override
 					public boolean hasNext() {
@@ -105,16 +90,16 @@ public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 					}
 
 					@Override
-					public Edge next() {
+					public Vertex next() {
 						if (!hasNext()) {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != IntegerEdgeMarker.this.version) {
+						if (version != LocalIntegerVertexMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next = graph.getEdge(index++);
+						Vertex next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}
