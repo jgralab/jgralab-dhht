@@ -48,9 +48,9 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  */
 public class LocalBooleanGraphMarker extends
-		AbstractGraphMarker<AttributedElement<?, ?>> {
+		AbstractGraphMarker<GraphElement<?, ?, ?>> {
 
-	private final HashSet<AttributedElement<?, ?>> markedElements;
+	private final HashSet<GraphElement<?, ?, ?>> markedElements;
 
 	/**
 	 * creates a new boolean graph marker
@@ -58,7 +58,7 @@ public class LocalBooleanGraphMarker extends
 	 */
 	public LocalBooleanGraphMarker(Graph g) {
 		super(g);
-		markedElements = new HashSet<AttributedElement<?, ?>>();
+		markedElements = new HashSet<GraphElement<?, ?, ?>>();
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if this GraphMarker marks the given element, false otherwise
 	 */
 	@Override
-	public final boolean isMarked(AttributedElement<?, ?> elem) {
+	public final boolean isMarked(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return markedElements.contains(elem);
@@ -84,7 +84,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if the element has been marked successfull, false if this
 	 *         element is already marked by this GraphMarker
 	 */
-	public final boolean mark(AttributedElement<?, ?> elem) {
+	public final boolean mark(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -101,7 +101,7 @@ public class LocalBooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(AttributedElement<?, ?> elem) {
+	public final boolean removeMark(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return markedElements.remove(elem);
@@ -113,7 +113,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return the markedElements
 	 */
 	@Override
-	public Iterable<AttributedElement<?, ?>> getMarkedElements() {
+	public Iterable<GraphElement<?, ?, ?>> getMarkedElements() {
 		return markedElements;
 	}
 
