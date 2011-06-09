@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
 public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends AbstractGraphMarker<T> {
@@ -33,6 +35,25 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 		//implementationTypeForLocalMarkers = implementationType;
 		localGraphMarkers = new GraphMarker[DEFAULT_PARTIAL_GRAPH_COUNT];
 	}
+	
+	@Override
+	public void edgeDeleted(Edge e) {
+		long elementId = e.getId();
+		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
+		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
+		if (localMarker != null)
+			localMarker.edgeDeleted(e);
+	}
+	
+	@Override
+	public void vertexDeleted(Vertex v) {
+		long elementId = v.getId();
+		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
+		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
+		if (localMarker != null)
+			localMarker.vertexDeleted(v);
+	}
+	
 
 	@Override
 	public boolean isMarked(T graphElement) {
@@ -101,16 +122,9 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 	
 	
 	protected abstract GraphMarker<T> createMarkerForPartialGraph();
-	
-	
-	public void mark(T graphElement, Object value) {
-		GraphMarker<T> localMarker = getOrCreateMarkerForPartialGraph(graphElement);
-		localMarker.mark(graphElement, value);		
-	}
-	
+
 	
 	private class GlobalGraphMarkerIterable implements Iterable<T> {
-
 
 		@Override
 		public Iterator<T> iterator() {

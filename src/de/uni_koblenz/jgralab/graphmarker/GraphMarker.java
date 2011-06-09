@@ -3,7 +3,9 @@ package de.uni_koblenz.jgralab.graphmarker;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Vertex;
 
 public interface GraphMarker<T extends AttributedElement<?, ?>> {
 
@@ -49,7 +51,12 @@ public interface GraphMarker<T extends AttributedElement<?, ?>> {
 	public abstract Graph getGraph();
 
 	public abstract Iterable<T> getMarkedElements();
+
+
+	public abstract void edgeDeleted(Edge e);
 	
-	
+
+	public abstract void vertexDeleted(Vertex v);
+
 
 }

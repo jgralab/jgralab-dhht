@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -41,7 +40,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class LocalBitSetEdgeMarker extends LocalBitSetGraphMarker<Edge> {
 
-	public LocalBitSetEdgeMarker(Graph graph) throws RemoteException {
+	public LocalBitSetEdgeMarker(Graph graph) {
 		super(graph);
 	}
 
