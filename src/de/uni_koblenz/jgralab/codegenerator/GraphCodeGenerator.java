@@ -58,7 +58,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		rootBlock.setVariable("graphElementClass", "Graph");
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
-		addImports("java.rmi.RemoteException");
 	}
 
 	@Override
@@ -203,8 +202,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	 * @param withTypes
 	 * @return
 	 */
-	private String buildParametersOutput(
-			Collection<RecordComponent> components, boolean withTypes) {
+	private String buildParametersOutput(Collection<RecordComponent> components, boolean withTypes) {
 		StringBuilder parameters = new StringBuilder();
 		int count = 0;
 		int size = components.size();
@@ -225,44 +223,43 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	@Override
 	protected CodeBlock createConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgImplPackage#.GraphFactoryImpl");
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("createSuffix", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
-			code.add(
-							"/* Constructors and create methods with values for initial vertex and edge count */",
-							"public #simpleClassName#Impl(int vMax, int eMax) {",
-							"\tthis(null, vMax, eMax);",
-							"}",
-							"",
-							"public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
-							"\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
-							"\tinitializeAttributesWithDefaultValues();",
-							"}",
-							"",
-							"public static #javaClassName# create(int vMax, int eMax) {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null, vMax, eMax);",
-							"}",
-							"",
-							"public static #javaClassName# create(String id, int vMax, int eMax) {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id, vMax, eMax);",
-							"}",
-							"",
-							"/* Constructors and create methods without values for initial vertex and edge count */",
-							"public #simpleClassName#Impl() {",
-							"\tthis(null);",
-							"}",
-							"",
-							"public #simpleClassName#Impl(java.lang.String id) {",
-							"\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
-							"\tinitializeAttributesWithDefaultValues();",
-							"}",
-							"",
-							"public static #javaClassName# create() {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null);",
-							"}",
-							"",
-							"public static #javaClassName# create(String id) {",
-							"\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id);",
-							"}");
+		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
+				 "public #simpleClassName#Impl(int vMax, int eMax) {",
+				 "\tthis(null, vMax, eMax);",
+				 "}",
+				 "",
+				 "public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
+				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
+				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #javaClassName# create(int vMax, int eMax) {",
+				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(null, vMax, eMax);",
+				 "}",
+				 "",
+				 "public static #javaClassName# create(String id, int vMax, int eMax) {",
+				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName##createSuffix#(id, vMax, eMax);",
+				 "}",
+				 "",
+				 "/* Constructors and create methods without values for initial vertex and edge count */",
+				 "public #simpleClassName#Impl() {",
+				 "\tthis(null);",
+				 "}",
+				 "",
+				 "public #simpleClassName#Impl(java.lang.String id) {",
+				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
+				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #javaClassName# create() {",
+				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(GraphFactoryImpl.generateUniqueGraphId());",
+				 "}",
+				 "",
+				 "public static #javaClassName# create(String id) {",
+				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(id);",
+				 "}");
 	
 		return code;
 	}
