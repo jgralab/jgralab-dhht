@@ -282,16 +282,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				gecCode.setVariable("ecSimpleName", gec.getSimpleName());
 				gecCode.setVariable("ecUniqueName", gec.getUniqueName());
 				gecCode.setVariable("ecQualifiedName", gec.getQualifiedName());
-				gecCode.setVariable("ecSchemaVariableName", gec
-						.getVariableName());
-				gecCode.setVariable("ecJavaClassName", schemaRootPackageName
-						+ "." + gec.getQualifiedName());
-				gecCode.setVariable("ecType",
-						(gec instanceof VertexClass ? "Vertex" : "Edge"));
-				gecCode.setVariable("ecTypeInComment",
-						(gec instanceof VertexClass ? "vertex" : "edge"));
-				gecCode.setVariable("ecCamelName", camelCase(gec
-						.getUniqueName()));
+				gecCode.setVariable("ecSchemaVariableName", gec.getVariableName());
+				gecCode.setVariable("ecJavaClassName", schemaRootPackageName + "." + gec.getQualifiedName());
+				gecCode.setVariable("ecType", (gec instanceof VertexClass ? "Vertex" : "Edge"));
+				gecCode.setVariable("ecTypeInComment", (gec instanceof VertexClass ? "vertex" : "edge"));
+				gecCode.setVariable("ecCamelName", camelCase(gec.getUniqueName()));
 				gecCode.setVariable("ecImplName",
 						(gec.isAbstract() ? "**ERROR**" : camelCase(gec
 								.getQualifiedName())

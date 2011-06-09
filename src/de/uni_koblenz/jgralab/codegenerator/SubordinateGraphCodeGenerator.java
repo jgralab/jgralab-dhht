@@ -62,7 +62,6 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		rootBlock.setVariable("theGraph", "this");
 		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "SubordinateImpl");
 		//rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "Subordinate");
-		addImports("java.rmi.RemoteException");
 	}
 	
 	public Vector<JavaSourceFromString> createJavaSources() {

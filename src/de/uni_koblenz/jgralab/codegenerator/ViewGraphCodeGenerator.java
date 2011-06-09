@@ -62,7 +62,6 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		rootBlock.setVariable("theGraph", "this");
 		//rootBlock.setVariable("simpleClassName", "ViewGraph");
 		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "ViewImpl");
-		addImports("java.rmi.RemoteException");
 	}
 	
 	public Vector<JavaSourceFromString> createJavaSources() {
