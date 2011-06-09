@@ -43,7 +43,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * This class can be used to "colorize" graphs, it supports only two "colors",
  * that are "marked" or "not marked". If you need to mark graphs or
  * graphelements with more specific "colors", have a look at the class
- * <code>GraphMarker</code>
+ * <code>LocalSimpleGraphMarker</code>
  * 
  * @author ist@uni-koblenz.de
  */

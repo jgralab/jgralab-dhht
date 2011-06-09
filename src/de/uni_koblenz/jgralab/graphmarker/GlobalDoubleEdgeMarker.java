@@ -13,14 +13,14 @@ import de.uni_koblenz.jgralab.Graph;
  *
  * @param <O> The kind of objects that can be attached to the edges as marks
  */
-public class GlobalArrayEdgeMarker<O> extends GlobalGraphMarker<Edge> {
+public class GlobalDoubleEdgeMarker extends GlobalGraphMarker<Edge> {
 
-	public GlobalArrayEdgeMarker(Graph globalGraph) {
+	public GlobalDoubleEdgeMarker(Graph globalGraph) {
 		super(globalGraph);
 	}
 
 	protected final GraphMarker<Edge> createMarkerForPartialGraph() {
-		return new LocalArrayEdgeMarker<O>(graph);
+		return new LocalDoubleEdgeMarker(graph);
 	}
 	
 	/**
@@ -28,9 +28,8 @@ public class GlobalArrayEdgeMarker<O> extends GlobalGraphMarker<Edge> {
 	 * @param edge the edge to be marked
 	 * @param value the object to be used a mark
 	 */
-	public final void mark(Edge edge, O value) {
-		@SuppressWarnings("unchecked")
-		LocalArrayEdgeMarker<O> localMarker = (LocalArrayEdgeMarker<O>) getOrCreateMarkerForPartialGraph(edge);
+	public final void mark(Edge edge, double value) {
+		LocalDoubleEdgeMarker localMarker = (LocalDoubleEdgeMarker) getOrCreateMarkerForPartialGraph(edge);
 		localMarker.mark(edge, value);		
 	}
 	

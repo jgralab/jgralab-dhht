@@ -17,7 +17,7 @@ public class GlobalBitSetEdgeMarker<O> extends GlobalGraphMarker<Edge> {
 		super(globalGraph);
 	}
 
-	protected GraphMarker<Edge> createMarkerForPartialGraph() {
+	protected final GraphMarker<Edge> createMarkerForPartialGraph() {
 		return new LocalBitSetEdgeMarker(graph);
 	}
 	
@@ -25,7 +25,7 @@ public class GlobalBitSetEdgeMarker<O> extends GlobalGraphMarker<Edge> {
 	 * Marks the given edge <code>edge</code> 
 	 * @param edge the edge to be marked
 	 */
-	public void mark(Edge edge) {
+	public final void mark(Edge edge) {
 		LocalBitSetEdgeMarker localMarker = (LocalBitSetEdgeMarker) getOrCreateMarkerForPartialGraph(edge);
 		localMarker.mark(edge);		
 	}

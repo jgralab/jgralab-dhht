@@ -17,7 +17,7 @@ public class GlobalBitSetVertexMarker<O> extends GlobalGraphMarker<Vertex> {
 		super(globalGraph);
 	}
 
-	protected GraphMarker<Vertex> createMarkerForPartialGraph() {
+	protected final GraphMarker<Vertex> createMarkerForPartialGraph() {
 		return new LocalBitSetVertexMarker(graph);
 	}
 	
@@ -25,7 +25,7 @@ public class GlobalBitSetVertexMarker<O> extends GlobalGraphMarker<Vertex> {
 	 * Marks the given vertex <code>vertex</code> 
 	 * @param vertex the vertex to be marked
 	 */
-	public void mark(Vertex edge) {
+	public final void mark(Vertex edge) {
 		LocalBitSetVertexMarker localMarker = (LocalBitSetVertexMarker) getOrCreateMarkerForPartialGraph(edge);
 		localMarker.mark(edge);		
 	}
