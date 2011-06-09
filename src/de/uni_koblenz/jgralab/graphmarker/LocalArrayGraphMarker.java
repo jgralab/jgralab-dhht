@@ -110,7 +110,7 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		return marked;
 	}
 

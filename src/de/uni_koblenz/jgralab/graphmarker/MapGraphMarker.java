@@ -115,7 +115,7 @@ public abstract class MapGraphMarker<T extends AttributedElement<?, ?>, O>
 	 * @return The number of marked elements.
 	 */
 	@Override
-	public int size() {
+	public long size() {
 		return tempAttributeMap.size();
 	}
 

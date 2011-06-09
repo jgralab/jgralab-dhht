@@ -64,7 +64,7 @@ public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> exte
 	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#size()
 	 */
 	@Override
-	public abstract int size();
+	public abstract long size();
 
 	/* (non-Javadoc)
 	 * @see de.uni_koblenz.jgralab.graphmarker.GraphMarker#isEmpty()

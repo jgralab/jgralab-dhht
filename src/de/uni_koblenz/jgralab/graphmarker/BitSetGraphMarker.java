@@ -91,7 +91,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		return marks.cardinality();
 	}
 

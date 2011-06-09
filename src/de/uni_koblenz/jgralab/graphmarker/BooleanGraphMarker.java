@@ -123,7 +123,7 @@ public class BooleanGraphMarker extends
 	 * @return The number of marked elements.
 	 */
 	@Override
-	public int size() {
+	public long size() {
 		return markedElements.size();
 	}
 

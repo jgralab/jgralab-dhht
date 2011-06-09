@@ -123,7 +123,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		return marked;
 	}
 

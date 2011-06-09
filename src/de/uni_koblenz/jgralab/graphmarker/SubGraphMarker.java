@@ -85,7 +85,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		return edgeGraphMarker.size() + vertexGraphMarker.size();
 	}
 

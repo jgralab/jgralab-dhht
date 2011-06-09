@@ -119,7 +119,7 @@ public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 	}
 
 	@Override
-	public int size() {
+	public long size() {
 		return marked;
 	}
 
