@@ -105,7 +105,6 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	@Deprecated
 	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return localGraphDatabase;
 	}
