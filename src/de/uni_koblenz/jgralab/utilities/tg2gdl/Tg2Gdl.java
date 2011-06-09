@@ -145,11 +145,7 @@ public class Tg2Gdl extends Tg2Whatever {
 	}
 
 	private String vTitle(Vertex v) {
-		try {
-			return "\"v" + v.getId() + "\"";
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		return "\"v" + v.getId() + "\"";
 	}
 
 	/*

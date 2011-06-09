@@ -81,11 +81,7 @@ public abstract class GraphVisitor {
 		if (marker == null) {
 			return true;
 		}
-		try {
-			return marker.isMarked(e);
-		} catch (RemoteException e1) {
-			throw new RuntimeException(e1);
-		}
+		return marker.isMarked(e);
 	}
 
 	protected abstract void preVisitor() throws Exception;

@@ -86,12 +86,8 @@ public class Tg2Dot extends Tg2Whatever {
 	 */
 	@Override
 	public void graphStart(PrintStream out) {
-		try {
-			out.println("digraph \"" + graph.getCompleteGraphUid() + "\"");
-			out.println("{");
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		out.println("digraph \"" + graph.getUniqueGraphId() + "\"");
+		out.println("{");
 		
 		// Set the ranksep
 		if (ranksepEqually) {
@@ -123,7 +119,6 @@ public class Tg2Dot extends Tg2Whatever {
 	
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		try {
 		VertexClass cls = v.getType();
 		out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
@@ -132,14 +127,10 @@ public class Tg2Dot extends Tg2Whatever {
 			printAttributes(out, v);
 		}
 		out.println("}\"];");
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
-		try {
 		EdgeClass cls = e.getType();
 		out.print("e" + e.getId() + " [label=\"{{e" + e.getId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
@@ -148,9 +139,6 @@ public class Tg2Dot extends Tg2Whatever {
 			printAttributes(out, e);
 		}
 		out.println("}\"];");
-		} catch (RemoteException ex) {
-			throw new RuntimeException(ex);
-		}
 	}
 
 
@@ -204,7 +192,6 @@ public class Tg2Dot extends Tg2Whatever {
 	}
 
 	private boolean printEdgeReversed(Edge e) {
-		try {
 		if (reversedEdgeTypes == null) {
 			return reversedEdges;
 		}
@@ -228,16 +215,12 @@ public class Tg2Dot extends Tg2Whatever {
 		}
 		revEdgeTypeCache.put(ec, rev);
 		return reversedEdges ^ rev;
-		} catch (RemoteException ex) {
-			throw new RuntimeException(ex);
-		}
 	}
 
 	
 	
 	@Override
 	protected void printIncidence(PrintStream out, Incidence i) {
-		try {
 		boolean reversed = printEdgeReversed(i.getEdge());
 
 		//assume Vertex_TO_EDGE to be the direction to use
@@ -304,9 +287,6 @@ public class Tg2Dot extends Tg2Whatever {
 			out.print(" headlabel=\"" + getIncidenceNumber(i, start) + "\"");
 		}
 		out.println("];");
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	private void printAttributes(PrintStream out, AttributedElement<?,?> elem) {

@@ -1248,16 +1248,18 @@ public class GraphIO {
 	
 	
 	/**
-	 * Use {@link loadGraphFromFileWithStandardSupport} instead.
+	 * Loads a graph from the file <code>filename</code>. When the
+	 * <code>filename</code> ends with <code>.gz</code>, it is assumed that the
+	 * input is GZIP compressed, otherwise uncompressed plain text.
 	 * 
 	 * @param filename
 	 * @param pf
 	 * @return
 	 * @throws GraphIOException
 	 */
-	public static Graph loadGraphFromFile(String filename, ProgressFunction pf, ImplementationType implType)
+	public static Graph loadGraphFromFile(String filename, Schema schema, ImplementationType implType)
 			throws GraphIOException {
-		return loadGraphFromFile(filename, null, pf, implType);
+		return loadGraphFromFile(filename, schema, null, implType);
 	}
 
 	/**

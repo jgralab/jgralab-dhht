@@ -45,6 +45,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
@@ -139,7 +140,7 @@ public abstract class Tg2Whatever {
 		graphFileName = fileName;
 		graph = GraphIO.loadSchemaAndGraphFromFile(graphFileName,
 				CodeGeneratorConfiguration.MINIMAL,
-				new ConsoleProgressFunction());
+				new ConsoleProgressFunction(), ImplementationType.MEMORY);
 	}
 
 	/**
@@ -237,20 +238,15 @@ public abstract class Tg2Whatever {
 
 	private void printEdges(PrintStream out) {
 		currentElementSequenceIndex = 0;
-		try {
 		for (Edge e : graph.getEdges()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(e)) {
 				printEdge(out, e);
 			}
 		}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	private void printVertices(PrintStream out) {
-		try{
 		currentElementSequenceIndex = 0;
 		for (Vertex v : graph.getVertices()) {
 			currentElementSequenceIndex++;
@@ -258,15 +254,11 @@ public abstract class Tg2Whatever {
 				printVertex(out, v);
 			}
 		}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 
 	
 	protected void printIncidences(PrintStream out) {
-		try {
 		for (Edge e : graph.getEdges()) {
 			if ((marker == null) || marker.isMarked(e)) {
 				for (Incidence i : e.getIncidences()) {
@@ -276,14 +268,10 @@ public abstract class Tg2Whatever {
 				}
 			}
 		}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 	
 
 	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?> elem) {
-		try {
 		int num = 1;
 		for (Incidence current : elem.getIncidences()) {
 			if (current == inc) {
@@ -292,9 +280,6 @@ public abstract class Tg2Whatever {
 			num++;
 		}
 		return -1;
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 
@@ -305,8 +290,8 @@ public abstract class Tg2Whatever {
 	private void loadGraph() {
 		try {
 			System.out.println("Loading graph from file " + graphFileName);
-			graph = GraphIO.loadGraphFromFileWithStandardSupport(graphFileName,
-					schema, new ConsoleProgressFunction());
+			graph = GraphIO.loadGraphFromFile(graphFileName,
+					schema, new ConsoleProgressFunction(), ImplementationType.MEMORY);
 			System.out.println("Graph loaded");
 		} catch (GraphIOException ex) {
 			System.err.println("Graph in file '" + graphFileName
