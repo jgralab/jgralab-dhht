@@ -68,7 +68,7 @@ public class DirectedGraphMarker<O> extends
 	 *         the given element is not marked in this marking.
 	 */
 	@Override
-	public O getMark(AttributedElement<?, ?> elem) throws RemoteException {
+	public O getMark(AttributedElement<?, ?> elem)  {
 		if (elem == null) {
 			return null;
 		}
@@ -88,7 +88,7 @@ public class DirectedGraphMarker<O> extends
 	 *         marking
 	 */
 	@Override
-	public O mark(AttributedElement<?, ?> elem, O value) throws RemoteException {
+	public O mark(AttributedElement<?, ?> elem, O value) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
@@ -102,14 +102,14 @@ public class DirectedGraphMarker<O> extends
 	}
 
 	@Override
-	public boolean isMarked(AttributedElement<?, ?> elem) throws RemoteException {
+	public boolean isMarked(AttributedElement<?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
-	public boolean removeMark(AttributedElement<?, ?> elem) throws RemoteException {
+	public boolean removeMark(AttributedElement<?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.remove(elem) != null;

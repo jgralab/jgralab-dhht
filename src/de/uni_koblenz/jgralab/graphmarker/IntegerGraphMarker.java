@@ -76,7 +76,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return temporaryAttributes[graphElement.getId()] != unmarkedValue;
+		return temporaryAttributes[(int) graphElement.getId()] != unmarkedValue;
 	}
 
 	/**
@@ -93,8 +93,8 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		int out = temporaryAttributes[graphElement.getId()];
-		temporaryAttributes[graphElement.getId()] = value;
+		int out = temporaryAttributes[(int) graphElement.getId()];
+		temporaryAttributes[(int) graphElement.getId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -104,7 +104,7 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		int out = temporaryAttributes[graphElement.getId()];
+		int out = temporaryAttributes[(int) graphElement.getId()];
 		return out;
 	}
 
@@ -113,10 +113,10 @@ public abstract class IntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (temporaryAttributes[graphElement.getId()] == unmarkedValue) {
+		if (temporaryAttributes[(int) graphElement.getId()] == unmarkedValue) {
 			return false;
 		}
-		temporaryAttributes[graphElement.getId()] = unmarkedValue;
+		temporaryAttributes[(int) graphElement.getId()] = unmarkedValue;
 		marked -= 1;
 		version++;
 		return true;

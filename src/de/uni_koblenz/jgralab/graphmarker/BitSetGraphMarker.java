@@ -74,7 +74,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		boolean out = isMarked(graphElement);
-		marks.set(graphElement.getId());
+		marks.set((int) graphElement.getId());
 		version++;
 		return !out;
 	}
@@ -85,7 +85,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		boolean out = isMarked(graphElement);
-		marks.clear(graphElement.getId());
+		marks.clear((int) graphElement.getId());
 		version--;
 		return out;
 	}
@@ -110,7 +110,7 @@ public abstract class BitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return marks.get(graphElement.getId());
+		return marks.get((int) graphElement.getId());
 	}
 
 	@Override

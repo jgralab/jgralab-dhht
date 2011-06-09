@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -39,10 +38,10 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
+public class LocalLongEdgeMarker extends LongGraphMarker<Edge> {
 
-	public ArrayEdgeMarker(Graph graph) throws RemoteException {
-		super(graph, graph.getMaxECount() + 1);
+	public LocalLongEdgeMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
 	@Override
@@ -69,21 +68,20 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 	}
 
 	@Override
-	public O mark(Edge edge, O value) throws RemoteException {
+	public long mark(Edge edge, long value) {
 		return super.mark(edge, value);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) throws RemoteException {
+	public boolean isMarked(Edge edge) {
 		return super.isMarked(edge);
 	}
 
 	@Override
-	public O getMark(Edge edge) throws RemoteException {
+	public long getMark(Edge edge) {
 		return super.getMark(edge);
 	}
 
-	// @Override
 	@Override
 	public Iterable<Edge> getMarkedElements() {
 		return new Iterable<Edge>() {
@@ -101,7 +99,7 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 					protected void moveIndex() {
 						int length = temporaryAttributes.length;
 						while (index < length
-								&& temporaryAttributes[index] == null) {
+								&& temporaryAttributes[index] == unmarkedValue) {
 							index++;
 						}
 					}
@@ -112,7 +110,7 @@ public class ArrayEdgeMarker<O> extends ArrayGraphMarker<Edge, O> {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != ArrayEdgeMarker.this.version) {
+						if (version != LocalLongEdgeMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}

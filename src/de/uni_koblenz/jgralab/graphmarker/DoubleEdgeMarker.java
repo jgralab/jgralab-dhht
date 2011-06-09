@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 
 	public DoubleEdgeMarker(Graph graph) {
-		super(graph, graph.getMaxECount() + 1);
+		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
 	@Override
@@ -116,11 +116,7 @@ public class DoubleEdgeMarker extends DoubleGraphMarker<Edge> {
 									MODIFIED_ERROR_MESSAGE);
 						}
 						Edge next;
-						try {
-							next = graph.getEdge(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

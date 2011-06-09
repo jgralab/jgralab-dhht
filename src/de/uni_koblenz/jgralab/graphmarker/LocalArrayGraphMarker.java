@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @param <T>
  */
-public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
+public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		extends AbstractGraphMarker<T> {
 
 	/**
@@ -51,7 +51,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	protected int marked;
 	protected long version;
 
-	protected ArrayGraphMarker(Graph graph, int size) {
+	protected LocalArrayGraphMarker(Graph graph, int size) {
 		super(graph);
 		temporaryAttributes = new Object[size];
 		marked = 0;
@@ -75,7 +75,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return temporaryAttributes[graphElement.getId()] != null;
+		return temporaryAttributes[(int)graphElement.getId()] != null;
 	}
 
 	public O getMark(T graphElement) {
@@ -83,7 +83,7 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		@SuppressWarnings("unchecked")
-		O out = (O) temporaryAttributes[graphElement.getId()];
+		O out = (O) temporaryAttributes[(int) graphElement.getId()];
 		return out;
 	}
 
@@ -102,8 +102,8 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		@SuppressWarnings("unchecked")
-		O out = (O) temporaryAttributes[graphElement.getId()];
-		temporaryAttributes[graphElement.getId()] = value;
+		O out = (O) temporaryAttributes[(int) graphElement.getId()];
+		temporaryAttributes[(int) graphElement.getId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -119,10 +119,10 @@ public abstract class ArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (temporaryAttributes[graphElement.getId()] == null) {
+		if (temporaryAttributes[(int) graphElement.getId()] == null) {
 			return false;
 		}
-		temporaryAttributes[graphElement.getId()] = null;
+		temporaryAttributes[(int) graphElement.getId()] = null;
 		marked -= 1;
 		version++;
 		return true;

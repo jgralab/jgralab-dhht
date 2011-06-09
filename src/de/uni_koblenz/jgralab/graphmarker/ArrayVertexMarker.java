@@ -45,10 +45,10 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class ArrayVertexMarker<O> extends ArrayGraphMarker<Vertex, O> {
+public class ArrayVertexMarker<O> extends LocalArrayGraphMarker<Vertex, O> {
 
 	public ArrayVertexMarker(Graph graph) {
-		super(graph, graph.getMaxVCount() + 1);
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override

@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public class LongVertexMarker extends LongGraphMarker<Vertex> {
 
 	public LongVertexMarker(Graph graph) {
-		super(graph, graph.getMaxVCount() + 1);
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override

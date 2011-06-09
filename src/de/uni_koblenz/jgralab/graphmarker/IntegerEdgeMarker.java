@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 
 	public IntegerEdgeMarker(Graph graph) {
-		super(graph, graph.getMaxECount() + 1);
+		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
 	@Override
@@ -115,12 +115,7 @@ public class IntegerEdgeMarker extends IntegerGraphMarker<Edge> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Edge next;
-						try {
-							next = graph.getEdge(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						Edge next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}

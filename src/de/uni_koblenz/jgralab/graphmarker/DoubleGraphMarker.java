@@ -72,7 +72,7 @@ public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return !Double.isNaN(temporaryAttributes[graphElement.getId()]);
+		return !Double.isNaN(temporaryAttributes[(int) graphElement.getId()]);
 	}
 
 	/**
@@ -89,8 +89,8 @@ public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		double out = temporaryAttributes[graphElement.getId()];
-		temporaryAttributes[graphElement.getId()] = value;
+		double out = temporaryAttributes[(int) graphElement.getId()];
+		temporaryAttributes[(int) graphElement.getId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -100,7 +100,7 @@ public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		double out = temporaryAttributes[graphElement.getId()];
+		double out = temporaryAttributes[(int) graphElement.getId()];
 		return out;
 	}
 
@@ -109,10 +109,10 @@ public abstract class DoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (Double.isNaN(temporaryAttributes[graphElement.getId()])) {
+		if (Double.isNaN(temporaryAttributes[(int) graphElement.getId()])) {
 			return false;
 		}
-		temporaryAttributes[graphElement.getId()] = Double.NaN;
+		temporaryAttributes[(int) graphElement.getId()] = Double.NaN;
 		marked -= 1;
 		version++;
 		return true;

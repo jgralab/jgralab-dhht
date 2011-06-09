@@ -35,7 +35,7 @@ import java.util.Iterator;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.ArrayEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.BitSetEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.BitSetVertexMarker;
@@ -43,19 +43,19 @@ import de.uni_koblenz.jgralab.graphmarker.DoubleEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.DoubleVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.IntegerEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.LongEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalLongEdgeMarker;
 import de.uni_koblenz.jgralab.graphmarker.LongVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
 
 public class TryGraphMarkerIterators {
 	private static ArrayVertexMarker<String> arrayVertexMarker;
-	private static ArrayEdgeMarker<String> arrayEdgeMarker;
+	private static LocalArrayEdgeMarker<String> arrayEdgeMarker;
 	private static IntegerVertexMarker integerVertexMarker;
 	private static IntegerEdgeMarker integerEdgeMarker;
 	private static DoubleVertexMarker doubleVertexMarker;
 	private static DoubleEdgeMarker doubleEdgeMarker;
 	private static LongVertexMarker longVertexMarker;
-	private static LongEdgeMarker longEdgeMarker;
+	private static LocalLongEdgeMarker longEdgeMarker;
 	private static BitSetVertexMarker bitSetVertexMarker;
 	private static BitSetEdgeMarker bitSetEdgeMarker;
 	private static SubGraphMarker subGraphMarker;
@@ -71,13 +71,13 @@ public class TryGraphMarkerIterators {
 			links[i] = graph.createLink(nodes[i], nodes[10 - i - 1]);
 		}
 		arrayVertexMarker = new ArrayVertexMarker<String>(graph);
-		arrayEdgeMarker = new ArrayEdgeMarker<String>(graph);
+		arrayEdgeMarker = new LocalArrayEdgeMarker<String>(graph);
 		integerVertexMarker = new IntegerVertexMarker(graph);
 		integerEdgeMarker = new IntegerEdgeMarker(graph);
 		doubleVertexMarker = new DoubleVertexMarker(graph);
 		doubleEdgeMarker = new DoubleEdgeMarker(graph);
 		longVertexMarker = new LongVertexMarker(graph);
-		longEdgeMarker = new LongEdgeMarker(graph);
+		longEdgeMarker = new LocalLongEdgeMarker(graph);
 		bitSetVertexMarker = new BitSetVertexMarker(graph);
 		bitSetEdgeMarker = new BitSetEdgeMarker(graph);
 		subGraphMarker = new SubGraphMarker(graph);

@@ -86,12 +86,7 @@ public class BitSetVertexMarker extends BitSetGraphMarker<Vertex> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Vertex next;
-						try {
-							next = graph.getVertex(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						Vertex next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}

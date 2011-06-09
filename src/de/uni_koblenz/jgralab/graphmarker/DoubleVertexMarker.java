@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public class DoubleVertexMarker extends DoubleGraphMarker<Vertex> {
 
 	public DoubleVertexMarker(Graph graph) {
-		super(graph, graph.getMaxVCount() + 1);
+		super(graph, (int) (graph.getMaxVCount() + 1));
 	}
 
 	@Override
@@ -100,12 +100,7 @@ public class DoubleVertexMarker extends DoubleGraphMarker<Vertex> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						Vertex next;
-						try {
-							next = graph.getVertex(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						Vertex next = graph.getVertex(index++);
 						moveIndex();
 						return next;
 					}

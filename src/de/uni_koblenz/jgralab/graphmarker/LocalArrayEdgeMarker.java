@@ -38,10 +38,10 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class LongEdgeMarker extends LongGraphMarker<Edge> {
+public class LocalArrayEdgeMarker<O> extends LocalArrayGraphMarker<Edge, O> {
 
-	public LongEdgeMarker(Graph graph) {
-		super(graph, graph.getMaxECount() + 1);
+	public LocalArrayEdgeMarker(Graph graph) {
+		super(graph, (int) (graph.getMaxECount() + 1));
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 	}
 
 	@Override
-	public long mark(Edge edge, long value) {
+	public O mark(Edge edge, O value) {
 		return super.mark(edge, value);
 	}
 
@@ -78,10 +78,11 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 	}
 
 	@Override
-	public long getMark(Edge edge) {
+	public O getMark(Edge edge) {
 		return super.getMark(edge);
 	}
 
+	// @Override
 	@Override
 	public Iterable<Edge> getMarkedElements() {
 		return new Iterable<Edge>() {
@@ -99,7 +100,7 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 					protected void moveIndex() {
 						int length = temporaryAttributes.length;
 						while (index < length
-								&& temporaryAttributes[index] == unmarkedValue) {
+								&& temporaryAttributes[index] == null) {
 							index++;
 						}
 					}
@@ -110,7 +111,7 @@ public class LongEdgeMarker extends LongGraphMarker<Edge> {
 							throw new NoSuchElementException(
 									NO_MORE_ELEMENTS_ERROR_MESSAGE);
 						}
-						if (version != LongEdgeMarker.this.version) {
+						if (version != LocalArrayEdgeMarker.this.version) {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}

@@ -76,7 +76,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public boolean isMarked(GraphElement<?, ?, ?> graphElement) throws RemoteException {
+	public boolean isMarked(GraphElement<?, ?, ?> graphElement) {
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.isMarked((Edge) graphElement);
 		} else {
@@ -90,7 +90,7 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public boolean removeMark(GraphElement<?, ?, ?> graphElement) throws RemoteException {
+	public boolean removeMark(GraphElement<?, ?, ?> graphElement) {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.removeMark((Edge) graphElement);
@@ -173,12 +173,12 @@ public class SubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, ?>> {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e)  {
 		edgeGraphMarker.edgeDeleted(e);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v)  {
 		vertexGraphMarker.vertexDeleted(v);
 	}
 

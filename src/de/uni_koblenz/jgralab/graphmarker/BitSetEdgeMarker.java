@@ -46,22 +46,22 @@ public class BitSetEdgeMarker extends BitSetGraphMarker<Edge> {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e) throws RemoteException {
+	public void edgeDeleted(Edge e)  {
 		removeMark(e);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v) throws RemoteException {
+	public void vertexDeleted(Vertex v)  {
 		// do nothing
 	}
 
 	@Override
-	public boolean mark(Edge edge) throws RemoteException {
+	public boolean mark(Edge edge)  {
 		return super.mark(edge);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge) throws RemoteException {
+	public boolean isMarked(Edge edge)  {
 		return super.isMarked(edge);
 	}
 
@@ -97,12 +97,7 @@ public class BitSetEdgeMarker extends BitSetGraphMarker<Edge> {
 									MODIFIED_ERROR_MESSAGE);
 						}
 						
-						Edge next;
-						try {
-							next = graph.getEdge(index++);
-						} catch (RemoteException e) {
-							throw new RuntimeException(e);
-						}
+						Edge next = graph.getEdge(index++);
 						moveIndex();
 						return next;
 					}
