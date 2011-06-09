@@ -40,7 +40,7 @@ import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.LocalSimpleGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 
 public class TempAttributeTest extends TestCase {
 
@@ -54,7 +54,7 @@ public class TempAttributeTest extends TestCase {
 
 	@Test
 	public void testTempAttribute() {
-		LocalSimpleGraphMarker<String> marker = new LocalSimpleGraphMarker<String>(graph);
+		LocalGenericGraphMarker<String> marker = new LocalGenericGraphMarker<String>(graph);
 		System.out
 				.println("Setting and getting temporary attribute belonging to the graph itself");
 		marker.mark(graph, "successful");

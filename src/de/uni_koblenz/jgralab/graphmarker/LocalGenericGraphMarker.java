@@ -31,11 +31,9 @@
 
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
-
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -53,9 +51,9 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class LocalSimpleGraphMarker<O> extends LocalMapGraphMarker<AttributedElement<?, ?>, O> {
+public class LocalGenericGraphMarker<O> extends LocalMapGraphMarker<GraphElement<?, ?, ?>, O> {
 
-	public LocalSimpleGraphMarker(Graph g) throws RemoteException {
+	public LocalGenericGraphMarker(Graph g) {
 		super(g);
 	}
 

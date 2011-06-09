@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -38,7 +37,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class LocalMapVertexMarker<O> extends LocalMapGraphMarker<Vertex, O> {
 
-	public LocalMapVertexMarker(Graph g) throws RemoteException {
+	public LocalMapVertexMarker(Graph g) {
 		super(g);
 	}
 

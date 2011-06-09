@@ -30,6 +30,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 	 * @param globalGraph the global graph to be marked
 	 * @param implementationType the impelemtation type to be used for the local markers
 	 */
+	@SuppressWarnings("unchecked")
 	public GlobalGraphMarker(Graph globalGraph) {
 		super(globalGraph);
 		//implementationTypeForLocalMarkers = implementationType;
@@ -141,7 +142,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 				
 		private Iterator<T> currentIterator;
 		
-		@SuppressWarnings("unchecked")
+
 		public GlobalGraphMarkerIterator() {
 			localIterators = new LinkedList<Iterator<T>>();
 			for (int i=0; i<graphMarker.localGraphMarkers.length; i++) {

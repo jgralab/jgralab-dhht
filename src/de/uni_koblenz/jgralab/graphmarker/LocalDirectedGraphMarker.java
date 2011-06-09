@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * Marks directed graphs with arbitrary objects. In contrast to the marking
- * mechanism implemented by {@link LocalSimpleGraphMarker}, in this case the edges are
+ * mechanism implemented by {@link LocalGenericGraphMarker}, in this case the edges are
  * marked taking their direction into account. That means, an incoming edge and
  * the same edge in the outgoing direction are marked independently
  * 

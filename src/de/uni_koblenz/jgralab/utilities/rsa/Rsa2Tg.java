@@ -120,7 +120,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.LocalSimpleGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -230,7 +230,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link VertexClass} and {@link EdgeClass} vertices with a set of
 	 * XMI Ids of superclasses.
 	 */
-	private LocalSimpleGraphMarker<Set<String>> generalizations;
+	private LocalGenericGraphMarker<Set<String>> generalizations;
 
 	/**
 	 * Keeps track of 'uml:Realization's (key = client id, value = set of
@@ -243,13 +243,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 * Marks {@link Attribute} vertices with the XMI Id of its type if the type
 	 * can not be resolved at the time the Attribute is processed.
 	 */
-	private LocalSimpleGraphMarker<String> attributeType;
+	private LocalGenericGraphMarker<String> attributeType;
 
 	/**
 	 * Marks {@link HasRecordDomainComponent} edges with the XMI Id of its type
 	 * if the type can not be resolved at the time the component is processed.
 	 */
-	private LocalSimpleGraphMarker<String> recordComponentType;
+	private LocalGenericGraphMarker<String> recordComponentType;
 
 	/**
 	 * Maps qualified names of domains to the corresponding {@link Domain}
@@ -305,7 +305,7 @@ public class Rsa2Tg extends XmlProcessor {
 	/**
 	 * marks incidence classes with the set of redefined rolenames
 	 */
-	private LocalSimpleGraphMarker<Set<String>> redefines;
+	private LocalGenericGraphMarker<Set<String>> redefines;
 
 	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
@@ -594,16 +594,16 @@ public class Rsa2Tg extends XmlProcessor {
 		xmiIdStack = new Stack<String>();
 		idMap = new HashMap<String, Vertex>();
 		packageStack = new Stack<Package>();
-		generalizations = new LocalSimpleGraphMarker<Set<String>>(sg);
+		generalizations = new LocalGenericGraphMarker<Set<String>>(sg);
 		realizations = new HashMap<String, Set<String>>();
-		attributeType = new LocalSimpleGraphMarker<String>(sg);
-		recordComponentType = new LocalSimpleGraphMarker<String>(sg);
+		attributeType = new LocalGenericGraphMarker<String>(sg);
+		recordComponentType = new LocalGenericGraphMarker<String>(sg);
 		domainMap = new HashMap<String, Domain>();
 		preliminaryVertices = new HashSet<Vertex>();
 		ownedEnds = new HashSet<IncidenceClass>();
 		constraints = new HashMap<String, List<String>>();
 		comments = new HashMap<String, List<String>>();
-		redefines = new LocalSimpleGraphMarker<Set<String>>(sg);
+		redefines = new LocalGenericGraphMarker<Set<String>>(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
