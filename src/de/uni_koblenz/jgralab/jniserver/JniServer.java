@@ -123,7 +123,7 @@ public class JniServer {
 					(Class[]) null).invoke(null));
 
 			Method graphCreateMethod = schema
-					.getGraphCreateMethod(ImplementationType.STANDARD);
+					.getGraphCreateMethod(ImplementationType.MEMORY);
 
 			Graph g = (Graph) (graphCreateMethod.invoke(null, new Object[] {
 					null, vMax, eMax }));
@@ -143,8 +143,7 @@ public class JniServer {
 
 	public int loadGraph(String fileName) {
 		try {
-			Graph g = GraphIO.loadGraphFromFileWithStandardSupport(fileName,
-					null);
+			Graph g = GraphIO.loadGraphFromFile(fileName, null, ImplementationType.MEMORY);
 			return addGraph(g);
 		} catch (Exception e) {
 			throw new GraphException("Exception while loading graph.", e);
@@ -159,7 +158,7 @@ public class JniServer {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Vertex> m1Class = graph.getGraphClass()
 				.getVertexClass(vertexClassName).getM1Class();
-		return graph.createVertex(m1Class).getId();
+		return (int) graph.createVertex(m1Class).getId();
 	}
 
 	public void deleteVertex(int graphId, int vertexId) throws RemoteException {
@@ -267,7 +266,7 @@ public class JniServer {
 				.getEdgeClass(edgeClassName).getM1Class();
 		Edge e = graph.createEdge(m1Class);
 
-		return e.getId();
+		return (int) e.getId();
 	}
 
 	public void deleteEdge(int graphId, int edgeId) throws RemoteException {
@@ -395,7 +394,7 @@ public class JniServer {
 		Vertex v = (vertexClassName != null) ? g.getFirstVertex((VertexClass) g
 				.getSchema().getAttributedElementClass(vertexClassName)) : g
 				.getFirstVertex();
-		return (v == null) ? 0 : v.getId();
+		return (int) ((v == null) ? 0 : v.getId());
 	}
 
 	public int getNextVertex(int graphId, int vertexId, String vertexClassName)
@@ -406,7 +405,7 @@ public class JniServer {
 						((VertexClass) g.getSchema().getAttributedElementClass(
 								vertexClassName))) : g.getVertex(vertexId)
 				.getNextVertex();
-		return (v == null) ? 0 : v.getId();
+		return (int) ((v == null) ? 0 : v.getId());
 	}
 
 	public int getFirstEdgeInGraph(int graphId, String edgeClassName)
@@ -415,7 +414,7 @@ public class JniServer {
 		Edge e = (edgeClassName != null) ? g.getFirstEdge((EdgeClass) g
 				.getSchema().getAttributedElementClass(edgeClassName)) : g
 				.getFirstEdge();
-		return (e == null) ? 0 : e.getId();
+		return (int) ((e == null) ? 0 : e.getId());
 	}
 
 	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName)
@@ -424,7 +423,7 @@ public class JniServer {
 		Edge e = (edgeClassName != null) ? g.getEdge(edgeId).getNextEdge(
 				((EdgeClass) g.getSchema().getAttributedElementClass(
 						edgeClassName))) : g.getEdge(edgeId).getNextEdge();
-		return (e == null) ? 0 : e.getId();
+		return (int) ((e == null) ? 0 : e.getId());
 	}
 
 	// public int getFirstEdge(int graphId, int vertexId, String edgeClassName)
