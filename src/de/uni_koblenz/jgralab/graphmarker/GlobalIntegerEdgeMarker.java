@@ -5,14 +5,14 @@ import de.uni_koblenz.jgralab.Graph;
 
 
 /**
- * Implements a GraphMarker to mark edges of a global DHHTGraph with doubles
+ * Implements a GraphMarker to mark edges of a global DHHTGraph with integer
  * using LocalArrayEdgeMarkers to mark elements in the several partial graphs.
  * 
  * @author dbildh
  */
-public class GlobalDoubleEdgeMarker extends GlobalGraphMarker<Edge> {
+public class GlobalIntegerEdgeMarker extends GlobalGraphMarker<Edge> {
 
-	public GlobalDoubleEdgeMarker(Graph globalGraph) {
+	public GlobalIntegerEdgeMarker(Graph globalGraph) {
 		super(globalGraph);
 	}
 
@@ -25,7 +25,7 @@ public class GlobalDoubleEdgeMarker extends GlobalGraphMarker<Edge> {
 	 * @param edge the edge to be marked
 	 * @param value the object to be used a mark
 	 */
-	public final void mark(Edge edge, double value) {
+	public final void mark(Edge edge, int value) {
 		LocalDoubleEdgeMarker localMarker = (LocalDoubleEdgeMarker) getOrCreateMarkerForPartialGraph(edge);
 		localMarker.mark(edge, value);		
 	}
