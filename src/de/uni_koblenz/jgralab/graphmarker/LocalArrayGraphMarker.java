@@ -51,6 +51,7 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	protected int marked;
 	protected long version;
 
+	@SuppressWarnings("unchecked")
 	protected LocalArrayGraphMarker(Graph graph, int size) {
 		super(graph);
 		temporaryAttributes = (O[]) new Object[size];
@@ -82,7 +83,6 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		@SuppressWarnings("unchecked")
 		O out = (O) temporaryAttributes[(int) graphElement.getId()];
 		return out;
 	}
@@ -101,7 +101,6 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 		assert (graphElement.getGraph() == graph);
 		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		@SuppressWarnings("unchecked")
 		O out = (O) temporaryAttributes[(int) graphElement.getId()];
 		temporaryAttributes[(int) graphElement.getId()] = value;
 		marked += 1;
@@ -130,6 +129,7 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 
 	protected void expand(int newSize) {
 		assert (newSize > temporaryAttributes.length);
+		@SuppressWarnings("unchecked")
 		O[] newTemporaryAttributes = (O[]) new Object[newSize];
 		System.arraycopy(temporaryAttributes, 0, newTemporaryAttributes, 0,
 				temporaryAttributes.length);

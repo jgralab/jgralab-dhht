@@ -122,7 +122,7 @@
 	<!-- jgralab -->
 	<!-- compiles jgralab basic sources -->
 	<target name="core" depends="createClassesDir">
-		<javac fork="true" srcdir="${core.src}" includes="${core.includes}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}" verbose ="true">
+		<javac fork="true" srcdir="${core.src}" includes="${core.includes}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}" >
 			<compilerarg line="-Xlint:unchecked"/>
 		</javac>
 	</target>
