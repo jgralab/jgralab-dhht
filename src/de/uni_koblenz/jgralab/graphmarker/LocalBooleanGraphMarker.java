@@ -72,7 +72,7 @@ public class LocalBooleanGraphMarker extends
 	@Override
 	public final boolean isMarked(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 		return markedElements.contains(elem);
 	}
 
@@ -86,7 +86,7 @@ public class LocalBooleanGraphMarker extends
 	 */
 	public final boolean mark(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 
 		return markedElements.add(elem);
 
@@ -103,7 +103,7 @@ public class LocalBooleanGraphMarker extends
 	@Override
 	public final boolean removeMark(GraphElement<?, ?, ?> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 		return markedElements.remove(elem);
 	}
 

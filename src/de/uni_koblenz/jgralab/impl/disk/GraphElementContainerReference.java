@@ -29,8 +29,8 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 	AttributeContainer[] attributes;
 	
 	
-	public GraphElementContainerReference(T container,ReferenceQueue<? super StorageContainer> queue) {
-		super(container, queue);
+	public GraphElementContainerReference(T container,ReferenceQueue<? extends T> queue) {
+		super(container,  queue);
 		backgroundStorage = container.backgroundStorage;
 		types = container.types;
 		id = container.id;
@@ -44,7 +44,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 	}
 	
 	public GraphElementContainerReference(T container,
-			FileChannel input, ReferenceQueue queue) throws IOException, ClassNotFoundException {
+			FileChannel input, ReferenceQueue<? extends T> queue) throws IOException {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
@@ -60,7 +60,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
    		read(input);
 	}
 	
-	public GraphElementContainerReference(T container, FileChannel input, GraphElementContainerReference<T> oldRef, ReferenceQueue queue) throws IOException {
+	public GraphElementContainerReference(T container, FileChannel input, GraphElementContainerReference<T> oldRef, ReferenceQueue<? extends T> queue) throws IOException {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
@@ -75,7 +75,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
    		read(input);
 	}
 	
-	public GraphElementContainerReference(T container, GraphElementContainerReference<T> oldRef, ReferenceQueue queue) {
+	public GraphElementContainerReference(T container, GraphElementContainerReference<T> oldRef, ReferenceQueue<? extends T> queue) {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;

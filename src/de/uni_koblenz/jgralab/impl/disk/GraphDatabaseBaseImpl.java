@@ -185,6 +185,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 
 		// instantiate object
+		@SuppressWarnings("unchecked")
 		VertexImpl v = (VertexImpl) graphFactory
 				.createVertexDiskBasedStorage((Class<? extends Vertex>) schema
 						.getM1ClassForId(vertexClassId), vertexId, this);
@@ -559,6 +560,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 
 		// instantiate object
+		@SuppressWarnings("unchecked")
 		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(
 				(Class<? extends Edge>) schema.getM1ClassForId(edgeClassId),
 				edgeId, this);
@@ -1466,12 +1468,18 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
+	public <T extends Record> T createRecord(Class<T> recordClass, Object... components) {
 		T record = graphFactory.createRecord(recordClass,
 				getGraphObject(convertToGlobalId(1)));
 		record.setComponentValues(components);
 		return record;
+	}
+	
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
@@ -1552,11 +1560,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		return null;
 	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 }

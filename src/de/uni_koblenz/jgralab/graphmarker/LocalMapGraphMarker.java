@@ -87,7 +87,7 @@ public abstract class LocalMapGraphMarker<T extends AttributedElement<?, ?>, O>
 			return null;
 		}
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 		return tempAttributeMap.get(elem);
 	}
 
@@ -103,7 +103,7 @@ public abstract class LocalMapGraphMarker<T extends AttributedElement<?, ?>, O>
 	 */
 	public O mark(T elem, O value) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 
 		return tempAttributeMap.put(elem, value);
 
@@ -150,14 +150,14 @@ public abstract class LocalMapGraphMarker<T extends AttributedElement<?, ?>, O>
 	@Override
 	public boolean isMarked(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
 	public boolean removeMark(T elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
-				.getGraph() == graph) || elem == graph);
+				.getGraph() == graph));
 		return tempAttributeMap.remove(elem) != null;
 	}
 

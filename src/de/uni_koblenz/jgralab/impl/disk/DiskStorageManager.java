@@ -559,12 +559,10 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			EdgeContainerReference reference = null;
 			if (edgeReuseQueueSize > 0) {
 				edgeReuseQueueSize--;
-				reference = new EdgeContainerReference(storage, channel,
-						firstInEdgeReuseQueue, edgeQueue);
+				reference = new EdgeContainerReference(storage, channel, firstInEdgeReuseQueue, edgeQueue);
 				firstInEdgeReuseQueue = (EdgeContainerReference) firstInEdgeReuseQueue.nextInReuseQueue;
 			} else {
-				reference = new EdgeContainerReference(storage, channel,
-						edgeQueue);
+				reference = new EdgeContainerReference(storage, channel, edgeQueue);
 			}
 			edgeStorages[storageId] = reference;
 			return storage;
@@ -587,8 +585,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						reference.setReused();
 						// create new container
 						storage = new EdgeContainer(storageId, this);
-						reference = new EdgeContainerReference(storage,
-								reference, edgeQueue);
+						reference = new EdgeContainerReference(storage,	reference, edgeQueue);
 						edgeStorages[storageId] = reference;
 					}
 				} else {

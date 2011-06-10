@@ -31,8 +31,9 @@ public abstract class ContainerReference<T extends StorageContainer> extends Wea
 	}
 	
 	
-	public ContainerReference(T container, ReferenceQueue<? super StorageContainer> queue) {
-		super(container, queue);
+	@SuppressWarnings("unchecked")
+	public ContainerReference(T container, ReferenceQueue<? extends StorageContainer> queue) {
+		super(container, (ReferenceQueue<? super T>) queue);
 	}
 	
 	abstract void write(FileChannel channel) throws IOException ;

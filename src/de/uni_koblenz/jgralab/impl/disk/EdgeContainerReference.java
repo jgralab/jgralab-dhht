@@ -32,27 +32,27 @@ public class EdgeContainerReference extends GraphElementContainerReference<EdgeC
 	
 	
 	/* creates a new reference to a freshly created container */
-	@SuppressWarnings("unchecked")
-	public EdgeContainerReference(EdgeContainer container, ReferenceQueue queue) {
+	public EdgeContainerReference(EdgeContainer container, ReferenceQueue<? extends EdgeContainer> queue) {
 		super(container, queue);
 	}
-		
-	public EdgeContainerReference(EdgeContainer container,
-			FileChannel input, ReferenceQueue  queue) throws IOException, ClassNotFoundException {
-		super(container, input, queue);
-   		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
-	}
 	
-	public EdgeContainerReference(EdgeContainer container, FileChannel input, EdgeContainerReference oldRef, ReferenceQueue queue) throws IOException {
+	public EdgeContainerReference(EdgeContainer container, FileChannel input, ReferenceQueue<? extends EdgeContainer> queue) throws IOException {
+		super(container, input, queue);
+		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
+	}
+		
+
+	public EdgeContainerReference(EdgeContainer container, FileChannel input, EdgeContainerReference oldRef, ReferenceQueue<? extends EdgeContainer> queue) throws IOException {
 		super(container, input, oldRef, queue);
    		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
+
 	
-	public EdgeContainerReference(EdgeContainer container, EdgeContainerReference oldRef, ReferenceQueue queue) {
-		super(container, oldRef, queue);
+	public EdgeContainerReference(EdgeContainer container, EdgeContainerReference reference, ReferenceQueue<? extends EdgeContainer> edgeQueue)  {
+		super(container, reference, edgeQueue);
    		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
-		
+	
 		
 	public String toString() {
 		return "EdgeStorage " + id;

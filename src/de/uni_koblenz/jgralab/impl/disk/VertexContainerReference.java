@@ -16,23 +16,22 @@ public class VertexContainerReference extends GraphElementContainerReference<Ver
 	private static final long serialVersionUID = 6397047815119746241L;
 	
 	
-	public VertexContainerReference(VertexContainer container, ReferenceQueue queue) {
+	public VertexContainerReference(VertexContainer container, ReferenceQueue<? extends VertexContainer> queue) {
 		super(container, queue);
 	}
 	
 	
-	public VertexContainerReference(VertexContainer container,
-			FileChannel input, ReferenceQueue queue) throws IOException, ClassNotFoundException {
+	public VertexContainerReference(VertexContainer container, FileChannel input, ReferenceQueue<? extends VertexContainer> queue) throws IOException, ClassNotFoundException {
 		super(container, input, queue);
    		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
-	public VertexContainerReference(VertexContainer container, FileChannel input, VertexContainerReference oldRef, ReferenceQueue queue) throws IOException {
+	public VertexContainerReference(VertexContainer container, FileChannel input, VertexContainerReference oldRef, ReferenceQueue<? extends VertexContainer> queue) throws IOException {
 		super(container, input, oldRef, queue);
    		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}
 	
-	public VertexContainerReference(VertexContainer container, VertexContainerReference oldRef, ReferenceQueue queue) {
+	public VertexContainerReference(VertexContainer container, VertexContainerReference oldRef, ReferenceQueue<? extends VertexContainer> queue) {
 		super(container, oldRef, queue);
    		container.vertices = new Vertex[DiskStorageManager.CONTAINER_SIZE];
 	}

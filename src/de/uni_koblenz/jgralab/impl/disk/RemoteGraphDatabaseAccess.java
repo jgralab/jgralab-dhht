@@ -356,7 +356,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 			Map<String, Object> fields);
 
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object[] components);
+			Object... components);
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
