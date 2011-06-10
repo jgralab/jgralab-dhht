@@ -316,6 +316,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public <T extends Incidence> T   reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
 		try {
+			@SuppressWarnings("unchecked")
 			T i = (T)incidenceMapForDiskStorageReloading.get(
 					incidenceClass).newInstance(id, container);
 			return i;
