@@ -20,7 +20,7 @@ public class GlobalGenericGraphMarker<O> extends GlobalGraphMarker<GraphElement<
 		super(globalGraph);
 	}
 
-	protected final GraphMarker<GraphElement<?,?,?>> createMarkerForPartialGraph() {
+	protected final LocalGenericGraphMarker<O> createMarkerForPartialGraph() {
 		return new LocalGenericGraphMarker<O>(graph);
 	}
 	

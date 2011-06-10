@@ -474,13 +474,15 @@ public abstract class GraphImpl extends GraphBaseImpl {
 		storingGraphDatabase.graphModified();
 	}
 
-	public void saveGraph(String filename, ProgressFunction pf,
-			LocalBooleanGraphMarker subGraph) throws GraphIOException {
-		if (subGraph != null) {
+	public void saveGraph(String filename, ProgressFunction pf, LocalBooleanGraphMarker subGraph) throws GraphIOException {
+	//	if (subGraph != null) {
 			GraphIO.saveGraphToFile(filename, this, pf);
-		} else {
-			GraphIO.saveGraphToFile(filename, subGraph, pf);
-		}
+//		} else {
+//			GraphIO.saveGraphToFile(filename, subGraph, pf);
+//		}
 	}
+
+
+
 
 }

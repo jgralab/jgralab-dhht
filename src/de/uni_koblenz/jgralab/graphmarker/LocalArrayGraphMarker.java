@@ -47,13 +47,13 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	/**
 	 * The array of temporary attributes.
 	 */
-	protected Object[] temporaryAttributes;
+	protected O[] temporaryAttributes;
 	protected int marked;
 	protected long version;
 
 	protected LocalArrayGraphMarker(Graph graph, int size) {
 		super(graph);
-		temporaryAttributes = new Object[size];
+		temporaryAttributes = (O[]) new Object[size];
 		marked = 0;
 	}
 
@@ -130,7 +130,7 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 
 	protected void expand(int newSize) {
 		assert (newSize > temporaryAttributes.length);
-		Object[] newTemporaryAttributes = new Object[newSize];
+		O[] newTemporaryAttributes = (O[]) new Object[newSize];
 		System.arraycopy(temporaryAttributes, 0, newTemporaryAttributes, 0,
 				temporaryAttributes.length);
 		// for (int i = 0; i < temporaryAttributes.length; i++) {

@@ -14,14 +14,14 @@ import de.uni_koblenz.jgralab.GraphElement;
  *
  * @param <O> The kind of objects that can be attached to the edges as marks
  */
-public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement<?,?,?>> {
+public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement> {
 
 	public GlobalBooleanGraphMarker(Graph globalGraph) {
 		super(globalGraph);
 	}
 
-	protected final GraphMarker<GraphElement<?, ?, ?>> createMarkerForPartialGraph() {
-		return new LocalBooleanGraphMarker(graph);
+	protected final  GraphMarker<GraphElement> createMarkerForPartialGraph() {
+		return  new LocalBooleanGraphMarker(graph);
 	}
 	
 	/**
@@ -29,7 +29,7 @@ public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement<?,?
 	 * @param edge the edge to be marked
 	 * @param value the object to be used a mark
 	 */
-	public final void mark(GraphElement<?,?,?> elem) {
+	public final void mark(GraphElement elem) {
 		LocalBooleanGraphMarker localMarker = (LocalBooleanGraphMarker) getOrCreateMarkerForPartialGraph(elem);
 		localMarker.mark(elem);		
 	}

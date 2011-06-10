@@ -48,9 +48,9 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  */
 public class LocalBooleanGraphMarker extends
-		AbstractGraphMarker<GraphElement<?, ?, ?>> {
+		AbstractGraphMarker<GraphElement> implements GraphMarker<GraphElement> {
 
-	private final HashSet<GraphElement<?, ?, ?>> markedElements;
+	private final HashSet<GraphElement> markedElements;
 
 	/**
 	 * creates a new boolean graph marker
@@ -58,7 +58,7 @@ public class LocalBooleanGraphMarker extends
 	 */
 	public LocalBooleanGraphMarker(Graph g) {
 		super(g);
-		markedElements = new HashSet<GraphElement<?, ?, ?>>();
+		markedElements = new HashSet<GraphElement>();
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if this GraphMarker marks the given element, false otherwise
 	 */
 	@Override
-	public final boolean isMarked(GraphElement<?, ?, ?> elem) {
+	public final boolean isMarked(GraphElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph));
 		return markedElements.contains(elem);
@@ -101,7 +101,7 @@ public class LocalBooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(GraphElement<?, ?, ?> elem) {
+	public final boolean removeMark(GraphElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph));
 		return markedElements.remove(elem);
@@ -113,7 +113,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return the markedElements
 	 */
 	@Override
-	public Iterable<GraphElement<?, ?, ?>> getMarkedElements() {
+	public Iterable<GraphElement> getMarkedElements() {
 		return markedElements;
 	}
 

@@ -102,6 +102,9 @@ import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
  * @author ist@uni-koblenz.de
  */
 public class GraphIO {
+	
+
+	
 	private static final int BUFFER_SIZE = 65536;
 	/**
 	 * TG File Version this GraphIO recognizes.
@@ -664,41 +667,41 @@ public class GraphIO {
 		}
 	}
 
-	/**
-	 * Saves the marked <code>subGraph</code> to the file named
-	 * <code>filename</code>. A {@link ProgressFunction} <code>pf</code> can be
-	 * used to monitor progress. The stream is <em>not</em> closed. This method
-	 * does <i>not</i> check if the subgraph marker is complete.
-	 * 
-	 * @param out
-	 *            a DataOutputStream
-	 * @param subGraph
-	 *            a BooleanGraphMarker denoting the subgraph to be saved
-	 * @param pf
-	 *            a {@link ProgressFunction}, may be <code>null</code>
-	 * @throws GraphIOException
-	 *             if an IOException occurs
-	 */
-	public static void saveGraphToFile(String filename,
-			LocalBooleanGraphMarker subGraph, ProgressFunction pf)
-			throws GraphIOException {
-		DataOutputStream out = null;
-		try {
-			if (filename.toLowerCase().endsWith(".gz")) {
-				out = new DataOutputStream(new GZIPOutputStream(
-						new FileOutputStream(filename), BUFFER_SIZE));
-			} else {
-				out = new DataOutputStream(new BufferedOutputStream(
-						new FileOutputStream(filename), BUFFER_SIZE));
-			}
-			saveGraphToStream(out, subGraph, pf, false);
-		} catch (IOException e) {
-			throw new GraphIOException("exception while saving graph to "
-					+ filename, e);
-		} finally {
-			close(out);
-		}
-	}
+//	/**
+//	 * Saves the marked <code>subGraph</code> to the file named
+//	 * <code>filename</code>. A {@link ProgressFunction} <code>pf</code> can be
+//	 * used to monitor progress. The stream is <em>not</em> closed. This method
+//	 * does <i>not</i> check if the subgraph marker is complete.
+//	 * 
+//	 * @param out
+//	 *            a DataOutputStream
+//	 * @param subGraph
+//	 *            a BooleanGraphMarker denoting the subgraph to be saved
+//	 * @param pf
+//	 *            a {@link ProgressFunction}, may be <code>null</code>
+//	 * @throws GraphIOException
+//	 *             if an IOException occurs
+//	 */
+//	public static void saveGraphToFile(String filename,
+//			LocalBooleanGraphMarker subGraph, ProgressFunction pf)
+//			throws GraphIOException {
+//		DataOutputStream out = null;
+//		try {
+//			if (filename.toLowerCase().endsWith(".gz")) {
+//				out = new DataOutputStream(new GZIPOutputStream(
+//						new FileOutputStream(filename), BUFFER_SIZE));
+//			} else {
+//				out = new DataOutputStream(new BufferedOutputStream(
+//						new FileOutputStream(filename), BUFFER_SIZE));
+//			}
+//			saveGraphToStream(out, subGraph, pf, false);
+//		} catch (IOException e) {
+//			throw new GraphIOException("exception while saving graph to "
+//					+ filename, e);
+//		} finally {
+//			close(out);
+//		}
+//	}
 
 	/**
 	 * Saves the specified <code>graph</code> to the stream <code>out</code>. A
@@ -730,6 +733,8 @@ public class GraphIO {
 		}
 	}
 
+
+	
 	/**
 	 * Saves the marked <code>subGraph</code> to the stream <code>out</code>. A
 	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
