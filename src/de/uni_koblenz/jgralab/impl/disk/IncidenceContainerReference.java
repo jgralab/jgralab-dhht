@@ -29,7 +29,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 
 	
 	
-	public IncidenceContainerReference(IncidenceContainer container, ReferenceQueue<? extends IncidenceContainer> queue) {
+	public IncidenceContainerReference(IncidenceContainer container, ReferenceQueue<IncidenceContainer> queue) {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
@@ -44,7 +44,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 	
 
 	public IncidenceContainerReference(IncidenceContainer container,
-			FileChannel input, ReferenceQueue<? extends IncidenceContainer> queue) throws IOException {
+			FileChannel input, ReferenceQueue<IncidenceContainer> queue) throws IOException {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
@@ -61,7 +61,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
    		read(input);
 	}
 	
-	public IncidenceContainerReference(IncidenceContainer container, FileChannel input, IncidenceContainerReference oldRef, ReferenceQueue<? extends IncidenceContainer> queue) throws IOException {
+	public IncidenceContainerReference(IncidenceContainer container, FileChannel input, IncidenceContainerReference oldRef, ReferenceQueue<IncidenceContainer> queue) throws IOException {
 		super(container, queue);
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;

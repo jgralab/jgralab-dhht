@@ -32,23 +32,23 @@ public class EdgeContainerReference extends GraphElementContainerReference<EdgeC
 	
 	
 	/* creates a new reference to a freshly created container */
-	public EdgeContainerReference(EdgeContainer container, ReferenceQueue<? extends EdgeContainer> queue) {
+	public EdgeContainerReference(EdgeContainer container, ReferenceQueue<EdgeContainer> queue) {
 		super(container, queue);
 	}
 	
-	public EdgeContainerReference(EdgeContainer container, FileChannel input, ReferenceQueue<? extends EdgeContainer> queue) throws IOException {
+	public EdgeContainerReference(EdgeContainer container, FileChannel input, ReferenceQueue<EdgeContainer> queue) throws IOException {
 		super(container, input, queue);
 		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
 		
 
-	public EdgeContainerReference(EdgeContainer container, FileChannel input, EdgeContainerReference oldRef, ReferenceQueue<? extends EdgeContainer> queue) throws IOException {
+	public EdgeContainerReference(EdgeContainer container, FileChannel input, EdgeContainerReference oldRef, ReferenceQueue<EdgeContainer> queue) throws IOException {
 		super(container, input, oldRef, queue);
    		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}
 
 	
-	public EdgeContainerReference(EdgeContainer container, EdgeContainerReference reference, ReferenceQueue<? extends EdgeContainer> edgeQueue)  {
+	public EdgeContainerReference(EdgeContainer container, EdgeContainerReference reference, ReferenceQueue<EdgeContainer> edgeQueue)  {
 		super(container, reference, edgeQueue);
    		container.edges = new Edge[DiskStorageManager.CONTAINER_SIZE];
 	}

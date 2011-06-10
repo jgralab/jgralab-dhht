@@ -13,8 +13,7 @@ public abstract class StorageContainer {
 	StorageContainer nextInQueue = null;
 	
 	StorageContainer previousInQueue = null;
-	
-	//TODO: Remove this field as soon as graph is storage
+
 	public DiskStorageManager backgroundStorage;
 
 	public StorageContainer(int id, int size, DiskStorageManager backgroundStorage) {
