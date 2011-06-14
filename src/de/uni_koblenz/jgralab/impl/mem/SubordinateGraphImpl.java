@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.impl.mem;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -51,6 +52,7 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -80,6 +82,8 @@ public abstract class SubordinateGraphImpl extends
 	private int eCount;
 
 	private int iCount;
+	
+	private int subgraphId;
 
 	@Override
 	public GraphElement<?, ?, ?> getContainingElement() {
@@ -130,6 +134,7 @@ public abstract class SubordinateGraphImpl extends
 	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getType());
 		initializeCommonFields(containingVertex);
+		subgraphId = (int) containingVertex.getId();
 		// System.out.println("Initialozing subordinate graph " + this);
 		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
 				&& ((GraphElementImpl<?, ?, ?>) current)
@@ -172,6 +177,7 @@ public abstract class SubordinateGraphImpl extends
 	 */
 	protected SubordinateGraphImpl(Edge containingEdge) {
 		super(containingEdge.getGraph().getType());
+		subgraphId = (int) (Integer.MAX_VALUE - containingEdge.getId());
 		initializeCommonFields(containingEdge);
 
 		// initialize edges
@@ -644,5 +650,51 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public int getPartialGraphId() {
 		return getCompleteGraph().getPartialGraphId();
+	}
+	
+	@Override
+	public Graph createPartialGraph(String hostname) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public List<? extends Graph> getPartialGraphs() {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public long getGlobalSubgraphId() {
+		return getLocalSubgraphId();
+	}
+
+
+	@Override
+	public int getLocalSubgraphId() {
+		return subgraphId;
+	}
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return getCompleteGraph().isLocalElementId(id);
+	}
+
+
+	@Override
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		throw new UnsupportedOperationException();
+	}
+
+
+	@Override
+	public void setLoading(boolean b) {
+		getCompleteGraph().setLoading(b);
 	}
 }

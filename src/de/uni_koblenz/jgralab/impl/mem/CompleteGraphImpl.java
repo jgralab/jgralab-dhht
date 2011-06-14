@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -55,6 +56,7 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
@@ -1352,7 +1354,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	protected abstract FreeIndexList getFreeIncidenceList();
+	protected FreeIndexList getFreeIncidenceList() {
+		return freeIncidenceList;
+	}
 
 	// ------------- GRAPH VARIABLES -------------
 
@@ -1731,6 +1735,52 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
-		throw new RuntimeException("Operation not yet implemented");
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	@Override
+	public Graph createPartialGraph(String hostname) {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	@Override
+	public List<? extends Graph> getPartialGraphs() {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	@Override
+	public long getGlobalSubgraphId() {
+		return 1;
+	}
+
+	@Override
+	public int getLocalSubgraphId() {
+		return 1;
+	}
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return ((int)id) == id;
+	}
+
+	@Override
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+
+	@Override
+	protected void setVCount(int count) {
+		vCount= count;
+	}
+
+	@Override
+	protected void setECount(int count) {
+		eCount = count;
 	}
 }
