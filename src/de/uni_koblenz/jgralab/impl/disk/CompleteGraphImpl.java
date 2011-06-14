@@ -55,7 +55,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphImpl extends GraphBaseImpl {
+public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	/**
 	 * the unique id of the complete graph this object represents or belogns to
@@ -68,7 +68,7 @@ public abstract class GraphImpl extends GraphBaseImpl {
 	 * @param id
 	 *            this Graph's id
 	 */
-	protected GraphImpl(String graphId, long partialGraphId,
+	protected CompleteGraphImpl(String graphId, long partialGraphId,
 			GraphDatabaseBaseImpl localDatabase,
 			RemoteGraphDatabaseAccess graphData) {
 		super(partialGraphId, localDatabase, graphData);

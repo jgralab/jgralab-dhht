@@ -68,9 +68,7 @@ import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
-import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -770,9 +768,9 @@ public class GraphIO {
 			LocalBooleanGraphMarker subGraph, boolean onlyLocalGraph)
 			throws IOException, GraphIOException {
 		ImplementationType type = null;
-		if (graph instanceof GraphImpl) {
+		if (graph instanceof de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) {
 			type = ImplementationType.DISK;
-		} else if (graph instanceof CompleteGraphImpl) {
+		} else if (graph instanceof de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) {
 			type = ImplementationType.MEMORY;
 		} else {
 			throw new GraphIOException(
@@ -787,7 +785,7 @@ public class GraphIO {
 
 		if (!onlyLocalGraph && type == ImplementationType.DISK) {
 			for (Graph pgraph : graph.getPartialGraphs()) {
-				((GraphImpl) pgraph).saveGraph(filename, pf, subGraph);
+				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) pgraph).saveGraph(filename, pf, subGraph);
 			}
 		}
 
@@ -2906,9 +2904,9 @@ public class GraphIO {
 
 		if (graph.getPartialGraphId() == 1) {
 			if (implementationType == ImplementationType.MEMORY) {
-				((CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+				((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 			} else {
-				((GraphImpl) graph).setGraphVersion(graphVersion);
+				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 			}
 		}
 		if (pf != null) {

@@ -88,7 +88,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
 		code.setVariable("extends",	" ");
 		if (currentCycle.isMemOrDiskImpl()) {
-			code.setVariable("extends",	" extends #baseClassOrProxyName#");
+			code.setVariable("extends",	" extends #baseClassName#");
 		} else if (currentCycle.isProxies()) {
 			code.setVariable("extends",	" extends #proxyClassName#");
 		}

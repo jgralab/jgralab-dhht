@@ -223,7 +223,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 * @param traversalContext {@link Graph}
 	 */
 	protected void setTraversalContext(Graph traversalContext)  {
-		((GraphImpl)getCompleteGraph()).setTraversalContext(traversalContext);
+		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(traversalContext);
 	}
 
 	@Override
@@ -233,7 +233,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	@Override
 	public void useAsTraversalContext() {
-		((GraphImpl)getCompleteGraph()).setTraversalContext(this);
+		((CompleteGraphImpl)getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
