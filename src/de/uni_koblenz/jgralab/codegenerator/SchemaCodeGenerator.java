@@ -95,6 +95,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		addImports("#jgImplPackage#.GraphFactoryImpl");
 		addImports("#jgPackage#.ImplementationType");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		addImports("#jgDiskImplPackage#.CompleteGraphDatabase");
+		addImports("java.net.UnknownHostException");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
 				true,
@@ -187,13 +189,32 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"",
 				"/**",
 				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user to create a " +
-				" * new #gcName#-graph instance.",
+				" * new #gcName#-graph instance. The local hostname is detected automatically",
 				" *",
 				"*/",
 				"public #gcName# create#gcCamelName#OnDisk() {",
 				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tString hostname = null;",
+				"\ttry {",
+				"\t\thostname = InetAddress.getLocalHost().getHostAddress();",
+				"\t} catch (UnknownHostException ex) {",
+				"\t\tthrow new RuntimeException(ex);",
+				"\t}",
 				"\tlong subgraphId = GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID;",
-				"\tGraphDabaseBaseImpl = new GraphDatabaseBaseImpl(this, uniqueGraphId, 0, subgraphId);",
+				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabase(this, uniqueGraphId, hostname);",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
+				"}",
+				"",
+				"/**",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user to create a " +
+				" * new #gcName#-graph instance.",
+				" * @param hostAddress the address or resolvable hostname of the local host",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#OnDisk(String localHostAddress) {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tlong subgraphId = GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID;",
+				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabase(this, uniqueGraphId, localHostAddress);",
 				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
 				"",
@@ -229,7 +250,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" * @throws GraphIOException if the graph cannot be loaded",
 				" */",
 				"public #gcName# load#gcCamelName#(String filename, ImplementationType implType, ProgressFunction pf) throws GraphIOException {",
-				"\tGraph graph = GraphIO.loadGraphFromFile(filename, this, pf, type);\n"
+				"\tGraph graph = GraphIO.loadGraphFromFile(filename, this, pf, implType);\n"
 						+ "\tif (!(graph instanceof #gcName#)) {\n"
 						+ "\t\tthrow new GraphIOException(\"Graph in file '\" + filename + \"' is not an instance of GraphClass #gcName#\");\n"
 						+ "\t}" + "\treturn (#gcName#) graph;\n",
@@ -242,6 +263,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.setVariable("gcImplName", schema.getGraphClass()
 				.getQualifiedName()
 				+ "Impl");
+		addImports("java.net.InetAddress");
 		return code;
 	}
 
@@ -425,7 +447,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"{",
-						"\tIncidenceClass #icVariable# = #schemaVariable# = #gcVariable#.createIncidenceClass(",
+						/*"\tIncidenceClass #icVariable# =*/ "#schemaVariable# = #gcVariable#.createIncidenceClass(",
 						"\t\t#gcVariable#.getEdgeClass(\"#icEdgeClass#\"),",
 						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
 						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
