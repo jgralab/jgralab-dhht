@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.schema.GraphElementClass;
  * @author ist@uni-koblenz.de
  */
 
+@SuppressWarnings("rawtypes")
 public class LocalBooleanGraphMarker extends
 		AbstractGraphMarker<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElement>> {
 
@@ -102,7 +103,7 @@ public class LocalBooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(GraphElement elem) {
+	public final boolean removeMark(GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElement> elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?>) elem)
 				.getGraph() == graph));
 		return markedElements.remove(elem);

@@ -256,9 +256,10 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass) {
+	@Override
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDatabase) {
 		try {
-			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance();
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(uniqueGraphId, subgraphId, graphDatabase);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -266,9 +267,10 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 	
-	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int partialGraphId, GraphDatabaseBaseImpl database) {
+	@Override
+	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, long subgraphId, GraphDatabaseBaseImpl database) {
 		try {
-			Graph g = graphProxyMapForDiskBasedImpl.get(graphClass).newInstance(uid, partialGraphId, database);
+			Graph g = graphProxyMapForDiskBasedImpl.get(graphClass).newInstance(uid, subgraphId, database);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph proxy of class "
@@ -384,7 +386,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public void setGraphImplementationClass(
+	public void setGraphInMemoryImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends Graph> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -401,13 +403,30 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public void setGraphImplementationClassForDiskBasedStorage(
+	public void setGraphDiskBasedImplementationClass(
 			Class<? extends Graph> originalClass,
 			Class<? extends Graph> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { };
+				Class<?>[] params = { String.class, long.class, GraphDatabaseBaseImpl.class };
 				graphMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+	
+	@Override
+	public void setGraphProxyImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends Graph> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { String.class, long.class, GraphDatabaseBaseImpl.class };
+				graphMapForProxies.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
@@ -418,7 +437,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public void setVertexImplementationClass(
+	public void setVertexInMemoryImplementationClass(
 			Class<? extends Vertex> originalClass,
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -435,7 +454,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public void setVertexImplementationClassForDiskBasedStorage(
+	public void setVertexDiskBasedImplementationClass(
 			Class<? extends Vertex> originalClass,
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -491,7 +510,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setEdgeImplementationClass(Class<? extends Edge> originalClass,
+	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
@@ -522,7 +541,7 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setEdgeImplementationClassForDiskBasedStorage(
+	public void setEdgeDiskBasedImplementationClass(
 			Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {

@@ -66,14 +66,14 @@ public interface GraphFactory {
 	 * be an instance of a subclass of the specified graphClass.
 	 * @param graphDatabase 
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, GraphDatabaseBaseImpl graphDatabase);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDatabase);
 	
 	/**
 	 * creates a local graph proxy object for an existing remote partial or global graph.
 	 * of the specified class. The returned object may be an instance of a subclass of the 
 	 * specified graphClass.
 	 */
-	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, int id, GraphDatabaseBaseImpl localDatabase);
+	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl localDatabase);
 
 	/**
 	 * creates a View-Graph object for the specified class. The returned object
@@ -237,20 +237,25 @@ public interface GraphFactory {
 
 	public <T extends Incidence> T createIncidenceProxy(Class<? extends T> ic, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
-	public <T extends Incidence> T  reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container);
+	public <T extends Incidence> T reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container);
 	
 	
 	
 	
 	
 	
-	public void setGraphImplementationClass(
+	public void setGraphInMemoryImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends Graph> implementationClass);
 	
-	public void setGraphImplementationClassForDiskBasedStorage(
+	public void setGraphDiskBasedImplementationClass(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends Graph> implementationClass);
+	
+	public void setGraphProxyImplementationClass(
+			Class<? extends Graph> originalClass,
+			Class<? extends Graph> implementationClass);
+
 
 	public void setSubordinateGraphImplementationClass(
 			Class<? extends Graph> graphM1Class,
@@ -268,19 +273,41 @@ public interface GraphFactory {
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass);
 		
-	public void setVertexImplementationClass(
+	
+	
+	/**
+	 * Sets the implementation class to be used for all vertices of the given M1 Class vertexM1Class if a graph
+	 * is created using the in-memory storage facility
+	 * @param vertexM1Class
+	 * @param implementationClass
+	 */
+	public void setVertexInMemoryImplementationClass(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends Vertex> implementationClass);
 	
-	public void setVertexImplementationClassForDiskBasedStorage(
+	public void setVertexDiskBasedImplementationClass(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends Vertex> implementationClass);
+	
+	public void setVertexProxyImplementationClass(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends Vertex> implementationClass);
 
-	public void setEdgeImplementationClass(Class<? extends Edge> edgeM1Class,
+	
+	
+	
+	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
 
-	public void setEdgeImplementationClassForDiskBasedStorage(Class<? extends Edge> edgeM1Class,
+	public void setEdgeDiskBasedImplementationClass(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
+	
+	public void setEdgeProxyImplementationClass(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
+	
+	
+	
+	
 	
 	/**
 	 * Creates an record of class <code>recordDomain</code> in the graph g
