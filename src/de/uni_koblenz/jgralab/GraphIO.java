@@ -2818,20 +2818,28 @@ public class GraphIO {
 			interval = pf.getUpdateInterval();
 		}
 		Graph graph = null;
-		try {
-			graph = (Graph) schema.getGraphCreateMethod(implementationType)
-					.invoke(null, new Object[] { uniqueGraphId, maxV, maxE });
-		} catch (Exception e) {
-			throw new GraphIOException("can't create graph for class '"
-					+ gcName + "'", e);
-		}
+
 
 		if (implementationType == ImplementationType.MEMORY) {
-			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)
-					.setLoading(true);
+			try {
+				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.MEMORY)
+						.invoke(null, new Object[] { uniqueGraphId, maxV, maxE });
+			} catch (Exception e) {
+				throw new GraphIOException("can't create graph for class '"
+						+ gcName + "'", e);
+			}
+			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)	.setLoading(true);
 		} else {
-			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
-					.setLoading(true);
+			try {
+				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
+				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) server.getGraphDatabase(uniqueGraphId);
+				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.DISK)
+						.invoke(null, new Object[] { uniqueGraphId, partialGraphId, localGraphDb });
+			} catch (Exception e) {
+				throw new GraphIOException("can't create graph for class '"
+						+ gcName + "'", e);
+			}
+			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph).setLoading(true);
 			server = JGraLabServerImpl.getLocalInstance();
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;

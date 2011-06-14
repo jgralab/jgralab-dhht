@@ -92,6 +92,9 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		addImports("#jgSchemaImplPackage#.#baseClassName#");
 		addImports("#jgSchemaPackage#.VertexClass");
 		addImports("#jgSchemaPackage#.EdgeClass");
+		addImports("#jgImplPackage#.GraphFactoryImpl");
+		addImports("#jgPackage#.ImplementationType");
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
 				true,
@@ -175,25 +178,35 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"",
 				// ---- disk bases storage support ----
 				"/**",
-				" * Creates a new #gcName# graph using disk bases storage with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+				" * Creates a new #gcName# graph using disk based storage. To be called only by the graph database class!",
 				" *",
-				" * @param vMax initial vertex count",
-				" * @param eMax initial edge count",
 				"*/",
 				"public #gcName# create#gcCamelName#OnDisk(String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDb) {",
-				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, graphDb);",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
 				"",
 				"/**",
-				" * Creates a new #gcName# graph with savemem support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user to create a " +
+				" * new #gcName#-graph instance.",
 				" *",
-				" * @param id the id name of the new graph",
-				" * @param vMax initial vertex count",
-				" * @param eMax initial edge count",
-				" */",
-				"public #gcName# create#gcCamelName#Proxy(String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDb) {",
-				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, id, vMax, eMax);"	,
+				"*/",
+				"public #gcName# create#gcCamelName#OnDisk() {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tlong subgraphId = GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID;",
+				"\tGraphDabaseBaseImpl = new GraphDatabaseBaseImpl(this, uniqueGraphId, 0, subgraphId);",
+				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
+				"",
+//				"/**",
+//				" * Creates a new #gcName# graph with savemem support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+//				" *",
+//				" * @param id the id name of the new graph",
+//				" * @param vMax initial vertex count",
+//				" * @param eMax initial edge count",
+//				" */",
+//				"public #gcName# create#gcCamelName#Proxy(String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDb, RemoteGraphDatabase remoteGraphDb) {",
+//				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, remoteGraphDb);",
+//				"}",
 
 				// ---- file handling methods ----
 				"/**",

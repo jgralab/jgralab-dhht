@@ -70,7 +70,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
-			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
+			rootBlock.setVariable("baseClassName", "GraphImpl");
 		//	addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
 		//	addImports("java.util.List");
 		//	addImports("de.uni_koblenz.jgralab.Vertex");

@@ -416,7 +416,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 			g = ref.get();
 		}
 		if (g == null) {
-			g = graphFactory.createGraphDiskBasedStorage(getGraphType(globalSubgraphId), (GraphDatabaseBaseImpl) this);
+			g = graphFactory.createGraphDiskBasedStorage(getGraphType(globalSubgraphId), uniqueGraphId, globalSubgraphId, (GraphDatabaseBaseImpl) this);
 			subgraphObjects.put(globalSubgraphId, new WeakReference<Graph>(g));
 		}
 		return g;

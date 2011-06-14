@@ -78,6 +78,7 @@ import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SubordinateGraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.ViewGraphCodeGenerator;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
@@ -142,9 +143,10 @@ public class SchemaImpl implements Schema {
 
 	private final ArrayList<TypedElementClass<?, ?>> typedElementClasses = new ArrayList<TypedElementClass<?, ?>>();
 
-	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE = { String.class,
-			int.class, int.class };
+	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_INMEMORY = { String.class, int.class, int.class };
 
+	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_DISKBASED = { String.class, long.class, GraphDatabaseBaseImpl.class };
+	
 	/**
 	 * This is the name of the package into which the implementation classes for
 	 * this schema are generated. The impl package is child of the package for
@@ -1157,9 +1159,19 @@ public class SchemaImpl implements Schema {
 
 	@Override
 	public Method getGraphCreateMethod(ImplementationType implementationType) {
-		return getCreateMethod(graphClass.getSimpleName(),
-				graphClass.getSimpleName(), GRAPHCLASS_CREATE_SIGNATURE,
-				implementationType);
+		switch (implementationType) {
+		case MEMORY:
+			return getCreateMethod(graphClass.getSimpleName(),
+					graphClass.getSimpleName(), GRAPHCLASS_CREATE_SIGNATURE_INMEMORY,
+					implementationType);
+		case DISK:
+			return getCreateMethod(graphClass.getSimpleName(),
+					graphClass.getSimpleName(), GRAPHCLASS_CREATE_SIGNATURE_DISKBASED,
+					implementationType);
+		default:
+			throw new RuntimeException("Unhandled case: " + implementationType);
+		}
+
 	}
 
 	@Override
