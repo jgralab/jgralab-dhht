@@ -26,6 +26,10 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		}
 		rolenameGenerator = new RolenameCodeGenerator<MetaClass>(metaClass, false);
 	}
+	
+	protected boolean hasProxySupport() {
+		return true;
+	}
 
 	
 	@Override

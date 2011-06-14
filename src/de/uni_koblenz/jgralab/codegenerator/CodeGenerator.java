@@ -66,7 +66,7 @@ public abstract class CodeGenerator {
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
 			out.add(DISKBASED);
-			out.add(PROXIES);
+		//	out.add(PROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -281,6 +281,7 @@ public abstract class CodeGenerator {
 				if (currentCycle.isMemOrDiskImpl()) {
 					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
 				} else {
+					if (hasProxySupport())
 					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
 				}
 			} else {
@@ -290,6 +291,12 @@ public abstract class CodeGenerator {
 		}
 	}
 
+	
+	
+	protected boolean hasProxySupport() {
+		return false;
+	}
+	
 	/**
 	 * creates the generated code string for a class
 	 */

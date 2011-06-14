@@ -57,44 +57,17 @@ package de.uni_koblenz.jgralab.codegenerator;
  */
 public class CodeGeneratorConfiguration {
 
-	public static final CodeGeneratorConfiguration WITH_TRANSACTION_SUPPORT = new CodeGeneratorConfiguration()
-			.withTransactionSupport();
-
-	public static final CodeGeneratorConfiguration WITH_DATABASE_SUPPORT = new CodeGeneratorConfiguration()
-			.withDatabaseSupport();
-
-	public static final CodeGeneratorConfiguration FULL = new CodeGeneratorConfiguration()
-			.withTransactionSupport().withMethodsForSubclassesSupport()
-			.withSaveMemSupport().withDatabaseSupport();
-
-	public static final CodeGeneratorConfiguration FULL_WITHOUT_SUBCLASS_FLAGS = new CodeGeneratorConfiguration()
-			.withTransactionSupport().withSaveMemSupport()
-			.withDatabaseSupport();
-
-	public static final CodeGeneratorConfiguration WITHOUT_TYPESPECIFIC_METHODS = new CodeGeneratorConfiguration()
-			.withTransactionSupport().withoutTypeSpecificMethodSupport()
-			.withDatabaseSupport();
-
-	public static final CodeGeneratorConfiguration MINIMAL = new CodeGeneratorConfiguration()
-			.withoutTypeSpecificMethodSupport();
 	
 
-	/** toggles, if the classes for standard support should be created */
-	private boolean standardSupport = true;
+	public static final CodeGeneratorConfiguration FULL = new CodeGeneratorConfiguration()
+			.withMethodsForSubclassesSupport();
 
-	/** toggles, if the classes for transaction support should be created */
-	private boolean transactionSupport = false;
+	public static final CodeGeneratorConfiguration FULL_WITHOUT_SUBCLASS_FLAGS = new CodeGeneratorConfiguration();
 
-	/** toggles, if classes for database support should be created */
-	private boolean databaseSupport = false;
 
-	/**
-	 * toggles, if the memory saving std classes shall be used or not. If true,
-	 * singly linked lists will be used internally, instead of double linked
-	 * lists. Runtime will be possibly worse, though.
-	 */
-	private boolean saveMemSupport = false;
-
+	public static final CodeGeneratorConfiguration WITHOUT_TYPESPECIFIC_METHODS  = new CodeGeneratorConfiguration()
+			.withoutTypeSpecificMethodSupport();
+	
 	/**
 	 * toggles, if the type-specific methods such as "getNextXYVertex" should be
 	 * created
@@ -118,35 +91,11 @@ public class CodeGeneratorConfiguration {
 	 * this.saveMemSupport = false <br>
 	 */
 	public CodeGeneratorConfiguration() {
-		standardSupport = true;
-		transactionSupport = false;
-		saveMemSupport = false;
 		typespecificMethodSupport = true;
 		methodsForSubclassesSupport = false;
-		databaseSupport = false;
 	}
 
 	
-	public CodeGeneratorConfiguration withoutStandardSupport() {
-		standardSupport = false;
-		return this;
-	}
-
-	public CodeGeneratorConfiguration withTransactionSupport() {
-		transactionSupport = true;
-		return this;
-	}
-
-	public CodeGeneratorConfiguration withDatabaseSupport() {
-		databaseSupport = true;
-		return this;
-	}
-
-	public CodeGeneratorConfiguration withSaveMemSupport() {
-		saveMemSupport = true;
-		return this;
-	}
-
 	public CodeGeneratorConfiguration withoutTypeSpecificMethodSupport() {
 		typespecificMethodSupport = false;
 		return this;
@@ -165,37 +114,11 @@ public class CodeGeneratorConfiguration {
 	 *            values from.
 	 */
 	public CodeGeneratorConfiguration(CodeGeneratorConfiguration other) {
-		this.standardSupport = other.standardSupport;
-		this.transactionSupport = other.transactionSupport;
 		this.typespecificMethodSupport = other.typespecificMethodSupport;
-		this.saveMemSupport = other.saveMemSupport;
-		this.databaseSupport = other.databaseSupport;
 		this.methodsForSubclassesSupport = other.methodsForSubclassesSupport;
 	}
 
-	public void setStandardSupport(boolean standardSupport) {
-		this.standardSupport = standardSupport;
-	}
-
-	public boolean hasStandardSupport() {
-		return standardSupport;
-	}
-
-	public void setTransactionSupport(boolean transactionSupport) {
-		this.transactionSupport = transactionSupport;
-	}
-
-	public boolean hasTransactionSupport() {
-		return transactionSupport;
-	}
-
-	public void setDatabaseSupport(boolean databaseSupport) {
-		this.databaseSupport = databaseSupport;
-	}
-
-	public boolean hasDatabaseSupport() {
-		return this.databaseSupport;
-	}
+	
 
 	public void setTypeSpecificMethodsSupport(boolean typespecificMethodSupport) {
 		this.typespecificMethodSupport = typespecificMethodSupport;
@@ -214,11 +137,4 @@ public class CodeGeneratorConfiguration {
 		return methodsForSubclassesSupport;
 	}
 
-	public void setSaveMemSupport(boolean saveMemSupport) {
-		this.saveMemSupport = saveMemSupport;
-	}
-
-	public boolean hasSavememSupport() {
-		return this.saveMemSupport;
-	}
 }

@@ -26,6 +26,10 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	}
 
 	
+	protected boolean hasProxySupport() {
+		return true;
+	}
+	
 	@Override
 	protected CodeBlock createHeader() {
 		CodeList code = new CodeList();

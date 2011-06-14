@@ -35,6 +35,8 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -219,46 +221,39 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		return parameters.toString();
 	}
-
+	
 	@Override
 	protected CodeBlock createConstructor() {
+		if (currentCycle.isMembasedImpl()) {
+			return createInMemoryConstructor();
+		} else {
+			return createDiskBasedConstuctor();
+		} 
+	}
+
+	private CodeBlock createDiskBasedConstuctor() {
+		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgImplPackage#.GraphFactoryImpl");
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
+				 "",
+				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
+				 "\tinitializeAttributesWithDefaultValues();",
+				 "}");
+	
+		return code;
+	}
+
+	private CodeBlock createInMemoryConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
 		addImports("#jgImplPackage#.GraphFactoryImpl");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
-				 "public #simpleClassName#Impl(int vMax, int eMax) {",
-				 "\tthis(null, vMax, eMax);",
-				 "}",
-				 "",
 				 "public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
 				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
 				 "\tinitializeAttributesWithDefaultValues();",
-				 "}",
-				 "",
-				 "public static #javaClassName# create(int vMax, int eMax) {",
-				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(null, vMax, eMax);",
-				 "}",
-				 "",
-				 "public static #javaClassName# create(String id, int vMax, int eMax) {",
-				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(id, vMax, eMax);",
-				 "}",
-				 "",
-				 "/* Constructors and create methods without values for initial vertex and edge count */",
-				 "public #simpleClassName#Impl() {",
-				 "\tthis(null);",
-				 "}",
-				 "",
-				 "public #simpleClassName#Impl(java.lang.String id) {",
-				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#);",
-				 "\tinitializeAttributesWithDefaultValues();",
-				 "}",
-				 "",
-				 "public static #javaClassName# create() {",
-				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(GraphFactoryImpl.generateUniqueGraphId());",
-				 "}",
-				 "",
-				 "public static #javaClassName# create(String id) {",
-				 "\treturn (#javaClassName#) #schemaName#.instance().create#uniqueClassName#(id);",
 				 "}");
 	
 		return code;
