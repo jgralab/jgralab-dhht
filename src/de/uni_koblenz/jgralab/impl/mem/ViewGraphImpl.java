@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -25,6 +26,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -690,4 +692,43 @@ public abstract class ViewGraphImpl implements Graph,
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public List<? extends Graph> getPartialGraphs() {
+		return viewedGraph.getPartialGraphs();
+	}
+
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		return viewedGraph.getPartialGraph(partialGraphId);
+	}
+
+
+	@Override
+	public long getGlobalSubgraphId() {
+		return viewedGraph.getGlobalSubgraphId();
+	}
+
+
+	@Override
+	public int getLocalSubgraphId() {
+		return viewedGraph.getLocalSubgraphId();
+	}
+
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return ((int)id) == id;
+	}
+
+
+	@Override
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setLoading(boolean b) {
+		viewedGraph.setLoading(b);
+	}
 }
