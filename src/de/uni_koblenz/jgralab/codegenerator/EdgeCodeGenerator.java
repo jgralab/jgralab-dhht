@@ -46,18 +46,24 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	public EdgeCodeGenerator(EdgeClass edgeClass, String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(edgeClass, schemaPackageName, config, false);
-		rootBlock.setVariable("baseClassName", "EdgeImpl");
+		if (currentCycle.isMemOrDiskImpl()) {
+			rootBlock.setVariable("baseClassName", "EdgeImpl");
+		} else {
+			rootBlock.setVariable("baseClassName", "EdgeProxy");
+		}
+
 		rootBlock.setVariable("graphElementClass", "Edge");
 	}
 
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = (CodeList) super.createConstructor();
+		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		if (currentCycle.isDiskbasedImpl()) {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 				true,
-				"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.EdgeContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
+				"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.EdgeContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
 				"\tsuper(id, storage, g);",
 				"}"));
 		}
@@ -65,12 +71,17 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 	
 	protected CodeBlock createLoadAttributeContainer() {
-		return new CodeSnippet(
-				true,
-				"protected InnerAttributeContainer loadAttributeContainer() {",
-				"\treturn (InnerAttributeContainer) storage.backgroundStorage.getEdgeAttributeContainer(id);",
-				"}"
-		);
+		if (currentCycle.isMemOrDiskImpl()) {
+			return new CodeSnippet(
+					true,
+					"protected InnerAttributeContainer loadAttributeContainer() {",
+					"\treturn (InnerAttributeContainer) storage.backgroundStorage.getEdgeAttributeContainer(id);",
+					"}"
+			);
+		} else {
+			return null;
+		}
+
 	}
 
 	@Override

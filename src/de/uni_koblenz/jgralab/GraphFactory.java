@@ -324,6 +324,10 @@ public interface GraphFactory {
 	public void setRecordImplementationClass(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
 
+	void setIncidenceProxyImplementationClass(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+
 
 
 

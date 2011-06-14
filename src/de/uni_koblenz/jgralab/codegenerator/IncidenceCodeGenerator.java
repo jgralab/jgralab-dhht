@@ -14,7 +14,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		super(metaClass,schemaPackageName, metaClass.getPackageName(), config);
 		rootBlock.setVariable("connectedVertexClass", absoluteName(metaClass.getVertexClass()));
 		rootBlock.setVariable("connectedEdgeClass", absoluteName(metaClass.getEdgeClass()));
-		rootBlock.setVariable("baseClassName", "IncidenceImpl");
+		if (currentCycle.isMemOrDiskImpl()) {
+			rootBlock.setVariable("baseClassName", "IncidenceImpl");
+		} else {
+			rootBlock.setVariable("baseClassName", "IncidenceProxy");
+		}
 		rootBlock.setVariable("graphElementClass", "Incidence");
 		rootBlock.setVariable("ownElementClass", "Incidence");
 	//	System.out.println("Create incidence class code " + metaClass.getFileName());
@@ -60,9 +64,10 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#jgPackage#.Edge");
 		addImports("#jgPackage#.Vertex");
 		addImports("#jgPackage#.Direction");
+		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
+						"public #simpleClassName##ImplOrProxy#(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));

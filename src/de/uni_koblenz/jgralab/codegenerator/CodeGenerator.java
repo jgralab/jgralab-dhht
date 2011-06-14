@@ -58,7 +58,7 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, MEMORYBASED, DISKBASED, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISKBASED, PROXIES, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
@@ -66,6 +66,7 @@ public abstract class CodeGenerator {
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
 			out.add(DISKBASED);
+			out.add(PROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -96,6 +97,14 @@ public abstract class CodeGenerator {
 		}
 
 
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isProxies() {
+			return this == PROXIES;
+		}
+		
 		/**
 		 * 
 		 * @return
@@ -180,7 +189,6 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("isAbstractClass", "false");
 
 		imports = new ImportCodeSnippet();
-		addImports("java.rmi.RemoteException");
 		cycles = GenerationCycle.filter(config);
 	}
 
@@ -248,6 +256,7 @@ public abstract class CodeGenerator {
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
 		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
+		String simpleProxyClassName = rootBlock.getVariable("simpleProxyClassName");
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -262,17 +271,20 @@ public abstract class CodeGenerator {
 				logger.finer("Creating interface for class: "+ simpleClassName);
 				logger.finer("Writing file to: " + pathPrefix + "/"	+ schemaPackage);
 			}
-			if (currentCycle.isMemOrDiskImpl()) {
+			if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
 				if (currentCycle.isMembasedImpl()) {
 					schemaImplPackage = rootBlock.getVariable("schemaMemImplPackage");
 				} else {
 					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
-				}
+				} 
 				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
-				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
+				if (currentCycle.isMemOrDiskImpl()) {
+					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
+				} else {
+					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
+				}
 			} else {
-				writeCodeToFile(pathPrefix, simpleClassName + ".java",
-						schemaPackage);
+				writeCodeToFile(pathPrefix, simpleClassName + ".java", schemaPackage);
 			}
 			currentCycle = getNextCycle();
 		}
@@ -310,6 +322,7 @@ public abstract class CodeGenerator {
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
 				break;
 			case DISKBASED:
+			case PROXIES:	
 				code.add("package #schemaDiskImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskImplPackage"));
 				break;
@@ -355,6 +368,7 @@ public abstract class CodeGenerator {
 	public Vector<JavaSourceFromString> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
+		String proxyClassName = rootBlock.getVariable("simpleProxyClassName");
 		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
 		currentCycle = getNextCycle();
@@ -362,7 +376,9 @@ public abstract class CodeGenerator {
 			createCode();
 			if (currentCycle.isMemOrDiskImpl()) {
 				javaSources.add(new JavaSourceFromString(implClassName,	rootBlock.getCode()));
-			} else {
+			} else if (currentCycle.isProxies()) {
+				javaSources.add(new JavaSourceFromString(proxyClassName,	rootBlock.getCode()));
+			} else {	
 				javaSources.add(new JavaSourceFromString(className, rootBlock.getCode()));
 			}
 			currentCycle = getNextCycle();

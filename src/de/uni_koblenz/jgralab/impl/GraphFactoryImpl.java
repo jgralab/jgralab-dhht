@@ -653,7 +653,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 
 
-	public void setIncidenceImplementationClass(
+	public void setIncidenceInMemoryImplementationClass(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -669,7 +669,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public void setIncidenceImplementationClassForDiskBasedStorage(
+	public void setIncidenceDiskBasedImplementationClass(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -688,6 +688,22 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 	
+	@Override
+	public void setIncidenceProxyImplementationClass(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
+				incidenceMapForProxies.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for incidence proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
 	
 
 	

@@ -45,7 +45,11 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(vertexClass, schemaPackageName, config, true);
-		rootBlock.setVariable("baseClassName", "VertexImpl");
+		if (currentCycle.isMemOrDiskImpl()) {
+			rootBlock.setVariable("baseClassName", "VertexImpl");
+		} else {
+			rootBlock.setVariable("baseClassName", "VertexProxy");
+		}
 		rootBlock.setVariable("graphElementClass", "Vertex");
 	}
 
@@ -54,11 +58,12 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = (CodeList) super.createConstructor();
+		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		if (currentCycle.isDiskbasedImpl()) {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 					true,
-					"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.VertexContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
+					"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.VertexContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
 					"\tsuper(id, storage, g);" +
 					"}"));
 		}
@@ -67,6 +72,8 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 	
 
 	protected CodeBlock createLoadAttributeContainer() {
+		if (currentCycle.isProxies())
+			return null;
 		return new CodeSnippet(
 				true,
 				"protected InnerAttributeContainer loadAttributeContainer() {",
