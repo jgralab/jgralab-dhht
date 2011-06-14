@@ -86,7 +86,12 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 																: rootBlock.getVariable("simpleClassName"));
 		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
 		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
-		code.setVariable("extends",	currentCycle.isMemOrDiskImpl() ?  " extends #baseClassName#" : "");
+		code.setVariable("extends",	" ");
+		if (currentCycle.isMemOrDiskImpl()) {
+			code.setVariable("extends",	" extends #baseClassOrProxyName#");
+		} else if (currentCycle.isProxies()) {
+			code.setVariable("extends",	" extends #proxyClassName#");
+		}
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
 			String delim = currentCycle.isMemOrDiskImpl() ? " implements " : " extends ";

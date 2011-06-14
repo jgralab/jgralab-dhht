@@ -45,11 +45,8 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			String schemaPackageName,
 			CodeGeneratorConfiguration config) {
 		super(vertexClass, schemaPackageName, config, true);
-		if (currentCycle.isMemOrDiskImpl()) {
-			rootBlock.setVariable("baseClassName", "VertexImpl");
-		} else {
-			rootBlock.setVariable("baseClassName", "VertexProxy");
-		}
+		rootBlock.setVariable("baseClassName", "VertexImpl");
+		rootBlock.setVariable("proxyClassName", "VertexProxy");
 		rootBlock.setVariable("graphElementClass", "Vertex");
 	}
 
