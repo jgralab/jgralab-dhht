@@ -126,12 +126,6 @@ public class TgSchema2Java {
 				t.setCreateJar(true);
 				t.setJarFileName(comLine.getOptionValue("j"));
 			}
-			if (comLine.hasOption("so")) {
-				t.setStandardSupportOnly();
-			} else if (comLine.hasOption("to")) {
-				t.setTransactionSupportOnly();
-			}
-
 			if (comLine.hasOption('w')) {
 				t.setTypeSpecificMethodSupport(false);
 			} else {
@@ -141,11 +135,6 @@ public class TgSchema2Java {
 				t.setMethodsForSubclassesSupport(true);
 			} else {
 				t.setMethodsForSubclassesSupport(false);
-			}
-			if (comLine.hasOption('i')) {
-				t.setImplementationMode(comLine.getOptionValue('i'));
-			} else {
-				t.setImplementationMode("standard");
 			}
 
 			// loading .tg-file and creating schema-object
@@ -175,39 +164,6 @@ public class TgSchema2Java {
 		config.setTypeSpecificMethodsSupport(enabled);
 	}
 
-	@Deprecated
-	public void setTransactionSupportOnly() {
-		System.err
-				.println("Warning: this call is deprecated, use option \"-i\" instead.");
-		config.setStandardSupport(false);
-		config.setTransactionSupport(true);
-		config.setSaveMemSupport(false);
-	}
-
-	@Deprecated
-	public void setStandardSupportOnly() {
-		System.err
-				.println("Warning: this call is deprecated, use option \"-i\" instead.");
-		config.setStandardSupport(true);
-		config.setTransactionSupport(false);
-		config.setSaveMemSupport(false);
-	}
-
-	public void setStandardSupport(boolean value) {
-		config.setStandardSupport(value);
-	}
-
-	public void setTransactionSupport(boolean value) {
-		config.setTransactionSupport(value);
-	}
-
-	public void setSavememSupport(boolean value) {
-		config.setSaveMemSupport(value);
-	}
-
-	public void setDatabaseSupport(boolean value) {
-		config.setDatabaseSupport(value);
-	}
 
 	/**
 	 * Constructs an instance of TgSchema2Java with the given command line
@@ -587,35 +543,5 @@ public class TgSchema2Java {
 		return schema;
 	}
 
-	public void setImplementationMode(String value) {
 
-		String[] values = value.toLowerCase().split(",");
-		if (values.length > 0) {
-			// paranoid ;-) ensure nothing is activated to minimize surprises
-			setTransactionSupport(false);
-			setStandardSupport(false);
-			setSavememSupport(false);
-			setDatabaseSupport(false);
-		} else {
-			throw new IllegalArgumentException(
-					"No implementation mode specified.");
-		}
-		for (String v : values) {
-			v = v.trim();
-			if (v.equals("transaction")) {
-				setTransactionSupport(true);
-			} else if (v.equals("standard")) {
-				setStandardSupport(true);
-			} else if (v.equals("savemem")) {
-				setSavememSupport(true);
-			} else if (v.equals("database")) {
-				setDatabaseSupport(true);
-			} else {
-				throw new IllegalArgumentException(
-						"Illegal value for implementation mode: "
-								+ v
-								+ "\nOnly \"transaction\",\"standard\" and \"savemem\" are supported.");
-			}
-		}
-	}
 }

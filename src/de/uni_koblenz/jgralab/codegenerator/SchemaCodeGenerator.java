@@ -136,9 +136,6 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
 				"#jgPackage#.GraphIOException");
-		if (config.hasDatabaseSupport()) {
-			addImports("#jgPackage#.GraphException");
-		}
 		CodeSnippet code = new CodeSnippet(
 				true,
 				"/**",

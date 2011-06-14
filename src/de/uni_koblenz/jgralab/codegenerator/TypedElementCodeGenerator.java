@@ -31,7 +31,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		rootBlock.setVariable("javaClassName", schemaRootPackageName + "."
 				+ aec.getQualifiedName());
 		rootBlock.setVariable("qualifiedImplClassName", schemaRootPackageName
-				+ ".impl." + (config.hasTransactionSupport() ? "trans" : "std")
+				+ ".impl." + "std"
 				+ aec.getQualifiedName() + "Impl");
 		rootBlock.setVariable("simpleClassName", aec.getSimpleName());
 		rootBlock.setVariable("simpleImplClassName", aec.getSimpleName() + "Impl");

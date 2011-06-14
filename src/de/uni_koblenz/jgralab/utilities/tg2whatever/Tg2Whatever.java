@@ -139,7 +139,7 @@ public abstract class Tg2Whatever {
 	public void setGraph(String fileName) throws GraphIOException {
 		graphFileName = fileName;
 		graph = GraphIO.loadSchemaAndGraphFromFile(graphFileName,
-				CodeGeneratorConfiguration.MINIMAL,
+				CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS,
 				new ConsoleProgressFunction(), ImplementationType.MEMORY);
 	}
 
@@ -305,7 +305,7 @@ public abstract class Tg2Whatever {
 		try {
 			System.out.println("Loading Schema from Graph");
 			schema = GraphIO.loadSchemaFromFile(graphFileName);
-			schema.compile(CodeGeneratorConfiguration.MINIMAL);
+			schema.compile(CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS);
 			System.out.println("Schema loaded");
 		} catch (GraphIOException ex) {
 			System.err.println("Graph in file '" + graphFileName
