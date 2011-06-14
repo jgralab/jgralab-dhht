@@ -60,7 +60,7 @@ import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphFactoryImpl implements GraphFactory {
+public class GraphFactoryImpl implements GraphFactory {
 
 	/* maps for in-memory storage */
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> graphMapForMemBasedImpl;
@@ -150,88 +150,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		incidenceMapForDiskStorageReloading = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
-
-	@Override
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega) {
-		try {
-			Edge e = binaryEdgeMapForMemBasedImpl.get(edgeClass).newInstance(
-					id, g, alpha, omega);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
-
-
-	@Override
-	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
-		try {
-			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
-					id, graphDatabase, container);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
-
-	@Override
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
-
-		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
-		// cg.backgroundStorage.freeMem();
-		try {
-			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
-
-	@Override
-	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase){
-		try {
-			Edge e = edgeMapForProxies.get(edgeClass).newInstance(id, graphDatabase, remoteDatabase);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
-
-	@Override
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase) {
-		try {
-			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, graphDatabase);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
-
+	
+	
+	
+	
+	
 	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id,
 			int vMax, int eMax) {
 		try {
@@ -278,6 +201,105 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
+	
+	
+	
+
+	@Override
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega) {
+		try {
+			Edge e = binaryEdgeMapForMemBasedImpl.get(edgeClass).newInstance(
+					id, g, alpha, omega);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	@Override
+	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
+		try {
+			Edge e = edgeMapForMemBasedImpl.get(edgeClass).newInstance(id, g);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	
+	@Override
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase) {
+		try {
+			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, graphDatabase);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
+		try {
+			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
+					id, graphDatabase, container);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+	
+	@Override
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase){
+		try {
+			Edge e = edgeMapForProxies.get(edgeClass).newInstance(id, graphDatabase, remoteDatabase);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	
+	
+	
+	
 	@Override
 	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
 			int id, Vertex v, Edge e) {
@@ -333,13 +355,32 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g) {
-		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
-		// cg.backgroundStorage.freeMem();
+	
+	@Override
+	public <T extends Incidence> T createIncidenceProxy(Class<? extends T> incidenceClass,
+			long id, GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess remoteDatabase) {
 		try {
-			Vertex v = vertexMapForMemBasedImpl.get(vertexClass).newInstance(
-					id, g);
+			@SuppressWarnings("unchecked")
+			T i = (T) incidenceMapForProxies.get(incidenceClass).newInstance(id, graphDatabase, remoteDatabase);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException(
+					"Cannot create incidence proxy of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
+	
+	
+	
+	@Override
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g) {
+		try {
+			Vertex v = vertexMapForMemBasedImpl.get(vertexClass).newInstance(id, g);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -351,13 +392,11 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Vertex createVertexDiskBasedStorage(
-			Class<? extends Vertex> vertexClass, int id, Graph g) {
-		// CompleteGraphImpl cg = (CompleteGraphImpl) g;
-		// cg.backgroundStorage.freeMem();
+	
+	@Override
+	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl localGraphDatabase) {
 		try {
-			Vertex v = vertexMapForDiskBasedImpl.get(vertexClass).newInstance(
-					id, g);
+			Vertex v = vertexMapForDiskBasedImpl.get(vertexClass).newInstance(id, localGraphDatabase);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -368,6 +407,25 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ vertexClass.getCanonicalName(), ex);
 		}
 	}
+
+	@Override
+	public Vertex createVertexProxy(Class<? extends Vertex> vertexClass,
+			long id, GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) {
+		try {
+			Vertex v = vertexMapForProxies.get(vertexClass).newInstance(id, graphDatabase, storingGraphDatabase);
+			return v;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new M1ClassAccessException("Cannot create vertex of class "
+					+ vertexClass.getCanonicalName(), ex);
+		}
+	}
+	
+	
 
 	@Override
 	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl graphDatabase, VertexContainer container) {
@@ -384,7 +442,15 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 					+ vertexClass.getCanonicalName(), ex);
 		}
 	}
+	
+	
+	
+	
 
+	
+	
+	
+	
 	@Override
 	public void setGraphInMemoryImplementationClass(
 			Class<? extends Graph> originalClass,
@@ -435,6 +501,98 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> originalClass,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { int.class, Graph.class };
+				edgeMapForMemBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+
+				List<Class<?>> interfaces = new ArrayList<Class<?>>();
+				for (Class<?> c : originalClass.getInterfaces()) {
+					interfaces.add(c);
+				}
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class,
+							Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
+							.getConstructor(binaryParams);
+					binaryEdgeMapForMemBasedImpl.put(
+							(Class<? extends BinaryEdge>) originalClass,
+							binaryConstructor);
+				}
+
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for edgeclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setEdgeDiskBasedImplementationClass(
+			Class<? extends Edge> originalClass,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, Graph.class };
+				edgeMapForDiskBasedImpl.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramsDisk = { long.class, EdgeContainer.class,
+						Graph.class };
+				edgeMapForDiskStorageReloading.put(originalClass,
+						implementationClass.getConstructor(paramsDisk));
+
+				List<Class<?>> interfaces = new ArrayList<Class<?>>();
+				for (Class<?> c : originalClass.getInterfaces()) {
+					interfaces.add(c);
+				}
+				if (interfaces.contains(BinaryEdge.class)) {
+					Class<?>[] binaryParams = { int.class, Graph.class,
+							Vertex.class, Vertex.class };
+					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
+							.getConstructor(binaryParams);
+					binaryEdgeMapForMemBasedImpl.put(
+							(Class<? extends BinaryEdge>) originalClass,
+							binaryConstructor);
+				}
+
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for edgeclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	
+
+	@Override
+	public void setEdgeProxyImplementationClass(
+			Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
+				edgeMapForProxies.put(edgeM1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for edge proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+	
+	
 
 	@Override
 	public void setVertexInMemoryImplementationClass(
@@ -473,6 +631,27 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+
+
+	@Override
+	public void setVertexProxyImplementationClass(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends Vertex> implementationClass) {
+		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
+				vertexMapForProxies.put(vertexM1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for vertex proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
+
+
 
 	public void setIncidenceImplementationClass(
 			Class<? extends Incidence> originalClass,
@@ -508,73 +687,10 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	
 
-	@SuppressWarnings("unchecked")
-	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> originalClass,
-			Class<? extends Edge> implementationClass) {
-		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-			try {
-				Class<?>[] params = { int.class, Graph.class };
-				edgeMapForMemBasedImpl.put(originalClass,
-						implementationClass.getConstructor(params));
-
-				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces()) {
-					interfaces.add(c);
-				}
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class,
-							Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
-							.getConstructor(binaryParams);
-					binaryEdgeMapForMemBasedImpl.put(
-							(Class<? extends BinaryEdge>) originalClass,
-							binaryConstructor);
-				}
-
-			} catch (NoSuchMethodException ex) {
-				throw new M1ClassAccessException(
-						"Unable to locate default constructor for edgeclass"
-								+ implementationClass, ex);
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void setEdgeDiskBasedImplementationClass(
-			Class<? extends Edge> originalClass,
-			Class<? extends Edge> implementationClass) {
-		if (isSuperclassOrEqual(originalClass, implementationClass)) {
-			try {
-				Class<?>[] params = { int.class, Graph.class };
-				edgeMapForDiskBasedImpl.put(originalClass,
-						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { int.class, EdgeContainer.class,
-						Graph.class };
-				edgeMapForDiskStorageReloading.put(originalClass,
-						implementationClass.getConstructor(paramsDisk));
-
-				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces()) {
-					interfaces.add(c);
-				}
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class,
-							Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
-							.getConstructor(binaryParams);
-					binaryEdgeMapForMemBasedImpl.put(
-							(Class<? extends BinaryEdge>) originalClass,
-							binaryConstructor);
-				}
-
-			} catch (NoSuchMethodException ex) {
-				throw new M1ClassAccessException(
-						"Unable to locate default constructor for edgeclass"
-								+ implementationClass, ex);
-			}
-		}
-	}
+	
 
 	public void setRecordImplementationClass(Class<? extends Record> m1Class,
 			Class<? extends Record> implementationClass) {
@@ -816,6 +932,9 @@ public abstract class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+
+	
+
 	
 
 }
