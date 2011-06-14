@@ -139,7 +139,7 @@
 
 	<!-- compiles greql2 sources -->
 	<target name="greql2" depends="tgtools">
-		<tgschema2java schemaFile="${greql2.schemafile}" sourcePath="${src.dir}" implementationMode="standard" />
+		<tgschema2java schemaFile="${greql2.schemafile}" sourcePath="${src.dir}" />
 		<javac fork="true" srcdir="${greql2.src}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}">
 			<compilerarg line="-Xlint:unchecked"/>
 		</javac>
@@ -153,7 +153,7 @@
 	</target>     
 	
 	<target name="dhhttest" depends="core">    
-	   	<tgschema2java schemaFile="${dhht.schemafile}" sourcePath="${src.dir}" implementationMode="standard" />     
+	   	<tgschema2java schemaFile="${dhht.schemafile}" sourcePath="${src.dir}" />     
 		<javac fork="true" srcdir="${dhht.src}" includes="${dhht.includes}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}">
 			<compilerarg line="-Xlint:unchecked"/>
 		</javac>
@@ -174,7 +174,7 @@
 
 	<!-- generates the gruml schema and compiles it -->
 	<target name="gruml" depends="tgtools">
-		<tgschema2java schemaFile="${gruml.schemafile}" sourcePath="${src.dir}" implementationMode="standard" />
+		<tgschema2java schemaFile="${gruml.schemafile}" sourcePath="${src.dir}" />
 		<javac fork="true" srcdir="${gruml.src}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}">
 			<compilerarg line="-Xlint:unchecked"/>
 		</javac>
