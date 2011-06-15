@@ -256,7 +256,7 @@ public abstract class CodeGenerator {
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
 		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
-		String simpleProxyClassName = rootBlock.getVariable("proxyClassName");
+		String simpleProxyClassName =  simpleClassName + "Proxy";
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -280,7 +280,7 @@ public abstract class CodeGenerator {
 				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
 				if (currentCycle.isMemOrDiskImpl()) {
 					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
-				} else if (currentCycle.isProxies()) {
+				} else if (hasProxySupport()) {
 					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
 				}
 			} else {

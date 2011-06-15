@@ -62,6 +62,8 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		addImports("#jgPackage#.Edge");
 		addImports("#jgPackage#.Vertex");
+		if (currentCycle.isProxies())
+			addImports("#jgDiskImplPackage#.IncidenceProxy");
 		if (currentCycle.isMembasedImpl()) {
 			return createInMemoryConstructor();
 		} else {

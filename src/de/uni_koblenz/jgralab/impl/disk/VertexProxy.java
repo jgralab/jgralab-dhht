@@ -63,7 +63,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class VertexProxyImpl extends
+public abstract class VertexProxy extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
 	/**
@@ -75,7 +75,7 @@ public abstract class VertexProxyImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected VertexProxyImpl(long id, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
+	protected VertexProxy(long id, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
 			throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
@@ -189,7 +189,7 @@ public abstract class VertexProxyImpl extends
 			Class<T> m1VertexClass, boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
-		VertexProxyImpl v = (VertexProxyImpl) getNextVertex();
+		VertexProxy v = (VertexProxy) getNextVertex();
 		while (v != null) {
 			if (noSubclasses) {
 				if (m1VertexClass == v.getM1Class()) {
@@ -200,7 +200,7 @@ public abstract class VertexProxyImpl extends
 					return (T) v;
 				}
 			}
-			v = (VertexProxyImpl) v.getNextVertex();
+			v = (VertexProxy) v.getNextVertex();
 		}
 		return null;
 	}
@@ -276,9 +276,9 @@ public abstract class VertexProxyImpl extends
 		if (this == v) {
 			return false;
 		}
-		VertexProxyImpl next = (VertexProxyImpl) v.getNextVertex();
+		VertexProxy next = (VertexProxy) v.getNextVertex();
 		while ((next != null) && (next != this)) {
-			next = (VertexProxyImpl) next.getNextVertex();
+			next = (VertexProxy) next.getNextVertex();
 		}
 		return next != null;
 	}

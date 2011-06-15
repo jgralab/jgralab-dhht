@@ -65,10 +65,12 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
 		code.setVariable("graphOrDatabase", currentCycle.isMembasedImpl() ? "#jgPackage#.Graph" : "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		code.setVariable("additionalProxyFormalParams", currentCycle.isMemOrDiskImpl() ? "" : ", #jgDiskImplPackage#.RemoteGraphDatabaseAccess remoteDb");
+		code.setVariable("additionalProxyActualParams", currentCycle.isMemOrDiskImpl() ? "" : ",remoteDb");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #graphOrDatabase# g) throws java.io.IOException {",
-						"\tsuper(id, g);"));
+						"public #simpleClassName##implOrProxy#(int id, #graphOrDatabase# g#additionalProxyFormalParams#) throws java.io.IOException {",
+						"\tsuper(id, g#additionalProxyActualParams#);"));
 		if (currentCycle.isDiskbasedImpl())
 			code.addNoIndent(new CodeSnippet("\tattributeContainer = new InnerAttributeContainer();"));
 		if (hasDefaultAttributeValues()) {
@@ -112,6 +114,9 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add(createReadAttributesMethod(aec.getAttributeList(), ""));
 			code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), ""));
 		}
+		if (currentCycle.isProxies()) {
+			code.add(createGetIncidenceClassForRolenameMethod());
+		}
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 			code.add(createFirstIncidenceMethods());
@@ -153,6 +158,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("edgeOrVertex", this instanceof VertexCodeGenerator ? "Vertex" : "Edge");
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
 						.equals("Boolean") ? "is" : "get");
@@ -174,12 +180,18 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 					 "\treturn attributeContainer._#name#;",
 					 "}");
 			break;
+		case PROXIES:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					 "\treturn storingGraphDatabase.get#EdgeOrVertex#Attribute(elementId, \"#name#\");",
+					 "}");
+			break;
 		}
 		return code;
 	}
 
 	protected CodeBlock createSetter(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("edgeOrVertex", this instanceof VertexCodeGenerator ? "Vertex" : "Edge");
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
@@ -201,6 +213,11 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 					 "\t}",
 					 "\tattributeContainer._#name# = _#name#;", 
 					 "\tgraphModified();", "}");
+			break;
+		case PROXIES:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					 "\treturn storingGraphDatabase.set#EdgeOrVertex#Attribute(elementId, \"#name#\", _#name#);",
+					 "}");
 			break;
 		}
 		return code;
@@ -345,7 +362,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add(" */",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
 			code.add("@Override",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",

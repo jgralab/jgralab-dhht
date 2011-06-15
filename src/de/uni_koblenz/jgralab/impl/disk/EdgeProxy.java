@@ -55,7 +55,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class EdgeProxyImpl extends
+public abstract class EdgeProxy extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
 	/**
@@ -67,7 +67,7 @@ public abstract class EdgeProxyImpl extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected EdgeProxyImpl(long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
+	protected EdgeProxy(long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
@@ -193,7 +193,7 @@ public abstract class EdgeProxyImpl extends
 			Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
-		EdgeProxyImpl e = (EdgeProxyImpl) getNextEdge(traversalContext);
+		EdgeProxy e = (EdgeProxy) getNextEdge(traversalContext);
 		while (e != null) {
 			if (noSubclasses) {
 				if (m1EdgeClass == e.getM1Class()) {
@@ -204,7 +204,7 @@ public abstract class EdgeProxyImpl extends
 					return e;
 				}
 			}
-			e = (EdgeProxyImpl) e.getNextEdge(traversalContext);
+			e = (EdgeProxy) e.getNextEdge(traversalContext);
 		}
 		return null;
 	}
@@ -249,9 +249,9 @@ public abstract class EdgeProxyImpl extends
 		if (this == e) {
 			return false;
 		}
-		EdgeProxyImpl next = (EdgeProxyImpl) e.getNextEdge();
+		EdgeProxy next = (EdgeProxy) e.getNextEdge();
 		while ((next != null) && (next != this)) {
-			next = (EdgeProxyImpl) next.getNextEdge();
+			next = (EdgeProxy) next.getNextEdge();
 		}
 		return next != null;
 	}

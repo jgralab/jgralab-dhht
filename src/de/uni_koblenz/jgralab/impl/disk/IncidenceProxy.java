@@ -48,7 +48,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class IncidenceProxyImpl implements Incidence {
+public abstract class IncidenceProxy implements Incidence {
 
 	private final GraphDatabaseBaseImpl localGraphDatabase;
 
@@ -56,7 +56,7 @@ public abstract class IncidenceProxyImpl implements Incidence {
 
 	private long id;
 
-	protected IncidenceProxyImpl(long globalId, GraphDatabaseBaseImpl localGraphDatabase,
+	protected IncidenceProxy(long globalId, GraphDatabaseBaseImpl localGraphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
@@ -74,18 +74,18 @@ public abstract class IncidenceProxyImpl implements Incidence {
 	}
 
 	void setPreviousIncidenceAtVertex(
-			IncidenceProxyImpl previousIncidenceAtVertex) {
+			IncidenceProxy previousIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setPreviousIncidenceIdAtVertexId(id,
 						previousIncidenceAtVertex.getId());
 	}
 
-	void setNextIncidenceAtEdge(IncidenceProxyImpl nextIncidenceAtEdge) {
+	void setNextIncidenceAtEdge(IncidenceProxy nextIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setNextIncidenceIdAtEdgeId(id, nextIncidenceAtEdge.getId());
 	}
 
-	void setPreviousIncidenceAtEdge(IncidenceProxyImpl previousIncidenceAtEdge) {
+	void setPreviousIncidenceAtEdge(IncidenceProxy previousIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setPreviousIncidenceIdAtEdgeId(id,
 						previousIncidenceAtEdge.getId());

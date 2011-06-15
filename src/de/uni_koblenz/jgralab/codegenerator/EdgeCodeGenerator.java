@@ -53,6 +53,8 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
 	@Override
 	protected CodeBlock createConstructor() {
+		if (currentCycle.isProxies())
+			addImports("#jgDiskImplPackage#.EdgeProxy");
 		CodeList code = (CodeList) super.createConstructor();
 		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		if (currentCycle.isDiskbasedImpl()) {

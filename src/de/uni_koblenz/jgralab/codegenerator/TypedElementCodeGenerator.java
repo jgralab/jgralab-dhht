@@ -72,8 +72,8 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
-	//		code.add(createGetM1ImplementationClassMethod());
-
+		} else if (currentCycle.isProxies()) {
+			code.add(createConstructor());
 		}
 		return code;
 	}
@@ -83,7 +83,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " class" : " interface");
 		code.setVariable("interfaceOrImplClass", currentCycle.isMemOrDiskImpl() ? rootBlock.getVariable("simpleImplClassName") 
-																: rootBlock.getVariable("simpleClassName"));
+																: (rootBlock.getVariable("simpleClassName") + (currentCycle.isProxies() ? "Proxy" : "")));
 		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
 		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
 		code.setVariable("extends",	" ");
