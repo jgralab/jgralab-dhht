@@ -60,8 +60,8 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 					true,
-					"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.VertexContainer container, #jgImplPackage#.GraphDatabaseBaseImpl g) throws java.io.IOException {",
-					"\tsuper(id, container, g);" +
+					"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.GraphDatabaseBaseImpl g, #jgDiskImplPackage#.VertexContainer container) throws java.io.IOException {",
+					"\tsuper(id, g, container);" +
 					"}"));
 		}
 		return code;

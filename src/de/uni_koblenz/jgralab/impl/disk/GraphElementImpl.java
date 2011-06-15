@@ -73,8 +73,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * The global id of this {@link GraphElement}.
 	 */
 	protected long elementId;
-	
-	protected abstract void setId(long id);
+
 	
 	protected final int getLocalId() {
 		return (int) elementId;

@@ -87,11 +87,6 @@ public abstract class VertexProxyImpl extends
 	 * Access id *********************************************************
 	 */
 
-	@Override
-	protected final void setId(long id) {
-		assert id >= 0;
-		this.elementId = id;
-	}
 
 	@Override
 	public final long getId() {

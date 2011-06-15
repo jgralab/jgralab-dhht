@@ -1196,5 +1196,14 @@ public abstract class EdgeImpl extends
 		return container.incidenceListVersion[getIdInStorage(elementId)];
 	}
 	
+	@Override
+	protected void putIncidenceAfter(Incidence target, Incidence moved) {
+		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getId(), moved.getId());
+	}
+
+	@Override
+	protected void putIncidenceBefore(Incidence target, Incidence moved) {
+		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getId(), moved.getId());
+	}
 
 }

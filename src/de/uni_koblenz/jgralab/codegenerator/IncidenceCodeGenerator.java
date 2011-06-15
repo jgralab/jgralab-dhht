@@ -58,6 +58,10 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	@Override
 	protected CodeBlock createConstructor() {
+		addImports("#usedJgImplPackage#.VertexImpl");
+		addImports("#usedJgImplPackage#.EdgeImpl");
+		addImports("#jgPackage#.Edge");
+		addImports("#jgPackage#.Vertex");
 		if (currentCycle.isMembasedImpl()) {
 			return createInMemoryConstructor();
 		} else {
@@ -67,12 +71,6 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	private CodeBlock createInMemoryConstructor() {
 		CodeList code = new CodeList();
-
-		addImports("#usedJgImplPackage#.VertexImpl");
-		addImports("#usedJgImplPackage#.EdgeImpl");
-		addImports("#jgPackage#.Edge");
-		addImports("#jgPackage#.Vertex");
-		addImports("#jgPackage#.Direction");
 		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		code.addNoIndent(new CodeSnippet(
 						true,
@@ -84,12 +82,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 	private CodeBlock createDiskBasedConstructor() {
 		CodeList code = new CodeList();
-
-		addImports("#usedJgImplPackage#.VertexImpl");
-		addImports("#usedJgImplPackage#.EdgeImpl");
-		addImports("#jgPackage#.Edge");
-		addImports("#jgPackage#.Vertex");
-		addImports("#jgPackage#.Direction");
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 
 		code.addNoIndent(new CodeSnippet(
