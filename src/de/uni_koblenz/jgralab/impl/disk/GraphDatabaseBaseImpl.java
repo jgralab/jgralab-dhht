@@ -33,8 +33,25 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class GraphDatabaseBaseImpl extends
 		GraphDatabaseElementaryMethods implements RemoteGraphDatabaseAccess {
 
-	public static final long GLOBAL_GRAPH_ID = Integer.MAX_VALUE + 2;
 
+	
+	// the partial graph id of the toplevel graph, the lowest bit of the 
+	// high int is set
+	public static final long TOPLEVEL_PARTIAL_GRAPH_ID = Integer.MAX_VALUE+1;
+
+	// the local subgraph id of the toplevel graph if a partial one
+	public static final long TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
+	
+	// the global subgraph id of the toplevel dhhtgraph
+	public static final long GLOBAL_GRAPH_ID = Integer.MAX_VALUE + 2;
+	
+	
+	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
+		long val = partialGraphId + TOPLEVEL_LOCAL_SUBGRAPH_ID;
+		return val;
+	}
+	
+	
 	public long createSubordinateGraphInVertex(long containingVertexId) {
 		// get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
@@ -267,7 +284,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				edgeHasBeenDeleted |= deleteEdge;
 				if (!deleteEdge) {
 					edges.add(edge);
-					edge.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+					removeIncidenceFromLambdaSeqOfEdge(inc.getId());
 				}
 				inc = v.getFirstIncidence();
 			}
@@ -600,8 +617,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		while (inc != null) {
 			vertices.add(inc.getVertex());
-			((VertexImpl) inc.getVertex())
-					.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+			removeIncidenceFromLambdaSeqOfVertex(inc.getId());
 			inc = e.getFirstIncidence();
 		}
 		for (Vertex vertex : vertices) {

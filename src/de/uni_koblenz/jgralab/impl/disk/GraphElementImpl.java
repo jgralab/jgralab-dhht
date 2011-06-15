@@ -42,6 +42,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -130,6 +131,26 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public final Graph getGraph() {
 		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getPartialGraphId(elementId));
+	}
+	
+	@Override
+	public Graph getContainingGraph() {
+		@SuppressWarnings("rawtypes")
+		GraphElement sigma = getSigma();
+		int ownPartialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(getId());
+		if ((sigma== null) || (GraphDatabaseBaseImpl.getPartialGraphId(sigma.getId()) != ownPartialGraphId)) {
+			//the element is contained in a partial graph different than its sigma element,
+			//thus this is the graph containing the element directly
+			return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(ownPartialGraphId));
+		} else {
+			//the subordinate graph of sigma is the directly containing graph of this element
+			return sigma.getSubordinateGraph();
+		}
+	}
+
+	@Override
+	public GraphClass getGraphClass() {
+		return getGraph().getGraphClass();
 	}
 	
 	@Override
@@ -387,28 +408,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @throws RemoteException 
 	 */
 	protected abstract void putIncidenceBefore(Incidence target, Incidence moved);
-
-	/**
-	 * Appends <code>i</code> to the sequence of {@link Incidence}s at this
-	 * {@link GraphElement}. {@link IncidenceImpl#nextIncidenceAtVertex} will be
-	 * set to <code>null</code>.
-	 * 
-	 * @param i
-	 *            {@link IncidenceImpl}
-	 * @throws RemoteException 
-	 */
-	protected abstract void appendIncidenceToLambdaSeq(Incidence i);
-
-	/**
-	 * Removes <code>i</code> from the sequence of {@link Incidence}s at this
-	 * {@link GraphElement}. <code>i</code> must be part of the sequence.
-	 * 
-	 * @param i
-	 *            {@link IncidenceImpl}
-	 * @throws RemoteException 
-	 */
-	protected abstract void removeIncidenceFromLambdaSeq(Incidence i);
-
 
 
 	/**

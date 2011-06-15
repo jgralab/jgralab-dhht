@@ -201,10 +201,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	private CodeBlock createGetDirectionMethod() {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("direction", aec.getDirection().toString());
+		addImports("#jgPackage#.Direction");
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.add("@Override",
 					 "public Direction getDirection() {",
-					 "\treturn #direction#;",
+					 "\treturn Direction.#direction#;",
 					 "}");
 		}
 		return code;

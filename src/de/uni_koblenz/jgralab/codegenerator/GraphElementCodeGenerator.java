@@ -64,9 +64,10 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
+		code.setVariable("graphOrDatabase", currentCycle.isMembasedImpl() ? "#jgPackage#.Graph" : "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, #jgPackage#.Graph g) throws java.io.IOException {",
+						"public #simpleClassName#Impl(int id, #graphOrDatabase# g) throws java.io.IOException {",
 						"\tsuper(id, g);"));
 		if (currentCycle.isDiskbasedImpl())
 			code.addNoIndent(new CodeSnippet("\tattributeContainer = new InnerAttributeContainer();"));
