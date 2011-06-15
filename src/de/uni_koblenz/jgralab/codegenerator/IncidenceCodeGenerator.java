@@ -77,7 +77,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) {",
-						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);," +
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);",
 						"}"));
 		return code;
 	}

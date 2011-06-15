@@ -68,7 +68,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	
 	protected CodeBlock createLoadAttributeContainer() {
 		if (currentCycle.isMemOrDiskImpl()) {
-			addImports("#jgDiskimplPackage#.GraphDatabaseBaseImpl");
+			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			return new CodeSnippet(
 					true,
 					"protected InnerAttributeContainer loadAttributeContainer() {",
