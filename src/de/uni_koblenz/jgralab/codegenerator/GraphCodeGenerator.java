@@ -364,49 +364,72 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase##additionalParams#);",
-					 "\treturn new#ecType#;", "}");
-			code.setVariable("additionalParams", "");
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
+					 "#connectToAlpha#",
+					 "#connectToOmega#",
+					 "\treturn new#ecType#;", 
+					 "}");
 		}
 
-		//TODO: For binary Edge constructor
 		
 		if (gec instanceof BinaryEdgeClass) {
-			String fromClass = null;
-			String toClass = null;
+			IncidenceClass alphaInc = null;
+			IncidenceClass omegaInc = null;
 			for (IncidenceClass ic : gec.getAllIncidenceClasses()) {
 				if (!ic.isAbstract()) {
 					if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
-						toClass = ic.getVertexClass().getQualifiedName();
+						omegaInc = ic;
 					} else {
-						fromClass = ic.getVertexClass().getQualifiedName();
+						alphaInc = ic;
 					}
 				}
 			}
+			VertexClass fromClass = alphaInc.getVertexClass();
+			VertexClass toClass = omegaInc.getVertexClass();
+			code.setVariable("alphaVertex", absoluteName(fromClass));
+			code.setVariable("omegaVertex", absoluteName(toClass));
+			code.setVariable("alphaInc", absoluteName(alphaInc));
+			code.setVariable("omegaInc", absoluteName(omegaInc));
+			code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, next#ecType#);");
+			code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, next#ecType#);");
 			if (fromClass.equals("Vertex")) {
 				code.setVariable("fromClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
 			} else {
 				code.setVariable("fromClass", schemaRootPackageName + "." + fromClass);
 			}
 			if (toClass.equals("Vertex")) {
-				code.setVariable("toClass", rootBlock.getVariable("jgPackage")
-						+ "." + "Vertex");
+				code.setVariable("toClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
 			} else {
-				code.setVariable("toClass", schemaRootPackageName + "."
-						+ toClass);
+				code.setVariable("toClass", schemaRootPackageName + "."	+ toClass);
 			}
-			code.setVariable("formalParams", (withId ? "int id, " : "")
-					+ "#fromClass# alpha, #toClass# omega");
-			code.setVariable("addActualParams", ", alpha, omega");
-			code.setVariable("additionalParams", ", alpha, omega");
+			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#fromClass# alpha, #toClass# omega");
+//			code.setVariable("addActualParams", ", alpha, omega");
 		} else {
 			code.setVariable("formalParams", (withId ? "int id" : ""));
-			code.setVariable("addActualParams", "");
+//			code.setVariable("addActualParams", "");
 		}
 		code.setVariable("newActualParams", (withId ? "id" : "0"));
 		return code;
 	}
 
+	
+	
+	protected CodeBlock createFactoryMethodForBinaryEdge(EdgeClass edgeClass) {
+		if (edgeClass.isAbstract())
+			return null;
+		CodeList code = new CodeList();
+//		addImports("#jgPackage#.#ownElementClass#");
+
+
+		
+		code.addNoIndent(new CodeSnippet("alpha.connect(#alphaInc#.class, this);"));
+		code.addNoIndent(new CodeSnippet("omega.connect(#omegaInc#.class, this);"));
+		//code.addNoIndent(new CodeSnippet("/* implement setting of alpha and omega */"));
+		code.addNoIndent(new CodeSnippet("}"));
+		return code;
+	}
+	
+	
 	private CodeBlock createIteratorMethods() {
 		GraphClass gc = (GraphClass) aec;
 

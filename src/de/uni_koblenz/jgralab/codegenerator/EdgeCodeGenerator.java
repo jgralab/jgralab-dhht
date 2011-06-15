@@ -59,8 +59,8 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 				true,
-				"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.EdgeContainer storage, #jgPackage#.Graph g) throws java.io.IOException {",
-				"\tsuper(id, storage, g);",
+				"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.EdgeContainer container, #jgPackage#.Graph g) throws java.io.IOException {",
+				"\tsuper(id, container, g);",
 				"}"));
 		}
 		return code;
@@ -71,7 +71,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 			return new CodeSnippet(
 					true,
 					"protected InnerAttributeContainer loadAttributeContainer() {",
-					"\treturn (InnerAttributeContainer) storage.backgroundStorage.getEdgeAttributeContainer(id);",
+					"\treturn (InnerAttributeContainer) container.backgroundStorage.getEdgeAttributeContainer(id);",
 					"}"
 			);
 		} else {
