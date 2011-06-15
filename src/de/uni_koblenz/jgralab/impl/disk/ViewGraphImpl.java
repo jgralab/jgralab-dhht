@@ -712,7 +712,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.getPartialGraphs();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
 		return viewedGraph.getPartialGraph(partialGraphId);

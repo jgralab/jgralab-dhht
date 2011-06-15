@@ -193,7 +193,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	/**
 	 * Retrieves the partial graph with the given id partialGraphId
 	 */
-	@Deprecated
 	public Graph getPartialGraph(int partialGraphId);
 	
 	

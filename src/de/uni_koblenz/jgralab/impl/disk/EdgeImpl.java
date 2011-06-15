@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -58,7 +59,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
-	public EdgeContainer container;
+	protected EdgeContainer container;
 
 	/**
 	 * Creates a new {@link Edge} instance.
@@ -527,9 +528,10 @@ public abstract class EdgeImpl extends
 				anIncidenceClass.getM1Class(), direction);
 	}
 
-	//
-	// @Override
-	// public final void sortIncidences(Comparator<Incidence> comp) {
+	
+	@Override
+	public final void sortIncidences(Comparator<Incidence> comp) {
+		throw new RuntimeException("Not yet implemented");
 	// assert isValid();
 	//
 	// if (getFirstIncidence() == null) {
@@ -663,7 +665,7 @@ public abstract class EdgeImpl extends
 	// b = d;
 	// }
 	//
-	// }
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

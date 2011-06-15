@@ -4,6 +4,7 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
 public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceClass> {
@@ -58,6 +59,14 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	@Override
 	protected CodeBlock createConstructor() {
+		if (currentCycle.isMembasedImpl()) {
+			return createInMemoryConstructor();
+		} else {
+			return createDiskBasedConstructor();
+		}
+	}
+	
+	private CodeBlock createInMemoryConstructor() {
 		CodeList code = new CodeList();
 
 		addImports("#usedJgImplPackage#.VertexImpl");
@@ -68,22 +77,36 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
+						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
-		code.add(createSpecialConstructorCode());
+		return code;
+	}
+
+	private CodeBlock createDiskBasedConstructor() {
+		CodeList code = new CodeList();
+
+		addImports("#usedJgImplPackage#.VertexImpl");
+		addImports("#usedJgImplPackage#.EdgeImpl");
+		addImports("#jgPackage#.Edge");
+		addImports("#jgPackage#.Vertex");
+		addImports("#jgPackage#.Direction");
+		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
+
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName##implOrProxy#(GraphDatabaseBaseImpl localGraphDatabase, long globalId, long vertexId, long edgeId) {",
+						"\tsuper(localGraphDatabase, globalId, vertexId, edgeId);"));
 		code.addNoIndent(new CodeSnippet("}"));
-		code.setVariable("dir", aec.getDirection().toString());
 		if (currentCycle.isDiskbasedImpl()) {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 				true,
-				"public #simpleClassName#Impl(int id, #jgDiskImplPackage#.IncidenceContainer storage) throws java.io.IOException {",
-				"\tsuper(id, storage);",
+				"public #simpleClassName#Impl(GraphDatabaseBaseImpl localGraphDatabase, long globalId, #jgDiskImplPackage#.IncidenceContainer container) {",
+				"\tsuper(localGraphDatabase, globalId, container);",
 				"}"));
 		}
 		return code;
 	}
-
 	
 	
 	
@@ -93,19 +116,6 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-//		if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-//			if (currentCycle.isStdImpl()) {
-//				addImports("#jgImplStdPackage#.#baseClassName#");
-//			} else if (currentCycle.isSaveMemImpl()) {
-//				addImports("#jgImplSaveMemPackage#.#baseClassName#");
-//			} else if (currentCycle.isTransImpl()) {
-//				addImports("#jgImplTransPackage#.#baseClassName#");
-//			} else if (currentCycle.isDbImpl()) {
-//				addImports("#jgImplDbPackage#.#baseClassName#");
-//			}
-//
-//			rootBlock.setVariable("baseClassName", "IncidenceImpl");
-//		}
 
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());

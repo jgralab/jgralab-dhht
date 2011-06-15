@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 
@@ -68,10 +69,11 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	
 	protected CodeBlock createLoadAttributeContainer() {
 		if (currentCycle.isMemOrDiskImpl()) {
+			addImports("#jgDiskimplPackage#.GraphDatabaseBaseImpl");
 			return new CodeSnippet(
 					true,
 					"protected InnerAttributeContainer loadAttributeContainer() {",
-					"\treturn (InnerAttributeContainer) container.backgroundStorage.getEdgeAttributeContainer(id);",
+					"\treturn (InnerAttributeContainer) container.backgroundStorage.getEdgeAttributeContainer(GraphDatabaseBaseImpl.convertToLocalId(elementId));",
 					"}"
 			);
 		} else {

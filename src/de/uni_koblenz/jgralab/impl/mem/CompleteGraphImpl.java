@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -56,7 +55,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
-import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;

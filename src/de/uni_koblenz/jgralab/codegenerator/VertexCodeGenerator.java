@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -71,10 +72,11 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 	protected CodeBlock createLoadAttributeContainer() {
 		if (currentCycle.isProxies())
 			return null;
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		return new CodeSnippet(
 				true,
 				"protected InnerAttributeContainer loadAttributeContainer() {",
-				"\treturn (InnerAttributeContainer) container.backgroundStorage.getVertexAttributeContainer(id);",
+				"\treturn (InnerAttributeContainer) container.backgroundStorage.getVertexAttributeContainer(GraphDatabaseBaseImpl.convertToLocalId(elementId));",
 				"}"
 		);
 	}

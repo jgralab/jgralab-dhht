@@ -373,8 +373,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl} which should be moved to a new position
 	 * @throws RemoteException 
 	 */
-	protected abstract void putIncidenceAfter(IncidenceImpl target,
-			IncidenceImpl moved);
+	protected abstract void putIncidenceAfter(Incidence target,	Incidence moved);
 
 	/**
 	 * Removes <code>moved</code> from the sequence of {@link Incidence}s at
@@ -387,8 +386,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl} which should be moved to a new position
 	 * @throws RemoteException 
 	 */
-	protected abstract void putIncidenceBefore(IncidenceImpl target,
-			IncidenceImpl moved);
+	protected abstract void putIncidenceBefore(Incidence target, Incidence moved);
 
 	/**
 	 * Appends <code>i</code> to the sequence of {@link Incidence}s at this
@@ -399,7 +397,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl}
 	 * @throws RemoteException 
 	 */
-	protected abstract void appendIncidenceToLambdaSeq(IncidenceImpl i);
+	protected abstract void appendIncidenceToLambdaSeq(Incidence i);
 
 	/**
 	 * Removes <code>i</code> from the sequence of {@link Incidence}s at this
@@ -409,7 +407,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            {@link IncidenceImpl}
 	 * @throws RemoteException 
 	 */
-	protected abstract void removeIncidenceFromLambdaSeq(IncidenceImpl i);
+	protected abstract void removeIncidenceFromLambdaSeq(Incidence i);
 
 
 

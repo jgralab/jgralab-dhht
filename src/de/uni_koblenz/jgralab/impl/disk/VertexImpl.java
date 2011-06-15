@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -66,7 +67,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class VertexImpl extends
 		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
 
-	VertexContainer container;
+	protected VertexContainer container;
 
 	/**
 	 * Creates a new {@link Vertex} instance.
@@ -924,7 +925,8 @@ public abstract class VertexImpl extends
 
 	// @Override
 	// //TODO: Move to storing graph database
-	// public void sortIncidences(Comparator<Incidence> comp) {
+	 public void sortIncidences(Comparator<Incidence> comp) {
+		 throw new RuntimeException("Not yet implemented");
 	// assert isValid();
 	//
 	// if (getFirstIncidence() == null) {
@@ -1059,7 +1061,7 @@ public abstract class VertexImpl extends
 	// b = d;
 	// }
 	//
-	// }
+	}
 
 	@Override
 	public List<? extends Vertex> getAdjacences(String role) {
