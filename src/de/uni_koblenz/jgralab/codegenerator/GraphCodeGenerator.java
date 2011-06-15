@@ -392,17 +392,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.setVariable("omegaInc", absoluteName(omegaInc));
 			code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, next#ecType#);");
 			code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, next#ecType#);");
-			if (fromClass.equals("Vertex")) {
-				code.setVariable("fromClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
-			} else {
-				code.setVariable("fromClass", schemaRootPackageName + "." + fromClass);
-			}
-			if (toClass.equals("Vertex")) {
-				code.setVariable("toClass", rootBlock.getVariable("jgPackage") + "." + "Vertex");
-			} else {
-				code.setVariable("toClass", schemaRootPackageName + "."	+ toClass);
-			}
-			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#fromClass# alpha, #toClass# omega");
+			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#alphaVertex# alpha, #omegaVertex# omega");
 //			code.setVariable("addActualParams", ", alpha, omega");
 		} else {
 			code.setVariable("formalParams", (withId ? "int id" : ""));

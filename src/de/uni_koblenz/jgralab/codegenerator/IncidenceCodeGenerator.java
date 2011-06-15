@@ -4,7 +4,6 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
 public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceClass> {
@@ -78,7 +77,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) {",
-						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
+						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);"));
 		return code;
 	}
 

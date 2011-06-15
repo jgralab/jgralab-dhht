@@ -62,11 +62,10 @@ public abstract class IncidenceImpl implements Incidence {
 	 * @param e
 	 *            {@link Edge}
 	 */
-	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e, Direction dir) {
+	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e) {
 		this.id = id;
 		setIncidentEdge(e);
 		setIncidentVertex(v);
-		this.direction = dir;
 
 		// add this incidence to the sequence of incidences of v
 		if (v.getFirstIncidence() == null) {
@@ -130,10 +129,6 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	private IncidenceImpl previousIncidenceAtEdge;
 
-	/**
-	 * The direction of this {@link Incidence}.
-	 */
-	private Direction direction;
 
 	public void setIncidentVertex(VertexImpl incidentVertex) {
 		this.incidentVertex = incidentVertex;
@@ -158,15 +153,6 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public void setPreviousIncidenceAtEdge(IncidenceImpl previousIncidenceAtEdge) {
 		this.previousIncidenceAtEdge = previousIncidenceAtEdge;
-	}
-
-	protected void setDirection(Direction direction) {
-		this.direction = direction;
-	}
-
-	@Override
-	public Direction getDirection() {
-		return direction;
 	}
 
 	@Override
@@ -233,7 +219,7 @@ public abstract class IncidenceImpl implements Incidence {
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentVertex);
-		return incidentVertex.getIncidentEdges(traversalContext, direction);
+		return incidentVertex.getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
@@ -243,7 +229,7 @@ public abstract class IncidenceImpl implements Incidence {
 		return incidentVertex
 				.getIncidentEdges(
 						traversalContext,
-						direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+						getDirection() == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
 								: Direction.EDGE_TO_VERTEX);
 	}
 
@@ -264,7 +250,7 @@ public abstract class IncidenceImpl implements Incidence {
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
 		assert getGraph().getTraversalContext().getContainingElement()
 				.containsElement(incidentEdge);
-		return incidentEdge.getIncidentVertices(traversalContext, direction);
+		return incidentEdge.getIncidentVertices(traversalContext, getDirection());
 	}
 
 	@Override
@@ -290,7 +276,7 @@ public abstract class IncidenceImpl implements Incidence {
 		return incidentEdge
 				.getIncidentVertices(
 						traversalContext,
-						direction == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
+						getDirection() == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
 								: Direction.EDGE_TO_VERTEX);
 	}
 
