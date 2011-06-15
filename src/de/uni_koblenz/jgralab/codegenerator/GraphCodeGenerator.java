@@ -406,6 +406,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 //			code.setVariable("addActualParams", ", alpha, omega");
 		} else {
 			code.setVariable("formalParams", (withId ? "int id" : ""));
+			code.setVariable("connectToAlpha", "");
+			code.setVariable("connectToOmega", "");
 //			code.setVariable("addActualParams", "");
 		}
 		code.setVariable("newActualParams", (withId ? "id" : "0"));
