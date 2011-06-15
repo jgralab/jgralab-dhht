@@ -81,7 +81,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() ? " class" : " interface");
+		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " class" : " interface");
 		code.setVariable("interfaceOrImplClass", currentCycle.isMemOrDiskImpl() ? rootBlock.getVariable("simpleImplClassName") 
 																: rootBlock.getVariable("simpleClassName"));
 		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
@@ -94,7 +94,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		}
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isMemOrDiskImpl() ? " implements " : " extends ";
+			String delim = currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
 				if (currentCycle.isMemOrDiskImpl()
 						|| !interfaceName.equals(aec.getQualifiedName())) {

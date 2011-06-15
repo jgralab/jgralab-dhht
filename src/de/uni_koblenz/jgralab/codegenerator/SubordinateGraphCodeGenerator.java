@@ -195,11 +195,33 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 	@Override
 	protected CodeBlock createConstructor() {
+		if (currentCycle.isMembasedImpl()) {
+			return createInMemoryConstructor();
+		} else {
+			return createDiskBasedConstructor();
+		}
+	}	
+	
+	private CodeBlock createDiskBasedConstructor() {
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("",
+				 "public #simpleImplClassName#(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase,	RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(globalSubgraphId, localGraphDatabase, storingGraphDatabase);",
+				 "}",
+				 "",
+				 "");	
+		return code;
+		
+	}
+
+
+	private CodeBlock createInMemoryConstructor() {
 		addImports("de.uni_koblenz.jgralab.Vertex");
 		addImports("de.uni_koblenz.jgralab.Edge");
 		addImports("#schemaPackageName#.#schemaName#");
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("createSuffix", "");
 		code.add("",
 				 "public #simpleImplClassName#(Vertex vertex) {",
 				 "\tsuper(vertex);",
@@ -212,6 +234,9 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				 "");	
 		return code;
 	}
+	
+	
+	
 
 	private CodeBlock createGraphElementClassMethods() {
 		CodeList code = new CodeList();

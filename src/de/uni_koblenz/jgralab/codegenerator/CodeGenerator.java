@@ -66,7 +66,7 @@ public abstract class CodeGenerator {
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
 			out.add(DISKBASED);
-		//	out.add(PROXIES);
+			out.add(PROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -256,7 +256,7 @@ public abstract class CodeGenerator {
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
 		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
-		String simpleProxyClassName = rootBlock.getVariable("simpleProxyClassName");
+		String simpleProxyClassName = rootBlock.getVariable("proxyClassName");
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -280,8 +280,7 @@ public abstract class CodeGenerator {
 				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
 				if (currentCycle.isMemOrDiskImpl()) {
 					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
-				} else {
-					if (hasProxySupport())
+				} else if (currentCycle.isProxies()) {
 					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
 				}
 			} else {
@@ -375,7 +374,7 @@ public abstract class CodeGenerator {
 	public Vector<JavaSourceFromString> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
-		String proxyClassName = rootBlock.getVariable("simpleProxyClassName");
+		String proxyClassName = rootBlock.getVariable("proxyClassName");
 		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
 		currentCycle = getNextCycle();
