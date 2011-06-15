@@ -35,8 +35,6 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -390,8 +388,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.setVariable("omegaVertex", absoluteName(toClass));
 			code.setVariable("alphaInc", absoluteName(alphaInc));
 			code.setVariable("omegaInc", absoluteName(omegaInc));
-			code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, next#ecType#);");
-			code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, next#ecType#);");
+			code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, new#ecType#);");
+			code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, new#ecType#);");
 			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#alphaVertex# alpha, #omegaVertex# omega");
 //			code.setVariable("addActualParams", ", alpha, omega");
 		} else {
