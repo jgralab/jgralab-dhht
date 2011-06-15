@@ -137,10 +137,10 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getPartialGraphId(elementId));
 	}
 	
-	@Override
-	public final Graph getCompleteGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
-	}
+//	@Override
+//	public final Graph getCompleteGraph() {
+//		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
+//	}
 	
 
 	@Override

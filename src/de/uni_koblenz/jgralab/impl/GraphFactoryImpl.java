@@ -32,12 +32,9 @@
 package de.uni_koblenz.jgralab.impl;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
-import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
@@ -68,7 +65,6 @@ public class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForMemBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForMemBasedImpl;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForMemBasedImpl;
-	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForMemBasedImpl;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForMemBasedImpl;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForMemBasedImpl;
 
@@ -79,7 +75,6 @@ public class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForDiskBasedImpl;
-	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForDiskBasedImpl;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForDiskBasedImpl;
 
@@ -89,7 +84,6 @@ public class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForEdgeMapForProxies;
 	protected HashMap<Class<? extends Graph>, Constructor<? extends Graph>> subordinateGraphForVertexMapForProxies;
 	protected HashMap<Class<? extends Edge>, Constructor<? extends Edge>> edgeMapForProxies;
-	protected HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>> binaryEdgeMapForProxies;
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForProxies;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForProxies;
 
@@ -122,7 +116,6 @@ public class GraphFactoryImpl implements GraphFactory {
 		subordinateGraphForVertexMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForEdgeMapForMemBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		edgeMapForMemBasedImpl = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-		binaryEdgeMapForMemBasedImpl = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
 		vertexMapForMemBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMapForMemBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 
@@ -132,7 +125,6 @@ public class GraphFactoryImpl implements GraphFactory {
 		subordinateGraphForVertexMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForEdgeMapForDiskBasedImpl = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		edgeMapForDiskBasedImpl = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-		binaryEdgeMapForDiskBasedImpl = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
 		vertexMapForDiskBasedImpl = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMapForDiskBasedImpl = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 
@@ -140,10 +132,9 @@ public class GraphFactoryImpl implements GraphFactory {
 		viewGraphMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForVertexMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		subordinateGraphForEdgeMapForProxies = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
-//		edgeMapForProxies = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-//		binaryEdgeMapForProxies = new HashMap<Class<? extends BinaryEdge>, Constructor<? extends BinaryEdge>>();
-//		vertexMapForProxies = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-//		incidenceMapForProxies = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+		edgeMapForProxies = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		vertexMapForProxies = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMapForProxies = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 
 		edgeMapForDiskStorageReloading = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		vertexMapForDiskStorageReloading = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
@@ -201,26 +192,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	
-	
-	
-	
 
-	@Override
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega) {
-		try {
-			Edge e = binaryEdgeMapForMemBasedImpl.get(edgeClass).newInstance(
-					id, g, alpha, omega);
-			return e;
-		} catch (Exception ex) {
-			if (ex.getCause() instanceof GraphException) {
-				throw new GraphException(ex.getCause().getLocalizedMessage(),
-						ex);
-			}
-			throw new M1ClassAccessException("Cannot create edge of class "
-					+ edgeClass.getCanonicalName(), ex);
-		}
-	}
 
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
@@ -252,6 +224,7 @@ public class GraphFactoryImpl implements GraphFactory {
 					+ edgeClass.getCanonicalName(), ex);
 		}
 	}
+
 	
 	@Override
 	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
@@ -504,29 +477,12 @@ public class GraphFactoryImpl implements GraphFactory {
 	
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { int.class, Graph.class };
-				edgeMapForMemBasedImpl.put(originalClass,
-						implementationClass.getConstructor(params));
-
-				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces()) {
-					interfaces.add(c);
-				}
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class,
-							Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
-							.getConstructor(binaryParams);
-					binaryEdgeMapForMemBasedImpl.put(
-							(Class<? extends BinaryEdge>) originalClass,
-							binaryConstructor);
-				}
-
+				edgeMapForMemBasedImpl.put(originalClass, implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -536,7 +492,6 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setEdgeDiskBasedImplementationClass(
 			Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
@@ -545,24 +500,8 @@ public class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { long.class, Graph.class };
 				edgeMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class, EdgeContainer.class,
-						Graph.class };
-				edgeMapForDiskStorageReloading.put(originalClass,
-						implementationClass.getConstructor(paramsDisk));
-
-				List<Class<?>> interfaces = new ArrayList<Class<?>>();
-				for (Class<?> c : originalClass.getInterfaces()) {
-					interfaces.add(c);
-				}
-				if (interfaces.contains(BinaryEdge.class)) {
-					Class<?>[] binaryParams = { int.class, Graph.class,
-							Vertex.class, Vertex.class };
-					Constructor<BinaryEdge> binaryConstructor = (Constructor<BinaryEdge>) implementationClass
-							.getConstructor(binaryParams);
-					binaryEdgeMapForMemBasedImpl.put(
-							(Class<? extends BinaryEdge>) originalClass,
-							binaryConstructor);
-				}
+				Class<?>[] paramsDisk = { long.class, EdgeContainer.class, Graph.class };
+				edgeMapForDiskStorageReloading.put(originalClass, implementationClass.getConstructor(paramsDisk));
 
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(

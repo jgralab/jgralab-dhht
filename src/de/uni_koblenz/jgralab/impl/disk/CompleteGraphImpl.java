@@ -110,8 +110,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	@Deprecated
-	public GraphFactory getGraphFactory() {
+	public final GraphFactory getGraphFactory() {
 		return localGraphDatabase.getGraphFactory();
 	}
 

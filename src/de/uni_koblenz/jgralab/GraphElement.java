@@ -100,12 +100,6 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public Graph getContainingGraph();
 	
-	/**
-	 * Returns the graph directly containing this graph elements, e.g. the
-	 * subordinate or partial one  
-	 * @return
-	 */
-	public Graph getContainingPartialGraph();
 
 	/**
 	 * Returns the {@link GraphElement} in which this {@link GraphElement} is

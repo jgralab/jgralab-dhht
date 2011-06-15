@@ -68,7 +68,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##ImplOrProxy#(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
+						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) throws java.io.IOException {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge, Direction.#dir#);"));
 		code.add(createSpecialConstructorCode());
 		code.addNoIndent(new CodeSnippet("}"));

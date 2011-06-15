@@ -163,12 +163,6 @@ public interface GraphFactory {
 	 */
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g);
 	
-	/**
-	 * creates a Edge-object for the specified class. The returned object may be
-	 * an instance of a subclass of the specified edgeClass.
-	 */
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha, Vertex omega);
-	
 	
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
@@ -176,6 +170,7 @@ public interface GraphFactory {
 	 */
 	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase);
 
+	
 	
 	/**
 	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 

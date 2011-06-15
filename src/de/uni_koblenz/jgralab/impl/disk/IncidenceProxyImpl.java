@@ -870,11 +870,11 @@ public abstract class IncidenceProxyImpl implements Incidence {
 		}
 	}
 
-
-	@Override
-	public Graph getCompleteGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
-	}
+//
+//	@Override
+//	public Graph getCompleteGraph() {
+//		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
+//	}
 
 
 

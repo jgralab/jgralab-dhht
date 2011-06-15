@@ -551,10 +551,10 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	public final void setSigma(GraphElementImpl<?, ?, ?> newSigma) {
+	public final void setSigma(GraphElement<?, ?, ?> newSigma) {
 		assert newSigma != null;
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		this.sigma = newSigma;
+		this.sigma = (GraphElementImpl<?, ?, ?>) newSigma;
 	}
 
 	/**

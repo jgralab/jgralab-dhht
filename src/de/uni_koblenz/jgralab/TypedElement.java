@@ -29,7 +29,6 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 */
 	public Schema getSchema();
 
-	Graph getCompleteGraph();
 	
 	/**
 	 * Returns the M1 implementation class for this IncidenceClass.

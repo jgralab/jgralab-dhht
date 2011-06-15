@@ -70,8 +70,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
+		code.setVariable("graphFactory", currentCycle.isDiskbasedImpl() ? "getGraphFactory()" : "graphFactory");
+		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
 		if (currentCycle.isMemOrDiskImpl()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
+			addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
 		//	addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
 		//	addImports("java.util.List");
@@ -155,14 +158,14 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
 				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
 				cs.add("\trecord.readComponentValues(io);");
 				cs.add("\treturn record;");
 				cs.add("}");
 				cs.add("");
 
 				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
 				
 
 				cs.add("\trecord.setComponentValues(fields);");
@@ -177,7 +180,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\t#rcname# record = graphFactory.createRecord(#rcname#.class, this);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
 				
 				for (RecordComponent entry : rd.getComponents()) {
 					cs.add("\trecord.set_" + entry.getName() + "(_"
@@ -361,7 +364,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) graphFactory.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, this#additionalParams#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase##additionalParams#);",
 					 "\treturn new#ecType#;", "}");
 			code.setVariable("additionalParams", "");
 		}
