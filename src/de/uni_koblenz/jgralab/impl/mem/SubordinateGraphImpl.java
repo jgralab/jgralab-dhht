@@ -337,13 +337,9 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public boolean isLoading() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
-	@Override
-	public void loadingCompleted() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {

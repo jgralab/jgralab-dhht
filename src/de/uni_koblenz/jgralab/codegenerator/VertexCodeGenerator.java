@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**

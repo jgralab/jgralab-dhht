@@ -878,12 +878,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public void setLoading(boolean b);
 
 
-	/**
-	 * Callback method: Called immediately after loading of this graph is
-	 * completed. Overwrite this method to perform user defined operations after
-	 * loading a graph.
-	 */
-	public void loadingCompleted();
 
 	/**
 	 * Checks whether this graph has changed with respect to the given

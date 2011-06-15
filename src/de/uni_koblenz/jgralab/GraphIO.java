@@ -1368,7 +1368,6 @@ public class GraphIO {
 					.graph(pf, implementationType, onlyLocalGraph);
 			io.incidencesAtEdge = null;
 			io.incidencesAtVertex = null;
-			loadedGraph.loadingCompleted();
 			return loadedGraph;
 		} catch (ClassNotFoundException e) {
 			// the schema class was not found, probably schema.commit-method was

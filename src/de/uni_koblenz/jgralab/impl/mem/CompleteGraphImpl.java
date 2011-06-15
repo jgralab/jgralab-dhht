@@ -1152,11 +1152,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return loading;
 	}
 
-	@Override
-	public void loadingCompleted() {
-
-	}
-
 	/**
 	 * Sets the loading flag.
 	 * 

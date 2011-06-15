@@ -106,13 +106,13 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 
 	
-	/**
-	 * number of vertices in the graph
-	 * @ 
-	 */
-	protected void setVCount(int count) {
-		localGraphDatabase.setVCount(globalSubgraphId, count);
-	}
+//	/**
+//	 * number of vertices in the graph
+//	 * @ 
+//	 */
+//	protected void setVCount(int count) {
+//		localGraphDatabase.setVCount(globalSubgraphId, count);
+//	}
 
 	@Override
 	public Vertex getFirstVertex() {
@@ -147,12 +147,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	// ------------- EDGE LIST VARIABLES -------------
 
-
-	/**
-	 * number of edges in the graph
-	 * @ 
-	 */
-	abstract protected void setECount(int count);
 
 	
 	@Override
@@ -996,9 +990,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		T newIncidence = vertex.connect(cls, edge);
 		return newIncidence;
 	}
-
-	protected abstract void setICount(int count);
-
 
 	
 	// ------------- PARTIAL GRAPH VARIABLES ------------

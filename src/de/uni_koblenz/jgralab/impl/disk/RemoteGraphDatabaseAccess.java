@@ -364,4 +364,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	void increaseECount(long subgraphId);
 
+	public int getLocalPartialGraphId();
+
 }

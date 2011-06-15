@@ -218,10 +218,6 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void loadingCompleted() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {

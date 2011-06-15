@@ -415,10 +415,10 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	// Methods to be used only internal
 	// ==============================================================
 
-	@Override
-	protected void setVCount(int count) {
-		storingGraphDatabase.setVCount(globalSubgraphId, count);
-	}
+//	@Override
+//	protected void setVCount(int count) {
+//		storingGraphDatabase.setVCount(globalSubgraphId, count);
+//	}
 
 	/**
 	 * Sets the loading flag.
@@ -444,6 +444,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public void defragment() {
 
 	}
+
+
 
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
@@ -481,6 +483,16 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 //		}
 	}
 
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		long globalId = (partialGraphId << 32) + 1;
+		return localGraphDatabase.getGraphObject(globalId);
+	}
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return GraphDatabaseElementaryMethods.getPartialGraphId(id) == storingGraphDatabase.getLocalPartialGraphId();
+	}
 
 
 

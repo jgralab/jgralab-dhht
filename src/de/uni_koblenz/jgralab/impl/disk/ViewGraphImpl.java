@@ -238,10 +238,6 @@ public abstract class ViewGraphImpl implements Graph,
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public void loadingCompleted() {
-		throw new UnsupportedOperationException();
-	}
 
 	@Override
 	public boolean isGraphModified(long previousVersion) {
