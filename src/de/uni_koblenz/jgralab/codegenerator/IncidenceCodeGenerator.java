@@ -87,15 +87,15 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##implOrProxy#(GraphDatabaseBaseImpl localGraphDatabase, long globalId, long vertexId, long edgeId) {",
-						"\tsuper(localGraphDatabase, globalId, vertexId, edgeId);"));
+						"public #simpleClassName##implOrProxy#(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
+						"\tsuper(globalId,localGraphDatabase, vertexId, edgeId);"));
 		code.addNoIndent(new CodeSnippet("}"));
 		if (currentCycle.isDiskbasedImpl()) {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 				true,
-				"public #simpleClassName#Impl(GraphDatabaseBaseImpl localGraphDatabase, long globalId, #jgDiskImplPackage#.IncidenceContainer container) {",
-				"\tsuper(localGraphDatabase, globalId, container);",
+				"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, #jgDiskImplPackage#.IncidenceContainer container) {",
+				"\tsuper(globalId, localGraphDatabase, container);",
 				"}"));
 		}
 		return code;

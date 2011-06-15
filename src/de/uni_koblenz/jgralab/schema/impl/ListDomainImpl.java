@@ -140,7 +140,7 @@ public final class ListDomainImpl extends CollectionDomainImpl implements
 		code.add(new CodeSnippet("\t#tmpname#.add($#name#Element);", "}",
 				"#io#.match(\"]\");"));
 		code.add(new CodeSnippet(
-				attributeContainer + "#name# = #theGraph#.createList(#tmpname#.size());"));
+				attributeContainer + "#name# = getGraph().createList(#tmpname#.size());"));
 		code.add(new CodeSnippet(attributeContainer + "#name#.addAll(#tmpname#);"));
 		code.addNoIndent(new CodeSnippet(
 				"} else if (#io#.isNextToken(GraphIO.NULL_LITERAL)) {"));

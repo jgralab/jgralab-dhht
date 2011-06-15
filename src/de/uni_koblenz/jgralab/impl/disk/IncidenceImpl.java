@@ -58,14 +58,14 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public IncidenceContainer container;
 
-	protected IncidenceImpl(GraphDatabaseBaseImpl localGraphDatabase, IncidenceContainer container, long globalId) {
+	protected IncidenceImpl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, IncidenceContainer container) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = localGraphDatabase;
 		this.container = container;
 		this.id = globalId;
 	}
 	
-	protected IncidenceImpl(GraphDatabaseBaseImpl localGraphDatabase, long globalId, long vertexId, long edgeId) {
+	protected IncidenceImpl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = localGraphDatabase;
 		this.container = localGraphDatabase.getLocalDiskStorage().getIncidenceContainer(GraphDatabaseBaseImpl.convertToLocalId(globalId));
