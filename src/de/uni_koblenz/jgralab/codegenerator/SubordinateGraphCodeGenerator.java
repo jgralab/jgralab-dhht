@@ -497,7 +497,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
+					"\tgetSuperordinateGraph().set_#name#(_#name#);","}");
 			break;
 		}
 		return code;
