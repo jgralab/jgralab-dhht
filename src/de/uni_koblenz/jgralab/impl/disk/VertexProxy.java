@@ -39,7 +39,10 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtVertex;
 import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
@@ -1182,4 +1185,28 @@ public abstract class VertexProxy extends
 	}
 	
 
+	@Override
+	public void readAttributeValueFromString(String attributeName, String value)
+			throws GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public String writeAttributeValueToString(String attributeName)
+			throws IOException, GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void writeAttributeValues(GraphIO io) throws IOException,
+			GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void readAttributeValues(GraphIO io) throws GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+	
+	
 }

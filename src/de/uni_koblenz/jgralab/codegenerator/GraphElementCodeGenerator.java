@@ -158,7 +158,6 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-		code.setVariable("edgeOrVertex", this instanceof VertexCodeGenerator ? "Vertex" : "Edge");
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
 						.equals("Boolean") ? "is" : "get");
@@ -182,7 +181,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn storingGraphDatabase.get#EdgeOrVertex#Attribute(elementId, \"#name#\");",
+					 "\treturn storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\");",
 					 "}");
 			break;
 		}
@@ -191,7 +190,6 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 
 	protected CodeBlock createSetter(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("edgeOrVertex", this instanceof VertexCodeGenerator ? "Vertex" : "Edge");
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
@@ -216,7 +214,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					 "\treturn storingGraphDatabase.set#EdgeOrVertex#Attribute(elementId, \"#name#\", _#name#);",
+					 "\treturn storingGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#);",
 					 "}");
 			break;
 		}

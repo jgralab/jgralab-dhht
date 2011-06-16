@@ -40,8 +40,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		rootBlock.setVariable("theGraph", "graph");
 		
 
-		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true"
-				: "false");
+		rootBlock.setVariable("isAbstractClass", aec.isAbstract() ? "true" : "false");
 		interfaces = new TreeSet<String>();
 		interfaces.add(aec.getQualifiedName());
 		for (TypedElementClass<?,?> superClass : aec.getDirectSuperClasses()) {
@@ -68,13 +67,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 			addImports("#usedJgImplPackage#.#baseClassName#");
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
-		} else if (currentCycle.isProxies()) {
-			code.add(createConstructor());
-		}
+		} 
 		return code;
 	}
 
@@ -96,7 +93,7 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 		if (interfaces.size() > 0) {
 			String delim = currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isMemOrDiskImpl()
+				if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")
