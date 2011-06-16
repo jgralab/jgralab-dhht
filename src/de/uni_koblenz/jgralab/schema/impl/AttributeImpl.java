@@ -175,11 +175,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 				element.readAttributeValueFromString(name, defaultValueAsString);
 			}
 
-			try {
-				defaultValue = element.getAttribute(name);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
+			defaultValue = element.getAttribute(name);
 			defaultValueComputed = true;
 		} else {
 			Object cloneOfDefaultValue = null;
@@ -189,11 +185,7 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 			} else {
 				cloneOfDefaultValue = defaultValue;
 			}
-			try {
-				element.setAttribute(name, cloneOfDefaultValue);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
+			element.setAttribute(name, cloneOfDefaultValue);
 		}
 	}
 }

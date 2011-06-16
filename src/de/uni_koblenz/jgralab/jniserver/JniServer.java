@@ -551,13 +551,8 @@ public class JniServer {
 		}
 	}
 
-	private void setAttribute(AttributedElement<?, ?> e, String attributeName,
-			Object value) {
-		try {
+	private void setAttribute(AttributedElement<?, ?> e, String attributeName, Object value) {
 			e.setAttribute(attributeName, value);
-		} catch (RemoteException e1) {
-			throw new RuntimeException(e1);
-		}
 	}
 
 	private String getEnumAttribute(AttributedElement<?, ?> e,
@@ -578,11 +573,7 @@ public class JniServer {
 	}
 
 	private Object getAttribute(AttributedElement<?, ?> e, String attributeName) {
-		try {
-			return e.getAttribute(attributeName);
-		} catch (RemoteException e1) {
-			throw new RuntimeException(e1);
-		}
+		return e.getAttribute(attributeName);
 	}
 
 }

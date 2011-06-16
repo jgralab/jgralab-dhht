@@ -290,7 +290,6 @@ public class Tg2Dot extends Tg2Whatever {
 	}
 
 	private void printAttributes(PrintStream out, AttributedElement<?,?> elem) {
-		try {
 		AttributedElementClass<?,?> cls = elem.getType();
 		for (Attribute attr : cls.getAttributeList()) {
 			if (abbreviateEdgeAttributeNames && (elem instanceof Edge)) {
@@ -315,9 +314,6 @@ public class Tg2Dot extends Tg2Whatever {
 				attributeString = '"' + attributeString + '"';
 			}
 			out.print(" = " + stringQuote(attributeString) + "\\l");
-		}
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
