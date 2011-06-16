@@ -366,4 +366,18 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public int getLocalPartialGraphId();
 
+	public void setVertexAttribute(long elementId, String attributeName,
+			Object data);
+	
+	public void setEdgeAttribute(long elementId, String attributeName,
+			Object data);
+	
+	public void setGraphAttribute(String attributeName, Object data);
+
+	public Object getVertexAttribute(long elementId, String attributeName);
+	
+	public Object getEdgeAttribute(long elementId, String attributeName);
+	
+	public Object getGraphAttribute(String attributeName);
+
 }

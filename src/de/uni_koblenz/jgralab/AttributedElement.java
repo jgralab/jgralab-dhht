@@ -72,10 +72,10 @@ extends TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 	 *             {@link AttributedElement}
 	 * @throws RemoteException 
 	 */
-	public Object getAttribute(String name) throws NoSuchAttributeException, RemoteException;
+	public Object getAttribute(String name) throws NoSuchAttributeException;
 
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException, RemoteException;
+			throws NoSuchAttributeException;
 
 	void initializeAttributesWithDefaultValues();
 }

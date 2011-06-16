@@ -101,7 +101,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		CodeList code = (CodeList) super.createBody();
 		if (currentCycle.isDiskbasedImpl()) {
 			code.add(createGetIncidenceClassForRolenameMethod());
-			code.add(createLoadAttributeContainer());
+			code.addNoIndent(createLoadAttributeContainer());
 			code.add(createWriteAttributesMethod(aec.getAttributeList(), "attributeContainer."));
 			code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), "attributeContainer."));
 			code.add(createReadAttributesMethod(aec.getAttributeList(), "attributeContainer."));

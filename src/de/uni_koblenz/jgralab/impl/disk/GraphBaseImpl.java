@@ -64,8 +64,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 /**
  * Base class for all graph implementations
  * 
- * TODO - Implement connect operation between elements of different partial
- * graphs
  * 
  * @author ist@uni-koblenz.de
  */

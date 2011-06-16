@@ -1470,6 +1470,50 @@ public abstract class GraphDatabaseBaseImpl extends
 			l.incidenceDeleted(o);
 		}
 	}
+	
+	
+	
+	@Override
+	public void setVertexAttribute(long elementId, String attributeName, Object data) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setVertexAttribute(elementId, attributeName, data);
+		} else {
+			getVertexObject(elementId).setAttribute(attributeName, data);
+		}
+	}
+
+	@Override
+	public void setEdgeAttribute(long elementId, String attributeName,
+			Object data) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).setEdgeAttribute(elementId, attributeName, data);
+		} else {
+			getEdgeObject(elementId).setAttribute(attributeName, data);
+		}
+	}
+
+	@Override
+	public Object getVertexAttribute(long elementId, String attributeName) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getVertexAttribute(elementId, attributeName);
+		} else {
+			return getVertexObject(elementId).getAttribute(attributeName);
+		}
+	}
+
+	@Override
+	public Object getEdgeAttribute(long elementId, String attributeName) {
+		int partialGraphId = getPartialGraphId(elementId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getEdgeAttribute(elementId, attributeName);
+		} else {
+			return getEdgeObject(elementId).getAttribute(attributeName);
+		}
+	}
+	
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {

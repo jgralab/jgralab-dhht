@@ -324,14 +324,13 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException,
-			RemoteException {
+	public Object getAttribute(String name) throws NoSuchAttributeException {
 		return containingElement.getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException, RemoteException {
+			throws NoSuchAttributeException {
 		containingElement.setAttribute(name, data);
 	}
 

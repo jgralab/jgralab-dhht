@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -1184,6 +1185,16 @@ public abstract class VertexProxy extends
 		return storingGraphDatabase.getIncidenceListVersionOfVertexId(elementId);
 	}
 	
+	
+	public Object getAttribute(String attributeName) {
+		return storingGraphDatabase.getVertexAttribute(elementId, attributeName);
+	}
+
+	public void setAttribute(String attributeName, Object data) {
+		storingGraphDatabase.setVertexAttribute(elementId, attributeName, data);
+	}
+	
+
 
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
@@ -1208,5 +1219,9 @@ public abstract class VertexProxy extends
 		throw new UnsupportedOperationException();
 	}
 	
+	@Override
+	public void sortIncidences(Comparator<Incidence> comp) {
+		throw new RuntimeException("Not yet implemented");
+	}
 	
 }

@@ -2,7 +2,7 @@ DHHTGraph 1;
 
 Schema de.uni_koblenz.jgralab.grumlschema.GrumlSchema;
 
-GraphClass SchemaGraph;
+GraphClass SchemaGraph {version: Integer};
 
 Package ;
 Package structure;

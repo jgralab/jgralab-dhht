@@ -104,5 +104,14 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 				getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID))
 				.setGraphVersion(graphVersion);
 	}
+	
+	public Object getGraphAttribute(String attributeName) {
+		return getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).getGraphAttribute(attributeName);
+	}
+	@Override
+	public void setGraphAttribute(String attributeName, Object data) {
+		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).setGraphAttribute(attributeName, data);
+	}
+		
 
 }

@@ -34,13 +34,17 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtEdge;
 import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
@@ -1191,4 +1195,40 @@ public abstract class EdgeProxy extends
 		return storingGraphDatabase.getIncidenceListVersionOfEdgeId(elementId);
 	}
 
+	public Object getAttribute(String attributeName) {
+		return storingGraphDatabase.getEdgeAttribute(elementId, attributeName);
+	}
+
+	public void setAttribute(String attributeName, Object data) {
+		storingGraphDatabase.setEdgeAttribute(elementId, attributeName, data);
+	}
+	
+	
+	@Override
+	public void readAttributeValueFromString(String attributeName, String value)
+			throws GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public String writeAttributeValueToString(String attributeName)
+			throws IOException, GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void writeAttributeValues(GraphIO io) throws IOException,
+			GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void readAttributeValues(GraphIO io) throws GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public void sortIncidences(Comparator<Incidence> comp) {
+		throw new RuntimeException("Not yet implemented");
+	}
 }

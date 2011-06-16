@@ -134,20 +134,19 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		}
 		snip.add("public void setAttribute(String attributeName, Object data) {");
 		code.addNoIndent(snip);
+		if (currentCycle.isMemOrDiskImpl()) {
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
 			s.setVariable("name", attr.getName());
 
 			if (attr.getDomain().isComposite()) {
-				s.setVariable(
-						"attributeClassName",
-						attr.getDomain()
-								.getJavaAttributeImplementationTypeName(
-										schemaRootPackageName));
+				String implTypeName = attr.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName);
+				s.setVariable("attributeClassName", implTypeName);
 			} else {
 				s.setVariable("attributeClassName", attr.getDomain()
 						.getJavaClassName(schemaRootPackageName));
 			}
+			
 			boolean isEnumDomain = false;
 			if (attr.getDomain() instanceof EnumDomain) {
 				isEnumDomain = true;
@@ -178,6 +177,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		}
 		code.add(new CodeSnippet(
 				"throw new NoSuchAttributeException(\"#qualifiedClassName# doesn't contain an attribute \" + attributeName);"));
+		}		
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
@@ -218,6 +218,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 					"\treturn _#name#;",
 					"}");
 			break;
+		case PROXIES:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					"\treturn storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\")",
+					"}");
 		}
 		return code;
 	}
@@ -238,6 +242,10 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 			code.add("public void set_#name#(#type# _#name#) {",
 					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
 			break;
+		case PROXIES:
+			code.add("public void set_#name#(#type# _#name#) {",
+					"\tstoringGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#)",
+					"}");
 		}
 		return code;
 	}

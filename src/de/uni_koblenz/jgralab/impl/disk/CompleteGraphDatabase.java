@@ -3,9 +3,11 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -19,6 +21,11 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	private final String[] hostnames;
 
 	private final List<Integer> freePartialGraphIds;
+	
+	/**
+	 * Stores the attributes of the complete graph
+	 */
+	private Map<String, Object> completeGraphAttributes;
 
 	public CompleteGraphDatabase(Schema schema, String uniqueGraphId,
 			String hostname) {
@@ -29,7 +36,10 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		for (int i = 0; i < MAX_NUMBER_OF_PARTIAL_GRAPHS; i++) {
 			freePartialGraphIds.add(i);
 		}
+		completeGraphAttributes = new HashMap<String, Object>();
 	}
+	
+
 
 	@Override
 	public String getHostname(int id) {
@@ -221,5 +231,20 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	public void setGraphVersion(long graphVersion) {
 		this.graphVersion = graphVersion;
 	}
+
+
+
+
+
+	public Object getGraphAttribute(String attributeName) {
+		//check if the graph has such an attribute
+		return completeGraphAttributes.get(attributeName);
+	}
+	@Override
+	public void setGraphAttribute(String attributeName, Object data) {
+		// check if the graph has such an attribute
+		completeGraphAttributes.put(attributeName, data);
+	}
+			
 
 }
