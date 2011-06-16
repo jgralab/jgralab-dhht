@@ -105,10 +105,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
 		code.add(createCreateRecordsMethods());
-		code.add(createReadAttributesMethod(aec.getAttributeList(), "attributeContainer."));
-		code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), "attributeContainer."));
-		code.add(createWriteAttributesMethod(aec.getAttributeList(), "attributeContainer"));
-		code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), "attributeContainer"));
+		String attributeContainerVariable = currentCycle.isDiskbasedImpl() ? "attributeContainer." : "";
+		code.add(createReadAttributesMethod(aec.getAttributeList(), attributeContainerVariable));
+		code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), attributeContainerVariable));
+		code.add(createWriteAttributesMethod(aec.getAttributeList(), attributeContainerVariable));
+		code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), attributeContainerVariable));
 		return code;
 	}
 

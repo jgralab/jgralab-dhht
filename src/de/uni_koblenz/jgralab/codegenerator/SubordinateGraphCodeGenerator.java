@@ -493,26 +493,19 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 		switch (currentCycle) {
 		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#) ;");
+			code.add("public void set_#name#(#type# _#name#);");
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\tgetSuperordinateGraph().set_#name#(_#name#);","}");
+					"\t((#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
+			break;
+		case DISKBASED:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					"\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);","}");
 			break;
 		}
 		return code;
 	}
 
-	protected CodeBlock createField(Attribute attr) {
-		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
-		code.setVariable("name", attr.getName());
-		if (currentCycle.isMemOrDiskImpl()) {
-			code.setVariable(
-					"type",
-					attr.getDomain().getJavaAttributeImplementationTypeName(
-							schemaRootPackageName));
-		}
-		return code;
-	}
 	
 }

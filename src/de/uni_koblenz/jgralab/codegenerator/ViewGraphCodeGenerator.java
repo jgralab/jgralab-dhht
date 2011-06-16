@@ -501,9 +501,13 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\tgetSuperordinateGraph().set_#name#(_#name#)","}");
+					"\t((#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
 			break;
-		}
+		case DISKBASED:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					"\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);","}");
+			break;
+		}	
 		return code;
 	}
 
