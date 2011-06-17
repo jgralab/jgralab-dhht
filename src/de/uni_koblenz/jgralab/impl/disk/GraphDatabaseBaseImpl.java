@@ -116,20 +116,50 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 	
 	
+	//for partial graph database
+	public int bindPartialGraphId(String hostname) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.bindPartialGraphId(hostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.createPartialGraphDatabase(uniqueGraphId, hostname, hostname, partialGraphId, partialGraphId);
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
+	
+	
+
+	
 	
 	@Override
 	public long createPartialGraphInGraph(long parentGlobalSubgraphId, String hostname) {
+		//allocation of graph id needs to be done on central database
+		int partialGraphId = bindPartialGraphId(hostname);
+		RemoteGraphDatabaseAccessWithInternalMethods remoteDb = partialGraphDatabases.get(partialGraphId);
+
+		Graph pg = getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
 		
-		
-		//the following needs to be delegated to the complete graph
-		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
-		int partialGraphId = compDatabase.getFreePartialGraphId();
-		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
-		partialGraphDatabases.put(partialGraphId,
-				(RemoteGraphDatabaseAccessWithInternalMethods) p);
-		return getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
 	}
+	
+	
+	@Override
+	public long createPartialGraphInVertex(long parentVertexId, String hostname) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long createPartialGraphInEdge(long parentEdgeId, String hostname) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	
+	
+	
+	// create partial graph
+	
+	// 
+	
 
 	
 	/** returns the list of all partial graph ids directly or indirectly 
@@ -1682,9 +1712,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-	public abstract void releasePartialGraphId(int partialGraphId);
 
 
 }

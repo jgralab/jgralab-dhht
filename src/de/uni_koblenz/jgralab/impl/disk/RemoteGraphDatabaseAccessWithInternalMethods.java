@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.util.List;
 
 /**
  * As an extension of RemoteGraphDatabaseAccess, this interface declares all remote accessible methods
@@ -132,18 +131,13 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 
 
-	public List<Integer> getPartialGraphIds(long globalSubgraphId);
 
-
-
-
-	public void addPartialGraphId(long globalSubgraphId,
-			int newPartialGraphId);
-
-
-
-
-	public int getFreePartialGraphId();
+	/** binds a free partial graph id to the hostname given
+	 * and returns the bound partial graph id 
+	 * @param hostname
+	 * @return
+	 */
+	public int bindPartialGraphId(String hostname);
 
 
 }

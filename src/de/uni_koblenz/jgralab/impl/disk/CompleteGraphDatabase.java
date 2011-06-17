@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -45,16 +46,24 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		return hostnames[id];
 	}
 
-	@Override
-	public int getFreePartialGraphId() {
+	private int allocatePartialGraphId() {
 		if (freePartialGraphIds.size() > 0) {
 			return freePartialGraphIds.remove(0);
 		} else {
 			throw new RuntimeException("There is no free partial graph id");
 		}
 	}
+	
+	//for central graph database
+	public int bindPartialGraphId(String hostname) {
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		int partialGraphId = allocatePartialGraphId();
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
 
-	public void releasePartialGraphId(int partialGraphId) {
+	private void releasePartialGraphId(int partialGraphId) {
 		freePartialGraphIds.add(partialGraphId);
 	}
 
@@ -234,6 +243,9 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		// check if the graph has such an attribute
 		completeGraphAttributes.put(attributeName, data);
 	}
+
+
+
 			
 
 }

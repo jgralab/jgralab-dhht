@@ -2,9 +2,9 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.Remote;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
@@ -52,10 +52,17 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public boolean isLoading();
 
-	public long createPartialGraph(Class<? extends Graph> m1Class,
-			String hostname);
+	public long createPartialGraphInGraph(long parentGraphId, String hostname);
+	
+	public long createPartialGraphInVertex(long parentVertexId, String hostname);
+	
+	public long createPartialGraphInEdge(long parentEdgeId, String hostname);
 
 	public void registerPartialGraph(int id, String hostname);
+	
+	public List<Integer> getPartialGraphIds(long globalSubgraphId);
+
+	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId);
 
 	/**
 	 * 

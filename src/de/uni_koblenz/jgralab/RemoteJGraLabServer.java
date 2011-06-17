@@ -10,12 +10,32 @@ public interface RemoteJGraLabServer extends Remote {
 	 * Returns the GraphDatabase <code>graphDatabase</code> responsible for the 
 	 * storage of all graphs belonging to the complete graph identified by the 
 	 * given <code>uniqueGraphId</code>. If there is no such graph database,
-	 * a new one will be created 
+	 * the server will try to load the graph with the given uid, if no such
+	 * graph is known, an exception is thrown 
 	 * @param uniqueGraphId 
 	 * @param graphDatabase
 	 */
 	public RemoteGraphDatabaseAccess getGraphDatabase(String graphUid);
 
 	
+	/**
+	 * Creates a new GraphDatabase for the partial graph with the given
+	 * partialGraphId belonging to the complete graph with the given
+	 * unique id stored on the host identified by the given name. The schema
+	 * named <code>schemaName</code> is used as a graph schema, it is required
+	 * that the instances of the schema are locally compiled an available
+	 * in the classpath 
+	 * @param schemaName
+	 * @param uniqueGraphId
+	 * @param hostnameOfCompleteGraph
+	 * @param localPartialGraphId
+	 * @param parentPartialGraphId
+	 * @return
+	 * @throws ClassNotFoundException if the schema class can not be loaded
+	 */
+	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName,
+			String uniqueGraphId, String hostnameOfCompleteGraph,
+			int localPartialGraphId, int parentPartialGraphId) throws ClassNotFoundException;
+
 	
 }

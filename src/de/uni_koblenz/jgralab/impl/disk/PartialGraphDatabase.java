@@ -1,6 +1,9 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.util.Map;
+
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
@@ -8,8 +11,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	private final CompleteGraphDatabase completeGraphDatabase;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
-			String hostnameOfCompleteGraph, int localPartialGraphId) {
-		super(schema, uniqueGraphId, 1, localPartialGraphId);
+			String hostnameOfCompleteGraph, long parentSubgraphId, int localPartialGraphId) {
+		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
 		completeGraphDatabase = (CompleteGraphDatabase) localJGraLabServer
 				.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
 						uniqueGraphId);
@@ -21,28 +24,15 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	}
 
 	@Override
-	public int getFreePartialGraphId() {
-		return completeGraphDatabase.getFreePartialGraphId();
-	}
-
-	@Override
 	public void registerPartialGraph(int id, String hostname) {
 		completeGraphDatabase.registerPartialGraph(id, hostname);
 	}
 
-	@Override
-	public void releasePartialGraphId(int partialGraphId) {
-		completeGraphDatabase.releasePartialGraphId(partialGraphId);
-	}
-
-	@Override
-	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
-		return completeGraphDatabase.createPartialGraph(gc, hostname);
-	}
 
 	@Override
 	public void deletePartialGraph(int partialGraphId) {
 		completeGraphDatabase.deletePartialGraph(partialGraphId);
+		//remove from list of partial graph ids
 	}
 
 	@Override
@@ -114,6 +104,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	public void setGraphAttribute(String attributeName, Object data) {
 		getGraphDatabase(getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)).setGraphAttribute(attributeName, data);
 	}
-		
+
+
+
 
 }

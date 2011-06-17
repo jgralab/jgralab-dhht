@@ -206,7 +206,7 @@ public class GraphIO {
 
 	private int bufferSize;
 
-	private Map<Integer, String> partialGraphs;
+	private Map<Integer, String> partialGraphHostnames;
 
 	/**
 	 * Stores the information about incidences at the edge<br>
@@ -2776,6 +2776,7 @@ public class GraphIO {
 		currentPackageName = "";
 		match("Graph");
 		String uniqueGraphId = matchUtfString();
+		long parentPartialGraphId = matchLong();
 		int partialGraphId = matchInteger();
 		long graphVersion = matchLong();
 
@@ -2847,8 +2848,9 @@ public class GraphIO {
 				gd = new PartialGraphDatabase(
 						schema,
 						uniqueGraphId,
-						partialGraphs.get(GraphDatabaseBaseImpl
+						partialGraphHostnames.get(GraphDatabaseBaseImpl
 								.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)),
+						parentPartialGraphId,
 						partialGraphId);
 			}
 			server.registerLocalGraphDatabase(gd);
@@ -2978,7 +2980,7 @@ public class GraphIO {
 
 	private void createPartialGraphs(String uniqueGraphId)
 			throws GraphIOException, RemoteException {
-		for (Entry<Integer, String> pGraph : partialGraphs.entrySet()) {
+		for (Entry<Integer, String> pGraph : partialGraphHostnames.entrySet()) {
 			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
 					.getRemoteInstance(pGraph.getValue());
 			remoteServer.getGraphDatabase(uniqueGraphId);
@@ -2987,7 +2989,7 @@ public class GraphIO {
 
 	private void readPartialGraphs(Graph graph) throws GraphIOException,
 			RemoteException {
-		partialGraphs = new HashMap<Integer, String>();
+		partialGraphHostnames = new HashMap<Integer, String>();
 		match("{");
 		while (!lookAhead.equals("}")) {
 			int partialGraphId = matchInteger();
@@ -2997,7 +2999,7 @@ public class GraphIO {
 			match();
 			isURL = false;
 
-			partialGraphs.put(partialGraphId, urlValue);
+			partialGraphHostnames.put(partialGraphId, urlValue);
 
 			if (lookAhead.equals(",")) {
 				match(",");

@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
@@ -17,7 +19,9 @@ import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.schema.Schema;
 
 public class JGraLabServerImpl extends UnicastRemoteObject implements
 		JGraLabServer {
@@ -86,9 +90,40 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		}
 	}
 
+	@Override
 	public void registerFileForUid(String uid, String fileName) {
 		localFilesContainingGraphs.put(uid, fileName);
 	}
+	
+	@Override 
+	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, int localPartialGraphId, int parentPartialGraphId) throws ClassNotFoundException {
+		Class<?> schemaClass = Class.forName(schemaName);
+		Schema schema = null;
+		@SuppressWarnings("rawtypes")
+		Class[] formalParams = {};
+		Object[] actualParams = {};
+		Method instanceMethod = null;
+		try {
+			instanceMethod = schemaClass.getMethod("instance", formalParams);
+		} catch (SecurityException e) {
+			throw new ClassNotFoundException("Class for schema " + schemaName + " does not provide a static instance() method", e);
+		} catch (NoSuchMethodException e) {
+			throw new ClassNotFoundException("Class for schema " + schemaName + " does not provide a static instance() method", e);
+		}
+		try {
+			schema = (Schema) instanceMethod.invoke(null, actualParams);
+		} catch (IllegalArgumentException e) {
+			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+		} catch (IllegalAccessException e) {
+			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+		} catch (InvocationTargetException e) {
+			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+		}
+		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema, uniqueGraphId, hostnameOfCompleteGraph, localPartialGraphId, parentPartialGraphId);
+		localGraphDatabases.put(uniqueGraphId, db);
+		return db;
+	}
+	
 
 	@Override
 	public RemoteGraphDatabaseAccess getGraphDatabase(String uid) {
