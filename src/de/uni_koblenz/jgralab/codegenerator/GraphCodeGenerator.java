@@ -107,11 +107,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
 		code.add(createCreateRecordsMethods());
-		String attributeContainerVariable = currentCycle.isDiskbasedImpl() ? "attributeContainer." : "";
-		code.add(createReadAttributesMethod(aec.getAttributeList(), attributeContainerVariable));
-		code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), attributeContainerVariable));
-		code.add(createWriteAttributesMethod(aec.getAttributeList(), attributeContainerVariable));
-		code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), attributeContainerVariable));
+		//String attributeContainerVariable = currentCycle.isDiskbasedImpl() ? "attributeContainer." : "";
+		code.add(createReadAttributesMethod(aec.getAttributeList(), ""));
+		code.add(createReadAttributesFromStringMethod(aec.getAttributeList(),""));
+		code.add(createWriteAttributesMethod(aec.getAttributeList(), ""));
+		code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), ""));
 		return code;
 	}
 
@@ -518,7 +518,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
-				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+				.getJavaClassName(schemaRootPackageName));
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
 						.equals("Boolean") ? "is" : "get");
