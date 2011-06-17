@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.util.List;
+
 /**
  * As an extension of RemoteGraphDatabaseAccess, this interface declares all remote accessible methods
  * which should only be called by a database in the distributed environment and which should not be
@@ -126,6 +128,22 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 
 	public void graphModified(int graphId);
+
+
+
+
+	public List<Integer> getPartialGraphIds(long globalSubgraphId);
+
+
+
+
+	public void addPartialGraphId(long globalSubgraphId,
+			int newPartialGraphId);
+
+
+
+
+	public int getFreePartialGraphId();
 
 
 }

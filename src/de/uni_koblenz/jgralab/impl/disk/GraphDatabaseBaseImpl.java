@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +19,7 @@ import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
+import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
@@ -37,57 +40,21 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	// the partial graph id of the toplevel graph, the lowest bit of the 
 	// high int is set
-	public static final long TOPLEVEL_PARTIAL_GRAPH_ID = Integer.MAX_VALUE+1;
+	public static final int TOPLEVEL_PARTIAL_GRAPH_ID = 1;
 
 	// the local subgraph id of the toplevel graph if a partial one
 	public static final long TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
 	
 	// the global subgraph id of the toplevel dhhtgraph
-	public static final long GLOBAL_GRAPH_ID = Integer.MAX_VALUE + 2;
+	public static final long GLOBAL_GRAPH_ID = 0x0000000100000001l;
 	
 	
 	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
-		long val = partialGraphId + TOPLEVEL_LOCAL_SUBGRAPH_ID;
+		long val = (TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
 		return val;
 	}
 	
 	
-	public long createSubordinateGraphInVertex(long containingVertexId) {
-		// get m1 class and free id
-		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
-
-		GraphData data = new GraphData();
-		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
-		localSubgraphData.add(data);
-		data.containingElementId = containingVertexId;
-
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
-
-		data.typeId = schema.getClassId(m1Class);
-		data.vertexCount = 0;
-		data.edgeCount = 0;
-		return data.globalSubgraphId;
-	}
-
-	public long createSubordinateGraphInEdge(long containingEdged) {
-		// get m1 class and free id
-		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
-
-		GraphData data = new GraphData();
-		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
-		localSubgraphData.add(data);
-		data.containingElementId = -containingEdged;
-
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
-
-		data.typeId = schema.getClassId(m1Class);
-		data.vertexCount = 0;
-		data.edgeCount = 0;
-		return data.globalSubgraphId;
-	}
-
 	/**
 	 * Creates a new graph database to store all local subgraphs of the complete
 	 * graph identified by the given <code>uniqueGraphId</code>. All those local
@@ -106,6 +73,102 @@ public abstract class GraphDatabaseBaseImpl extends
 			long parentDistributedGraphId, int partialGraphId) {
 		super(schema, uniqueGraphId, parentDistributedGraphId, partialGraphId);
 	}
+	
+	
+	
+	
+	@Override
+	public long createSubordinateGraphInVertex(long containingVertexId) {
+		// get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
+		localSubgraphData.add(data);
+		data.containingElementId = containingVertexId;
+
+		// Graph subordinateGraph =
+		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+
+		data.typeId = schema.getClassId(m1Class);
+		data.vertexCount = 0;
+		data.edgeCount = 0;
+		return data.globalSubgraphId;
+	}
+
+	@Override
+	public long createSubordinateGraphInEdge(long containingEdged) {
+		// get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
+		localSubgraphData.add(data);
+		data.containingElementId = -containingEdged;
+
+		// Graph subordinateGraph =
+		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+
+		data.typeId = schema.getClassId(m1Class);
+		data.vertexCount = 0;
+		data.edgeCount = 0;
+		return data.globalSubgraphId;
+	}
+	
+	
+	
+	@Override
+	public long createPartialGraphInGraph(long parentGlobalSubgraphId, String hostname) {
+		
+		
+		//the following needs to be delegated to the complete graph
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.getFreePartialGraphId();
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId,
+				(RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
+	}
+
+	
+	/** returns the list of all partial graph ids directly or indirectly 
+	 *  contained in the graph identified by the given globalSubgraphId
+	 * @param globalSubgraphId
+	 * @return
+	 */
+	@Override
+	public List<Integer> getPartialGraphIds(long globalSubgraphId) {
+		int partialGraphId = getPartialGraphId(globalSubgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getPartialGraphIds(globalSubgraphId);
+		}
+		int localSubgraphId = convertToLocalId(globalSubgraphId);
+		GraphData data = getGraphData(localSubgraphId);
+		if (data.partialGraphs == null)
+			return null;
+		List<Integer> value = new LinkedList<Integer>();
+		for (Integer pgId : data.partialGraphs) {
+			value.add(pgId);
+			value.addAll(getPartialGraphIds(getToplevelGraphForPartialGraphId(pgId)));
+		}
+		return value;		
+	}
+	
+	@Override
+	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId) {
+		int partialGraphId = getPartialGraphId(globalSubgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).addPartialGraphId(globalSubgraphId, newPartialGraphId);
+		}
+		int localSubgraphId = convertToLocalId(globalSubgraphId);
+		GraphData data = getGraphData(localSubgraphId);
+		if (data.partialGraphs == null) {
+			data.partialGraphs = new LinkedList<Integer>();
+		}
+		data.partialGraphs.add(newPartialGraphId);
+	}
+	
 
 	/**
 	 * Deletes the partial graph identified by its id
@@ -1620,6 +1683,8 @@ public abstract class GraphDatabaseBaseImpl extends
 		return null;
 	}
 
+
+	public abstract void releasePartialGraphId(int partialGraphId);
 
 
 }

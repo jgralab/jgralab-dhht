@@ -30,10 +30,12 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		completeGraphDatabase.registerPartialGraph(id, hostname);
 	}
 
+	@Override
 	public void releasePartialGraphId(int partialGraphId) {
 		completeGraphDatabase.releasePartialGraphId(partialGraphId);
 	}
 
+	@Override
 	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
 		return completeGraphDatabase.createPartialGraph(gc, hostname);
 	}

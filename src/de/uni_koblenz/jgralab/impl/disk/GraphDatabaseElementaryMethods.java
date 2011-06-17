@@ -33,6 +33,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		long incidenceCount;
 		long containingElementId;
 		int typeId;
+		List<Integer> partialGraphs;
 	}
 	
 	/**
@@ -242,12 +243,6 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		return data;
 	}
 
-//	/**
-//	 * Allocates and returns a free local subgraph id
-//	 */
-//	protected int allocateLocalSubgraphId() {
-//		return localSubgraphData.size();
-//	}
 
 	/**
 	 * Retrieves the hostname that stores all subgraphs with the given partial graph id 
@@ -255,12 +250,6 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * @return the hostname of the station containing the partial graph with the given id
 	 */
 	public abstract String getHostname(int partialGraphId);
-
-	/**
-	 * Retrieves a free partial graph id
-	 * @return a free and currently unused partial graph id
-	 */
-	protected abstract int getFreePartialGraphId();
 	
 
 	@Override
@@ -421,16 +410,8 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		}
 		return g;
 	}
-//
-//	/**
-//	 * 
-//	 * @return
-//	 */
-//	@Override
-//	public Graph getCompleteGraphObject() {
-//		return getGraphObject(0);
-//	}
 
+	
 	/**
 	 * Returns an object (Vertex or Edge) representing the GraphElement
 	 * identified by the given global id
@@ -825,11 +806,5 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	}
 
 
-	
-//	@Override
-//	public void setDirection(long globalIncidenceId, Direction dir) {
-//		int partialGraphId = getPartialGraphId(globalIncidenceId);
-//		getDiskStorageForPartialGraph(partialGraphId).setDirection(convertToLocalId(globalIncidenceId), dir);
-//	}
 
 }

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -75,18 +74,8 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 					+ id + " registered");
 		}
 	}
-
-	@Override
-	public long createPartialGraph(Class<? extends Graph> gc, String hostname) {
-		int partialGraphId = getFreePartialGraphId();
-		RemoteJGraLabServer remoteServer = localJGraLabServer
-				.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer
-				.getGraphDatabase(uniqueGraphId);
-		partialGraphDatabases.put(partialGraphId,
-				(RemoteGraphDatabaseAccessWithInternalMethods) p);
-		return getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
-	}
+	
+	
 
 	@Override
 	public void deletePartialGraph(int partialGraphId) {
