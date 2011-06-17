@@ -475,6 +475,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		case ABSTRACT:
 			code.add("public #type# #isOrGet#_#name#() ;");
 			break;
+		case DISKBASED:
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
 					"\treturn ((#schemaPackageName#.#simpleClassName#)getViewedGraph()).get_#name#();",
@@ -495,13 +496,10 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#) ;");
 			break;
+		case DISKBASED:
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					"\t((#schemaPackageName#.#simpleClassName#)getViewedGraph()).set_#name#(_#name#);","}");
-			break;
-		case DISKBASED:
-			code.add("public void set_#name#(#type# _#name#)  {",
-					"\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);","}");
 			break;
 		}	
 		return code;

@@ -555,8 +555,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.add("public void set_#name#(#type# _#name#);");
 			break;
 		case MEMORYBASED:
-			code.add("public void set_#name#(#type# _#name#) {",
-					 "\t_#name# = _#name#;", 
+			code.add("public void set_#name#(#type# new_#name#) {",
+					 "\t_#name# = new_#name#;", 
 					 "\tgraphModified();", "}");
 			break;
 		case DISKBASED:

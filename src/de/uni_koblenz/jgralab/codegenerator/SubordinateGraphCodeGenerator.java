@@ -204,6 +204,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 	}	
 	
 	private CodeBlock createDiskBasedConstructor() {
+		addImports("#schemaPackageName#.#schemaName#");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
 		CodeSnippet code = new CodeSnippet(true);
@@ -462,6 +463,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 	protected CodeBlock createGetter(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("name", attr.getName());
+		code.setVariable("typeCast", attr.getDomain().getJavaClassName(schemaRootPackageName));
 		code.setVariable("type", attr.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
@@ -474,6 +476,11 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
 					"\treturn ((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).get_#name#();",
+					"}");
+			break;
+		case DISKBASED:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					"\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
 					"}");
 			break;
 		}
@@ -493,7 +500,8 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\t((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
+					"\t((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);",
+					"}");
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",

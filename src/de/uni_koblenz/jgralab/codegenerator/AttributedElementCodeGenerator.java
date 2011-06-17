@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.Set;
 import java.util.SortedSet;
 
-import javax.smartcardio.ATR;
 
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
