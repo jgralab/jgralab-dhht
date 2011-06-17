@@ -518,6 +518,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("typeCast", attr.getDomain()
 				.getJavaClassName(schemaRootPackageName));
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
@@ -534,7 +536,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			break;
 		case DISKBASED:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn (#type#) storingGraphDatabase.getGraphAttribute(\"#name#\");",
+					 "\treturn (#typeCast#) storingGraphDatabase.getGraphAttribute(\"#name#\");",
 					 "}");
 			break;
 		}

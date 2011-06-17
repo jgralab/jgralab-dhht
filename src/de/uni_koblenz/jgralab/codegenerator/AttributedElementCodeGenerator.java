@@ -223,7 +223,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.setVariable("setterName", "set_" + attribute.getName());
 				a.setVariable("attributeContainer", attributeContainer);
 				a.setVariable("attrType", attribute.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				a.add(new CodeSnippet("#attrType# temp_#variableName#;"));
+				a.setVariable("nullValue", attribute.getDomain().getInitialValue());
+				a.add(new CodeSnippet("#attrType# temp_#variableName# = #nullValue#;"));
 				a.add(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringReader(value, getSchema());"));
