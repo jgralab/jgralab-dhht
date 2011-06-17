@@ -34,6 +34,8 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.Set;
 import java.util.SortedSet;
 
+import javax.smartcardio.ATR;
+
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
@@ -64,8 +66,8 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	protected CodeList createBody() {
 		CodeList code = super.createBody();
 		if (currentCycle.isMemOrDiskImpl()) {
-			code.add(createFields(aec.getAttributeList()));
 			// code.add(createConstructor());
+			code.add(createFields(aec.getAttributeList()));
 			code.add(createGenericGetter(aec.getAttributeList()));
 			code.add(createGenericSetter(aec.getAttributeList()));
 			code.add(createGettersAndSetters(aec.getAttributeList()));
@@ -89,11 +91,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return false;
 	}
 
-	protected void addCheckValidityCode(CodeSnippet code) {
-		code.add(
-				"\tif (!isValid())",
-				"\t\tthrow new #jgPackage#.GraphException(\"Cannot access attribute '#name#', because \" + this + \" isn't valid in current transaction.\");");
-	}
 
 	protected CodeBlock createGenericGetter(Set<Attribute> attrSet) {
 		CodeList code = new CodeList();
@@ -182,13 +179,6 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		return code;
 	}
 
-	protected CodeBlock createFields(Set<Attribute> attrSet) {
-		CodeList code = new CodeList();
-		for (Attribute attr : attrSet) {
-			code.addNoIndent(createField(attr));
-		}
-		return code;
-	}
 
 	protected CodeBlock createGettersAndSetters(Set<Attribute> attrSet) {
 		CodeList code = new CodeList();
@@ -198,65 +188,25 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		}
 		return code;
 	}
-
-	protected CodeBlock createGetter(Attribute attr) {
-		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("name", attr.getName());
-		code.setVariable("type", attr.getDomain()
-				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-		code.setVariable("isOrGet",
-				attr.getDomain().getJavaClassName(schemaRootPackageName)
-						.equals("Boolean") ? "is" : "get");
-
-		switch (currentCycle) {
-		case ABSTRACT:
-			code.add("public #type# #isOrGet#_#name#();");
-			break;
-		case DISKBASED:
-		case MEMORYBASED:
-			code.add("public #type# #isOrGet#_#name#()  {",
-					"\treturn _#name#;",
-					"}");
-			break;
-		case PROXIES:
-			code.add("public #type# #isOrGet#_#name#()  {",
-					"\treturn storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\")",
-					"}");
-		}
-		return code;
-	}
-
-	protected CodeBlock createSetter(Attribute attr) {
-		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("name", attr.getName());
-		code.setVariable("type", attr.getDomain()
-				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-		code.setVariable("dname", attr.getDomain().getSimpleName());
-
-		switch (currentCycle) {
-		case ABSTRACT:
-			code.add("public void set_#name#(#type# _#name#);");
-			break;
-		case DISKBASED:
-		case MEMORYBASED:
-			code.add("public void set_#name#(#type# _#name#) {",
-					"\tthis._#name# = _#name#;", "\tgraphModified();", "}");
-			break;
-		case PROXIES:
-			code.add("public void set_#name#(#type# _#name#) {",
-					"\tstoringGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#)",
-					"}");
-		}
-		return code;
-	}
-
+	
+	
+	protected abstract CodeBlock createGetter(Attribute attr);
+	
+	
+	protected abstract CodeBlock createSetter(Attribute attr);
+	
+	
+	protected abstract CodeBlock createFields(Set<Attribute> attrSet);
+	
+	
 	protected CodeBlock createField(Attribute attr) {
 		CodeSnippet code = new CodeSnippet(true, "protected #type# _#name#;");
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
 		return code;
 	}
-
+	
+	
 	protected CodeBlock createReadAttributesFromStringMethod(Set<Attribute> attrSet, String attributeContainer) {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.GraphIO", "#jgPackage#.GraphIOException",
@@ -272,14 +222,16 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				a.setVariable("variableName", attribute.getName());
 				a.setVariable("setterName", "set_" + attribute.getName());
 				a.setVariable("attributeContainer", attributeContainer);
+				a.setVariable("attrType", attribute.getDomain().getJavaAttributeImplementationTypeName(schemaRootPackageName));
+				a.add(new CodeSnippet("#attrType# temp_#variableName#;"));
 				a.add(new CodeSnippet(
 						"if (attributeName.equals(\"#variableName#\")) {",
 						"\tGraphIO io = GraphIO.createStringReader(value, getSchema());"));
 				a.add(attribute.getDomain().getReadMethod(
-							schemaRootPackageName, "_" + attribute.getName(),
-							"io", attributeContainer));
-					a.addNoIndent(new CodeSnippet(
-							"\t#setterName#(#attributeContainer#_#variableName#);", "\treturn;",
+							schemaRootPackageName, "temp_" + attribute.getName(),
+							"io", ""));
+				a.addNoIndent(new CodeSnippet(
+							"\t#setterName#(temp_#variableName#);", "\treturn;",
 							"}"));
 				code.add(a);
 			}

@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -459,12 +460,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		return code;
 	}
-	
 
-	@Override
-	protected void addCheckValidityCode(CodeSnippet code) {
-		// just do nothing here
-	}
 	
 	//Overwritten methods from AttributedElement to delegate to the complete graph
 	protected CodeBlock createGetter(Attribute attr) {
@@ -481,7 +477,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			break;
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
-					"\treturn getSuperordinateGraph().get_#name#();",
+					"\treturn ((#schemaPackageName#.#simpleClassName#)getViewedGraph()).get_#name#();",
 					"}");
 			break;
 		}
@@ -501,7 +497,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\t((#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
+					"\t((#schemaPackageName#.#simpleClassName#)getViewedGraph()).set_#name#(_#name#);","}");
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
@@ -513,6 +509,11 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 
 	/* for the views, no fields are created since all attribute access operations are delegatd to the viewed graph */
 	protected CodeBlock createField(Attribute attr) {
+		return null;
+	}
+	
+	@Override
+	protected CodeBlock createFields(Set<Attribute> attrSet) {
 		return null;
 	}
 	

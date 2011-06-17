@@ -32,9 +32,11 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -421,6 +423,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	}
 	
 	
+	
+	
 	private CodeBlock createIteratorMethods() {
 		GraphClass gc = (GraphClass) aec;
 
@@ -499,9 +503,68 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		return code;
 	}
 	
-
-	@Override
-	protected void addCheckValidityCode(CodeSnippet code) {
-		// just do nothing here
+	
+	protected CodeBlock createFields(Set<Attribute> attrSet) {
+		CodeList code = new CodeList();
+		for (Attribute attr : attrSet) {
+			code.add(createField(attr));
+		}
+		return code;
 	}
+
+	
+	
+	protected CodeBlock createGetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("isOrGet",
+				attr.getDomain().getJavaClassName(schemaRootPackageName)
+						.equals("Boolean") ? "is" : "get");
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public #type# #isOrGet#_#name#();");
+			break;
+		case MEMORYBASED:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					 "\treturn _#name#;",
+					 "}");
+			break;
+		case DISKBASED:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					 "\treturn (#type#) storingGraphDatabase.getGraphAttribute(\"#name#\");",
+					 "}");
+			break;
+		}
+		return code;
+	}
+
+	protected CodeBlock createSetter(Attribute attr) {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("name", attr.getName());
+		code.setVariable("type", attr.getDomain()
+				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("dname", attr.getDomain().getSimpleName());
+
+		switch (currentCycle) {
+		case ABSTRACT:
+			code.add("public void set_#name#(#type# _#name#);");
+			break;
+		case MEMORYBASED:
+			code.add("public void set_#name#(#type# _#name#) {",
+					 "\t_#name# = _#name#;", 
+					 "\tgraphModified();", "}");
+			break;
+		case DISKBASED:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					 "\tstoringGraphDatabase.set#graphElementClass#Attribute(\"#name#\", _#name#);",
+					 "}");
+			break;
+		}
+		return code;
+	}
+	
+
 }

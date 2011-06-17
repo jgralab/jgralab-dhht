@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -456,11 +457,6 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		return code;
 	}
 	
-
-	@Override
-	protected void addCheckValidityCode(CodeSnippet code) {
-		// just do nothing here
-	}
 	
 	//Overwritten methods from AttributedElement to delegate to the complete graph
 	protected CodeBlock createGetter(Attribute attr) {
@@ -477,7 +473,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
-					"\treturn getSuperordinateGraph().get_#name#();",
+					"\treturn ((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).get_#name#();",
 					"}");
 			break;
 		}
@@ -497,7 +493,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\t((#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
+					"\t((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);","}");
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
@@ -505,6 +501,11 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		}
 		return code;
+	}
+
+	@Override
+	protected CodeBlock createFields(Set<Attribute> attrSet) {
+		return null;
 	}
 
 	
