@@ -48,7 +48,6 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -127,13 +126,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		} else {
 			return getParentDistributedGraph();
 		}
-	}
-
-	@Override
-	public Graph createPartialGraph(String hostnameOfPartialGraph, long parentEntityGlobalId, ParentEntity kindOfParentEntity) {
-		long pgId = storingGraphDatabase.createPartialGraph(this
-				.getGraphClass().getM1Class(), hostname);
-		return localGraphDatabase.getGraphObject(pgId);
 	}
 
 	@Override

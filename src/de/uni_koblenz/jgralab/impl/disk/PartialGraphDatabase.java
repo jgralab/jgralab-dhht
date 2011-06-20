@@ -1,9 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -17,6 +15,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		GRAPH
 	}
 	
+	@SuppressWarnings("unused")
 	private ParentEntity kindOfParentElement;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,

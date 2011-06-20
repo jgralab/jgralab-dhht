@@ -646,12 +646,6 @@ public abstract class SubordinateGraphImpl extends
 	public int getPartialGraphId() {
 		return getCompleteGraph().getPartialGraphId();
 	}
-	
-	@Override
-	public Graph createPartialGraph(String hostname) {
-		throw new UnsupportedOperationException();
-	}
-
 
 	@Override
 	public List<? extends Graph> getPartialGraphs() {

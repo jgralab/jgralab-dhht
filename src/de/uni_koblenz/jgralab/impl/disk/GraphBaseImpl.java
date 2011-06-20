@@ -102,6 +102,11 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		return GraphDatabaseBaseImpl.getPartialGraphId(globalSubgraphId);
 	}
 	
+	@Override
+	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
+		long pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalSubgraphId(), hostnameOfPartialGraph);
+		return localGraphDatabase.getGraphObject(pgId);
+	}
 
 	
 //	/**

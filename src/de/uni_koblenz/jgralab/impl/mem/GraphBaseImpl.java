@@ -55,7 +55,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.GraphInternalMethods;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
-import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -1069,19 +1069,40 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	public abstract boolean containsEdgeLocally(Edge e);
 
-	public DiskStorageManager getDiskStorage() {
-		return null;
-	}
 
-	@Override
-	public void savePartialGraphs(GraphIO graphIO) {
-		throw new RuntimeException("Operation not yet implemented");
-	}
+
 
 	public abstract void setLoading(boolean b);
 
-	protected FreeIndexList getFreeIncidenceList() {
-		// TODO Auto-generated method stub
-		return null;
+//	public DiskStorageManager getDiskStorage() {
+//		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+//	}
+	
+	@Override
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
 	}
+
+
+	@Override
+	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+	
+	@Override
+	public void savePartialGraphs(GraphIO graphIO) {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	
+	@Override
+	public List<? extends Graph> getPartialGraphs() {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
+	}
+	
 }

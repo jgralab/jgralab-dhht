@@ -174,19 +174,17 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	/**
 	 * Adds a partial graph on the given host to the sequence of partial graphs
-	 * and returns a local proxy
+	 * and returns a local proxy. The graph will not be a refinement of a vertex 
+	 * or edge but just a part of the graph this method is called on.
 	 * 
 	 * @param hostname
 	 *            name of the host running the remote JGraLab instance
 	 * @return a local proxy object for the created partial graph
 	 * @throws RemoteException 
 	 */
-	public Graph createPartialGraph(String hostnameOfPartialGraph,
-			long parentEntityGlobalId, ParentEntity kindOfParentEntity);
+	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph);
 
 
-
-	
 	/**
 	 * Retrieves the list of all partial graphs of this (partial) graph
 	 * @return

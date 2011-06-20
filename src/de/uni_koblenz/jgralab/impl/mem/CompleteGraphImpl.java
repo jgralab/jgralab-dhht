@@ -1346,7 +1346,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		freeVertexList.freeIndex(index);
 	}
 
-	@Override
+
 	protected FreeIndexList getFreeIncidenceList() {
 		return freeIncidenceList;
 	}
@@ -1726,25 +1726,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return this;
 	}
 
-	@Override
-	public void savePartialGraphs(GraphIO graphIO) {
-		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
-	}
 
-	@Override
-	public Graph createPartialGraph(String hostname) {
-		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
-	}
-
-	@Override
-	public List<? extends Graph> getPartialGraphs() {
-		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
-	}
-
-	@Override
-	public Graph getPartialGraph(int partialGraphId) {
-		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
-	}
 
 	@Override
 	public long getGlobalSubgraphId() {
@@ -1762,12 +1744,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	@Override
-	public GraphDatabaseBaseImpl getGraphDatabase() {
-		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
-	}
-
-
-	@Override
 	protected void setVCount(int count) {
 		vCount= count;
 	}
@@ -1776,4 +1752,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected void setECount(int count) {
 		eCount = count;
 	}
+	
+
+
+
 }

@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -692,8 +691,8 @@ public abstract class ViewGraphImpl implements Graph,
 
 
 	@Override
-	public Graph createPartialGraph(String hostname) {
-		return viewedGraph.createPartialGraph(hostname);
+	public Graph createPartialGraphInGraph(String hostname) {
+		return viewedGraph.createPartialGraphInGraph(hostname);
 	}
 
 	

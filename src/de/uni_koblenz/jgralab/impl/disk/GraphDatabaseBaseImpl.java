@@ -117,7 +117,14 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	
 
-
+	//for central graph database
+	public int bindPartialGraphId(String hostname, ) {
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		int partialGraphId = allocatePartialGraphId();
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
 	
 	
 	@Override
@@ -126,7 +133,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		int partialGraphId = bindPartialGraphId(hostname);
 		RemoteGraphDatabaseAccessWithInternalMethods remoteDb = partialGraphDatabases.get(partialGraphId);
 
-		Graph pg = getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
+		long graphId = getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
 		
 	}
 	
