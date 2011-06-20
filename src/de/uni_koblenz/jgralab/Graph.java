@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -180,7 +181,10 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return a local proxy object for the created partial graph
 	 * @throws RemoteException 
 	 */
-	public Graph createPartialGraph(String hostname);
+	public Graph createPartialGraph(String hostnameOfPartialGraph,
+			long parentEntityGlobalId, ParentEntity kindOfParentEntity);
+
+
 
 	
 	/**
@@ -944,7 +948,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return
 	 */
 	public GraphFactory getGraphFactory();
-
 
 	
 }
