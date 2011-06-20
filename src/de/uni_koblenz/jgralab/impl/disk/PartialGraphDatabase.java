@@ -4,15 +4,25 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Record;
+import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final CompleteGraphDatabase completeGraphDatabase;
+	
+	public enum ParentEntity {
+		VERTEX,
+		EDGE,
+		GRAPH
+	}
+	
+	private ParentEntity kindOfParentElement;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
-			String hostnameOfCompleteGraph, long parentSubgraphId, int localPartialGraphId) {
+			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntity kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
+		this.kindOfParentElement = kindOfParentElement;
 		completeGraphDatabase = (CompleteGraphDatabase) localJGraLabServer
 				.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
 						uniqueGraphId);
@@ -28,6 +38,36 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		completeGraphDatabase.registerPartialGraph(id, hostname);
 	}
 
+	//for partial graph database
+	public int bindPartialGraphId(String hostname) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.bindPartialGraphId(hostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
+	
+
+	
+	//for partial graph database
+	protected int createPartialGraphInGraph(String hostname, long parentEntityGlobalId, ParentEntity parent) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.bindPartialGraphId(hostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.createPartialGraphDatabase(uniqueGraphId, hostname, hostname, parentEntityGlobalId, parent, partialGraphId);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Cannot create partial graph on remote host " + hostname, e);
+		}
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
+	
+	
+	
+	
 
 	@Override
 	public void deletePartialGraph(int partialGraphId) {

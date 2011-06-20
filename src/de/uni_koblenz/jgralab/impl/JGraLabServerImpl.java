@@ -96,7 +96,8 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 	
 	@Override 
-	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, int localPartialGraphId, int parentPartialGraphId) throws ClassNotFoundException {
+	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, PartialGraphDatabase.ParentEntity parent, int localPartialGraphId) throws ClassNotFoundException {
+		
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
 		@SuppressWarnings("rawtypes")
@@ -119,7 +120,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 		} catch (InvocationTargetException e) {
 			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
 		}
-		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema, uniqueGraphId, hostnameOfCompleteGraph, localPartialGraphId, parentPartialGraphId);
+		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema, uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId, parent, localPartialGraphId);
 		localGraphDatabases.put(uniqueGraphId, db);
 		return db;
 	}
