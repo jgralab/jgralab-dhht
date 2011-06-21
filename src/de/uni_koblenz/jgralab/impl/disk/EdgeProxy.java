@@ -1109,7 +1109,7 @@ public abstract class EdgeProxy extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			subordinateGraphId = storingGraphDatabase
-					.createSubordinateGraphInEdge(this.getId());
+					.createLocalSubordinateGraphInEdge(this.getId());
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}

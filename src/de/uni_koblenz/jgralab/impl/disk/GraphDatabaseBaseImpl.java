@@ -22,6 +22,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
+import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -78,7 +79,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	
 	@Override
-	public long createSubordinateGraphInVertex(long containingVertexId) {
+	public long createLocalSubordinateGraphInVertex(long containingVertexId) {
 		// get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
 
@@ -97,7 +98,46 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	@Override
-	public long createSubordinateGraphInEdge(long containingEdged) {
+	public long createLocalSubordinateGraphInEdge(long containingEdged) {
+		// get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
+		localSubgraphData.add(data);
+		data.containingElementId = -containingEdged;
+
+		// Graph subordinateGraph =
+		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+
+		data.typeId = schema.getClassId(m1Class);
+		data.vertexCount = 0;
+		data.edgeCount = 0;
+		return data.globalSubgraphId;
+	}
+	
+	
+	@Override
+	public long createPartialGraphInVertex(long containingVertexId, String hostname) {
+		// get m1 class and free id
+		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
+
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
+		localSubgraphData.add(data);
+		data.containingElementId = containingVertexId;
+
+		// Graph subordinateGraph =
+		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
+
+		data.typeId = schema.getClassId(m1Class);
+		data.vertexCount = 0;
+		data.edgeCount = 0;
+		return data.globalSubgraphId;
+	}
+
+	@Override
+	public long createPartialGraphInEdge(long containingEdged, String hostname) {
 		// get m1 class and free id
 		Class<? extends Graph> m1Class = schema.getGraphClass().getM1Class();
 
@@ -117,47 +157,58 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	
 
-	//for central graph database
-	public int bindPartialGraphId(String hostname, ) {
+
+	
+	
+	@Override
+	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		String localHostname =  getHostname(getLocalPartialGraphId());
 		int partialGraphId = allocatePartialGraphId();
+		RemoteGraphDatabaseAccess p = remoteServer.createPartialGraphDatabase(
+										schema.getQualifiedName(), remoteHostname, localHostname, parentGlobalEntityId, ParentEntity.GRAPH,  partilGraphId);
+
 		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return partialGraphId;
 	}
 	
 	
+	//for partial graph database
 	@Override
-	public long createPartialGraphInGraph(long parentGlobalSubgraphId, String hostname) {
-		//allocation of graph id needs to be done on central database
-		int partialGraphId = bindPartialGraphId(hostname);
-		RemoteGraphDatabaseAccessWithInternalMethods remoteDb = partialGraphDatabases.get(partialGraphId);
+	public int loadPartialGraph(String hostname) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.loadPartialGraph(hostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
+	
 
-		long graphId = getGraphObject(convertToGlobalId(1)).getGlobalSubgraphId();
-		
+	
+	//for partial graph database
+	protected int createPartialGraphInGraph(String hostname, long parentEntityGlobalId, ParentEntity parent) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.bindPartialGraphId(hostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.createPartialGraphDatabase(uniqueGraphId, hostname, hostname, parentEntityGlobalId, parent, partialGraphId);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Cannot create partial graph on remote host " + hostname, e);
+		}
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
 	}
 	
 	
-	@Override
-	public long createPartialGraphInVertex(long parentVertexId, String hostname) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long createPartialGraphInEdge(long parentEdgeId, String hostname) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
+	
 
 	
 	
 	
-	// create partial graph
 	
-	// 
-	
-
 	
 	/** returns the list of all partial graph ids directly or indirectly 
 	 *  contained in the graph identified by the given globalSubgraphId

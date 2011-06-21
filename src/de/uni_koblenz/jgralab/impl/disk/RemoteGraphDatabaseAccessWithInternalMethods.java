@@ -132,12 +132,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 
 
-	/** binds a free partial graph id to the hostname given
-	 * and returns the bound partial graph id 
-	 * @param hostname
-	 * @return
-	 */
-	public int bindPartialGraphId(String hostname);
+	public int loadPartialGraph(String hostname);
 
 
 }

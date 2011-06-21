@@ -66,7 +66,7 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
-import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.schema.Attribute;
@@ -2842,7 +2842,7 @@ public class GraphIO {
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
 			if (graph.getPartialGraphId() == 1) {
-				gd = new CompleteGraphDatabase(schema, uniqueGraphId,
+				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
 						getLocalHostname());
 			} else {
 				gd = new PartialGraphDatabase(

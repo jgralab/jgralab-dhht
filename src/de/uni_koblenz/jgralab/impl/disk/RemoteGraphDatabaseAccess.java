@@ -26,8 +26,9 @@ import de.uni_koblenz.jgralab.Record;
 public interface RemoteGraphDatabaseAccess extends Remote {
 
 	/*
-	 * ===================================================== Methods to access
-	 * graph properties =====================================================
+	 * ========================================================================
+	 * Methods to access graph properties 
+	 * ========================================================================
 	 */
 
 	public String getUniqueGraphId();
@@ -54,9 +55,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long createPartialGraphInGraph(long parentGraphId, String hostname);
 	
-	public long createPartialGraphInVertex(long parentVertexId, String hostname);
+	public long createPartialGraphInVertex(long containingVertexId, String hostname);
 	
-	public long createPartialGraphInEdge(long parentEdgeId, String hostname);
+	public long createPartialGraphInEdge(long containingVertexId, String hostname);
 
 	public void registerPartialGraph(int id, String hostname);
 	
@@ -64,6 +65,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId);
 
+	public void decreaseECount(long subgraphId);
+
+	public void increaseECount(long subgraphId);
+
+	public int getLocalPartialGraphId();
+	
+	
 	/**
 	 * 
 	 * @param globalSubgraphId
@@ -78,6 +86,16 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Methods to access hierarchy
 	 * ====================================================================
 	 */
+	
+	public int getKappaOfVertexId(long elementId);
+
+	public void setKappaOfVertexId(long elementId, int kappa);
+
+	public int getKappaOfEdgeId(long elementId);
+
+	public void setKappaOfEdgeId(long elementId, int kappa);
+	
+	
 
 	public long getSigmaIdOfVertexId(long globalVertexId);
 
@@ -87,13 +105,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void setSigmaIdOfEdgeId(long globalEdgeId, long globalSigmaId);
 
-	public int getKappaOfVertexId(long elementId);
-
-	public void setKappaOfVertexId(long elementId, int kappa);
-
-	public int getKappaOfEdgeId(long elementId);
-
-	public void setKappaOfEdgeId(long elementId, int kappa);
 
 	/**
 	 * Creates a new subordinate graph for the element identified by the given
@@ -102,7 +113,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id
 	 * @return
 	 */
-	public long createSubordinateGraphInVertex(long id);
+	public long createLocalSubordinateGraphInVertex(long id);
 
 	/**
 	 * Creates a new subordinate graph for the element identified by the given
@@ -111,8 +122,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id
 	 * @return
 	 */
-	public long createSubordinateGraphInEdge(long id);
+	public long createLocalSubordinateGraphInEdge(long id);
 
+	
+	
+	
+	
+	
 	/*
 	 * =====================================================================
 	 * Methods to access vertex sequence
@@ -190,9 +206,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void setLastVertexId(long globalSubgraphId, long id);
 
+	
+	
+	
 	/*
-	 * ===================================================== Methods to access
-	 * edge sequence =====================================================
+	 * ========================================================================
+	 * Methods to access edge sequence
+	 * ========================================================================
 	 */
 
 	public void edgeListModified();
@@ -268,9 +288,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public long getPreviousEdgeId(long edgeId);
 
+	
+	
+	
 	/*
-	 * ===================================================== Methods to access
-	 * Lambda sequence =====================================================
+	 * ========================================================================
+	 * Methods to access Lambda sequence
+	 * ========================================================================
 	 */
 
 	public long getIncidenceListVersionOfVertexId(long vertexId);
@@ -328,6 +352,30 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void deleteIncidence(long id);
 
+	
+	
+	
+	
+	/* ========================================================================
+	 * Attribute Access
+	 * ======================================================================*/
+	
+	public Object getGraphAttribute(String attributeName);
+	
+	public void setGraphAttribute(String attributeName, Object data);
+	
+	public Object getVertexAttribute(long elementId, String attributeName);
+	
+	public void setVertexAttribute(long elementId, String attributeName, Object data);
+	
+	public Object getEdgeAttribute(long elementId, String attributeName);
+	
+	public void setEdgeAttribute(long elementId, String attributeName, Object data);
+	
+	
+	
+	
+	
 	/*
 	 * =====================================================================
 	 * Methods to access domains
@@ -367,24 +415,10 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
-	void decreaseECount(long subgraphId);
 
-	void increaseECount(long subgraphId);
 
-	public int getLocalPartialGraphId();
+	
 
-	public void setVertexAttribute(long elementId, String attributeName,
-			Object data);
 	
-	public void setEdgeAttribute(long elementId, String attributeName,
-			Object data);
-	
-	public void setGraphAttribute(String attributeName, Object data);
-
-	public Object getVertexAttribute(long elementId, String attributeName);
-	
-	public Object getEdgeAttribute(long elementId, String attributeName);
-	
-	public Object getGraphAttribute(String attributeName);
 
 }

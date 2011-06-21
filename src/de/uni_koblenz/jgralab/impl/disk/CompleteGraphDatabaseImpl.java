@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.management.RuntimeErrorException;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
+public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements CompleteGraphDatabaseRemoteAccess {
 
 	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
 
@@ -27,7 +30,7 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 	 */
 	private Map<String, Object> completeGraphAttributes;
 
-	public CompleteGraphDatabase(Schema schema, String uniqueGraphId,
+	public CompleteGraphDatabaseImpl(Schema schema, String uniqueGraphId,
 			String hostname) {
 		super(schema, uniqueGraphId, 0, 1);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
@@ -54,15 +57,50 @@ public class CompleteGraphDatabase extends GraphDatabaseBaseImpl {
 		}
 	}
 	
+	@Override
+	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
+		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.GRAPH);
+	}
+	
+	@Override
+	public long createPartialGraphInEdge(long parentGlobalEntityId, String remoteHostname) {
+		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.EDGE);
+	}
+	
+	@Override
+	public long createPartialGraphInVertex(long parentGlobalEntityId, String remoteHostname) {
+		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.VERTEX);
+	}
+		
+	/* (non-Javadoc)
+	 * @see de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseRemoteAccess#internalCreatePartialGraphInEntity(long, java.lang.String, de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity)
+	 */
+	@Override
+	public long internalCreatePartialGraphInEntity(long parentGlobalEntityId, String remoteHostname, ParentEntity entityKind) {
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
+		String localHostname =  getHostname(getLocalPartialGraphId());
+		int partialGraphId = allocatePartialGraphId();
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.createPartialGraphDatabase(
+											schema.getQualifiedName(), remoteHostname, localHostname, parentGlobalEntityId, entityKind, partialGraphId);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Cannot create remote graph database of host " + remoteHostname,e );
+		}
+
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return getToplevelGraphForPartialGraphId(partialGraphId);
+	}
+	
 	//for central graph database
-	public int bindPartialGraphId(String hostname) {
+	public int loadPartialGraph(String hostname) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
-		int partialGraphId = allocatePartialGraphId();
+		int partialGraphId = p.getLocalPartialGraphId();
 		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return partialGraphId;
 	}
-
+	
 	private void releasePartialGraphId(int partialGraphId) {
 		freePartialGraphIds.add(partialGraphId);
 	}
