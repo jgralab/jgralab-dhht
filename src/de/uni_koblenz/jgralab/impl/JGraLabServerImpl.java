@@ -19,6 +19,7 @@ import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -96,7 +97,7 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	}
 	
 	@Override 
-	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, PartialGraphDatabase.ParentEntity parent, int localPartialGraphId) throws ClassNotFoundException {
+	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException {
 		
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;

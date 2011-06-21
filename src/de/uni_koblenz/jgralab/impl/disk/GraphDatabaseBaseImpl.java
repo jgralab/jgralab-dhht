@@ -22,7 +22,6 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -133,17 +132,17 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	@Override
 	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.GRAPH);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.GRAPH);
 	}
 	
 	@Override
 	public long createPartialGraphInEdge(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.EDGE);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.EDGE);
 	}
 	
 	@Override
 	public long createPartialGraphInVertex(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.VERTEX);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.VERTEX);
 	}
 		
 	

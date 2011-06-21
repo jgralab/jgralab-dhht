@@ -8,7 +8,6 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
@@ -56,24 +55,24 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	
 	@Override
 	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.GRAPH);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.GRAPH);
 	}
 	
 	@Override
 	public long createPartialGraphInEdge(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.EDGE);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.EDGE);
 	}
 	
 	@Override
 	public long createPartialGraphInVertex(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.VERTEX);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.VERTEX);
 	}
 		
 	/* (non-Javadoc)
 	 * @see de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseRemoteAccess#internalCreatePartialGraphInEntity(long, java.lang.String, de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity)
 	 */
 	@Override
-	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentGlobalEntityId, ParentEntity entityKind) {
+	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentGlobalEntityId, ParentEntityKind entityKind) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
 		String localHostname =  getHostname(getLocalPartialGraphId());
 		int partialGraphId = allocatePartialGraphId();

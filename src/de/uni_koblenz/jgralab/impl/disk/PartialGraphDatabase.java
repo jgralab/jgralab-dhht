@@ -9,17 +9,11 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final CompleteGraphDatabaseImpl completeGraphDatabase;
 	
-	public enum ParentEntity {
-		VERTEX,
-		EDGE,
-		GRAPH
-	}
-	
 	@SuppressWarnings("unused")
-	private ParentEntity kindOfParentElement;
+	private ParentEntityKind kindOfParentElement;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
-			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntity kindOfParentElement, int localPartialGraphId) {
+			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
 		this.kindOfParentElement = kindOfParentElement;
 		completeGraphDatabase = (CompleteGraphDatabaseImpl) localJGraLabServer
@@ -35,7 +29,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	
 	
 	//for partial graph database
-	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentEntityGlobalId, ParentEntity parentEntityKind) {
+	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentEntityGlobalId, ParentEntityKind parentEntityKind) {
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.internalCreatePartialGraphInEntity(remoteHostname, parentEntityGlobalId, parentEntityKind);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);

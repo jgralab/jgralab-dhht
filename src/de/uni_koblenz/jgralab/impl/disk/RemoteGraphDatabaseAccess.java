@@ -10,7 +10,6 @@ import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 
 /**
  * This interface defines all methods needed to access properties of the graph
@@ -56,7 +55,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	
 	public abstract int internalCreatePartialGraphInEntity(
 			String remoteHostname, long parentGlobalEntityId, 
-			ParentEntity entityKind);
+			ParentEntityKind entityKind);
 
 	public long createPartialGraphInGraph(long parentGraphId, String hostname);
 	

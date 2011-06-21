@@ -68,6 +68,7 @@ import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -2777,6 +2778,7 @@ public class GraphIO {
 		match("Graph");
 		String uniqueGraphId = matchUtfString();
 		long parentPartialGraphId = matchLong();
+		ParentEntityKind parentEntityKind = ParentEntityKind.valueOf(matchEnumConstant());
 		int partialGraphId = matchInteger();
 		long graphVersion = matchLong();
 
@@ -2845,13 +2847,13 @@ public class GraphIO {
 				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
 						getLocalHostname());
 			} else {
-				gd = new PartialGraphDatabase(
+					gd = new PartialGraphDatabase(
 						schema,
 						uniqueGraphId,
 						partialGraphHostnames.get(GraphDatabaseBaseImpl
 								.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)),
 						parentPartialGraphId,
-						partialGraphId);
+						/* TODO: kind of parent element */ parentEntityKind, partialGraphId);
 			}
 			server.registerLocalGraphDatabase(gd);
 		}

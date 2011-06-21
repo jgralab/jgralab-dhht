@@ -2,7 +2,7 @@ package de.uni_koblenz.jgralab;
 
 import java.rmi.Remote;
 
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
+import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 
 public interface RemoteJGraLabServer extends Remote {
@@ -37,7 +37,7 @@ public interface RemoteJGraLabServer extends Remote {
 	 */
 	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName,
 			String uniqueGraphId, String hostnameOfCompleteGraph,
-			long parentGlobalEntityId, PartialGraphDatabase.ParentEntity parent, int localPartialGraphId) throws ClassNotFoundException;
+			long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException;
 
 
 	
