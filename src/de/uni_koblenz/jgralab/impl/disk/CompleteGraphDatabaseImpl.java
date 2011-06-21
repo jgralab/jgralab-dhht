@@ -6,10 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import javax.management.RuntimeErrorException;
-
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.Schema;

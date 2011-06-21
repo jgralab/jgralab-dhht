@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.utilities.tg2dot;
 
 import java.io.PrintStream;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

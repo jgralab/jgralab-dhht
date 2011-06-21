@@ -37,6 +37,16 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.Domain;

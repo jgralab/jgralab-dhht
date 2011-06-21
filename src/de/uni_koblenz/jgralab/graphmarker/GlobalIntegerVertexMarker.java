@@ -1,7 +1,7 @@
 package de.uni_koblenz.jgralab.graphmarker;
 
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Vertex;
 
 
 /**

@@ -31,7 +31,6 @@
 package de.uni_koblenz.jgralab.utilities.tg2gdl;
 
 import java.io.PrintStream;
-import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;

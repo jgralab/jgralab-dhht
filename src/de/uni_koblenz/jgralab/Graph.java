@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;

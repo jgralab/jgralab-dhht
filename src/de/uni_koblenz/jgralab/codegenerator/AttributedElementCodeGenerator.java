@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.codegenerator;
 import java.util.Set;
 import java.util.SortedSet;
 
-
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;

@@ -31,8 +31,6 @@
 
 package de.uni_koblenz.jgralab.schema.impl;
 
-import java.rmi.RemoteException;
-
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLabCloneable;
