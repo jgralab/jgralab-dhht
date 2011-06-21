@@ -14,7 +14,7 @@ import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements CompleteGraphDatabaseRemoteAccess {
+public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 
 	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
 
@@ -59,37 +59,37 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements 
 	
 	@Override
 	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.GRAPH);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.GRAPH);
 	}
 	
 	@Override
 	public long createPartialGraphInEdge(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.EDGE);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.EDGE);
 	}
 	
 	@Override
 	public long createPartialGraphInVertex(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(parentGlobalEntityId, remoteHostname, ParentEntity.VERTEX);
+		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntity.VERTEX);
 	}
 		
 	/* (non-Javadoc)
 	 * @see de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseRemoteAccess#internalCreatePartialGraphInEntity(long, java.lang.String, de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase.ParentEntity)
 	 */
 	@Override
-	public long internalCreatePartialGraphInEntity(long parentGlobalEntityId, String remoteHostname, ParentEntity entityKind) {
+	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentGlobalEntityId, ParentEntity entityKind) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
 		String localHostname =  getHostname(getLocalPartialGraphId());
 		int partialGraphId = allocatePartialGraphId();
 		RemoteGraphDatabaseAccess p;
 		try {
 			p = remoteServer.createPartialGraphDatabase(
-											schema.getQualifiedName(), remoteHostname, localHostname, parentGlobalEntityId, entityKind, partialGraphId);
+											schema.getQualifiedName(), uniqueGraphId, localHostname, parentGlobalEntityId, entityKind, partialGraphId);
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Cannot create remote graph database of host " + remoteHostname,e );
 		}
 
 		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
-		return getToplevelGraphForPartialGraphId(partialGraphId);
+		return partialGraphId;
 	}
 	
 	//for central graph database

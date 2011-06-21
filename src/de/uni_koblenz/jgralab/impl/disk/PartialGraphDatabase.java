@@ -32,6 +32,20 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		return completeGraphDatabase.getHostname(id);
 	}
 
+	
+	
+	//for partial graph database
+	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentEntityGlobalId, ParentEntity parentEntityKind) {
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		int partialGraphId = compDatabase.internalCreatePartialGraphInEntity(remoteHostname, parentEntityGlobalId, parentEntityKind);
+		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
+		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		return partialGraphId;
+	}
+	
+	
+	
 	@Override
 	public void registerPartialGraph(int id, String hostname) {
 		completeGraphDatabase.registerPartialGraph(id, hostname);
