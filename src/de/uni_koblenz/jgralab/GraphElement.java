@@ -55,16 +55,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
 public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
 		extends AttributedElement<OwnTypeClass, OwnType> {
 
-	/**
-	 * Returns the global id of this {@link GraphElement} consisting of 
-	 * - 12 bit partial graph id
-	 * - 20 bit subgraph id inside this partial graph
-	 * - 32 bit vertex or edge id inside the subgraph
-	 * 
-	 * @return int the id of this {@link GraphElement}.
-	 */
-	public long getId();
-		
+	
 
 
 	/**

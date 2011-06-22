@@ -946,5 +946,16 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public GraphFactory getGraphFactory();
 
+	/**
+	 * Retrieves the graph or element directly containing this graph
+	 * (e.g. a vertex or edge for a (partial) subordinate one or 
+	 * a the parent distributed graph for a partial graph that is 
+	 * not the refinement of a single element)
+	 * or null, if this is the toplevel graph.
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public AttributedElement getParentGraphOrElement();
+
 	
 }

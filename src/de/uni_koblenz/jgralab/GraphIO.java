@@ -805,9 +805,30 @@ public class GraphIO {
 		}
 
 		space();
-		write("Graph " + toUtfString(graph.getUniqueGraphId()) + " "
-				+ graph.getPartialGraphId() + " " + +graph.getGraphVersion());
+		if (graph.getPartialGraphId() != GraphDatabaseBaseImpl.TOPLEVEL_PARTIAL_GRAPH_ID) {
+			write("PartialGraph ");
+			write(toUtfString(graph.getUniqueGraphId()));
+			write(" " + graph.getPartialGraphId() + " ");
+			@SuppressWarnings("rawtypes")
+			AttributedElement e = graph.getParentGraphOrElement();
+			if (e instanceof Graph) {
+				write(" GRAPH ");
+			} else if (e instanceof Vertex) {
+				write(" VERTEX ");
+			} else {
+				write(" EDGE ");
+			}
+			writeInteger(GraphDatabaseBaseImpl.convertToLocalId(e.getId()));
+		} else {
+			write("Graph ");	
+			write(toUtfString(graph.getUniqueGraphId()));
+		}
+
+
+		write(" " + graph.getGraphVersion() + " ");
 		writeIdentifier(graph.getType().getQualifiedName());
+	
+		
 		long vCount = graph.getVCount();
 		long eCount = graph.getECount();
 		// with a GraphMarker, v/eCount have to be restricted to the marked
@@ -2775,11 +2796,27 @@ public class GraphIO {
 			ImplementationType implementationType, boolean onlyLocalGraph)
 			throws GraphIOException, RemoteException {
 		currentPackageName = "";
-		match("Graph");
-		String uniqueGraphId = matchUtfString();
-		long parentPartialGraphId = matchLong();
-		ParentEntityKind parentEntityKind = ParentEntityKind.valueOf(matchEnumConstant());
-		int partialGraphId = matchInteger();
+		
+		String uniqueGraphId = null;
+		ParentEntityKind parentEntityKind = null;
+		int partialGraphId = -1;
+		long parentPartialGraphId = -1;
+		if (lookAhead.equals("PartialGraph")) {
+			match("PartialGraph");
+			uniqueGraphId = matchUtfString();
+			parentPartialGraphId = matchLong();
+			if (lookAhead.equals("GRAPH")) {
+				parentEntityKind = ParentEntityKind.GRAPH; 
+			} else if (lookAhead.equals("EDGE")) {
+				parentEntityKind = ParentEntityKind.EDGE; 
+			} else {
+				parentEntityKind = ParentEntityKind.VERTEX; 
+			}
+			partialGraphId = matchInteger();
+		} else {
+			match("Graph");
+			uniqueGraphId = matchUtfString();
+		}
 		long graphVersion = matchLong();
 
 		gcName = matchAndNext();
@@ -2843,7 +2880,7 @@ public class GraphIO {
 			server = JGraLabServerImpl.getLocalInstance();
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-			if (graph.getPartialGraphId() == 1) {
+			if (graph.getPartialGraphId() == GraphDatabaseBaseImpl.TOPLEVEL_PARTIAL_GRAPH_ID) {
 				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
 						getLocalHostname());
 			} else {
