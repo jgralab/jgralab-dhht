@@ -102,7 +102,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	//for partial graph database
 	@Override
 	public int loadPartialGraph(String hostname) {
-		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(DiskImplementationBasics.TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.loadPartialGraph(hostname);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
@@ -158,7 +158,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		List<Integer> value = new LinkedList<Integer>();
 		for (Integer pgId : data.partialGraphs) {
 			value.add(pgId);
-			value.addAll(getPartialGraphIds(DiskImplementationBasicMethods.getToplevelGraphForPartialGraphId(pgId)));
+			value.addAll(getPartialGraphIds(DiskImplementationBasics.getToplevelGraphForPartialGraphId(pgId)));
 		}
 		return value;		
 	}

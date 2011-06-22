@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
@@ -487,6 +488,12 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return GraphDatabaseElementaryMethods.getPartialGraphId(id) == storingGraphDatabase.getLocalPartialGraphId();
 	}
 
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public AttributedElement getParentGraphOrElement() {
+		return null;
+	}
 
 
 }

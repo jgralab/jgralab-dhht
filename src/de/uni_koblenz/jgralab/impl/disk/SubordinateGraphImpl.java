@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -68,12 +69,6 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			GraphDatabaseBaseImpl localGraphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		super(globalSubgraphId, localGraphDatabase, storingGraphDatabase);
-	}
-
-	@Override
-	public GraphElement<?, ?, ?> getContainingElement() {
-		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
-				.getContainingElementId(globalSubgraphId));
 	}
 
 	@Override
@@ -202,31 +197,31 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 
 	@Override
 	public Object getAttribute(String name) throws NoSuchAttributeException {
-		return getContainingElement().getAttribute(name);
+		return getParentGraphOrElement().getAttribute(name);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException {
-		getContainingElement().setAttribute(name, data);
+		getParentGraphOrElement().setAttribute(name, data);
 	}
 
 	@Override
 	public boolean isLoading() {
-		throw new UnsupportedOperationException();
+		return getCompleteGraph().isLoading();
 	}
 
 
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return ((GraphElementImpl<?, ?, ?>) v)
-				.isChildOf(getContainingElement());
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
 		return ((GraphElementImpl<?, ?, ?>) e)
-				.isChildOf(getContainingElement());
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
 	}
 
 	@Override
@@ -235,7 +230,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			storingGraphDatabase.deleteVertex(v.getGlobalId());
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getGlobalId()
+					+ getParentGraphOrElement().getGlobalId()
 					+ " does not contain vertex " + v.getGlobalId() + ".");
 		}
 	}
@@ -246,7 +241,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			storingGraphDatabase.deleteEdge(e.getGlobalId());
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getGlobalId()
+					+ getParentGraphOrElement().getGlobalId()
 					+ " does not contain edge " + e.getGlobalId() + ".");
 		}
 	}
@@ -254,7 +249,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = localGraphDatabase.getVertexObject(id);
-		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
+		if (((GraphElementImpl<?, ?, ?>) v).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
 			return v;
 		} else {
 			return null;
@@ -264,7 +259,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = localGraphDatabase.getEdgeObject(id);
-		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
+		if (((GraphElementImpl<?, ?, ?>) e).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
 			return e;
 		} else {
 			return null;
@@ -291,25 +286,28 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		return localGraphDatabase.getSchema();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
 		T edge = super.createEdge(cls, alpha, omega);
-		getContainingElement().addSubordinateElement(edge);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
 		return edge;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
 		T edge = super.createEdge(cls);
-		getContainingElement().addSubordinateElement(edge);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
 		return edge;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
 		T vertex = super.createVertex(cls);
-		getContainingElement().addSubordinateElement(vertex);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(vertex);
 		return vertex;
 	}
 
@@ -498,17 +496,17 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		if (getCompleteGraph() == arg0) {
 			// each graph is smaller than the complete graph
 			return -1;
-		} else if (arg0.getContainingElement() != null) {
+		} else if (arg0.getParentGraphOrElement() != null) {
 			// this is a SubordinateGraphImpl
-			GraphElement<?, ?, ?> ce = arg0.getContainingElement();
+			GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>) arg0.getParentGraphOrElement();
 			boolean isArg0Vertex = ce instanceof Vertex;
-			boolean isThisVertex = getContainingElement() instanceof Vertex;
+			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
 			if (isArg0Vertex && isThisVertex) {
 				// both are vertices
-				return ((Vertex) getContainingElement()).compareTo((Vertex) ce);
+				return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
 			} else if (!isArg0Vertex && !isThisVertex) {
 				// both are edges
-				return ((Edge) getContainingElement()).compareTo((Edge) ce);
+				return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
 			} else {
 				// the subordinate graph of a vertex is greater
 				return isThisVertex ? 1 : -1;
@@ -523,4 +521,13 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	public int getPartialGraphId() {
 		return getCompleteGraph().getPartialGraphId();
 	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public AttributedElement getParentGraphOrElement() {
+		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
+				.getContainingElementId(globalSubgraphId));
+	}
+	
 }

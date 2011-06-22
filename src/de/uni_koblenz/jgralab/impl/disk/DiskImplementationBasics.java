@@ -1,9 +1,9 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-public class DiskImplementationBasicMethods {
+public class DiskImplementationBasics {
 
 	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
-		long val = (DiskImplementationBasicMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
+		long val = (DiskImplementationBasics.TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
 		return val;
 	}
 

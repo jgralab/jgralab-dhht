@@ -176,7 +176,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
-			return getGraphObject(DiskImplementationBasicMethods.GLOBAL_GRAPH_ID);
+			return getGraphObject(DiskImplementationBasics.GLOBAL_GRAPH_ID);
 		} else {
 			return stack.peek();
 		}

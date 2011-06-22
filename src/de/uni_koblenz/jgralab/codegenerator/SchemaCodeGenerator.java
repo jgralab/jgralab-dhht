@@ -95,7 +95,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		addImports("#jgImplPackage#.GraphFactoryImpl");
 		addImports("#jgPackage#.ImplementationType");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
-		addImports("#jgDiskImplPackage#.CompleteGraphDatabase");
+		addImports("#jgDiskImplPackage#.CompleteGraphDatabaseImpl");
 		addImports("java.net.UnknownHostException");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
@@ -135,7 +135,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	private CodeBlock createGraphFactoryMethod() {
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
-				"#jgPackage#.GraphIOException");
+				"#jgPackage#.GraphIOException",
+				"#jgDiskImplPackage#.DiskImplementationBasics");
 		CodeSnippet code = new CodeSnippet(
 				true,
 				"/**",
@@ -185,8 +186,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"}",
 				"",
 				"/**",
-				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user to create a " +
-				" * new #gcName#-graph instance. The local hostname is detected automatically",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user  ",
+				" * to create a new #gcName#-graph instance. The local hostname is detected automatically",
 				" *",
 				"*/",
 				"public #gcName# create#gcCamelName#OnDisk() {",
@@ -197,21 +198,21 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"\t} catch (UnknownHostException ex) {",
 				"\t\tthrow new RuntimeException(ex);",
 				"\t}",
-				"\tlong subgraphId = GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID;",
-				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabase(this, uniqueGraphId, hostname);",
+				"\tlong subgraphId = DiskImplementationBasics.GLOBAL_GRAPH_ID;",
+				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
 				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
 				"",
 				"/**",
-				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user to create a " +
-				" * new #gcName#-graph instance.",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user ",
+				" * to create a  new #gcName#-graph instance.",
 				" * @param hostAddress the address or resolvable hostname of the local host",
 				" *",
 				"*/",
 				"public #gcName# create#gcCamelName#OnDisk(String localHostAddress) {",
 				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
-				"\tlong subgraphId = GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID;",
-				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabase(this, uniqueGraphId, localHostAddress);",
+				"\tlong subgraphId = DiskImplementationBasics.GLOBAL_GRAPH_ID;",
+				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabaseImpl(this, uniqueGraphId, localHostAddress);",
 				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
 				"",

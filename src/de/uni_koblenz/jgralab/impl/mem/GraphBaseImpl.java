@@ -170,18 +170,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		this.lastEdge = lastEdge;
 	}
 
-	/**
-	 * Sets version of ESeq.
-	 * 
-	 * @param edgeListVersion
-	 *            Version to set.
-	 */
-	// abstract protected void setEdgeListVersion(long edgeListVersion);
 
-	@Override
-	public GraphElement<?, ?, ?> getContainingElement() {
-		return null;
-	}
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {

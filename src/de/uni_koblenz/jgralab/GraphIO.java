@@ -67,7 +67,7 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.DiskImplementationBasicMethods;
+import de.uni_koblenz.jgralab.impl.disk.DiskImplementationBasics;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
@@ -806,7 +806,7 @@ public class GraphIO {
 		}
 
 		space();
-		if (graph.getPartialGraphId() != DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
+		if (graph.getPartialGraphId() != DiskImplementationBasics.TOPLEVEL_PARTIAL_GRAPH_ID) {
 			write("PartialGraph ");
 			write(toUtfString(graph.getUniqueGraphId()));
 			write(" " + graph.getPartialGraphId() + " ");
@@ -2881,7 +2881,7 @@ public class GraphIO {
 			server = JGraLabServerImpl.getLocalInstance();
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-			if (graph.getPartialGraphId() == DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
+			if (graph.getPartialGraphId() == DiskImplementationBasics.TOPLEVEL_PARTIAL_GRAPH_ID) {
 				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
 						getLocalHostname());
 			} else {
@@ -2889,7 +2889,7 @@ public class GraphIO {
 						schema,
 						uniqueGraphId,
 						partialGraphHostnames.get(GraphDatabaseBaseImpl
-								.getPartialGraphId(DiskImplementationBasicMethods.GLOBAL_GRAPH_ID)),
+								.getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID)),
 						parentPartialGraphId,
 						/* TODO: kind of parent element */ parentEntityKind, partialGraphId);
 			}

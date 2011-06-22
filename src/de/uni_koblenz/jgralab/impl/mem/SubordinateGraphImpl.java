@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -84,8 +85,9 @@ public abstract class SubordinateGraphImpl extends
 	
 	private int subgraphId;
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public GraphElement<?, ?, ?> getContainingElement() {
+	public AttributedElement getParentGraphOrElement() {
 		return containingElement;
 	}
 
@@ -342,13 +344,13 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return ((GraphElementImpl<?, ?, ?>) v)
-				.isChildOf(getContainingElement());
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
 		return ((GraphElementImpl<?, ?, ?>) e)
-				.isChildOf(getContainingElement());
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
 	}
 
 	@Override
@@ -357,7 +359,7 @@ public abstract class SubordinateGraphImpl extends
 			containingElement.getGraph().deleteVertex(v);
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getGlobalId()
+					+ getParentGraphOrElement().getGlobalId()
 					+ " does not contain vertex " + v.getGlobalId() + ".");
 		}
 	}
@@ -368,7 +370,7 @@ public abstract class SubordinateGraphImpl extends
 			containingElement.getGraph().deleteEdge(e);
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getGlobalId()
+					+ getParentGraphOrElement().getGlobalId()
 					+ " does not contain edge " + e.getGlobalId() + ".");
 		}
 	}
@@ -376,7 +378,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = containingElement.getGraph().getVertex(id);
-		if (((GraphElementImpl<?, ?, ?>) v).isChildOf(getContainingElement())) {
+		if (((GraphElementImpl<?, ?, ?>) v).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
 			return v;
 		} else {
 			return null;
@@ -386,7 +388,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = containingElement.getGraph().getEdge(id);
-		if (((GraphElementImpl<?, ?, ?>) e).isChildOf(getContainingElement())) {
+		if (((GraphElementImpl<?, ?, ?>) e).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
 			return e;
 		} else {
 			return null;
@@ -521,7 +523,7 @@ public abstract class SubordinateGraphImpl extends
 	public void vertexAdded(Vertex v) {
 		if (containsVertex(v)) {
 			vCount++;
-			if (v.getPreviousVertex() == getContainingElement()) {
+			if (v.getPreviousVertex() == getParentGraphOrElement()) {
 				// this is a new first vertex
 				setFirstVertex((VertexImpl) v);
 				if (getLastVertex() == null) {
@@ -557,7 +559,7 @@ public abstract class SubordinateGraphImpl extends
 	public void edgeAdded(Edge e) {
 		if (containsEdge(e)) {
 			eCount++;
-			if (e.getPreviousEdge() == getContainingElement()) {
+			if (e.getPreviousEdge() == getParentGraphOrElement()) {
 				// this is a new first edge
 				setFirstEdge((EdgeImpl) e);
 				if (getLastEdge() == null) {
@@ -620,17 +622,17 @@ public abstract class SubordinateGraphImpl extends
 		if (getCompleteGraph() == arg0) {
 			// each graph is smaller than the complete graph
 			return -1;
-		} else if (arg0.getContainingElement() != null) {
+		} else if (arg0.getParentGraphOrElement() != null) {
 			// this is a SubordinateGraphImpl
-			GraphElement<?, ?, ?> ce = arg0.getContainingElement();
+			GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>) arg0.getParentGraphOrElement();
 			boolean isArg0Vertex = ce instanceof Vertex;
-			boolean isThisVertex = getContainingElement() instanceof Vertex;
+			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
 			if (isArg0Vertex && isThisVertex) {
 				// both are vertices
-				return ((Vertex) getContainingElement()).compareTo((Vertex) ce);
+				return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
 			} else if (!isArg0Vertex && !isThisVertex) {
 				// both are edges
-				return ((Edge) getContainingElement()).compareTo((Edge) ce);
+				return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
 			} else {
 				// the subordinate graph of a vertex is greater
 				return isThisVertex ? 1 : -1;

@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -127,23 +126,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public boolean isPartOfGraph(Graph other);
 
-	
-	
-	/**
-	 * @return {@link GraphElement} which contains this {@link Graph} or
-	 *         <code>null</code> if it is the complete {@link Graph} or a
-	 *         {@link ViewGraphImpl}
-	 */
-	public GraphElement<?, ?, ?> getContainingElement();
-
-	/**
-	 * @return {@link Graph} the superordinate {@link Graph} containing the
-	 *         element this graph is contained in as subordinate one or this
-	 *         graph, if it is not a subordinate one
-	 */
-	public abstract Graph getSuperordinateGraph();
-
-	
 	
 	/**
 	 * @see GraphElement#isVisible(int)
