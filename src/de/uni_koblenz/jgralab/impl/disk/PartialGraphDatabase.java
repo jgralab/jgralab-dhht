@@ -30,7 +30,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	
 	//for partial graph database
 	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentEntityGlobalId, ParentEntityKind parentEntityKind) {
-		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(DiskImplementationBasics.TOPLEVEL_PARTIAL_GRAPH_ID);
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.internalCreatePartialGraphInEntity(remoteHostname, parentEntityGlobalId, parentEntityKind);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
 		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
@@ -96,7 +96,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	@Override
 	public void incidenceListOfEdgeModified(long edgeId) {
 		getGraphDatabase(
-				getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID))
+				getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
 				.incidenceListOfEdgeModified(edgeId);
 	}
 
@@ -106,23 +106,23 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	@Override
 	public void graphModified(int graphId) {
 		getGraphDatabase(
-				getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID))
+				getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
 				.graphModified();
 	}
 
 	@Override
 	public void setGraphVersion(long graphVersion) {
 		getGraphDatabase(
-				getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID))
+				getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
 				.setGraphVersion(graphVersion);
 	}
 	
 	public Object getGraphAttribute(String attributeName) {
-		return getGraphDatabase(getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID)).getGraphAttribute(attributeName);
+		return getGraphDatabase(getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)).getGraphAttribute(attributeName);
 	}
 	@Override
 	public void setGraphAttribute(String attributeName, Object data) {
-		getGraphDatabase(getPartialGraphId(DiskImplementationBasics.GLOBAL_GRAPH_ID)).setGraphAttribute(attributeName, data);
+		getGraphDatabase(getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)).setGraphAttribute(attributeName, data);
 	}
 
 

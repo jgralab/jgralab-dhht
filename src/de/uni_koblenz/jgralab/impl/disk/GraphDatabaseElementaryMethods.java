@@ -22,6 +22,35 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatabaseAccessWithInternalMethods {
 	
+	// the global subgraph id of the toplevel dhhtgraph
+	public static final long GLOBAL_GRAPH_ID = 0x0000000100000001l;
+	// the local subgraph id of the toplevel graph if a partial one
+	public static final long TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
+	// the partial graph id of the toplevel graph, the lowest bit of the 
+	// high int is set
+	public static final int TOPLEVEL_PARTIAL_GRAPH_ID = 1;
+	
+	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
+		long val = (TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
+		return val;
+	}
+	/**
+	 * Retrieves the partial graph id of the given globalSubgraphOrElementId, this
+	 * is the highbyte of the long value.
+	 */
+	public static final int getPartialGraphId(long globalSubgraphOrElementId) {
+		return (int) (globalSubgraphOrElementId >> 32);
+	}
+
+	/**
+	 * Retrieves the local id of the given globalSubgraphOrElementId, this
+	 * is the lowbyte of the long value.
+	 */
+	public final static int convertToLocalId(long globalSubgraphOrElementId) {
+		return (int) globalSubgraphOrElementId;
+	}
+	
+	
 	protected class GraphData {
 		long globalSubgraphId;
 		long firstVertexId;
@@ -42,21 +71,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 */
 	protected final ArrayList<GraphData> localSubgraphData;
 
-	/**
-	 * Retrieves the partial graph id of the given globalSubgraphOrElementId, this
-	 * is the highbyte of the long value.
-	 */
-	public static final int getPartialGraphId(long globalSubgraphOrElementId) {
-		return (int) (globalSubgraphOrElementId >> 32);
-	}
 
-	/**
-	 * Retrieves the local id of the given globalSubgraphOrElementId, this
-	 * is the lowbyte of the long value.
-	 */
-	public final static int convertToLocalId(long globalSubgraphOrElementId) {
-		return (int) globalSubgraphOrElementId;
-	}
 	
 	public final long convertToGlobalId(int localSubgraphOrElementId) {
 		long l = localPartialGraphId << 32;

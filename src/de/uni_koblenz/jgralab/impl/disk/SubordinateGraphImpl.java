@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Stack;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -73,7 +74,8 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		super(globalSubgraphId, localGraphDatabase, storingGraphDatabase);
 	}
-
+	
+	
 	@Override
 	public long getVCount() {
 		return storingGraphDatabase.getVCount(globalSubgraphId);
@@ -357,7 +359,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 
 	@Override
 	public Graph getCompleteGraph() {
-		return localGraphDatabase.getGraphObject(DiskImplementationBasics.GLOBAL_GRAPH_ID); 
+		return localGraphDatabase.getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID); 
 	}
 
 	@Override

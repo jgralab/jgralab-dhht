@@ -140,7 +140,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		if ((sigma== null) || (GraphDatabaseBaseImpl.getPartialGraphId(sigma.getGlobalId()) != ownPartialGraphId)) {
 			//the element is contained in a partial graph different than its sigma element,
 			//thus this is the graph containing the element directly
-			return localGraphDatabase.getGraphObject(DiskImplementationBasics.getToplevelGraphForPartialGraphId(ownPartialGraphId));
+			return localGraphDatabase.getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(ownPartialGraphId));
 		} else {
 			//the subordinate graph of sigma is the directly containing graph of this element
 			return sigma.getSubordinateGraph();

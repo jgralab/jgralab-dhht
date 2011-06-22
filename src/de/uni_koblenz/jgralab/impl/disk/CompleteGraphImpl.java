@@ -58,11 +58,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
-	/**
-	 * the unique id of the complete graph this object represents or belogns to
-	 */
-	private final String uid;
-
+	
 	/**
 	 * Creates a graph
 	 * 
@@ -73,17 +69,35 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			GraphDatabaseBaseImpl localDatabase,
 			RemoteGraphDatabaseAccess graphData) {
 		super(partialGraphId, localDatabase, graphData);
-		this.uid = graphId;
 	}
 
+	
+	// ==============================================================
+	// Methods to access traversal context
+	// ==============================================================
+
+
+	@Override
+	public void useAsTraversalContext() {
+		localGraphDatabase.setTraversalContext(this);
+	}
+
+	@Override
+	public void releaseTraversalContext() {
+		localGraphDatabase.releaseTraversalContext();
+	}
+
+	@Override
+	public Graph getTraversalContext() {
+		return localGraphDatabase.getTraversalContext();
+	}
+	
+	
 	// ==============================================================
 	// Methods to access basic graph properties
 	// ==============================================================
 
-	@Override
-	public String getUniqueGraphId() {
-		return uid;
-	}
+
 
 	@Override
 	public int compareTo(Graph a) {
@@ -187,64 +201,24 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 				&& (localGraphDatabase.getVertexObject(v.getGlobalId()) == v);
 	}
 
-	@Override
-	public void deleteEdge(Edge e) {
-		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e.getGlobalId());
-	}
 
-	@Override
-	public void deleteVertex(Vertex v) {
-		assert (v != null) && v.isValid() && containsVertex(v);
-		storingGraphDatabase.deleteVertex(v.getGlobalId());
-	}
 
-	@Override
-	public long getECount() {
-		return storingGraphDatabase.getECount(globalSubgraphId);
-	}
 
-	@Override
-	public long getMaxECount() {
-		return storingGraphDatabase.getMaxECount();
-	}
-
-	@Override
-	public Edge getEdge(long eId) {
-		assert eId != 0 : "The edge id must be != 0, given was " + eId;
-		return localGraphDatabase.getEdgeObject(eId);
-	}
 
 	@Override
 	public long getEdgeListVersion() {
 		return storingGraphDatabase.getEdgeListVersion();
 	}
 
-	@Override
-	public long getVCount() {
-		return storingGraphDatabase.getVCount(globalSubgraphId);
-	}
 
-	@Override
-	public long getMaxVCount() {
-		return storingGraphDatabase.getMaxVCount();
-	}
 
-	@Override
-	public Vertex getVertex(long vId) {
-		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
-		return localGraphDatabase.getVertexObject(vId);
-	}
+
 
 	@Override
 	public long getVertexListVersion() {
 		return storingGraphDatabase.getVertexListVersion();
 	}
 
-	@Override
-	public long getICount() {
-		return localGraphDatabase.getICount(globalSubgraphId);
-	}
 
 	/**
 	 * Modifies eSeq such that the movedEdge is immediately after the
@@ -304,29 +278,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 				movedVertex.getGlobalId());
 	}
 
-	// ==============================================================
-	// Methods to access traversal context
-	// ==============================================================
 
-	@Override
-	public void setTraversalContext(Graph traversalContext) {
-		localGraphDatabase.setTraversalContext(traversalContext);
-	}
-
-	@Override
-	public void useAsTraversalContext() {
-		localGraphDatabase.setTraversalContext(this);
-	}
-
-	@Override
-	public void releaseTraversalContext() {
-		localGraphDatabase.releaseTraversalContext();
-	}
-
-	@Override
-	public Graph getTraversalContext() {
-		return localGraphDatabase.getTraversalContext();
-	}
 
 	// ====================================================
 	// Methods to create domain objects
@@ -483,10 +435,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return localGraphDatabase.getGraphObject(globalId);
 	}
 
-	@Override
-	public boolean isLocalElementId(long id) {
-		return GraphDatabaseElementaryMethods.getPartialGraphId(id) == storingGraphDatabase.getLocalPartialGraphId();
-	}
+
 
 	
 	@SuppressWarnings("rawtypes")

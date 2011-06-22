@@ -38,6 +38,12 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		completeGraphAttributes = new HashMap<String, Object>();
 	}
 	
+	
+	
+	
+	
+	
+	
 
 
 	@Override

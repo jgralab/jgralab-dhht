@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -117,7 +116,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	/**
 	 * @return {@link Graph} the complete, top-level {@link Graph}
 	 */
-	public abstract Graph getCompleteGraph();
+	public Graph getCompleteGraph();
 	
 	
 	
@@ -125,7 +124,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return {@link Graph} the local partial graph (which may also
 	 * be the toplevel one)
 	 */
-	public abstract Graph getLocalPartialGraph();
+	public Graph getLocalPartialGraph();
 	
 	
 	/**
@@ -148,7 +147,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *          - for a subordinate graph the graph directly containing    
 	 *            the element refined by the subordinate graph
 	 */		
-	public abstract Graph getParentGraph();
+	public Graph getParentGraph();
 	
 	
 	/**
@@ -173,12 +172,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return {@link Graph} the graph viewed by this viewgraph or the graph
 	 *         itself if it is not a view
 	 */
-	public abstract Graph getViewedGraph();
-	
-	
+	public Graph getViewedGraph();
 	
 
-	
 
 	/**
 	 * Adds a partial graph on the given host to the sequence of partial graphs
@@ -255,11 +251,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public boolean isLocalElementId(long id);
 
 
-	/**
-	 * Retrieves the GraphDatabase this graph is stored in
-	 * @return
-	 */
-	public GraphDatabaseBaseImpl getGraphDatabase();
 
 	
 	// ============================================================================
@@ -280,6 +271,13 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public <T extends Edge> T createEdge(Class<T> cls);
 
 	/**
+	 * Creates an binary edge of the specified class <code>cls</code> and adds
+	 * the new edge to this Graph.
+	 */
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega);
+
+	/**
 	 * Connects the given vertex and the given edge by an incidence of class
 	 * cls. The direction of the connection is automatically determined by cls
 	 * 
@@ -287,14 +285,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge);
-
-	/**
-	 * Creates an binary edge of the specified class <code>cls</code> and adds
-	 * the new edge to this Graph.
-	 */
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega);
-
 
 	/**
 	 * @return true if this graph contains the given vertex <code>v</code>.
@@ -416,8 +406,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return the first Vertex, or null if this graph contains no vertices of
 	 *         the specified <code>vertexClass</code>.
 	 */
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
-			boolean noSubclasses);
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass, boolean noSubclasses);
 
 	/**
 	 * Returns the first {@link Edge} in the edge sequence of this {@link Graph}
@@ -492,8 +481,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *         specified <code>edgeClass</code>.
 	 * @throws RemoteException 
 	 */
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
-			boolean noSubclasses);
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass, boolean noSubclasses);
 
 	/**
 	 * Returns the Vertex with the specified <code>id</code> if such a vertex
@@ -551,6 +539,42 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public long getICount();
 
+	
+	/**
+	 * Returns an {@link Iterable} which iterates over all vertices of this
+	 * {@link Graph} in the order determined by the vertex sequence.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getVertices();
+
+	/**
+	 * Returns an Iterable which iterates over all vertices of this Graph which
+	 * have the specified <code>vertexClass</code> (including subclasses), in
+	 * the order determined by the vertex sequence.
+	 * 
+	 * @param vertexclass
+	 *            a VertexClass (i.e. instance of schema.VertexClass)
+	 * 
+	 * @return an Iterable for all vertices of the specified
+	 *         <code>vertexClass</code>
+	 */
+	public Iterable<Vertex> getVertices(VertexClass vertexclass);
+
+	/**
+	 * Returns an Iterable which iterates over all vertices of this Graph which
+	 * have the specified <code>vertexClass</code> (including subclasses), in
+	 * the order determined by the vertex sequence.
+	 * 
+	 * @param vertexClass
+	 *            a VertexClass (i.e. an M1 interface extending Vertex)
+	 * 
+	 * @return a iterable for all vertices of the specified
+	 *         <code>vertexClass</code>
+	 */
+	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass);
+
+	
 	/**
 	 * Returns an {@link Iterable} which iterates over all {@link Edge}s of this
 	 * {@link Graph} in the order determined by the edge sequence.
@@ -600,39 +624,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	// public <T extends Vertex> List<T> reachableVertices(Vertex startVertex,
 	// String pathDescription, Class<T> vertexType);// old
 
-	/**
-	 * Returns an {@link Iterable} which iterates over all vertices of this
-	 * {@link Graph} in the order determined by the vertex sequence.
-	 * 
-	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
-	 */
-	public Iterable<Vertex> getVertices();
-
-	/**
-	 * Returns an Iterable which iterates over all vertices of this Graph which
-	 * have the specified <code>vertexClass</code> (including subclasses), in
-	 * the order determined by the vertex sequence.
-	 * 
-	 * @param vertexclass
-	 *            a VertexClass (i.e. instance of schema.VertexClass)
-	 * 
-	 * @return an Iterable for all vertices of the specified
-	 *         <code>vertexClass</code>
-	 */
-	public Iterable<Vertex> getVertices(VertexClass vertexclass);
-
-	/**
-	 * Returns an Iterable which iterates over all vertices of this Graph which
-	 * have the specified <code>vertexClass</code> (including subclasses), in
-	 * the order determined by the vertex sequence.
-	 * 
-	 * @param vertexClass
-	 *            a VertexClass (i.e. an M1 interface extending Vertex)
-	 * 
-	 * @return a iterable for all vertices of the specified
-	 *         <code>vertexClass</code>
-	 */
-	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass);
 
 	
 	/**
@@ -721,7 +712,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public void setLoading(boolean b);
 
-	
+	/**
+	 * Method is be called by all operations changing the graph
+	 */
 	public void graphModified();
 
 	/**
@@ -791,7 +784,13 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public GraphFactory getGraphFactory();
 
 
-
+	/**
+	 * Retrieves the GraphDatabase this graph is stored in
+	 * @return
+	 */
+	public GraphDatabaseBaseImpl getGraphDatabase();
+	
+	
 	// ============================================================================
 	// Methods to create complex values such as lists and maps
 	// ============================================================================
