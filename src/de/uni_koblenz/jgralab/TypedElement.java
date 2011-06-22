@@ -35,9 +35,18 @@ public interface TypedElement<ConcreteMetaClass extends TypedElementClass<Concre
 	 * - 32 bit partial graph id
 	 * - 32 bit subgraph, incidence, vertex or edge id inside the subgraph
 	 * 
-	 * @return int the id of this {@link GraphElement}.
+	 * @return long the global id of this {@link TypedElement}.
 	 */
-	public long getId();
+	public long getGlobalId();
+	
+	
+	/**
+	 * Returns the local id of this Graph, GraphElement or incidence 
+	 * in the local partial graph
+	 * 
+	 * @return long the local id of this {@link TypedElement}.
+	 */
+	public int getLocalId();
 	
 	/**
 	 * Returns the M1 implementation class for this IncidenceClass.

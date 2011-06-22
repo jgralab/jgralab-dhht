@@ -758,7 +758,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public void storeVertex(VertexImpl v) {
-		int vId = getLocalId(v.getId());
+		int vId = getLocalId(v.getGlobalId());
 		VertexContainer storage = getVertexContainer(vId);
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
@@ -769,7 +769,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public void storeEdge(EdgeImpl e) {
-		int eId = getLocalId(e.getId());
+		int eId = getLocalId(e.getGlobalId());
 		EdgeContainer storage = getEdgeContainer(eId);
 		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
@@ -780,9 +780,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public void storeIncidence(IncidenceImpl i) {
-		int iId = getLocalId(i.getId());
+		int iId = getLocalId(i.getGlobalId());
 		IncidenceContainer storage = getIncidenceContainer(iId);
-		int id = getElementIdInContainer(i.getId());
+		int id = getElementIdInContainer(i.getGlobalId());
 		storage.incidences[id] = i;
 		i.container = storage;
 		storage.types[id] = graphDatabase.getSchema().getClassId(i.getType());

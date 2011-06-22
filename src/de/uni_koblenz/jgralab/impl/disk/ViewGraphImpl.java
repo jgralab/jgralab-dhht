@@ -290,7 +290,7 @@ public abstract class ViewGraphImpl implements Graph,
 			throw new GraphException(
 					"The view with lowest visible kappa value "
 							+ lowestVisibleKappaLevel
-							+ " does not contain vertex " + v.getId() + ".");
+							+ " does not contain vertex " + v.getGlobalId() + ".");
 		}
 	}
 
@@ -302,7 +302,7 @@ public abstract class ViewGraphImpl implements Graph,
 			throw new GraphException(
 					"The view with lowest visible kappa value "
 							+ lowestVisibleKappaLevel
-							+ " does not contain edge " + e.getId() + ".");
+							+ " does not contain edge " + e.getGlobalId() + ".");
 		}
 	}
 
@@ -718,13 +718,13 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public long getGlobalSubgraphId() {
-		return viewedGraph.getGlobalSubgraphId();
+	public long getGlobalId() {
+		return viewedGraph.getGlobalId();
 	}
 
 	@Override
-	public int getLocalSubgraphId() {
-		return viewedGraph.getLocalSubgraphId();
+	public int getLocalId() {
+		return viewedGraph.getLocalId();
 	}
 
 	@Override

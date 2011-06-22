@@ -123,7 +123,7 @@ public class VertexListTest extends InstanceTest {
 	private String getVSeq() {
 		StringBuilder sb = new StringBuilder();
 		for (Vertex v : g.vertices()) {
-			sb.append('v').append(v.getId()).append(' ');
+			sb.append('v').append(v.getGlobalId()).append(' ');
 		}
 		return sb.toString().trim();
 	}
@@ -325,14 +325,14 @@ public class VertexListTest extends InstanceTest {
 
 		int i = 1;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i++].getCompleteGraphUid());
+			assertEquals(currentNode.getGlobalId(), nodes[i++].getCompleteGraphUid());
 		}
 
 		Comparator<Vertex> comp = new Comparator<Vertex>() {
 
 			@Override
 			public int compare(Vertex o1, Vertex o2) {
-				return Double.compare(o2.getId(), o1.getId());
+				return Double.compare(o2.getGlobalId(), o1.getGlobalId());
 			}
 
 		};
@@ -341,14 +341,14 @@ public class VertexListTest extends InstanceTest {
 
 		i = VERTEX_COUNT;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i--].getCompleteGraphUid());
+			assertEquals(currentNode.getGlobalId(), nodes[i--].getCompleteGraphUid());
 		}
 
 		comp = new Comparator<Vertex>() {
 
 			@Override
 			public int compare(Vertex o1, Vertex o2) {
-				return Double.compare(o1.getId(), o2.getId());
+				return Double.compare(o1.getGlobalId(), o2.getGlobalId());
 			}
 
 		};
@@ -357,7 +357,7 @@ public class VertexListTest extends InstanceTest {
 
 		i = 1;
 		for (Vertex currentNode : g.vertices()) {
-			assertEquals(currentNode.getId(), nodes[i++].getCompleteGraphUid());
+			assertEquals(currentNode.getGlobalId(), nodes[i++].getCompleteGraphUid());
 		}
 		commit(g);
 

@@ -74,16 +74,16 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	@Override
 	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return temporaryAttributes[(int)graphElement.getId()] != null;
+		return temporaryAttributes[(int)graphElement.getGlobalId()] != null;
 	}
 
 	public O getMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		O out = (O) temporaryAttributes[(int) graphElement.getId()];
+		O out = (O) temporaryAttributes[(int) graphElement.getGlobalId()];
 		return out;
 	}
 
@@ -99,10 +99,10 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	 */
 	public O mark(T graphElement, O value) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		O out = (O) temporaryAttributes[(int) graphElement.getId()];
-		temporaryAttributes[(int) graphElement.getId()] = value;
+		O out = (O) temporaryAttributes[(int) graphElement.getGlobalId()];
+		temporaryAttributes[(int) graphElement.getGlobalId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -116,12 +116,12 @@ public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
 	@Override
 	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (temporaryAttributes[(int) graphElement.getId()] == null) {
+		if (temporaryAttributes[(int) graphElement.getGlobalId()] == null) {
 			return false;
 		}
-		temporaryAttributes[(int) graphElement.getId()] = null;
+		temporaryAttributes[(int) graphElement.getGlobalId()] = null;
 		marked -= 1;
 		version++;
 		return true;

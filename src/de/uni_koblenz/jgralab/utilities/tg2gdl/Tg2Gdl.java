@@ -87,10 +87,10 @@ public class Tg2Gdl extends Tg2Whatever {
 	private void printLabel(AttributedElement<? extends AttributedElement, ? extends AttributedElementClass> ae, PrintStream out) {
 		out.print("label: \"");
 		if (ae instanceof Vertex) {
-			out.print("v" + ((Vertex) ae).getId() + " : "
+			out.print("v" + ((Vertex) ae).getGlobalId() + " : "
 					+ ae.getType().getSimpleName() + "\\n");
 		} else if (ae instanceof Edge) {
-			out.print("e" + ((Edge) ae).getId() + " : "
+			out.print("e" + ((Edge) ae).getGlobalId() + " : "
 					+ ae.getType().getSimpleName() + "\\n");
 		}
 		boolean first = true;
@@ -140,7 +140,7 @@ public class Tg2Gdl extends Tg2Whatever {
 	}
 
 	private String vTitle(Vertex v) {
-		return "\"v" + v.getId() + "\"";
+		return "\"v" + v.getGlobalId() + "\"";
 	}
 
 	/*

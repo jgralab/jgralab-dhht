@@ -143,7 +143,7 @@ public class Tg2xml extends GraphVisitor {
 		writer.writeEmptyElement(v.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_ID, GRUML_ID_PREFIX_VERTEX
-				+ v.getId());
+				+ v.getGlobalId());
 		writeAttributes(v);
 		// iterate over incidences and mark these edges
 		int i = 1;

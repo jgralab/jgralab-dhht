@@ -171,7 +171,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public final long getId() {
+	public final long getGlobalId() {
 		return id;
 	}
 

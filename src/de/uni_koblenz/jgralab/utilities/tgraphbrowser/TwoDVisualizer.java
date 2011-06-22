@@ -525,7 +525,7 @@ public class TwoDVisualizer {
 				return;
 			}
 
-			out.print("v" + alpha.getId() + " -> v" + omega.getId() + " [");
+			out.print("v" + alpha.getGlobalId() + " -> v" + omega.getGlobalId() + " [");
 
 			EdgeClass cls = (EdgeClass) e.getMetaClass();
 
@@ -561,7 +561,7 @@ public class TwoDVisualizer {
 				out.print("arrowtail=\"none\" ");
 			}
 
-			out.print(" label=\"e" + e.getId() + ": "
+			out.print(" label=\"e" + e.getGlobalId() + ": "
 					+ cls.getUniqueName().replace('$', '.') + "");
 
 			if (showAttributes && cls.getAttributeCount() > 0) {
@@ -586,7 +586,7 @@ public class TwoDVisualizer {
 								+ "\"");
 			}
 
-			out.print(" href=\"javascript:top.showElement('e" + e.getId()
+			out.print(" href=\"javascript:top.showElement('e" + e.getGlobalId()
 					+ "');\"");
 
 			if (e == current) {
@@ -646,14 +646,14 @@ public class TwoDVisualizer {
 		@Override
 		protected void printVertex(PrintStream out, Vertex v) {
 			AttributedElementClass cls = v.getMetaClass();
-			out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
+			out.print("v" + v.getGlobalId() + " [label=\"{{v" + v.getGlobalId() + "|"
 					+ cls.getUniqueName().replace('$', '.') + "}");
 			if (showAttributes && cls.getAttributeCount() > 0) {
 				out.print("|");
 				printAttributes(out, v);
 			}
 			out.print("}\"");
-			out.print(" href=\"javascript:top.showElement('v" + v.getId()
+			out.print(" href=\"javascript:top.showElement('v" + v.getGlobalId()
 					+ "');\"");
 			if (v == current) {
 				out.print(" fillcolor=\"#FFC080\"");
@@ -674,7 +674,7 @@ public class TwoDVisualizer {
 					out.println("nv" + counter
 							+ " [shape=\"plaintext\" fontcolor=\"white\"]");
 					// print the little arrow as a new edge
-					out.println("nv" + counter++ + " -> v" + v.getId()
+					out.println("nv" + counter++ + " -> v" + v.getGlobalId()
 							+ " [style=\"dashed\"]");
 					break;
 				}

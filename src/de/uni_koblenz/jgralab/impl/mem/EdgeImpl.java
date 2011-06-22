@@ -137,7 +137,7 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		return (int) (getId() - e.getId());
+		return (int) (getGlobalId() - e.getGlobalId());
 	}
 
 	@Override

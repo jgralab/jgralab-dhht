@@ -686,8 +686,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		removeEdgeFromESeqWithoutDeletingIt(e);
 
 		// freeIndex(getFreeEdgeList(), e.getId());
-		freeEdgeIndex((int) e.getId());
-		getEdgeArray()[(int) e.getId()] = null;
+		freeEdgeIndex((int) e.getGlobalId());
+		getEdgeArray()[(int) e.getGlobalId()] = null;
 		e.setPreviousEdge(null);
 		e.setNextEdge(null);
 		e.setId(0);
@@ -750,8 +750,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					.getPreviousVertex());
 		}
 		// freeIndex(getFreeVertexList(), v.getId());
-		freeVertexIndex((int) v.getId());
-		getVertexArray()[(int) v.getId()] = null;
+		freeVertexIndex((int) v.getGlobalId());
+		getVertexArray()[(int) v.getGlobalId()] = null;
 		v.setPreviousVertex(null);
 		v.setNextVertex(null);
 		v.setId(0);
@@ -950,16 +950,16 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 		EdgeImpl e = (EdgeImpl) newEdge;
 
-		int eId = (int) e.getId();
+		int eId = (int) e.getGlobalId();
 		if (isLoading()) {
 			if (eId > 0) {
 				// the given edge already has an id, try to use it
 				if (containsEdgeId(eId)) {
-					throw new GraphException("edge with id " + e.getId()
+					throw new GraphException("edge with id " + e.getGlobalId()
 							+ " already exists");
 				}
 				if (eId > eMax) {
-					throw new GraphException("edge id " + e.getId()
+					throw new GraphException("edge id " + e.getGlobalId()
 							+ " is bigger than eSize");
 				}
 			} else {
@@ -985,7 +985,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected void addIncidence(Incidence newIncidence) {
 		IncidenceImpl i = (IncidenceImpl) newIncidence;
 
-		int iId = (int) i.getId();
+		int iId = (int) i.getGlobalId();
 		if (isLoading()) {
 			if (iId > 0) {
 				// the given vertex already has an id, try to use it
@@ -1032,7 +1032,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected void addVertex(Vertex newVertex) {
 		VertexImpl v = (VertexImpl) newVertex;
 
-		int vId = (int) v.getId();
+		int vId = (int) v.getGlobalId();
 		if (isLoading()) {
 			if (vId > 0) {
 				// the given vertex already has an id, try to use it
@@ -1729,12 +1729,12 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 
 	@Override
-	public long getGlobalSubgraphId() {
+	public long getGlobalId() {
 		return 1;
 	}
 
 	@Override
-	public int getLocalSubgraphId() {
+	public int getLocalId() {
 		return 1;
 	}
 

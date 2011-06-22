@@ -99,7 +99,7 @@ public abstract class VertexImpl extends
 
 
 	@Override
-	public final long getId() {
+	public final long getGlobalId() {
 		return elementId;
 	}
 
@@ -244,7 +244,7 @@ public abstract class VertexImpl extends
 	 */
 	protected void setNextVertex(Vertex nextVertex) {
 		container.nextElementInGraphId[getIdInStorage(elementId)] = nextVertex
-				.getId();
+				.getGlobalId();
 	}
 
 	/**
@@ -256,7 +256,7 @@ public abstract class VertexImpl extends
 	 */
 	protected void setPreviousVertex(Vertex prevVertex) {
 		container.previousElementInGraphId[getIdInStorage(elementId)] = prevVertex
-				.getId();
+				.getGlobalId();
 	}
 
 	@Override
@@ -280,7 +280,7 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexBefore(v.getId(), this.getId());
+		storingGraphDatabase.putVertexBefore(v.getGlobalId(), this.getGlobalId());
 	}
 
 	@Override
@@ -304,7 +304,7 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexAfter(v.getId(), this.getId());
+		storingGraphDatabase.putVertexAfter(v.getGlobalId(), this.getGlobalId());
 	}
 
 	/* **********************************************************
@@ -559,7 +559,7 @@ public abstract class VertexImpl extends
 		if (subordinateGraphId == 0) {
 			Graph subordinateGraph = localGraphDatabase.getGraphFactory()
 					.createSubordinateGraph(this);
-			subordinateGraphId = subordinateGraph.getGlobalSubgraphId();
+			subordinateGraphId = subordinateGraph.getGlobalId();
 			return subordinateGraph;
 		} else {
 			return localGraphDatabase.getGraphObject(subordinateGraphId);
@@ -578,7 +578,7 @@ public abstract class VertexImpl extends
 	
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
-		long sigmaId = elem.getId();
+		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;
 		} else {
@@ -895,27 +895,27 @@ public abstract class VertexImpl extends
 	public int compareTo(Vertex v) {
 		assert isValid() && v.isValid();
 		assert getGraph() == v.getGraph();
-		return (int) (getId() - v.getId());
+		return (int) (getGlobalId() - v.getGlobalId());
 	}
 
 	@Override
 	public void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteVertex(this.getId());
+		storingGraphDatabase.deleteVertex(this.getGlobalId());
 	}
 
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getId(),
-				moved.getId());
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getId(),
-				moved.getId());
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 	public void deleteIncidence(Incidence i) {
-		storingGraphDatabase.deleteIncidence(i.getId());
+		storingGraphDatabase.deleteIncidence(i.getGlobalId());
 	}
 
 	// @Override

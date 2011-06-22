@@ -74,9 +74,9 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected long elementId;
 
-	
-	protected final int getLocalId() {
-		return (int) elementId;
+	@Override
+	public final int getLocalId() {
+		return GraphDatabaseBaseImpl.convertToLocalId(elementId);
 	}
 	
 	protected final int getIdInStorage(long elementId) {
@@ -136,11 +136,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public Graph getContainingGraph() {
 		@SuppressWarnings("rawtypes")
 		GraphElement sigma = getSigma();
-		int ownPartialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(getId());
-		if ((sigma== null) || (GraphDatabaseBaseImpl.getPartialGraphId(sigma.getId()) != ownPartialGraphId)) {
+		int ownPartialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(getGlobalId());
+		if ((sigma== null) || (GraphDatabaseBaseImpl.getPartialGraphId(sigma.getGlobalId()) != ownPartialGraphId)) {
 			//the element is contained in a partial graph different than its sigma element,
 			//thus this is the graph containing the element directly
-			return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(ownPartialGraphId));
+			return localGraphDatabase.getGraphObject(DiskImplementationBasicMethods.getToplevelGraphForPartialGraphId(ownPartialGraphId));
 		} else {
 			//the subordinate graph of sigma is the directly containing graph of this element
 			return sigma.getSubordinateGraph();

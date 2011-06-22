@@ -158,7 +158,7 @@ public class JniServer {
 		Graph graph = graphs.get(graphId);
 		Class<? extends Vertex> m1Class = graph.getGraphClass()
 				.getVertexClass(vertexClassName).getM1Class();
-		return (int) graph.createVertex(m1Class).getId();
+		return (int) graph.createVertex(m1Class).getGlobalId();
 	}
 
 	public void deleteVertex(int graphId, int vertexId) throws RemoteException {
@@ -266,7 +266,7 @@ public class JniServer {
 				.getEdgeClass(edgeClassName).getM1Class();
 		Edge e = graph.createEdge(m1Class);
 
-		return (int) e.getId();
+		return (int) e.getGlobalId();
 	}
 
 	public void deleteEdge(int graphId, int edgeId) throws RemoteException {
@@ -394,7 +394,7 @@ public class JniServer {
 		Vertex v = (vertexClassName != null) ? g.getFirstVertex((VertexClass) g
 				.getSchema().getAttributedElementClass(vertexClassName)) : g
 				.getFirstVertex();
-		return (int) ((v == null) ? 0 : v.getId());
+		return (int) ((v == null) ? 0 : v.getGlobalId());
 	}
 
 	public int getNextVertex(int graphId, int vertexId, String vertexClassName)
@@ -405,7 +405,7 @@ public class JniServer {
 						((VertexClass) g.getSchema().getAttributedElementClass(
 								vertexClassName))) : g.getVertex(vertexId)
 				.getNextVertex();
-		return (int) ((v == null) ? 0 : v.getId());
+		return (int) ((v == null) ? 0 : v.getGlobalId());
 	}
 
 	public int getFirstEdgeInGraph(int graphId, String edgeClassName)
@@ -414,7 +414,7 @@ public class JniServer {
 		Edge e = (edgeClassName != null) ? g.getFirstEdge((EdgeClass) g
 				.getSchema().getAttributedElementClass(edgeClassName)) : g
 				.getFirstEdge();
-		return (int) ((e == null) ? 0 : e.getId());
+		return (int) ((e == null) ? 0 : e.getGlobalId());
 	}
 
 	public int getNextEdgeInGraph(int graphId, int edgeId, String edgeClassName)
@@ -423,7 +423,7 @@ public class JniServer {
 		Edge e = (edgeClassName != null) ? g.getEdge(edgeId).getNextEdge(
 				((EdgeClass) g.getSchema().getAttributedElementClass(
 						edgeClassName))) : g.getEdge(edgeId).getNextEdge();
-		return (int) ((e == null) ? 0 : e.getId());
+		return (int) ((e == null) ? 0 : e.getGlobalId());
 	}
 
 	// public int getFirstEdge(int graphId, int vertexId, String edgeClassName)

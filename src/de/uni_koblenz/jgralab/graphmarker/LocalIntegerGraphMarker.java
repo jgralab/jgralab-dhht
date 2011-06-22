@@ -74,9 +74,9 @@ public abstract class LocalIntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	@Override
 	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return temporaryAttributes[(int) graphElement.getId()] != unmarkedValue;
+		return temporaryAttributes[(int) graphElement.getGlobalId()] != unmarkedValue;
 	}
 
 	/**
@@ -91,10 +91,10 @@ public abstract class LocalIntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 	 */
 	public int mark(T graphElement, int value) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		int out = temporaryAttributes[(int) graphElement.getId()];
-		temporaryAttributes[(int) graphElement.getId()] = value;
+		int out = temporaryAttributes[(int) graphElement.getGlobalId()];
+		temporaryAttributes[(int) graphElement.getGlobalId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -102,21 +102,21 @@ public abstract class LocalIntegerGraphMarker<T extends GraphElement<?, ?, ?>>
 
 	public int getMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		int out = temporaryAttributes[(int) graphElement.getId()];
+		int out = temporaryAttributes[(int) graphElement.getGlobalId()];
 		return out;
 	}
 
 	@Override
 	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (temporaryAttributes[(int) graphElement.getId()] == unmarkedValue) {
+		if (temporaryAttributes[(int) graphElement.getGlobalId()] == unmarkedValue) {
 			return false;
 		}
-		temporaryAttributes[(int) graphElement.getId()] = unmarkedValue;
+		temporaryAttributes[(int) graphElement.getGlobalId()] = unmarkedValue;
 		marked -= 1;
 		version++;
 		return true;

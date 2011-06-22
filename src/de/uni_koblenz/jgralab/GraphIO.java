@@ -67,6 +67,7 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.DiskImplementationBasicMethods;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
@@ -805,7 +806,7 @@ public class GraphIO {
 		}
 
 		space();
-		if (graph.getPartialGraphId() != GraphDatabaseBaseImpl.TOPLEVEL_PARTIAL_GRAPH_ID) {
+		if (graph.getPartialGraphId() != DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
 			write("PartialGraph ");
 			write(toUtfString(graph.getUniqueGraphId()));
 			write(" " + graph.getPartialGraphId() + " ");
@@ -818,7 +819,7 @@ public class GraphIO {
 			} else {
 				write(" EDGE ");
 			}
-			writeInteger(GraphDatabaseBaseImpl.convertToLocalId(e.getId()));
+			writeInteger(GraphDatabaseBaseImpl.convertToLocalId(e.getGlobalId()));
 		} else {
 			write("Graph ");	
 			write(toUtfString(graph.getUniqueGraphId()));
@@ -870,7 +871,7 @@ public class GraphIO {
 				nextV = nextV.getNextVertex(graph);
 				continue;
 			}
-			vId = nextV.getId();
+			vId = nextV.getGlobalId();
 			AttributedElementClass<?, ?> aec = nextV.getType();
 
 			Package currentPackage = aec.getPackage();
@@ -898,8 +899,8 @@ public class GraphIO {
 						continue;
 					}
 					if (!onlyLocalGraph
-							|| graph.isLocalElementId(nextI.getId())) {
-						writeLong(nextI.getId());
+							|| graph.isLocalElementId(nextI.getGlobalId())) {
+						writeLong(nextI.getGlobalId());
 					}
 				}
 				write(">");
@@ -933,10 +934,10 @@ public class GraphIO {
 			if (nextE.getLocalGraph() == graph) {
 				if (!nextE.isBinary()
 						|| (graph.isLocalElementId(((BinaryEdge) nextE)
-								.getAlpha().getId()) && graph
+								.getAlpha().getGlobalId()) && graph
 								.isLocalElementId(((BinaryEdge) nextE)
-										.getOmega().getId()))) {
-					eId = nextE.getId();
+										.getOmega().getGlobalId()))) {
+					eId = nextE.getGlobalId();
 					AttributedElementClass<?, ?> aec = nextE.getType();
 
 					Package currentPackage = aec.getPackage();
@@ -962,7 +963,7 @@ public class GraphIO {
 							continue;
 						}
 						if (!onlyLocalGraph
-								|| graph.isLocalElementId(i.getVertex().getId())) {
+								|| graph.isLocalElementId(i.getVertex().getGlobalId())) {
 							writeSpace();
 							write(++edgeIncidenceCounter + ":"
 									+ i.getType().getRolename());
@@ -998,7 +999,7 @@ public class GraphIO {
 	private void savePartialGraphs(Graph graph) throws IOException {
 		write("{");
 		for (Graph pgraph : graph.getPartialGraphs()) {
-			writeLong(pgraph.getGlobalSubgraphId());
+			writeLong(pgraph.getGlobalId());
 			write("-");
 			write(graph.getGraphDatabase().getHostname(
 					pgraph.getPartialGraphId()));
@@ -1021,10 +1022,10 @@ public class GraphIO {
 				.getContainingElement();
 		if (containingElement != null
 				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
-						.getId()))) {
+						.getGlobalId()))) {
 			write(" sigma=");
 			write((containingElement instanceof Vertex ? "v" : "e")
-					+ containingElement.getId());
+					+ containingElement.getGlobalId());
 		}
 
 		// write kappa
@@ -2880,7 +2881,7 @@ public class GraphIO {
 			server = JGraLabServerImpl.getLocalInstance();
 			readPartialGraphs(graph);
 			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-			if (graph.getPartialGraphId() == GraphDatabaseBaseImpl.TOPLEVEL_PARTIAL_GRAPH_ID) {
+			if (graph.getPartialGraphId() == DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
 				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
 						getLocalHostname());
 			} else {
@@ -2888,7 +2889,7 @@ public class GraphIO {
 						schema,
 						uniqueGraphId,
 						partialGraphHostnames.get(GraphDatabaseBaseImpl
-								.getPartialGraphId(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID)),
+								.getPartialGraphId(DiskImplementationBasicMethods.GLOBAL_GRAPH_ID)),
 						parentPartialGraphId,
 						/* TODO: kind of parent element */ parentEntityKind, partialGraphId);
 			}
@@ -3051,7 +3052,7 @@ public class GraphIO {
 		// sort lambda sequence at vertices
 		for (Vertex v : graph.getVertices()) {
 			Incidence firstUnsorted = v.getFirstIncidence();
-			for (Long incidenceId : incidencesAtVertex.get(v.getId())) {
+			for (Long incidenceId : incidencesAtVertex.get(v.getGlobalId())) {
 				if (incidenceId == null) {
 					continue;
 				}
@@ -3071,7 +3072,7 @@ public class GraphIO {
 		// sort lambda sequence at edges
 		for (Edge e : graph.getEdges()) {
 			Incidence firstUnsorted = e.getFirstIncidence();
-			for (Long incidenceId : incidencesAtEdge.get(e.getId())) {
+			for (Long incidenceId : incidencesAtEdge.get(e.getGlobalId())) {
 				if (incidenceId == null) {
 					continue;
 				}
@@ -3207,7 +3208,7 @@ public class GraphIO {
 
 	private void parseIncidences(Edge edge) throws GraphIOException {
 		int lambdaSeqPosAtEdge = 0;
-		long eId = edge.getId();
+		long eId = edge.getGlobalId();
 
 		match("<");
 		while (!lookAhead.equals(">")) {
@@ -3223,7 +3224,7 @@ public class GraphIO {
 	}
 
 	private void parseIncidencesAtVertex(Vertex v) throws GraphIOException {
-		long vId = v.getId();
+		long vId = v.getGlobalId();
 		int lambdaSeqPosAtVertex = 0;
 
 		match("<");

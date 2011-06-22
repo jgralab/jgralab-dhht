@@ -133,7 +133,7 @@ public abstract class SubordinateGraphImpl extends
 	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getType());
 		initializeCommonFields(containingVertex);
-		subgraphId = (int) containingVertex.getId();
+		subgraphId = (int) containingVertex.getGlobalId();
 		// System.out.println("Initialozing subordinate graph " + this);
 		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
 				&& ((GraphElementImpl<?, ?, ?>) current)
@@ -176,7 +176,7 @@ public abstract class SubordinateGraphImpl extends
 	 */
 	protected SubordinateGraphImpl(Edge containingEdge) {
 		super(containingEdge.getGraph().getType());
-		subgraphId = (int) (Integer.MAX_VALUE - containingEdge.getId());
+		subgraphId = (int) (Integer.MAX_VALUE - containingEdge.getGlobalId());
 		initializeCommonFields(containingEdge);
 
 		// initialize edges
@@ -357,8 +357,8 @@ public abstract class SubordinateGraphImpl extends
 			containingElement.getGraph().deleteVertex(v);
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getId()
-					+ " does not contain vertex " + v.getId() + ".");
+					+ getContainingElement().getGlobalId()
+					+ " does not contain vertex " + v.getGlobalId() + ".");
 		}
 	}
 
@@ -368,8 +368,8 @@ public abstract class SubordinateGraphImpl extends
 			containingElement.getGraph().deleteEdge(e);
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getId()
-					+ " does not contain edge " + e.getId() + ".");
+					+ getContainingElement().getGlobalId()
+					+ " does not contain edge " + e.getGlobalId() + ".");
 		}
 	}
 
@@ -659,13 +659,13 @@ public abstract class SubordinateGraphImpl extends
 
 
 	@Override
-	public long getGlobalSubgraphId() {
-		return getLocalSubgraphId();
+	public long getGlobalId() {
+		return getLocalId();
 	}
 
 
 	@Override
-	public int getLocalSubgraphId() {
+	public int getLocalId() {
 		return subgraphId;
 	}
 

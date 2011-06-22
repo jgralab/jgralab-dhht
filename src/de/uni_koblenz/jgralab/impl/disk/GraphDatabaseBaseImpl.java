@@ -38,23 +38,6 @@ public abstract class GraphDatabaseBaseImpl extends
 
 
 	
-	// the partial graph id of the toplevel graph, the lowest bit of the 
-	// high int is set
-	public static final int TOPLEVEL_PARTIAL_GRAPH_ID = 1;
-
-	// the local subgraph id of the toplevel graph if a partial one
-	public static final long TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
-	
-	// the global subgraph id of the toplevel dhhtgraph
-	public static final long GLOBAL_GRAPH_ID = 0x0000000100000001l;
-	
-	
-	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
-		long val = (TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
-		return val;
-	}
-	
-	
 	/**
 	 * Creates a new graph database to store all local subgraphs of the complete
 	 * graph identified by the given <code>uniqueGraphId</code>. All those local
@@ -119,7 +102,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	//for partial graph database
 	@Override
 	public int loadPartialGraph(String hostname) {
-		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(TOPLEVEL_PARTIAL_GRAPH_ID);
+		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(DiskImplementationBasicMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.loadPartialGraph(hostname);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
@@ -175,7 +158,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		List<Integer> value = new LinkedList<Integer>();
 		for (Integer pgId : data.partialGraphs) {
 			value.add(pgId);
-			value.addAll(getPartialGraphIds(getToplevelGraphForPartialGraphId(pgId)));
+			value.addAll(getPartialGraphIds(DiskImplementationBasicMethods.getToplevelGraphForPartialGraphId(pgId)));
 		}
 		return value;		
 	}
@@ -266,7 +249,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	public boolean containsVertex(Vertex vertex) {
-		return getVertexObject(vertex.getId()) == vertex;
+		return getVertexObject(vertex.getGlobalId()) == vertex;
 	}
 
 	public long createVertex(int vertexClassId) {
@@ -347,10 +330,10 @@ public abstract class GraphDatabaseBaseImpl extends
 							if ((omega != v)
 									&& containsVertex(omega)
 									&& !deleteVertexList
-											.contains(omega.getId())) {
-								deleteVertexList.add(omega.getId());
-								notifyEdgeDeleted(bedge.getId());
-								removeEdgeFromESeq(bedge.getId());
+											.contains(omega.getGlobalId())) {
+								deleteVertexList.add(omega.getGlobalId());
+								notifyEdgeDeleted(bedge.getGlobalId());
+								removeEdgeFromESeq(bedge.getGlobalId());
 								deleteEdge = true;
 							}
 						}
@@ -360,10 +343,10 @@ public abstract class GraphDatabaseBaseImpl extends
 							if ((alpha != v)
 									&& containsVertex(alpha)
 									&& !deleteVertexList
-											.contains(alpha.getId())) {
-								deleteVertexList.add(alpha.getId());
-								notifyEdgeDeleted(bedge.getId());
-								removeEdgeFromESeq(bedge.getId());
+											.contains(alpha.getGlobalId())) {
+								deleteVertexList.add(alpha.getGlobalId());
+								notifyEdgeDeleted(bedge.getGlobalId());
+								removeEdgeFromESeq(bedge.getGlobalId());
 								deleteEdge = true;
 							}
 						}
@@ -372,12 +355,12 @@ public abstract class GraphDatabaseBaseImpl extends
 				edgeHasBeenDeleted |= deleteEdge;
 				if (!deleteEdge) {
 					edges.add(edge);
-					removeIncidenceFromLambdaSeqOfEdge(inc.getId());
+					removeIncidenceFromLambdaSeqOfEdge(inc.getGlobalId());
 				}
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeImpl edge : edges) {
-				incidenceListOfEdgeModified(edge.getId());
+				incidenceListOfEdgeModified(edge.getGlobalId());
 			}
 			removeVertexFromVSeq(vertexId);
 		}
@@ -459,7 +442,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		assert (movedVertex != null) && movedVertex.isValid()
 				&& containsVertex(movedVertex);
 		assert targetVertex != movedVertex;
-		putVertexBefore(targetVertex.getId(), movedVertex.getId());
+		putVertexBefore(targetVertex.getGlobalId(), movedVertex.getGlobalId());
 
 	}
 
@@ -611,7 +594,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	boolean containsEdge(Edge edge) {
-		return getEdgeObject(edge.getId()) == edge;
+		return getEdgeObject(edge.getGlobalId()) == edge;
 	}
 
 	/**
@@ -705,11 +688,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		Set<Vertex> vertices = new HashSet<Vertex>();
 		while (inc != null) {
 			vertices.add(inc.getVertex());
-			removeIncidenceFromLambdaSeqOfVertex(inc.getId());
+			removeIncidenceFromLambdaSeqOfVertex(inc.getGlobalId());
 			inc = e.getFirstIncidence();
 		}
 		for (Vertex vertex : vertices) {
-			incidenceListOfVertexModified(vertex.getId());
+			incidenceListOfVertexModified(vertex.getGlobalId());
 		}
 
 		removeEdgeFromESeq(edgeId);
@@ -786,7 +769,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		assert (movedEdge != null) && movedEdge.isValid()
 				&& containsEdge(movedEdge);
 		assert targetEdge != movedEdge;
-		putEdgeBefore(targetEdge.getId(), movedEdge.getId());
+		putEdgeBefore(targetEdge.getGlobalId(), movedEdge.getGlobalId());
 
 	}
 

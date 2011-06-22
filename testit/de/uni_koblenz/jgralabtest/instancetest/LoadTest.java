@@ -404,7 +404,7 @@ public class LoadTest extends InstanceTest {
 			if (v2 == null) {
 				fail();
 			}
-			assertEquals(v1.getId(), v2.getId());
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
 			assertEquals(v1.getMetaClass().getQualifiedName(), v2
 					.getMetaClass().getQualifiedName());
 			v1 = v1.getNextVertex();
@@ -422,7 +422,7 @@ public class LoadTest extends InstanceTest {
 			if (v2 == null) {
 				fail();
 			}
-			assertEquals(v1.getId(), v2.getId());
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
 			assertEquals(v1.getMetaClass().getQualifiedName(), v2
 					.getMetaClass().getQualifiedName());
 			v1 = v1.getNextEdge();
@@ -456,7 +456,7 @@ public class LoadTest extends InstanceTest {
 		for (int i = 1; i < g1.getVCount(); i += 7) {
 			Vertex v1 = g1.getVertex(i);
 			Vertex v2 = g2.getVertex(i);
-			assertEquals(v1.getId(), v2.getId());
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
 			assertEquals(v1.getMetaClass().getQualifiedName(), v2
 					.getMetaClass().getQualifiedName());
 			v1.delete();

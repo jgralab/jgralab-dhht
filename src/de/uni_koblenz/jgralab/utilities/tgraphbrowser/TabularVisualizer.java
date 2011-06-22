@@ -214,7 +214,7 @@ public class TabularVisualizer {
 			for (int i = 0; i < (isVertex ? state.verticesOfTableView
 					: state.edgesOfTableView).length; i++) {
 				if ((isVertex ? state.verticesOfTableView
-						: state.edgesOfTableView)[i].getId() == idOfElement) {
+						: state.edgesOfTableView)[i].getGlobalId() == idOfElement) {
 					positionOfElementInArray = i;
 					break;
 				}
@@ -361,20 +361,20 @@ public class TabularVisualizer {
 			code.append("var currentTr = document.createElement(\"tr\");\n");
 			code.append("currentTr.id = \"tr").append(
 					currentElement instanceof Vertex ? "v" : "e").append(
-					currentElement.getId()).append("\";\n");
+					currentElement.getGlobalId()).append("\";\n");
 			code.append("table").append(typeInfix).append(
 					".appendChild(currentTr);\n");
 			// create identifier td
 			createCell(code, false, createElement(currentElement), false);
 			code.append("currentTd.onclick = function(){\nclickOnElement(\"")
 					.append(currentElement instanceof Vertex ? "v" : "e")
-					.append(currentElement.getId()).append("\");\n}\n");
+					.append(currentElement.getGlobalId()).append("\");\n}\n");
 			// create jumpTo
 			if (createLinks) {
 				code.append("var anker = document.createElement(\"a\");\n");
 				code.append("anker.id = \"").append(
 						currentElement instanceof Vertex ? "v" : "e").append(
-						currentElement.getId()).append("\";\n");
+						currentElement.getGlobalId()).append("\";\n");
 				code.append("currentTd.appendChild(anker);\n");
 			}
 			if (!showAttributes) {
@@ -391,7 +391,7 @@ public class TabularVisualizer {
 			createCell(code, false, "", true);
 			if (currentElement instanceof Vertex) {
 				code.append("currentTd.id = \"td").append("v").append(
-						currentElement.getId()).append("\";\n");
+						currentElement.getGlobalId()).append("\";\n");
 				createIncidentEdges(code, (Vertex) currentElement,
 						selectedEdgeClasses, selectedVertexClasses, 1, null);
 			} else {
@@ -413,7 +413,7 @@ public class TabularVisualizer {
 	 */
 	private String createElement(GraphElement currentElement) {
 		return currentElement.getMetaClass().getUniqueName()
-				+ "<sub>" + Math.abs(currentElement.getId()) + "</sub>";
+				+ "<sub>" + Math.abs(currentElement.getGlobalId()) + "</sub>";
 	}
 
 	/**
@@ -538,7 +538,7 @@ public class TabularVisualizer {
 					code.append("currentTd.appendChild(text);\n");
 					code.append("var aE = document.createElement(\"a\");\n");
 					code.append("aE.href = \"javascript:showElement('e")
-							.append(Math.abs(e.getId())).append("');\";\n");
+							.append(Math.abs(e.getGlobalId())).append("');\";\n");
 					code.append("aE.innerHTML = \"").append(createElement(e))
 							.append("\";\n");
 					createAttributes(code, e.getNormalEdge(), true, "aE");
@@ -578,7 +578,7 @@ public class TabularVisualizer {
 					/ NUMBER_OF_INCIDENCES_PER_PAGE
 					+ (numberOfEdges % NUMBER_OF_INCIDENCES_PER_PAGE == 0 ? 0
 							: 1);
-			createNavigationThroughPages(code, "v" + currentVertex.getId(),
+			createNavigationThroughPages(code, "v" + currentVertex.getGlobalId(),
 					numberOfPages, displayedPage, false);
 		}
 	}

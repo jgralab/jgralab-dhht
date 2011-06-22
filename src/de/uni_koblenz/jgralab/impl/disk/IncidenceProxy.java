@@ -70,25 +70,25 @@ public abstract class IncidenceProxy implements Incidence {
 	
 	void setNextIncidenceAtVertex(Incidence nextIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setNextIncidenceIdAtVertexId(id, nextIncidenceAtVertex.getId());
+				.setNextIncidenceIdAtVertexId(id, nextIncidenceAtVertex.getGlobalId());
 	}
 
 	void setPreviousIncidenceAtVertex(
 			IncidenceProxy previousIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setPreviousIncidenceIdAtVertexId(id,
-						previousIncidenceAtVertex.getId());
+						previousIncidenceAtVertex.getGlobalId());
 	}
 
 	void setNextIncidenceAtEdge(IncidenceProxy nextIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setNextIncidenceIdAtEdgeId(id, nextIncidenceAtEdge.getId());
+				.setNextIncidenceIdAtEdgeId(id, nextIncidenceAtEdge.getGlobalId());
 	}
 
 	void setPreviousIncidenceAtEdge(IncidenceProxy previousIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
 				.setPreviousIncidenceIdAtEdgeId(id,
-						previousIncidenceAtEdge.getId());
+						previousIncidenceAtEdge.getGlobalId());
 	}
 
 
@@ -243,33 +243,33 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public void putAfterAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getId());
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getGlobalId());
 	}
 
 	@Override
 	public void putBeforeAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getId());
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getGlobalId());
 	}
 
 	@Override
 	public void putAfterAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getId());
+		storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getGlobalId());
 	}
 
 	@Override
 	public void putBeforeAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getId());
+		storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getGlobalId());
 	}
 
 	@Override
-	public long getId() {
+	public long getGlobalId() {
 		return id;
 	}
 
 	@Override
 	public int compareTo(Incidence i) {
 		assert getGraph() == i.getGraph();
-		return (int) (getId() - i.getId());
+		return (int) (getGlobalId() - i.getGlobalId());
 	}
 
 	@Override

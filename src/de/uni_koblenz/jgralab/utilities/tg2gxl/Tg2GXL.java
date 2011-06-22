@@ -194,7 +194,7 @@ public class Tg2GXL extends Tg2Whatever {
 				out.println("<node id=\"" + v.getAttribute("qualifiedName")
 						+ "\">");
 			} else {
-				out.println("<node id=\"v:" + v.getId() + "\">");
+				out.println("<node id=\"v:" + v.getGlobalId() + "\">");
 			}
 			out.println("<type xlink:href=\"" + gxlMetaSchema + "#"
 					+ grUML2GXL.get(elemClass.getQualifiedName())
@@ -207,7 +207,7 @@ public class Tg2GXL extends Tg2Whatever {
 		}
 
 		else if (!printSchema) {
-			out.println("<node id=\"v:" + v.getId() + "\">");
+			out.println("<node id=\"v:" + v.getGlobalId() + "\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ elemClass.getQualifiedName()
 					+ "\" xlink:type=\" simple\"/>");
@@ -269,7 +269,7 @@ public class Tg2GXL extends Tg2Whatever {
 						.getThat()).get_qualifiedName();
 			}
 
-			out.println("<edge id=\"e:" + e.getId() + "\" to=\"" + thatVertex
+			out.println("<edge id=\"e:" + e.getGlobalId() + "\" to=\"" + thatVertex
 					+ "\" from=\"" + thisVertex + "\">");
 			out.println("<type xlink:href=\"" + gxlMetaSchema + "#"
 					+ grUML2GXL.get(elemClass.getQualifiedName())
@@ -283,7 +283,7 @@ public class Tg2GXL extends Tg2Whatever {
 		} else if (!printSchema) {
 			int toOrder = getEdgeIncidence(e.getReversedEdge(), e.getThat());
 			int fromOrder = getEdgeIncidence(e, e.getThis());
-			out.println("<edge id=\"e:" + e.getId() + "\" to=\"v:"
+			out.println("<edge id=\"e:" + e.getGlobalId() + "\" to=\"v:"
 					+ e.getThat().getCompleteGraphUid() + "\" from=\"v:"
 					+ e.getThis().getCompleteGraphUid() + "\" toorder=\" " + toOrder
 					+ "\" fromorder=\" " + fromOrder + "\">");

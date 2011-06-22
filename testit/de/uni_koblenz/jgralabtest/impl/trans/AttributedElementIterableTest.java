@@ -101,7 +101,7 @@ public class AttributedElementIterableTest {
 			Iterable<Vertex> vertices = motorwayMap.vertices();
 			assertTrue(vertices instanceof AttributedElementIterable<?>);
 			for (Vertex vertex : vertices) {
-				vertex.getId();
+				vertex.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -119,7 +119,7 @@ public class AttributedElementIterableTest {
 			assertTrue(vertices instanceof AttributedElementIterable<?>);
 			for (Vertex vertex : vertices) {
 				motorwayMap.getVertexObject(N).delete();
-				vertex.getId();
+				vertex.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {
@@ -165,7 +165,7 @@ public class AttributedElementIterableTest {
 			Iterable<Edge> edges = motorwayMap.edges();
 			assertTrue(edges instanceof AttributedElementIterable<?>);
 			for (Edge edge : edges) {
-				edge.getId();
+				edge.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -183,7 +183,7 @@ public class AttributedElementIterableTest {
 			assertTrue(edges instanceof AttributedElementIterable<?>);
 			for (Edge edge : edges) {
 				motorwayMap.getEdgeObject(N).delete();
-				edge.getId();
+				edge.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {
@@ -231,7 +231,7 @@ public class AttributedElementIterableTest {
 			Iterable<Edge> incidences = motorwayMap.getVertexObject(1).incidences();
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
-				edge.getId();
+				edge.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -251,7 +251,7 @@ public class AttributedElementIterableTest {
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
 				v1.getLastIncidence().delete();
-				edge.getId();
+				edge.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {

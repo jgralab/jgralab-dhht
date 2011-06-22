@@ -39,7 +39,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 	
 	@Override
 	public void edgeDeleted(Edge e) {
-		long elementId = e.getId();
+		long elementId = e.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker != null)
@@ -48,7 +48,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 	
 	@Override
 	public void vertexDeleted(Vertex v) {
-		long elementId = v.getId();
+		long elementId = v.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker != null)
@@ -58,7 +58,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 
 	@Override
 	public boolean isMarked(T graphElement) {
-		long elementId = graphElement.getId();
+		long elementId = graphElement.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker == null)
@@ -68,7 +68,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 
 	@Override
 	public boolean removeMark(T graphElement) {
-		long elementId = graphElement.getId();
+		long elementId = graphElement.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker == null)
@@ -111,7 +111,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends
 	
 	
 	protected GraphMarker<T> getOrCreateMarkerForPartialGraph(T graphElement) {
-		long elementId = graphElement.getId();
+		long elementId = graphElement.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
 		if (localMarker == null) {

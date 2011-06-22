@@ -119,7 +119,7 @@ public class Tg2Dot extends Tg2Whatever {
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
 		VertexClass cls = v.getType();
-		out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
+		out.print("v" + v.getGlobalId() + " [label=\"{{v" + v.getGlobalId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
 		if (cls.getAttributeCount() > 0) {
 			out.print("|");
@@ -131,7 +131,7 @@ public class Tg2Dot extends Tg2Whatever {
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
 		EdgeClass cls = e.getType();
-		out.print("e" + e.getId() + " [label=\"{{e" + e.getId() + "|"
+		out.print("e" + e.getGlobalId() + " [label=\"{{e" + e.getGlobalId() + "|"
 				+ cls.getUniqueName().replace('$', '.') + "}");
 		if (cls.getAttributeCount() > 0) {
 			out.print("|");
@@ -238,7 +238,7 @@ public class Tg2Dot extends Tg2Whatever {
 			end = i.getEdge();
 		}
 		
-		out.print(startLabel + start.getId() + " -> " + endLabel + end.getId() + " [");
+		out.print(startLabel + start.getGlobalId() + " -> " + endLabel + end.getGlobalId() + " [");
 
 		IncidenceClass cls = (IncidenceClass) i.getType();
 		if (roleNames) {

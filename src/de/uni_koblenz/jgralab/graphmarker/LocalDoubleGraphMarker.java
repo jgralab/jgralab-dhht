@@ -70,9 +70,9 @@ public abstract class LocalDoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 	@Override
 	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return !Double.isNaN(temporaryAttributes[(int) graphElement.getId()]);
+		return !Double.isNaN(temporaryAttributes[(int) graphElement.getGlobalId()]);
 	}
 
 	/**
@@ -87,10 +87,10 @@ public abstract class LocalDoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 	 */
 	public double mark(T graphElement, double value) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		double out = temporaryAttributes[(int) graphElement.getId()];
-		temporaryAttributes[(int) graphElement.getId()] = value;
+		double out = temporaryAttributes[(int) graphElement.getGlobalId()];
+		temporaryAttributes[(int) graphElement.getGlobalId()] = value;
 		marked += 1;
 		version++;
 		return out;
@@ -98,21 +98,21 @@ public abstract class LocalDoubleGraphMarker<T extends GraphElement<?, ?, ?>>
 
 	public double getMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		double out = temporaryAttributes[(int) graphElement.getId()];
+		double out = temporaryAttributes[(int) graphElement.getGlobalId()];
 		return out;
 	}
 
 	@Override
 	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		if (Double.isNaN(temporaryAttributes[(int) graphElement.getId()])) {
+		if (Double.isNaN(temporaryAttributes[(int) graphElement.getGlobalId()])) {
 			return false;
 		}
-		temporaryAttributes[(int) graphElement.getId()] = Double.NaN;
+		temporaryAttributes[(int) graphElement.getGlobalId()] = Double.NaN;
 		marked -= 1;
 		version++;
 		return true;

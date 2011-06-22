@@ -164,38 +164,38 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		return (e != null) && (e.getId() > 0)
-				&& (localGraphDatabase.getEdgeObject(e.getId()) == e);
+		return (e != null) && (e.getGlobalId() > 0)
+				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
 	}
 
 	@Override
 	public boolean containsEdgeLocally(Edge e) {
 		return (e != null) && (e.getGraph() == this)
-				&& (localGraphDatabase.getEdgeObject(e.getId()) == e);
+				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
 	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {
-		return (v != null) && (v.getId() > 0)
-				&& (localGraphDatabase.getVertexObject(v.getId()) == v);
+		return (v != null) && (v.getGlobalId() > 0)
+				&& (localGraphDatabase.getVertexObject(v.getGlobalId()) == v);
 	}
 
 	@Override
 	public boolean containsVertexLocally(Vertex v) {
 		return (v != null) && (v.getGraph() == this)
-				&& (localGraphDatabase.getVertexObject(v.getId()) == v);
+				&& (localGraphDatabase.getVertexObject(v.getGlobalId()) == v);
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e.getId());
+		storingGraphDatabase.deleteEdge(e.getGlobalId());
 	}
 
 	@Override
 	public void deleteVertex(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
-		storingGraphDatabase.deleteVertex(v.getId());
+		storingGraphDatabase.deleteVertex(v.getGlobalId());
 	}
 
 	@Override
@@ -256,7 +256,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
 		storingGraphDatabase
-				.putEdgeAfter(targetEdge.getId(), movedEdge.getId());
+				.putEdgeAfter(targetEdge.getGlobalId(), movedEdge.getGlobalId());
 	}
 
 	/**
@@ -269,8 +269,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 *            the edge to be moved
 	 */
 	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeBefore(targetEdge.getId(),
-				movedEdge.getId());
+		storingGraphDatabase.putEdgeBefore(targetEdge.getGlobalId(),
+				movedEdge.getGlobalId());
 	}
 
 	/**
@@ -284,8 +284,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexAfterInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexAfter(targetVertex.getId(),
-				movedVertex.getId());
+		storingGraphDatabase.putVertexAfter(targetVertex.getGlobalId(),
+				movedVertex.getGlobalId());
 	}
 
 	/**
@@ -299,8 +299,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
 			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexBefore(targetVertex.getId(),
-				movedVertex.getId());
+		storingGraphDatabase.putVertexBefore(targetVertex.getGlobalId(),
+				movedVertex.getGlobalId());
 	}
 
 	// ==============================================================

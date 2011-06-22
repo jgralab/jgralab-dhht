@@ -215,7 +215,7 @@ public class BenchmarkTests {
 	private void internalIterateVertices() {
 		progressFunction.init(1000);
 		for (Vertex v : motorwayMap.vertices()) {
-			v.getId();
+			v.getGlobalId();
 			for (Edge edge : v.incidences()) {
 				edge.getAlpha();
 				edge.getOmega();

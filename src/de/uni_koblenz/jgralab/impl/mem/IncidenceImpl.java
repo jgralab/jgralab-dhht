@@ -478,14 +478,14 @@ public abstract class IncidenceImpl implements Incidence {
 	protected int id;
 
 	@Override
-	public long getId() {
+	public long getGlobalId() {
 		return id;
 	}
 
 	@Override
 	public int compareTo(Incidence i) {
 		assert getGraph() == i.getGraph();
-		return ((int) getId()) - ((int) i.getId());
+		return ((int) getGlobalId()) - ((int) i.getGlobalId());
 	}
 
 	@Override

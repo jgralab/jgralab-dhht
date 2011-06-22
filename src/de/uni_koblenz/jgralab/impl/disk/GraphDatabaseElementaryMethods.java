@@ -737,14 +737,6 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	
 	
 	
-
-
-	
-	
-	
-	
-	
-
 	protected boolean containsIncidenceId(long iId) {
 		return getIncidenceObject(iId) != null;
 	}

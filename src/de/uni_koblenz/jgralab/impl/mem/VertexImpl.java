@@ -779,7 +779,7 @@ public abstract class VertexImpl extends
 	public int compareTo(Vertex v) {
 			assert isValid() && v.isValid();
 			assert getGraph() == v.getGraph();
-			return (int) (getId() - v.getId());
+			return (int) (getGlobalId() - v.getGlobalId());
 	}
 
 	@Override

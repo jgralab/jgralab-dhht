@@ -232,7 +232,7 @@ public class IncidenceListTest extends InstanceTest {
 	private String getISeq(Vertex v) {
 		StringBuilder sb = new StringBuilder();
 		for (Edge e : v.incidences()) {
-			sb.append('e').append(e.getId()).append(' ');
+			sb.append('e').append(e.getGlobalId()).append(' ');
 		}
 		return sb.toString().trim();
 	}

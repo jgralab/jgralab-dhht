@@ -156,7 +156,7 @@ public class EdgeTest extends InstanceTest {
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertEquals(1, e0.getId());
+		assertEquals(1, e0.getGlobalId());
 		commit(g);
 
 		createTransaction(g);
@@ -164,7 +164,7 @@ public class EdgeTest extends InstanceTest {
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertEquals(2, e1.getId());
+		assertEquals(2, e1.getGlobalId());
 		commit(g);
 
 		createTransaction(g);
@@ -176,7 +176,7 @@ public class EdgeTest extends InstanceTest {
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertEquals(1, e0.getId());
+		assertEquals(1, e0.getGlobalId());
 		commit(g);
 
 		createTransaction(g);
@@ -184,7 +184,7 @@ public class EdgeTest extends InstanceTest {
 		commit(g);
 
 		createReadOnlyTransaction(g);
-		assertEquals(3, e0.getId());
+		assertEquals(3, e0.getGlobalId());
 		commit(g);
 	}
 

@@ -47,7 +47,7 @@ public class HypergraphSearchAlgorithmOptimized {
 			
 			while (!buffer.isEmpty()) {
 				Vertex currentVertex = buffer.get();    
-				if (currentVertex.getId() == 77)
+				if (currentVertex.getGlobalId() == 77)
 					handlingsOf77++;
 				if (handlingsOf77 > 1) {
 					System.out.println("Handling vertex " + currentVertex + " twice");	
@@ -57,17 +57,17 @@ public class HypergraphSearchAlgorithmOptimized {
 				Incidence curIncAtVertex = currentVertex.getFirstIncidence(Direction.BOTH);
 				while (curIncAtVertex != null) {
 					Edge currentEdge = curIncAtVertex.getEdge();
-					if (parentEdgeInc[(int) currentEdge.getId()]==0) { 
+					if (parentEdgeInc[(int) currentEdge.getGlobalId()]==0) { 
 						handleEdge(currentEdge);
-						parentEdgeInc[(int) currentEdge.getId()] = (int) curIncAtVertex.getId();     
+						parentEdgeInc[(int) currentEdge.getGlobalId()] = (int) curIncAtVertex.getGlobalId();     
 						handleTreeIncidence(curIncAtVertex); 
 						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
 						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
 						while (curIncAtEdge != null) {
 						//	System.out.println("Handling incidence at edge " + curIncAtEdge);
 							Vertex omega = curIncAtEdge.getVertex();
-							if ((parentVertexInc[(int) omega.getId()]==0) && (omega!=startVertex)) {
-								parentVertexInc[(int) omega.getId()]= (int) curIncAtEdge.getId();
+							if ((parentVertexInc[(int) omega.getGlobalId()]==0) && (omega!=startVertex)) {
+								parentVertexInc[(int) omega.getGlobalId()]= (int) curIncAtEdge.getGlobalId();
 								handleVertex(omega);
 								handleTreeIncidence(curIncAtEdge);
 								buffer.add(omega);

@@ -232,22 +232,22 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public void deleteVertex(Vertex v) {
 		if (containsVertex(v)) {
-			storingGraphDatabase.deleteVertex(v.getId());
+			storingGraphDatabase.deleteVertex(v.getGlobalId());
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getId()
-					+ " does not contain vertex " + v.getId() + ".");
+					+ getContainingElement().getGlobalId()
+					+ " does not contain vertex " + v.getGlobalId() + ".");
 		}
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
-			storingGraphDatabase.deleteEdge(e.getId());
+			storingGraphDatabase.deleteEdge(e.getGlobalId());
 		} else {
 			throw new GraphException("The subordinate graph of "
-					+ getContainingElement().getId()
-					+ " does not contain edge " + e.getId() + ".");
+					+ getContainingElement().getGlobalId()
+					+ " does not contain edge " + e.getGlobalId() + ".");
 		}
 	}
 

@@ -128,7 +128,7 @@ public class EdgeListTest extends InstanceTest {
 	private String getESeq() {
 		StringBuilder sb = new StringBuilder();
 		for (Edge e : g.edges()) {
-			sb.append('e').append(e.getId()).append(' ');
+			sb.append('e').append(e.getGlobalId()).append(' ');
 		}
 		return sb.toString().trim();
 	}
@@ -361,14 +361,14 @@ public class EdgeListTest extends InstanceTest {
 
 		int i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getCompleteGraphUid());
+			assertEquals(currentEdge.getGlobalId(), links[i++].getCompleteGraphUid());
 		}
 
 		Comparator<Edge> comp = new Comparator<Edge>() {
 
 			@Override
 			public int compare(Edge o1, Edge o2) {
-				return Double.compare(o2.getId(), o1.getId());
+				return Double.compare(o2.getGlobalId(), o1.getGlobalId());
 			}
 
 		};
@@ -377,14 +377,14 @@ public class EdgeListTest extends InstanceTest {
 
 		i = EDGE_COUNT;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i--].getCompleteGraphUid());
+			assertEquals(currentEdge.getGlobalId(), links[i--].getCompleteGraphUid());
 		}
 
 		comp = new Comparator<Edge>() {
 
 			@Override
 			public int compare(Edge o1, Edge o2) {
-				return Double.compare(o1.getId(), o2.getId());
+				return Double.compare(o1.getGlobalId(), o2.getGlobalId());
 			}
 
 		};
@@ -393,7 +393,7 @@ public class EdgeListTest extends InstanceTest {
 
 		i = 1;
 		for (Edge currentEdge : g.edges()) {
-			assertEquals(currentEdge.getId(), links[i++].getCompleteGraphUid());
+			assertEquals(currentEdge.getGlobalId(), links[i++].getCompleteGraphUid());
 		}
 		commit(g);
 

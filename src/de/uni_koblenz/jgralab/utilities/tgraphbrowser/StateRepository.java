@@ -305,7 +305,7 @@ public class StateRepository {
 						new TabularVisualizer().visualizeElements(code, state,
 								numberPerPage, showAttributes, (element
 										.isVertex() ? "v" : "e")
-										+ ge.getId(), true, true);
+										+ ge.getGlobalId(), true, true);
 					} else {
 						new TwoDVisualizer().visualizeElements(code, state,
 								sessionId, workspace.toString(), element,
@@ -354,7 +354,7 @@ public class StateRepository {
 							showAttributes,
 							"v"
 									+ (state.verticesOfTableView != null ? state.verticesOfTableView[0]
-											.getId()
+											.getGlobalId()
 											: ""), false, false);
 			tv
 					.visualizeElements(
@@ -365,7 +365,7 @@ public class StateRepository {
 							"e"
 									+ ((state.edgesOfTableView != null)
 											&& (state.edgesOfTableView.length > 0) ? state.edgesOfTableView[0]
-											.getId()
+											.getGlobalId()
 											: ""), false, false);
 			if (state.verticesOfTableView != null) {
 				showCorrectTable(code, new JValueImpl(
@@ -482,7 +482,7 @@ public class StateRepository {
 					Vertex current = state.navigationHistory.get(currentIndex)
 							.toVertex();
 					tv.visualizeElements(code, state, numberPerPage,
-							showAttributes, "v" + current.getId(), true, true);
+							showAttributes, "v" + current.getGlobalId(), true, true);
 					// find latest edge
 					Edge latestEdge = null;
 					for (int i = state.navigationHistory.size() - 1; i >= 0; i--) {
@@ -496,7 +496,7 @@ public class StateRepository {
 						latestEdge = state.getGraph().getFirstEdge();
 					}
 					tv.visualizeElements(code, state, 20, false, "e"
-							+ (latestEdge != null ? latestEdge.getId() : ""),
+							+ (latestEdge != null ? latestEdge.getGlobalId() : ""),
 							false, true);
 					code
 							.append("document.getElementById(\"h3HowManyVertices\").style.display = \"block\";\n");
@@ -509,7 +509,7 @@ public class StateRepository {
 					Edge current = state.navigationHistory.get(currentIndex)
 							.toEdge();
 					tv.visualizeElements(code, state, numberPerPage,
-							showAttributes, "e" + current.getId(), true, true);
+							showAttributes, "e" + current.getGlobalId(), true, true);
 					// find latest vertex
 					Vertex latestVertex = null;
 					for (int i = state.navigationHistory.size() - 1; i >= 0; i--) {
@@ -522,7 +522,7 @@ public class StateRepository {
 					tv.visualizeElements(code, state, 20, false,
 							"v"
 									+ (latestVertex != null ? latestVertex
-											.getId() : ""), false, true);
+											.getGlobalId() : ""), false, true);
 					code
 							.append("document.getElementById(\"h3HowManyEdges\").style.display = \"block\";\n");
 					code
@@ -540,7 +540,7 @@ public class StateRepository {
 									showAttributes,
 									"v"
 											+ (state.verticesOfTableView != null ? state.verticesOfTableView[0]
-													.getId()
+													.getGlobalId()
 													: ""), false, false);
 					tv
 							.visualizeElements(
@@ -551,7 +551,7 @@ public class StateRepository {
 									"e"
 											+ ((state.edgesOfTableView != null)
 													&& (state.edgesOfTableView.length > 0) ? state.edgesOfTableView[0]
-													.getId()
+													.getGlobalId()
 													: ""), false, false);
 					if (state.verticesOfTableView != null) {
 						showCorrectTable(code, new JValueImpl(
@@ -652,11 +652,11 @@ public class StateRepository {
 						state.currentExplicitlyDefinedSet);
 				curVertex = "v"
 						+ (state.verticesOfTableView != null ? state.verticesOfTableView[0]
-								.getId()
+								.getGlobalId()
 								: "");
 				curEdge = "e"
 						+ (state.edgesOfTableView != null ? state.edgesOfTableView[0]
-								.getId()
+								.getGlobalId()
 								: "");
 			} else {
 				new TabularVisualizer().calculateVertexListAndEdgeList(state);
@@ -753,14 +753,14 @@ public class StateRepository {
 									showAttributes,
 									!isVertex ? "v"
 											+ state.getGraph().getFirstVertex()
-													.getId()
+													.getGlobalId()
 											: "e"
 													+ (state
 															.getGraph()
 															.getFirstEdge() != null ? state
 															.getGraph()
 															.getFirstEdge()
-															.getId()
+															.getGlobalId()
 															: ""), true,
 									state.currentExplicitlyDefinedSet == null);
 				}
@@ -838,7 +838,7 @@ public class StateRepository {
 			String elementId = (showVertices ? "v" : "e")
 					+ (showVertices ? state.verticesOfTableView
 							: state.edgesOfTableView)[(numberPerPage == -1 ? 0
-							: (pageNumber - 1) * numberPerPage)].getId();
+							: (pageNumber - 1) * numberPerPage)].getGlobalId();
 			new TabularVisualizer().visualizeElements(code, state,
 					numberPerPage, showAttributes, elementId, false,
 					state.currentExplicitlyDefinedSet == null);
@@ -888,13 +888,13 @@ public class StateRepository {
 								showAttributes,
 								elementId.charAt(0) == 'e' ? "v"
 										+ state.getGraph().getFirstVertex()
-												.getId()
+												.getGlobalId()
 										: "e"
 												+ (state.getGraph()
 														.getFirstEdge() != null ? state
 														.getGraph()
 														.getFirstEdge()
-														.getId()
+														.getGlobalId()
 														: ""), true,
 								isAJValueSetShown);
 			}
@@ -996,14 +996,14 @@ public class StateRepository {
 			TabularVisualizer tv = new TabularVisualizer();
 			tv.calculateVertexListAndEdgeList(state);
 			tv.visualizeElements(code, state, 20, false, "v"
-					+ (firstVertex != null ? firstVertex.getId() : ""), false,
+					+ (firstVertex != null ? firstVertex.getGlobalId() : ""), false,
 					state.currentExplicitlyDefinedSet == null);
 			code.append("changeBackgroundColor(\"v").append(
-					firstVertex != null ? firstVertex.getId() : "").append(
+					firstVertex != null ? firstVertex.getGlobalId() : "").append(
 					"\");\n");
 			tv.visualizeElements(code, state, 20, false, "e"
 					+ (state.getGraph().getFirstEdge() != null ? state
-							.getGraph().getFirstEdge().getId() : ""),
+							.getGraph().getFirstEdge().getGlobalId() : ""),
 					false, state.currentExplicitlyDefinedSet == null);
 			code.append("timestamp = ").append(state.lastAccess).append(";\n");
 			code.append("resize();\n");

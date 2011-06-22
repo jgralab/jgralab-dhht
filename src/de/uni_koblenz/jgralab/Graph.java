@@ -221,19 +221,14 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public String getUniqueGraphId();
 	
-	
-	/**
-	 * @return the global id of this subgraph unique in the complete graph and
-	 *          consisting of 12 bit for the partial graph id and 20 bit of the
-	 *          subordinate graph id inside this partial graph 
-	 */
-	public long getGlobalSubgraphId();
+
+	public long getGlobalId();
 	
 	
 	/**
 	 * @return the local id of this subgraph unique in the local partial graph
 	 */
-	public int getLocalSubgraphId();
+	public int getLocalId();
 	
 	
 	/**

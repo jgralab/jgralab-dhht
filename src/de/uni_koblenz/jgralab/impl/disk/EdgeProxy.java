@@ -92,7 +92,7 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final long getId() {
+	public final long getGlobalId() {
 		return -elementId;
 	}
 
@@ -121,7 +121,7 @@ public abstract class EdgeProxy extends
 	 */
 	protected final void setNextEdge(Edge nextEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase).setNextEdgeId(elementId,
-				nextEdge.getId());
+				nextEdge.getGlobalId());
 	}
 
 	/**
@@ -134,7 +134,7 @@ public abstract class EdgeProxy extends
 	 */
 	protected final void setPreviousEdge(Edge prevEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase).setPreviousEdgeId(
-				elementId, prevEdge.getId());
+				elementId, prevEdge.getGlobalId());
 	}
 
 	@Override
@@ -283,7 +283,7 @@ public abstract class EdgeProxy extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeAfter(e.getId(), this.getId());
+		storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
 	}
 
 	@Override
@@ -294,7 +294,7 @@ public abstract class EdgeProxy extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeBefore(e.getId(), this.getId());
+		storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
 	}
 
 	/* ***********************************************************
@@ -671,7 +671,7 @@ public abstract class EdgeProxy extends
 			Vertex elemToConnect) {
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
 				.connect(getSchema().getClassId(incidenceClass),
-						elemToConnect.getId(), this.getId()));
+						elemToConnect.getGlobalId(), this.getGlobalId()));
 	}
 
 	@Override
@@ -1109,7 +1109,7 @@ public abstract class EdgeProxy extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			subordinateGraphId = storingGraphDatabase
-					.createLocalSubordinateGraphInEdge(this.getId());
+					.createLocalSubordinateGraphInEdge(this.getGlobalId());
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
@@ -1125,7 +1125,7 @@ public abstract class EdgeProxy extends
 	
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
-		long sigmaId = elem.getId();
+		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			storingGraphDatabase.setSigmaIdOfEdgeId(elementId, -sigmaId);
 		} else {
@@ -1166,18 +1166,18 @@ public abstract class EdgeProxy extends
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		return (int) (getId() - e.getId());
+		return (int) (getGlobalId() - e.getGlobalId());
 	}
 
 	@Override
 	public final boolean isValid() {
-		return storingGraphDatabase.containsEdgeId(getId());
+		return storingGraphDatabase.containsEdgeId(getGlobalId());
 	}
 
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteEdge(getId());
+		storingGraphDatabase.deleteEdge(getGlobalId());
 	}
 
 	@Override

@@ -90,11 +90,11 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	protected final long globalSubgraphId;
 	
 	
-	public long getGlobalSubgraphId() {
+	public long getGlobalId() {
 		return globalSubgraphId;
 	}
 	
-	public int getLocalSubgraphId() {
+	public int getLocalId() {
 		return GraphDatabaseBaseImpl.convertToLocalId(globalSubgraphId);
 	}
 	
@@ -104,7 +104,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	@Override
 	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
-		long pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalSubgraphId(), hostnameOfPartialGraph);
+		long pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalId(), hostnameOfPartialGraph);
 		return localGraphDatabase.getGraphObject(pgId);
 	}
 
@@ -132,7 +132,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setFirstVertex(VertexImpl firstVertex) {
 		if (firstVertex != null)
-			storingGraphDatabase.setFirstVertexId(globalSubgraphId, firstVertex.getId());
+			storingGraphDatabase.setFirstVertexId(globalSubgraphId, firstVertex.getGlobalId());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	protected void setLastVertex(VertexImpl lastVertex) {
 		if (lastVertex != null)
-			storingGraphDatabase.setLastVertexId(globalSubgraphId, lastVertex.getId());
+			storingGraphDatabase.setLastVertexId(globalSubgraphId, lastVertex.getGlobalId());
 	}
 
 
@@ -687,16 +687,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getId());
-			storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getId());
+			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
+			storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getId());
-				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getId());
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
+				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
 				edgeListModified();
 				return;
 			}

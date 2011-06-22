@@ -91,15 +91,16 @@ public abstract class EdgeImpl extends
 	 * *********************************************************
 	 */
 
-	protected final void setId(int id) {
-		assert id >= 0;
-		this.elementId = id;
-	}
+//	protected final void setId(int id) {
+//		assert id >= 0;
+//		this.elementId = id;
+//	}
 
 	@Override
-	public final long getId() {
+	public final long getGlobalId() {
 		return elementId;
 	}
+	
 
 	/* ***********************************************************
 	 * Access Eseq ***********************************************************
@@ -126,7 +127,7 @@ public abstract class EdgeImpl extends
 	 */
 	protected final void setNextEdge(Edge nextEdge) {
 		container.nextElementInGraphId[getIdInStorage(elementId)] = nextEdge
-				.getId();
+				.getGlobalId();
 	}
 
 	/**
@@ -139,7 +140,7 @@ public abstract class EdgeImpl extends
 	 */
 	protected final void setPreviousEdge(Edge prevEdge) {
 		container.previousElementInGraphId[getIdInStorage(elementId)] = prevEdge
-				.getId();
+				.getGlobalId();
 	}
 
 	@Override
@@ -287,7 +288,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeAfter(e.getId(), this.getId());
+		storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
 	}
 
 	@Override
@@ -298,7 +299,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeBefore(e.getId(), this.getId());
+		storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
 	}
 
 	/* ***********************************************************
@@ -673,7 +674,7 @@ public abstract class EdgeImpl extends
 			Vertex elemToConnect) {
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
 				.connect(getSchema().getClassId(incidenceClass),
-						elemToConnect.getId(), this.getId()));
+						elemToConnect.getGlobalId(), this.getGlobalId()));
 	}
 
 	@Override
@@ -1111,7 +1112,7 @@ public abstract class EdgeImpl extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			subordinateGraphId = storingGraphDatabase
-					.createLocalSubordinateGraphInEdge(this.getId());
+					.createLocalSubordinateGraphInEdge(this.getGlobalId());
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
@@ -1127,7 +1128,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
-		long sigmaId = elem.getId();
+		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;
 		} else {
@@ -1167,18 +1168,18 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
-		return (int) (getId() - e.getId());
+		return (int) (getGlobalId() - e.getGlobalId());
 	}
 
 	@Override
 	public final boolean isValid() {
-		return storingGraphDatabase.containsEdgeId(this.getId());
+		return storingGraphDatabase.containsEdgeId(this.getGlobalId());
 	}
 
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteEdge(this.getId());
+		storingGraphDatabase.deleteEdge(this.getGlobalId());
 	}
 
 	@Override
@@ -1198,12 +1199,12 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	protected void putIncidenceAfter(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getId(), moved.getId());
+		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(), moved.getGlobalId());
 	}
 
 	@Override
 	protected void putIncidenceBefore(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getId(), moved.getId());
+		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(), moved.getGlobalId());
 	}
 
 }

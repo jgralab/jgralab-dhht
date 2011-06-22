@@ -71,10 +71,10 @@ public abstract class LocalBitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	 */
 	public boolean mark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		boolean out = isMarked(graphElement);
-		marks.set((int) graphElement.getId());
+		marks.set((int) graphElement.getGlobalId());
 		version++;
 		return !out;
 	}
@@ -82,10 +82,10 @@ public abstract class LocalBitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	@Override
 	public boolean removeMark(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
 		boolean out = isMarked(graphElement);
-		marks.clear((int) graphElement.getId());
+		marks.clear((int) graphElement.getGlobalId());
 		version--;
 		return out;
 	}
@@ -108,9 +108,9 @@ public abstract class LocalBitSetGraphMarker<T extends GraphElement<?, ?, ?>>
 	@Override
 	public boolean isMarked(T graphElement) {
 		assert (graphElement.getGraph() == graph);
-		assert (graphElement.getId() <= (graphElement instanceof Vertex ? graph
+		assert (graphElement.getGlobalId() <= (graphElement instanceof Vertex ? graph
 				.getMaxVCount() : graph.getMaxECount()));
-		return marks.get((int) graphElement.getId());
+		return marks.get((int) graphElement.getGlobalId());
 	}
 
 	@Override

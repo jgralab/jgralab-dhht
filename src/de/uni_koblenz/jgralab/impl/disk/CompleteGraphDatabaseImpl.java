@@ -176,7 +176,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
-			return getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
+			return getGraphObject(DiskImplementationBasicMethods.GLOBAL_GRAPH_ID);
 		} else {
 			return stack.peek();
 		}
@@ -272,6 +272,8 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		//check if the graph has such an attribute
 		return completeGraphAttributes.get(attributeName);
 	}
+	
+	
 	@Override
 	public void setGraphAttribute(String attributeName, Object data) {
 		// check if the graph has such an attribute
