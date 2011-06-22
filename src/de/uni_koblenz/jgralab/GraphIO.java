@@ -1001,8 +1001,7 @@ public class GraphIO {
 		for (Graph pgraph : graph.getPartialGraphs()) {
 			writeLong(pgraph.getGlobalId());
 			write("-");
-			write(graph.getGraphDatabase().getHostname(
-					pgraph.getPartialGraphId()));
+			write(graph.getGraphDatabase().getHostname(pgraph.getPartialGraphId()));
 		}
 		write("}");
 	}
@@ -1018,8 +1017,7 @@ public class GraphIO {
 		}
 
 		// write sigma
-		GraphElement<?, ?, ?> containingElement = next.getContainingGraph()
-				.getContainingElement();
+		GraphElement<?, ?, ?> containingElement = next.getSigma();
 		if (containingElement != null
 				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
 						.getGlobalId()))) {

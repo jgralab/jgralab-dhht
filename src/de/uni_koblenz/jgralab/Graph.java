@@ -129,6 +129,18 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	
 	
 	/**
+	 * Retrieves the graph or element directly containing this graph
+	 * (e.g. a vertex or edge for a (partial) subordinate one or 
+	 * a the parent distributed graph for a partial graph that is 
+	 * not the refinement of a single element)
+	 * or null, if this is the toplevel graph.
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public AttributedElement getParentGraphOrElement();
+	
+	
+	/**
 	 * @return {@link Graph} the graph this graph belongs to, this is
 	 * 			- for the complete graph null
 	 * 			- for the a partial (subordinate) graph the partial or 
@@ -146,18 +158,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public boolean isPartOfGraph(Graph other);
 	
-	
-	/**
-	 * Retrieves the graph or element directly containing this graph
-	 * (e.g. a vertex or edge for a (partial) subordinate one or 
-	 * a the parent distributed graph for a partial graph that is 
-	 * not the refinement of a single element)
-	 * or null, if this is the toplevel graph.
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public AttributedElement getParentGraphOrElement();
-
 	
 	/**
 	 * @see GraphElement#isVisible(int)
@@ -207,7 +207,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	
 	
 	/**
-	 * Saves the partila graphs of this graph
+	 * Saves the partial graphs of this graph
 	 * @param graphIO
 	 */
 	@Deprecated
@@ -246,9 +246,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public int getPartialGraphId();
 	
-	
-	
-	
 
 	/**
 	 * Checks if the given id <code>id</code> is the id of an local
@@ -258,19 +255,12 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public boolean isLocalElementId(long id);
 
 
-
-
-
-
 	/**
 	 * Retrieves the GraphDatabase this graph is stored in
 	 * @return
 	 */
 	public GraphDatabaseBaseImpl getGraphDatabase();
 
-	
-	
-	
 	
 	// ============================================================================
 	// Methods to access vertices and edges of the graph
@@ -644,6 +634,26 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass);
 
+	
+	/**
+	 * Sorts the vertex sequence according to the given comparator in ascending
+	 * order.
+	 * 
+	 * @param comp
+	 *            the comparator defining the desired vertex order.
+	 */
+	public void sortVertices(Comparator<Vertex> comp);
+
+	/**
+	 * Sorts the edge sequence according to the given comparator in ascending
+	 * order.
+	 * 
+	 * @param comp
+	 *            the comparator defining the desired edge order.
+	 */
+	public void sortEdges(Comparator<Edge> comp);
+	
+	
 	/**
 	 * Optimizes edge and vertex ids such that after defragmentation
 	 * getMaxECount() == getECount() and getMaxVCount() == getVCount(). That
@@ -657,6 +667,136 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public void defragment();
 
+	
+	
+
+
+	/**
+	 * Registers the given <code>newListener</code> to the internal listener
+	 * list.
+	 * 
+	 * @param newListener
+	 *            the new <code>GraphStructureChangedListener</code> to
+	 *            register.
+	 */
+	public void addGraphStructureChangedListener(
+			GraphStructureChangedListener newListener);
+
+	/**
+	 * Removes the given <code>listener</code> from the internal listener list.
+	 * 
+	 * @param listener
+	 *            the <code>GraphStructureChangedListener</code> to be removed.
+	 */
+	public void removeGraphStructureChangedListener(
+			GraphStructureChangedListener listener);
+
+	/**
+	 * Removes all <code>GraphStructureChangedListener</code> from the internal
+	 * listener list.
+	 */
+	public void removeAllGraphStructureChangedListeners();
+
+	/**
+	 * Returns the amount of registered
+	 * <code>GraphStructureChangedListener</code>s.
+	 * 
+	 * @return the amount of registered
+	 *         <code>GraphStructureChangedListener</code>s
+	 */
+	public int getGraphStructureChangedListenerCount();
+
+	
+	/**
+	 * Checks whether this graph is currently being loaded.
+	 * 
+	 * @return true if the graph is currently being loaded
+	 */
+	public boolean isLoading();
+	
+	
+	/**
+	 * Sets the loading flag of this graph
+	 * @param b
+	 */
+	public void setLoading(boolean b);
+
+	
+	public void graphModified();
+
+	/**
+	 * Checks whether this graph has changed with respect to the given
+	 * <code>previousVersion</code>. Every change in the graph, e.g. adding,
+	 * creating and reordering of edges and vertices or changes of attributes of
+	 * the graph, an edge or a vertex are treated as a change.
+	 * 
+	 * @param previousVersion
+	 *            The version to check against
+	 * @return <code>true</code> if the internal graph version of the graph is
+	 *         different from the <code>previousVersion</code>.
+	 */
+	public boolean isGraphModified(long previousVersion);
+
+	/**
+	 * Returns the version counter of this graph.
+	 * 
+	 * @return the graph version
+	 * @see #isGraphModified(long)
+	 */
+	public long getGraphVersion();
+
+	/**
+	 * Checks if the vertex sequence of this has changed with respect to the
+	 * given <code>previousVersion</code>. Changes in the vertex sequence are
+	 * creation and deletion as well as reordering of vertices, but not changes
+	 * of attribute values.
+	 * 
+	 * @return <code>true</code> if the vertex list version of this graph is
+	 *         different from <code>previousVersion</code>.
+	 */
+	public boolean isVertexListModified(long previousVersion);
+
+	/**
+	 * Returns the version counter of the vertex sequence of this graph.
+	 * 
+	 * @return the vertex sequence version
+	 * @see #isVertexListModified(long)
+	 */
+	public long getVertexListVersion();
+
+	/**
+	 * Checks if the edge sequence of this has changed with respect to the given
+	 * <code>previousVersion</code>. Changes in the edge sequence are creation
+	 * and deletion as well as reordering of edges, but not changes of attribute
+	 * values.
+	 * 
+	 * @return <code>true</code> if the edge list version of this graph is
+	 *         different from <code>previousVersion</code>.
+	 */
+	public boolean isEdgeListModified(long edgeListVersion);
+
+	/**
+	 * Returns the version counter of the edge sequence of this graph.
+	 * 
+	 * @return the edge sequence version
+	 * @see #isEdgeListModified(long)
+	 */
+	public long getEdgeListVersion();
+	
+	
+	/**
+	 * Retrieves that GraphFactory used to create elements of this graph
+	 * @return
+	 */
+	public GraphFactory getGraphFactory();
+
+
+
+	// ============================================================================
+	// Methods to create complex values such as lists and maps
+	// ============================================================================
+
+	
 	/**
 	 * 
 	 * @param <T>
@@ -818,146 +958,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @throws RemoteException 
 	 */
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components);
-
-	/**
-	 * Sorts the vertex sequence according to the given comparator in ascending
-	 * order.
-	 * 
-	 * @param comp
-	 *            the comparator defining the desired vertex order.
-	 */
-	public void sortVertices(Comparator<Vertex> comp);
-
-	/**
-	 * Sorts the edge sequence according to the given comparator in ascending
-	 * order.
-	 * 
-	 * @param comp
-	 *            the comparator defining the desired edge order.
-	 */
-	public void sortEdges(Comparator<Edge> comp);
-
-	/**
-	 * Registers the given <code>newListener</code> to the internal listener
-	 * list.
-	 * 
-	 * @param newListener
-	 *            the new <code>GraphStructureChangedListener</code> to
-	 *            register.
-	 */
-	public void addGraphStructureChangedListener(
-			GraphStructureChangedListener newListener);
-
-	/**
-	 * Removes the given <code>listener</code> from the internal listener list.
-	 * 
-	 * @param listener
-	 *            the <code>GraphStructureChangedListener</code> to be removed.
-	 */
-	public void removeGraphStructureChangedListener(
-			GraphStructureChangedListener listener);
-
-	/**
-	 * Removes all <code>GraphStructureChangedListener</code> from the internal
-	 * listener list.
-	 */
-	public void removeAllGraphStructureChangedListeners();
-
-	/**
-	 * Returns the amount of registered
-	 * <code>GraphStructureChangedListener</code>s.
-	 * 
-	 * @return the amount of registered
-	 *         <code>GraphStructureChangedListener</code>s
-	 */
-	public int getGraphStructureChangedListenerCount();
-
-	
-	/**
-	 * Checks whether this graph is currently being loaded.
-	 * 
-	 * @return true if the graph is currently being loaded
-	 */
-	public boolean isLoading();
-	
-	
-	/**
-	 * Sets the loading flag of this graph
-	 * @param b
-	 */
-	public void setLoading(boolean b);
-
-	
-	public void graphModified();
-
-	/**
-	 * Checks whether this graph has changed with respect to the given
-	 * <code>previousVersion</code>. Every change in the graph, e.g. adding,
-	 * creating and reordering of edges and vertices or changes of attributes of
-	 * the graph, an edge or a vertex are treated as a change.
-	 * 
-	 * @param previousVersion
-	 *            The version to check against
-	 * @return <code>true</code> if the internal graph version of the graph is
-	 *         different from the <code>previousVersion</code>.
-	 */
-	public boolean isGraphModified(long previousVersion);
-
-	/**
-	 * Returns the version counter of this graph.
-	 * 
-	 * @return the graph version
-	 * @see #isGraphModified(long)
-	 */
-	public long getGraphVersion();
-
-	/**
-	 * Checks if the vertex sequence of this has changed with respect to the
-	 * given <code>previousVersion</code>. Changes in the vertex sequence are
-	 * creation and deletion as well as reordering of vertices, but not changes
-	 * of attribute values.
-	 * 
-	 * @return <code>true</code> if the vertex list version of this graph is
-	 *         different from <code>previousVersion</code>.
-	 */
-	public boolean isVertexListModified(long previousVersion);
-
-	/**
-	 * Returns the version counter of the vertex sequence of this graph.
-	 * 
-	 * @return the vertex sequence version
-	 * @see #isVertexListModified(long)
-	 */
-	public long getVertexListVersion();
-
-	/**
-	 * Checks if the edge sequence of this has changed with respect to the given
-	 * <code>previousVersion</code>. Changes in the edge sequence are creation
-	 * and deletion as well as reordering of edges, but not changes of attribute
-	 * values.
-	 * 
-	 * @return <code>true</code> if the edge list version of this graph is
-	 *         different from <code>previousVersion</code>.
-	 */
-	public boolean isEdgeListModified(long edgeListVersion);
-
-	/**
-	 * Returns the version counter of the edge sequence of this graph.
-	 * 
-	 * @return the edge sequence version
-	 * @see #isEdgeListModified(long)
-	 */
-	public long getEdgeListVersion();
-	
-	
-	/**
-	 * Retrieves that GraphFactory used to create elements of this graph
-	 * @return
-	 */
-	public GraphFactory getGraphFactory();
-
-
-
 
 
 

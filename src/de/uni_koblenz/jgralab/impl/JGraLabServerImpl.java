@@ -77,8 +77,10 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	public GraphDatabaseBaseImpl loadGraph(String uid) throws GraphIOException {
 		GraphDatabaseBaseImpl db = localGraphDatabases.get(uid);
 		if (db == null) {
+			//TODO: The determine, if a Complete or Partial graphdb needs to be created 
+			XXXX
 			String filename = localFilesContainingGraphs.get(uid);
-			((CompleteGraphImpl) GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK)).getGraphDatabase();
+			GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK);
 			localGraphDatabases.put(uid, db);
 		}
 		return db;
