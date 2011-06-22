@@ -174,6 +174,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final long getGlobalId() {
 		return id;
 	}
+	
+	@Override
+	public final int getLocalId() {
+		return id;
+	}
 
 	/**
 	 * Sets {@link GraphElement#partialGraphId}.

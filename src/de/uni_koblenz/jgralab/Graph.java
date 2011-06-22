@@ -119,12 +119,44 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public abstract Graph getCompleteGraph();
 	
+	
+	
+	/**
+	 * @return {@link Graph} the local partial graph (which may also
+	 * be the toplevel one)
+	 */
+	public abstract Graph getLocalPartialGraph();
+	
+	
+	/**
+	 * @return {@link Graph} the graph this graph belongs to, this is
+	 * 			- for the complete graph null
+	 * 			- for the a partial (subordinate) graph the partial or 
+	 *            complete graph this graph belongs to
+	 *          - for a subordinate graph the graph directly containing    
+	 *            the element refined by the subordinate graph
+	 */		
+	public abstract Graph getParentGraph();
+	
+	
 	/**
 	 * @return true if this graph is a part of <code>other</code> either
 	 *         directly as a subordinate or partial one or indirectly by its
 	 *         parent
 	 */
 	public boolean isPartOfGraph(Graph other);
+	
+	
+	/**
+	 * Retrieves the graph or element directly containing this graph
+	 * (e.g. a vertex or edge for a (partial) subordinate one or 
+	 * a the parent distributed graph for a partial graph that is 
+	 * not the refinement of a single element)
+	 * or null, if this is the toplevel graph.
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public AttributedElement getParentGraphOrElement();
 
 	
 	/**
@@ -145,12 +177,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	
 	
 	
-	/**
-	 * @return {@link Graph} the distributed {@link Graph} this partial graph is
-	 *         a member of or this graph itself, it is not directly a member of
-	 *         a distributed graph
-	 */
-	public abstract Graph getParentDistributedGraph();
+
 	
 
 	/**
@@ -860,7 +887,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public void setLoading(boolean b);
 
-
+	
+	public void graphModified();
 
 	/**
 	 * Checks whether this graph has changed with respect to the given
@@ -928,16 +956,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public GraphFactory getGraphFactory();
 
-	/**
-	 * Retrieves the graph or element directly containing this graph
-	 * (e.g. a vertex or edge for a (partial) subordinate one or 
-	 * a the parent distributed graph for a partial graph that is 
-	 * not the refinement of a single element)
-	 * or null, if this is the toplevel graph.
-	 * @return
-	 */
-	@SuppressWarnings("rawtypes")
-	public AttributedElement getParentGraphOrElement();
+
+
+
 
 
 

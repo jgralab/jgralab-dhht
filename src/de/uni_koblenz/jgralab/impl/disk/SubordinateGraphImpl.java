@@ -340,18 +340,24 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getParentDistributedGraph() {
-		return null; // this;
+	public GraphBaseImpl getParentDistributedGraph() {
+		return localGraphDatabase.getGraphObject(superordinateGraphId);
+	}
+
+
+	private Graph getSuperordinateGraph() {
+		long containingElementId = storingGraphDatabase.getContainingElementId(globalSubgraphId);
+		long superordinateGraphId = 0;
+		if (containingElementId < 0)
+			superordinateGraphId = localGraphDatabase.getEdgeObject(-containingElementId).getGraph().getGlobalId();
+		else 
+			superordinateGraphId = localGraphDatabase.getVertexObject(containingElementId).getGraph().getGlobalId();
+		return localGraphDatabase.getGraphObject(superordinateGraphId);
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getSuperordinateGraph() {
-		return null; // (GraphBaseImpl) containingElement.getGraph();
-	}
-
-	@Override
-	public de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl getCompleteGraph() {
-		return null; // getSuperordinateGraph().getCompleteGraph();
+	public Graph getCompleteGraph() {
+		return localGraphDatabase.getGraphObject(DiskImplementationBasics.GLOBAL_GRAPH_ID); 
 	}
 
 	@Override

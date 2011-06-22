@@ -134,11 +134,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new GraphException("eMax must not be less than 1", null);
 		}
 		graphFactory = cls.getSchema().getGraphFactory();
-		id = GraphBaseImpl.PARTIAL_GRAPH_MASK;
-		partialGraphIds = new LinkedList<Long>();
-		for (int i = GraphBaseImpl.LOCAL_ELEMENT_MASK + 1; i < GraphBaseImpl.PARTIAL_GRAPH_MASK; i++) {
-			partialGraphIds.add((long) i);
-		}
+		id = 1;
 
 		expandVertexArray(vMax);
 		setDeleteVertexList(new LinkedList<VertexImpl>());
@@ -147,10 +143,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		expandIncidenceArray(vMax + eMax);
 	}
 
-	/**
-	 * 
-	 */
-	private List<Long> partialGraphIds = null;
 
 	/**
 	 * The id of this complete or partial graph identifying it in the complete
@@ -264,12 +256,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	private IncidenceImpl[] incidenceArray;
 
-	public long allocateFreePartialGraphId() {
-		if (partialGraphIds.isEmpty()) {
-			throw new GraphException("No free partial graph ID available");
-		}
-		return partialGraphIds.remove(0);
-	}
+	
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
@@ -832,10 +819,10 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return this;
 	}
 
-	@Override
-	public GraphBaseImpl getSuperordinateGraph() {
-		return this;
-	}
+//	@Override
+//	public GraphBaseImpl getSuperordinateGraph() {
+//		return this;
+//	}
 
 	@Override
 	public int compareTo(Graph a) {

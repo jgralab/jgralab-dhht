@@ -472,8 +472,8 @@ public abstract class SubordinateGraphImpl extends
 		return this;
 	}
 
-	@Override
-	public GraphBaseImpl getSuperordinateGraph() {
+	//@Override
+	private GraphBaseImpl getSuperordinateGraph() {
 		return (GraphBaseImpl) containingElement.getGraph();
 	}
 

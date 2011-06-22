@@ -1038,10 +1038,10 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	public abstract Graph getParentDistributedGraph();
 
-	/**
-	 * @return the distributed graph this graph belongs to
-	 */
-	public abstract Graph getSuperordinateGraph();
+//	/**
+//	 * @return the distributed graph this graph belongs to
+//	 */
+//	public abstract Graph getSuperordinateGraph();
 
 	/**
 	 * @return the complete top-level DHHTGraph

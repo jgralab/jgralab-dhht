@@ -120,14 +120,14 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return localGraphDatabase.getSchema();
 	}
 
-	@Override
-	public Graph getSuperordinateGraph() {
-		if (globalSubgraphId == 1) {
-			return this;
-		} else {
-			return getParentDistributedGraph();
-		}
-	}
+//	@Override
+//	public Graph getSuperordinateGraph() {
+//		if (globalSubgraphId == 1) {
+//			return this;
+//		} else {
+//			return getParentDistributedGraph();
+//		}
+//	}
 
 	@Override
 	public Graph getParentDistributedGraph() {

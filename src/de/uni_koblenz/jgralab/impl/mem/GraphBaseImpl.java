@@ -72,23 +72,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
-	static final int PARTIAL_GRAPH_MASK = 0xff000000;
-
-	static final int LOCAL_ELEMENT_MASK = 0xffffffff ^ PARTIAL_GRAPH_MASK;
-
-	public static final int getLocalId(int graphElementId) {
-		return graphElementId & LOCAL_ELEMENT_MASK;
-	}
-
-	public static final int getPartialGraphId(int graphElementId) {
-		return graphElementId & PARTIAL_GRAPH_MASK;
-	}
-
-	public static final int getGlobalId(int partialGraphId, int localElementId) {
-		assert getPartialGraphId(localElementId) == 0;
-		return partialGraphId & localElementId;
-	}
-
 
 	// ------------- VERTEX LIST VARIABLES -------------
 
@@ -1043,10 +1026,10 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	public abstract GraphBaseImpl getParentDistributedGraph();
 
-	/**
-	 * @return the distributed graph this graph belongs to
-	 */
-	public abstract GraphBaseImpl getSuperordinateGraph();
+//	/**
+//	 * @return the distributed graph this graph belongs to
+//	 */
+//	public abstract GraphBaseImpl getSuperordinateGraph();
 
 	/**
 	 * @return the complete top-level DHHTGraph
