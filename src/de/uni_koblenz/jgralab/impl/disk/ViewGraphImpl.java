@@ -10,6 +10,7 @@ import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -269,6 +270,15 @@ public abstract class ViewGraphImpl implements Graph,
 	@Override
 	public long getEdgeListVersion() {
 		return viewedGraph.getEdgeListVersion();
+	}
+	
+	@Override
+	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+		if (elem.getKappa() > this.lowestVisibleKappaLevel) {
+			return viewedGraph.containsElement(elem);
+		} else {
+			return false;
+		}
 	}
 
 	@Override

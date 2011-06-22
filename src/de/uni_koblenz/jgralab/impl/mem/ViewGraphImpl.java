@@ -270,6 +270,22 @@ public abstract class ViewGraphImpl implements Graph,
 	public long getEdgeListVersion() {
 		return viewedGraph.getEdgeListVersion();
 	}
+	
+	@Override
+	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+		if (elem.getKappa() > this.lowestVisibleKappaLevel) {
+			return viewedGraph.containsElement(elem);
+		} else {
+			return false;
+		}
+	}
 
 	@Override
 	public boolean containsVertex(Vertex v) {

@@ -936,6 +936,8 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 	}
 
+	//TODO: increase/decrease e and v count of parent graphs in necessary?
+	
 	@Override
 	public void increaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
@@ -950,7 +952,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void decreaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
+			getGraphDatabase(partialGraphId).decreaseVCount(subgraphId);
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).vertexCount--;
 		}
@@ -960,7 +962,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void increaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
+			getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount++;
 		}
@@ -973,6 +975,26 @@ public abstract class GraphDatabaseBaseImpl extends
 			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount--;
+		}
+	}
+	
+	@Override
+	public void increaseICount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).increaseICount(subgraphId);
+		} else {
+			getGraphData(convertToLocalId(subgraphId)).incidenceCount++;
+		}
+	}
+
+	@Override
+	public void decreaseICount(long subgraphId) {
+		int partialGraphId = getPartialGraphId(subgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			getGraphDatabase(partialGraphId).decreaseICount(subgraphId);
+		} else {
+			getGraphData(convertToLocalId(subgraphId)).incidenceCount--;
 		}
 	}
 

@@ -1007,6 +1007,15 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 
 	@Override
+	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+		if (elem instanceof Edge) {
+			return containsEdge((Edge) elem);
+		} else {
+			return containsVertex((Vertex) elem);
+		}
+	}
+	
+	@Override
 	public boolean containsEdge(Edge e) {
 		if (containsEdgeLocally(e)) {
 			return true;

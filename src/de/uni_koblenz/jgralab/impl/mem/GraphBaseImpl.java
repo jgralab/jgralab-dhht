@@ -1011,7 +1011,14 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	protected abstract void setICount(int count);
 
-	
+	@Override
+	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+		if (elem instanceof Edge) {
+			return containsEdge((Edge) elem);
+		} else {
+			return containsVertex((Vertex) elem);
+		}
+	}
 
 	@Override
 	public boolean containsEdge(Edge e) {

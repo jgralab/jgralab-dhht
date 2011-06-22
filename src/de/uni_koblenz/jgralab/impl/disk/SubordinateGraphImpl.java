@@ -44,12 +44,15 @@ import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.mem.EdgeImpl;
+import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -528,6 +531,104 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	public AttributedElement getParentGraphOrElement() {
 		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
 				.getContainingElementId(globalSubgraphId));
+	}
+	
+	@Override
+	public void vertexAdded(Vertex v) {
+		if (containsVertex(v)) {
+			storingGraphDatabase.increaseVCount(globalSubgraphId);
+			if (v.getPreviousVertex() == getParentGraphOrElement()) {
+				// this is a new first vertex
+				storingGraphDatabase.setFirstVertexId(globalSubgraphId, v.getGlobalId());
+				if (getLastVertex() == null) {
+					storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+				}
+			} else if (v.getPreviousVertex() == getLastVertex()) {
+				// this is a new last vertex
+				storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+			}
+		}
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v) {
+		if (containsVertex(v)) {
+			storingGraphDatabase.decreaseVCount(globalSubgraphId);
+			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
+				// this was the last vertex
+				setLastVertex(null);
+				setFirstVertex(null);
+			} else {
+				if (getLastVertex() == v) {
+					storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getPreviousVertex().getGlobalId());
+				}
+				if (getFirstVertex() == v) {
+					storingGraphDatabase.setFirstVertexId(globalSubgraphId, v.getNextVertex().getGlobalId());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void edgeAdded(Edge e) {
+		if (containsEdge(e)) {
+			storingGraphDatabase.increaseECount(globalSubgraphId);
+			if (e.getPreviousEdge() == getParentGraphOrElement()) {
+				// this is a new first edge
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, e.getGlobalId());
+				if (getLastEdge() == null) {
+					storingGraphDatabase.setLastEdgeId(globalSubgraphId, e.getGlobalId());
+				} else if (e.getPreviousEdge() == getLastEdge()) {
+					// this is a new last edge
+					storingGraphDatabase.setLastEdgeId(globalSubgraphId, e.getGlobalId());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void edgeDeleted(Edge e) {
+		if (containsEdge(e)) {
+			storingGraphDatabase.decreaseECount(globalSubgraphId);
+			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
+				// this was the last edge
+				storingGraphDatabase.setLastEdgeId(globalSubgraphId, 0);
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, 0);
+			} else {
+				if (getLastEdge() == e) {
+					storingGraphDatabase.setLastEdgeId(globalSubgraphId, e.getPreviousEdge().getGlobalId());
+				}
+				if (getFirstEdge() == e) {
+					storingGraphDatabase.setFirstEdgeId(globalSubgraphId, e.getNextEdge().getGlobalId());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void maxEdgeCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void maxIncidenceCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void incidenceAdded(Incidence i) {
+		if (containsEdge(i.getEdge())) {
+			storingGraphDatabase.increaseICount(globalSubgraphId);
+		}
+	}
+
+	@Override
+	public void incidenceDeleted(Incidence i) {
+		if (containsEdge(i.getEdge())) {
+			storingGraphDatabase.decreaseICount(globalSubgraphId);
+		}
 	}
 	
 }

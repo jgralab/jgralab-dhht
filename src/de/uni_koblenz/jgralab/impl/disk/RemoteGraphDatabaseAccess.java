@@ -72,6 +72,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void decreaseECount(long subgraphId);
 
 	public void increaseECount(long subgraphId);
+	
+
+	public void increaseICount(long globalSubgraphId);
+
+	public void decreaseICount(long globalSubgraphId);
 
 	public int getLocalPartialGraphId();
 	
@@ -420,9 +425,5 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
 
 
-
-	
-
-	
 
 }

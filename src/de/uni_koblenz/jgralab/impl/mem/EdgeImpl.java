@@ -807,7 +807,7 @@ public abstract class EdgeImpl extends
 		return getPreviousEdge(getGraph().getTraversalContext());
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
