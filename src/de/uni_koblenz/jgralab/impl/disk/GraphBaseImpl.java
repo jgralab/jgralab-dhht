@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;

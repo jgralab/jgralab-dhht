@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -184,9 +184,10 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public GraphElement<?, ?, ?> getContainingElement() {
-		return null;
+	public AttributedElement getParentGraphOrElement() {
+		return getViewedGraph().getParentGraphOrElement();
 	}
 
 	@Override
@@ -660,10 +661,6 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
-	@Override
-	public Graph getSuperordinateGraph() {
-		return viewedGraph.getSuperordinateGraph().getView(lowestVisibleKappaLevel);
-	}
 	
 	@Override
 	public Graph getParentDistributedGraph() {

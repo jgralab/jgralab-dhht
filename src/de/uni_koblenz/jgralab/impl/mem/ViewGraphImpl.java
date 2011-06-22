@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -186,11 +187,12 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public GraphElement<?, ?, ?> getContainingElement() {
-		return null;
+	public AttributedElement getParentGraphOrElement() {
+		return getViewedGraph().getParentGraphOrElement();
 	}
-
+	
 	@Override
 	public Graph getCompleteGraph() {
 		return viewedGraph.getCompleteGraph();
@@ -644,12 +646,6 @@ public abstract class ViewGraphImpl implements Graph,
 		if (containsEdge(i.getEdge())) {
 			iCount--;
 		}
-	}
-
-	@Override
-	public Graph getSuperordinateGraph() {
-		return viewedGraph.getSuperordinateGraph().getView(
-				lowestVisibleKappaLevel);
 	}
 
 	@Override

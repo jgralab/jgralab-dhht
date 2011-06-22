@@ -217,15 +217,11 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
-		assert getGraph().getTraversalContext().getContainingElement()
-				.containsElement(incidentVertex);
 		return incidentVertex.getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
-		assert getGraph().getTraversalContext().getContainingElement()
-				.containsElement(incidentVertex);
 		return incidentVertex
 				.getIncidentEdges(
 						traversalContext,
@@ -238,8 +234,7 @@ public abstract class IncidenceImpl implements Incidence {
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
-		} else if (getGraph().getTraversalContext().getContainingElement()
-				.containsElement(incidentVertex)) {
+		} else if (getGraph().getTraversalContext().containsElement(incidentVertex)) {
 			return incidentVertex;
 		} else {
 			return null;
@@ -248,8 +243,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().getContainingElement()
-				.containsElement(incidentEdge);
+		assert getGraph().getTraversalContext().containsElement(incidentEdge);
 		return incidentEdge.getIncidentVertices(traversalContext, getDirection());
 	}
 
@@ -261,8 +255,7 @@ public abstract class IncidenceImpl implements Incidence {
 		}
 		Vertex vertex = (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge)
 				.getOmega() : ((BinaryEdge) incidentEdge).getAlpha();
-		if (getGraph().getTraversalContext().getContainingElement()
-				.containsElement(vertex)) {
+		if (getGraph().getTraversalContext().containsElement(vertex)) {
 			return vertex;
 		} else {
 			return null;
@@ -271,8 +264,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().getContainingElement()
-				.containsElement(incidentEdge);
+		assert getGraph().getTraversalContext().containsElement(incidentEdge);
 		return incidentEdge
 				.getIncidentVertices(
 						traversalContext,

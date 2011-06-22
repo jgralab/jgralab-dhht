@@ -39,6 +39,7 @@ import java.util.NoSuchElementException;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtEdge;
@@ -806,12 +807,13 @@ public abstract class EdgeImpl extends
 		return getPreviousEdge(getGraph().getTraversalContext());
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
 		Edge previousEdge = prevEdgeInGraph;
 		if (previousEdge == null
-				|| !traversalContext.getContainingElement().containsElement(
+				|| !((GraphElement) traversalContext.getParentGraphOrElement()).containsElement(
 						previousEdge)) {
 			// all incidences belong to the same graph like this edge
 			return null;

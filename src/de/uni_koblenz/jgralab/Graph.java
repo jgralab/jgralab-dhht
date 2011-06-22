@@ -288,6 +288,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return true if this graph contains the given edge <code>e</code>.
 	 */
 	public boolean containsEdge(Edge e);
+	
+	/**
+	 * @return true if this graph contains the given element <code>elem</code>.
+	 */
+	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem);
 
 	/**
 	 * Removes the vertex <code>v</code> from the vertex sequence of this graph.
@@ -933,6 +938,8 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	@SuppressWarnings("rawtypes")
 	public AttributedElement getParentGraphOrElement();
+
+
 
 	
 }
