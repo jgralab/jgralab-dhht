@@ -40,7 +40,23 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	
 	
 	
+	public ParentEntityKind getParentEntityKind(long globalSubgraphId) {
+		int partialGraphId = getPartialGraphId(globalSubgraphId);
+		if (partialGraphId != localPartialGraphId) {
+			return getGraphDatabase(partialGraphId).getParentEntityKind(globalSubgraphId);
+		}
+		int localSubgraphId = convertToLocalId(globalSubgraphId);
+		//for the local toplevel graph, the value is stored in the kindOfParentElement flag
+		//of the partial graph database
+		if (localSubgraphId == TOPLEVEL_LOCAL_SUBGRAPH_ID) {
+			return null;
+		}
+		//a non-toplevel graph is implemented by subordinate graph
+		//and thus nested either in a vertex or a edge, which is 
+		//encoded by the sign of its sigma value 
 	
+		return getGraphData(localSubgraphId).containingElementId < 0 ? ParentEntityKind.EDGE : ParentEntityKind.VERTEX;
+	}
 	
 	
 	
@@ -182,7 +198,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
-			return getGraphObject(DiskImplementationBasics.GLOBAL_GRAPH_ID);
+			return getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID);
 		} else {
 			return stack.peek();
 		}

@@ -277,8 +277,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * Creates an binary edge of the specified class <code>cls</code> and adds
 	 * the new edge to this Graph.
 	 */
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega);
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega);
 
 	/**
 	 * Connects the given vertex and the given edge by an incidence of class
@@ -286,8 +285,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * 
 	 * @return the incidence created
 	 */
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge);
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge);
 
 	/**
 	 * @return true if this graph contains the given vertex <code>v</code>.

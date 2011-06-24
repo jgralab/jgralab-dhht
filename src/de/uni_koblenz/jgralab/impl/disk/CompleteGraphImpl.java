@@ -37,6 +37,7 @@ import java.util.Map;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
@@ -92,14 +93,15 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public abstract GraphClass getType();
 
 
-	@Override
-	public int compareTo(Graph a) {
-		int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
-		if (compVal == 0) {
-			return a.getPartialGraphId() - getPartialGraphId();
-			return compVal;
-		}
-	}
+//	@Override
+//	public int compareTo(Graph a) {
+//		int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
+//		if (compVal == 0) {
+//			return a.getPartialGraphId() - getPartialGraphId();
+//		} else {
+//			return compVal;
+//		}
+//	}
 
 
 	public void saveGraph(String filename, ProgressFunction pf, LocalBooleanGraphMarker subGraph) throws GraphIOException {
@@ -160,13 +162,22 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public AttributedElement getParentGraphOrElement() {
-		return null;
+		if (globalSubgraphId == GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)
+			return null;
+		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
+				.getContainingElementId(globalSubgraphId));
 	}
 	
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Graph getParentGraph() {
-		return null;
+		if (globalSubgraphId == GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)
+			return null;
+		AttributedElement elem = getParentGraphOrElement();
+		if (elem instanceof Graph)
+			return (Graph) elem; 
+		return ((GraphElement) elem).getGraph();
 	}
 	
 	

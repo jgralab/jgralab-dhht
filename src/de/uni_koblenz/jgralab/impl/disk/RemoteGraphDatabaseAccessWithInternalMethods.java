@@ -135,4 +135,13 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	public int loadPartialGraph(String hostname);
 
 
+
+	/**
+	 * @param globalSubgraphId
+	 * @return the kind of the parent entity (graph, edge or vertex) containing
+	 * the graph identified by its globalSubgraphId
+	 */
+	public ParentEntityKind getParentEntityKind(long globalSubgraphId);
+
+
 }

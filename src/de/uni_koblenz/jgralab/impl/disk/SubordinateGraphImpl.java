@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Stack;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -41,7 +40,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
@@ -52,8 +50,6 @@ import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.mem.EdgeImpl;
-import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -76,6 +72,239 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	}
 	
 	
+	// ============================================================================
+	// Methods to access schema 
+	// ============================================================================
+	
+	@Override
+	public Schema getSchema() {
+		return localGraphDatabase.getSchema();
+	}
+	
+	// TODO: Check if these methods should return the type of the vertex or edge
+	// the subordinate graph is embedded in
+	@Override
+	public GraphClass getGraphClass() {
+		return getParentGraph().getGraphClass();
+	}
+
+	public Class<? extends Graph> getM1Class() {
+		return getParentGraph().getM1Class();
+	}
+
+
+
+	
+	
+	
+	// ============================================================================
+	// Methods to manage the current traversal context inherited from GraphBaseImpl
+	// ============================================================================
+
+	
+	// ============================================================================
+	// Methods to access hierarchy and distribution
+	//
+	// - General methods
+	// - Nesting hierarchy
+	// - Visibility layering
+	// - Distribution
+	// - Graph IDs
+	// ============================================================================
+	
+	
+	@Override
+	public Graph getCompleteGraph() {
+		return localGraphDatabase.getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID); 
+	}
+
+	//Inherited from GraphBaseImpl
+	//public Graph getLocalPartialGraph()
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public AttributedElement getParentGraphOrElement() {
+		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
+				.getContainingElementId(globalSubgraphId));
+	}
+	
+	
+	@Override
+	public Graph getParentGraph() {
+		long containingElementId = storingGraphDatabase.getContainingElementId(globalSubgraphId);
+		long superordinateGraphId = 0;
+		if (containingElementId < 0)
+			superordinateGraphId = localGraphDatabase.getEdgeObject(-containingElementId).getGraph().getGlobalId();
+		else 
+			superordinateGraphId = localGraphDatabase.getVertexObject(containingElementId).getGraph().getGlobalId();
+		return localGraphDatabase.getGraphObject(superordinateGraphId);
+	}
+
+	
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		return other == getParentGraph() || getParentGraph().isPartOfGraph(other);
+	}
+	
+	
+	@Override
+	public Graph getView(int kappa) {
+		return localGraphDatabase.createViewGraph(this, kappa);
+	}
+	
+
+	@Override
+	public Graph getViewedGraph() {
+		return this;
+	}
+	
+	
+	//inherited from GraphBaseImpl
+	//public Graph createPartialGraphInGraph(String hostnameOfPartialGraph)
+	
+	//inherited from GraphBaseImpl
+	//public List<? extends Graph> getPartialGraphs();
+	
+
+	//inherited from GraphBaseImpl
+	//public Graph getPartialGraph(int partialGraphId);
+	
+	//inherited from GraphBaseImpl
+	//@Deprecated
+	//public void savePartialGraphs(GraphIO graphIO);
+	
+	
+	
+	// ============================================================================
+	// Methods to access ids inherited from GraphBaseImpl
+	// ============================================================================
+
+	
+	// ============================================================================
+	// Methods to access vertices and edges of the graph
+	// ============================================================================
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public <T extends Vertex> T createVertex(Class<T> cls) {
+		T vertex = super.createVertex(cls);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(vertex);
+		return vertex;
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public <T extends Edge> T createEdge(Class<T> cls) {
+		T edge = super.createEdge(cls);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
+		return edge;
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega) {
+		T edge = super.createEdge(cls, alpha, omega);
+		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
+		return edge;
+	}
+
+
+	//inherited from GraphBaseImpl
+	//public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge)
+
+	
+	@Override
+	public boolean containsVertex(Vertex v) {
+		return ((GraphElementImpl<?, ?, ?>) v)
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
+	}
+	
+	@Override
+	public boolean containsVertexLocally(Vertex v) {
+		return isLocalElementId(v.getGlobalId()) && 
+		  (getVertexObjectForId(GraphDatabaseElementaryMethods.convertToLocalId(v.getGlobalId())) == v); 
+	}
+
+	@Override
+	public boolean containsEdge(Edge e) {
+		return ((GraphElementImpl<?, ?, ?>) e)
+				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
+	}
+	
+	@Override
+	public boolean containsEdgeLocally(Edge e) {
+		return isLocalElementId(e.getGlobalId()) && 
+		  (getEdgeObjectForId(GraphDatabaseElementaryMethods.convertToLocalId(e.getGlobalId())) == e); 
+
+	}
+	
+	//inherited by GraphBaseImpl
+	//public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem);
+
+	
+	
+	@Override
+	public void deleteVertex(Vertex v) {
+		if (containsVertex(v)) {
+			storingGraphDatabase.deleteVertex(v.getGlobalId());
+		} else {
+			throw new GraphException("The subordinate graph of "
+					+ getParentGraphOrElement().getGlobalId()
+					+ " does not contain vertex " + v.getGlobalId() + ".");
+		}
+	}
+
+	@Override
+	public void deleteEdge(Edge e) {
+		if (containsEdge(e)) {
+			storingGraphDatabase.deleteEdge(e.getGlobalId());
+		} else {
+			throw new GraphException("The subordinate graph of "
+					+ getParentGraphOrElement().getGlobalId()
+					+ " does not contain edge " + e.getGlobalId() + ".");
+		}
+	}
+	
+	
+	// ============================================================================
+	// getFirstVertex and getFirstEdge methods are inherited from GraphBaseImpl
+	// ============================================================================
+	
+	
+	@Override
+	public Vertex getVertex(long id) {
+		Vertex v = localGraphDatabase.getVertexObject(id);
+		if (((GraphElementImpl<?, ?, ?>) v).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
+			return v;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Edge getEdge(long id) {
+		Edge e = localGraphDatabase.getEdgeObject(id);
+		if (((GraphElementImpl<?, ?, ?>) e).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
+			return e;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public long getMaxVCount() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public long getMaxECount() {
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override
 	public long getVCount() {
 		return storingGraphDatabase.getVCount(globalSubgraphId);
@@ -85,17 +314,116 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	public long getECount() {
 		return storingGraphDatabase.getECount(globalSubgraphId);
 	}
+	
+	@Override
+	public long getICount() {
+		return storingGraphDatabase.getICount(globalSubgraphId);
+	}
+	
+	
+	// ============================================================================
+	// getVertices() and getEdges() methods are inherited from GraphBaseImpl
+	// ============================================================================
 
+	
+	// ============================================================================
+	// sortVertices() and sortEdges() methods are inherited from GraphBaseImpl
+	// ============================================================================
+	
+	@Override
+	public void defragment() {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to handle graph listeners are inherited from GraphBaseImpl
+	// ============================================================================
+	
+	
+	// ============================================================================
+	// Methods to access graph state and version (loading etc.)
+	// ============================================================================
+
+	
+	@Override
+	public boolean isLoading() {
+		return getCompleteGraph().isLoading();
+	}
+	
+	
+	@Override
+	public void graphModified() {
+		((GraphBaseImpl) getParentGraph()).graphModified();
+	}
+	
+
+	@Override
+	public long getGraphVersion() {
+		return getParentGraph().getGraphVersion();
+	}
+	
+	
+	//Inherited from GraphBaseImpl
+	//public boolean isVertexListModified(long vertexListVersion);
+	
+	
 	@Override
 	public long getVertexListVersion() {
-		return getSuperordinateGraph().getVertexListVersion();
+		return getParentGraph().getVertexListVersion();
 	}
+	
 
 	@Override
+	public void vertexListModified() {
+		((GraphBaseImpl) getParentGraph()).vertexListModified();
+	}
+	
+	
+	//Inherited from GraphBaseImpl
+	//public boolean isEdgeListModified(long edgeListVersion);
+
+	
+	@Override
 	public long getEdgeListVersion() {
-		return getSuperordinateGraph().getEdgeListVersion();
+		return getParentGraph().getEdgeListVersion();
 	}
 
+	
+	@Override
+	public void edgeListModified() {
+		((GraphBaseImpl) getParentGraph()).edgeListModified();
+	}
+
+
+	//Inherited from GraphBaseImpl
+	//public GraphFactory getGraphFactory();
+
+
+	//Inherited from GraphBaseImpl
+	//public GraphDatabaseBaseImpl getGraphDatabase();
+
+
+	
+
+	@Override
+	public int getPartialGraphId() {
+		return getCompleteGraph().getPartialGraphId();
+	}
+	
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to create complex values such as lists and maps
+	// ============================================================================
+	
+	
+	
+	
 	@Override
 	public <T> JGraLabList<T> createList() {
 		return storingGraphDatabase.createList();
@@ -169,11 +497,16 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		return storingGraphDatabase.createRecord(recordClass, components);
 	}
 
-	@Override
-	public Graph getView(int kappa) {
-		return localGraphDatabase.createViewGraph(this, kappa);
-	}
 
+
+	
+	
+	// ============================================================================
+	// Methods which are created by the code generator for the complete graph
+	// ============================================================================
+
+	
+	
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
@@ -210,336 +543,19 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			throws NoSuchAttributeException {
 		getParentGraphOrElement().setAttribute(name, data);
 	}
-
-	@Override
-	public boolean isLoading() {
-		return getCompleteGraph().isLoading();
-	}
-
-
-	@Override
-	public boolean containsVertex(Vertex v) {
-		return ((GraphElementImpl<?, ?, ?>) v)
-				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
-	}
-
-	@Override
-	public boolean containsEdge(Edge e) {
-		return ((GraphElementImpl<?, ?, ?>) e)
-				.isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement());
-	}
-
-	@Override
-	public void deleteVertex(Vertex v) {
-		if (containsVertex(v)) {
-			storingGraphDatabase.deleteVertex(v.getGlobalId());
-		} else {
-			throw new GraphException("The subordinate graph of "
-					+ getParentGraphOrElement().getGlobalId()
-					+ " does not contain vertex " + v.getGlobalId() + ".");
-		}
-	}
-
-	@Override
-	public void deleteEdge(Edge e) {
-		if (containsEdge(e)) {
-			storingGraphDatabase.deleteEdge(e.getGlobalId());
-		} else {
-			throw new GraphException("The subordinate graph of "
-					+ getParentGraphOrElement().getGlobalId()
-					+ " does not contain edge " + e.getGlobalId() + ".");
-		}
-	}
-
-	@Override
-	public Vertex getVertex(long id) {
-		Vertex v = localGraphDatabase.getVertexObject(id);
-		if (((GraphElementImpl<?, ?, ?>) v).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
-			return v;
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public Edge getEdge(long id) {
-		Edge e = localGraphDatabase.getEdgeObject(id);
-		if (((GraphElementImpl<?, ?, ?>) e).isChildOf((GraphElement<?, ?, ?>) getParentGraphOrElement())) {
-			return e;
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public long getMaxVCount() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public long getMaxECount() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void defragment() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Schema getSchema() {
-		return localGraphDatabase.getSchema();
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
-			Vertex omega) {
-		T edge = super.createEdge(cls, alpha, omega);
-		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
-		return edge;
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public <T extends Edge> T createEdge(Class<T> cls) {
-		T edge = super.createEdge(cls);
-		((GraphElement)getParentGraphOrElement()).addSubordinateElement(edge);
-		return edge;
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls) {
-		T vertex = super.createVertex(cls);
-		((GraphElement)getParentGraphOrElement()).addSubordinateElement(vertex);
-		return vertex;
-	}
-
-	@Override
-	public long getICount() {
-		return localGraphDatabase.getICount(globalSubgraphId);
-	}
-
-	@Override
-	public GraphFactory getGraphFactory() {
-		return getCompleteGraph().getGraphFactory();
-	}
-
-	@Override
-	public void graphModified() {
-		getSuperordinateGraph().graphModified();
-	}
-
-	@Override
-	public void vertexListModified() {
-		// getSuperordinateGraph().vertexListModified();
-	}
-
-	@Override
-	public void edgeListModified() {
-		// getSuperordinateGraph().edgeListModified();
-	}
-
-	@Override
-	public GraphBaseImpl getParentDistributedGraph() {
-		return localGraphDatabase.getGraphObject(superordinateGraphId);
-	}
-
-
-	private Graph getSuperordinateGraph() {
-		long containingElementId = storingGraphDatabase.getContainingElementId(globalSubgraphId);
-		long superordinateGraphId = 0;
-		if (containingElementId < 0)
-			superordinateGraphId = localGraphDatabase.getEdgeObject(-containingElementId).getGraph().getGlobalId();
-		else 
-			superordinateGraphId = localGraphDatabase.getVertexObject(containingElementId).getGraph().getGlobalId();
-		return localGraphDatabase.getGraphObject(superordinateGraphId);
-	}
-
-	@Override
-	public Graph getCompleteGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID); 
-	}
-
-	@Override
-	public Graph getViewedGraph() {
-		return this;
-	}
-
-	@Override
-	public long getGraphVersion() {
-		return getSuperordinateGraph().getGraphVersion();
-	}
-
-	@Override
-	public boolean isPartOfGraph(Graph other) {
-		return other == getSuperordinateGraph()
-				|| getSuperordinateGraph().isPartOfGraph(other);
-	}
-
-	@Override
-	public boolean containsVertexLocally(Vertex v) {
-		return getSuperordinateGraph().containsVertexLocally(v);
-	}
-
-	@Override
-	public boolean containsEdgeLocally(Edge e) {
-		return getSuperordinateGraph().containsEdgeLocally(e);
-	}
-
-	// TODO: Check if these methods should return the type of the vertex or edge
-	// the subordinate graph is embedded in
-	@Override
-	public GraphClass getGraphClass() {
-		return getSuperordinateGraph().getGraphClass();
-	}
-
-	public Class<? extends Graph> getM1Class() {
-		return getSuperordinateGraph().getM1Class();
-	}
-
-	/*
-	 * TODO: The relevant fields need to be updated during creation/deletion
-	 * inside the graph db
-	 */
-
-	// @Override
-	// public void vertexAdded(Vertex v) {
-	// if (containsVertex(v)) {
-	// storingGraphDatabase.increaseVertexCount(globalSubgraphId);
-	// if (v.getPreviousVertex() == getContainingElement()) {
-	// // this is a new first vertex
-	// setFirstVertex((VertexImpl) v);
-	// if (getLastVertex() == null) {
-	// setLastVertex((VertexImpl) v);
-	// }
-	// } else if (v.getPreviousVertex() == getLastVertex()) {
-	// // this is a new last vertex
-	// setLastVertex((VertexImpl) v);
-	// }
-	// }
-	// }
-
-	// @Override
-	// public void vertexDeleted(Vertex v) {
-	// if (containsVertex(v)) {
-	// storingGraphDatabase.decreaseVertexCount(globalSubgraphId);
-	// if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
-	// // this was the last vertex
-	// setLastVertex(null);
-	// setFirstVertex(null);
-	// } else {
-	// if (getLastVertex() == v) {
-	// setLastVertex((VertexImpl) v.getPreviousVertex());
-	// }
-	// if (getFirstVertex() == v) {
-	// setFirstVertex((VertexImpl) v.getNextVertex());
-	// }
-	// }
-	// }
-	// }
-	//
-	// @Override
-	// public void edgeAdded(Edge e) {
-	// if (containsEdge(e)) {
-	// storingGraphDatabase.increaseEdgeCount(globalSubgraphId);
-	// if (e.getPreviousEdge() == getContainingElement()) {
-	// // this is a new first edge
-	// setFirstEdge((EdgeImpl) e);
-	// if (getLastEdge() == null) {
-	// setLastEdge((EdgeImpl) e);
-	// } else if (e.getPreviousEdge() == getLastEdge()) {
-	// // this is a new last edge
-	// setLastEdge((EdgeImpl) e);
-	// }
-	// }
-	// }
-	// }
-	//
-	// @Override
-	// public void edgeDeleted(Edge e) {
-	// if (containsEdge(e)) {
-	// storingGraphDatabase.decreaseEdgeCount(globalSubgraphId);
-	// if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
-	// // this was the last edge
-	// setLastEdge(null);
-	// setFirstEdge(null);
-	// } else {
-	// if (getLastEdge() == e) {
-	// setLastEdge((EdgeImpl) e.getPreviousEdge());
-	// }
-	// if (getFirstEdge() == e) {
-	// setFirstEdge((EdgeImpl) e.getNextEdge());
-	// }
-	// }
-	// }
-	// }
-
-	// @Override
-	// public void maxVertexCountIncreased(int newValue) {
-	// }
-	//
-	// @Override
-	// public void maxEdgeCountIncreased(int newValue) {
-	// }
-	//
-	// @Override
-	// public void maxIncidenceCountIncreased(int newValue) {
-	// }
-	//
-	// @Override
-	// public void incidenceAdded(Incidence i) {
-	// if (containsEdge(i.getEdge())) {
-	// setICount(getICount() + 1);
-	// }
-	// }
-	//
-	// @Override
-	// public void incidenceDeleted(Incidence i) {
-	// if (containsEdge(i.getEdge())) {
-	// setICount(getICount() + 1);
-	// }
-	// }
-
-	@Override
-	public int compareTo(Graph arg0) {
-		if (getCompleteGraph() == arg0) {
-			// each graph is smaller than the complete graph
-			return -1;
-		} else if (arg0.getParentGraphOrElement() != null) {
-			// this is a SubordinateGraphImpl
-			GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>) arg0.getParentGraphOrElement();
-			boolean isArg0Vertex = ce instanceof Vertex;
-			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
-			if (isArg0Vertex && isThisVertex) {
-				// both are vertices
-				return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
-			} else if (!isArg0Vertex && !isThisVertex) {
-				// both are edges
-				return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
-			} else {
-				// the subordinate graph of a vertex is greater
-				return isThisVertex ? 1 : -1;
-			}
-		} else {
-			// this is a ViewGraphImpl or PartialGraphImpl
-			return -arg0.compareTo(this);
-		}
-	}
-
-	@Override
-	public int getPartialGraphId() {
-		return getCompleteGraph().getPartialGraphId();
-	}
 	
 	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public AttributedElement getParentGraphOrElement() {
-		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
-				.getContainingElementId(globalSubgraphId));
-	}
+	
+	
+	
+	
+	// ============================================================================
+	// Methods of SubordinateGraph as GraphListener on the complete graph
+	// ============================================================================
+	
+	
+	
+	
 	
 	@Override
 	public void vertexAdded(Vertex v) {
@@ -564,8 +580,8 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			storingGraphDatabase.decreaseVCount(globalSubgraphId);
 			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
 				// this was the last vertex
-				setLastVertex(null);
-				setFirstVertex(null);
+				storingGraphDatabase.setLastVertexId(globalSubgraphId, 0);
+				storingGraphDatabase.setFirstVertexId(globalSubgraphId, 0);
 			} else {
 				if (getLastVertex() == v) {
 					storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getPreviousVertex().getGlobalId());

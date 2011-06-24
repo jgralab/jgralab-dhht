@@ -129,13 +129,6 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 		
 	
-
-	
-	
-	
-	
-
-	
 	
 	
 	

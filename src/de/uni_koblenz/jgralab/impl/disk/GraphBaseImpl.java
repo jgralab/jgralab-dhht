@@ -105,6 +105,37 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		this.storingGraphDatabase = storingGraphDatabase;
 	}
 	
+	@Override
+	public int compareTo(Graph arg0) {
+		int comVal = (int) (globalSubgraphId - arg0.getGlobalId());
+		if (comVal == 0) {
+			return getUniqueGraphId().compareTo(arg0.getUniqueGraphId());
+		}
+		return comVal;
+//		if (getCompleteGraph() == arg0) {
+//			// each graph is smaller than the complete graph
+//			return -1;
+//		} else if (arg0.getParentGraphOrElement() != null) {
+//			// this is a SubordinateGraphImpl
+//			GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>) arg0.getParentGraphOrElement();
+//			boolean isArg0Vertex = ce instanceof Vertex;
+//			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
+//			if (isArg0Vertex && isThisVertex) {
+//				// both are vertices
+//				return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
+//			} else if (!isArg0Vertex && !isThisVertex) {
+//				// both are edges
+//				return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
+//			} else {
+//				// the subordinate graph of a vertex is greater
+//				return isThisVertex ? 1 : -1;
+//			}
+//		} else {
+//			// this is a ViewGraphImpl or PartialGraphImpl
+//			return -arg0.compareTo(this);
+//		}
+	}
+	
 	
 	// ============================================================================
 	// Methods to manage the current traversal context 
@@ -1171,22 +1202,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 
 	
-	
-	
-	
-	
-	
-	
-
-
-	
 	@Override
-	public abstract GraphFactory getGraphFactory();
+	public GraphFactory getGraphFactory() {
+		return localGraphDatabase.getGraphFactory();
+	}
 
 
 	@Override
-	public abstract GraphDatabaseBaseImpl getGraphDatabase();
-
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		return localGraphDatabase;
+	}
 
 
 	
@@ -1214,8 +1239,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	/**
 	 * Retrieves the Vertex object representing the vertex with the id vid
-	 * that is part of the global graph this graph belongs to. In the case
-	 * of remote elements, 
+	 * that is part of the global graph this graph belongs to.
 	 * @param id
 	 * @return
 	 */
@@ -1224,14 +1248,13 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 	
 	/**
-	 * Retrieves the Vertex object representing the vertex with the id vid
-	 * that is part of the global graph this graph belongs to. In the case
-	 * of remote elements, 
+	 * Retrieves the Edge object representing the edge with the id eid
+	 * that is part of the global graph this graph belongs to. 
 	 * @param id
 	 * @return
 	 */
-	Vertex getEdgeObjectForId(int vid) {
-		return getGraphDatabase().getVertexObject(vid);
+	Edge getEdgeObjectForId(int eid) {
+		return getGraphDatabase().getEdgeObject(eid);
 	}
 	
 	
