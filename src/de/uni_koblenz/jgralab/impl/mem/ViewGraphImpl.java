@@ -156,13 +156,19 @@ public abstract class ViewGraphImpl implements Graph,
 	@SuppressWarnings("rawtypes")
 	@Override
 	public AttributedElement getParentGraphOrElement() {
-		return getViewedGraph().getParentGraphOrElement();
+		AttributedElement a = getViewedGraph().getParentGraphOrElement();
+		if (a instanceof Graph) {
+			Graph g = (Graph) a;
+			return g.getView(lowestVisibleKappaLevel);
+		}
+		return a;
 	}
+
 	
 
 	@Override
 	public Graph getParentGraph() {
-		return getViewedGraph().getParentGraph();
+		return getViewedGraph().getParentGraph().getView(lowestVisibleKappaLevel);
 	}
 	
 	
@@ -273,16 +279,32 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.createEdge(cls);
 	}
 
-	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge) {
-		return viewedGraph.connect(cls, vertex, edge);
-	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega) {
 		return viewedGraph.createEdge(cls, alpha, omega);
 	}
 
+	
+	@Override
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge) {
+		return viewedGraph.connect(cls, vertex, edge);
+	}
+	
+
+	@Override
+	public boolean containsVertex(Vertex v) {
+		return v.isVisible(lowestVisibleKappaLevel)
+				&& viewedGraph.containsVertex(v);
+	}
+	
+
+	@Override
+	public boolean containsEdge(Edge e) {
+		return e.isVisible(lowestVisibleKappaLevel)
+				&& viewedGraph.containsEdge(e);
+	}
+	
 	
 	@Override
 	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
@@ -293,18 +315,7 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
-	@Override
-	public boolean containsVertex(Vertex v) {
-		return v.isVisible(lowestVisibleKappaLevel)
-				&& viewedGraph.containsVertex(v);
-	}
-
-	@Override
-	public boolean containsEdge(Edge e) {
-		return e.isVisible(lowestVisibleKappaLevel)
-				&& viewedGraph.containsEdge(e);
-	}
-
+	
 	@Override
 	public void deleteVertex(Vertex v) {
 		if (containsVertex(v)) {
@@ -317,6 +328,7 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
+	
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
@@ -329,6 +341,7 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
+	
 	@Override
 	public Vertex getFirstVertex() {
 		Vertex v = viewedGraph.getFirstVertex();
@@ -462,30 +475,17 @@ public abstract class ViewGraphImpl implements Graph,
 		return vCount;
 	}
 	
-//	protected void setVCount(int vCount) {
-//		this.vCount = vCount;
-//	}
 
 	@Override
 	public long getECount() {
 		return eCount;
 	}
 	
-//	protected void setECount(int eCount) {
-//		this.eCount = eCount;
-//	}
-
 
 	@Override
 	public long getICount() {
 		return iCount;
 	}
-
-
-//	protected void setICount(int iCount) {
-//		this.iCount = iCount;
-//	}
-
 
 	
 	@Override
@@ -538,52 +538,6 @@ public abstract class ViewGraphImpl implements Graph,
 	
 	
 	// ============================================================================
-	// Methods to access attributes
-	// ============================================================================
-	
-	@Override
-	public Object getAttribute(String name) throws NoSuchAttributeException {
-		return viewedGraph.getAttribute(name);
-	}
-
-	@Override
-	public void setAttribute(String name, Object data)
-			throws NoSuchAttributeException {
-		viewedGraph.setAttribute(name, data);
-	}
-
-	@Override
-	public void initializeAttributesWithDefaultValues() {
-		throw new UnsupportedOperationException();
-	}
-	
-
-	@Override
-	public void readAttributeValueFromString(String attributeName, String value)
-			throws GraphIOException, NoSuchAttributeException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String writeAttributeValueToString(String attributeName)
-			throws IOException, GraphIOException, NoSuchAttributeException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void writeAttributeValues(GraphIO io) throws IOException,
-			GraphIOException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		throw new UnsupportedOperationException();
-	}
-
-	
-	
-	// ============================================================================
 	// Methods to manage graph listeners
 	// ============================================================================
 
@@ -613,12 +567,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	
-	
-	
-	
-	
 
-	
 	
 	// ============================================================================
 	// Methods to access graph state (version, loading state) and graph storage 
@@ -660,13 +609,7 @@ public abstract class ViewGraphImpl implements Graph,
 	public boolean isLoading() {
 		return false;
 	}
-	
 
-	@Override
-	public void setLoading(boolean b) {
-		viewedGraph.setLoading(b);
-	}
-	
 	
 	@Override
 	public GraphDatabaseBaseImpl getGraphDatabase() {
@@ -841,5 +784,51 @@ public abstract class ViewGraphImpl implements Graph,
 			iCount--;
 		}
 	}
+	
+	
+	// ============================================================================
+	// Methods to access attributes
+	// ============================================================================
+	
+	@Override
+	public Object getAttribute(String name) throws NoSuchAttributeException {
+		return viewedGraph.getAttribute(name);
+	}
+
+	@Override
+	public void setAttribute(String name, Object data)
+			throws NoSuchAttributeException {
+		viewedGraph.setAttribute(name, data);
+	}
+
+	@Override
+	public void initializeAttributesWithDefaultValues() {
+		throw new UnsupportedOperationException();
+	}
+	
+
+	@Override
+	public void readAttributeValueFromString(String attributeName, String value)
+			throws GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String writeAttributeValueToString(String attributeName)
+			throws IOException, GraphIOException, NoSuchAttributeException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void writeAttributeValues(GraphIO io) throws IOException,
+			GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void readAttributeValues(GraphIO io) throws GraphIOException {
+		throw new UnsupportedOperationException();
+	}
+
 	
 }

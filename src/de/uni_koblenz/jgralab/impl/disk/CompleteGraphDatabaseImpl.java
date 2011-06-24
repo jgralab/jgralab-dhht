@@ -119,9 +119,9 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		return partialGraphId;
 	}
 	
-	private void releasePartialGraphId(int partialGraphId) {
-		freePartialGraphIds.add(partialGraphId);
-	}
+//	private void releasePartialGraphId(int partialGraphId) {
+//		freePartialGraphIds.add(partialGraphId);
+//	}
 
 	/**
 	 * Registers the partial graph with the given id <code>id</code> which is
