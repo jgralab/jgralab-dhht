@@ -9,7 +9,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	private final CompleteGraphDatabaseImpl completeGraphDatabase;
 	
-	@SuppressWarnings("unused")
+
 	private ParentEntityKind kindOfParentElement;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,

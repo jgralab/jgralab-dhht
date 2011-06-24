@@ -83,6 +83,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 
 	
 	// ============================================================================
+	// Methods to access schema are inherited from AttributedElement 
+	// ============================================================================
+
+	
+	// ============================================================================
 	// Methods to manage the current traversal context 
 	// ============================================================================
 	
