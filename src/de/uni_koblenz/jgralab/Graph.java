@@ -227,6 +227,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public String getUniqueGraphId();
 	
 
+	/**
+	 * @return the global id of this subgraph unique in the distributed graph
+	 */
 	public long getGlobalId();
 	
 	
@@ -659,7 +662,9 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public void defragment();
 
 	
-	
+	// ============================================================================
+	// Methods to handle graph listeners
+	// ============================================================================
 
 
 	/**
@@ -698,6 +703,13 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public int getGraphStructureChangedListenerCount();
 
 	
+	
+	
+	// ============================================================================
+	// Methods to access graph state and version (loading etc.)
+	// ============================================================================
+	
+	
 	/**
 	 * Checks whether this graph is currently being loaded.
 	 * 
@@ -706,17 +718,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public boolean isLoading();
 	
 	
-	/**
-	 * Sets the loading flag of this graph
-	 * @param b
-	 */
-	public void setLoading(boolean b);
-
-	/**
-	 * Method is be called by all operations changing the graph
-	 */
-	public void graphModified();
-
 	/**
 	 * Checks whether this graph has changed with respect to the given
 	 * <code>previousVersion</code>. Every change in the graph, e.g. adding,

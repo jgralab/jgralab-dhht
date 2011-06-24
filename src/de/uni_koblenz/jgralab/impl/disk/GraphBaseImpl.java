@@ -39,7 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.Stack;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -48,6 +47,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
@@ -514,108 +514,24 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	public Iterable<Edge> getEdges() {
 		return new EdgeIterable<Edge>(this);
 	}
-
-	@Override
-	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
-		return new EdgeIterable<Edge>(this, edgeClass);
-	}
+	
 
 	@Override
 	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
 		return new EdgeIterable<Edge>(this, edgeClass.getM1Class());
 	}
 
-
-
-
+	@Override
+	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
+		return new EdgeIterable<Edge>(this, edgeClass);
+	}
 
 	
-
-
-
-
-	@Override
-	public void initializeAttributesWithDefaultValues() {
-		for (Attribute attr : getType().getAttributeList()) {
-			try {
-				if ((attr.getDefaultValueAsString() != null)
-						&& !attr.getDefaultValueAsString().isEmpty()) {
-					internalSetDefaultValue(attr);
-				}
-			} catch (GraphIOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param attr
-	 * @throws GraphIOException
-	 */
-	protected void internalSetDefaultValue(Attribute attr)
-			throws GraphIOException {
-		attr.setDefaultValue(this);
-	}
-
-
-
-
-
-	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
-			GraphElement<?, ?, ?> child) {
-		try {
-			parent.addSubordinateElement((Vertex) child);
-		} catch (ClassCastException e) {
-			parent.addSubordinateElement((Edge) child);
-		}
-	}
-
-
-
-	protected abstract void edgeListModified();
-
-	protected abstract void vertexListModified();
-
+	// ============================================================================
+	// Methods to sort vertices and edges of the graph
+	// ============================================================================
 	
-
-
-
-	@Override
-	public GraphClass getGraphClass() {
-		return getType();
-	}
-
-
-	@Override
-	abstract public long getVertexListVersion();
-
-	@Override
-	public boolean isEdgeListModified(long edgeListVersion) {
-		return getEdgeListVersion() != edgeListVersion;
-	}
-
-	@Override
-	public boolean isGraphModified(long previousVersion) {
-		return getGraphVersion() != previousVersion;
-	}
-
-	@Override
-	public boolean isVertexListModified(long previousVersion) {
-		return getVertexListVersion() != previousVersion;
-	}
-
-	/**
-	 * Changes this graph's version. graphModified() is called whenever the
-	 * graph is changed, all changes like adding, creating and reordering of
-	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change.
-	 * @ 
-	 */
-	public abstract void graphModified();
-
-
-
+	
 	// sort vertices
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
@@ -898,7 +814,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	}
 
-	// handle GraphStructureChangedListener
+
+
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to handle graph listeners
+	// ============================================================================
+	
 
 	/**
 	 * A list of all registered <code>GraphStructureChangedListener</code> as
@@ -1130,16 +1055,145 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 			graphStructureChangedListeners.get(i).edgeAdded(e);
 		}
 	}
+	
+	
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to access graph state and version (loading etc.)
+	// ============================================================================
+
+
+	@Override
+	public void initializeAttributesWithDefaultValues() {
+		for (Attribute attr : getType().getAttributeList()) {
+			try {
+				if ((attr.getDefaultValueAsString() != null)
+						&& !attr.getDefaultValueAsString().isEmpty()) {
+					internalSetDefaultValue(attr);
+				}
+			} catch (GraphIOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * @param attr
+	 * @throws GraphIOException
+	 */
+	protected void internalSetDefaultValue(Attribute attr)
+			throws GraphIOException {
+		attr.setDefaultValue(this);
+	}
+
+
+
+
+
+	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
+			GraphElement<?, ?, ?> child) {
+		try {
+			parent.addSubordinateElement((Vertex) child);
+		} catch (ClassCastException e) {
+			parent.addSubordinateElement((Edge) child);
+		}
+	}
 
 
 	
-	// ------------- PARTIAL GRAPH VARIABLES ------------
+	
+	
+	/**
+	 * Sets the loading flag of this graph
+	 * @param b
+	 */
+	public abstract void setLoading(boolean b);
+
+
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change.
+	 */
+	public abstract void graphModified();
+	
+	
+	@Override
+	public boolean isGraphModified(long previousVersion) {
+		return getGraphVersion() != previousVersion;
+	}
+	
+	
+	
+	/**
+	 * Changes the vertex list version of this graph. vertexListModified() is 
+	 * called whenever the vertices of a graph are changes, all changes like adding, 
+	 * creating and reordering of vertices are treated as a change. 
+	 */
+	protected abstract void vertexListModified();
+	
+	
+	@Override
+	public boolean isVertexListModified(long previousVersion) {
+		return getVertexListVersion() != previousVersion;
+	}
+
+
+	@Override
+	abstract public long getVertexListVersion();
+
+	
+	
+	
+	/**
+	 * Changes the edge list version of this graph. edgeListModified() is 
+	 * called whenever the edges of a graph are changes, all changes like adding, 
+	 * creating and reordering of edges  are treated as a change. 
+	 */
+	protected abstract void edgeListModified();
+
+
+
+	
+	@Override
+	public boolean isEdgeListModified(long edgeListVersion) {
+		return getEdgeListVersion() != edgeListVersion;
+	}
+
+	
+	@Override
+	abstract public long getEdgeListVersion();
+
+
+	
+	
+	
+	
+	
+	
 	
 
 
+	
+	@Override
+	public abstract GraphFactory getGraphFactory();
+
+
+	@Override
 	public abstract GraphDatabaseBaseImpl getGraphDatabase();
 
 
+
+	
+	@Override
+	public GraphClass getGraphClass() {
+		return getType();
+	}
 
 
 
@@ -1156,7 +1210,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	public abstract boolean containsEdgeLocally(Edge e);
 	
-
 
 	
 	/**

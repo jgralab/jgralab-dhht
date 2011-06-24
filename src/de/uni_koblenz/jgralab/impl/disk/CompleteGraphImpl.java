@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
+import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -70,6 +71,46 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			RemoteGraphDatabaseAccess graphData) {
 		super(partialGraphId, localDatabase, graphData);
 	}
+	
+	
+	// ==============================================================
+	// Methods to access schema and type
+	// ==============================================================
+	
+
+	@Override
+	public Schema getSchema() {
+		return localGraphDatabase.getSchema();
+	}
+	
+
+	@Override
+	public abstract Class<? extends Graph> getM1Class();
+
+
+	@Override
+	public abstract GraphClass getType();
+
+
+	@Override
+	public int compareTo(Graph a) {
+		int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
+		if (compVal == 0) {
+			return a.getPartialGraphId() - getPartialGraphId();
+			return compVal;
+		}
+	}
+
+
+	public void saveGraph(String filename, ProgressFunction pf, LocalBooleanGraphMarker subGraph) throws GraphIOException {
+	//	if (subGraph != null) {
+			GraphIO.saveGraphToFile(filename, this, pf);
+//		} else {
+//			GraphIO.saveGraphToFile(filename, subGraph, pf);
+//		}
+	}
+
+
 
 	
 	// ==============================================================
@@ -93,102 +134,118 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 	
 	
-	// ==============================================================
-	// Methods to access basic graph properties
-	// ==============================================================
+	// ============================================================================
+	// Methods to access hierarchy and distribution
+	//
+	// - General methods
+	// - Nesting hierarchy
+	// - Visibility layering
+	// - Distribution
+	// - Graph IDs
+	// ============================================================================
 
-
-
-	@Override
-	public int compareTo(Graph a) {
-		int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
-		if (compVal == 0) {
-			return a.getPartialGraphId() - getPartialGraphId();
-		} else {
-			return compVal;
-		}
-	}
-
-	@Override
-	public long getGraphVersion() {
-		return storingGraphDatabase.getGraphVersion();
-	}
-
-	@Override
-	public boolean isLoading() {
-		return storingGraphDatabase.isLoading();
-	}
-
-	@Override
-	public GraphDatabaseBaseImpl getGraphDatabase() {
-		return localGraphDatabase;
-	}
-
-	@Override
-	public final GraphFactory getGraphFactory() {
-		return localGraphDatabase.getGraphFactory();
-	}
-
-	@Override
-	public Schema getSchema() {
-		return localGraphDatabase.getSchema();
-	}
-
-//	@Override
-//	public Graph getSuperordinateGraph() {
-//		if (globalSubgraphId == 1) {
-//			return this;
-//		} else {
-//			return getParentDistributedGraph();
-//		}
-//	}
-
-	@Override
-	public Graph getParentDistributedGraph() {
-		return localGraphDatabase.getGraphObject(storingGraphDatabase
-				.getIdOfParentDistributedGraph());
-	}
-
+	
 	@Override
 	public Graph getCompleteGraph() {
 		return localGraphDatabase.getGraphObject(0);
 	}
+	
+	
+	@Override
+	public Graph getLocalPartialGraph() {
+		return localGraphDatabase.getGraphObject(0);
+	}
+	
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public AttributedElement getParentGraphOrElement() {
+		return null;
+	}
+	
 
+	@Override
+	public Graph getParentGraph() {
+		return null;
+	}
+	
+	
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		Graph parentGraph = getParentGraph();
+		return ((parentGraph == other) || (parentGraph.isPartOfGraph(other)));
+	}
+
+	
 	@Override
 	public Graph getView(int kappa) {
 		return localGraphDatabase.getGraphFactory()
 				.createViewGraph(this, kappa);
 	}
 
+	@Override
 	public Graph getViewedGraph() {
 		return this;
 	}
-
+	
+	//inherited from GraphBaseImpl
+	//public Graph createPartialGraphInGraph(String hostnameOfPartialGraph)  
+	
+	
 	@Override
-	public boolean isPartOfGraph(Graph other) {
-		Graph parentDistributedGraph = getParentDistributedGraph();
-		return ((parentDistributedGraph == other) || (parentDistributedGraph
-				.isPartOfGraph(other)));
+	public Graph getPartialGraph(int partialGraphId) {
+		long globalId = (partialGraphId << 32) + 1;
+		return localGraphDatabase.getGraphObject(globalId);
 	}
+	
+	
+	//Inherited from GraphBaseImpl
+	//@Deprecated
+	//public void savePartialGraphs(GraphIO graphIO)
+	
+	
+	//Inherited from GraphBaseImpl
+	//public String getUniqueGraphId() {}
+	
+	//Inherited from GraphBaseImpl
+	//public long getGlobalId() {}
+	
+	//Inherited from GraphBaseImpl
+	//public int getLocalId() {}
+	
 
+	//Inherited from GraphBaseImpl
+	//public int getPartialGraphId() {}
+	
+	//Inherited from GraphBaseImpl
+	//public int isLocalElementId(long id) {}
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to access vertices and edges of the graph
+	// ============================================================================
+
+	//Inherited from GraphBaseImpl
+	//public <T extends Vertex> T createVertex(Class<T> cls) {}
+	
+	
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends Edge> T createEdge(Class<T> cls)
+	
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega)
+	
+	
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge) {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
 		return vertex.connect(cls, edge);
 	}
-
-	@Override
-	public boolean containsEdge(Edge e) {
-		return (e != null) && (e.getGlobalId() > 0)
-				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
-	}
-
-	@Override
-	public boolean containsEdgeLocally(Edge e) {
-		return (e != null) && (e.getGraph() == this)
-				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
-	}
-
+	
+	
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return (v != null) && (v.getGlobalId() > 0)
@@ -201,83 +258,247 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 				&& (localGraphDatabase.getVertexObject(v.getGlobalId()) == v);
 	}
 
+	
+	@Override
+	public boolean containsEdge(Edge e) {
+		return (e != null) && (e.getGlobalId() > 0)
+				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
+	}
 
+	@Override
+	public boolean containsEdgeLocally(Edge e) {
+		return (e != null) && (e.getGraph() == this)
+				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
+	}
 
+	
+	//Inherited from GraphBaseImpl
+	//public boolean containsElement(GraphElement elem);
+	
+	//Inherited from GraphBaseImpl
+	//public boolean deleteVertex(Vertex v);
+	
+	//Inherited from GraphBaseImpl
+	//public boolean deleteEdge(Edge e);
+	
+	//Inherited from GraphBaseImpl
+	//public Vertex getFirstVertex()
+	
+	//Inherited from GraphBaseImpl
+	//public Vertex getLastVertex()
+	
+	//Inherited from GraphBaseImpl
+	//public Edge getFirstEdge()
+	
+	//Inherited from GraphBaseImpl
+	//public Edge getLastEdge()
+	
+	//Inherited from GraphBaseImpl
+	//public Vertex getVertex(long id)
+	
+	//Inherited from GraphBaseImpl
+	//public Edge getEdge(long id)
+	
+	//Inherited from GraphBaseImpl
+	//public long getMaxVCount()
+	
+	//Inherited from GraphBaseImpl
+	//public long getMaxECount()
+	
+	//Inherited from GraphBaseImpl
+	//public long getVCount()
+	
+	//Inherited from GraphBaseImpl
+	//public long getECount()
+	
+	//Inherited from GraphBaseImpl
+	//public long getICount()
+	
+	//Inherited from GraphBaseImpl
+	//public Iterable<Vertex> getVertices()
+	
+	//Inherited from GraphBaseImpl
+	//public Iterable<Edge> getEdges()
+	
+	//Inherited from GraphBaseImpl
+	//public void sortVertices(Comparator<Vertex> comp)
+	
+	//Inherited from GraphBaseImpl
+	//public void sortEdges(Comparator<Edge> comp)
+	
+	
+	@Override
+	public void defragment() {
+
+	}
+	
+	
+	// ============================================================================
+	// Methods to access vertex and edge order
+	// ============================================================================
+	
+	
+	
+//	/**
+//	 * Modifies eSeq such that the movedEdge is immediately after the
+//	 * targetEdge.
+//	 * 
+//	 * @param targetEdge
+//	 *            an edge
+//	 * @param movedEdge
+//	 *            the edge to be moved
+//	 */
+//	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
+//		storingGraphDatabase
+//				.putEdgeAfter(targetEdge.getGlobalId(), movedEdge.getGlobalId());
+//	}
+//
+//	/**
+//	 * Modifies eSeq such that the movedEdge is immediately before the
+//	 * targetEdge.
+//	 * 
+//	 * @param targetEdge
+//	 *            an edge
+//	 * @param movedEdge
+//	 *            the edge to be moved
+//	 */
+//	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
+//		storingGraphDatabase.putEdgeBefore(targetEdge.getGlobalId(),
+//				movedEdge.getGlobalId());
+//	}
+//
+//	/**
+//	 * Modifies vSeq such that the movedVertex is immediately after the
+//	 * targetVertex.
+//	 * 
+//	 * @param targetVertex
+//	 *            an edge
+//	 * @param movedVertex
+//	 *            the edge to be moved
+//	 */
+//	protected void putVertexAfterInGraph(VertexImpl targetVertex,
+//			VertexImpl movedVertex) {
+//		storingGraphDatabase.putVertexAfter(targetVertex.getGlobalId(),
+//				movedVertex.getGlobalId());
+//	}
+//
+//	/**
+//	 * Modifies eSeq such that the movedVertex is immediately before the
+//	 * targetVertex.
+//	 * 
+//	 * @param targetVertex
+//	 *            an edge
+//	 * @param movedVertex
+//	 *            the edge to be moved
+//	 */
+//	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
+//			VertexImpl movedVertex) {
+//		storingGraphDatabase.putVertexBefore(targetVertex.getGlobalId(),
+//				movedVertex.getGlobalId());
+//	}
+
+	
+	
+	// ============================================================================
+	// Listener methods inherited from GraphBaseImpl
+	// ============================================================================
+	
+	
+	// ============================================================================
+	// Methods to access graph state and version (loading etc.)
+	// ============================================================================
+	
+	@Override
+	public boolean isLoading() {
+		return storingGraphDatabase.isLoading();
+	}
+	
+	
+	/**
+	 * Sets the loading flag.
+	 * 
+	 * @param isLoading
+	 */
+	public void setLoading(boolean isLoading) {
+		storingGraphDatabase.setLoading(isLoading);
+	}
+
+	
+	
+	@Override
+	public long getGraphVersion() {
+		return storingGraphDatabase.getGraphVersion();
+	}
+	
+	
+	/**
+	 * Sets the version counter of this graph. Should only be called immediately
+	 * after loading and in graphModified.
+	 * 
+	 * @param graphVersion
+	 *            new version value
+	 */
+	public void setGraphVersion(long graphVersion) {
+		storingGraphDatabase.setGraphVersion(graphVersion);
+	}
+	
+	
+	/**
+	 * Changes this graph's version. graphModified() is called whenever the
+	 * graph is changed, all changes like adding, creating and reordering of
+	 * edges and vertices or changes of attributes of the graph, an edge or a
+	 * vertex are treated as a change.
+	 */
+	@Override
+	public void graphModified() {
+		storingGraphDatabase.graphModified();
+	}
+	
+	
+	
+	@Override
+	public long getVertexListVersion() {
+		return storingGraphDatabase.getVertexListVersion();
+	}
+	
 
 
 	@Override
 	public long getEdgeListVersion() {
 		return storingGraphDatabase.getEdgeListVersion();
 	}
+	
+	
+	@Override
+	protected void edgeListModified() {
+		storingGraphDatabase.edgeListModified();
+		storingGraphDatabase.graphModified();
+	}
 
-
-
+	
+	/**
+	 * Changes the vertex sequence version of this graph. Should be called
+	 * whenever the vertex list of this graph is changed, for instance by
+	 * creation and deletion or reordering of vertices.
+	 */
+	@Override
+	protected void vertexListModified() {
+		storingGraphDatabase.vertexListModified();
+		storingGraphDatabase.graphModified();
+	}
 
 
 	@Override
-	public long getVertexListVersion() {
-		return storingGraphDatabase.getVertexListVersion();
+	public final GraphFactory getGraphFactory() {
+		return localGraphDatabase.getGraphFactory();
 	}
-
-
-	/**
-	 * Modifies eSeq such that the movedEdge is immediately after the
-	 * targetEdge.
-	 * 
-	 * @param targetEdge
-	 *            an edge
-	 * @param movedEdge
-	 *            the edge to be moved
-	 */
-	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase
-				.putEdgeAfter(targetEdge.getGlobalId(), movedEdge.getGlobalId());
+	
+	
+	@Override
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		return localGraphDatabase;
 	}
-
-	/**
-	 * Modifies eSeq such that the movedEdge is immediately before the
-	 * targetEdge.
-	 * 
-	 * @param targetEdge
-	 *            an edge
-	 * @param movedEdge
-	 *            the edge to be moved
-	 */
-	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-		storingGraphDatabase.putEdgeBefore(targetEdge.getGlobalId(),
-				movedEdge.getGlobalId());
-	}
-
-	/**
-	 * Modifies vSeq such that the movedVertex is immediately after the
-	 * targetVertex.
-	 * 
-	 * @param targetVertex
-	 *            an edge
-	 * @param movedVertex
-	 *            the edge to be moved
-	 */
-	protected void putVertexAfterInGraph(VertexImpl targetVertex,
-			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexAfter(targetVertex.getGlobalId(),
-				movedVertex.getGlobalId());
-	}
-
-	/**
-	 * Modifies eSeq such that the movedVertex is immediately before the
-	 * targetVertex.
-	 * 
-	 * @param targetVertex
-	 *            an edge
-	 * @param movedVertex
-	 *            the edge to be moved
-	 */
-	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
-			VertexImpl movedVertex) {
-		storingGraphDatabase.putVertexBefore(targetVertex.getGlobalId(),
-				movedVertex.getGlobalId());
-	}
-
+	
 
 
 	// ====================================================
@@ -357,92 +578,13 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return storingGraphDatabase.createRecord(recordClass, components);
 	}
 
-	// ==============================================================
-	// Methods to be used only internal
-	// ==============================================================
-
-//	@Override
-//	protected void setVCount(int count) {
-//		storingGraphDatabase.setVCount(globalSubgraphId, count);
-//	}
-
-	/**
-	 * Sets the loading flag.
-	 * 
-	 * @param isLoading
-	 */
-	public void setLoading(boolean isLoading) {
-		storingGraphDatabase.setLoading(isLoading);
-	}
-
-	/**
-	 * Sets the version counter of this graph. Should only be called immediately
-	 * after loading and in graphModified.
-	 * 
-	 * @param graphVersion
-	 *            new version value
-	 */
-	public void setGraphVersion(long graphVersion) {
-		storingGraphDatabase.setGraphVersion(graphVersion);
-	}
-
-	@Override
-	public void defragment() {
-
-	}
-
-
-
-	/**
-	 * Changes this graph's version. graphModified() is called whenever the
-	 * graph is changed, all changes like adding, creating and reordering of
-	 * edges and vertices or changes of attributes of the graph, an edge or a
-	 * vertex are treated as a change.
-	 */
-	@Override
-	public void graphModified() {
-		storingGraphDatabase.graphModified();
-	}
-
-	@Override
-	protected void edgeListModified() {
-		storingGraphDatabase.edgeListModified();
-		storingGraphDatabase.graphModified();
-	}
-
-	/**
-	 * Changes the vertex sequence version of this graph. Should be called
-	 * whenever the vertex list of this graph is changed, for instance by
-	 * creation and deletion or reordering of vertices.
-	 */
-	@Override
-	protected void vertexListModified() {
-		storingGraphDatabase.vertexListModified();
-		storingGraphDatabase.graphModified();
-	}
-
-	public void saveGraph(String filename, ProgressFunction pf, LocalBooleanGraphMarker subGraph) throws GraphIOException {
-	//	if (subGraph != null) {
-			GraphIO.saveGraphToFile(filename, this, pf);
-//		} else {
-//			GraphIO.saveGraphToFile(filename, subGraph, pf);
-//		}
-	}
-
-	@Override
-	public Graph getPartialGraph(int partialGraphId) {
-		long globalId = (partialGraphId << 32) + 1;
-		return localGraphDatabase.getGraphObject(globalId);
-	}
-
 
 
 	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public AttributedElement getParentGraphOrElement() {
-		return null;
-	}
+
+
+
+
 
 
 }
