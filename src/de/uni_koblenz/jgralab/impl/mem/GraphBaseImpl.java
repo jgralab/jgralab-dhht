@@ -1048,11 +1048,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	public abstract boolean containsEdgeLocally(Edge e);
 
-
-
-
-	public abstract void setLoading(boolean b);
-
 //	public DiskStorageManager getDiskStorage() {
 //		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
 //	}

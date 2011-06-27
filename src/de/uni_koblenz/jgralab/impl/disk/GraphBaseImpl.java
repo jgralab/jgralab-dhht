@@ -213,8 +213,11 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		return list;
 	}
 
+	
 	@Override
-	public abstract Graph getPartialGraph(int partialGraphId);
+	public Graph getPartialGraph(int partialGraphId) {
+		return getGraphDatabase().getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(partialGraphId));
+	}
 	
 	/**
 	 * Saves the partial graphs of this graph

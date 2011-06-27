@@ -118,8 +118,16 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		return localGraphDatabase.getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID); 
 	}
 
-	//Inherited from GraphBaseImpl
-	//public Graph getLocalPartialGraph()
+	public Graph getLocalPartialGraph() {
+		return getParentGraph().getLocalPartialGraph();
+	}
+
+
+	@Override
+	public Graph getPartialGraph(int partialGraphId) {
+		return getGraphDatabase().getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(partialGraphId));
+	}
+
 	
 	
 	@SuppressWarnings("rawtypes")

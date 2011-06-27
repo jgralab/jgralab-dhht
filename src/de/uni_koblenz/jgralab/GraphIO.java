@@ -2864,7 +2864,7 @@ public class GraphIO {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
 			}
-			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)	.setLoading(true);
+			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setLoading(true);
 		} else {
 			try {
 				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
