@@ -11,13 +11,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
@@ -77,10 +77,11 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 	public GraphDatabaseBaseImpl loadGraph(String uid) throws GraphIOException {
 		GraphDatabaseBaseImpl db = localGraphDatabases.get(uid);
 		if (db == null) {
-			//TODO: The determine, if a Complete or Partial graphdb needs to be created 
-			XXXX
+			//Depending on the data stored in the GraphIO file, either a
+			//complete or a partial graph database will be created
 			String filename = localFilesContainingGraphs.get(uid);
-			GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK);
+			Graph graph = GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK);
+			db = graph.getGraphDatabase();
 			localGraphDatabases.put(uid, db);
 		}
 		return db;
