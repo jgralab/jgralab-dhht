@@ -55,7 +55,6 @@ import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
-import de.uni_koblenz.jgralab.impl.GraphInternalMethods;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -69,7 +68,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
+public abstract class GraphBaseImpl implements Graph {
 
 	/**
 	 * the graph database that stores this graph and manages all connections to
@@ -1137,15 +1136,6 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		}
 	}
 
-
-	
-	
-	
-	/**
-	 * Sets the loading flag of this graph
-	 * @param b
-	 */
-	public abstract void setLoading(boolean b);
 
 
 	/**
