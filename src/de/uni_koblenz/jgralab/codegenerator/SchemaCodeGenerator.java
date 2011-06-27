@@ -136,7 +136,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
 				"#jgPackage#.GraphIOException",
-				"#jgDiskImplPackage#.DiskImplementationBasics");
+				"#jgDiskImplPackage#.GraphDatabaseElementaryMethods");
 		CodeSnippet code = new CodeSnippet(
 				true,
 				"/**",
@@ -198,7 +198,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"\t} catch (UnknownHostException ex) {",
 				"\t\tthrow new RuntimeException(ex);",
 				"\t}",
-				"\tlong subgraphId = DiskImplementationBasics.GLOBAL_GRAPH_ID;",
+				"\tlong subgraphId = GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
 				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
 				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",
@@ -211,7 +211,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				"*/",
 				"public #gcName# create#gcCamelName#OnDisk(String localHostAddress) {",
 				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
-				"\tlong subgraphId = DiskImplementationBasics.GLOBAL_GRAPH_ID;",
+				"\tlong subgraphId = GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
 				"\tGraphDatabaseBaseImpl graphDb = new CompleteGraphDatabaseImpl(this, uniqueGraphId, localHostAddress);",
 				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb);",
 				"}",

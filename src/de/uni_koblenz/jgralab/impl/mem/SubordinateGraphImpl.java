@@ -118,12 +118,12 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public long getVertexListVersion() {
-		return getSuperordinateGraph().getVertexListVersion();
+		return getParentGraph().getVertexListVersion();
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		return getSuperordinateGraph().getEdgeListVersion();
+		return getParentGraph().getEdgeListVersion();
 	}
 
 	/**
@@ -454,17 +454,17 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public void graphModified() {
-		getSuperordinateGraph().graphModified();
+		getParentGraph().graphModified();
 	}
 
 	@Override
 	public void vertexListModified() {
-		getSuperordinateGraph().vertexListModified();
+		getParentGraph().vertexListModified();
 	}
 
 	@Override
 	public void edgeListModified() {
-		getSuperordinateGraph().edgeListModified();
+		getParentGraph().edgeListModified();
 	}
 
 	@Override
@@ -472,14 +472,15 @@ public abstract class SubordinateGraphImpl extends
 		return this;
 	}
 
-	//@Override
-	private GraphBaseImpl getSuperordinateGraph() {
-		return (GraphBaseImpl) containingElement.getGraph();
-	}
 
 	@Override
 	public GraphBaseImpl getCompleteGraph() {
-		return getSuperordinateGraph().getCompleteGraph();
+		return getParentGraph().getCompleteGraph();
+	}
+	
+
+	public GraphBaseImpl getParentGraph() {
+		return (GraphBaseImpl) containingElement.getGraph();
 	}
 
 	@Override
@@ -489,34 +490,34 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public long getGraphVersion() {
-		return getSuperordinateGraph().getGraphVersion();
+		return getParentGraph().getGraphVersion();
 	}
 
 	@Override
 	public boolean isPartOfGraph(Graph other) {
-		return other == getSuperordinateGraph()
-				|| getSuperordinateGraph().isPartOfGraph(other);
+		return other == getParentGraph()
+				|| getParentGraph().isPartOfGraph(other);
 	}
 
 	@Override
 	public boolean containsVertexLocally(Vertex v) {
-		return getSuperordinateGraph().containsVertexLocally(v);
+		return getParentGraph().containsVertexLocally(v);
 	}
 
 	@Override
 	public boolean containsEdgeLocally(Edge e) {
-		return getSuperordinateGraph().containsEdgeLocally(e);
+		return getParentGraph().containsEdgeLocally(e);
 	}
 
 	// TODO: Check if these methods should return the type of the vertex or edge
 	// the subordinate graph is embedded in
 	@Override
 	public GraphClass getGraphClass() {
-		return getSuperordinateGraph().getGraphClass();
+		return getParentGraph().getGraphClass();
 	}
 
 	public Class<? extends Graph> getM1Class() {
-		return getSuperordinateGraph().getM1Class();
+		return getParentGraph().getM1Class();
 	}
 
 	@Override

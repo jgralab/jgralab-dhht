@@ -475,7 +475,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
-					"\treturn ((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).get_#name#();",
+					"\treturn ((#schemaPackageName#.#simpleClassName#)getParentGraph()).get_#name#();",
 					"}");
 			break;
 		case DISKBASED:
@@ -500,7 +500,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\t((#schemaPackageName#.#simpleClassName#)getSuperordinateGraph()).set_#name#(_#name#);",
+					"\t((#schemaPackageName#.#simpleClassName#)getParentGraph()).set_#name#(_#name#);",
 					"}");
 			break;
 		case DISKBASED:
