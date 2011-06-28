@@ -2799,9 +2799,11 @@ public class GraphIO {
 		String uniqueGraphId = null;
 		ParentEntityKind parentEntityKind = null;
 		int partialGraphId = -1;
+		boolean isPartialGraph = false;
 		long parentPartialGraphId = -1;
 		if (lookAhead.equals("PartialGraph")) {
 			match("PartialGraph");
+			isPartialGraph = true;
 			uniqueGraphId = matchUtfString();
 			parentPartialGraphId = matchLong();
 			if (lookAhead.equals("GRAPH")) {
@@ -2857,6 +2859,7 @@ public class GraphIO {
 
 
 		if (implementationType == ImplementationType.MEMORY) {
+			//InMemory Implementation
 			try {
 				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.MEMORY)
 						.invoke(null, new Object[] { uniqueGraphId, maxV, maxE });
@@ -2866,8 +2869,11 @@ public class GraphIO {
 			}
 			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setLoading(true);
 		} else {
+			//DISK Implementation
 			try {
 				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
+				
+				
 				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) server.getGraphDatabase(uniqueGraphId);
 				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.DISK)
 						.invoke(null, new Object[] { uniqueGraphId, partialGraphId, localGraphDb });
@@ -2875,22 +2881,21 @@ public class GraphIO {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
 			}
-			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph).setLoading(true);
-			server = JGraLabServerImpl.getLocalInstance();
-			readPartialGraphs(graph);
-			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-			if (graph.getPartialGraphId() == GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
-				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
-						getLocalHostname());
-			} else {
-					gd = new PartialGraphDatabase(
-						schema,
-						uniqueGraphId,
-						partialGraphHostnames.get(GraphDatabaseBaseImpl
-								.getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)),
-						parentPartialGraphId, parentEntityKind, partialGraphId);
-			}
-			server.registerLocalGraphDatabase(gd);
+//			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph).setLoading(true);
+//			server = JGraLabServerImpl.getLocalInstance();
+//			readPartialGraphs(graph);
+//			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
+//			if (graph.getPartialGraphId() == GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
+//				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId, getLocalHostname());
+//			} else {
+//					gd = new PartialGraphDatabase(
+//						schema,
+//						uniqueGraphId,
+//						partialGraphHostnames.get(GraphDatabaseBaseImpl
+//								.getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)),
+//						parentPartialGraphId, parentEntityKind, partialGraphId);
+//			}
+//			server.registerLocalGraphDatabase(gd);
 		}
 
 		graph.readAttributeValues(this);
@@ -2940,7 +2945,7 @@ public class GraphIO {
 		sortLambdaSequences(graph);
 		setSigmas(graph, onlyLocalGraph, implementationType);
 
-		if (graph.getPartialGraphId() == 1) {
+		if (!isPartialGraph) {
 			if (implementationType == ImplementationType.MEMORY) {
 				((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setGraphVersion(graphVersion);
 			} else {
@@ -2951,18 +2956,14 @@ public class GraphIO {
 			pf.finished();
 		}
 		if (implementationType == ImplementationType.MEMORY) {
-			((de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl) graph)
-					.setLoading(false);
+			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setLoading(false);
 		} else {
-			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph)
-					.setLoading(false);
+			((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph).setLoading(false);
+
 		}
 		return graph;
 	}
-
-	private String getLocalHostname() {
-		return JGraLabServerImpl.getLocalInstance().getHostname();
-	}
+	
 
 	private void deleteIncompleteBinaryEdges(Graph graph) {
 		for (Edge edge : graph.getEdges()) {

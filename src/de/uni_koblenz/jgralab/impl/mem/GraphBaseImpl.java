@@ -72,6 +72,32 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  */
 public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	@Override
+	public Graph getTraversalContext() {
+		return getCompleteGraph().getTraversalContext();
+	}
+
+	@Override
+	public void useAsTraversalContext() {
+		((CompleteGraphImpl) getCompleteGraph()).setTraversalContext(this);
+	}
+
+	@Override
+	public void releaseTraversalContext() {
+		getCompleteGraph().releaseTraversalContext();
+	}
+	
+	
 
 	// ------------- VERTEX LIST VARIABLES -------------
 
@@ -197,30 +223,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		setECount(0);
 	}
 
-	/*
-	 * Sets <code>traversalContext</code> as the traversal context.
-	 * 
-	 * @param traversalContext {@link Graph}
-	 */
-	protected void setTraversalContext(Graph traversalContext)
-			 {
-		(getCompleteGraph()).setTraversalContext(traversalContext);
-	}
 
-	@Override
-	public Graph getTraversalContext() {
-		return getCompleteGraph().getTraversalContext();
-	}
-
-	@Override
-	public void useAsTraversalContext() {
-		(getCompleteGraph()).setTraversalContext(this);
-	}
-
-	@Override
-	public void releaseTraversalContext() {
-		getCompleteGraph().releaseTraversalContext();
-	}
 
 	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
 			GraphElement<?, ?, ?> child) {
@@ -298,21 +301,18 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Vertex> T createVertex(Class<T> cls)
-			 {
+	public <T extends Vertex> T createVertex(Class<T> cls) {
 		try {
 			return (T) internalCreateVertex(cls);
 		} catch (Exception ex) {
 			if (ex instanceof GraphException) {
 				throw (GraphException) ex;
 			}
-			throw new GraphException("Error creating vertex of class "
-					+ cls.getName(), ex);
+			throw new GraphException("Error creating vertex of class "	+ cls.getName(), ex);
 		}
 	}
 
-	protected Vertex internalCreateVertex(Class<? extends Vertex> cls)
-			 {
+	protected Vertex internalCreateVertex(Class<? extends Vertex> cls) {
 		return getGraphFactory().createVertex(cls, 0, this);
 	}
 
@@ -985,12 +985,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		}
 	}
 
-	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge) {
-		T newIncidence = vertex.connect(cls, edge);
-		return newIncidence;
-	}
+	
 
 	protected abstract void setICount(int count);
 
@@ -1002,6 +997,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 			return containsVertex((Vertex) elem);
 		}
 	}
+	
+	
+	@Override
+	public boolean containsVertex(Vertex v) {
+		if (containsVertexLocally(v)) {
+			return true;
+		}
+		return v.getContainingGraph().isPartOfGraph(this)
+				&& v.getContainingGraph().containsVertex(v);
+	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
@@ -1012,24 +1017,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 				&& e.getContainingGraph().containsEdge(e);
 	}
 
+	
+	
+	
 	@Override
-	public boolean containsVertex(Vertex v) {
-		if (containsVertexLocally(v)) {
-			return true;
-		}
-		return v.getContainingGraph().isPartOfGraph(this)
-				&& v.getContainingGraph().containsVertex(v);
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
+		T newIncidence = vertex.connect(cls, edge);
+		return newIncidence;
 	}
-
-	/**
-	 * @return the distributed graph this graph belongs to
-	 */
-	public abstract GraphBaseImpl getParentDistributedGraph();
-
-//	/**
-//	 * @return the distributed graph this graph belongs to
-//	 */
-//	public abstract GraphBaseImpl getSuperordinateGraph();
+	
 
 	/**
 	 * @return the complete top-level DHHTGraph

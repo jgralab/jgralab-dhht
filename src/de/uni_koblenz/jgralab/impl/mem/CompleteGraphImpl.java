@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.mem;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -43,9 +44,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -55,6 +58,7 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
+import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
@@ -74,31 +78,9 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public abstract class CompleteGraphImpl extends GraphBaseImpl {
-
-	// ------------- GRAPH VARIABLES -------------
-
-	/**
-	 * the unique id of the graph in the schema
-	 */
-	private String uid;
-
-	/**
-	 * List of vertices to be deleted by a cascading delete caused by deletion
-	 * of a composition "parent".
-	 */
-	private List<VertexImpl> deleteVertexList;
-
-	/**
-	 * Stores the traversal context of each {@link Thread} working on this
-	 * {@link Graph}.
-	 */
-	private HashMap<Thread, Stack<Graph>> traversalContextMap;
-
-	@Override
-	public void useAsTraversalContext() {
-		setTraversalContext(this);
-	}
-
+	
+	
+	
 	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
@@ -142,13 +124,358 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		expandEdgeArray(eMax);
 		expandIncidenceArray(vMax + eMax);
 	}
+	
+	
+	
+	
+	// ============================================================================
+	// Methods to access schema are inherited from AttributedElement 
+	// ============================================================================
 
+	
+	// ============================================================================
+	// Methods to manage the current traversal context 
+	// ============================================================================
+
+	/**
+	 * Stores the traversal context of each {@link Thread} working on this
+	 * {@link Graph}.
+	 */
+	private HashMap<Thread, Stack<Graph>> traversalContextMap;
+	
+	
+	@Override
+	public Graph getTraversalContext() {
+		if (traversalContextMap == null) {
+			return null;
+		}
+		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
+		if (stack == null || stack.isEmpty()) {
+			return this;
+		} else {
+			return stack.peek();
+		}
+	}
+	
+	
+	@Override
+	public void useAsTraversalContext() {
+		setTraversalContext(this);
+	}
+	
+	
+	@Override
+	public void releaseTraversalContext() {
+		if (traversalContextMap == null) {
+			return;
+		}
+		Stack<Graph> stack = this.traversalContextMap.get(Thread
+				.currentThread());
+		if (stack != null) {
+			stack.pop();
+			if (stack.isEmpty()) {
+				traversalContextMap.remove(Thread.currentThread());
+				if (traversalContextMap.isEmpty()) {
+					traversalContextMap = null;
+				}
+			}
+		}
+	}
+	
+	
+	public void setTraversalContext(Graph traversalContext) {
+		if (this.traversalContextMap == null) {
+			this.traversalContextMap = new HashMap<Thread, Stack<Graph>>();
+		}
+		Stack<Graph> stack = this.traversalContextMap.get(Thread
+				.currentThread());
+		if (stack == null) {
+			stack = new Stack<Graph>();
+			this.traversalContextMap.put(Thread.currentThread(), stack);
+		}
+		stack.add(traversalContext);
+	}
+	
+	
+	
+	// ============================================================================
+	// Methods to access hierarchy and distribution
+	//
+	// - General methods
+	// - Nesting hierarchy
+	// - Visibility layering
+	// - Distribution
+	// - Graph IDs
+	// ============================================================================
+	
+	
+	@Override
+	public CompleteGraphImpl getCompleteGraph() {
+		return this;
+	}
+	
+	@Override
+	public Graph getLocalPartialGraph() {
+		return this;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public AttributedElement getParentGraphOrElement() {
+		return null;
+	}
+	
+	@Override
+	public Graph getParentGraph() {
+		return null;
+	}
+	
+
+	@Override
+	public boolean isPartOfGraph(Graph other) {
+		return false;
+	}
+
+	
+	@Override
+	public int getPartialGraphId() {
+		return GraphDatabaseBaseImpl.getPartialGraphId(id);
+	}
+	
+
+	@Override
+	public Graph getView(int kappa) {
+		return graphFactory.createViewGraph(this, kappa);
+	}
+	
+	
+	@Override
+	public Graph getViewedGraph() {
+		return this;
+	}
+
+	
+	@Override
+	public Graph createPartialGraphInGraph(String hostname) {
+		throw new RuntimeException("Creation of partial graphs is not supported in memory-only implementation");
+	}
+	
+	
+	public Graph getPartialGraphId(int id) {
+		if (id == 1) return this;
+		throw new RuntimeException("Partial graphs are not supported in memory-only implementation");
+	}
+	
+	
+	// ============================================================================
+	// Methods to access ids
+	// ============================================================================
+
+	/**
+	 * the unique id of the graph in the schema
+	 */
+	private String uid;
+	
 
 	/**
 	 * The id of this complete or partial graph identifying it in the complete
 	 * graph
 	 */
 	protected int id;
+	
+	
+	
+	@Override
+	public String getUniqueGraphId() {
+		return uid;
+	}
+
+	@Override
+	public long getGlobalId() {
+		return 1;
+	}
+
+	@Override
+	public int getLocalId() {
+		return 1;
+	}
+	
+	
+	//Inherited from GraphBaseImpl
+	//public int getPartialGraphId();
+	
+
+	@Override
+	public boolean isLocalElementId(long id) {
+		return ((int)id) == id;
+	}
+	
+	
+	
+	// ============================================================================
+	// Methods to access vertices and edges of the graph
+	// ============================================================================
+
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends Vertex> T createVertex(Class<T> cls);
+	
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends Edge> T createEdge(Class<T> cls);
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega);
+
+	
+	//Inherited from GraphBaseImpl
+	//public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge);
+
+	
+	//Inherited from GraphBaseImpl
+	//public boolean containsVertex(Vertex v);
+	
+	@Override
+	public boolean containsVertexLocally(Vertex v) {
+		return (v != null) && (v.getGraph() == this)
+				&& (getVertexArray()[((VertexImpl) v).id] == v);
+	}
+	
+	
+	//Inherited from GraphBaseImpl
+	//public boolean containsEdge(Edge e);
+	
+	
+	@Override
+	public boolean containsEdgeLocally(Edge e) {
+		return (e != null) && (e.getGraph() == this)
+				&& (getEdgeArray()[((EdgeImpl) e).id] == e);
+	}
+	
+	//Inherited from GraphBaseImpl
+	//public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem);
+
+	
+	/**
+	 * Checks if the vertex id vId is valid and if there is an such a vertex
+	 * locally in this graph.
+	 * 
+	 * @param vId
+	 *            a vertex id
+	 * @return true if this graph contains a vertex with id vId
+	 */
+	private final boolean containsVertexId(int vId) {
+		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
+	}
+	
+
+	/**
+	 * Checks if the edge id eId is valid and if there is an such an edge
+	 * locally in this graph.
+	 * 
+	 * @param eId
+	 *            an edge id
+	 * @return true if this graph contains an edge with id eId
+	 */
+	private final boolean containsEdgeId(int eId) {
+		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
+	}
+
+	
+	/**
+	 * Checks if the incidence id iId is valid and if there is an such an
+	 * incidence locally in this graph.
+	 * 
+	 * @param iId
+	 *            a incidence id
+	 * @return true if this graph contains an incidence with id iId
+	 */
+	private final boolean containsIncidenceId(int iId) {
+		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
+	}
+	
+
+
+
+	/**
+	 * List of vertices to be deleted by a cascading delete caused by deletion
+	 * of a composition "parent".
+	 */
+	private List<VertexImpl> deleteVertexList;
+
+	
+	@Override
+	public void deleteVertex(Vertex v) {
+		assert (v != null) && v.isValid() && containsVertex(v);
+		getDeleteVertexList().add((VertexImpl) v);
+		internalDeleteVertex();
+	}
+
+
+	@Override
+	public void deleteEdge(Edge e) {
+		assert (e != null) && e.isValid() && containsEdge(e);
+		internalDeleteEdge(e);
+		edgeListModified();
+	}
+	
+	
+	@Override
+	public Vertex getFirstVertex() {
+		return firstVertex;
+	}
+	
+	@Override
+	protected void setFirstVertex(VertexImpl firstVertex) {
+		this.firstVertex = firstVertex;
+	}
+	
+	
+	@Override
+	public Vertex getLastVertex() {
+		return lastVertex;
+	}
+	
+	
+	@Override
+	protected void setLastVertex(VertexImpl lastVertex) {
+		this.lastVertex = lastVertex;
+	}
+	
+	
+	@Override
+	public Edge getFirstEdge() {
+		return firstEdge;
+	}
+	
+	
+	@Override
+	protected void setFirstEdge(EdgeImpl firstEdge) {
+		this.firstEdge = firstEdge;
+	}
+
+	
+	@Override
+	public Edge getLastEdge() {
+		return lastEdge;
+	}
+	
+	
+	@Override
+	protected void setLastEdge(EdgeImpl lastEdge) {
+		this.lastEdge = lastEdge;
+	}
+
+
+	
+
+
+
+	
+	
+	
+
+
 
 	/**
 	 * The GraphFactory that was used to create this graph. This factory will be
@@ -258,37 +585,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	
 
-	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
-			Edge edge) {
-		return vertex.connect(cls, edge);
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uni_koblenz.jgralab.Graph#deleteEdge(de.uni_koblenz.jgralab.Edge)
-	 */
-	@Override
-	public void deleteEdge(Edge e) {
-		assert (e != null) && e.isValid() && containsEdge(e);
-		internalDeleteEdge(e);
-		edgeListModified();
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uni_koblenz.jgralab.Graph#deleteVertex(de.uni_koblenz.jgralab.Vertex)
-	 */
-	@Override
-	public void deleteVertex(Vertex v) {
-		assert (v != null) && v.isValid() && containsVertex(v);
-
-		getDeleteVertexList().add((VertexImpl) v);
-		internalDeleteVertex();
-	}
 
 	/**
 	 * Callback function for triggered actions just after the edge
@@ -309,10 +607,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	}
 
-	@Override
-	public CompleteGraphImpl getCompleteGraph() {
-		return this;
-	}
+	
 
 	protected List<VertexImpl> getDeleteVertexList() {
 		return deleteVertexList;
@@ -328,23 +623,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	@Override
-	public String getUniqueGraphId() {
-		return uid;
-	}
+	
 
-	@Override
-	public Graph getTraversalContext() {
-		if (traversalContextMap == null) {
-			return null;
-		}
-		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
-		if (stack == null || stack.isEmpty()) {
-			return this;
-		} else {
-			return stack.peek();
-		}
-	}
+
 
 	@Override
 	public Vertex getVertex(long vId) {
@@ -644,23 +925,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		vertexListModified();
 	}
 
-	@Override
-	public void releaseTraversalContext() {
-		if (traversalContextMap == null) {
-			return;
-		}
-		Stack<Graph> stack = this.traversalContextMap.get(Thread
-				.currentThread());
-		if (stack != null) {
-			stack.pop();
-			if (stack.isEmpty()) {
-				traversalContextMap.remove(Thread.currentThread());
-				if (traversalContextMap.isEmpty()) {
-					traversalContextMap = null;
-				}
-			}
-		}
-	}
+
 
 	/**
 	 * Removes the edge e from the global edge sequence of this graph.
@@ -761,19 +1026,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		graphModified();
 	}
 
-	@Override
-	public void setTraversalContext(Graph traversalContext) {
-		if (this.traversalContextMap == null) {
-			this.traversalContextMap = new HashMap<Thread, Stack<Graph>>();
-		}
-		Stack<Graph> stack = this.traversalContextMap.get(Thread
-				.currentThread());
-		if (stack == null) {
-			stack = new Stack<Graph>();
-			this.traversalContextMap.put(Thread.currentThread(), stack);
-		}
-		stack.add(traversalContext);
-	}
+	
+	
 
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
@@ -798,25 +1052,13 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected void vertexAfterDeleted(Vertex vertexToBeDeleted) {
 
 	}
-
-	@Override
-	public boolean isPartOfGraph(Graph other) {
-		return false;
-	}
-
-	@Override
-	public int getPartialGraphId() {
-		return GraphDatabaseBaseImpl.getPartialGraphId(id);
-	}
+	
+	
+	
 
 	@Override
 	protected void vertexListModified() {
 		vertexListVersion++;
-	}
-
-	@Override
-	public GraphBaseImpl getParentDistributedGraph() {
-		return this;
 	}
 
 //	@Override
@@ -837,6 +1079,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public GraphFactory getGraphFactory() {
 		return graphFactory;
 	}
+	
+	
+	
 
 	@Override
 	public long getGraphVersion() {
@@ -904,17 +1149,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return vId;
 	}
 
-	@Override
-	public boolean containsVertexLocally(Vertex v) {
-		return (v != null) && (v.getGraph() == this)
-				&& (getVertexArray()[((VertexImpl) v).id] == v);
-	}
-
-	@Override
-	public boolean containsEdgeLocally(Edge e) {
-		return (e != null) && (e.getGraph() == this)
-				&& (getEdgeArray()[((EdgeImpl) e).id] == e);
-	}
+	
 
 	/**
 	 * Adds an edge to this graph. If the edges id is 0, a valid id is set,
@@ -1051,41 +1286,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	/**
-	 * Checks if the edge id eId is valid and if there is an such an edge
-	 * locally in this graph.
-	 * 
-	 * @param eId
-	 *            an edge id
-	 * @return true if this graph contains an edge with id eId
-	 */
-	protected final boolean containsEdgeId(int eId) {
-		return (eId > 0) && (eId <= eMax) && (getEdgeArray()[eId] != null);
-	}
-
-	/**
-	 * Checks if the incidence id iId is valid and if there is an such an
-	 * incidence locally in this graph.
-	 * 
-	 * @param iId
-	 *            a incidence id
-	 * @return true if this graph contains an incidence with id iId
-	 */
-	private final boolean containsIncidenceId(int iId) {
-		return (iId > 0) && (iId <= vMax) && (getIncidenceArray()[iId] != null);
-	}
-
-	/**
-	 * Checks if the vertex id vId is valid and if there is an such a vertex
-	 * locally in this graph.
-	 * 
-	 * @param vId
-	 *            a vertex id
-	 * @return true if this graph contains a vertex with id vId
-	 */
-	protected final boolean containsVertexId(int vId) {
-		return (vId > 0) && (vId <= vMax) && (getVertexArray()[vId] != null);
-	}
 
 	/**
 	 * Appends the edge e to the global edge sequence of this graph.
@@ -1129,10 +1329,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		return graphElementId == 0;
 	}
 
-	@Override
-	public Graph getView(int kappa) {
-		return graphFactory.createViewGraph(this, kappa);
-	}
+	
 
 	@Override
 	public boolean isLoading() {
@@ -1160,15 +1357,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		this.incidenceArray = incidenceArray;
 	}
 
-	@Override
-	protected void setLastEdge(EdgeImpl lastEdge) {
-		this.lastEdge = lastEdge;
-	}
 
-	@Override
-	protected void setLastVertex(VertexImpl lastVertex) {
-		this.lastVertex = lastVertex;
-	}
 
 	protected void setEdgeArray(EdgeImpl[] edge) {
 		this.edgeArray = edge;
@@ -1178,15 +1367,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		this.edgeListVersion = edgeListVersion;
 	}
 
-	@Override
-	protected void setFirstEdge(EdgeImpl firstEdge) {
-		this.firstEdge = firstEdge;
-	}
 
-	@Override
-	protected void setFirstVertex(VertexImpl firstVertex) {
-		this.firstVertex = firstVertex;
-	}
 
 	protected void setFreeEdgeList(FreeIndexList freeEdgeList) {
 		this.freeEdgeList = freeEdgeList;
@@ -1244,30 +1425,14 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected IncidenceImpl[] getIncidenceArray() {
 		return incidenceArray;
 	}
+	
 
-	@Override
-	public Edge getLastEdge() {
-		return lastEdge;
-	}
-
-	@Override
-	public Vertex getLastVertex() {
-		return lastVertex;
-	}
 
 	public int getExpandedVertexCount() {
 		return computeNewSize(vMax);
 	}
 
-	@Override
-	public Edge getFirstEdge() {
-		return firstEdge;
-	}
 
-	@Override
-	public Vertex getFirstVertex() {
-		return firstVertex;
-	}
 
 	protected FreeIndexList getFreeEdgeList() {
 		return freeEdgeList;
@@ -1708,26 +1873,8 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	public Graph getViewedGraph() {
-		return this;
-	}
 
-
-
-	@Override
-	public long getGlobalId() {
-		return 1;
-	}
-
-	@Override
-	public int getLocalId() {
-		return 1;
-	}
-
-	@Override
-	public boolean isLocalElementId(long id) {
-		return ((int)id) == id;
-	}
+	
 
 	@Override
 	protected void setVCount(int count) {
@@ -1738,8 +1885,10 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	protected void setECount(int count) {
 		eCount = count;
 	}
-	
 
+
+
+	
 
 
 }

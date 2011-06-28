@@ -467,11 +467,6 @@ public abstract class SubordinateGraphImpl extends
 		getParentGraph().edgeListModified();
 	}
 
-	@Override
-	public GraphBaseImpl getParentDistributedGraph() {
-		return this;
-	}
-
 
 	@Override
 	public GraphBaseImpl getCompleteGraph() {
