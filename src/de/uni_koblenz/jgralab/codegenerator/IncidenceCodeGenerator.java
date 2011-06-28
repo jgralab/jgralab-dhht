@@ -62,8 +62,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		addImports("#jgPackage#.Edge");
 		addImports("#jgPackage#.Vertex");
-		if (currentCycle.isProxies())
+		if (currentCycle.isProxies()) {
 			addImports("#jgDiskImplPackage#.IncidenceProxy");
+			return createProxyConstructor();
+		}
+			
 		if (currentCycle.isMembasedImpl()) {
 			return createInMemoryConstructor();
 		} else {
@@ -73,33 +76,38 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	private CodeBlock createInMemoryConstructor() {
 		CodeList code = new CodeList();
-		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##implOrProxy#(int id, Vertex vertex, Edge edge) {",
+						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);",
 						"}"));
 		return code;
 	}
 
+	private CodeBlock createProxyConstructor() {
+		CodeList code = new CodeList();
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Proxy(long globalId, GraphDatabaseBaseImpl localGraphDatabase,	RemoteGraphDatabaseAccess storingGraphDatabase) {",
+						"\tsuper(globalId, localGraphDatabase, storingGraphDatabase);",
+						"}"));
+		return code;
+	}
+	
 	private CodeBlock createDiskBasedConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
-		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
-
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##implOrProxy#(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
+						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
 						"\tsuper(globalId,localGraphDatabase, vertexId, edgeId);"));
 		code.addNoIndent(new CodeSnippet("}"));
-		if (currentCycle.isDiskbasedImpl()) {
-			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
-			code.addNoIndent(new CodeSnippet(
-				true,
-				"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, #jgDiskImplPackage#.IncidenceContainer container) {",
-				"\tsuper(globalId, localGraphDatabase, container);",
-				"}"));
-		}
+		code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
+		code.addNoIndent(new CodeSnippet(
+			true,
+			"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, #jgDiskImplPackage#.IncidenceContainer container) {",
+			"\tsuper(globalId, localGraphDatabase, container);",
+			"}"));
 		return code;
 	}
 	

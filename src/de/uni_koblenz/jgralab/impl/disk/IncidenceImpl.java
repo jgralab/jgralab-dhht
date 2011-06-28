@@ -230,6 +230,11 @@ public abstract class IncidenceImpl implements Incidence {
 	}
 	
 	@Override
+	public int getLocalId() {
+		return (int) id;
+	}
+	
+	@Override
 	public int compareTo(Incidence i) {
 		assert getGraph() == i.getGraph();
 		return (int) (getGlobalId() - i.getGlobalId());

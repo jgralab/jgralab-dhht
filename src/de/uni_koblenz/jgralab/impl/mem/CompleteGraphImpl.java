@@ -1144,7 +1144,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * 
 	 * @param isLoading
 	 */
-	@Override
 	public void setLoading(boolean isLoading) {
 		loading = isLoading;
 	}

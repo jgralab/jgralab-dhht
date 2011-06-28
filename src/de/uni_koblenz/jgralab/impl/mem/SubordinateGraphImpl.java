@@ -684,8 +684,4 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 
-	@Override
-	public void setLoading(boolean b) {
-		getCompleteGraph().setLoading(b);
-	}
 }
