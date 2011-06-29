@@ -475,6 +475,11 @@ public abstract class ViewGraphImpl implements Graph,
 	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public long getMaxICount() {
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public long getVCount() {

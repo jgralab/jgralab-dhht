@@ -73,6 +73,9 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if (currentCycle.isAbstract()) {
 			code.add(createGettersAndSetters(aec.getOwnAttributeList()));
 		}
+		if (currentCycle.isProxies()) {
+			code.add(createGettersAndSetters(aec.getAttributeList()));
+		}
 		return code;
 	}
 

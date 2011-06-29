@@ -64,6 +64,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#jgPackage#.Vertex");
 		if (currentCycle.isProxies()) {
 			addImports("#jgDiskImplPackage#.IncidenceProxy");
+			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			return createProxyConstructor();
 		}
 			
@@ -191,7 +192,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			code.add(" */",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isMemOrDiskImpl()  || currentCycle.isProxies() ) {
 			code.add("@Override",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
@@ -205,7 +206,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("direction", aec.getDirection().toString());
 		addImports("#jgPackage#.Direction");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isMemOrDiskImpl()  || currentCycle.isProxies() ) {
 			code.add("@Override",
 					 "public Direction getDirection() {",
 					 "\treturn Direction.#direction#;",

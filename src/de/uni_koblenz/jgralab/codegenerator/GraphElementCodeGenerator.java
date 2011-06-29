@@ -149,6 +149,12 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 										"\treturn attributeContainer;",
 									 "}"));
 		}	
+		if (currentCycle.isProxies()) {
+			code.add(new CodeSnippet("}"));
+			code.add(new CodeSnippet("public InnerAttributeContainer getAttributeContainer() {",
+										"\tthrow new UnsupportedOperationException();",
+									 "}"));
+		}	
 		return code;
 	}
 	
@@ -158,6 +164,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
+		code.setVariable("typeClass", attr.getDomain()
+				.getJavaClassName(schemaRootPackageName));
 		code.setVariable("isOrGet",
 				attr.getDomain().getJavaClassName(schemaRootPackageName)
 						.equals("Boolean") ? "is" : "get");
@@ -181,7 +189,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\");",
+					 "\treturn (#typeClass#) storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\");",
 					 "}");
 			break;
 		}
@@ -214,7 +222,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					 "\treturn storingGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#);",
+					 "\tstoringGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#);",
 					 "}");
 			break;
 		}

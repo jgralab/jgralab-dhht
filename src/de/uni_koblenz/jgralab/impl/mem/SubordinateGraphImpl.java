@@ -404,6 +404,14 @@ public abstract class SubordinateGraphImpl extends
 	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public long getMaxICount() {
+		throw new UnsupportedOperationException();
+	}
+	
+
+
 
 	@Override
 	public String getUniqueGraphId() {

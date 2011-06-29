@@ -265,6 +265,11 @@ public abstract class IncidenceProxy implements Incidence {
 	public long getGlobalId() {
 		return id;
 	}
+	
+	@Override
+	public int getLocalId() {
+		return (int) id;
+	}
 
 	@Override
 	public int compareTo(Incidence i) {

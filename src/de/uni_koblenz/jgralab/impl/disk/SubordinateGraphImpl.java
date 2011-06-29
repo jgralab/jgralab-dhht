@@ -314,6 +314,11 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	}
 	
 	@Override
+	public long getMaxICount() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public long getVCount() {
 		return storingGraphDatabase.getVCount(globalSubgraphId);
 	}

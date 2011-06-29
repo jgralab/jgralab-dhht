@@ -684,6 +684,16 @@ public abstract class EdgeProxy extends
 	public final Incidence connect(String rolename, Vertex elemToConnect) {
 		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
+	
+	@Override
+	protected void putIncidenceAfter(Incidence target, Incidence moved) {
+		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+	}
+
+	@Override
+	protected void putIncidenceBefore(Incidence target, Incidence moved) {
+		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+	}
 
 	@Override
 	public final List<? extends Edge> getAdjacences(Graph traversalContext,
@@ -983,6 +993,8 @@ public abstract class EdgeProxy extends
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, Direction.VERTEX_TO_EDGE);
 	}
+	
+
 
 	@Override
 	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext,
@@ -1035,6 +1047,26 @@ public abstract class EdgeProxy extends
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
+	
+
+	public Vertex getAlpha() {
+		Incidence firstInc = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(elementId));
+		if (firstInc.getDirection() == Direction.VERTEX_TO_EDGE) {
+			return firstInc.getVertex();
+		} else {
+			return firstInc.getNextIncidenceAtEdge().getVertex();
+		}
+	}
+
+	public Vertex getOmega() {
+		Incidence firstInc = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(elementId));
+		if (firstInc.getDirection() == Direction.EDGE_TO_VERTEX) {
+			return firstInc.getVertex();
+		} else {
+			return firstInc.getNextIncidenceAtEdge().getVertex();
+		}
+	}
+	
 
 	@Override
 	public void removeAdjacence(IncidenceClass ic, Edge other) {
@@ -1231,4 +1263,12 @@ public abstract class EdgeProxy extends
 	public void sortIncidences(Comparator<Incidence> comp) {
 		throw new RuntimeException("Not yet implemented");
 	}
+	
+	@Override
+	public AttributeContainer getAttributeContainer() {
+		throw new UnsupportedOperationException();
+	}
+	
+	
+	
 }

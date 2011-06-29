@@ -1071,5 +1071,10 @@ public abstract class IncidenceImpl implements Incidence {
 	public void setId(int iId) {
 		this.id = iId;
 	}
+	
+	@Override
+	public int getLocalId() {
+		return id;
+	}
 
 }

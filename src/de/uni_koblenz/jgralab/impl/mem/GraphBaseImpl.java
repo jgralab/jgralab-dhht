@@ -168,7 +168,9 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	public abstract GraphBaseImpl getCompleteGraph();
 	
 	@Override
-	public abstract Graph getLocalPartialGraph();
+	public Graph getLocalPartialGraph() {
+		return getCompleteGraph();
+	}
 	
 	
 	@SuppressWarnings("rawtypes")

@@ -509,6 +509,11 @@ public abstract class GraphBaseImpl implements Graph {
 		return storingGraphDatabase.getMaxECount();
 	}
 	
+	@Override
+	public long getMaxICount() {
+		throw new UnsupportedOperationException();
+	}
+	
 	
 	@Override
 	public long getVCount() {

@@ -1224,4 +1224,11 @@ public abstract class VertexProxy extends
 		throw new RuntimeException("Not yet implemented");
 	}
 	
+	
+	@Override
+	public AttributeContainer getAttributeContainer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }
