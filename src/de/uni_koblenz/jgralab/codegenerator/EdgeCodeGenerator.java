@@ -49,6 +49,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		rootBlock.setVariable("baseClassName", "EdgeImpl");
 		rootBlock.setVariable("proxyClassName", "EdgeProxy");
 		rootBlock.setVariable("graphElementClass", "Edge");
+		rootBlock.setVariable("edgeOrVertex", "Edge");
 	}
 
 	@Override

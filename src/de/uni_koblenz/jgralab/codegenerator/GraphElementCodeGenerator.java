@@ -189,7 +189,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn (#typeClass#) storingGraphDatabase.get#graphElementClass#Attribute(elementId, \"#name#\");",
+					 "\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
 					 "}");
 			break;
 		}
@@ -222,7 +222,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					 "\tstoringGraphDatabase.set#graphElementClass#Attribute(elementId, \"#name#\", _#name#);",
+					 "\tstoringGraphDatabase.set#edgeOrVertex#Attribute(elementId, \"#name#\", _#name#);",
 					 "}");
 			break;
 		}

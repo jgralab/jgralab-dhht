@@ -65,6 +65,8 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		if (currentCycle.isProxies()) {
 			addImports("#jgDiskImplPackage#.IncidenceProxy");
 			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+			addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
+			
 			return createProxyConstructor();
 		}
 			

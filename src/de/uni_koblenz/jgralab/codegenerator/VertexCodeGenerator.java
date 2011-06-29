@@ -48,7 +48,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		rootBlock.setVariable("baseClassName", "VertexImpl");
 		rootBlock.setVariable("proxyClassName", "VertexProxy");
 		rootBlock.setVariable("graphElementClass", "Vertex");
-		
+		rootBlock.setVariable("edgeOrVertex", "Vertex");
 	}
 
 
