@@ -254,10 +254,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 	
-	@Override
-	public int getPartialGraphId() {
-		return GraphDatabaseBaseImpl.getPartialGraphId(id);
-	}
 	
 
 	@Override
@@ -294,38 +290,31 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	private String uid;
 	
 
-	/**
-	 * The id of this complete or partial graph identifying it in the complete
-	 * graph
-	 */
-	protected int id;
-	
-	
 	
 	@Override
 	public String getUniqueGraphId() {
 		return uid;
 	}
 
-	@Override
-	public long getGlobalId() {
-		return 1;
-	}
-
-	@Override
-	public int getLocalId() {
-		return 1;
-	}
-	
-	
 	//Inherited from GraphBaseImpl
-	//public int getPartialGraphId();
+	//public long getGlobalId()
+
+	//Inherited from GraphBaseImpl
+	//public int getLocalId() 
+
+	
+	@Override
+	public int getPartialGraphId() {
+		//Access to GraphDatabase is correct here,
+		//since the method only returns the partial
+		//graph id of the complete graph
+		return GraphDatabaseBaseImpl.getPartialGraphId(id);
+	}
 	
 
-	@Override
-	public boolean isLocalElementId(long id) {
-		return ((int)id) == id;
-	}
+	//Inherited from GraphBaseImpl
+	//public boolean isLocalElementId(long id) 
+
 	
 	
 	
@@ -1075,10 +1064,17 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 	
 	
+	
+	
 	//All methods to access first and last vertex and edge, respectively, are inherited from GraphBaseImpl
 	//@Override
 	//public Vertex getFirstVertex()
 
+	
+	
+	
+	
+	
 	
 	@Override
 	public Vertex getVertex(long vId) {

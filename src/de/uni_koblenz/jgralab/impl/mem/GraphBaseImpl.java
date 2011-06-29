@@ -91,6 +91,11 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 	
 	
+	// ============================================================================
+	// Methods to access schema 
+	// ============================================================================
+
+	
 	@Override
 	public void initializeAttributesWithDefaultValues() {
 		for (Attribute attr : getType().getAttributeList()) {
@@ -214,13 +219,22 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	@Override
 	public abstract String getUniqueGraphId();
 	
+	/**
+	 * The id of this complete or partial graph identifying it in the complete
+	 * graph
+	 */
+	protected int id;
 	
 	@Override
-	public abstract long getGlobalId();
+	public long getGlobalId() {
+		return id;
+	}
 	
 	
 	@Override
-	public abstract int getLocalId();
+	public int getLocalId() {
+		return id;
+	}
 	
 
 	@Override
@@ -228,7 +242,10 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	
 	@Override
-	public abstract boolean isLocalElementId(long id);
+	public boolean isLocalElementId(long id) {
+		return ((int)id) == id;
+	}
+	
 	
 	
 	
