@@ -69,10 +69,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 
 /**
- * Implementation of the complete, possibly distributed DHHTGraph
- * 
- * TODO:
- * 
+ * In-memory implementation of the complete graph containing some subordinate ones
+ * Beware: Distribution is not supported by in-memory implementation
  * 
  * @author ist@uni-koblenz.de
  */

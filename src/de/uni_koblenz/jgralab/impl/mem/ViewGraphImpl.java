@@ -122,7 +122,7 @@ public abstract class ViewGraphImpl implements Graph,
 
 	@Override
 	public void useAsTraversalContext() {
-		((GraphBaseImpl) viewedGraph).setTraversalContext(this);
+		((CompleteGraphImpl) getCompleteGraph()).setTraversalContext(this);
 	}
 
 	@Override
