@@ -132,15 +132,20 @@ import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
+import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
@@ -1566,7 +1571,7 @@ public class Rsa2Tg extends XmlProcessor {
 				throw new ProcessingException(getParser(), getFileName(),
 						"The XMI id " + xmiId
 								+ " must denonte an EdgeClass, but is "
-								+ ae.getMetaClass().getQualifiedName());
+								+ ae.getType().getQualifiedName());
 			}
 
 			assert preliminaryVertices.contains(ae);
@@ -2883,7 +2888,7 @@ public class Rsa2Tg extends XmlProcessor {
 							"Type attribute of association end (XMI id "
 									+ xmiId
 									+ ") must denote a VertexClass, but is "
-									+ ae.getMetaClass().getQualifiedName());
+									+ ae.getType().getQualifiedName());
 				}
 				// VertexClass found
 				vc = (VertexClass) ae;
@@ -2921,7 +2926,7 @@ public class Rsa2Tg extends XmlProcessor {
 								"Assiocation attribute of association end (XMI id "
 										+ xmiId
 										+ ") must denote an EdgeClass, but is "
-										+ ae.getMetaClass().getQualifiedName());
+										+ ae.getType().getQualifiedName());
 					}
 					// EdgeClass found
 					ec = (EdgeClass) ae;
