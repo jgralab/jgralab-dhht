@@ -145,8 +145,8 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	// ------------- EDGE LIST VARIABLES -------------
 
-	private EdgeImpl firstEdge;
-	private EdgeImpl lastEdge;
+	protected EdgeImpl firstEdge;
+	protected EdgeImpl lastEdge;
 
 	/**
 	 * number of edges in the graph
@@ -159,18 +159,22 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	public Edge getFirstEdge() {
 		return firstEdge;
 	}
-
-	@Override
-	public Edge getLastEdge() {
-		return lastEdge;
-	}
-
+	
+	
 	/**
 	 * holds the id of the first edge in Eseq
 	 */
 	protected void setFirstEdge(EdgeImpl firstEdge) {
 		this.firstEdge = firstEdge;
 	}
+	
+
+	@Override
+	public Edge getLastEdge() {
+		return lastEdge;
+	}
+
+
 
 	/**
 	 * holds the id of the last edge in Eseq
@@ -183,16 +187,16 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-			for (Attribute attr : getType().getAttributeList()) {
-				try {
-					if ((attr.getDefaultValueAsString() != null)
-							&& !attr.getDefaultValueAsString().isEmpty()) {
-						internalSetDefaultValue(attr);
-					}
-				} catch (GraphIOException e) {
-					e.printStackTrace();
+		for (Attribute attr : getType().getAttributeList()) {
+			try {
+				if ((attr.getDefaultValueAsString() != null)
+						&& !attr.getDefaultValueAsString().isEmpty()) {
+					internalSetDefaultValue(attr);
 				}
+			} catch (GraphIOException e) {
+				e.printStackTrace();
 			}
+		}
 	}
 
 	/**

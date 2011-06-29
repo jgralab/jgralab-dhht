@@ -526,6 +526,11 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public long getMaxECount();
 
+	
+	
+	long getMaxICount();
+
+	
 	/**
 	 * Returns the number of vertices in this Graph.
 	 * 
@@ -961,6 +966,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @throws RemoteException 
 	 */
 	public <T extends Record> T createRecord(Class<T> recordClass, Object... components);
+
 
 
 
