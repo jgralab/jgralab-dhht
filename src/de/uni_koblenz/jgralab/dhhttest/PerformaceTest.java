@@ -4,6 +4,17 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.dhhttest.schema.Activity;
+import de.uni_koblenz.jgralab.dhhttest.schema.BusinessProcess;
+import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralab.dhhttest.schema.Feature;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_activity;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_feature;
+import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_process;
+import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_rule;
+import de.uni_koblenz.jgralab.dhhttest.schema.TransformationRule;
 
 public class PerformaceTest {
 	
@@ -24,7 +35,7 @@ public class PerformaceTest {
 	
 	private Graph createGraph()  throws RemoteException {
 		System.out.println("Creating graph...");
-		DHHTTestGraph graph = DHHTTestSchema.instance().createDHHTTestGraph();
+		DHHTTestGraph graph = DHHTTestSchema.instance().createDHHTTestGraphInMem();
 		
 		long startTime = System.currentTimeMillis();
 		for (int i=0; i<activityCount;i++) {

@@ -430,7 +430,6 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		
 		code.setVariable("icName", ic.getQualifiedName());
 		code.setVariable("schemaVariable", ic.getVariableName());
-		code.setVariable("icVariable", "ic");
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icVertexClass", ic.getVertexClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
@@ -457,7 +456,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				continue;
 			}
 			CodeSnippet s = new CodeSnippet(
-					"#icVariable#.addSuperClass(#superClassName#);");
+					"#schemaVariable#.addSuperClass(#superClassName#);");
 			s.setVariable("superClassName", superClass.getVariableName());
 			code.add(s);
 		}
