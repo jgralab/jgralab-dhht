@@ -81,13 +81,13 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
-	 * @param id
-	 *            this Graph's id
+	 * @param uid
+	 *            this Graph's unique id
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected CompleteGraphImpl(String id, GraphClass cls) {
-		this(id, cls, 1000, 1000);
+	protected CompleteGraphImpl(String uid, GraphClass cls) {
+		this(uid, cls, 1000, 1000);
 	}
 
 	/**

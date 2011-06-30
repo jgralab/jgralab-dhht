@@ -258,8 +258,12 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
 				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
 				 "\tinitializeAttributesWithDefaultValues();",
+				 "}\n\n");
+		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
+				 "public #simpleClassName#Impl() {",
+				 "\tsuper(GraphFactoryImpl.generateUniqueGraphId(), #schemaName#.instance().#schemaVariableName#);",
+				 "\tinitializeAttributesWithDefaultValues();",
 				 "}");
-	
 		return code;
 	}
 
