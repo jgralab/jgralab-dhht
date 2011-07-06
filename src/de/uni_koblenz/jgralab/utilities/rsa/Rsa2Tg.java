@@ -133,12 +133,16 @@ import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
+import de.uni_koblenz.jgralab.grumlschema.impl.mem.structure.ConnectsToVertexClassImpl;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Direction;
 import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
@@ -2941,14 +2945,25 @@ public class Rsa2Tg extends XmlProcessor {
 
 			assert (vc != null) && (ec != null);
 			inc = sg.createIncidenceClass();
-			inc.set_min(DEFAULT_MIN_MULTIPLICITY);
-			inc.set_max(DEFAULT_MAX_MULTIPLICITY);
-			sg.createComesFrom(ec, inc);
-			sg.createEndsAt(inc, vc);
+			inc.set_minEdgesAtVertex(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxEdgesAtVertex(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_abstract(false);
+			inc.set_direction(Direction.VERTEX_TO_EDGE);
+			sg.createConnectsToEdgeClass(inc, ec);
+			sg.createConnectsToVertexClass(inc, vc);
 		} else {
-			EdgeClass ec = (EdgeClass) (inc.getFirstComesFromIncidence() != null ? inc
-					.getFirstComesFromIncidence() : inc
-					.getFirstGoesToIncidence()).getThat();
+			// at this point the IncidenceClass was already created because the
+			// association was seen before via memberEnd
+			EdgeClass ec = null;
+			for (ConnectsToEdgeClass ctec : inc
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+				ec = (EdgeClass) ctec.getOmega();
+				break;
+			}
+			assert ec != null;
+
 			String id = null;
 			for (Entry<String, Vertex> idEntry : idMap.entrySet()) {
 				if (idEntry.getValue() == ec) {
@@ -2962,8 +2977,14 @@ public class Rsa2Tg extends XmlProcessor {
 
 			// an ownedEnd of an association or an ownedAttribute of a class
 			// with a possibly preliminary vertex class
-			VertexClass vc = (VertexClass) inc.getFirstEndsAtIncidence()
-					.getThat();
+			VertexClass vc = null;
+			for (ConnectsToVertexClass ctvc : inc
+					.getIncidentEdges(ConnectsToVertexClass.class)) {
+				vc = (VertexClass) ctvc.getOmega();
+				break;
+			}
+			assert vc != null;
+
 			if (preliminaryVertices.contains(vc)) {
 
 				AttributedElement ae = idMap.get(typeId);
@@ -2976,7 +2997,13 @@ public class Rsa2Tg extends XmlProcessor {
 								"Type attribute of association end (XMI id "
 										+ xmiId
 										+ ") must denote a VertexClass, but is "
-										+ ae.getMetaClass().getQualifiedName());
+										+ ae.getType().getQualifiedName());
+					}
+					for (ConnectsToVertexClass ctvc : inc
+							.getIncidentEdges(ConnectsToVertexClass.class)) {
+						((ConnectsToVertexClassImpl) ctvc)
+								.setOmega((VertexClass) ae);
+						break;
 					}
 					inc.getFirstEndsAtIncidence().setOmega((VertexClass) ae);
 
