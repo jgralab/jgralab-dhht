@@ -114,11 +114,11 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.ist.utilities.xml.XmlProcessor;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
@@ -147,8 +147,11 @@ import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain_domain;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceType;
 import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
@@ -723,7 +726,7 @@ public class Rsa2Tg extends XmlProcessor {
 				vertexId = handleClass(xmiId);
 			} else if (type.equals(UML_ASSOCIATION)
 					|| type.equals(UML_ASSOCIATION_CLASS)) {
-				vertexId = handleAssociation(xmiId);// TODO
+				vertexId = handleAssociation(xmiId);
 			} else if (type.equals(UML_ENUMERATION)) {
 				vertexId = handleEnumeration();
 			} else if (type.equals(UML_PRIMITIVE_TYPE)) {
@@ -735,7 +738,7 @@ public class Rsa2Tg extends XmlProcessor {
 						createUnexpectedElementMessage(name, type));
 			}
 
-		} else if (name.equals(UML_OWNEDRULE)) {// TODO
+		} else if (name.equals(UML_OWNEDRULE)) {
 			// Owned rule
 			inConstraint = true;
 			constrainedElementId = getAttribute(UML_ATTRIBUTE_CONSTRAINED_ELEMENT);
@@ -750,7 +753,7 @@ public class Rsa2Tg extends XmlProcessor {
 					constrainedElementId = null;
 				}
 			}
-		} else if (name.equals(UML_BODY)) {// TODO
+		} else if (name.equals(UML_BODY)) {
 			if (!inConstraint && !inComment && !inDefaultValue
 					&& !inSpecification) {
 				// Throw an error for body elements, which aren't
@@ -758,17 +761,17 @@ public class Rsa2Tg extends XmlProcessor {
 				throw new ProcessingException(getParser(), getFileName(),
 						createUnexpectedElementMessage(name, null));
 			}
-		} else if (name.equals(UML_SPECIFICATION)) {// TODO
+		} else if (name.equals(UML_SPECIFICATION)) {
 			// Specification is ignored for most elements
 			inSpecification = true;
-		} else if (name.equals(UML_LANGUAGE)) {// TODO
+		} else if (name.equals(UML_LANGUAGE)) {
 			if (!inConstraint) {
 				// Throw an error for specification elements, which aren't
 				// contained in a constraint.
 				throw new ProcessingException(getParser(), getFileName(),
 						createUnexpectedElementMessage(name, null));
 			}
-		} else if (name.equals(UML_OWNEDEND)) {// TODO
+		} else if (name.equals(UML_OWNEDEND)) {
 			// Owned end marks the end of the current class, which should be
 			// an edgeClasss.
 			if (type.equals(UML_PROPERTY)
@@ -779,7 +782,7 @@ public class Rsa2Tg extends XmlProcessor {
 						createUnexpectedElementMessage(name, type));
 			}
 
-		} else if (name.equals(UML_OWNED_ATTRIBUTE)) {// TODO
+		} else if (name.equals(UML_OWNED_ATTRIBUTE)) {
 			inOwnedAttribute = true;
 			// Handles the attributes of the current element
 			if (type.equals(UML_PROPERTY)) {
@@ -789,7 +792,7 @@ public class Rsa2Tg extends XmlProcessor {
 						createUnexpectedElementMessage(name, type));
 			}
 
-		} else if (name.equals(UML_ATTRIBUTE_TYPE)) {// TODO
+		} else if (name.equals(UML_ATTRIBUTE_TYPE)) {
 			// Handles the type of the current attribute, which should be a
 			// primitive type.
 			if (!inDefaultValue) {
@@ -800,7 +803,7 @@ public class Rsa2Tg extends XmlProcessor {
 							createUnexpectedElementMessage(name, type));
 				}
 			}
-		} else if (name.equals(UML_OWNED_LITERAL)) {// TODO
+		} else if (name.equals(UML_OWNED_LITERAL)) {
 			// Handles the literal of the current enumeration.
 			if (type.equals(UML_ENUMERATION_LITERAL)) {
 				handleEnumerationLiteral();
@@ -812,18 +815,18 @@ public class Rsa2Tg extends XmlProcessor {
 			// ignore
 		} else if (name.equals(UML_E_ANNOTATIONS)) {
 			// ignore
-		} else if (name.equals(UML_GENERALIZATION)) {// TODO
+		} else if (name.equals(UML_GENERALIZATION)) {
 			handleGeneralization();
-		} else if (name.equals(UML_DETAILS)) {// TODO
+		} else if (name.equals(UML_DETAILS)) {
 			handleStereotype();
-		} else if (name.equals(UML_LOWER_VALUE)) {// TODO
+		} else if (name.equals(UML_LOWER_VALUE)) {
 			handleLowerValue();
-		} else if (name.equals(UML_UPPER_VALUE)) {// TODO
+		} else if (name.equals(UML_UPPER_VALUE)) {
 			handleUpperValue();
-		} else if (name.equals(UML_OWNED_COMMENT)) {// TODO
+		} else if (name.equals(UML_OWNED_COMMENT)) {
 			annotatedElementId = getAttribute(UML_ANNOTATED_ELEMENT);
 			inComment = true;
-		} else if (name.equals(UML_DEFAULT_VALUE)) {// TODO
+		} else if (name.equals(UML_DEFAULT_VALUE)) {
 			String xmiType = getAttribute(XMI_NAMESPACE_PREFIX, XMI_TYPE);
 			if (isPrimitiveDefaultValue(xmiType)) {
 				// boolean, integer, string, or enumeration value
@@ -942,7 +945,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 		String xmiId = xmiIdStack.pop();
 
-		if (name.equals(UML_BODY)) {// TODO
+		if (name.equals(UML_BODY)) {
 			if (inConstraint) {
 				assert !inComment && !inDefaultValue;
 				handleConstraint(content.toString().trim().replace("\\s+", " "));
@@ -953,7 +956,7 @@ public class Rsa2Tg extends XmlProcessor {
 				handleDefaultValue(xmiId, content.toString().trim());
 			}
 		}
-		TypedElement elem = idMap.get(xmiId);
+		AttributedElement<?, ?> elem = idMap.get(xmiId);
 		if (elem != null) {
 			if (elem instanceof Package) {
 
@@ -983,32 +986,37 @@ public class Rsa2Tg extends XmlProcessor {
 				throw new ProcessingException(getParser(), getFileName(),
 						"XMI file is malformed. There is probably one end element to much.");
 			}
-		} else if (name.equals(UML_OWNED_ATTRIBUTE)) {// TODO
+		} else if (name.equals(UML_OWNED_ATTRIBUTE)) {
 			currentRecordDomainComponent = null;
 			if (currentAssociationEnd != null) {
 				checkMultiplicities(currentAssociationEnd);
 				currentAssociationEnd = null;
 			}
 			inOwnedAttribute = false;
-		} else if (name.equals(UML_OWNEDEND)) {// TODO
+		} else if (name.equals(UML_OWNEDEND)) {
 			checkMultiplicities(currentAssociationEnd);
 			currentAssociationEnd = null;
-		} else if (name.equals(UML_OWNEDRULE)) {// TODO
+		} else if (name.equals(UML_OWNEDRULE)) {
 			inConstraint = false;
 			constrainedElementId = null;
-		} else if (name.equals(UML_OWNED_COMMENT)) {// TODO
+		} else if (name.equals(UML_OWNED_COMMENT)) {
 			inComment = false;
 			annotatedElementId = null;
-		} else if (name.equals(UML_DEFAULT_VALUE)) {// TODO
+		} else if (name.equals(UML_DEFAULT_VALUE)) {
 			inDefaultValue = false;
-		} else if (name.equals(UML_SPECIFICATION)) {// TODO
+		} else if (name.equals(UML_SPECIFICATION)) {
 			inSpecification = false;
 		}
 	}
 
 	private void checkMultiplicities(IncidenceClass inc) {
-		int min = inc.get_min();
-		int max = inc.get_max();
+		checkMultiplicityValues(inc, inc.get_minEdgesAtVertex(),
+				inc.get_maxEdgesAtVertex());
+		checkMultiplicityValues(inc, inc.get_minVerticesAtEdge(),
+				inc.get_maxVerticesAtEdge());
+	}
+
+	private void checkMultiplicityValues(IncidenceClass inc, int min, int max) {
 		assert min >= 0;
 		assert max > 0;
 		if (min == Integer.MAX_VALUE) {
@@ -1310,7 +1318,7 @@ public class Rsa2Tg extends XmlProcessor {
 		// indirect superclass is redefined, this results in a redefines edge to
 		// that incidence class, without replacing a subsets edge.
 
-		for (TypedElement ae : redefines.getMarkedElements()) {
+		for (AttributedElement<?, ?> ae : redefines.getMarkedElements()) {
 			IncidenceClass inc = (IncidenceClass) ae;
 			Set<String> redefinedRolenames = redefines.getMark(inc);
 			for (String rolename : redefinedRolenames) {
@@ -1398,17 +1406,17 @@ public class Rsa2Tg extends XmlProcessor {
 		sg.createSubsets(subInc, superInc);
 	}
 
-	private IncidenceDirection getDirection(IncidenceClass inc) {
-		assert (inc.getFirstComesFromIncidence() == null)
-				|| (inc.getFirstGoesToIncidence() == null);
-		if (inc.getFirstComesFromIncidence() != null) {
-			return IncidenceDirection.OUT;
-		} else if (inc.getFirstGoesToIncidence() != null) {
-			return IncidenceDirection.IN;
-		} else {
-			return null;
-		}
-	}
+	// private IncidenceDirection getDirection(IncidenceClass inc) {
+	// assert (inc.getFirstComesFromIncidence() == null)
+	// || (inc.getFirstGoesToIncidence() == null);
+	// if (inc.getFirstComesFromIncidence() != null) {
+	// return IncidenceDirection.OUT;
+	// } else if (inc.getFirstGoesToIncidence() != null) {
+	// return IncidenceDirection.IN;
+	// } else {
+	// return null;
+	// }
+	// } TODO delete this
 
 	/**
 	 * Writes a DOT file and a TG file out.
@@ -1526,7 +1534,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private Vertex handleClass(String xmiId) throws XMLStreamException {
 
-		TypedElement ae = idMap.get(xmiId);
+		AttributedElement<?, ?> ae = idMap.get(xmiId);
 		VertexClass vc = null;
 		if (ae != null) {
 
@@ -1568,7 +1576,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// create an EdgeClass at first, probably, this has to
 		// become an Aggregation or Composition later...
-		AttributedElement ae = idMap.get(xmiId);
+		AttributedElement<?, ?> ae = idMap.get(xmiId);
 		EdgeClass ec = null;
 		if (ae != null) {
 			if (!(ae instanceof EdgeClass)) {
@@ -1614,29 +1622,44 @@ public class Rsa2Tg extends XmlProcessor {
 			preliminaryVertices.add(vc);
 			vc.set_qualifiedName("preliminary for source end " + sourceEnd);
 			inc = sg.createIncidenceClass();
-			inc.set_aggregation(AggregationKind.NONE);
-			inc.set_min(DEFAULT_MIN_MULTIPLICITY);
-			inc.set_max(DEFAULT_MAX_MULTIPLICITY);
-			sg.createComesFrom(ec, inc);
-			sg.createEndsAt(inc, vc);
+			inc.set_incidenceType(IncidenceType.EDGE);
+			inc.set_abstract(false);
+			inc.set_minEdgesAtVertex(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxEdgesAtVertex(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_direction(Direction.VERTEX_TO_EDGE);
+			sg.createConnectsToEdgeClass(inc, ec);
+			sg.createConnectsToVertexClass(inc, vc);
 			idMap.put(sourceEnd, inc);
 		}
 
 		inc = (IncidenceClass) idMap.get(targetEnd);
 		if (inc != null) {
 			assert inc.isValid();
-			assert getDirection(inc) == IncidenceDirection.OUT;
+			assert inc.get_direction() == Direction.EDGE_TO_VERTEX;
+
+			VertexClass vc = null;
+			for (ConnectsToVertexClass ctvc : inc
+					.getIncidentEdges(ConnectsToVertexClass.class)) {
+				vc = (VertexClass) ctvc.getOmega();
+				break;
+			}
+			assert vc != null;
 
 			IncidenceClass to = sg.createIncidenceClass();
 
 			IncidenceClass from = inc;
-			sg.createGoesTo(ec, to);
-			sg.createEndsAt(to, (VertexClass) from.getFirstEndsAtIncidence()
-					.getThat());
+			to.set_direction(Direction.EDGE_TO_VERTEX);
+			sg.createConnectsToEdgeClass(to, ec);
+			sg.createConnectsToVertexClass(to, vc);
 
-			to.set_aggregation(from.get_aggregation());
-			to.set_max(from.get_max());
-			to.set_min(from.get_min());
+			to.set_incidenceType(from.get_incidenceType());
+			to.set_abstract(from.is_abstract());
+			to.set_minVerticesAtEdge(from.get_minVerticesAtEdge());
+			to.set_maxVerticesAtEdge(from.get_maxVerticesAtEdge());
+			to.set_minEdgesAtVertex(from.get_minEdgesAtVertex());
+			to.set_maxEdgesAtVertex(from.get_maxEdgesAtVertex());
 			to.set_roleName(from.get_roleName());
 
 			if (ownedEnds.contains(from)) {
@@ -1650,11 +1673,15 @@ public class Rsa2Tg extends XmlProcessor {
 			preliminaryVertices.add(vc);
 			vc.set_qualifiedName("preliminary for target end " + targetEnd);
 			inc = sg.createIncidenceClass();
-			inc.set_aggregation(AggregationKind.NONE);
-			inc.set_min(DEFAULT_MIN_MULTIPLICITY);
-			inc.set_max(DEFAULT_MAX_MULTIPLICITY);
-			sg.createGoesTo(ec, inc);
-			sg.createEndsAt(inc, vc);
+			inc.set_incidenceType(IncidenceType.EDGE);
+			inc.set_abstract(false);
+			inc.set_minEdgesAtVertex(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxEdgesAtVertex(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
+			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
+			inc.set_direction(Direction.EDGE_TO_VERTEX);
+			sg.createConnectsToEdgeClass(inc, ec);
+			sg.createConnectsToVertexClass(inc, vc);
 			idMap.put(targetEnd, inc);
 		}
 		return ec;
@@ -2114,17 +2141,18 @@ public class Rsa2Tg extends XmlProcessor {
 		for (Attribute att : sg.getAttributeVertices()) {
 			String domainId = attributeType.getMark(att);
 			if (domainId == null) {
-				assert att.getDegree(HasDomain.class, EdgeDirection.OUT) == 1 : "Attribute '"
+				assert att.getDegree(HasAttribute_attribute.class,
+						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
-						+ att.getFirstHasAttributeIncidence().getThat()
-								.getM1Class().getSimpleName()
+						+ att.getFirst_attribute().getThat().getM1Class()
+								.getSimpleName()
 						+ " '"
-						+ ((AttributedElementClass) att
-								.getFirstHasAttributeIncidence().getThat())
-								.get_qualifiedName()
+						+ ((AttributedElementClass) att.getFirst_attribute()
+								.getThat()).get_qualifiedName()
 						+ "' has "
-						+ att.getDegree(HasDomain.class, EdgeDirection.OUT)
+						+ att.getDegree(HasDomain_domain.class,
+								de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)
 						+ " domain(s)";
 				continue;
 			}
@@ -2138,7 +2166,8 @@ public class Rsa2Tg extends XmlProcessor {
 						"Undefined Domain with ID '" + domainId + "' found.");
 			}
 
-			assert att.getDegree(HasDomain.class, EdgeDirection.OUT) == 1;
+			assert att.getDegree(HasDomain_domain.class,
+					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1;
 		}
 
 		// If 'attributeType' is not empty, there will be a Domain objects
@@ -2196,7 +2225,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		for (TypedElement ae : generalizations.getMarkedElements()) {
+		for (AttributedElement<?, ?> ae : generalizations.getMarkedElements()) {
 			AttributedElementClass sub = (AttributedElementClass) ae;
 
 			Set<String> superclasses = generalizations.getMark(sub);
@@ -2509,7 +2538,9 @@ public class Rsa2Tg extends XmlProcessor {
 		} else {
 			assert currentAssociationEnd != null;
 			assert n >= 1;
-			currentAssociationEnd.set_max(n);
+			currentAssociationEnd.set_maxEdgesAtVertex(n);
+			currentAssociationEnd.set_maxVerticesAtEdge(1);
+			// TODO check for non BinaryEdges
 		}
 	}
 
@@ -2543,7 +2574,9 @@ public class Rsa2Tg extends XmlProcessor {
 		} else {
 			assert currentAssociationEnd != null;
 			assert n >= 0;
-			currentAssociationEnd.set_min(n);
+			currentAssociationEnd.set_minEdgesAtVertex(n);
+			currentAssociationEnd.set_minVerticesAtEdge(1);
+			// TODO check for non BinaryEdges
 		}
 	}
 
@@ -2597,15 +2630,16 @@ public class Rsa2Tg extends XmlProcessor {
 					.get(currentClassId);
 			assert graphClass != null;
 			graphClass.set_qualifiedName(aec.get_qualifiedName());
-			Edge e = aec.getFirstIncidence();
-			while (e != null) {
-				Edge n = e.getNextIncidence();
-				if (e instanceof ContainsGraphElementClass) {
-					e.delete();
+			Incidence i = aec.getFirstIncidence();
+			while (i != null) {
+				Incidence n = i.getNextIncidenceAtVertex();
+				if (i.getEdge() instanceof ContainsGraphElementClass) {
+					i.getEdge().delete();
 				} else {
-					e.setThis(graphClass);
+					((IncidenceImpl) i)
+							.setIncidentVertex((VertexImpl) graphClass);
 				}
-				e = n;
+				i = n;
 			}
 			aec.delete();
 			idMap.put(currentClassId, graphClass);
@@ -2622,17 +2656,17 @@ public class Rsa2Tg extends XmlProcessor {
 
 			RecordDomain rd = sg.createRecordDomain();
 			rd.set_qualifiedName(currentClass.get_qualifiedName());
-			Edge e = currentClass.getFirstIncidence();
-			while (e != null) {
-				Edge n = e.getNextIncidence();
-				if (e instanceof ContainsGraphElementClass) {
-					sg.createContainsDomain((Package) e.getThat(), rd);
-					e.delete();
-				} else if (e instanceof HasAttribute) {
-					Attribute att = (Attribute) e.getThat();
-					Edge d = att.getFirstHasDomainIncidence();
+			Incidence i = currentClass.getFirstIncidence();
+			while (i != null) {
+				Incidence n = i.getNextIncidenceAtVertex();
+				if (i.getEdge() instanceof ContainsGraphElementClass) {
+					sg.createContainsDomain((Package) i.getThat(), rd);
+					i.getEdge().delete();
+				} else if (i.getEdge() instanceof HasAttribute) {
+					Attribute att = (Attribute) i.getThat();
+					Edge d = att.getFirst_attribute().getEdge();
 					if (d != null) {
-						Domain dom = (Domain) e.getThat();
+						Domain dom = (Domain) i.getThat();
 						HasRecordDomainComponent comp = sg
 								.createHasRecordDomainComponent(rd, dom);
 						comp.set_name(att.get_name());
@@ -2655,7 +2689,7 @@ public class Rsa2Tg extends XmlProcessor {
 					}
 					att.delete();
 				}
-				e = n;
+				i = n;
 			}
 			if (currentClass.getDegree() != 0) {
 				throw new ProcessingException(getParser(), getFileName(),
@@ -2884,7 +2918,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 			// we have an "ownedEnd", vertex class id is in "type" attribute
 
-			AttributedElement ae = idMap.get(typeId);
+			AttributedElement<?, ?> ae = idMap.get(typeId);
 			if (ae != null) {
 				if (!(ae instanceof VertexClass)) {
 					// TODO the other end can be an EdgeClass too
@@ -2987,7 +3021,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 			if (preliminaryVertices.contains(vc)) {
 
-				AttributedElement ae = idMap.get(typeId);
+				AttributedElement<?, ?> ae = idMap.get(typeId);
 
 				if ((ae != null) && !vc.equals(ae)) {
 					if (!(ae instanceof VertexClass)) {
@@ -3005,12 +3039,11 @@ public class Rsa2Tg extends XmlProcessor {
 								.setOmega((VertexClass) ae);
 						break;
 					}
-					inc.getFirstEndsAtIncidence().setOmega((VertexClass) ae);
 
 					Set<String> gens = generalizations.getMark(vc);
 					if (gens != null) {
 						generalizations.removeMark(vc);
-						generalizations.mark(ae, gens);
+						generalizations.mark((GraphElement<?, ?, ?>) ae, gens);
 					}
 
 					vc.delete();
@@ -3029,9 +3062,8 @@ public class Rsa2Tg extends XmlProcessor {
 		if (currentClass instanceof EdgeClass) {
 			ownedEnds.add(inc);
 		}
-		inc.set_aggregation(aggregation ? AggregationKind.SHARED
-				: composition ? AggregationKind.COMPOSITE
-						: AggregationKind.NONE);
+		inc.set_incidenceType(aggregation ? IncidenceType.AGGREGATION
+				: composition ? IncidenceType.COMPOSITION : IncidenceType.EDGE);
 		idMap.put(xmiId, inc);
 		inc.set_roleName(endName);
 	}
