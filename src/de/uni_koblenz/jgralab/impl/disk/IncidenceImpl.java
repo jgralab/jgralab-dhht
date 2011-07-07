@@ -820,6 +820,10 @@ public abstract class IncidenceImpl implements Incidence {
 		this.id = iId;
 	}
 	
+	@Override
+	public void delete() {
+		localGraphDatabase.deleteIncidence(id);
+	}
 	
-
+	
 }

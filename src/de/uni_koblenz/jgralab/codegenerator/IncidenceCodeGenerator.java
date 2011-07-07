@@ -81,7 +81,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		CodeList code = new CodeList();
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName#Impl(int id, Vertex vertex, Edge edge) {",
+						"public #simpleClassName#Impl(long id, Vertex vertex, Edge edge) {",
 						"\tsuper(id, (VertexImpl)vertex, (EdgeImpl)edge);",
 						"}"));
 		return code;

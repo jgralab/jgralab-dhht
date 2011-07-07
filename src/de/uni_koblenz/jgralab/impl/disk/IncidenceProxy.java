@@ -881,6 +881,10 @@ public abstract class IncidenceProxy implements Incidence {
 //		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
 //	}
 
-
+	
+	@Override
+	public void delete() {
+		localGraphDatabase.deleteIncidence(id);
+	}
 
 }

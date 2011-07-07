@@ -984,5 +984,11 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public void putAfterAtEdge(Incidence i);
 
 
+	/**
+	 * Deletes this incidence and disconnects the connected vertex and edge
+	 */
+	public void delete();
+
+
 
 }

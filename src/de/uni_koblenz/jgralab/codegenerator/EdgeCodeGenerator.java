@@ -62,7 +62,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
 				true,
-				"public #simpleClassName##implOrProxy#(int id, #jgDiskImplPackage#.GraphDatabaseBaseImpl g, #jgDiskImplPackage#.EdgeContainer container) throws java.io.IOException {",
+				"public #simpleClassName##implOrProxy#(long id, #jgDiskImplPackage#.GraphDatabaseBaseImpl g, #jgDiskImplPackage#.EdgeContainer container) throws java.io.IOException {",
 				"\tsuper(id, g, container);",
 				"}"));
 		}

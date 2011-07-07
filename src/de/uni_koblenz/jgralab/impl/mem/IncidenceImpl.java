@@ -62,8 +62,8 @@ public abstract class IncidenceImpl implements Incidence {
 	 * @param e
 	 *            {@link Edge}
 	 */
-	protected IncidenceImpl(int id, VertexImpl v, EdgeImpl e) {
-		this.id = id;
+	protected IncidenceImpl(long id, VertexImpl v, EdgeImpl e) {
+		this.id = (int) id;
 		setIncidentEdge(e);
 		setIncidentVertex(v);
 
@@ -1075,6 +1075,18 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public int getLocalId() {
 		return id;
+	}
+	
+	@Override
+	public void delete() {
+		incidentVertex.removeIncidenceFromLambdaSeq(this);
+		incidentEdge.removeIncidenceFromLambdaSeq(this);
+		incidentVertex = null;
+		incidentEdge = null;
+		nextIncidenceAtEdge = null;
+		nextIncidenceAtVertex = null;
+		previousIncidenceAtEdge = null;
+		previousIncidenceAtVertex = null;
 	}
 
 }

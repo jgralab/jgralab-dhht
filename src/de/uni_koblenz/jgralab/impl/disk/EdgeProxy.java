@@ -1068,6 +1068,31 @@ public abstract class EdgeProxy extends
 	}
 	
 
+
+	public void setAlpha(Vertex vertex) {
+		Incidence i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+		if (i.getDirection() != Direction.VERTEX_TO_EDGE) {
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getLastIncidenceIdAtEdgeId(getGlobalId()));
+		}
+		Vertex v = i.getVertex();
+		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
+				elementId);
+		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+	}
+
+
+	public void setOmega(Vertex vertex) {
+		Incidence i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+		if (i.getDirection() != Direction.EDGE_TO_VERTEX) {
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getLastIncidenceIdAtEdgeId(getGlobalId()));
+		}
+		Vertex v = i.getVertex();
+		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
+				elementId);
+		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+	}
+	
+
 	@Override
 	public void removeAdjacence(IncidenceClass ic, Edge other) {
 		// TODO (graph and incidencelists modified)
