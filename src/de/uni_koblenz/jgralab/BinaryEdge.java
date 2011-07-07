@@ -30,6 +30,14 @@ public interface BinaryEdge extends Edge {
 	public Vertex getAlpha();
 
 	/**
+	 * Sets the start {@link Vertex} to <code>vertex</code>;
+	 * 
+	 * @param vertex
+	 *            {@link Vertex}
+	 */
+	public void setAlpha(Vertex vertex);
+
+	/**
 	 * Returns the end {@link Vertex} of this {@link BinaryEdge}.
 	 * 
 	 * @return {@link Vertex} the omega {@link Vertex} of this {@link Edge}
@@ -37,6 +45,14 @@ public interface BinaryEdge extends Edge {
 	 *             if this {@link Edge} is not binary.
 	 */
 	public Vertex getOmega();
+
+	/**
+	 * Sets the end {@link Vertex} to <code>vertex</code>;
+	 * 
+	 * @param vertex
+	 *            {@link Vertex}
+	 */
+	public void setOmega(Vertex vertex);
 
 	/**
 	 * The semanctics of this {@link Edge}, e.g. {@link IncidenceType#EDGE},
