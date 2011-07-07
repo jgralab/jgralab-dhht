@@ -500,7 +500,7 @@ public class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
 				edgeMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class, GraphDatabaseBaseImpl.class, EdgeContainer.class, };
+				Class<?>[] paramsDisk = { long.class, GraphDatabaseBaseImpl.class, EdgeContainer.class};
 				edgeMapForDiskStorageReloading.put(originalClass, implementationClass.getConstructor(paramsDisk));
 
 			} catch (NoSuchMethodException ex) {
@@ -559,7 +559,7 @@ public class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { int.class, GraphDatabaseBaseImpl.class };
 				vertexMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { int.class, VertexContainer.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] paramsDisk = { int.class, GraphDatabaseBaseImpl.class, VertexContainer.class };
 				vertexMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
