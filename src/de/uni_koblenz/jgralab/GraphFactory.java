@@ -66,14 +66,14 @@ public interface GraphFactory {
 	 * be an instance of a subclass of the specified graphClass.
 	 * @param graphDatabase 
 	 */
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDatabase);
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
 	
 	/**
 	 * creates a local graph proxy object for an existing remote partial or global graph.
 	 * of the specified class. The returned object may be an instance of a subclass of the 
 	 * specified graphClass.
 	 */
-	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl localDatabase);
+//	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase );
 
 	/**
 	 * creates a View-Graph object for the specified class. The returned object
@@ -247,9 +247,9 @@ public interface GraphFactory {
 			Class<? extends Graph> graphM1Class,
 			Class<? extends Graph> implementationClass);
 	
-	public void setGraphProxyImplementationClass(
-			Class<? extends Graph> originalClass,
-			Class<? extends Graph> implementationClass);
+//	public void setGraphProxyImplementationClass(
+//			Class<? extends Graph> originalClass,
+//			Class<? extends Graph> implementationClass);
 
 
 	public void setSubordinateGraphImplementationClass(
