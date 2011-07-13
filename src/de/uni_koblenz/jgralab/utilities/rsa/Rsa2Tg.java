@@ -139,14 +139,21 @@ import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
 import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_IC_ConnectsToEdgeClass_0;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_connectedEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass_IC_ConnectsToVertexClass_0;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass_connectedVertexClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass_IC_ContainsGraphElementClass_0;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
 import de.uni_koblenz.jgralab.grumlschema.structure.Direction;
 import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_IC_HasAttribute_0;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain_domain;
@@ -156,6 +163,8 @@ import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_IC_SpecializesIncidenceClass_0;
 import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.impl.mem.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
@@ -1154,50 +1163,50 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private void removePackage(Package pkg) {
 		if (!pkg.isValid()) {
-			// possibly alread deleted
+			// possibly already deleted
 			return;
 		}
 		System.out.println("\tremoving " + pkg.get_qualifiedName());
 		// recursively descend into subpackages
 		List<Package> subPackages = new ArrayList<Package>();
-		for (Package sub : pkg.get_subpackage()) {
-			subPackages.add(sub);
+		for (ContainsSubPackage csp : pkg
+				.getIncidentEdges(ContainsSubPackage.class)) {
+			subPackages.add((Package) csp.getOmega());
 		}
 		for (Package sub : subPackages) {
 			removePackage(sub);
 		}
 
 		// remove all GraphElementClasses
-		for (ContainsGraphElementClass c = pkg
-				.getFirstContainsGraphElementClassIncidence(EdgeDirection.OUT); c != null; c = pkg
-				.getFirstContainsGraphElementClassIncidence(EdgeDirection.OUT)) {
-			GraphElementClass gec = (GraphElementClass) c.getThat();
+		for (Incidence i = pkg.getFirstIncidence(
+				ContainsGraphElementClass_IC_ContainsGraphElementClass_0.class,
+				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
+				.getNextIncidenceAtVertex(
+						ContainsGraphElementClass_IC_ContainsGraphElementClass_0.class,
+						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+			ContainsGraphElementClass c = (ContainsGraphElementClass) i
+					.getEdge();
+			GraphElementClass gec = (GraphElementClass) c.getOmega();
 
 			if (gec instanceof EdgeClass) {
 				// in case of an EdgeClass, also remove IncidenceClasses
 				EdgeClass ec = (EdgeClass) gec;
-				ec.get_to().delete();
-				ec.get_from().delete();
+				deleteIncidentIncidenceClasses(ec);
 			} else if (gec instanceof VertexClass) {
-				// in case of an EdgeClass, also remove incident EdgeClasses
+				// in case of an VertexClass, also remove incident EdgeClasses
 				VertexClass vc = (VertexClass) gec;
-				for (EndsAt e = vc.getFirstEndsAtIncidence(EdgeDirection.IN); e != null; e = vc
-						.getFirstEndsAtIncidence(EdgeDirection.IN)) {
-					EdgeClass ec;
-					// the EdgeClass can be either outgoing (ComesFrom) or
-					// ingoing (GoesTo) to this VertexClass
-					ComesFrom cf = ((IncidenceClass) e.getThat())
-							.getFirstComesFromIncidence();
-					if (cf == null) {
-						GoesTo gt = ((IncidenceClass) e.getThat())
-								.getFirstGoesToIncidence();
-						ec = (EdgeClass) gt.getThat();
-					} else {
-						ec = (EdgeClass) cf.getThat();
-					}
-					// remove IncidenceClasses
-					ec.get_to().delete();
-					ec.get_from().delete();
+				for (Incidence inc = vc
+						.getFirstIncidence(ConnectsToVertexClass_connectedVertexClass.class); inc != null; inc = inc
+						.getNextIncidenceAtVertex(ConnectsToVertexClass_connectedVertexClass.class)) {
+					ConnectsToVertexClass ctec = (ConnectsToVertexClass) inc
+							.getEdge();
+					IncidenceClass incClassAtEdgeClass = (IncidenceClass) ctec
+							.getAlpha();
+					EdgeClass ec = (EdgeClass) ((ConnectsToEdgeClass) incClassAtEdgeClass
+							.getFirstIncidence(
+									ConnectsToEdgeClass_IC_ConnectsToEdgeClass_0.class)
+							.getEdge()).getOmega();
+					deleteIncidentIncidenceClasses(ec);
 					// remove Attributes of EdgeClass
 					removeAttributes(ec);
 					ec.delete();
@@ -1214,6 +1223,15 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
+	private void deleteIncidentIncidenceClasses(EdgeClass ec) {
+		for (Incidence inc = ec
+				.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class); inc != null; inc = inc
+				.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+			ConnectsToEdgeClass ctec = (ConnectsToEdgeClass) inc.getEdge();
+			ctec.getAlpha().delete();
+		}
+	}
+
 	/**
 	 * Removes all Attribute vertices of AttributedElementClass <code>aec</code>
 	 * from the schema graph
@@ -1221,10 +1239,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @param aec
 	 */
 	private void removeAttributes(AttributedElementClass aec) {
-		for (HasAttribute ha = aec
-				.getFirstHasAttributeIncidence(EdgeDirection.OUT); ha != null; ha = aec
-				.getFirstHasAttributeIncidence(EdgeDirection.OUT)) {
-			ha.getThat().delete();
+		for (Incidence inc = aec.getFirstIncidence(
+				HasAttribute_IC_HasAttribute_0.class,
+				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); inc != null; inc = inc
+				.getNextIncidenceAtVertex(HasAttribute_IC_HasAttribute_0.class,
+						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+			HasAttribute ha = (HasAttribute) inc.getEdge();
+			ha.getOmega().delete();
 		}
 	}
 
@@ -1288,30 +1309,58 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void createSubsetsAndRedefinesRelations() {
 		System.out.println("Creating subsets and redefines relationships...");
-		// for each specialisation between edge classes, add a subsets edge
+		// for each specialization between edge classes, add a subsets edge
 		// between their incidence classes
 		SpecializesEdgeClass spec = sg.getFirstSpecializesEdgeClass();
 		while (spec != null) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
 
-			assert subClass.getFirstComesFromIncidence() != null;
-			assert superClass.getFirstComesFromIncidence() != null;
-			createSubsetsForIncidences(subClass, superClass,
-					(IncidenceClass) subClass.getFirstComesFromIncidence()
-							.getThat(), (IncidenceClass) superClass
-							.getFirstComesFromIncidence().getThat());
+			IncidenceClass cfSubClass = null;
+			IncidenceClass gtSubClass = null;
+			for (ConnectsToEdgeClass ctec : subClass
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
+				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+					if (cfSubClass == null) {
+						cfSubClass = ic;
+					}
+				} else {
+					if (gtSubClass == null) {
+						gtSubClass = ic;
+					}
+				}
+			}
 
-			assert subClass.getFirstGoesToIncidence() != null;
-			assert superClass.getFirstGoesToIncidence() != null;
-			createSubsetsForIncidences(subClass, superClass,
-					(IncidenceClass) subClass.getFirstGoesToIncidence()
-							.getThat(), (IncidenceClass) superClass
-							.getFirstGoesToIncidence().getThat());
-			spec = spec.getNextSpecializesEdgeClassInGraph();
+			IncidenceClass cfSuperClass = null;
+			IncidenceClass gtSuperClass = null;
+			for (ConnectsToEdgeClass ctec : superClass
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
+				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+					if (cfSuperClass == null) {
+						cfSuperClass = ic;
+					}
+				} else {
+					if (gtSuperClass == null) {
+						gtSuperClass = ic;
+					}
+				}
+			}
+
+			assert cfSubClass != null;
+			assert cfSuperClass != null;
+			createSpecializesIncidenceClassForIncidences(subClass, superClass,
+					cfSubClass, cfSuperClass);
+
+			assert gtSubClass != null;
+			assert gtSuperClass != null;
+			createSpecializesIncidenceClassForIncidences(subClass, superClass,
+					gtSubClass, gtSuperClass);
+			spec = spec.getNextSpecializesEdgeClass();
 		}
 
-		// Generalisation hierarchy is complete, now process redefinitions.
+		// Generalization hierarchy is complete, now process redefinitions.
 
 		// When a rolename of a direct superclass is redefined, the subsets
 		// edge is replaced by a redefines edge. When a rolename of an
@@ -1322,8 +1371,8 @@ public class Rsa2Tg extends XmlProcessor {
 			IncidenceClass inc = (IncidenceClass) ae;
 			Set<String> redefinedRolenames = redefines.getMark(inc);
 			for (String rolename : redefinedRolenames) {
-				// breadth first search over subsets edges for closest
-				// superclass with correct rolename
+				// breadth first search over SpecializesIncidenceClass edges for
+				// closest superclass with correct rolename
 				IncidenceClass sup = null;
 				Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
 				LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
@@ -1336,9 +1385,10 @@ public class Rsa2Tg extends XmlProcessor {
 						sup = curr;
 						break;
 					}
-					for (Subsets si : curr
-							.getSubsetsIncidences(EdgeDirection.OUT)) {
-						IncidenceClass i = (IncidenceClass) si.getOmega();
+					for (SpecializesIncidenceClass sic : curr.getIncidentEdges(
+							SpecializesIncidenceClass.class,
+							de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+						IncidenceClass i = (IncidenceClass) sic.getOmega();
 						if (!m.isMarked(i)) {
 							m.mark(i);
 							q.offer(i);
@@ -1350,29 +1400,37 @@ public class Rsa2Tg extends XmlProcessor {
 					throw new ProcessingException(getFileName(),
 							"Redefined rolename '" + rolename + "' not found");
 				} else {
-					// delete direct subsets edge from inc to sup
-					for (Subsets si : inc
-							.getSubsetsIncidences(EdgeDirection.OUT)) {
-						IncidenceClass i = (IncidenceClass) si.getOmega();
-						if (i == sup) {
-							assert !(si instanceof Redefines);
-							si.delete();
+					// delete direct SpecializedIncidenceClass edge from inc to
+					// sup
+					for (Incidence i = inc
+							.getFirstIncidence(
+									SpecializesIncidenceClass_IC_SpecializesIncidenceClass_0.class,
+									de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
+							.getNextIncidenceAtVertex(
+									SpecializesIncidenceClass_IC_SpecializesIncidenceClass_0.class,
+									de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+						SpecializesIncidenceClass sic = (SpecializesIncidenceClass) i
+								.getEdge();
+						IncidenceClass i2 = (IncidenceClass) sic.getOmega();
+						if (i2 == sup) {
+							sic.delete();
 							break;
 						}
 					}
-					sg.createRedefines(inc, sup);
 				}
+				sg.createHidesIncidenceClassAtVertexClass(inc, sup);
 			}
 		}
 	}
 
-	private void createSubsetsForIncidences(EdgeClass subClass,
-			EdgeClass superClass, IncidenceClass subInc, IncidenceClass superInc) {
-		assert getDirection(subInc) != null;
-		assert getDirection(superInc) != null;
+	private void createSpecializesIncidenceClassForIncidences(
+			EdgeClass subClass, EdgeClass superClass, IncidenceClass subInc,
+			IncidenceClass superInc) {
+		assert subInc.get_direction() != null;
+		assert superInc.get_direction() != null;
 
 		// Check incidence directions
-		if (getDirection(subInc) != getDirection(superInc)) {
+		if (subInc.get_direction() != superInc.get_direction()) {
 			throw new ProcessingException(getFileName(),
 					"Incompatible incidence direction in specialisation "
 							+ subClass + " --> " + superClass);
@@ -1380,43 +1438,33 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// Check multiplicities: Subclass must not have greater upper bound than
 		// superclass
-		if (subInc.get_max() > superInc.get_max()) {
+		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()) {
 			throw new ProcessingException(getFileName(),
-					"Subclass has higher upper bound (" + subInc.get_max()
-							+ ") than superclass (" + superInc.get_max()
+					"Subclass has higher upper bound ("
+							+ subInc.get_maxVerticesAtEdge()
+							+ ") than superclass ("
+							+ superInc.get_maxVerticesAtEdge()
 							+ ") in specialisation " + subClass + " --> "
 							+ superClass);
 		}
 
-		// COMPOSITE end may specialize any other end
-		// SHARED end may specialize only SHARED and NONE ends
-		// NONE end may specialize only NONE ends
-		AggregationKind subAgg = subInc.get_aggregation();
-		AggregationKind superAgg = superInc.get_aggregation();
-		if (((subAgg == AggregationKind.SHARED) && (superAgg == AggregationKind.COMPOSITE))
-				|| ((subAgg == AggregationKind.NONE) && (superAgg != AggregationKind.NONE))) {
+		// COMPOSITION end may specialize any other end
+		// AGGREGATION end may specialize only AGGREGATION and EDGE ends
+		// EDGE end may specialize only EDGE ends
+		IncidenceType subType = subInc.get_incidenceType();
+		IncidenceType superType = superInc.get_incidenceType();
+		if (((subType == IncidenceType.AGGREGATION) && (superType == IncidenceType.COMPOSITION))
+				|| ((subType == IncidenceType.EDGE) && (superType != IncidenceType.EDGE))) {
 			throw new ProcessingException(getFileName(),
-					"Incompatible aggregation kinds (" + subAgg
-							+ " specialises " + superAgg
+					"Incompatible aggregation kinds (" + subType
+							+ " specialises " + superType
 							+ ") in generalisation " + subClass + " --> "
 							+ superClass);
 
 		}
 
-		sg.createSubsets(subInc, superInc);
+		sg.createSpecializesIncidenceClass(subInc, superInc);
 	}
-
-	// private IncidenceDirection getDirection(IncidenceClass inc) {
-	// assert (inc.getFirstComesFromIncidence() == null)
-	// || (inc.getFirstGoesToIncidence() == null);
-	// if (inc.getFirstComesFromIncidence() != null) {
-	// return IncidenceDirection.OUT;
-	// } else if (inc.getFirstGoesToIncidence() != null) {
-	// return IncidenceDirection.IN;
-	// } else {
-	// return null;
-	// }
-	// } TODO delete this
 
 	/**
 	 * Writes a DOT file and a TG file out.
@@ -1769,12 +1817,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 *            representation should be created.
 	 * @return A String representing the given AttributedElement.
 	 */
-	private String attributedElement2String(AttributedElement attributedElement) {
+	private String attributedElement2String(
+			AttributedElement<?, ?> attributedElement) {
 
 		StringBuilder sb = new StringBuilder();
 
-		de.uni_koblenz.jgralab.schema.AttributedElementClass aec = attributedElement
-				.getMetaClass();
+		de.uni_koblenz.jgralab.schema.AttributedElementClass<?, ?> aec = attributedElement
+				.getType();
 		sb.append(attributedElement);
 		sb.append(" { ");
 
@@ -1860,19 +1909,25 @@ public class Rsa2Tg extends XmlProcessor {
 		System.out
 				.println("Correcting edge directions according to navigability...");
 		for (EdgeClass e : sg.getEdgeClassVertices()) {
-			ComesFrom cf = e.getFirstComesFromIncidence();
-			if (cf == null) {
-				throw new ProcessingException(getFileName(), "EdgeClass "
-						+ e.get_qualifiedName() + " has no ComesFrom incidence");
+			IncidenceClass from = null;
+			IncidenceClass to = null;
+			for (ConnectsToEdgeClass ctec : e
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
+				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+					from = ic;
+				} else {
+					to = ic;
+				}
 			}
-			GoesTo gt = e.getFirstGoesToIncidence();
-			if (gt == null) {
+			if (from == null) {
 				throw new ProcessingException(getFileName(), "EdgeClass "
-						+ e.get_qualifiedName() + " has no GoesTo incidence");
+						+ e.get_qualifiedName() + " has no start incidence");
 			}
-
-			IncidenceClass from = (IncidenceClass) cf.getThat();
-			IncidenceClass to = (IncidenceClass) gt.getThat();
+			if (to == null) {
+				throw new ProcessingException(getFileName(), "EdgeClass "
+						+ e.get_qualifiedName() + " has no end incidence");
+			}
 
 			boolean fromIsNavigable = !ownedEnds.contains(from);
 			boolean toIsNavigable = !ownedEnds.contains(to);
@@ -1889,12 +1944,8 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 			// "from" end is marked navigable, swap edge direction
-			assert getDirection(to) == IncidenceDirection.IN;
-			assert getDirection(from) == IncidenceDirection.OUT;
-
-			IncidenceClass inc = (IncidenceClass) cf.getThat();
-			cf.setThat(gt.getThat());
-			gt.setThat(inc);
+			assert to.get_direction() == Direction.VERTEX_TO_EDGE;
+			assert from.get_direction() == Direction.EDGE_TO_VERTEX;
 		}
 
 	}
@@ -1992,15 +2043,29 @@ public class Rsa2Tg extends XmlProcessor {
 				continue;
 			}
 
-			IncidenceClass to = (IncidenceClass) ec.getFirstGoesToIncidence()
-					.getThat();
-			IncidenceClass from = (IncidenceClass) ec
-					.getFirstComesFromIncidence().getThat();
+			IncidenceClass to = null;
+			IncidenceClass from = null;
+			for (ConnectsToEdgeClass ctec : ec
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+				IncidenceClass inc = (IncidenceClass) ctec.getAlpha();
+				if (inc.get_direction() == Direction.VERTEX_TO_EDGE) {
+					if (from == null) {
+						from = inc;
+					}
+				} else {
+					if (to == null) {
+						to = inc;
+					}
+				}
+			}
+			assert to != null && from != null;
 
 			String toRole = to.get_roleName();
 			if ((toRole == null) || toRole.equals("")) {
-				toRole = ((VertexClass) to.getFirstEndsAtIncidence().getThat())
-						.get_qualifiedName();
+				toRole = ((VertexClass) ((ConnectsToVertexClass) to
+						.getFirstIncidence(
+								ConnectsToVertexClass_IC_ConnectsToVertexClass_0.class)
+						.getEdge()).getOmega()).get_qualifiedName();
 				int p = toRole.lastIndexOf('.');
 				if (p >= 0) {
 					toRole = toRole.substring(p + 1);
@@ -2019,9 +2084,9 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 			if (ecName == null) {
-				if ((from.get_aggregation() != AggregationKind.NONE)
-						|| (to.get_aggregation() != AggregationKind.NONE)) {
-					if (to.get_aggregation() != AggregationKind.NONE) {
+				if ((from.get_incidenceType() != IncidenceType.EDGE)
+						|| (to.get_incidenceType() != IncidenceType.EDGE)) {
+					if (to.get_incidenceType() != IncidenceType.EDGE) {
 						ecName = "Contains" + toRole;
 					} else {
 						ecName = "IsPartOf" + toRole;
@@ -2036,8 +2101,10 @@ public class Rsa2Tg extends XmlProcessor {
 			if (isUseFromRole()) {
 				String fromRole = from.get_roleName();
 				if ((fromRole == null) || fromRole.equals("")) {
-					fromRole = ((VertexClass) from.getFirstEndsAtIncidence()
-							.getThat()).get_qualifiedName();
+					fromRole = ((VertexClass) ((ConnectsToVertexClass) from
+							.getFirstIncidence(
+									ConnectsToVertexClass_IC_ConnectsToVertexClass_0.class)
+							.getEdge()).getOmega()).get_qualifiedName();
 					int p = fromRole.lastIndexOf('.');
 					if (p >= 0) {
 						fromRole = fromRole.substring(p + 1);
