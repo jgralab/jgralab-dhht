@@ -1086,7 +1086,7 @@ public abstract class EdgeImpl extends
 							.getPreviousIncidenceAtEdge());
 		}
 		// delete incidence
-		i.setIncidentEdge(null);
+		// i.setIncidentEdge(null);
 		i.setNextIncidenceAtEdge(null);
 		i.setPreviousIncidenceAtEdge(null);
 		incidenceListModified();
