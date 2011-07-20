@@ -540,6 +540,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 					edges.add(edge);
 					edge.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
 				}
+				v.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeImpl edge : edges) {
