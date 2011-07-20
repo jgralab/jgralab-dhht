@@ -135,6 +135,7 @@ import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
 import de.uni_koblenz.jgralab.grumlschema.impl.mem.structure.ConnectsToVertexClassImpl;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
@@ -165,6 +166,8 @@ import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_IC_SpecializesIncidenceClass_0;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.TypedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.impl.mem.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
@@ -393,8 +396,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private boolean inOwnedAttribute;
 
-	private GreqlEvaluator edgeClassAcyclicEvaluator;
-	private GreqlEvaluator vertexClassAcyclicEvaluator;
+	// private GreqlEvaluator edgeClassAcyclicEvaluator;
+	// private GreqlEvaluator vertexClassAcyclicEvaluator;
 
 	private boolean inDefaultValue;
 
@@ -2140,14 +2143,17 @@ public class Rsa2Tg extends XmlProcessor {
 			Domain n = d.getNextDomain();
 			// unused if in-degree of all but Annotates edges is <=1 (one
 			// incoming edge is the ContainsDomain edge from a Package)
-			if (d.getDegree(EdgeDirection.IN)
-					- d.getDegree(Annotates.class, EdgeDirection.IN) <= 1) {
+			if (d.getDegree(de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)
+					- d.getDegree(Annotates_annotatedElement.class,
+							de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX) <= 1) {
 				// System.out.println("...remove unused domain '"
 				// + d.getQualifiedName() + "'");
 
 				// remove possible comments
-				List<? extends Comment> comments = d.remove_comment();
-				for (Comment c : comments) {
+				for (Incidence i = d
+						.getFirstIncidence(Annotates_annotatedElement.class); i != null; i = d
+						.getFirstIncidence(Annotates_annotatedElement.class)) {
+					Comment c = (Comment) ((Annotates) i.getEdge()).getAlpha();
 					c.delete();
 				}
 				d.delete();
@@ -2362,12 +2368,13 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @return true iff the edge class generalization hierarchy is acyclic.
 	 */
 	private boolean edgeClassHierarchyIsAcyclic() {
-		if (edgeClassAcyclicEvaluator == null) {
-			edgeClassAcyclicEvaluator = new GreqlEvaluator(
-					"isAcyclic(vSubgraph{structure.EdgeClass})", sg, null);
-		}
-		edgeClassAcyclicEvaluator.startEvaluation();
-		return edgeClassAcyclicEvaluator.getEvaluationResult().toBoolean();
+		return isClassHierarchyAcyclic(sg.getFirstEdgeClass());
+		// if (edgeClassAcyclicEvaluator == null) {
+		// edgeClassAcyclicEvaluator = new GreqlEvaluator(
+		// "isAcyclic(vSubgraph{structure.EdgeClass})", sg, null);
+		// }
+		// edgeClassAcyclicEvaluator.startEvaluation();
+		// return edgeClassAcyclicEvaluator.getEvaluationResult().toBoolean();
 	}
 
 	/**
@@ -2376,12 +2383,42 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @return true iff the vertex class generalization hierarchy is acyclic.
 	 */
 	private boolean vertexClassHierarchyIsAcyclic() {
-		if (vertexClassAcyclicEvaluator == null) {
-			vertexClassAcyclicEvaluator = new GreqlEvaluator(
-					"isAcyclic(vSubgraph{structure.VertexClass})", sg, null);
+		return isClassHierarchyAcyclic(sg.getFirstVertexClass());
+		// if (vertexClassAcyclicEvaluator == null) {
+		// vertexClassAcyclicEvaluator = new GreqlEvaluator(
+		// "isAcyclic(vSubgraph{structure.VertexClass})", sg, null);
+		// }
+		// vertexClassAcyclicEvaluator.startEvaluation();
+		// return vertexClassAcyclicEvaluator.getEvaluationResult().toBoolean();
+	}
+
+	private <V extends TypedElementClass> boolean isClassHierarchyAcyclic(V tec) {
+		assert tec != null;
+		LocalBooleanGraphMarker marker = new LocalBooleanGraphMarker(sg);
+		ArrayList<V> workList = new ArrayList<V>();
+		workList.add(tec);
+		for (int i = 0; i < workList.size(); i++) {
+			V currentElement = workList.get(i);
+			if (marker.isMarked(currentElement)) {
+				// current element was already seen thus a cycle is detected
+				return false;
+			} else {
+				// mark current element as seen
+				marker.mark(currentElement);
+				// add all sub and superclasses of current Element, if they are
+				// not yet seen, to working list
+				for (SpecializesTypedElementClass stec : currentElement
+						.getIncidentEdges(SpecializesTypedElementClass.class)) {
+					@SuppressWarnings("unchecked")
+					V otherEnd = (V) (stec.getAlpha() == currentElement ? stec
+							.getOmega() : stec.getAlpha());
+					if (!workList.contains(otherEnd)) {
+						workList.add(otherEnd);
+					}
+				}
+			}
 		}
-		vertexClassAcyclicEvaluator.startEvaluation();
-		return vertexClassAcyclicEvaluator.getEvaluationResult().toBoolean();
+		return true;
 	}
 
 	/**
@@ -2393,7 +2430,7 @@ public class Rsa2Tg extends XmlProcessor {
 		Package p = sg.getFirstPackage();
 		while (p != null) {
 			Package n = p.getNextPackage();
-			int commentCount = p.getDegree(Annotates.class);
+			int commentCount = p.getDegree(Annotates_annotatedElement.class);
 			if ((p.getDegree() - commentCount == 1)
 					&& (p.get_qualifiedName().length() > 0)) {
 				System.out
@@ -2405,9 +2442,10 @@ public class Rsa2Tg extends XmlProcessor {
 												+ " comments"
 										: ""));
 				if (commentCount > 0) {
-					for (Annotates a = p.getFirstAnnotatesIncidence(); a != null; a = p
-							.getFirstAnnotatesIncidence()) {
-						a.getThat().delete();
+					for (Incidence i = p
+							.getFirstIncidence(Annotates_annotatedElement.class); i != null; i = p
+							.getFirstIncidence(Annotates_annotatedElement.class)) {
+						((Annotates) i.getEdge()).getAlpha().delete();
 					}
 				}
 				p.delete();
