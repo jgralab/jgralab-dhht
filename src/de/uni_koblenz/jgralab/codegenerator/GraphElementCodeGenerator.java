@@ -69,8 +69,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		code.setVariable("additionalProxyActualParams", currentCycle.isMemOrDiskImpl() ? "" : ",remoteDb");
 		code.addNoIndent(new CodeSnippet(
 						true,
-						"public #simpleClassName##implOrProxy#(int id, #graphOrDatabase# g#additionalProxyFormalParams#) throws java.io.IOException {",
-						"\tsuper(id, g#additionalProxyActualParams#);"));
+						"public #simpleClassName##implOrProxy#(long id, #graphOrDatabase# g#additionalProxyFormalParams#) throws java.io.IOException {",
+						"\tsuper(" + (currentCycle.isMembasedImpl()?"(int)":"") + " id, g#additionalProxyActualParams#);"));
 		if (currentCycle.isDiskbasedImpl())
 			code.addNoIndent(new CodeSnippet("\tattributeContainer = new InnerAttributeContainer();"));
 		if (hasDefaultAttributeValues()) {
