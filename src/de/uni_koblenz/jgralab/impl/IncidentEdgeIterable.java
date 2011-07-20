@@ -27,7 +27,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            {@link Vertex}
 	 */
 	public IncidentEdgeIterable(Vertex vertex) {
-		this(vertex.getGraph().getTraversalContext(), vertex, null, null);
+		this(vertex.getGraph().getTraversalContext(), vertex, null,
+				Direction.BOTH);
 	}
 
 	/**
@@ -54,7 +55,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            class or subclasses
 	 */
 	public IncidentEdgeIterable(Vertex vertex, Class<? extends Edge> ec) {
-		this(vertex.getGraph().getTraversalContext(), vertex, ec, null);
+		this(vertex.getGraph().getTraversalContext(), vertex, ec,
+				Direction.BOTH);
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 *            {@link Vertex}
 	 */
 	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex) {
-		this(traversalContext, vertex, null, null);
+		this(traversalContext, vertex, null, Direction.BOTH);
 	}
 
 	/**
@@ -120,7 +122,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 	 */
 	public IncidentEdgeIterable(Graph traversalContext, Vertex vertex,
 			Class<? extends Edge> ec) {
-		this(traversalContext, vertex, ec, null);
+		this(traversalContext, vertex, ec, Direction.BOTH);
 	}
 
 	/**
@@ -189,8 +191,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 
 		@Override
 		protected void setCurrentToNextIncidentGraphElement() {
-			while (current != null
-					&& !current.getEdge().getM1Class().isInstance(gc)) {
+			while (current != null && !gc.isInstance(current.getEdge())) {
 				current = current.getNextIncidenceAtVertex(traversalContext,
 						dir);
 			}
