@@ -811,7 +811,8 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		Edge previousEdge = prevEdgeInGraph;
 		if (previousEdge == null
-				|| !traversalContext.containsElement(previousEdge)) {
+				|| (traversalContext != null && !traversalContext
+						.containsElement(previousEdge))) {
 			// all incidences belong to the same graph like this edge
 			return null;
 		} else {
