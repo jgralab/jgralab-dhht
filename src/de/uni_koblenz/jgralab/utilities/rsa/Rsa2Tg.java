@@ -1493,7 +1493,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// The Graph is always validated, but not always written to a hard
 		// drive.
-		validateGraph(filenameValidation);
+		// validateGraph(filenameValidation); TODO if GraphValidator works again
+		// comment it in
 		if (filenameValidation != null) {
 			printTypeAndFilename("validation report", filenameValidation);
 			fileCreated = true;
@@ -1688,7 +1689,7 @@ public class Rsa2Tg extends XmlProcessor {
 		inc = (IncidenceClass) idMap.get(targetEnd);
 		if (inc != null) {
 			assert inc.isValid();
-			assert inc.get_direction() == Direction.EDGE_TO_VERTEX;
+			assert inc.get_direction() == Direction.VERTEX_TO_EDGE;
 
 			VertexClass vc = null;
 			for (ConnectsToVertexClass ctvc : inc
@@ -3311,7 +3312,7 @@ public class Rsa2Tg extends XmlProcessor {
 		Package p = packageStack.peek();
 
 		assert p != null;
-		if (p.get_qualifiedName().equals("")) {
+		if (p.get_qualifiedName() == null || p.get_qualifiedName().equals("")) {
 			return simpleName;
 		} else {
 			return p.get_qualifiedName() + "." + simpleName;
