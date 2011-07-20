@@ -215,7 +215,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		if (!incClass.isAbstract()) {
 			code.add("setIncidenceInMemoryImplementationClass(#incName#.class, #incMemImplName#Impl.class);");
 			code.add("setIncidenceDiskBasedImplementationClass(#incName#.class, #incDiskImplName#Impl.class);");
-			code.add("setIncidenceProxyImplementationClass(#incName#.class, #incDiskImplName#Impl.class);");
+			code.add("setIncidenceProxyImplementationClass(#incName#.class, #incDiskImplName#Proxy.class);");
 		}
 		return code;
 	}
