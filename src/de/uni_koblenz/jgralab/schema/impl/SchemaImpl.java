@@ -143,10 +143,12 @@ public class SchemaImpl implements Schema {
 
 	private final ArrayList<TypedElementClass<?, ?>> typedElementClasses = new ArrayList<TypedElementClass<?, ?>>();
 
-	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_INMEMORY = { String.class, int.class, int.class };
+	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_INMEMORY = {
+			String.class, int.class, int.class };
 
-	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_DISKBASED = { String.class, long.class, GraphDatabaseBaseImpl.class };
-	
+	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_DISKBASED = {
+			String.class, long.class, GraphDatabaseBaseImpl.class };
+
 	/**
 	 * This is the name of the package into which the implementation classes for
 	 * this schema are generated. The impl package is child of the package for
@@ -599,7 +601,7 @@ public class SchemaImpl implements Schema {
 		// ProgressFunctionImpl pf;
 		long schemaElements = 0, currentCount = 0, interval = 1;
 		if (progressFunction != null) {
-			int elements = getNumberOfElements()*2;
+			int elements = getNumberOfElements() * 2;
 			progressFunction.init(getNumberOfElements());
 			interval = progressFunction.getUpdateInterval();
 		}
@@ -1125,7 +1127,8 @@ public class SchemaImpl implements Schema {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private Class<? extends Graph> getGraphClassImpl(ImplementationType implementationType) {
+	private Class<? extends Graph> getGraphClassImpl(
+			ImplementationType implementationType) {
 		String implClassName = packagePrefix + ".";
 		// determine package
 		switch (implementationType) {
@@ -1159,12 +1162,12 @@ public class SchemaImpl implements Schema {
 		switch (implementationType) {
 		case MEMORY:
 			return getCreateMethod(graphClass.getSimpleName(),
-					graphClass.getSimpleName(), GRAPHCLASS_CREATE_SIGNATURE_INMEMORY,
-					implementationType);
+					graphClass.getSimpleName(),
+					GRAPHCLASS_CREATE_SIGNATURE_INMEMORY, implementationType);
 		case DISK:
 			return getCreateMethod(graphClass.getSimpleName(),
-					graphClass.getSimpleName(), GRAPHCLASS_CREATE_SIGNATURE_DISKBASED,
-					implementationType);
+					graphClass.getSimpleName(),
+					GRAPHCLASS_CREATE_SIGNATURE_DISKBASED, implementationType);
 		default:
 			throw new RuntimeException("Unhandled case: " + implementationType);
 		}
@@ -1379,7 +1382,7 @@ public class SchemaImpl implements Schema {
 
 	public void registerM1ClassId(TypedElementClass<?, ?> clazz) {
 		typedElementClasses.add(clazz);
-		int id = typedElementClasses.size();
+		int id = typedElementClasses.size() - 1;
 		clazz.setId(id);
 	}
 
