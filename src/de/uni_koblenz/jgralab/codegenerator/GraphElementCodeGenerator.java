@@ -209,7 +209,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# new_#name#) {",
-					 "\tnew_#name# = _#name#;", 
+					 "\t_#name# = new_#name#;", 
 					 "\tgraphModified();", "}");
 			break;
 		case DISKBASED:
