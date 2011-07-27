@@ -61,7 +61,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -285,7 +284,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		// Access to GraphDatabase is correct here,
 		// since the method only returns the partial
 		// graph id of the complete graph
-		return GraphDatabaseBaseImpl.getPartialGraphId(id);
+		return id;// GraphDatabaseBaseImpl.getPartialGraphId(id);
 	}
 
 	// Inherited from GraphBaseImpl
