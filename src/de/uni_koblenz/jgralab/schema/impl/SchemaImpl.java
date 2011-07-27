@@ -983,13 +983,13 @@ public class SchemaImpl implements Schema {
 												.getUniqueName()), signature);
 			}
 		} catch (SecurityException e) {
-			throw new M1ClassAccessException(
-					"can't find create method in '" + m1Class.getName()
-							+ "' for '" + aec.getUniqueName() + "'", e);
+			throw new M1ClassAccessException("can't find create method in '"
+					+ m1Class.getName() + "' for '"
+					+ (aec != null ? aec.getUniqueName() : className) + "'", e);
 		} catch (NoSuchMethodException e) {
-			throw new M1ClassAccessException(
-					"can't find create method in '" + m1Class.getName()
-							+ "' for '" + aec.getUniqueName() + "'", e);
+			throw new M1ClassAccessException("can't find create method in '"
+					+ m1Class.getName() + "' for '"
+					+ (aec != null ? aec.getUniqueName() : className) + "'", e);
 		}
 	}
 
