@@ -65,6 +65,7 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.grumlschema.impl.mem.SchemaGraphImpl;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
@@ -287,7 +288,7 @@ public class GraphIO {
 
 	private final Object[] vertexDescTempObject = { 0 };
 
-	private final Object[] edgeDescTempObject = { 0 };
+	private final Object[] edgeDescTempObject = { 0, 0, 0 };
 
 	private ByteArrayOutputStream BAOut;
 
@@ -542,10 +543,13 @@ public class GraphIO {
 		space();
 		writeIdentifier(ic.getVertexClass().getQualifiedName(pkg));
 
-		write(" role");
-		space();
-		writeIdentifier(ic.getRolename());
-		writeHierarchy(ic);
+		if (ic.getRolename() != null && !ic.getRolename().isEmpty()) {
+			// TODO set role declaration as optional [Daniel Janke]
+			write(" role");
+			space();
+			writeIdentifier(ic.getRolename());
+			writeHierarchy(ic);
+		}
 
 		// multiplicity and redefinitions at vertex class
 		write(" (");
@@ -953,7 +957,6 @@ public class GraphIO {
 					// write OrderedTypedIncidences
 					write("<");
 					noSpace();
-					int edgeIncidenceCounter = 0;
 					for (Incidence i : nextE.getIncidences()) {
 						if (subGraph != null
 								&& !subGraph.isMarked(i.getVertex())) {
@@ -963,8 +966,9 @@ public class GraphIO {
 								|| graph.isLocalElementId(i.getVertex()
 										.getGlobalId())) {
 							writeSpace();
-							write(++edgeIncidenceCounter + ":"
-									+ i.getType().getRolename());
+							// TODO roleName oder simpleName?
+							write(i.getLocalId() + ":"
+									+ i.getType().getSimpleName());
 							space();
 						}
 					}
@@ -1331,7 +1335,8 @@ public class GraphIO {
 			if (inputStream != null) {
 				close(inputStream);
 			}
-			close(fileStream);
+			if (fileStream != null)
+				close(fileStream);
 		}
 	}
 
@@ -2856,9 +2861,11 @@ public class GraphIO {
 		if (implementationType == ImplementationType.MEMORY) {
 			// InMemory Implementation
 			try {
-				graph = (Graph) schema.getGraphCreateMethod(
-						ImplementationType.MEMORY).invoke(null,
-						new Object[] { uniqueGraphId, maxV, maxE });
+				// TODO remove line below and use the outcommented one
+				graph = new SchemaGraphImpl(uniqueGraphId, maxV, maxE);
+				// graph = (Graph) schema.getGraphCreateMethod(
+				// ImplementationType.MEMORY).invoke(null,
+				// new Object[] { uniqueGraphId, maxV, maxE });
 			} catch (Exception e) {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
@@ -2900,10 +2907,11 @@ public class GraphIO {
 			// }
 			// server.registerLocalGraphDatabase(gd);
 		}
-
+		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
 
+		match("vertices");
 		while (!lookAhead.equals("edges")) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
@@ -2921,6 +2929,7 @@ public class GraphIO {
 			}
 		}
 
+		match("edges");
 		while (lookAhead != null && !lookAhead.isEmpty()) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
@@ -2989,8 +2998,15 @@ public class GraphIO {
 						&& incidence.getValue()[1] != 0;
 				Vertex v = graph.getVertex(incidence.getValue()[0]);
 				Edge e = graph.getEdge(incidence.getValue()[1]);
-				e.connect(e.getIncidenceClassForRolename(incidenceTypes
-						.get(incidence.getKey())), v);
+				for (IncidenceClass ic : e.getType().getAllIncidenceClasses()) {
+					if (ic.getSimpleName().equals(
+							incidenceTypes.get(incidence.getKey()))) {
+						e.connect(ic, v);
+						break;
+					}
+				}
+				// e.connect(e.getIncidenceClassForRolename(incidenceTypes
+				// .get(incidence.getKey())), v); // TODO adapt loading
 				incidences.put(incidence.getKey(), e.getLastIncidence());
 			}
 		}
@@ -3118,7 +3134,7 @@ public class GraphIO {
 						implementationType);
 				createMethods.put(vcName, createMethod);
 			}
-			vertexDescTempObject[0] = vId;
+			vertexDescTempObject[0] = (int) vId;
 			vertex = (Vertex) createMethod.invoke(graph, vertexDescTempObject);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3168,7 +3184,7 @@ public class GraphIO {
 						implementationType);
 				createMethods.put(ecName, createMethod);
 			}
-			edgeDescTempObject[0] = eId;
+			edgeDescTempObject[0] = (int) eId;
 			edge = (Edge) createMethod.invoke(graph, edgeDescTempObject);
 		} catch (Exception e) {
 			throw new GraphIOException("Can't create edge " + eId + ".", e);
@@ -3261,7 +3277,7 @@ public class GraphIO {
 			lambdaSequence = new ArrayList<V>();
 			incidencesAtGraphElement.put(graphElementId, lambdaSequence);
 		}
-		if (lambdaSequence.size() >= posInLambdaSequence
+		if (lambdaSequence.size() > posInLambdaSequence
 				&& lambdaSequence.get(posInLambdaSequence) != null) {
 			throw new GraphIOException(
 					"There already exists an element in the lambda sequence at the position "
