@@ -54,6 +54,11 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 *            {@link Class} returned {@link Vertex}
 import de.uni_koblenz.jgralab.Edge;
  import
+	 *            de.uni_koblenz.jgralab.Edge; import
+	 *            de.uni_koblenz.jgralab.Edge;
+	 * 
+	 *            import de.uni_koblenz.jgralab.Edge; import
+	 *            de.uni_koblenz.jgralab.Edge; import
 	 *            de.uni_koblenz.jgralab.Edge; are res import
 	 *            de.uni_koblenz.jgralab.Edge; tricted to that class or
 	 *            subclasses
@@ -188,6 +193,9 @@ import de.uni_koblenz.jgralab.Edge;
 				throw new NoSuchElementException();
 			}
 			V result = (V) current.getVertex();
+			if (current != null) {
+				current = current.getNextIncidenceAtEdge(traversalContext, dir);
+			}
 			setCurrentToNextIncidentGraphElement();
 			return result;
 		}

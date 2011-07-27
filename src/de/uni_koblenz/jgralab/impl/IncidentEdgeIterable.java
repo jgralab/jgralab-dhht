@@ -173,7 +173,7 @@ public class IncidentEdgeIterable<E extends Edge> extends
 				Class<? extends Edge> ec, Direction dir) {
 			super(traversalContext, vertex, ec, dir);
 			if (ec != null && current != null
-					&& !current.getEdge().getM1Class().isInstance(ec)) {
+					&& !ec.isInstance(current.getEdge())) {
 				setCurrentToNextIncidentGraphElement();
 			}
 		}
@@ -186,6 +186,10 @@ public class IncidentEdgeIterable<E extends Edge> extends
 				throw new NoSuchElementException();
 			}
 			E result = (E) current.getEdge();
+			if (current != null) {
+				current = current.getNextIncidenceAtVertex(traversalContext,
+						dir);
+			}
 			setCurrentToNextIncidentGraphElement();
 			return result;
 		}
