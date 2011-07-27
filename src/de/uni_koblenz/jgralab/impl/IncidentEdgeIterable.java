@@ -172,7 +172,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 		public IncidentEdgeIterator(Graph traversalContext, Vertex vertex,
 				Class<? extends Edge> ec, Direction dir) {
 			super(traversalContext, vertex, ec, dir);
-			if (ec != null && !current.getEdge().getM1Class().isInstance(ec)) {
+			if (ec != null && current != null
+					&& !current.getEdge().getM1Class().isInstance(ec)) {
 				setCurrentToNextIncidentGraphElement();
 			}
 		}

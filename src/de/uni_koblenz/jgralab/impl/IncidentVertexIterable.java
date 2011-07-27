@@ -51,7 +51,9 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 * @param edge
 	 *            {@link Edge}
 	 * @param vc
-	 *            {@link Class} returned {@link Vertex} import
+	 *            {@link Class} returned {@link Vertex}
+import de.uni_koblenz.jgralab.Edge;
+ import
 	 *            de.uni_koblenz.jgralab.Edge; are res import
 	 *            de.uni_koblenz.jgralab.Edge; tricted to that class or
 	 *            subclasses
@@ -172,7 +174,8 @@ public class IncidentVertexIterable<V extends Vertex> extends
 		public IncidentVertexIterator(Graph traversalContext, Edge edge,
 				Class<? extends Vertex> vc, Direction dir) {
 			super(traversalContext, edge, vc, dir);
-			if (vc != null && !vc.isInstance(current.getVertex())) {
+			if (vc != null && current != null
+					&& !vc.isInstance(current.getVertex())) {
 				setCurrentToNextIncidentGraphElement();
 			}
 		}
