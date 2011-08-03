@@ -48,7 +48,7 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 		IncidenceImpl i = firstIncidenceAtEdge.getDirection() == Direction.EDGE_TO_VERTEX ? firstIncidenceAtEdge
 				: lastIncidenceAtEdge;
 		((VertexImpl) i.getVertex()).removeIncidenceFromLambdaSeq(i);
-		i.setIncidentVertex((VertexImpl) vertex);
+		// i.setIncidentVertex((VertexImpl) vertex);
 		((VertexImpl) vertex).appendIncidenceToLambdaSeq(i);
 	}
 
