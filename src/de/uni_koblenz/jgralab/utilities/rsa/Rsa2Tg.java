@@ -113,6 +113,7 @@ import org.apache.commons.cli.Option;
 import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.ist.utilities.xml.XmlProcessor;
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
@@ -133,6 +134,7 @@ import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
+import de.uni_koblenz.jgralab.grumlschema.impl.disk.structure.ConnectsToEdgeClass_connectedEdgeClassImpl;
 import de.uni_koblenz.jgralab.grumlschema.impl.mem.structure.ConnectsToVertexClassImpl;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
@@ -2811,19 +2813,106 @@ public class Rsa2Tg extends XmlProcessor {
 			currentClass = null;
 			currentClassId = null;
 		} else if (key.equals("abstract")) {
-			if (currentClass instanceof GraphElementClass) {
-				GraphElementClass gec = (GraphElementClass) currentClass;
-				gec.set_abstract(true);
-			} else {
-				throw new ProcessingException(
-						getParser(),
-						getFileName(),
-						"The stereotype <<abstract>> can only be specified for vertex and edge classes, but not for class '"
-								+ currentClass.get_qualifiedName() + "'");
-			}
+			setCurrentClassToAbstract();
+		} else if (key.equals("edge")) {
+			convertCurrentClassToEdgeClass();
+		} else if (key.equals("abstract edge")) {
+			convertCurrentClassToEdgeClass();
+			setCurrentClassToAbstract();
 		} else {
 			throw new ProcessingException(getParser(), getFileName(),
 					"Unexpected stereotype '<<" + key + ">>'.");
+		}
+	}
+
+	private void convertCurrentClassToEdgeClass() {
+		if (currentClass instanceof EdgeClass) {
+			return;
+		} else if (currentClass instanceof VertexClass) {
+			EdgeClass ec = sg.createBinaryEdgeClass();
+			ec.set_qualifiedName(currentClass.get_qualifiedName());
+			ec.set_abstract(currentClass.is_abstract());
+			ec.set_maxKappa(((VertexClass) currentClass).get_maxKappa());
+			ec.set_minKappa(((VertexClass) currentClass).get_minKappa());
+
+			Incidence i = currentClass.getFirstIncidence();
+			while (i != null) {
+				Incidence n = i.getNextIncidenceAtVertex();
+				if (i.getEdge() instanceof ConnectsToVertexClass) {
+					BinaryEdge e = (BinaryEdge) i.getEdge();
+					convertToIncidenceClass(
+							(EdgeClass) (e.getFirstIncidence() == i ? e
+									.getLastIncidence().getVertex() : e
+									.getFirstIncidence().getVertex()),
+							i.getDirection(), currentClass, ec);
+				} else {
+					((IncidenceImpl) i).setIncidentVertex((VertexImpl) ec);
+				}
+				i = n;
+			}
+
+			if (generalizations.isMarked(currentClass)) {
+				generalizations.mark(ec, generalizations.getMark(currentClass));
+				generalizations.removeMark(currentClass);
+			}
+
+			idMap.put(currentClassId, ec);
+			currentClass.delete();
+			currentClass = ec;
+		} else {
+			throw new ProcessingException(getParser(), getFileName(),
+					"The stereotype '<<edge>>' is only valid for a UML class.");
+		}
+	}
+
+	private void convertToIncidenceClass(EdgeClass oldEdgeClass,
+			de.uni_koblenz.jgralab.Direction direction,
+			AttributedElementClass oldVertexClass, EdgeClass newEdgeClass) {
+		assert oldEdgeClass
+				.getDegree(ConnectsToEdgeClass_connectedEdgeClassImpl.class) <= 2;
+		IncidenceClass from = null;
+		IncidenceClass to = null;
+		for (Edge edge : oldEdgeClass.getIncidentEdges()) {
+			if (ConnectsToEdgeClass.class.isInstance(edge)) {
+				IncidenceClass ic = (IncidenceClass) ((ConnectsToEdgeClass) edge)
+						.getAlpha();
+				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+					from = ic;
+				} else {
+					to = ic;
+				}
+			} else {
+				throw new ProcessingException(getParser(), getFileName(),
+						"The UML association '"
+								+ oldEdgeClass.get_qualifiedName()
+								+ "' must not have an incident edge of type '"
+								+ edge.getType().getQualifiedName() + "'.");
+			}
+		}
+		assert from != null && to != null;
+		IncidenceClass newIncidenceClass = sg.createIncidenceClass();
+		newIncidenceClass.set_abstract(oldEdgeClass.is_abstract());
+		// TODO set attributes
+		// TODO setSpecializesIncidenceClass
+		// TODO set HidingEndAtVertexClass aso.
+		// TODO delete old objects
+		// TODO create ConnectsToEdgeClass and ConnectsToVertexClass
+		// TODO check structure of rsa2tg like idMap
+	}
+
+	/**
+	 * Sets {@link #currentClass} to abstract.
+	 */
+	private void setCurrentClassToAbstract() {
+		if (currentClass instanceof GraphElementClass) {
+			GraphElementClass gec = (GraphElementClass) currentClass;
+			gec.set_abstract(true);
+		} else {
+			throw new ProcessingException(
+					getParser(),
+					getFileName(),
+					"The stereotype <<abstract>> can only be specified for vertex and edge classes, but not for class '"
+							+ currentClass.get_qualifiedName() + "'");
 		}
 	}
 
