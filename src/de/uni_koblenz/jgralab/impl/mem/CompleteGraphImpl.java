@@ -518,8 +518,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 							if ((omega != v) && containsVertex(omega)
 									&& !deleteVertexList.contains(omega)) {
 								deleteVertexList.add(omega);
-								removeEdgeFromESeq((EdgeImpl) bedge);
-								deleteEdge = true;
 							}
 						}
 					} else if (bedge.getOmega() == v) {
@@ -528,18 +526,18 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 							if ((alpha != v) && containsVertex(alpha)
 									&& !deleteVertexList.contains(alpha)) {
 								deleteVertexList.add(alpha);
-								removeEdgeFromESeq((EdgeImpl) bedge);
-								deleteEdge = true;
 							}
 						}
 					}
+					internalDeleteEdge(bedge);
+					deleteEdge = true;
 				}
 				edgeHasBeenDeleted |= deleteEdge;
 				if (!deleteEdge) {
 					edges.add(edge);
 					edge.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
+					v.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
 				}
-				v.removeIncidenceFromLambdaSeq((IncidenceImpl) inc);
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeImpl edge : edges) {

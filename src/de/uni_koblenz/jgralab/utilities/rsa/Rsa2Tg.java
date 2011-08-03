@@ -1232,6 +1232,7 @@ public class Rsa2Tg extends XmlProcessor {
 				.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class)) {
 			ConnectsToEdgeClass ctec = (ConnectsToEdgeClass) inc.getEdge();
 			ctec.getAlpha().delete();
+			ctec.delete();
 		}
 	}
 
