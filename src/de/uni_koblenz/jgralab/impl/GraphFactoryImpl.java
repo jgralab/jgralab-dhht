@@ -103,12 +103,11 @@ public class GraphFactoryImpl implements GraphFactory {
 	protected GraphFactoryImpl() {
 		this.createMapsForStandardSupport();
 	}
-
+	
 	public static String generateUniqueGraphId() {
 		long uidPart = System.currentTimeMillis();
 		Random r = new Random();
-		return uidPart + "-" + r.nextLong() + "-" + r.nextLong() + "-"
-				+ r.nextLong();
+		return uidPart + "-" + r.nextLong() + "-" + r.nextLong() + "-" + r.nextLong();
 	}
 
 	private void createMapsForStandardSupport() {
@@ -142,12 +141,15 @@ public class GraphFactoryImpl implements GraphFactory {
 		incidenceMapForDiskStorageReloading = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
-
-	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass,
-			String id, int vMax, int eMax) {
+	
+	
+	
+	
+	
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id,
+			int vMax, int eMax) {
 		try {
-			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
-					vMax, eMax);
+			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,vMax, eMax);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -155,8 +157,8 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass,
-			String id) {
+
+	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass, String id) {
 		try {
 			Graph g = graphMapForMemBasedImpl.get(graphClass).newInstance(id,
 					1000, 1000);
@@ -168,33 +170,28 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass,
-			String uniqueGraphId, long subgraphId,
-			GraphDatabaseBaseImpl graphDatabase,
-			RemoteGraphDatabaseAccess storingGraphDatabase) {
+	public Graph createGraphDiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
-			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(
-					uniqueGraphId, subgraphId, graphDatabase, graphDatabase);
+			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(uniqueGraphId, subgraphId, graphDatabase, graphDatabase);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
 					+ graphClass.getCanonicalName(), ex);
 		}
 	}
+	
+//	@Override
+//	public Graph createGraphProxy(Class<? extends Graph> graphClass, String uid, long subgraphId, GraphDatabaseBaseImpl database, RemoteGraphDatabaseAccess storingGraphDatabase ) {
+//		try {
+//			Graph g = graphProxyMapForDiskBasedImpl.get(graphClass).newInstance(uid, subgraphId, database);
+//			return g;
+//		} catch (Exception ex) {
+//			throw new M1ClassAccessException("Cannot create graph proxy of class "
+//					+ graphClass.getCanonicalName(), ex);
+//		}
+//	}
 
-	// @Override
-	// public Graph createGraphProxy(Class<? extends Graph> graphClass, String
-	// uid, long subgraphId, GraphDatabaseBaseImpl database,
-	// RemoteGraphDatabaseAccess storingGraphDatabase ) {
-	// try {
-	// Graph g = graphProxyMapForDiskBasedImpl.get(graphClass).newInstance(uid,
-	// subgraphId, database);
-	// return g;
-	// } catch (Exception ex) {
-	// throw new M1ClassAccessException("Cannot create graph proxy of class "
-	// + graphClass.getCanonicalName(), ex);
-	// }
-	// }
+
 
 	@Override
 	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g) {
@@ -211,12 +208,11 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
 	@Override
-	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass,
-			long id, GraphDatabaseBaseImpl graphDatabase) {
+	public Edge createEdgeDiskBasedStorage(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase) {
 		try {
-			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id,
-					graphDatabase);
+			Edge e = edgeMapForDiskBasedImpl.get(edgeClass).newInstance(id, graphDatabase);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -228,9 +224,9 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
 	@Override
-	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id,
-			GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
 		try {
 			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
 					id, graphDatabase, container);
@@ -245,13 +241,11 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
 	@Override
-	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id,
-			GraphDatabaseBaseImpl graphDatabase,
-			RemoteGraphDatabaseAccess remoteDatabase) {
+	public Edge createEdgeProxy(Class<? extends Edge> edgeClass, long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase){
 		try {
-			Edge e = edgeMapForProxies.get(edgeClass).newInstance(id,
-					graphDatabase, remoteDatabase);
+			Edge e = edgeMapForProxies.get(edgeClass).newInstance(id, graphDatabase, remoteDatabase);
 			return e;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -263,6 +257,21 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	
+	
+	
+	
 	@Override
 	public <T extends Incidence> T createIncidence(Class<T> incidenceClass,
 			int id, Vertex v, Edge e) {
@@ -283,9 +292,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public <T extends Incidence> T createIncidenceDiskBasedStorage(
-			Class<? extends T> incidenceClass, long incidenceId, long vertexId,
-			long edgeId, GraphDatabaseBaseImpl graphDatabase) {
+	public <T extends Incidence> T createIncidenceDiskBasedStorage(Class<? extends T> incidenceClass, long incidenceId, long vertexId, long edgeId, GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMapForDiskBasedImpl.get(incidenceClass)
@@ -303,13 +310,11 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public <T extends Incidence> T reloadLocalIncidence(
-			Class<? extends T> incidenceClass, long id,
-			GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
+	public <T extends Incidence> T   reloadLocalIncidence(Class<? extends T> incidenceClass, long id, GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
 		try {
 			@SuppressWarnings("unchecked")
-			T i = (T) incidenceMapForDiskStorageReloading.get(incidenceClass)
-					.newInstance(id, container);
+			T i = (T)incidenceMapForDiskStorageReloading.get(
+					incidenceClass).newInstance(id, container);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -322,15 +327,14 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
 	@Override
-	public <T extends Incidence> T createIncidenceProxy(
-			Class<? extends T> incidenceClass, long id,
-			GraphDatabaseBaseImpl graphDatabase,
+	public <T extends Incidence> T createIncidenceProxy(Class<? extends T> incidenceClass,
+			long id, GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess remoteDatabase) {
 		try {
 			@SuppressWarnings("unchecked")
-			T i = (T) incidenceMapForProxies.get(incidenceClass).newInstance(
-					id, graphDatabase, remoteDatabase);
+			T i = (T) incidenceMapForProxies.get(incidenceClass).newInstance(id, graphDatabase, remoteDatabase);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -342,13 +346,13 @@ public class GraphFactoryImpl implements GraphFactory {
 							+ incidenceClass.getCanonicalName(), ex);
 		}
 	}
-
+	
+	
+	
 	@Override
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g) {
+	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,	Graph g) {
 		try {
-			Vertex v = vertexMapForMemBasedImpl.get(vertexClass).newInstance(
-					id, g);
+			Vertex v = vertexMapForMemBasedImpl.get(vertexClass).newInstance(id, g);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -360,13 +364,11 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
 	@Override
-	public Vertex createVertexDiskBasedStorage(
-			Class<? extends Vertex> vertexClass, long id,
-			GraphDatabaseBaseImpl localGraphDatabase) {
+	public Vertex createVertexDiskBasedStorage(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl localGraphDatabase) {
 		try {
-			Vertex v = vertexMapForDiskBasedImpl.get(vertexClass).newInstance(
-					id, localGraphDatabase);
+			Vertex v = vertexMapForDiskBasedImpl.get(vertexClass).newInstance(id, localGraphDatabase);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -383,8 +385,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			long id, GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
-			Vertex v = vertexMapForProxies.get(vertexClass).newInstance(id,
-					graphDatabase, storingGraphDatabase);
+			Vertex v = vertexMapForProxies.get(vertexClass).newInstance(id, graphDatabase, storingGraphDatabase);
 			return v;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -395,11 +396,11 @@ public class GraphFactoryImpl implements GraphFactory {
 					+ vertexClass.getCanonicalName(), ex);
 		}
 	}
+	
+	
 
 	@Override
-	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass,
-			long id, GraphDatabaseBaseImpl graphDatabase,
-			VertexContainer container) {
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, GraphDatabaseBaseImpl graphDatabase, VertexContainer container) {
 		try {
 			Vertex v = vertexMapForDiskStorageReloading.get(vertexClass)
 					.newInstance(id, graphDatabase, container);
@@ -413,7 +414,15 @@ public class GraphFactoryImpl implements GraphFactory {
 					+ vertexClass.getCanonicalName(), ex);
 		}
 	}
+	
+	
+	
+	
 
+	
+	
+	
+	
 	@Override
 	public void setGraphInMemoryImplementationClass(
 			Class<? extends Graph> originalClass,
@@ -437,9 +446,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Graph> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { String.class, long.class,
-						GraphDatabaseBaseImpl.class,
-						RemoteGraphDatabaseAccess.class };
+				Class<?>[] params = { String.class, long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
 				graphMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -449,34 +456,32 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
-
-	// @Override
-	// public void setGraphProxyImplementationClass(
-	// Class<? extends Graph> originalClass,
-	// Class<? extends Graph> implementationClass) {
-	// if (isSuperclassOrEqual(originalClass, implementationClass)) {
-	// try {
-	// Class<?>[] params = { String.class, long.class,
-	// GraphDatabaseBaseImpl.class };
-	// graphMapForProxies.put(originalClass,
-	// implementationClass.getConstructor(params));
-	// } catch (NoSuchMethodException ex) {
-	// throw new M1ClassAccessException(
-	// "Unable to locate default constructor for graphclass "
-	// + implementationClass.getName(), ex);
-	// }
-	// }
-	// }
-
+	
+//	@Override
+//	public void setGraphProxyImplementationClass(
+//			Class<? extends Graph> originalClass,
+//			Class<? extends Graph> implementationClass) {
+//		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+//			try {
+//				Class<?>[] params = { String.class, long.class, GraphDatabaseBaseImpl.class };
+//				graphMapForProxies.put(originalClass,
+//						implementationClass.getConstructor(params));
+//			} catch (NoSuchMethodException ex) {
+//				throw new M1ClassAccessException(
+//						"Unable to locate default constructor for graphclass "
+//								+ implementationClass.getName(), ex);
+//			}
+//		}
+//	}
+	
+	
 	@Override
-	public void setEdgeInMemoryImplementationClass(
-			Class<? extends Edge> originalClass,
+	public void setEdgeInMemoryImplementationClass(Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, Graph.class };
-				edgeMapForMemBasedImpl.put(originalClass,
-						implementationClass.getConstructor(params));
+				Class<?>[] params = { int.class, Graph.class };
+				edgeMapForMemBasedImpl.put(originalClass, implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
 						"Unable to locate default constructor for edgeclass"
@@ -494,10 +499,8 @@ public class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
 				edgeMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class,
-						GraphDatabaseBaseImpl.class, EdgeContainer.class };
-				edgeMapForDiskStorageReloading.put(originalClass,
-						implementationClass.getConstructor(paramsDisk));
+				Class<?>[] paramsDisk = { long.class, GraphDatabaseBaseImpl.class, EdgeContainer.class};
+				edgeMapForDiskStorageReloading.put(originalClass, implementationClass.getConstructor(paramsDisk));
 
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
@@ -506,6 +509,8 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	
 
 	@Override
 	public void setEdgeProxyImplementationClass(
@@ -513,8 +518,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
-						RemoteGraphDatabaseAccess.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
 				edgeMapForProxies.put(edgeM1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -525,13 +529,16 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+	
+	
+
 	@Override
 	public void setVertexInMemoryImplementationClass(
 			Class<? extends Vertex> originalClass,
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, Graph.class };
+				Class<?>[] params = { int.class, Graph.class };
 				vertexMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -548,11 +555,10 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] params = { int.class, GraphDatabaseBaseImpl.class };
 				vertexMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class,
-						GraphDatabaseBaseImpl.class, VertexContainer.class };
+				Class<?>[] paramsDisk = { int.class, GraphDatabaseBaseImpl.class, VertexContainer.class };
 				vertexMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
@@ -562,6 +568,8 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+
 
 	@Override
 	public void setVertexProxyImplementationClass(
@@ -569,8 +577,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
-						RemoteGraphDatabaseAccess.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
 				vertexMapForProxies.put(vertexM1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -581,12 +588,14 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
+
+
 	public void setIncidenceInMemoryImplementationClass(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, Vertex.class, Edge.class };
+				Class<?>[] params = { int.class, Vertex.class, Edge.class };
 				incidenceMapForMemBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -602,10 +611,10 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, long.class, long.class };
+				Class<?>[] params = { int.class, Vertex.class, Edge.class };
 				incidenceMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class, GraphDatabaseBaseImpl.class, IncidenceContainer.class };
+				Class<?>[] paramsDisk = { int.class, IncidenceContainer.class };
 				incidenceMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
@@ -615,15 +624,14 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
-
+	
 	@Override
 	public void setIncidenceProxyImplementationClass(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
-						RemoteGraphDatabaseAccess.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
 				incidenceMapForProxies.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -633,6 +641,9 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+
+	
 
 	public void setRecordImplementationClass(Class<? extends Record> m1Class,
 			Class<? extends Record> implementationClass) {
@@ -713,7 +724,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl createViewGraph(
-			Graph viewGraph, int level) {
+			Graph viewGraph, int level)  {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl) viewGraphMapForMemBasedImpl
@@ -728,7 +739,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraphDiskBasedStorage(
-			Graph viewGraph, int level) {
+			Graph viewGraph, int level)  {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl) viewGraphMapForMemBasedImpl
@@ -743,7 +754,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
-			Vertex vertex) {
+			Vertex vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
@@ -757,8 +768,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInVertex(
-			GraphDatabaseBaseImpl graphDatabase, long vertexId) {
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInVertex(GraphDatabaseBaseImpl graphDatabase, long vertexId)  {
 		try {
 			Vertex vertex = graphDatabase.getVertexObject(vertexId);
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
@@ -767,14 +777,13 @@ public class GraphFactoryImpl implements GraphFactory {
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException(
-					"Cannot create subordinate graph for vertex " + vertexId,
-					ex);
+					"Cannot create subordinate graph for vertex " + vertexId, ex);
 		}
 	}
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraph(
-			Edge vertex) {
+			Edge vertex)  {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForEdgeMapForMemBasedImpl
@@ -788,10 +797,9 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInEdge(
-			GraphDatabaseBaseImpl graphDatabase, long edgeId) {
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphDiskBasedStorageInEdge(GraphDatabaseBaseImpl graphDatabase, long edgeId)  {
 		try {
-			Edge edge = graphDatabase.getEdgeObject(edgeId);
+			Edge edge =graphDatabase.getEdgeObject(edgeId);
 			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMapForDiskBasedImpl
 					.get(graphClass).newInstance(edge);
@@ -801,6 +809,8 @@ public class GraphFactoryImpl implements GraphFactory {
 					"Cannot create subordinate graph for edge " + edgeId, ex);
 		}
 	}
+
+
 
 	@Override
 	public void setSubordinateGraphImplementationClass(
@@ -875,5 +885,9 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+
+	
+
+	
 
 }
