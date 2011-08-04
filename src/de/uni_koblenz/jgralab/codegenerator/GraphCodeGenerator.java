@@ -343,6 +343,9 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		CodeList code = new CodeList();
 		code.addNoIndent(createFactoryMethod(gec, false));
+		if (gec instanceof BinaryEdgeClass) {
+			code.addNoIndent(createFactoryMethodForBinaryEdge((EdgeClass) gec));
+		}
 		if (currentCycle.isMemOrDiskImpl()) {
 			code.addNoIndent(createFactoryMethod(gec, true));
 		}
@@ -370,59 +373,55 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
-					 "#connectToAlpha#",
-					 "#connectToOmega#",
 					 "\treturn new#ecType#;", 
 					 "}");
 		}
-
-		
-		if (gec instanceof BinaryEdgeClass) {
-			IncidenceClass alphaInc = null;
-			IncidenceClass omegaInc = null;
-			for (IncidenceClass ic : gec.getAllIncidenceClasses()) {
-				if (!ic.isAbstract()) {
-					if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
-						omegaInc = ic;
-					} else {
-						alphaInc = ic;
-					}
-				}
-			}
-			VertexClass fromClass = alphaInc.getVertexClass();
-			VertexClass toClass = omegaInc.getVertexClass();
-			code.setVariable("alphaVertex", absoluteName(fromClass));
-			code.setVariable("omegaVertex", absoluteName(toClass));
-			code.setVariable("alphaInc", absoluteName(alphaInc));
-			code.setVariable("omegaInc", absoluteName(omegaInc));
-			code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, new#ecType#);");
-			code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, new#ecType#);");
-			code.setVariable("formalParams", (withId ? "int id, " : "")	+ "#alphaVertex# alpha, #omegaVertex# omega");
-//			code.setVariable("addActualParams", ", alpha, omega");
-		} else {
-			code.setVariable("formalParams", (withId ? "int id" : ""));
-			code.setVariable("connectToAlpha", "");
-			code.setVariable("connectToOmega", "");
-//			code.setVariable("addActualParams", "");
-		}
+		code.setVariable("formalParams", (withId ? "int id" : ""));
 		code.setVariable("newActualParams", (withId ? "id" : "0"));
 		return code;
 	}
 
 	
 	
-	protected CodeBlock createFactoryMethodForBinaryEdge(EdgeClass edgeClass) {
-		if (edgeClass.isAbstract())
-			return null;
-		CodeList code = new CodeList();
-//		addImports("#jgPackage#.#ownElementClass#");
-
-
-		
-		code.addNoIndent(new CodeSnippet("alpha.connect(#alphaInc#.class, this);"));
-		code.addNoIndent(new CodeSnippet("omega.connect(#omegaInc#.class, this);"));
-		//code.addNoIndent(new CodeSnippet("/* implement setting of alpha and omega */"));
-		code.addNoIndent(new CodeSnippet("}"));
+	private CodeBlock createFactoryMethodForBinaryEdge(EdgeClass edgeClass) {
+		CodeSnippet code = new CodeSnippet(true);
+		if (currentCycle.isAbstract()) {
+			code.add("/**",
+					 " * Creates a new #ecUniqueName# #ecTypeInComment# in this graph.",
+					 " * @param alpha the start vertex of the edge",
+				  	 " * @param omega the target vertex of the edge");
+			code.add("*/",
+					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
+		}
+		if (currentCycle.isMemOrDiskImpl()) {
+			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "#connectToAlpha#",
+					 "#connectToOmega#",
+					 "\treturn new#ecType#;", 
+				 "}");
+		}
+		IncidenceClass alphaInc = null;
+		IncidenceClass omegaInc = null;
+		for (IncidenceClass ic : edgeClass.getAllIncidenceClasses()) {
+			if (!ic.isAbstract()) {
+				if (ic.getDirection() == Direction.EDGE_TO_VERTEX) {
+					omegaInc = ic;
+				} else {
+					alphaInc = ic;
+				}
+			}
+		}
+		VertexClass fromClass = alphaInc.getVertexClass();
+		VertexClass toClass = omegaInc.getVertexClass();
+		code.setVariable("alphaVertex", absoluteName(fromClass));
+		code.setVariable("omegaVertex", absoluteName(toClass));
+		code.setVariable("alphaInc", absoluteName(alphaInc));
+		code.setVariable("omegaInc", absoluteName(omegaInc));
+		code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, new#ecType#);");
+		code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, new#ecType#);");
+		code.setVariable("formalParams", "#alphaVertex# alpha, #omegaVertex# omega");
 		return code;
 	}
 	
