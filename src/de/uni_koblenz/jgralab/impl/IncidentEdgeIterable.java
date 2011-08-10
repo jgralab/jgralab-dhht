@@ -196,7 +196,8 @@ public class IncidentEdgeIterable<E extends Edge> extends
 
 		@Override
 		protected void setCurrentToNextIncidentGraphElement() {
-			while (current != null && !gc.isInstance(current.getEdge())) {
+			while (current != null && gc != null
+					&& !gc.isInstance(current.getEdge())) {
 				current = current.getNextIncidenceAtVertex(traversalContext,
 						dir);
 			}

@@ -51,9 +51,8 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 * @param edge
 	 *            {@link Edge}
 	 * @param vc
-	 *            {@link Class} returned {@link Vertex}
-import de.uni_koblenz.jgralab.Edge;
- import
+	 *            {@link Class} returned {@link Vertex} import
+	 *            de.uni_koblenz.jgralab.Edge; import
 	 *            de.uni_koblenz.jgralab.Edge; import
 	 *            de.uni_koblenz.jgralab.Edge;
 	 * 
@@ -202,7 +201,8 @@ import de.uni_koblenz.jgralab.Edge;
 
 		@Override
 		protected void setCurrentToNextIncidentGraphElement() {
-			while (current != null && !gc.isInstance(current.getVertex())) {
+			while (current != null && gc != null
+					&& !gc.isInstance(current.getVertex())) {
 				current = current.getNextIncidenceAtEdge(traversalContext, dir);
 			}
 		}
