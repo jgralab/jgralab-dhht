@@ -79,7 +79,7 @@ public class TgSchema2JavaTask extends Task {
 	public TgSchema2JavaTask() {
 		executeObject = new TgSchema2Java();
 		executeObject.setTypeSpecificMethodSupport(true);
-		executeObject.setMethodsForSubclassesSupport(false);
+		executeObject.setMethodsForSubclassesSupport(true);
 		schemaLocation = new HashSet<String>();
 	}
 

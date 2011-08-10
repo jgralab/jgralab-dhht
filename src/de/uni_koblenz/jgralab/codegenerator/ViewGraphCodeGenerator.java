@@ -443,21 +443,6 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		s.add("");
 	
-		if (config.hasMethodsForSubclassesSupport()) {
-			if (currentCycle.isAbstract()) {
-				s.add("/**");
-				s.add(" * @return an Iterable for all #elemClassPluralName# of this graph that are of type #elemQualifiedName#.");
-				s.add(" *");
-				s.add(" * @param noSubClasses toggles wether subclasses of #elemQualifiedName# should be excluded");
-				s.add(" */");
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses);");
-			}
-			if (currentCycle.isMemOrDiskImpl()) {
-				s.add("public Iterable<#elemJavaClassName#> get#elemCamelName#elemClassPluralName(boolean noSubClasses) {");
-				s.add("\treturn new #elemClasslName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class, noSubClasses);");
-				s.add("}\n");
-			}
-		}
 		return code;
 	}
 
