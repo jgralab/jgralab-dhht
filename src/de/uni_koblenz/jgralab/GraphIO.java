@@ -66,11 +66,9 @@ import java.util.zip.GZIPOutputStream;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
-import de.uni_koblenz.jgralab.impl.disk.CompleteGraphDatabaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -102,9 +100,7 @@ import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
  * @author ist@uni-koblenz.de
  */
 public class GraphIO {
-	
 
-	
 	private static final int BUFFER_SIZE = 65536;
 	/**
 	 * TG File Version this GraphIO recognizes.
@@ -291,7 +287,7 @@ public class GraphIO {
 
 	private final Object[] vertexDescTempObject = { 0 };
 
-	private final Object[] edgeDescTempObject = { 0 };
+	private final Object[] edgeDescTempObject = { 0, 0, 0 };
 
 	private ByteArrayOutputStream BAOut;
 
@@ -546,10 +542,12 @@ public class GraphIO {
 		space();
 		writeIdentifier(ic.getVertexClass().getQualifiedName(pkg));
 
-		write(" role");
-		space();
-		writeIdentifier(ic.getRolename());
-		writeHierarchy(ic);
+		if (ic.getRolename() != null && !ic.getRolename().isEmpty()) {
+			write(" role");
+			space();
+			writeIdentifier(ic.getRolename());
+			writeHierarchy(ic);
+		}
 
 		// multiplicity and redefinitions at vertex class
 		write(" (");
@@ -667,41 +665,43 @@ public class GraphIO {
 		}
 	}
 
-//	/**
-//	 * Saves the marked <code>subGraph</code> to the file named
-//	 * <code>filename</code>. A {@link ProgressFunction} <code>pf</code> can be
-//	 * used to monitor progress. The stream is <em>not</em> closed. This method
-//	 * does <i>not</i> check if the subgraph marker is complete.
-//	 * 
-//	 * @param out
-//	 *            a DataOutputStream
-//	 * @param subGraph
-//	 *            a BooleanGraphMarker denoting the subgraph to be saved
-//	 * @param pf
-//	 *            a {@link ProgressFunction}, may be <code>null</code>
-//	 * @throws GraphIOException
-//	 *             if an IOException occurs
-//	 */
-//	public static void saveGraphToFile(String filename,
-//			LocalBooleanGraphMarker subGraph, ProgressFunction pf)
-//			throws GraphIOException {
-//		DataOutputStream out = null;
-//		try {
-//			if (filename.toLowerCase().endsWith(".gz")) {
-//				out = new DataOutputStream(new GZIPOutputStream(
-//						new FileOutputStream(filename), BUFFER_SIZE));
-//			} else {
-//				out = new DataOutputStream(new BufferedOutputStream(
-//						new FileOutputStream(filename), BUFFER_SIZE));
-//			}
-//			saveGraphToStream(out, subGraph, pf, false);
-//		} catch (IOException e) {
-//			throw new GraphIOException("exception while saving graph to "
-//					+ filename, e);
-//		} finally {
-//			close(out);
-//		}
-//	}
+	// /**
+	// * Saves the marked <code>subGraph</code> to the file named
+	// * <code>filename</code>. A {@link ProgressFunction} <code>pf</code> can
+	// be
+	// * used to monitor progress. The stream is <em>not</em> closed. This
+	// method
+	// * does <i>not</i> check if the subgraph marker is complete.
+	// *
+	// * @param out
+	// * a DataOutputStream
+	// * @param subGraph
+	// * a BooleanGraphMarker denoting the subgraph to be saved
+	// * @param pf
+	// * a {@link ProgressFunction}, may be <code>null</code>
+	// * @throws GraphIOException
+	// * if an IOException occurs
+	// */
+	// public static void saveGraphToFile(String filename,
+	// LocalBooleanGraphMarker subGraph, ProgressFunction pf)
+	// throws GraphIOException {
+	// DataOutputStream out = null;
+	// try {
+	// if (filename.toLowerCase().endsWith(".gz")) {
+	// out = new DataOutputStream(new GZIPOutputStream(
+	// new FileOutputStream(filename), BUFFER_SIZE));
+	// } else {
+	// out = new DataOutputStream(new BufferedOutputStream(
+	// new FileOutputStream(filename), BUFFER_SIZE));
+	// }
+	// saveGraphToStream(out, subGraph, pf, false);
+	// } catch (IOException e) {
+	// throw new GraphIOException("exception while saving graph to "
+	// + filename, e);
+	// } finally {
+	// close(out);
+	// }
+	// }
 
 	/**
 	 * Saves the specified <code>graph</code> to the stream <code>out</code>. A
@@ -733,8 +733,6 @@ public class GraphIO {
 		}
 	}
 
-
-	
 	/**
 	 * Saves the marked <code>subGraph</code> to the stream <code>out</code>. A
 	 * {@link ProgressFunction} <code>pf</code> can be used to monitor progress.
@@ -787,7 +785,8 @@ public class GraphIO {
 
 		if (!onlyLocalGraph && type == ImplementationType.DISK) {
 			for (Graph pgraph : graph.getPartialGraphs()) {
-				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) pgraph).saveGraph(filename, pf, subGraph);
+				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) pgraph)
+						.saveGraph(filename, pf, subGraph);
 			}
 		}
 
@@ -819,17 +818,16 @@ public class GraphIO {
 			} else {
 				write(" EDGE ");
 			}
-			writeInteger(GraphDatabaseBaseImpl.convertToLocalId(e.getGlobalId()));
+			writeInteger(GraphDatabaseBaseImpl
+					.convertToLocalId(e.getGlobalId()));
 		} else {
-			write("Graph ");	
+			write("Graph ");
 			write(toUtfString(graph.getUniqueGraphId()));
 		}
 
-
 		write(" " + graph.getGraphVersion() + " ");
 		writeIdentifier(graph.getType().getQualifiedName());
-	
-		
+
 		long vCount = graph.getVCount();
 		long eCount = graph.getECount();
 		// with a GraphMarker, v/eCount have to be restricted to the marked
@@ -902,6 +900,7 @@ public class GraphIO {
 							|| graph.isLocalElementId(nextI.getGlobalId())) {
 						writeLong(nextI.getGlobalId());
 					}
+					nextI = nextI.getNextIncidenceAtVertex();
 				}
 				write(">");
 
@@ -956,17 +955,17 @@ public class GraphIO {
 					// write OrderedTypedIncidences
 					write("<");
 					noSpace();
-					int edgeIncidenceCounter = 0;
 					for (Incidence i : nextE.getIncidences()) {
 						if (subGraph != null
 								&& !subGraph.isMarked(i.getVertex())) {
 							continue;
 						}
 						if (!onlyLocalGraph
-								|| graph.isLocalElementId(i.getVertex().getGlobalId())) {
+								|| graph.isLocalElementId(i.getVertex()
+										.getGlobalId())) {
 							writeSpace();
-							write(++edgeIncidenceCounter + ":"
-									+ i.getType().getRolename());
+							write(i.getLocalId() + ":"
+									+ i.getType().getSimpleName());
 							space();
 						}
 					}
@@ -1001,7 +1000,8 @@ public class GraphIO {
 		for (Graph pgraph : graph.getPartialGraphs()) {
 			writeLong(pgraph.getGlobalId());
 			write("-");
-			write(graph.getGraphDatabase().getHostname(pgraph.getPartialGraphId()));
+			write(graph.getGraphDatabase().getHostname(
+					pgraph.getPartialGraphId()));
 		}
 		write("}");
 	}
@@ -1251,8 +1251,8 @@ public class GraphIO {
 	 *             not be loaded
 	 */
 	public static Graph loadSchemaAndGraphFromFile(String filename,
-			CodeGeneratorConfiguration config, ProgressFunction pf, ImplementationType implType)
-			throws GraphIOException {
+			CodeGeneratorConfiguration config, ProgressFunction pf,
+			ImplementationType implType) throws GraphIOException {
 		try {
 			logger.finer("Loading graph " + filename);
 			return loadGraphFromFile(filename, null, pf, implType);
@@ -1268,9 +1268,6 @@ public class GraphIO {
 		}
 	}
 
-
-	
-	
 	/**
 	 * Loads a graph from the file <code>filename</code>. When the
 	 * <code>filename</code> ends with <code>.gz</code>, it is assumed that the
@@ -1281,8 +1278,8 @@ public class GraphIO {
 	 * @return
 	 * @throws GraphIOException
 	 */
-	public static Graph loadGraphFromFile(String filename, Schema schema, ImplementationType implType)
-			throws GraphIOException {
+	public static Graph loadGraphFromFile(String filename, Schema schema,
+			ImplementationType implType) throws GraphIOException {
 		return loadGraphFromFile(filename, schema, null, implType);
 	}
 
@@ -1335,7 +1332,8 @@ public class GraphIO {
 			if (inputStream != null) {
 				close(inputStream);
 			}
-			close(fileStream);
+			if (fileStream != null)
+				close(fileStream);
 		}
 	}
 
@@ -2795,32 +2793,30 @@ public class GraphIO {
 			ImplementationType implementationType, boolean onlyLocalGraph)
 			throws GraphIOException, RemoteException {
 		currentPackageName = "";
-		
+
 		String uniqueGraphId = null;
 		ParentEntityKind parentEntityKind = null;
 		int partialGraphId = -1;
 		boolean isPartialGraph = false;
 		long parentPartialGraphId = -1;
-		long graphVersion = 0;
 		if (lookAhead.equals("PartialGraph")) {
 			match("PartialGraph");
 			isPartialGraph = true;
 			uniqueGraphId = matchUtfString();
 			parentPartialGraphId = matchLong();
 			if (lookAhead.equals("GRAPH")) {
-				parentEntityKind = ParentEntityKind.GRAPH; 
+				parentEntityKind = ParentEntityKind.GRAPH;
 			} else if (lookAhead.equals("EDGE")) {
-				parentEntityKind = ParentEntityKind.EDGE; 
+				parentEntityKind = ParentEntityKind.EDGE;
 			} else {
-				parentEntityKind = ParentEntityKind.VERTEX; 
+				parentEntityKind = ParentEntityKind.VERTEX;
 			}
 			partialGraphId = matchInteger();
 		} else {
 			match("Graph");
 			uniqueGraphId = matchUtfString();
-			graphVersion = matchLong();
 		}
-
+		long graphVersion = matchLong();
 
 		gcName = matchAndNext();
 		assert !gcName.contains(".") && isValidIdentifier(gcName) : "illegal characters in graph class '"
@@ -2859,51 +2855,60 @@ public class GraphIO {
 		}
 		Graph graph = null;
 
-
 		if (implementationType == ImplementationType.MEMORY) {
-			//InMemory Implementation
+			// InMemory Implementation
 			try {
-				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.MEMORY)
-						.invoke(null, new Object[] { uniqueGraphId, maxV, maxE });
+				// TODO remove line below and use the outcommented one
+				// graph = new SchemaGraphImpl(uniqueGraphId, maxV, maxE);
+				graph = (Graph) schema.getGraphCreateMethod(
+						ImplementationType.MEMORY).invoke(null,
+						new Object[] { uniqueGraphId, maxV, maxE });
 			} catch (Exception e) {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
 			}
-			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setLoading(true);
+			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph)
+					.setLoading(true);
 		} else {
-			//DISK Implementation
+			// DISK Implementation
 			try {
 				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
-				
-				
-				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) server.getGraphDatabase(uniqueGraphId);
-				graph = (Graph) schema.getGraphCreateMethod(ImplementationType.DISK)
-						.invoke(null, new Object[] { uniqueGraphId, partialGraphId, localGraphDb });
-				//TODO Add parent graph or element id  and parent kind 
+
+				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) server
+						.getGraphDatabase(uniqueGraphId);
+				graph = (Graph) schema.getGraphCreateMethod(
+						ImplementationType.DISK).invoke(
+						null,
+						new Object[] { uniqueGraphId, partialGraphId,
+								localGraphDb });
 			} catch (Exception e) {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
 			}
-//			((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) graph).setLoading(true);
-//			server = JGraLabServerImpl.getLocalInstance();
-//			readPartialGraphs(graph);
-//			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
-//			if (graph.getPartialGraphId() == GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
-//				gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId, getLocalHostname());
-//			} else {
-//					gd = new PartialGraphDatabase(
-//						schema,
-//						uniqueGraphId,
-//						partialGraphHostnames.get(GraphDatabaseBaseImpl
-//								.getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)),
-//						parentPartialGraphId, parentEntityKind, partialGraphId);
-//			}
-//			server.registerLocalGraphDatabase(gd);
+			// ((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl)
+			// graph).setLoading(true);
+			// server = JGraLabServerImpl.getLocalInstance();
+			// readPartialGraphs(graph);
+			// de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl gd = null;
+			// if (graph.getPartialGraphId() ==
+			// GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
+			// gd = new CompleteGraphDatabaseImpl(schema, uniqueGraphId,
+			// getLocalHostname());
+			// } else {
+			// gd = new PartialGraphDatabase(
+			// schema,
+			// uniqueGraphId,
+			// partialGraphHostnames.get(GraphDatabaseBaseImpl
+			// .getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)),
+			// parentPartialGraphId, parentEntityKind, partialGraphId);
+			// }
+			// server.registerLocalGraphDatabase(gd);
 		}
-
+		readPartialGraphs(graph);
 		graph.readAttributeValues(this);
 		match(";");
 
+		match("vertices");
 		while (!lookAhead.equals("edges")) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
@@ -2921,6 +2926,7 @@ public class GraphIO {
 			}
 		}
 
+		match("edges");
 		while (lookAhead != null && !lookAhead.isEmpty()) {
 			if (lookAhead.equals("Package")) {
 				parsePackage();
@@ -2950,23 +2956,26 @@ public class GraphIO {
 
 		if (!isPartialGraph) {
 			if (implementationType == ImplementationType.MEMORY) {
-				((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+				((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph)
+						.setGraphVersion(graphVersion);
 			} else {
-				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph).setGraphVersion(graphVersion);
+				((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph)
+						.setGraphVersion(graphVersion);
 			}
 		}
 		if (pf != null) {
 			pf.finished();
 		}
 		if (implementationType == ImplementationType.MEMORY) {
-			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph).setLoading(false);
+			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph)
+					.setLoading(false);
 		} else {
-			((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph).setLoading(false);
+			((de.uni_koblenz.jgralab.impl.disk.CompleteGraphImpl) graph)
+					.setLoading(false);
 
 		}
 		return graph;
 	}
-	
 
 	private void deleteIncompleteBinaryEdges(Graph graph) {
 		for (Edge edge : graph.getEdges()) {
@@ -2986,8 +2995,15 @@ public class GraphIO {
 						&& incidence.getValue()[1] != 0;
 				Vertex v = graph.getVertex(incidence.getValue()[0]);
 				Edge e = graph.getEdge(incidence.getValue()[1]);
-				e.connect(e.getIncidenceClassForRolename(incidenceTypes
-						.get(incidence.getKey())), v);
+				for (IncidenceClass ic : e.getType().getAllIncidenceClasses()) {
+					if (ic.getSimpleName().equals(
+							incidenceTypes.get(incidence.getKey()))) {
+						e.connect(ic, v);
+						break;
+					}
+				}
+				// e.connect(e.getIncidenceClassForRolename(incidenceTypes
+				// .get(incidence.getKey())), v); // TODO adapt loading
 				incidences.put(incidence.getKey(), e.getLastIncidence());
 			}
 		}
@@ -3115,7 +3131,7 @@ public class GraphIO {
 						implementationType);
 				createMethods.put(vcName, createMethod);
 			}
-			vertexDescTempObject[0] = vId;
+			vertexDescTempObject[0] = (int) vId;
 			vertex = (Vertex) createMethod.invoke(graph, vertexDescTempObject);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3165,7 +3181,7 @@ public class GraphIO {
 						implementationType);
 				createMethods.put(ecName, createMethod);
 			}
-			edgeDescTempObject[0] = eId;
+			edgeDescTempObject[0] = (int) eId;
 			edge = (Edge) createMethod.invoke(graph, edgeDescTempObject);
 		} catch (Exception e) {
 			throw new GraphIOException("Can't create edge " + eId + ".", e);
@@ -3258,7 +3274,7 @@ public class GraphIO {
 			lambdaSequence = new ArrayList<V>();
 			incidencesAtGraphElement.put(graphElementId, lambdaSequence);
 		}
-		if (lambdaSequence.size() >= posInLambdaSequence
+		if (lambdaSequence.size() > posInLambdaSequence
 				&& lambdaSequence.get(posInLambdaSequence) != null) {
 			throw new GraphIOException(
 					"There already exists an element in the lambda sequence at the position "

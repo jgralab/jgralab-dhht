@@ -2222,11 +2222,11 @@ public class Rsa2Tg extends XmlProcessor {
 						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
-						+ att.getFirst_attribute().getThat().getM1Class()
+						+ att.getFirst_attribute(false).getThat().getM1Class()
 								.getSimpleName()
 						+ " '"
-						+ ((AttributedElementClass) att.getFirst_attribute()
-								.getThat()).get_qualifiedName()
+						+ ((AttributedElementClass) att.getFirst_attribute(
+								false).getThat()).get_qualifiedName()
 						+ "' has "
 						+ att.getDegree(HasDomain_domain.class,
 								de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)
@@ -2773,7 +2773,7 @@ public class Rsa2Tg extends XmlProcessor {
 					i.getEdge().delete();
 				} else if (i.getEdge() instanceof HasAttribute) {
 					Attribute att = (Attribute) i.getThat();
-					Edge d = att.getFirst_attribute().getEdge();
+					Edge d = att.getFirst_attribute(false).getEdge();
 					if (d != null) {
 						Domain dom = (Domain) i.getThat();
 						HasRecordDomainComponent comp = sg
