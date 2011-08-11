@@ -1079,7 +1079,7 @@ public class SchemaImpl implements Schema {
 		Class<?> m1Class = getGraphClassImpl(implementationType);
 		for (Method m : m1Class.getMethods()) {
 			if (m.getName().equals(methodName)
-					&& (m.getParameterTypes().length == 3/* TODO 2 not 3 */)) {
+					&& (m.getParameterTypes().length == 1/* 3/* TODO 2 not 3 */)) {
 				return m;
 			}
 		}
