@@ -287,7 +287,7 @@ public class GraphIO {
 
 	private final Object[] vertexDescTempObject = { 0 };
 
-	private final Object[] edgeDescTempObject = { 0, 0, 0 };
+	private final Object[] edgeDescTempObject = { 0 };
 
 	private ByteArrayOutputStream BAOut;
 
@@ -959,6 +959,11 @@ public class GraphIO {
 						if (subGraph != null
 								&& !subGraph.isMarked(i.getVertex())) {
 							continue;
+						}
+						try {// TODO delete
+							i.getType().getM1Class();
+						} catch (Exception e) {
+							System.out.println(i.getType().getQualifiedName());
 						}
 						if (!onlyLocalGraph
 								|| graph.isLocalElementId(i.getVertex()
@@ -2858,10 +2863,8 @@ public class GraphIO {
 		if (implementationType == ImplementationType.MEMORY) {
 			// InMemory Implementation
 			try {
-				// TODO remove line below and use the outcommented one
-				// graph = new SchemaGraphImpl(uniqueGraphId, maxV, maxE);
 				graph = (Graph) schema.getGraphCreateMethod(
-						ImplementationType.MEMORY).invoke(null,
+						ImplementationType.MEMORY).invoke(schema,
 						new Object[] { uniqueGraphId, maxV, maxE });
 			} catch (Exception e) {
 				throw new GraphIOException("can't create graph for class '"
@@ -3002,8 +3005,6 @@ public class GraphIO {
 						break;
 					}
 				}
-				// e.connect(e.getIncidenceClassForRolename(incidenceTypes
-				// .get(incidence.getKey())), v); // TODO adapt loading
 				incidences.put(incidence.getKey(), e.getLastIncidence());
 			}
 		}
@@ -3232,12 +3233,13 @@ public class GraphIO {
 			lambdaSeqPosAtEdge++;
 			long incidenceId = matchLong();
 			match(":");
-			String incidenceName = matchSimpleName(false);
+			String incidenceName = matchSimpleName(true);
 			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge,
 					new Long(incidenceId));
 			incidenceTypes.put(incidenceId, incidenceName);
 			setIncidence(eId, incidenceId, false);
 		}
+		match();
 	}
 
 	private void parseIncidencesAtVertex(Vertex v) throws GraphIOException {

@@ -928,7 +928,7 @@ public abstract class EdgeImpl extends
 					.setNextIncidenceAtEdge(null);
 		} else {
 			((IncidenceImpl) moved.getPreviousIncidenceAtEdge())
-					.setNextIncidenceAtVertex((IncidenceImpl) moved
+					.setNextIncidenceAtEdge((IncidenceImpl) moved
 							.getNextIncidenceAtEdge());
 			((IncidenceImpl) moved.getNextIncidenceAtEdge())
 					.setPreviousIncidenceAtEdge((IncidenceImpl) moved

@@ -966,7 +966,17 @@ public class SchemaImpl implements Schema {
 		try {
 			m1Class = getGraphClassImpl(implementationType);
 			if (className.equals(graphClassName)) {
-				return m1Class.getMethod("create", signature);
+				return getClass()
+						.getMethod(
+								"create"
+										+ CodeGenerator.camelCase(m1Class
+												.getSimpleName().substring(
+														0,
+														m1Class.getSimpleName()
+																.length() - 4))
+										+ (implementationType == ImplementationType.DISK ? "OnDisk"
+												: "InMem"), signature);
+				// -4 == -"Impl".length()
 			} else {
 				aec = graphClass.getVertexClass(className);
 				if (aec == null) {
@@ -1069,7 +1079,7 @@ public class SchemaImpl implements Schema {
 		Class<?> m1Class = getGraphClassImpl(implementationType);
 		for (Method m : m1Class.getMethods()) {
 			if (m.getName().equals(methodName)
-					&& (m.getParameterTypes().length == 3/* TODO 2 not 3 */)) {
+					&& (m.getParameterTypes().length == 1/* 3/* TODO 2 not 3 */)) {
 				return m;
 			}
 		}
