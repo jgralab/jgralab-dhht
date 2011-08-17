@@ -154,7 +154,7 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
 						superclassesAtThisEdgeClass.add(sc);
 					}
 				}
-				// nur superklasen an gelicher kantenklasse
+				//only superclasses at the same edge class
 				if (topologicalOrderList
 						.containsAll(superclassesAtThisEdgeClass)) {
 					topologicalOrderList.add(ic);

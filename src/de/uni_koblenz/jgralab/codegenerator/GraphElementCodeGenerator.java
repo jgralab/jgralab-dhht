@@ -240,7 +240,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		snippet.add("public IncidenceClass getIncidenceClassForRolename(String rolename) {");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getAllIncidenceClasses()) {
-			if (ic.getRolename() != null && ic.getRolename().length() > 0) {
+			if (!ic.isInternal()) {
 				snippet = new CodeSnippet();
 				snippet.setVariable("rolename", ic.getRolename());
 				snippet.setVariable("schemaVariable", ic.getVariableName());
@@ -273,7 +273,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			if (createMethod) {
 				addImports("#jgPackage#.Direction");
 				if (config.hasTypeSpecificMethodsSupport()) {
-					if (ic.getRolename() != null && ic.getRolename().length()>0) {
+					if (!ic.isInternal()) {
 						code.addNoIndent(createFirstIncidenceMethod(ic, true));
 						if (config.hasMethodsForSubclassesSupport() && !ic.isAbstract()) {
 							code.addNoIndent(createFirstIncidenceMethod(ic, false));

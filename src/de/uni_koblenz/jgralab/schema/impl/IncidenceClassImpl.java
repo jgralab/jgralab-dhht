@@ -48,18 +48,22 @@ public class IncidenceClassImpl extends
 		TypedElementClassImpl<IncidenceClass, Incidence> implements
 		IncidenceClass {
 
+	public static String getRolenameString(String role, EdgeClass ec) {
+		if ((role== null) || (role.length() == 0)) {
+			return "IncidenceClass_" + Integer.toString(ec.getIncidenceClasses().size()) + "_Of_" + ec.getSimpleName();
+		} else {
+			return role;
+		}
+	}
+	
+	
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
 		super(edgeClass.getSimpleName()
 				+ "_"
-				+ ((rolename != null) && (rolename.length() > 0) ? rolename
-						: "IC_"
-								+ edgeClass.getSimpleName()
-								+ "_"
-								+ Integer.toString(edgeClass
-										.getIncidenceClasses().size())),
+				+ getRolenameString(rolename, edgeClass),
 				edgeClass.getPackage(), edgeClass.getSchema());
 		this.incidenceType = incidenceType;
 		this.direction = direction;
@@ -68,17 +72,7 @@ public class IncidenceClassImpl extends
 		this.minEdgesAtVertex = minEdgesAtVertex;
 		this.maxVerticesAtEdge = maxVerticesAtEdge;
 		this.minVerticesAtEdge = minVerticesAtEdge;
-		this.rolename = rolename;
-		if (rolename == null) {
-			rolename = "IC_" + edgeClass.getSimpleName() + "_"
-					+ Integer.toString(edgeClass.getIncidenceClasses().size());
-			// rolename = "";
-		}
-		if (rolename.length() == 0) {
-			rolename = "IC_" + edgeClass.getSimpleName() + "_"
-					+ Integer.toString(edgeClass.getIncidenceClasses().size());
-			// rolename = "";
-		}
+		this.rolename = getRolenameString(rolename, edgeClass);
 		this.vertexClass = vertexClass;
 		setAbstract(isAbstract);
 	}
@@ -463,7 +457,7 @@ public class IncidenceClassImpl extends
 		assert schema.getDefaultIncidenceClass(dir) == null : "DefaultIncidenceClass has already been created";
 		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(
 				schema.getDefaultEdgeClass(), schema.getDefaultVertexClass(),
-				"", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir,
+				dir == Direction.EDGE_TO_VERTEX ? "EdgeToVertex" : "VertexToEdge", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir,
 				IncidenceType.EDGE);
 		return ic;
 	}

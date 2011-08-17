@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
@@ -453,7 +454,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
 		code.setVariable("icVertexClass", ic.getVertexClass().getQualifiedName());
 		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
-		code.setVariable("icRoleName", ic.getRolename() != null ? ic.getRolename() : "");
+		code.setVariable("icRoleName", ic.getRolename());
 		code.setVariable("dir", ic.getDirection().toString());
 		code.setVariable("schemaVariable", ic.getVariableName());
 		code.setVariable("incidenceType", ic.getIncidenceType().toString());
