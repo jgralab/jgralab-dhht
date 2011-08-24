@@ -1196,7 +1196,6 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 			idMap.put(currentClassId, ec);
-			System.out.println(oldVertexClass.getDegree());// TODO delete
 			oldVertexClass.delete();
 		}
 	}
