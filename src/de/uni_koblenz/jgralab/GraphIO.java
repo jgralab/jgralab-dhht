@@ -960,11 +960,6 @@ public class GraphIO {
 								&& !subGraph.isMarked(i.getVertex())) {
 							continue;
 						}
-						try {// TODO delete
-							i.getType().getM1Class();
-						} catch (Exception e) {
-							System.out.println(i.getType().getQualifiedName());
-						}
 						if (!onlyLocalGraph
 								|| graph.isLocalElementId(i.getVertex()
 										.getGlobalId())) {
@@ -3003,7 +2998,14 @@ public class GraphIO {
 				for (IncidenceClass ic : e.getType().getAllIncidenceClasses()) {
 					if (ic.getSimpleName().equals(
 							incidenceTypes.get(incidence.getKey()))) {
-						e.connect(ic, v);
+						if (implementationType == ImplementationType.MEMORY) {
+							((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e)
+									.connect(incidence.getKey().intValue(), ic,
+											v);
+						} else {
+							((de.uni_koblenz.jgralab.impl.disk.EdgeImpl) e)
+									.connect(incidence.getKey(), ic, v);
+						}
 						break;
 					}
 				}
@@ -3189,7 +3191,7 @@ public class GraphIO {
 		} catch (Exception e) {
 			throw new GraphIOException("Can't create edge " + eId + ".", e);
 		}
-		parseIncidences(edge);
+		parseIncidences(edge, implementationType);
 		edge.readAttributeValues(this);
 		parseSigma(edge);
 		parseKappa(edge, implementationType);
@@ -3226,7 +3228,8 @@ public class GraphIO {
 		return toQNameString(qn);
 	}
 
-	private void parseIncidences(Edge edge) throws GraphIOException {
+	private void parseIncidences(Edge edge,
+			ImplementationType implementationType) throws GraphIOException {
 		int lambdaSeqPosAtEdge = 0;
 		long eId = edge.getGlobalId();
 
@@ -3236,8 +3239,18 @@ public class GraphIO {
 			long incidenceId = matchLong();
 			match(":");
 			String incidenceName = matchSimpleName(true);
-			addToIncidenceList(incidencesAtEdge, eId, lambdaSeqPosAtEdge,
-					new Long(incidenceId));
+			// in case of the disk implementation the global id of an incidence
+			// is the partialGraphId of the edge concatenated with the local id
+			// of the incidence
+			addToIncidenceList(
+					incidencesAtEdge,
+					eId,
+					lambdaSeqPosAtEdge,
+					implementationType == ImplementationType.MEMORY ? new Long(
+							incidenceId)
+							: (((long) GraphDatabaseElementaryMethods
+									.getPartialGraphId(edge.getGlobalId())) << 32)
+									| ((long) incidenceId));
 			incidenceTypes.put(incidenceId, incidenceName);
 			setIncidence(eId, incidenceId, false);
 		}

@@ -61,12 +61,13 @@ public abstract class VertexImpl extends
 	private VertexImpl prevVertexInGraph;
 	private IncidenceImpl firstIncidenceAtVertex;
 	private IncidenceImpl lastIncidenceAtVertex;
-	
+
 	@Override
 	public Incidence getFirstIncidence(Graph traversalContext) {
 		Incidence firstIncidence = firstIncidenceAtVertex;
-		while ((firstIncidence != null) && (traversalContext != null) && (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			firstIncidence = ((IncidenceImpl)firstIncidence).nextIncidenceAtVertex;
+		while ((firstIncidence != null) && (traversalContext != null)
+				&& (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
+			firstIncidence = ((IncidenceImpl) firstIncidence).nextIncidenceAtVertex;
 		}
 		return firstIncidence;
 	}
@@ -76,7 +77,8 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (nextVertexInGraph == null) {
 			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(nextVertexInGraph)) {
+		} else if ((traversalContext == null)
+				|| traversalContext.containsVertex(nextVertexInGraph)) {
 			return nextVertexInGraph;
 		} else {
 			return nextVertexInGraph.getNextVertex(traversalContext);
@@ -88,19 +90,19 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (prevVertexInGraph == null) {
 			return null;
-		} else if ((traversalContext == null) || traversalContext.containsVertex(prevVertexInGraph)) {
+		} else if ((traversalContext == null)
+				|| traversalContext.containsVertex(prevVertexInGraph)) {
 			return prevVertexInGraph;
 		} else {
 			return prevVertexInGraph.getPreviousVertex(traversalContext);
 		}
 	}
 
-
-	
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) {
 		Incidence lastIncidence = lastIncidenceAtVertex;
-		if ((lastIncidence == null) || (traversalContext == null) || (traversalContext.containsVertex(lastIncidence.getVertex()))) {
+		if ((lastIncidence == null) || (traversalContext == null)
+				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
 		} else {
 			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
@@ -139,11 +141,11 @@ public abstract class VertexImpl extends
 		lastIncidenceAtVertex = lastIncidence;
 	}
 
-
 	@Override
 	public Graph getSubordinateGraph() {
 		if (subOrdinateGraph == null) {
-			subOrdinateGraph = getLocalGraph().getGraphFactory().createSubordinateGraph(this);
+			subOrdinateGraph = getLocalGraph().getGraphFactory()
+					.createSubordinateGraph(this);
 		}
 		return subOrdinateGraph;
 	}
@@ -195,24 +197,31 @@ public abstract class VertexImpl extends
 				direction, noSubclasses);
 	}
 
-	
 	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext, Direction direction) {
+	public final Incidence getFirstIncidence(Graph traversalContext,
+			Direction direction) {
 		assert isValid();
 		Incidence i = firstIncidenceAtVertex;
-		if (traversalContext==null) {
-			while (((i != null) && (direction != null) && (direction != Direction.BOTH) && (direction != i.getDirection()))) { 
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
-			}		
+		if (traversalContext == null) {
+			while (((i != null) && (direction != null)
+					&& (direction != Direction.BOTH) && (direction != i
+						.getDirection()))) {
+				i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
-				while ((i != null) && ((!traversalContext.containsEdge(i.getEdge())) || (direction != i.getDirection())))
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
+				while ((i != null)
+						&& ((!traversalContext.containsEdge(i.getEdge())) || (direction != i
+								.getDirection()))) {
+					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+				}
 			} else {
-				while ((i != null) && (!traversalContext.containsEdge(i.getEdge())))
-					i = ((IncidenceImpl)i).nextIncidenceAtVertex;
+				while ((i != null)
+						&& (!traversalContext.containsEdge(i.getEdge()))) {
+					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+				}
 			}
-			
+
 		}
 		return i;
 	}
@@ -243,7 +252,8 @@ public abstract class VertexImpl extends
 			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		Incidence currentIncidence = getFirstIncidence(traversalContext, direction);
+		Incidence currentIncidence = getFirstIncidence(traversalContext,
+				direction);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -254,8 +264,8 @@ public abstract class VertexImpl extends
 					return (T) currentIncidence;
 				}
 			}
-			currentIncidence = currentIncidence
-					.getNextIncidenceAtVertex(traversalContext, direction);
+			currentIncidence = currentIncidence.getNextIncidenceAtVertex(
+					traversalContext, direction);
 		}
 		return null;
 	}
@@ -771,15 +781,15 @@ public abstract class VertexImpl extends
 
 	@Override
 	public String toString() {
-			assert isValid();
-			return "v" + id + ": " + getType().getQualifiedName();
+		assert isValid();
+		return "v" + id + ": " + getType().getQualifiedName();
 	}
 
 	@Override
 	public int compareTo(Vertex v) {
-			assert isValid() && v.isValid();
-			assert getGraph() == v.getGraph();
-			return (int) (getGlobalId() - v.getGlobalId());
+		assert isValid() && v.isValid();
+		assert getGraph() == v.getGraph();
+		return (int) (getGlobalId() - v.getGlobalId());
 	}
 
 	@Override
@@ -1260,9 +1270,20 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
+	public final Incidence connect(int id, IncidenceClass incidenceClass,
+			Edge elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
+	}
+
+	@Override
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect) {
 		int id = graph.allocateIncidenceIndex(0);
+		return connect(incidenceClass, elemToConnect, id);
+	}
+
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Edge elemToConnect, int id) {
 		return getSchema().getGraphFactory().createIncidence(incidenceClass,
 				id, this, elemToConnect);
 	}
@@ -1276,5 +1297,5 @@ public abstract class VertexImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
-	
+
 }

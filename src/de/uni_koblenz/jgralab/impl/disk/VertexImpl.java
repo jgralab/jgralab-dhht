@@ -97,7 +97,6 @@ public abstract class VertexImpl extends
 	 * Access id *********************************************************
 	 */
 
-
 	@Override
 	public final long getGlobalId() {
 		return elementId;
@@ -280,7 +279,8 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexBefore(v.getGlobalId(), this.getGlobalId());
+		storingGraphDatabase.putVertexBefore(v.getGlobalId(),
+				this.getGlobalId());
 	}
 
 	@Override
@@ -304,7 +304,8 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		storingGraphDatabase
+				.putVertexAfter(v.getGlobalId(), this.getGlobalId());
 	}
 
 	/* **********************************************************
@@ -361,7 +362,7 @@ public abstract class VertexImpl extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {
@@ -549,6 +550,21 @@ public abstract class VertexImpl extends
 		return elemToConnect.connect(incidenceClass, this);
 	}
 
+	@SuppressWarnings("unchecked")
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Edge elemToConnect, long globalIdOfIncidence) {
+		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+				.connect(getSchema().getClassId(incidenceClass),
+						this.getGlobalId(), elemToConnect.getGlobalId(),
+						globalIdOfIncidence));
+	}
+
+	@Override
+	public Incidence connect(long id, IncidenceClass incidenceClass,
+			Edge elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
+	}
+
 	/* **********************************************************
 	 * Access sigma and kappa information
 	 * *********************************************************
@@ -569,13 +585,13 @@ public abstract class VertexImpl extends
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
-		if (sigmaId < 0)
+		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
-		else
+		} else {
 			return localGraphDatabase.getVertexObject(sigmaId);
+		}
 	}
 
-	
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
 		long sigmaId = elem.getGlobalId();
@@ -586,13 +602,12 @@ public abstract class VertexImpl extends
 		}
 	}
 
-	
 	@Override
 	public int getKappa() {
 		return container.kappa[getIdInStorage(elementId)];
 	}
 
-
+	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -904,14 +919,16 @@ public abstract class VertexImpl extends
 		storingGraphDatabase.deleteVertex(this.getGlobalId());
 	}
 
+	@Override
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getGlobalId(),
-				moved.getGlobalId());
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(
+				target.getGlobalId(), moved.getGlobalId());
 	}
 
+	@Override
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getGlobalId(),
-				moved.getGlobalId());
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
+				target.getGlobalId(), moved.getGlobalId());
 	}
 
 	public void deleteIncidence(Incidence i) {
@@ -920,142 +937,144 @@ public abstract class VertexImpl extends
 
 	// @Override
 	// //TODO: Move to storing graph database
-	 public void sortIncidences(Comparator<Incidence> comp) {
-		 throw new RuntimeException("Not yet implemented");
-	// assert isValid();
-	//
-	// if (getFirstIncidence() == null) {
-	// // no sorting required for empty incidence lists
-	// return;
-	// }
-	// class IncidenceList {
-	// IncidenceImpl first;
-	// IncidenceImpl last;
-	//
-	// public void add(IncidenceImpl i) {
-	// if (first == null) {
-	// first = i;
-	// assert (last == null);
-	// last = i;
-	// } else {
-	// i.setPreviousIncidenceAtVertex(last);
-	// last.setNextIncidenceAtVertex(i);
-	// last = i;
-	// }
-	// i.setNextIncidenceAtVertex(null);
-	// }
-	//
-	// public IncidenceImpl remove() {
-	// if (first == null) {
-	// throw new NoSuchElementException();
-	// }
-	// IncidenceImpl out;
-	// if (first == last) {
-	// out = first;
-	// first = null;
-	// last = null;
-	// return out;
-	// }
-	// out = first;
-	// first = (IncidenceImpl) out.getNextIncidenceAtVertex();
-	// first.setPreviousIncidenceAtVertex(null);
-	// return out;
-	// }
-	//
-	// public boolean isEmpty() {
-	// assert ((first == null) == (last == null));
-	// return first == null;
-	// }
-	//
-	// }
-	//
-	// IncidenceList a = new IncidenceList();
-	// IncidenceList b = new IncidenceList();
-	// IncidenceList out = a;
-	//
-	// // split
-	// IncidenceImpl last;
-	// IncidenceList l = new IncidenceList();
-	// l.first = (IncidenceImpl) getFirstIncidence();
-	// l.last = (IncidenceImpl) getLastIncidence();
-	//
-	// out.add(last = l.remove());
-	// while (!l.isEmpty()) {
-	// IncidenceImpl current = l.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == a) ? b : a;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	// if (a.isEmpty() || b.isEmpty()) {
-	// out = a.isEmpty() ? b : a;
-	// storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
-	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-	// return;
-	// }
-	//
-	// while (true) {
-	// if (a.isEmpty() || b.isEmpty()) {
-	// out = a.isEmpty() ? b : a;
-	// storingGraphDatabase.setFirstIncidenceOfVertexId(elementId,
-	// out.first.getId());
-	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-	// storingGraphDatabase.incidenceListModified(elementId);
-	// return;
-	// }
-	//
-	// IncidenceList c = new IncidenceList();
-	// IncidenceList d = new IncidenceList();
-	// out = c;
-	//
-	// last = null;
-	// while (!a.isEmpty() && !b.isEmpty()) {
-	// int compareAToLast = last != null ? comp.compare(a.first, last)
-	// : 0;
-	// int compareBToLast = last != null ? comp.compare(b.first, last)
-	// : 0;
-	//
-	// if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
-	// if (comp.compare(a.first, b.first) <= 0) {
-	// out.add(last = a.remove());
-	// } else {
-	// out.add(last = b.remove());
-	// }
-	// } else if ((compareAToLast < 0) && (compareBToLast < 0)) {
-	// out = (out == c) ? d : c;
-	// last = null;
-	// } else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
-	// out.add(last = b.remove());
-	// } else {
-	// out.add(last = a.remove());
-	// }
-	// }
-	//
-	// // copy rest of A
-	// while (!a.isEmpty()) {
-	// IncidenceImpl current = a.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == c) ? d : c;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	//
-	// // copy rest of B
-	// while (!b.isEmpty()) {
-	// IncidenceImpl current = b.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == c) ? d : c;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	//
-	// a = c;
-	// b = d;
-	// }
-	//
+	@Override
+	public void sortIncidences(Comparator<Incidence> comp) {
+		throw new RuntimeException("Not yet implemented");
+		// assert isValid();
+		//
+		// if (getFirstIncidence() == null) {
+		// // no sorting required for empty incidence lists
+		// return;
+		// }
+		// class IncidenceList {
+		// IncidenceImpl first;
+		// IncidenceImpl last;
+		//
+		// public void add(IncidenceImpl i) {
+		// if (first == null) {
+		// first = i;
+		// assert (last == null);
+		// last = i;
+		// } else {
+		// i.setPreviousIncidenceAtVertex(last);
+		// last.setNextIncidenceAtVertex(i);
+		// last = i;
+		// }
+		// i.setNextIncidenceAtVertex(null);
+		// }
+		//
+		// public IncidenceImpl remove() {
+		// if (first == null) {
+		// throw new NoSuchElementException();
+		// }
+		// IncidenceImpl out;
+		// if (first == last) {
+		// out = first;
+		// first = null;
+		// last = null;
+		// return out;
+		// }
+		// out = first;
+		// first = (IncidenceImpl) out.getNextIncidenceAtVertex();
+		// first.setPreviousIncidenceAtVertex(null);
+		// return out;
+		// }
+		//
+		// public boolean isEmpty() {
+		// assert ((first == null) == (last == null));
+		// return first == null;
+		// }
+		//
+		// }
+		//
+		// IncidenceList a = new IncidenceList();
+		// IncidenceList b = new IncidenceList();
+		// IncidenceList out = a;
+		//
+		// // split
+		// IncidenceImpl last;
+		// IncidenceList l = new IncidenceList();
+		// l.first = (IncidenceImpl) getFirstIncidence();
+		// l.last = (IncidenceImpl) getLastIncidence();
+		//
+		// out.add(last = l.remove());
+		// while (!l.isEmpty()) {
+		// IncidenceImpl current = l.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == a) ? b : a;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		// if (a.isEmpty() || b.isEmpty()) {
+		// out = a.isEmpty() ? b : a;
+		// storingGraphDatabase.setFirstIncidenceId(elementId,
+		// out.first.getId());
+		// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+		// return;
+		// }
+		//
+		// while (true) {
+		// if (a.isEmpty() || b.isEmpty()) {
+		// out = a.isEmpty() ? b : a;
+		// storingGraphDatabase.setFirstIncidenceOfVertexId(elementId,
+		// out.first.getId());
+		// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+		// storingGraphDatabase.incidenceListModified(elementId);
+		// return;
+		// }
+		//
+		// IncidenceList c = new IncidenceList();
+		// IncidenceList d = new IncidenceList();
+		// out = c;
+		//
+		// last = null;
+		// while (!a.isEmpty() && !b.isEmpty()) {
+		// int compareAToLast = last != null ? comp.compare(a.first, last)
+		// : 0;
+		// int compareBToLast = last != null ? comp.compare(b.first, last)
+		// : 0;
+		//
+		// if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
+		// if (comp.compare(a.first, b.first) <= 0) {
+		// out.add(last = a.remove());
+		// } else {
+		// out.add(last = b.remove());
+		// }
+		// } else if ((compareAToLast < 0) && (compareBToLast < 0)) {
+		// out = (out == c) ? d : c;
+		// last = null;
+		// } else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
+		// out.add(last = b.remove());
+		// } else {
+		// out.add(last = a.remove());
+		// }
+		// }
+		//
+		// // copy rest of A
+		// while (!a.isEmpty()) {
+		// IncidenceImpl current = a.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == c) ? d : c;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		//
+		// // copy rest of B
+		// while (!b.isEmpty()) {
+		// IncidenceImpl current = b.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == c) ? d : c;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		//
+		// a = c;
+		// b = d;
+		// }
+		//
 	}
 
 	@Override
@@ -1187,15 +1206,15 @@ public abstract class VertexImpl extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
-	
+
 	/**
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
+	@Override
 	public final long getIncidenceListVersion() {
 		assert isValid();
 		return container.incidenceListVersion[getIdInStorage(elementId)];
 	}
-	
 
 }
