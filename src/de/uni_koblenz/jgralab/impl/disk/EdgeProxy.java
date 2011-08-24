@@ -71,14 +71,12 @@ public abstract class EdgeProxy extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected EdgeProxy(long id, GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
-			throws IOException {
+	protected EdgeProxy(long id, GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
 		this.storingGraphDatabase = storingGraphDatabase;
 	}
-
-
 
 	/* **********************************************************
 	 * Access id, remember, the signed bit is used to encode that this object is
@@ -338,7 +336,7 @@ public abstract class EdgeProxy extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = i.getNextIncidenceAtEdge();
 			}
 		} else {
@@ -674,6 +672,15 @@ public abstract class EdgeProxy extends
 						elemToConnect.getGlobalId(), this.getGlobalId()));
 	}
 
+	@SuppressWarnings("unchecked")
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Vertex elemToConnect, long incidenceId) {
+		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+				.connect(getSchema().getClassId(incidenceClass),
+						elemToConnect.getGlobalId(), this.getGlobalId(),
+						incidenceId));
+	}
+
 	@Override
 	public final Incidence connect(IncidenceClass incidenceClass,
 			Vertex elemToConnect) {
@@ -684,15 +691,23 @@ public abstract class EdgeProxy extends
 	public final Incidence connect(String rolename, Vertex elemToConnect) {
 		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
-	
+
+	@Override
+	public Incidence connect(long id, IncidenceClass incidenceClass,
+			Vertex elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
+	}
+
 	@Override
 	protected void putIncidenceAfter(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 	@Override
 	protected void putIncidenceBefore(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 	@Override
@@ -993,8 +1008,6 @@ public abstract class EdgeProxy extends
 		return new IncidentVertexIterable<Vertex>(traversalContext, this,
 				aVertexClass, Direction.VERTEX_TO_EDGE);
 	}
-	
-
 
 	@Override
 	public final Iterable<Vertex> getAlphaVertices(Graph traversalContext,
@@ -1047,10 +1060,11 @@ public abstract class EdgeProxy extends
 		return new IncidentVertexIterable<Vertex>(this,
 				aVertexClass.getM1Class(), Direction.EDGE_TO_VERTEX);
 	}
-	
 
 	public Vertex getAlpha() {
-		Incidence firstInc = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(elementId));
+		Incidence firstInc = localGraphDatabase
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(elementId));
 		if (firstInc.getDirection() == Direction.VERTEX_TO_EDGE) {
 			return firstInc.getVertex();
 		} else {
@@ -1059,39 +1073,43 @@ public abstract class EdgeProxy extends
 	}
 
 	public Vertex getOmega() {
-		Incidence firstInc = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(elementId));
+		Incidence firstInc = localGraphDatabase
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(elementId));
 		if (firstInc.getDirection() == Direction.EDGE_TO_VERTEX) {
 			return firstInc.getVertex();
 		} else {
 			return firstInc.getNextIncidenceAtEdge().getVertex();
 		}
 	}
-	
-
 
 	public void setAlpha(Vertex vertex) {
-		Incidence i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+		Incidence i = localGraphDatabase
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(getGlobalId()));
 		if (i.getDirection() != Direction.VERTEX_TO_EDGE) {
-			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getLastIncidenceIdAtEdgeId(getGlobalId()));
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.getLastIncidenceIdAtEdgeId(getGlobalId()));
 		}
 		Vertex v = i.getVertex();
 		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
 				elementId);
 		storingGraphDatabase.deleteIncidence(i.getGlobalId());
 	}
-
 
 	public void setOmega(Vertex vertex) {
-		Incidence i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+		Incidence i = localGraphDatabase
+				.getIncidenceObject(storingGraphDatabase
+						.getFirstIncidenceIdAtEdgeId(getGlobalId()));
 		if (i.getDirection() != Direction.EDGE_TO_VERTEX) {
-			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase.getLastIncidenceIdAtEdgeId(getGlobalId()));
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.getLastIncidenceIdAtEdgeId(getGlobalId()));
 		}
 		Vertex v = i.getVertex();
 		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
 				elementId);
 		storingGraphDatabase.deleteIncidence(i.getGlobalId());
 	}
-	
 
 	@Override
 	public void removeAdjacence(IncidenceClass ic, Edge other) {
@@ -1174,12 +1192,13 @@ public abstract class EdgeProxy extends
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
 		long sigmaId = storingGraphDatabase.getSigmaIdOfEdgeId(elementId);
-		if (sigmaId < 0)
+		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
-		else
+		} else {
 			return localGraphDatabase.getVertexObject(sigmaId);
+		}
 	}
-	
+
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
 		long sigmaId = elem.getGlobalId();
@@ -1189,14 +1208,13 @@ public abstract class EdgeProxy extends
 			storingGraphDatabase.setSigmaIdOfEdgeId(elementId, sigmaId);
 		}
 	}
-	
-	
+
 	@Override
 	public int getKappa() {
 		return storingGraphDatabase.getKappaOfEdgeId(elementId);
 	}
 
-
+	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -1242,11 +1260,12 @@ public abstract class EdgeProxy extends
 		assert isValid();
 		return "+e" + elementId + ": " + getType().getQualifiedName();
 	}
-	
+
 	/**
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
+	@Override
 	public final long getIncidenceListVersion() {
 		assert isValid();
 		return storingGraphDatabase.getIncidenceListVersionOfEdgeId(elementId);
@@ -1259,41 +1278,38 @@ public abstract class EdgeProxy extends
 	public void setAttribute(String attributeName, Object data) {
 		storingGraphDatabase.setEdgeAttribute(elementId, attributeName, data);
 	}
-	
-	
+
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void sortIncidences(Comparator<Incidence> comp) {
 		throw new RuntimeException("Not yet implemented");
 	}
-	
+
 	@Override
 	public AttributeContainer getAttributeContainer() {
 		throw new UnsupportedOperationException();
 	}
-	
-	
-	
+
 }

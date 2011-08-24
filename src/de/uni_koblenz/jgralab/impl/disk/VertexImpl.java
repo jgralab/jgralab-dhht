@@ -551,7 +551,7 @@ public abstract class VertexImpl extends
 	}
 
 	@SuppressWarnings("unchecked")
-	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, long globalIdOfIncidence) {
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
 				.connect(getSchema().getClassId(incidenceClass),
