@@ -559,11 +559,7 @@ public abstract class VertexImpl extends
 						globalIdOfIncidence));
 	}
 
-	@Override
-	public Incidence connect(long id, IncidenceClass incidenceClass,
-			Edge elemToConnect) {
-		return connect(incidenceClass.getM1Class(), elemToConnect, id);
-	}
+
 
 	/* **********************************************************
 	 * Access sigma and kappa information

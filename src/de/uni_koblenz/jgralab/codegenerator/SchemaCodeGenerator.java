@@ -555,7 +555,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						"\t#gecType#Class #gecVariable# = #schemaVariable# = gc.create#gecType#Class(\"#gecName#\");",
 						"\t#gecVariable#.setAbstract(#gecAbstract#);",
 						"\tif (!#gecVariable#.isAbstract())",
-						"\t\tregisterClassId(ec);"));
+						"\t\tregisterClassId(#gecVariable#);"));
 		for (GraphElementClass<?,?> superClass : gec.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
 				continue;
