@@ -3,7 +3,7 @@ package de.uni_koblenz.jgralab;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
 
-public interface JGraLabServer extends RemoteJGraLabServer {
+public interface JGraLabServer {
 	
 	/**
 	 * Registers the GraphDatabase <code>graphDatabase</code> as local 

@@ -2877,7 +2877,7 @@ public class GraphIO {
 			try {
 				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 
-				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) server
+				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) ((JGraLabServerImpl) server)
 						.getGraphDatabase(uniqueGraphId);
 				graph = (Graph) schema.getGraphCreateMethod(
 						ImplementationType.DISK).invoke(

@@ -48,6 +48,7 @@ import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -672,9 +673,18 @@ public abstract class EdgeImpl extends
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
+
+		System.out.println("IncidenceClass: " + incidenceClass);
+
+		Schema schema = getSchema();
+		System.out.println("Schema: " + ((schema == null) ? "null" : "not null") );
+		int classId = schema.getClassId(incidenceClass);
+		System.out.println("Elem to connect: " + elemToConnect);
+		long globalId = elemToConnect.getGlobalId();
+		
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(getSchema().getClassId(incidenceClass),
-						elemToConnect.getGlobalId(), this.getGlobalId()));
+				.connect(classId, globalId,
+						 this.getGlobalId()));
 	}
 
 	@Override

@@ -369,10 +369,15 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.add("*/",
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
-			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
+		if (currentCycle.isMembasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
+					 "\treturn new#ecType#;", 
+					 "}");
+		} else if (currentCycle.isDiskbasedImpl()) {
+			code.setVariable("ecKind", gec instanceof VertexClass ? "Vertex" : "Edge");
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecKind#(schema.getClassId(#ecJavaClassName#.class), #newActualParams#);",
 					 "\treturn new#ecType#;", 
 					 "}");
 		}

@@ -107,8 +107,7 @@ public final class GraphClassImpl extends
 		}
 		graphElementClasses.put(ec.getQualifiedName(), ec);
 		edgeClasses.put(ec.getQualifiedName(), ec);
-		if (!ec.isAbstract())
-			((SchemaImpl)getSchema()).registerM1ClassId(ec);
+
 	}
 
 	void addVertexClass(VertexClass vc) {
@@ -124,8 +123,6 @@ public final class GraphClassImpl extends
 
 		graphElementClasses.put(vc.getQualifiedName(), vc);
 		vertexClasses.put(vc.getQualifiedName(), vc);
-		if (!vc.isAbstract())
-			((SchemaImpl)getSchema()).registerM1ClassId(vc);
 	}
 
 	@Override
@@ -283,8 +280,6 @@ public final class GraphClassImpl extends
 		vertexClass.addIncidenceClass(incClass);
 		edgeClass.addIncidenceClass(incClass);
 		incClass.addSuperClass(incClass.getDefaultClass());
-		if (!incClass.isAbstract())
-			((SchemaImpl)getSchema()).registerM1ClassId(incClass);
 		return incClass;
 	}
 

@@ -1,6 +1,8 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -16,9 +18,13 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
 		this.kindOfParentElement = kindOfParentElement;
-		completeGraphDatabase = (CompleteGraphDatabaseImpl) localJGraLabServer
-				.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
-						uniqueGraphId);
+		try {
+			completeGraphDatabase = (CompleteGraphDatabaseImpl) localJGraLabServer
+					.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
+							uniqueGraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -33,7 +39,12 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.internalCreatePartialGraphInEntity(remoteHostname, parentEntityGlobalId, parentEntityKind);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.getGraphDatabase(uniqueGraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return partialGraphId;
 	}

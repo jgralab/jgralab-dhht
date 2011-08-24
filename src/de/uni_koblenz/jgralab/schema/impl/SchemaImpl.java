@@ -235,6 +235,7 @@ public class SchemaImpl implements Schema {
 	 * A set of all qualified names known to this schema.
 	 */
 	private final Map<String, NamedElementClass> namedElements = new TreeMap<String, NamedElementClass>();
+	
 
 	private BooleanDomain booleanDomain;
 
@@ -261,7 +262,6 @@ public class SchemaImpl implements Schema {
 	 *            Package prefix of schema.
 	 */
 	public SchemaImpl(String name, String packagePrefix) {
-
 		if (!SCHEMA_NAME_PATTERN.matcher(name).matches()) {
 			this.throwInvalidSchemaNameException();
 		}
@@ -277,7 +277,7 @@ public class SchemaImpl implements Schema {
 
 		// Needs to be created before any NamedElement can be created
 		defaultPackage = PackageImpl.createDefaultPackage(this);
-
+		System.out.println("Constructing domains");
 		// Creation of the BasicDomains
 		createBooleanDomain();
 		createDoubleDomain();
@@ -290,7 +290,6 @@ public class SchemaImpl implements Schema {
 		 * created.
 		 */
 		defaultGraphClass = GraphClassImpl.createDefaultGraphClass(this);
-
 		// Creation of default GraphElementClasses
 		defaultVertexClass = VertexClassImpl.createDefaultVertexClass(this);
 		defaultEdgeClass = EdgeClassImpl.createDefaultEdgeClass(this);
@@ -1390,16 +1389,20 @@ public class SchemaImpl implements Schema {
 		return typedElementClasses.get(id).getM1Class();
 	}
 
-	public void registerM1ClassId(TypedElementClass<?, ?> clazz) {
+	public void registerClassId(TypedElementClass<?, ?> clazz) {
 		typedElementClasses.add(clazz);
 		int id = typedElementClasses.size() - 1;
 		clazz.setId(id);
+		if ((getDefaultBinaryEdgeClass() != null) && (getDefaultEdgeClass() !=null) && (getDefaultIncidenceClass(Direction.VERTEX_TO_EDGE) != null) && (getDefaultIncidenceClass(Direction.EDGE_TO_VERTEX) != null) && (getDefaultVertexClass() != null)) 
+			m1ClassToIdMap.put(clazz.getM1Class(), id);
 	}
+	
+	private Map<Class<? extends TypedElement<?, ?>>, Integer> m1ClassToIdMap = new HashMap <Class<? extends TypedElement<?, ?>>, Integer>();
 
 	@Override
 	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return m1ClassToIdMap.get(schemaClass);
 	}
+
 
 }

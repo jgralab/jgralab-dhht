@@ -12,18 +12,21 @@ import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge;
 import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_start;
 import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_target;
 import de.uni_koblenz.jgralab.dhhttest.schema.SimpleVertex;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 
 public class BGStorageTest {
 	
-	private static int vertexCount = 1000000;
+	private static int vertexCount = 10;
 
-	private static int linkCount = 1000000;
+	private static int linkCount = 10;
 	
 	private DHHTTestGraph  graph;
 	
 	private Vertex getVertex(int id) {
 		int vId = id % vertexCount;
-		return graph.getVertex(vId+1);
+		System.out.println("Local id of partial graph db: " + graph.getGraphDatabase().getLocalPartialGraphId());
+		System.out.println("GlobalVertexId: " + graph.getGraphDatabase().convertToGlobalId(vId + 1));
+		return graph.getVertex(graph.getGraphDatabase().convertToGlobalId(vId + 1));
 	}
 	
 	
@@ -32,9 +35,12 @@ public class BGStorageTest {
 		graph = DHHTTestSchema.instance().createDHHTTestGraphOnDisk();
 		
 		long startTime = System.currentTimeMillis();
+		System.out.println("Creating vertices...");
 		for (int i=0; i<vertexCount;i++) {
-			graph.createSimpleVertex();
+			Vertex v = graph.createSimpleVertex();
+			System.out.println("Vertexid " + v.getGlobalId());
 		}
+		System.out.println("Creating edges");
 		for (int i=0; i<linkCount; i++) {
 			SimpleEdge e = graph.createSimpleEdge();
 			e.connect(SimpleEdge_start.class, getVertex(i));
@@ -62,7 +68,8 @@ public class BGStorageTest {
 		long startTime = System.currentTimeMillis();
 		for (int i=0; i<vertexCount;i++) {
 		//	System.out.println("Creating vertex " + i);
-			graph.createSimpleVertex();
+			Vertex v = graph.createSimpleVertex();
+			System.out.println("Vertexid " + v.getGlobalId());
 		}
 		for (int i=0; i<linkCount; i++) {
 		//	System.out.println("Creating edge " + i);

@@ -113,6 +113,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected GraphElementImpl(GraphDatabaseBaseImpl graphDatabase)  {
 		this.localGraphDatabase = graphDatabase;
+		this.storingGraphDatabase = graphDatabase;
 	}
 
 

@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -105,8 +106,14 @@ public abstract class GraphDatabaseBaseImpl extends
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
 		int partialGraphId = compDatabase.loadPartialGraph(hostname);
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
-		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.getGraphDatabase(uniqueGraphId);
+			partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return partialGraphId;
 	}
 	
@@ -245,11 +252,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		return getVertexObject(vertex.getGlobalId()) == vertex;
 	}
 
-	public long createVertex(int vertexClassId) {
-		return createVertex(vertexClassId, 0);
+	@Override
+	public long createVertex(int m1ClassId) {
+		return createVertex(m1ClassId, 0);
 	}
 
-	public long createVertex(int vertexClassId, long vertexId) {
+	@Override
+	public long createVertex(int m1ClassId, long vertexId) {
 		// set id
 		if (isLoading()) {
 			if (vertexId == 0) {
@@ -266,10 +275,9 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 
 		// instantiate object
-		@SuppressWarnings("unchecked")
+		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory
-				.createVertexDiskBasedStorage((Class<? extends Vertex>) schema
-						.getM1ClassForId(vertexClassId), vertexId, this);
+				.createVertexDiskBasedStorage(m1Class, vertexId, this);
 		localDiskStorage.storeVertex(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
@@ -620,11 +628,12 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	@Override
-	public long createEdge(int edgeClassId) {
-		return createEdge(edgeClassId, 0);
+	public long createEdge(int  m1ClassId) {
+		return createEdge(m1ClassId, 0);
 	}
 
-	public long createEdge(int edgeClassId, long edgeId) {
+	@Override
+	public long createEdge(int m1ClassId, long edgeId) {
 		// set id
 		if (isLoading()) {
 			if (edgeId == 0) {
@@ -642,9 +651,8 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		// instantiate object
 		@SuppressWarnings("unchecked")
-		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(
-				(Class<? extends Edge>) schema.getM1ClassForId(edgeClassId),
-				edgeId, this);
+		Class<? extends Edge> m1Class = (Class<? extends Edge>) schema.getM1ClassForId(m1ClassId);
+		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(m1Class, edgeId, this);
 		localDiskStorage.storeEdge(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);

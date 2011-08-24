@@ -36,6 +36,7 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
+import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
@@ -552,7 +553,9 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						true,
 						"{",
 						"\t#gecType#Class #gecVariable# = #schemaVariable# = gc.create#gecType#Class(\"#gecName#\");",
-						"\t#gecVariable#.setAbstract(#gecAbstract#);"));
+						"\t#gecVariable#.setAbstract(#gecAbstract#);",
+						"\tif (!#gecVariable#.isAbstract())",
+						"\t\tregisterClassId(ec);"));
 		for (GraphElementClass<?,?> superClass : gec.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
 				continue;

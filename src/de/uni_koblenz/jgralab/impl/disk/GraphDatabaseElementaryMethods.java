@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -74,7 +75,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 
 	
 	public final long convertToGlobalId(int localSubgraphOrElementId) {
-		long l = localPartialGraphId << 32;
+		long l = ((long)localPartialGraphId) << 32;
 		return l + localSubgraphOrElementId;
 	}
 
@@ -219,6 +220,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	public GraphDatabaseElementaryMethods( Schema schema, String uniqueGraphId, long parentSubgraphId, int localPartialGraphId) {
 		this.uniqueGraphId = uniqueGraphId;
 		this.schema = schema;
+		this.graphFactory = schema.getGraphFactory();
 		this.parentSubgraphId = parentSubgraphId;
 		this.localPartialGraphId = localPartialGraphId;
 		try {
@@ -226,6 +228,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
+		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccessWithInternalMethods>();
 		remoteDiskStorages = new HashMap<Integer, RemoteDiskStorageAccess>();
 		remoteDiskStorages.put(localPartialGraphId, localDiskStorage);
 		this.freeVertexList = new FreeIndexList(Integer.MAX_VALUE);
@@ -309,7 +312,12 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	protected RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(int partialGraphId) {
 		RemoteGraphDatabaseAccessWithInternalMethods remoteAccess = partialGraphDatabases.get(partialGraphId);
 		if (remoteAccess == null) {
-			remoteAccess = (RemoteGraphDatabaseAccessWithInternalMethods) localJGraLabServer.getRemoteInstance(getHostname(partialGraphId)).getGraphDatabase(uniqueGraphId);
+			try {
+				remoteAccess = (RemoteGraphDatabaseAccessWithInternalMethods) localJGraLabServer.getRemoteInstance(getHostname(partialGraphId)).getGraphDatabase(uniqueGraphId);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) remoteAccess);
 		}
 		return remoteAccess;
@@ -449,6 +457,8 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 */
 	public Vertex getVertexObject(long id) {
 		int partialGraphId = getPartialGraphId(id);
+		System.out.println("Partial graph id: " + partialGraphId);
+		System.out.println("LocalPartialGraphId: " + localPartialGraphId);
 		if (partialGraphId == localPartialGraphId) {
 			return localDiskStorage.getVertexObject(convertToLocalId(id));
 		}

@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +103,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		try {
 			p = remoteServer.createPartialGraphDatabase(
 											schema.getQualifiedName(), uniqueGraphId, localHostname, parentGlobalEntityId, entityKind, partialGraphId);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Cannot create remote graph database of host " + remoteHostname,e );
 		}
 
@@ -113,10 +114,15 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	//for central graph database
 	public int loadPartialGraph(String hostname) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
-		RemoteGraphDatabaseAccess p = remoteServer.getGraphDatabase(uniqueGraphId);
-		int partialGraphId = p.getLocalPartialGraphId();
-		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
-		return partialGraphId;
+		RemoteGraphDatabaseAccess p;
+		try {
+			p = remoteServer.getGraphDatabase(uniqueGraphId);
+			int partialGraphId = p.getLocalPartialGraphId();
+			partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+			return partialGraphId;
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 //	private void releasePartialGraphId(int partialGraphId) {

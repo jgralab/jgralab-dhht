@@ -7,6 +7,8 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +26,7 @@ import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class JGraLabServerImpl extends UnicastRemoteObject implements
-		JGraLabServer {
+public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
 	/**
 	 * 
@@ -36,27 +37,40 @@ public class JGraLabServerImpl extends UnicastRemoteObject implements
 
 	private static JGraLabServerImpl localInstance = null;
 	
+	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
+	
 	private String localHostname = "127.0.0.1";
 
 	private final Map<String, GraphDatabaseBaseImpl> localGraphDatabases = new HashMap<String, GraphDatabaseBaseImpl>();
 
 	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
 
-	private JGraLabServerImpl() throws RemoteException, MalformedURLException,
-			AlreadyBoundException {
-		Naming.bind(JGRALAB_SERVER_IDENTIFIER, this);
-	}
+	
+	
+	
+	private JGraLabServerImpl() {
 
-	public static JGraLabServer getLocalInstance() {
-		try {
+	}
+	
+
+
+	public static JGraLabServerImpl getLocalInstance() {
+		 try {
 			if (localInstance == null) {
+				System.out.println("Creatign local server");
 				localInstance = new JGraLabServerImpl();
+			    remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject.exportObject(localInstance, 0);
+		        Registry registry = LocateRegistry.createRegistry(0);
+		        registry.bind(JGRALAB_SERVER_IDENTIFIER, remoteAccessToLocalInstance);
 			}
-		} catch (Exception ex) {
-			throw new RuntimeException("Error creating local server instance"
-					+ ex);
+		 } catch (Exception e) {
+			 System.out.println("Local Server: " + localInstance);
+
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 		}
-		return localInstance;
+
+		return (JGraLabServerImpl) localInstance;
 	}
 
 	@Override
