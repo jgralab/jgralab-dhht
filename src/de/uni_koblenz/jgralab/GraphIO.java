@@ -2848,6 +2848,7 @@ public class GraphIO {
 					+ ") exceeds maximum number of edges (" + maxE + ")");
 		}
 
+		incidences = new HashMap<Long, Incidence>();
 		incidencesAtEdge = new HashMap<Long, ArrayList<Long>>();
 		incidencesAtVertex = new HashMap<Long, ArrayList<Long>>();
 		incidenceTypes = new HashMap<Long, String>();
