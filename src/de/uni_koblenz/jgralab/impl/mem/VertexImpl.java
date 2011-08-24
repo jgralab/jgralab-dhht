@@ -799,7 +799,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	protected void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
+	public void putIncidenceAfter(IncidenceImpl target, IncidenceImpl moved) {
 		assert (target != null) && (moved != null);
 		assert target.getGraph() == moved.getGraph();
 		assert target.getGraph() == getGraph();
@@ -917,7 +917,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	protected void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
+	public void removeIncidenceFromLambdaSeq(IncidenceImpl i) {
 		assert i != null;
 		assert i.getVertex() == this;
 		if (i == getFirstIncidence()) {

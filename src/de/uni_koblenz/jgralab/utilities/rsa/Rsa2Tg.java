@@ -1184,9 +1184,7 @@ public class Rsa2Tg extends XmlProcessor {
 									.getEdge()).getOmega(), i.getDirection(),
 							oldVertexClass, ec);
 				} else {
-					// TODO Lambda-Sequenzen des alten und des neuen Knoten
-					// verändern (evtl. in IncidenceImpl)
-					((IncidenceImpl) i).setIncidentVertex((VertexImpl) ec);
+					setIncidentVertex(i, ec);
 				}
 				i = n;
 			}
@@ -2965,8 +2963,7 @@ public class Rsa2Tg extends XmlProcessor {
 				if (i.getEdge() instanceof ContainsGraphElementClass) {
 					i.getEdge().delete();
 				} else {
-					((IncidenceImpl) i)
-							.setIncidentVertex((VertexImpl) graphClass);
+					setIncidentVertex(i, graphClass);
 				}
 				i = n;
 			}
@@ -3042,6 +3039,23 @@ public class Rsa2Tg extends XmlProcessor {
 		} else {
 			throw new ProcessingException(getParser(), getFileName(),
 					"Unexpected stereotype '<<" + key + ">>'.");
+		}
+	}
+
+	private void setIncidentVertex(Incidence incidence, Vertex newIncidentVertex) {
+		((VertexImpl) incidence.getVertex())
+				.removeIncidenceFromLambdaSeq((IncidenceImpl) incidence);
+		((IncidenceImpl) incidence)
+				.setIncidentVertex((VertexImpl) newIncidentVertex);
+		if (newIncidentVertex.getLastIncidence() != null) {
+			((VertexImpl) newIncidentVertex).putIncidenceAfter(
+					(IncidenceImpl) newIncidentVertex.getLastIncidence(),
+					(IncidenceImpl) incidence);
+		} else {
+			((VertexImpl) newIncidentVertex)
+					.setFirstIncidence((IncidenceImpl) incidence);
+			((VertexImpl) newIncidentVertex)
+					.setLastIncidence((IncidenceImpl) incidence);
 		}
 	}
 
@@ -3422,7 +3436,7 @@ public class Rsa2Tg extends XmlProcessor {
 		Incidence curr = oldVertex.getFirstIncidence();
 		while (curr != null) {
 			Incidence next = curr.getNextIncidenceAtVertex();
-			((IncidenceImpl) curr).setIncidentVertex((VertexImpl) newVertex);
+			setIncidentVertex(curr, newVertex);
 			curr = next;
 		}
 	}
