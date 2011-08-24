@@ -2853,6 +2853,7 @@ public class GraphIO {
 		incidencesAtVertex = new HashMap<Long, ArrayList<Long>>();
 		incidenceTypes = new HashMap<Long, String>();
 		incidenceInformation = new HashMap<Long, Long[]>();
+		sigmasOfGraphElement = new HashMap<GraphElement<?, ?, ?>, String>();
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
