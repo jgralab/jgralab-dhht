@@ -153,7 +153,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@Override
 	public Graph getTraversalContext() {
 		if (traversalContextMap == null) {
-			return null;
+			return this;
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {
