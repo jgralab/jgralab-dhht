@@ -144,6 +144,11 @@ public abstract class EdgeImpl extends
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 		int id = graph.allocateIncidenceIndex(0);
+		return connect(incidenceClass, elemToConnect, id);
+	}
+
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Vertex elemToConnect, int id) {
 		return getSchema().getGraphFactory().createIncidence(incidenceClass,
 				id, elemToConnect, this);
 	}
@@ -152,6 +157,12 @@ public abstract class EdgeImpl extends
 	public final Incidence connect(IncidenceClass incidenceClass,
 			Vertex elemToConnect) {
 		return connect(incidenceClass.getM1Class(), elemToConnect);
+	}
+
+	@Override
+	public final Incidence connect(int id, IncidenceClass incidenceClass,
+			Vertex elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
 	}
 
 	@Override

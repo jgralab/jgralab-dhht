@@ -134,6 +134,16 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		return this.kappa >= kappa;
 	}
 
+	/**
+	 * @param id
+	 *            the id of the created incidence
+	 * @param incidenceClass
+	 * @param elemToConnect
+	 * @return
+	 */
+	public abstract Incidence connect(int id, IncidenceClass incidenceClass,
+			DualType elemToConnect);
+
 	@Override
 	public final boolean containsElement(GraphElement<?, ?, ?> element) {
 		for (GraphElement<?, ?, ?> el = element; el.getSigma() != null
@@ -174,7 +184,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	public final long getGlobalId() {
 		return id;
 	}
-	
+
 	@Override
 	public final int getLocalId() {
 		return id;

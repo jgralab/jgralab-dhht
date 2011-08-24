@@ -48,23 +48,30 @@ public class IncidenceClassImpl extends
 		TypedElementClassImpl<IncidenceClass, Incidence> implements
 		IncidenceClass {
 
-	public static String getRolenameString(String role, EdgeClass ec) {
-		if ((role== null) || (role.length() == 0)) {
-			return "IncidenceClass_" + Integer.toString(ec.getIncidenceClasses().size()) + "_Of_" + ec.getSimpleName();
+	public static String getRolenameString(String role, VertexClass vc,
+			Direction direction, EdgeClass ec) {
+		if ((role == null) || (role.length() == 0)) {
+			return Character.toLowerCase(ec.getSimpleName().charAt(0))
+					+ (ec.getSimpleName().length() > 1 ? ec.getSimpleName()
+							.substring(1) : "")
+					+ "_"
+					+ (direction == Direction.VERTEX_TO_EDGE ? "ComesFrom"
+							: "GoesTo") + "_" + vc.getSimpleName();
 		} else {
 			return role;
 		}
 	}
-	
-	
+
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
 			String rolename, boolean isAbstract, int minEdgesAtVertex,
 			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
 			Direction direction, IncidenceType incidenceType) {
-		super(edgeClass.getSimpleName()
-				+ "_"
-				+ getRolenameString(rolename, edgeClass),
-				edgeClass.getPackage(), edgeClass.getSchema());
+		super(
+				edgeClass.getSimpleName()
+						+ "_"
+						+ getRolenameString(rolename, vertexClass, direction,
+								edgeClass), edgeClass.getPackage(), edgeClass
+						.getSchema());
 		this.incidenceType = incidenceType;
 		this.direction = direction;
 		this.edgeClass = edgeClass;
@@ -72,7 +79,8 @@ public class IncidenceClassImpl extends
 		this.minEdgesAtVertex = minEdgesAtVertex;
 		this.maxVerticesAtEdge = maxVerticesAtEdge;
 		this.minVerticesAtEdge = minVerticesAtEdge;
-		this.rolename = getRolenameString(rolename, edgeClass);
+		this.rolename = getRolenameString(rolename, vertexClass, direction,
+				edgeClass);
 		this.vertexClass = vertexClass;
 		setAbstract(isAbstract);
 	}
@@ -164,7 +172,6 @@ public class IncidenceClassImpl extends
 	public void addHiddenRolenameAtVertex(IncidenceClass ic) {
 		hiddenEndsAtVertex.add(ic);
 	}
-
 
 	@Override
 	public String getRolename() {
@@ -456,9 +463,11 @@ public class IncidenceClassImpl extends
 		assert schema.getDefaultEdgeClass() != null : "DefaultEdgeClass not yet been created!";
 		assert schema.getDefaultIncidenceClass(dir) == null : "DefaultIncidenceClass has already been created";
 		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(
-				schema.getDefaultEdgeClass(), schema.getDefaultVertexClass(),
-				dir == Direction.EDGE_TO_VERTEX ? "EdgeToVertex" : "VertexToEdge", true, 0, Integer.MAX_VALUE, 0, Integer.MAX_VALUE, dir,
-				IncidenceType.EDGE);
+				schema.getDefaultEdgeClass(),
+				schema.getDefaultVertexClass(),
+				dir == Direction.EDGE_TO_VERTEX ? "EdgeToVertex"
+						: "VertexToEdge", true, 0, Integer.MAX_VALUE, 0,
+				Integer.MAX_VALUE, dir, IncidenceType.EDGE);
 		return ic;
 	}
 

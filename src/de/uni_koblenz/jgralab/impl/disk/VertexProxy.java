@@ -79,18 +79,16 @@ public abstract class VertexProxy extends
 	 *            {@link Graph} its corresponding graph
 	 * @throws IOException
 	 */
-	protected VertexProxy(long id, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase)
-			throws IOException {
+	protected VertexProxy(long id, GraphDatabaseBaseImpl localGraphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
 		this.storingGraphDatabase = storingGraphDatabase;
 	}
 
-
 	/* **********************************************************
 	 * Access id *********************************************************
 	 */
-
 
 	@Override
 	public final long getGlobalId() {
@@ -269,7 +267,8 @@ public abstract class VertexProxy extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexBefore(v.getGlobalId(), this.getGlobalId());
+		storingGraphDatabase.putVertexBefore(v.getGlobalId(),
+				this.getGlobalId());
 	}
 
 	@Override
@@ -293,7 +292,8 @@ public abstract class VertexProxy extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		storingGraphDatabase
+				.putVertexAfter(v.getGlobalId(), this.getGlobalId());
 	}
 
 	/* **********************************************************
@@ -352,7 +352,7 @@ public abstract class VertexProxy extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {
@@ -540,6 +540,21 @@ public abstract class VertexProxy extends
 		return elemToConnect.connect(incidenceClass, this);
 	}
 
+	@SuppressWarnings("unchecked")
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Edge elemToConnect, long incidenceId) {
+		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+				.connect(getSchema().getClassId(incidenceClass),
+						this.getGlobalId(), elemToConnect.getGlobalId(),
+						incidenceId));
+	}
+
+	@Override
+	public Incidence connect(long id, IncidenceClass incidenceClass,
+			Edge elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
+	}
+
 	/* **********************************************************
 	 * Access sigma and kappa information
 	 * *********************************************************
@@ -560,12 +575,13 @@ public abstract class VertexProxy extends
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
 		long sigmaId = storingGraphDatabase.getSigmaIdOfVertexId(elementId);
-		if (sigmaId < 0)
+		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
-		else
+		} else {
 			return localGraphDatabase.getVertexObject(sigmaId);
+		}
 	}
-	
+
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
 		long sigmaId = elem.getGlobalId();
@@ -581,7 +597,7 @@ public abstract class VertexProxy extends
 		return storingGraphDatabase.getKappaOfVertexId(elementId);
 	}
 
-
+	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -893,14 +909,16 @@ public abstract class VertexProxy extends
 		storingGraphDatabase.deleteVertex(this.getGlobalId());
 	}
 
+	@Override
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(target.getGlobalId(),
-				moved.getGlobalId());
+		storingGraphDatabase.putIncidenceIdAfterAtVertexId(
+				target.getGlobalId(), moved.getGlobalId());
 	}
 
+	@Override
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(target.getGlobalId(),
-				moved.getGlobalId());
+		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
+				target.getGlobalId(), moved.getGlobalId());
 	}
 
 	public void deleteIncidence(Incidence i) {
@@ -1175,60 +1193,59 @@ public abstract class VertexProxy extends
 	protected void addFirstSubordinateVertex(Vertex appendix) {
 		appendix.putAfter(this);
 	}
-	
+
 	/**
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
+	@Override
 	public final long getIncidenceListVersion() {
 		assert isValid();
-		return storingGraphDatabase.getIncidenceListVersionOfVertexId(elementId);
+		return storingGraphDatabase
+				.getIncidenceListVersionOfVertexId(elementId);
 	}
-	
-	
+
 	public Object getAttribute(String attributeName) {
-		return storingGraphDatabase.getVertexAttribute(elementId, attributeName);
+		return storingGraphDatabase
+				.getVertexAttribute(elementId, attributeName);
 	}
 
 	public void setAttribute(String attributeName, Object data) {
 		storingGraphDatabase.setVertexAttribute(elementId, attributeName, data);
 	}
-	
-
 
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public void sortIncidences(Comparator<Incidence> comp) {
 		throw new RuntimeException("Not yet implemented");
 	}
-	
-	
+
 	@Override
 	public AttributeContainer getAttributeContainer() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

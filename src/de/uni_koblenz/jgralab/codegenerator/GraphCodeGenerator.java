@@ -377,7 +377,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		} else if (currentCycle.isDiskbasedImpl()) {
 			code.setVariable("ecKind", gec instanceof VertexClass ? "Vertex" : "Edge");
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecKind#(schema.getClassId(#ecJavaClassName#.class), #newActualParams#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecKind#(getSchema().getClassId(#ecJavaClassName#.class), #newActualParams#);",
 					 "\treturn new#ecType#;", 
 					 "}");
 		}

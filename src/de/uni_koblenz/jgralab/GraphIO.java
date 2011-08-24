@@ -960,11 +960,6 @@ public class GraphIO {
 								&& !subGraph.isMarked(i.getVertex())) {
 							continue;
 						}
-						try {// TODO delete
-							i.getType().getM1Class();
-						} catch (Exception e) {
-							System.out.println(i.getType().getQualifiedName());
-						}
 						if (!onlyLocalGraph
 								|| graph.isLocalElementId(i.getVertex()
 										.getGlobalId())) {

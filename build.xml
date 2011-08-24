@@ -63,7 +63,6 @@
 	<path id="classpathExtension">
 		<fileset dir="${comlib.dir}/apache/commons/cli/" includes="**/*.jar" />
 		<fileset dir="${comlib.dir}/apache/ant" includes="**/*.jar" />
-		<fileset dir="${comlib.dir}/jdom/" includes="**/*.jar" />
 		<fileset dir="${comlib.dir}/junit/" includes="**/*.jar" />
 		<pathelement path="${clover.jar}"/>
 	</path>
@@ -192,7 +191,6 @@
 	<target name="unjar" depends="common.unjar">
 		<unjar dest="${tmp.dir}">
 			<fileset dir="${comlib.dir}/apache/commons/cli/" includes="**/*.jar" />
-			<fileset dir="${comlib.dir}/jdom/" includes="**/*.jar" />
 		</unjar>
 		<copy todir="${tmp.dir}/META-INF/license">
 			<fileset dir="license" includes="jdom/** jgralab/**" />
@@ -201,5 +199,5 @@
 
 	<!-- release -->
 	<!-- calls targets modify, clean, jar, test and document -->
-	<target name="release" depends="modify,cleanall,jar,sourcejar,document" />
+	<!--<target name="release" depends="modify,cleanall,jar,sourcejar,document" />-->
 </project>
