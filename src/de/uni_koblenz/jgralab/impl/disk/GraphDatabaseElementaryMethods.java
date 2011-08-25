@@ -26,13 +26,13 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	// the global subgraph id of the toplevel dhhtgraph
 	public static final long GLOBAL_GRAPH_ID = 0x0000000100000001l;
 	// the local subgraph id of the toplevel graph if a partial one
-	public static final long TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
+	public static final int TOPLEVEL_LOCAL_SUBGRAPH_ID = 1;
 	// the partial graph id of the toplevel graph, the lowest bit of the 
 	// high int is set
 	public static final int TOPLEVEL_PARTIAL_GRAPH_ID = 1;
 	
 	public static long getToplevelGraphForPartialGraphId(int partialGraphId) {
-		long val = (TOPLEVEL_LOCAL_SUBGRAPH_ID << 32) + partialGraphId;
+		long val = (((long) partialGraphId) << 32) + TOPLEVEL_LOCAL_SUBGRAPH_ID;
 		return val;
 	}
 	/**
@@ -257,7 +257,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * subgraph identified by <code>localSubgraphId</code>
 	 */
 	protected GraphData getGraphData(int localSubgraphId) {
-		GraphData data = localSubgraphData.get(localSubgraphId);
+		GraphData data = localSubgraphData.get(localSubgraphId-1);
 		return data;
 	}
 
@@ -459,7 +459,9 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(id);
 		System.out.println("Partial graph id: " + partialGraphId);
 		System.out.println("LocalPartialGraphId: " + localPartialGraphId);
+		System.out.println("VertexId: " + id);
 		if (partialGraphId == localPartialGraphId) {
+			System.out.println("Returning object");
 			return localDiskStorage.getVertexObject(convertToLocalId(id));
 		}
 		Reference<Vertex> ref = remoteVertices.get(id);

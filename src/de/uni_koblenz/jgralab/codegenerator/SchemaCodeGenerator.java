@@ -471,7 +471,9 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						"\t\t#gcVariable#.getEdgeClass(\"#icEdgeClass#\"),",
 						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
 						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
-						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,IncidenceType.#incidenceType#);"));
+						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,IncidenceType.#incidenceType#);",
+						"\tif (!#gecVariable#.isAbstract())",
+						"\t\tregisterClassId(#gecVariable#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {

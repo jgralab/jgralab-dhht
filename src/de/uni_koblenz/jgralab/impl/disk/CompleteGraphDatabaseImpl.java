@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods.GraphData;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
@@ -29,7 +30,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 
 	public CompleteGraphDatabaseImpl(Schema schema, String uniqueGraphId,
 			String hostname) {
-		super(schema, uniqueGraphId, 0, 1);
+		super(schema, uniqueGraphId, 0, TOPLEVEL_PARTIAL_GRAPH_ID);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
 		hostnames[0] = hostname;
 		freePartialGraphIds = new LinkedList<Integer>();
@@ -37,6 +38,11 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 			freePartialGraphIds.add(i);
 		}
 		completeGraphAttributes = new HashMap<String, Object>();
+		
+		//creates toplevel graph
+		GraphData data = new GraphData();
+		data.globalSubgraphId = convertToGlobalId(GraphDatabaseElementaryMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID);
+		localSubgraphData.add(data);
 	}
 	
 	

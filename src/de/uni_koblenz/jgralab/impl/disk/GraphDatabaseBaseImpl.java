@@ -273,7 +273,7 @@ public abstract class GraphDatabaseBaseImpl extends
 						"Cannot add a vertex with a predefined id outside the graph loading");
 			}
 		}
-
+		System.out.println("Creating vertex with id " + vertexId);
 		// instantiate object
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory
@@ -282,7 +282,7 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
-		getGraphData(0).vertexCount++;
+		getGraphData(TOPLEVEL_LOCAL_SUBGRAPH_ID).vertexCount++;
 		if (getFirstVertexId(toplevelSubgraphId) == 0) {
 			setFirstVertexId(toplevelSubgraphId, vertexId);
 		}
@@ -657,7 +657,7 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
-		getGraphData(0).vertexCount++;
+		getGraphData(TOPLEVEL_LOCAL_SUBGRAPH_ID).vertexCount++;
 		if (getFirstEdgeId(toplevelSubgraphId) == 0) {
 			setFirstEdgeId(toplevelSubgraphId, edgeId);
 		}

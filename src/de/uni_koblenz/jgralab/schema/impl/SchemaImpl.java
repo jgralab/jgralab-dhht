@@ -1381,18 +1381,19 @@ public class SchemaImpl implements Schema {
 
 	@Override
 	public TypedElementClass<?, ?> getTypeForId(Integer id) {
-		return typedElementClasses.get(id);
+		return typedElementClasses.get(id-1);
 	}
 
 	@Override
 	public Class<?> getM1ClassForId(Integer id) {
-		return typedElementClasses.get(id).getM1Class();
+		return typedElementClasses.get(id-1).getM1Class();
 	}
 
 	public void registerClassId(TypedElementClass<?, ?> clazz) {
 		typedElementClasses.add(clazz);
-		int id = typedElementClasses.size() - 1;
+		int id = typedElementClasses.size();
 		clazz.setId(id);
+		System.out.println("Registering class: " + clazz.getM1Class().getSimpleName() + " with id " + id);
 		if ((getDefaultBinaryEdgeClass() != null) && (getDefaultEdgeClass() !=null) && (getDefaultIncidenceClass(Direction.VERTEX_TO_EDGE) != null) && (getDefaultIncidenceClass(Direction.EDGE_TO_VERTEX) != null) && (getDefaultVertexClass() != null)) 
 			m1ClassToIdMap.put(clazz.getM1Class(), id);
 	}
@@ -1401,6 +1402,7 @@ public class SchemaImpl implements Schema {
 
 	@Override
 	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass) {
+		System.out.println("Id From map:" +  m1ClassToIdMap.get(schemaClass) + " for class " + schemaClass.getSimpleName());
 		return m1ClassToIdMap.get(schemaClass);
 	}
 

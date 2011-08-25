@@ -497,6 +497,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		VertexContainer container = getVertexContainer(id);
 		int idInStorage = getElementIdInContainer(id);
 		int type = container.types[idInStorage];
+		System.out.println("Type: " + type);
 		if (type != 0) {
 			// element is typed, so return either the existing vertex or create
 			// a new one
@@ -763,6 +764,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
 		v.container = storage;
+		System.out.println("Storing vertex in diskstore, id: " + id + " type " + v.getType() + " TypeId: " + graphDatabase.getSchema().getClassId(v.getType()));
 		storage.types[id] = graphDatabase.getSchema().getClassId(v.getType());
 		AttributeContainer[] containerArray = getVertexAttributeContainerArray(getContainerId(vId));
 		containerArray[id] = v.getAttributeContainer();
