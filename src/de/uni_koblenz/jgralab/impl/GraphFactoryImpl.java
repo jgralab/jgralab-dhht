@@ -289,7 +289,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMapForDiskBasedImpl.get(incidenceClass)
-					.newInstance(incidenceId, vertexId, edgeId);
+					.newInstance(incidenceId, graphDatabase, vertexId, edgeId);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -309,7 +309,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMapForDiskStorageReloading.get(incidenceClass)
-					.newInstance(id, container);
+					.newInstance(id, graphDatabase, container);
 			return i;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {

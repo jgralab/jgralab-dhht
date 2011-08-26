@@ -600,7 +600,7 @@ public abstract class VertexImpl extends
 
 	@Override
 	public int getKappa() {
-		return container.kappa[getIdInStorage(elementId)];
+		return (int) container.kappa[getIdInStorage(elementId)];
 	}
 
 	@Override

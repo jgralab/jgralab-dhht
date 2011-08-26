@@ -8,7 +8,7 @@ public abstract class StorageContainer {
 	int id;
 	
 	/* stores the type of the element or null if the element is null */
-	int[] types;
+	long[] types;
 	
 	StorageContainer nextInQueue = null;
 	
@@ -18,7 +18,7 @@ public abstract class StorageContainer {
 
 	public StorageContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		this.id = id;
-		types = new int[size];
+		types = new long[size];
 		this.backgroundStorage = backgroundStorage;
 	}
 

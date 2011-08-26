@@ -47,29 +47,27 @@ public class HypergraphSearchAlgorithmOptimized {
 			
 			while (!buffer.isEmpty()) {
 				Vertex currentVertex = buffer.get();    
-				if (currentVertex.getGlobalId() == 77)
-					handlingsOf77++;
-				if (handlingsOf77 > 1) {
-					System.out.println("Handling vertex " + currentVertex + " twice");	
-					System.exit(0);
-				}	
-				//System.out.println("Handling vertex " + currentVertex);	
-				Incidence curIncAtVertex = currentVertex.getFirstIncidence(Direction.BOTH);
+				Incidence curIncAtVertex = currentVertex.getFirstIncidence();
 				while (curIncAtVertex != null) {
 					Edge currentEdge = curIncAtVertex.getEdge();
-					if (parentEdgeInc[(int) currentEdge.getGlobalId()]==0) { 
+				//	System.out.println("Incidence at vertex " + currentVertex.getLocalId() + " is " + curIncAtVertex.getLocalId() + " and leads to edge " + currentEdge.getLocalId());
+				//	System.out.println("ParentEdgeInd of edge is " + parentEdgeInc[currentEdge.getLocalId()]);
+					if (parentEdgeInc[currentEdge.getLocalId()]==0) { 
 						handleEdge(currentEdge);
-						parentEdgeInc[(int) currentEdge.getGlobalId()] = (int) curIncAtVertex.getGlobalId();     
+						parentEdgeInc[currentEdge.getLocalId()] = curIncAtVertex.getLocalId();     
 						handleTreeIncidence(curIncAtVertex); 
-						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
+						Direction opposite = Direction.EDGE_TO_VERTEX; //curIncAtVertex.getDirection().getOppositeDirection();
 						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
 						while (curIncAtEdge != null) {
-						//	System.out.println("Handling incidence at edge " + curIncAtEdge);
+						//	System.out.println("Incidence at edge " + currentEdge.getLocalId() + " is " + curIncAtEdge.getLocalId());
 							Vertex omega = curIncAtEdge.getVertex();
-							if ((parentVertexInc[(int) omega.getGlobalId()]==0) && (omega!=startVertex)) {
-								parentVertexInc[(int) omega.getGlobalId()]= (int) curIncAtEdge.getGlobalId();
+						//	System.out.println("Omega vertex of edge is " + omega.getLocalId());
+							if ((parentVertexInc[omega.getLocalId()]==0) && (omega!=startVertex)) {
+							//	System.out.println("Omega vertex is handled");
+								parentVertexInc[omega.getLocalId()]= curIncAtEdge.getLocalId();
 								handleVertex(omega);
 								handleTreeIncidence(curIncAtEdge);
+							//	System.out.println("Omega vertex is enqueed");
 								buffer.add(omega);
 							} else {
 								handleCrossIncidence(curIncAtEdge);
@@ -79,7 +77,7 @@ public class HypergraphSearchAlgorithmOptimized {
 					} else {
 						handleCrossIncidence(curIncAtVertex);
 					}
-					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex(Direction.BOTH);
+					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex();
 				}
 			}  
 		}	

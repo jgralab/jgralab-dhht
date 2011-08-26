@@ -273,7 +273,6 @@ public abstract class GraphDatabaseBaseImpl extends
 						"Cannot add a vertex with a predefined id outside the graph loading");
 			}
 		}
-		System.out.println("Creating vertex with id " + vertexId);
 		// instantiate object
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory
@@ -282,7 +281,6 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
-		getGraphData(TOPLEVEL_LOCAL_SUBGRAPH_ID).vertexCount++;
 		if (getFirstVertexId(toplevelSubgraphId) == 0) {
 			setFirstVertexId(toplevelSubgraphId, vertexId);
 		}
@@ -291,7 +289,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			setPreviousVertexId(vertexId, getLastVertexId(toplevelSubgraphId));
 		}
 		setLastVertexId(toplevelSubgraphId, vertexId);
-
+		increaseVCount(toplevelSubgraphId);
 		if (!isLoading()) {
 			vertexListModified();
 			notifyVertexAdded(vertexId);
@@ -652,12 +650,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		// instantiate object
 		@SuppressWarnings("unchecked")
 		Class<? extends Edge> m1Class = (Class<? extends Edge>) schema.getM1ClassForId(m1ClassId);
-		EdgeImpl v = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(m1Class, edgeId, this);
-		localDiskStorage.storeEdge(v);
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(m1Class, edgeId, this);
+		localDiskStorage.storeEdge(e);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
-		getGraphData(TOPLEVEL_LOCAL_SUBGRAPH_ID).vertexCount++;
 		if (getFirstEdgeId(toplevelSubgraphId) == 0) {
 			setFirstEdgeId(toplevelSubgraphId, edgeId);
 		}
@@ -666,7 +663,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			setPreviousEdgeId(edgeId, getLastEdgeId(toplevelSubgraphId));
 		}
 		setLastEdgeId(toplevelSubgraphId, edgeId);
-
+		increaseECount(toplevelSubgraphId);
 		if (!isLoading()) {
 			edgeListModified();
 			notifyEdgeAdded(edgeId);
@@ -973,7 +970,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void decreaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).increaseECount(subgraphId);
+			getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount--;
 		}
@@ -1024,13 +1021,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * @param id
 	 */
 	@Override
-	public long connect(int incidenceClassId, long vertexId, long edgeId,
-			long incId) {
+	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) {
 		IncidenceClass incClass = (IncidenceClass) schema
 				.getTypeForId(incidenceClassId);
 		Class<? extends Incidence> m1Class = incClass.getM1Class();
-		// Direction dir = incClass.getDirection();
-
+		
 		// check id
 		if (incId != 0) {
 			if (!isLoading()) {
@@ -1053,7 +1048,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			setFirstIncidenceIdAtVertexId(vertexId, incId);
 			setLastIncidenceIdAtVertexId(vertexId, incId);
 		} else {
-			long lastIncId = getLastIncidenceIdAtEdgeId(vertexId);
+			long lastIncId = getLastIncidenceIdAtVertexId(vertexId);
 			setNextIncidenceIdAtVertexId(lastIncId, incId);
 			setPreviousIncidenceIdAtVertexId(incId, lastIncId);
 			setLastIncidenceIdAtVertexId(vertexId, incId);
@@ -1061,15 +1056,21 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		incidenceListOfVertexModified(vertexId);
 
-		if (getFirstIncidenceIdAtEdgeId(-edgeId) == 0) {
+		if (getFirstIncidenceIdAtEdgeId(edgeId) == 0) {
 			// v has no incidences
-			setFirstIncidenceIdAtEdgeId(-edgeId, incId);
-			setLastIncidenceIdAtEdgeId(-edgeId, incId);
+			System.out.println("Setting first incidence at edge " + convertToLocalId(edgeId) + " to " + incId);
+			setFirstIncidenceIdAtEdgeId(edgeId, incId);
+			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+			setLastIncidenceIdAtEdgeId(edgeId, incId);
 		} else {
-			long lastIncId = getLastIncidenceIdAtEdgeId(-edgeId);
+			long lastIncId = getLastIncidenceIdAtEdgeId(edgeId);
+			System.out.println("Setting next incidence at edge " + convertToLocalId(edgeId));
 			setNextIncidenceIdAtEdgeId(lastIncId, incId);
+			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 			setPreviousIncidenceIdAtEdgeId(incId, lastIncId);
-			setLastIncidenceIdAtEdgeId(-edgeId, incId);
+			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+			setLastIncidenceIdAtEdgeId(edgeId, incId);
+			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 		}
 
 		incidenceListOfEdgeModified(edgeId);
@@ -1078,6 +1079,8 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (!isLoading()) {
 			notifyIncidenceAdded(incId);
 		}
+		System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+		System.out.println("Incidence object: " + getIncidenceObject(getFirstIncidenceIdAtEdgeId(edgeId)));
 		return incId;
 	}
 

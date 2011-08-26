@@ -49,7 +49,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
 
-		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
+		container.types = types = new long[DiskStorageManager.CONTAINER_SIZE];
    		container.edgeId = edgeId = new long[DiskStorageManager.CONTAINER_SIZE];
 		container.vertexId = vertexId = new long[DiskStorageManager.CONTAINER_SIZE];
    		container.nextIncidenceAtEdgeId = nextIncidenceAtEdgeId = new long[DiskStorageManager.CONTAINER_SIZE];
@@ -99,7 +99,8 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 	}
 
 	void read(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 8);
+		int bufferSizeInBytes =  DiskStorageManager.CONTAINER_SIZE /* number of entries */ * (6*8 /*edgeId-previousIncAtVertex as long values */ + 8 /*typeId as int value*/ );
+		MappedByteBuffer bb = channel.map(MapMode.READ_ONLY, 0, bufferSizeInBytes);
 		LongBuffer lb = bb.asLongBuffer();
 		lb.get(edgeId);
 		lb.get(vertexId);
@@ -107,9 +108,8 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		lb.get(nextIncidenceAtVertexId);
 		lb.get(previousIncidenceAtEdgeId);
 		lb.get(previousIncidenceAtVertexId);
-		IntBuffer ib = bb.asIntBuffer();
-		ib.get(types);
-		lb.clear();
+		lb.get(types);
+;
 	}	
 	
 	public String toString() {
@@ -119,7 +119,8 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 
 
 	void write(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 8);
+		int bufferSizeInBytes =  DiskStorageManager.CONTAINER_SIZE /* number of entries */ * (6*8 /*edgeId-previousIncAtVertex as long values */ + 8 /*typeId as int value*/ );
+		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, bufferSizeInBytes);
 		LongBuffer lb = bb.asLongBuffer();
 		lb.put(edgeId);
 		lb.put(vertexId);
@@ -127,8 +128,7 @@ public class IncidenceContainerReference extends ContainerReference<IncidenceCon
 		lb.put(nextIncidenceAtVertexId);
 		lb.put(previousIncidenceAtEdgeId);
 		lb.put(previousIncidenceAtVertexId);
-		IntBuffer ib =bb.asIntBuffer();
-		ib.put(types);
+		lb.put(types);
 	}
 	
 	void nullify() {

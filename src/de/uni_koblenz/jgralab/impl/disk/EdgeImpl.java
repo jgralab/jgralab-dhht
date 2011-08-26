@@ -674,17 +674,12 @@ public abstract class EdgeImpl extends
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 
-		System.out.println("IncidenceClass: " + incidenceClass);
-
 		Schema schema = getSchema();
-		System.out.println("Schema: " + ((schema == null) ? "null" : "not null") );
-		int classId = schema.getClassId(incidenceClass);
-		System.out.println("Elem to connect: " + elemToConnect);
-		long globalId = elemToConnect.getGlobalId();
+     	int classId = schema.getClassId(incidenceClass);
+		long globalVId = elemToConnect.getGlobalId();
 		
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(classId, globalId,
-						 this.getGlobalId()));
+				.connect(classId, globalVId,  this.getGlobalId()));
 	}
 
 	@Override
@@ -1148,7 +1143,7 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	public int getKappa() {
-		return container.kappa[getIdInStorage(elementId)];
+		return (int) container.kappa[getIdInStorage(elementId)];
 	}
 
 
