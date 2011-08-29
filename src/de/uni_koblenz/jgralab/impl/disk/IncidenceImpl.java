@@ -68,15 +68,16 @@ public abstract class IncidenceImpl implements Incidence {
 	protected IncidenceImpl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = localGraphDatabase;
-		this.container = localGraphDatabase.getLocalDiskStorage().getIncidenceContainer(GraphDatabaseBaseImpl.convertToLocalId(globalId));
-		container.vertexId[getIdInStorage(id)] = vertexId;
-		container.edgeId[getIdInStorage(id)] = edgeId;
+		this.container = localGraphDatabase.getLocalDiskStorage().getIncidenceContainer(GraphDatabaseBaseImpl.convertToLocalId(DiskStorageManager.getContainerId(GraphDatabaseElementaryMethods.convertToLocalId(globalId))));
+		container.vertexId[getIdInStorage(globalId)] = vertexId;
+		container.edgeId[getIdInStorage(globalId)] = edgeId;
 		this.id = globalId;
 	}
 	
 	
 	protected final int getIdInStorage(long elementId) {
-		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
+		return DiskStorageManager.getElementIdInContainer((int)elementId);
+	//	return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
 	}
 
 	void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
@@ -256,7 +257,7 @@ public abstract class IncidenceImpl implements Incidence {
 			Incidence i = localGraphDatabase.getIncidenceObject(container.nextIncidenceAtEdgeId[getIdInStorage(id)]);
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection()))
-					i.getNextIncidenceAtEdge();
+					i = i.getNextIncidenceAtEdge();
 			} 
 			return i;
 		} else {

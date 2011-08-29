@@ -388,7 +388,9 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						true,
 						"{",
 						"\tGraphClass #gecVariable# = #schemaVariable# = createGraphClass(\"#gcName#\");",
-						"\t#gecVariable#.setAbstract(#gcAbstract#);"));
+						"\t#gecVariable#.setAbstract(#gcAbstract#);",
+						"\tif (!#gecVariable#.isAbstract())",
+						"\t\tregisterClassId(#gecVariable#);"));
 		code.add(createAttributes(gc));
 		code.add(createConstraints(gc));
 		code.add(createComments("gc", gc));
@@ -472,8 +474,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
 						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
 						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,IncidenceType.#incidenceType#);",
-						"\tif (!#gecVariable#.isAbstract())",
-						"\t\tregisterClassId(#gecVariable#);"));
+						"\tif (!#schemaVariable#.isAbstract())",
+						"\t\tregisterClassId(#schemaVariable#);"));
 
 		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {

@@ -75,12 +75,10 @@ public abstract class EdgeImpl extends
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(
-				getLocalId());
+		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(DiskStorageManager.getContainerId(DiskStorageManager.getContainerId(getLocalId())));
 	}
 
-	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase,
-			EdgeContainer container) throws IOException {
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
 		this.container = container;
@@ -310,13 +308,14 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence() {
+		System.out.println("GetFirstIncidence");
 		return getFirstIncidence(localGraphDatabase.getTraversalContext());
 	}
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = localGraphDatabase
-				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		long firstIncId = container.firstIncidenceId[getIdInStorage(elementId)];
+		Incidence firstIncidence = localGraphDatabase.getIncidenceObject(firstIncId);
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext
@@ -674,17 +673,12 @@ public abstract class EdgeImpl extends
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 
-		System.out.println("IncidenceClass: " + incidenceClass);
-
 		Schema schema = getSchema();
-		System.out.println("Schema: " + ((schema == null) ? "null" : "not null") );
-		int classId = schema.getClassId(incidenceClass);
-		System.out.println("Elem to connect: " + elemToConnect);
-		long globalId = elemToConnect.getGlobalId();
+     	int classId = schema.getClassId(incidenceClass);
+		long globalVId = elemToConnect.getGlobalId();
 		
 		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(classId, globalId,
-						 this.getGlobalId()));
+				.connect(classId, globalVId,  this.getGlobalId()));
 	}
 
 	@Override
@@ -1148,7 +1142,7 @@ public abstract class EdgeImpl extends
 	
 	@Override
 	public int getKappa() {
-		return container.kappa[getIdInStorage(elementId)];
+		return (int) container.kappa[getIdInStorage(elementId)];
 	}
 
 

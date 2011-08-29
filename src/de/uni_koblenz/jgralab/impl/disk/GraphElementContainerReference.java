@@ -14,7 +14,7 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 	
 	long[] incidenceListVersion = null;
 	
-	int[] kappa;
+	long[] kappa;
 	
 	long[] sigmaId;
 	
@@ -49,9 +49,9 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		backgroundStorage = container.backgroundStorage;
 		id = container.id;
 
-		container.types = types = new int[DiskStorageManager.CONTAINER_SIZE];
+		container.types = types = new long[DiskStorageManager.CONTAINER_SIZE];
    		container.incidenceListVersion = incidenceListVersion= new long[DiskStorageManager.CONTAINER_SIZE];
-   		container.kappa = kappa= new int[DiskStorageManager.CONTAINER_SIZE];
+   		container.kappa = kappa= new long[DiskStorageManager.CONTAINER_SIZE];
   		container.sigmaId = sigmaId= new long[DiskStorageManager.CONTAINER_SIZE];
    		container.nextElementInGraphId = nextElementInGraphId= new long[DiskStorageManager.CONTAINER_SIZE];
    		container.previousElementInGraphId = previousElementInGraphId= new long[DiskStorageManager.CONTAINER_SIZE];
@@ -104,12 +104,10 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 
 	
 	void read(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_ONLY, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9);
-		if (types == null)
-			throw new RuntimeException("Types is null");
-		IntBuffer ib = bb.asIntBuffer();
-		ib.get(types);
-		ib.get(kappa);
+		int bufferSizeInBytes = DiskStorageManager.CONTAINER_SIZE /*number of elements*/ * (2*8 /*types and kappa as int */ + 6*8 /*sigmaId to incListVersion as longs */ );
+
+		MappedByteBuffer bb = channel.map(MapMode.READ_ONLY, 0, bufferSizeInBytes);
+
 		
 		LongBuffer lb = bb.asLongBuffer(); 
 		lb.get(sigmaId);
@@ -118,16 +116,14 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		lb.get(firstIncidenceId);
 		lb.get(lastIncidenceId);
 		lb.get(incidenceListVersion);
+		lb.get(types);
+		lb.get(kappa);
 	}	
 	
 
 	void write(FileChannel channel) throws IOException {
-		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, DiskStorageManager.CONTAINER_SIZE * 4 * 9);
-		IntBuffer ib = bb.asIntBuffer();
-		ib.clear();
-		ib.put(types);
-		ib.put(kappa);
-		
+		int bufferSizeInBytes = DiskStorageManager.CONTAINER_SIZE /*number of elements*/ * (8*8);
+		MappedByteBuffer bb = channel.map(MapMode.READ_WRITE, 0, bufferSizeInBytes);
 		LongBuffer lb = bb.asLongBuffer(); 
 		lb.put(sigmaId);
 		lb.put(nextElementInGraphId);
@@ -135,6 +131,8 @@ public abstract class GraphElementContainerReference<T extends GraphElementConta
 		lb.put(firstIncidenceId);
 		lb.put(lastIncidenceId);
 		lb.put(incidenceListVersion);
+		lb.put(types);
+		lb.put(kappa);
 
 	}
 }

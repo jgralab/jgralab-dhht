@@ -27,9 +27,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	/* Switches to toggle behaviour */
 
-	private final static int MAX_REUSE_QUEUE_SIZE = 80;
+	private final static int MAX_REUSE_QUEUE_SIZE = 0;
 
-	private final static int MAX_LRU_QUEUE_SIZE = 200;
+	private final static int MAX_LRU_QUEUE_SIZE = 500;
 
 	private final static int CLEANUP_THREAD_WAITING_TIME = 50;
 
@@ -42,7 +42,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 * BITS_FOR_ELEMENT_MASK
 	 */
 
-	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK + 1)); // =
+	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK+1)); // =
 																								// 00000011
 																								// 11111111
 																								// in
@@ -55,11 +55,11 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 																								// per
 																								// container
 
-	static final int ELEMENT_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK + 2);
+	public static final int ELEMENT_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	static final int INCIDENCE_CONTAINER_COUNT = Integer.MAX_VALUE >> BITS_FOR_ELEMENT_MASK;
+	static final int INCIDENCE_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
+	public static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
 
 	/* Threads to control the disk buffering */
 
@@ -257,13 +257,14 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		return channel;
 	}
 
-	private static final int getContainerId(int elementId) {
+	public static final int getContainerId(int elementId) {
 		return elementId >> BITS_FOR_ELEMENT_MASK & Integer.MAX_VALUE;
 	}
 
-	private static final int getElementIdInContainer(long l) {
+	public static final int getElementIdInContainer(int l) {
 		return ((int) l) & CONTAINER_MASK & Integer.MAX_VALUE;
 	}
+	
 
 	private final int clearUnusedVertexContainers() {
 		int count = 0;
@@ -438,6 +439,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			}
 		}
 		try {
+
 			FileChannel channel = getChannel(vertexFiles, storageId,
 					vertexFileName);
 			VertexContainer storage = new VertexContainer(storageId, this);
@@ -448,8 +450,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						firstInVertexReuseQueue, vertexQueue);
 				firstInVertexReuseQueue = (VertexContainerReference) firstInVertexReuseQueue.nextInReuseQueue;
 			} else {
-				reference = new VertexContainerReference(storage, channel,
-						vertexQueue);
+				reference = new VertexContainerReference(storage, channel, vertexQueue);
 			}
 			vertexStorages[storageId] = reference;
 			return storage;
@@ -458,8 +459,14 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		}
 	}
 
-	final VertexContainer getVertexContainer(int vertexId) {
-		int storageId = getContainerId(vertexId);
+	
+	/**
+	 * 
+	 * Retrieves the vertex container with the container id <code>id<code>
+	 * @param storageId
+	 * @return
+	 */
+	final VertexContainer getVertexContainer(int storageId) {
 		VertexContainer storage = null;
 		VertexContainerReference reference = null;
 		if (storageId < vertexStorageCount) {
@@ -494,10 +501,12 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public final Vertex getVertexObject(int id) {
-		VertexContainer container = getVertexContainer(id);
+		VertexContainer container = getVertexContainer(getContainerId(id));
 		int idInStorage = getElementIdInContainer(id);
-		int type = container.types[idInStorage];
-		System.out.println("Type: " + type);
+		long type = container.types[idInStorage];
+		if (type == 0) {
+			System.out.println("Type of vertex " + id + " is null");
+		}
 		if (type != 0) {
 			// element is typed, so return either the existing vertex or create
 			// a new one
@@ -505,8 +514,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (v == null) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Vertex> c = (Class<? extends Vertex>) schema
-						.getM1ClassForId(type);
-				v = factory.reloadLocalVertex(c, id, graphDatabase, container);
+						.getM1ClassForId((int)type);
+				v = factory.reloadLocalVertex(c, graphDatabase.convertToGlobalId(id), graphDatabase, container);
 				container.vertices[idInStorage] = v;
 			}
 			return v;
@@ -572,8 +581,13 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		}
 	}
 
-	final EdgeContainer getEdgeContainer(int edgeId) {
-		int storageId = getContainerId(edgeId);
+	/**
+	 * 
+	 * Retrieves the edge container with the container id <code>id<code>
+	 * @param storageId
+	 * @return
+	 */
+	final EdgeContainer getEdgeContainer(int storageId) {
 		EdgeContainer storage = null;
 		EdgeContainerReference reference = null;
 		if (storageId < edgeStorageCount) {
@@ -590,6 +604,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						edgeStorages[storageId] = reference;
 					}
 				} else {
+					System.out.println("Reloading edge storage");
 					// reload storage from disk
 					storage = reloadEdgeStorage(storageId);
 				}
@@ -608,9 +623,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@SuppressWarnings("unchecked")
 	public final Edge getEdgeObject(int id) {
-		EdgeContainer container = getEdgeContainer(id);
+		EdgeContainer container = getEdgeContainer(getContainerId(id));
 		int idInStorage = getElementIdInContainer(id);
-		int type = container.types[idInStorage];
+		int type = (int) container.types[idInStorage];
 		if (type != 0) {
 			// element is typed, so return either the existing vertex or create
 			// a new one
@@ -618,7 +633,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (e == null) {
 				e = factory.reloadLocalEdge(
 						(Class<? extends Edge>) schema.getM1ClassForId(type),
-						id, graphDatabase, container);
+						graphDatabase.convertToGlobalId(id), graphDatabase, container);
 				container.edges[idInStorage] = e;
 			}
 			return e;
@@ -688,8 +703,14 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		}
 	}
 
-	final IncidenceContainer getIncidenceContainer(int incidenceId) {
-		int storageId = getContainerId(incidenceId);
+	/**
+	 * 
+	 * Retrieves the incidence container with the container id <code>id<code>
+	 * @param storageId
+	 * @return
+	 */
+	final IncidenceContainer getIncidenceContainer(int storageId) {
+		//int storageId = getContainerId(incidenceId);
 		IncidenceContainer storage = null;
 		IncidenceContainerReference reference = null;
 		if (storageId < incidenceStorageCount) {
@@ -728,9 +749,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		if (id == 0) {
 			return null;
 		}
-		IncidenceContainer container = getIncidenceContainer(id);
+		IncidenceContainer container = getIncidenceContainer(getContainerId(id));
 		int idInStorage = getElementIdInContainer(id);
-		int type = container.types[idInStorage];
+		int type = (int) container.types[idInStorage];
 		if (type != 0) {
 			// element is typed, so return either the existing vertex or create
 			// a new one
@@ -738,7 +759,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (i == null) {
 				i = factory.reloadLocalIncidence(
 						(Class<? extends Incidence>) schema
-								.getM1ClassForId(type), id, graphDatabase,
+								.getM1ClassForId(type),graphDatabase.convertToGlobalId(id), graphDatabase,
 						container);
 				container.incidences[idInStorage] = i;
 			}
@@ -760,11 +781,10 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	public void storeVertex(VertexImpl v) {
 		int vId = getLocalId(v.getGlobalId());
-		VertexContainer storage = getVertexContainer(vId);
+		VertexContainer storage = getVertexContainer(getContainerId(vId));
 		int id = getElementIdInContainer(vId);
 		storage.vertices[id] = v;
 		v.container = storage;
-		System.out.println("Storing vertex in diskstore, id: " + id + " type " + v.getType() + " TypeId: " + graphDatabase.getSchema().getClassId(v.getType()));
 		storage.types[id] = graphDatabase.getSchema().getClassId(v.getType());
 		AttributeContainer[] containerArray = getVertexAttributeContainerArray(getContainerId(vId));
 		containerArray[id] = v.getAttributeContainer();
@@ -772,7 +792,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	public void storeEdge(EdgeImpl e) {
 		int eId = getLocalId(e.getGlobalId());
-		EdgeContainer storage = getEdgeContainer(eId);
+		EdgeContainer storage = getEdgeContainer(getContainerId(eId));
 		int id = getElementIdInContainer(eId);
 		storage.edges[id] = e;
 		e.container = storage;
@@ -783,22 +803,22 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	public void storeIncidence(IncidenceImpl i) {
 		int iId = getLocalId(i.getGlobalId());
-		IncidenceContainer storage = getIncidenceContainer(iId);
-		int id = getElementIdInContainer(i.getGlobalId());
+		IncidenceContainer storage = getIncidenceContainer(getContainerId(iId));
+		int id = getElementIdInContainer(iId);
 		storage.incidences[id] = i;
 		i.container = storage;
 		storage.types[id] = graphDatabase.getSchema().getClassId(i.getType());
 	}
 
 	public void removeEdgeFromDiskStorage(int edgeId) {
-		EdgeContainer storage = getEdgeContainer(edgeId);
+		EdgeContainer storage = getEdgeContainer(getContainerId(edgeId));
 		int id = getElementIdInContainer(edgeId);
 		storage.edges[id] = null;
 		storage.types[id] = 0;
 	}
 
 	public void removeVertexFromDiskStorage(int vertexId) {
-		VertexContainer storage = getVertexContainer(vertexId);
+		VertexContainer storage = getVertexContainer(getContainerId(vertexId));
 		int id = getElementIdInContainer(vertexId);
 		storage.vertices[id] = null;
 		storage.types[id] = 0;
@@ -914,6 +934,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getFirstIncidenceIdAtEdgeId(int elemId) {
+		int containerId = getContainerId(elemId);
 		return getEdgeContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
 	}
 
@@ -982,7 +1003,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public int getKappaOfVertexId(int localElemId) {
-		return getVertexContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
+		return (int) getVertexContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
 	}
 
 	public void setKappaOfVertexId(int localElemId, int kappa) {
@@ -1002,7 +1023,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	}
 
 	public int getKappaOfEdgeId(int localElemId) {
-		return getEdgeContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
+		return (int) getEdgeContainer(getContainerId(localElemId)).kappa[getElementIdInContainer(localElemId)];
 	}
 
 	@Override
@@ -1013,15 +1034,15 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	// types
 
 	public int getVertexTypeId(int localVertexId) {
-		return getVertexContainer(getContainerId(localVertexId)).types[getElementIdInContainer(localVertexId)];
+		return (int) getVertexContainer(getContainerId(localVertexId)).types[getElementIdInContainer(localVertexId)];
 	}
 
 	public int getEdgeTypeId(int localEdgeId) {
-		return getEdgeContainer(getContainerId(localEdgeId)).types[getElementIdInContainer(localEdgeId)];
+		return (int) getEdgeContainer(getContainerId(localEdgeId)).types[getElementIdInContainer(localEdgeId)];
 	}
 
 	public int getIncidenceTypeId(int localIncidenceId) {
-		return getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
+		return (int) getIncidenceContainer(getContainerId(localIncidenceId)).types[getElementIdInContainer(localIncidenceId)];
 	}
 
 	public void incidenceListOfVertexModified(long vertexId) {

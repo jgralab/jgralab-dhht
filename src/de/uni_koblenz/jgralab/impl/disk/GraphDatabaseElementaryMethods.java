@@ -40,7 +40,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 * is the highbyte of the long value.
 	 */
 	public static final int getPartialGraphId(long globalSubgraphOrElementId) {
-		return (int) (globalSubgraphOrElementId >> 32);
+		return (int) (globalSubgraphOrElementId >>> 32);
 	}
 
 	/**
@@ -248,6 +248,7 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		//register graph database at server
 		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
 		localJGraLabServer.registerLocalGraphDatabase((GraphDatabaseBaseImpl) this); 
+		partialGraphDatabases.put(localPartialGraphId, this);
 	}
 	
 	
@@ -389,10 +390,10 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 
 	public int getGraphTypeId(long globalSubgraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
-		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getGraphTypeId(localSubgraphId);
+			return getGraphDatabase(partialGraphId).getGraphTypeId(globalSubgraphId);
 		}	
+		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		return getGraphData(localSubgraphId).typeId;
 	}
 
@@ -456,12 +457,10 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Vertex getVertexObject(long id) {
+		if (id == 0)
+			return null;
 		int partialGraphId = getPartialGraphId(id);
-		System.out.println("Partial graph id: " + partialGraphId);
-		System.out.println("LocalPartialGraphId: " + localPartialGraphId);
-		System.out.println("VertexId: " + id);
 		if (partialGraphId == localPartialGraphId) {
-			System.out.println("Returning object");
 			return localDiskStorage.getVertexObject(convertToLocalId(id));
 		}
 		Reference<Vertex> ref = remoteVertices.get(id);
@@ -485,6 +484,9 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Edge getEdgeObject(long id) {
+		if (id == 0) {
+			return null;
+		}
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
 			return localDiskStorage.getEdgeObject(convertToLocalId(id));
@@ -510,6 +512,8 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	 *         may be either a local one or a proxy for a remote one
 	 */
 	public Incidence getIncidenceObject(long id) {
+		if (id == 0)
+			return null;
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
 			return localDiskStorage.getIncidenceObject(convertToLocalId(id));

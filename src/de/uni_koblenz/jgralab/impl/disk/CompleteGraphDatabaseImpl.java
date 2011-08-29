@@ -42,7 +42,9 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 		//creates toplevel graph
 		GraphData data = new GraphData();
 		data.globalSubgraphId = convertToGlobalId(GraphDatabaseElementaryMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID);
+		data.typeId = schema.getClassId(schema.getGraphClass());
 		localSubgraphData.add(data);
+		getGraphObject(data.globalSubgraphId);
 	}
 	
 	
@@ -267,8 +269,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	public long getFirstIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
+		return diskStore.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
 	}
 
 	@Override

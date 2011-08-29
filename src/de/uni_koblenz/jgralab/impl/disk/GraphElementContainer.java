@@ -11,7 +11,7 @@ public abstract class GraphElementContainer extends StorageContainer {
 	public GraphElementContainer(int id, int size, DiskStorageManager backgroundStorage) {
 		super(id, size, backgroundStorage);
 		incidenceListVersion = new long[size];
-		kappa = new int[size];
+		kappa = new long[size];
 		sigmaId = new long[size];
 		nextElementInGraphId = new long[size];
 		previousElementInGraphId = new long[size];
@@ -25,7 +25,7 @@ public abstract class GraphElementContainer extends StorageContainer {
 	
 	long[] incidenceListVersion;
 	
-	int[] kappa;
+	long[] kappa;
 	
 	long[] sigmaId;
 	

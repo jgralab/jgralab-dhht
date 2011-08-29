@@ -80,7 +80,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 	
 	protected final int getIdInStorage(long elementId) {
-		return ((int) (elementId)) & DiskStorageManager.CONTAINER_MASK;
+		return DiskStorageManager.getElementIdInContainer(GraphDatabaseBaseImpl.convertToLocalId(elementId));
 	}
 
 
@@ -114,6 +114,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	protected GraphElementImpl(GraphDatabaseBaseImpl graphDatabase)  {
 		this.localGraphDatabase = graphDatabase;
 		this.storingGraphDatabase = graphDatabase;
+		this.storingDiskStorage = graphDatabase.localDiskStorage;
 	}
 
 
@@ -130,7 +131,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final Graph getGraph() {
-		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getPartialGraphId(elementId));
+		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(GraphDatabaseBaseImpl.getPartialGraphId(elementId)));
 	}
 	
 	@Override

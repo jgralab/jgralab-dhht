@@ -14,7 +14,7 @@ public abstract class ContainerReference<T extends StorageContainer> extends Wea
 	
 	int id;
 	
-	int[] types = null;
+	long[] types = null;
 	
 	boolean changed = false;
 	
