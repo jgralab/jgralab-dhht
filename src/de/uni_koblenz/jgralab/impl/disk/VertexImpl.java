@@ -83,7 +83,7 @@ public abstract class VertexImpl extends
 		super(localGraphDatabase);
 		this.elementId = id;
 		this.container = localGraphDatabase.getLocalDiskStorage()
-				.getVertexContainer(getLocalId());
+				.getVertexContainer(DiskStorageManager.getContainerId(getLocalId()));
 	}
 
 	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase,
@@ -333,7 +333,7 @@ public abstract class VertexImpl extends
 		}
 		return firstIncidence;
 	}
-
+	
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) {
 		Incidence lastIncidence = localGraphDatabase

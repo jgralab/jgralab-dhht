@@ -75,12 +75,10 @@ public abstract class EdgeImpl extends
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(
-				getLocalId());
+		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(DiskStorageManager.getContainerId(DiskStorageManager.getContainerId(getLocalId())));
 	}
 
-	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase,
-			EdgeContainer container) throws IOException {
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
 		this.container = container;
@@ -310,13 +308,14 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence() {
+		System.out.println("GetFirstIncidence");
 		return getFirstIncidence(localGraphDatabase.getTraversalContext());
 	}
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = localGraphDatabase
-				.getIncidenceObject(container.firstIncidenceId[getIdInStorage(elementId)]);
+		long firstIncId = container.firstIncidenceId[getIdInStorage(elementId)];
+		Incidence firstIncidence = localGraphDatabase.getIncidenceObject(firstIncId);
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext

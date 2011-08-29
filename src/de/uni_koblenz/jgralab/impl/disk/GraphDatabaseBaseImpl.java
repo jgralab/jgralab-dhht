@@ -1058,19 +1058,19 @@ public abstract class GraphDatabaseBaseImpl extends
 
 		if (getFirstIncidenceIdAtEdgeId(edgeId) == 0) {
 			// v has no incidences
-			System.out.println("Setting first incidence at edge " + convertToLocalId(edgeId) + " to " + incId);
+		//	System.out.println("Setting first incidence at edge " + convertToLocalId(edgeId) + " to " + incId);
 			setFirstIncidenceIdAtEdgeId(edgeId, incId);
-			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+		//	System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 			setLastIncidenceIdAtEdgeId(edgeId, incId);
 		} else {
 			long lastIncId = getLastIncidenceIdAtEdgeId(edgeId);
-			System.out.println("Setting next incidence at edge " + convertToLocalId(edgeId));
+		//	System.out.println("Setting next incidence at edge " + convertToLocalId(edgeId));
 			setNextIncidenceIdAtEdgeId(lastIncId, incId);
-			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+		//	System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 			setPreviousIncidenceIdAtEdgeId(incId, lastIncId);
-			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+		//	System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 			setLastIncidenceIdAtEdgeId(edgeId, incId);
-			System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+		//	System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 		}
 
 		incidenceListOfEdgeModified(edgeId);
@@ -1079,8 +1079,8 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (!isLoading()) {
 			notifyIncidenceAdded(incId);
 		}
-		System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
-		System.out.println("Incidence object: " + getIncidenceObject(getFirstIncidenceIdAtEdgeId(edgeId)));
+	//	System.out.println("First incidence of edge " + edgeId + " is: " + getFirstIncidenceIdAtEdgeId(edgeId));
+	//	System.out.println("Incidence object: " + getIncidenceObject(getFirstIncidenceIdAtEdgeId(edgeId)));
 		return incId;
 	}
 

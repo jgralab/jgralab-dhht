@@ -18,9 +18,9 @@ import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 
 public class BGStorageTest {
 	
-	private static int vertexCount = 3;
+	private static int vertexCount = 1000000;
 
-	private static int linkCount = 6;
+	private static int linkCount = 2000000;
 	
 	private DHHTTestGraph  graph;
 	
@@ -81,8 +81,9 @@ public class BGStorageTest {
 		//	System.out.println("Vertexid " + v.getGlobalId());
 		}
 		for (int i=0; i<linkCount; i++) {
-			System.out.println("Creating edge " + (i+1));
+		//	System.out.println("Creating edge " + (i+1));
 			SimpleEdge e = graph.createSimpleEdge();
+	//		System.out.println("FirstInc of vertex " + (i+1) + " : " + getVertex(i).getFirstIncidence().getLocalId());
 			e.connect(SimpleEdge_start.class, getVertex(i));
 			
 //			for (int j=0; j<i; j++) {
@@ -90,11 +91,16 @@ public class BGStorageTest {
 //				System.out.println("FirstInc of edge " + j + " : " + getEdge(j).getFirstIncidence().getLocalId());
 //			}
 		//	e.connect(SimpleEdge_start.class, getVertex(i+3));
+			//if (i == 3)
+			//System.out.println("FirstInc of vertex " + (i+1) + " : " + getVertex(i).getFirstIncidence().getLocalId());
 			e.connect(SimpleEdge_target.class, getVertex(i+1));
-			for (int j=0; j<=i; j++) {
-				System.out.println("FirstInc of vertex " + (j+1) + " : " + getVertex(j).getFirstIncidence().getLocalId());
-				System.out.println("FirstInc of edge " + (j+1) + " : " + getEdge(j).getFirstIncidence().getLocalId());
-			}
+//			if (i==3)
+//			for (int j=0; j<=i; j++) {
+//				System.out.println("Vertex: " + getVertex(j));
+//				System.out.println("FirstInc: " + getVertex(j).getFirstIncidence());
+//				System.out.println("FirstInc of vertex " + (j+1) + " : " + getVertex(j).getFirstIncidence().getLocalId());
+//				System.out.println("FirstInc of edge " + (j+1) + " : " + getEdge(j).getFirstIncidence().getLocalId());
+//			}
 //			e.connect(SimpleEdge_target.class, getVertex(i+2));
 //			if (i%2==0)
 //				e.connect(SimpleEdge_target.class, getVertex((i*97)%100));
