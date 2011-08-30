@@ -27,11 +27,11 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	/* Switches to toggle behaviour */
 
-	private final static int MAX_REUSE_QUEUE_SIZE = 0;
+	private final static int MAX_REUSE_QUEUE_SIZE = 100;
 
-	private final static int MAX_LRU_QUEUE_SIZE = 500;
+	private final static int MAX_LRU_QUEUE_SIZE = 200;
 
-	private final static int CLEANUP_THREAD_WAITING_TIME = 50;
+	private final static int CLEANUP_THREAD_WAITING_TIME = 30;
 
 	private final static int BITS_FOR_ELEMENT_MASK = 14;
 
@@ -54,12 +54,15 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 																								// elements
 																								// per
 																								// container
-
-	public static final int ELEMENT_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
-
-	static final int INCIDENCE_CONTAINER_COUNT = Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
-
 	public static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
+	
+	public static final int ELEMENT_CONTAINER_COUNT = (int) 3500000 / CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+
+	static final int INCIDENCE_CONTAINER_COUNT = (int) 12000000 / CONTAINER_SIZE;  //Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+
+	
+	private static final int WAITING_TIME = 10;
+
 
 	/* Threads to control the disk buffering */
 
@@ -150,6 +153,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	private IncidenceContainerReference firstInIncidenceReuseQueue;
 
 	private int incidenceReuseQueueSize = 0;
+	
+	public static int reloadedContainers = 0;
 
 	public DiskStorageManager(GraphDatabaseBaseImpl database)
 			throws FileNotFoundException {
@@ -433,13 +438,13 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		while (!isVertexStorageSaved(storageId)) {
 			try {
 				vertexStorages.notifyAll();
-				vertexStorages.wait(20);
+				vertexStorages.wait(WAITING_TIME);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		try {
-
+			reloadedContainers++;
 			FileChannel channel = getChannel(vertexFiles, storageId,
 					vertexFileName);
 			VertexContainer storage = new VertexContainer(storageId, this);
@@ -504,9 +509,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		VertexContainer container = getVertexContainer(getContainerId(id));
 		int idInStorage = getElementIdInContainer(id);
 		long type = container.types[idInStorage];
-		if (type == 0) {
-			System.out.println("Type of vertex " + id + " is null");
-		}
 		if (type != 0) {
 			// element is typed, so return either the existing vertex or create
 			// a new one
@@ -528,7 +530,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		VertexContainer container = getVertexContainer(id);
 		if (container.attributes == null) {
 			try {
-
 				FileChannel channel = getChannel(vertexAttributeFiles,
 						container.id, vertexAttributeFileName);
 				if (channel.size() != 0) {
@@ -558,7 +559,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		while (!isEdgeStorageSaved(storageId)) {
 			try {
 				edgeStorages.notify();
-				edgeStorages.wait(20);
+				edgeStorages.wait(WAITING_TIME);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -567,6 +568,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			FileChannel channel = getChannel(edgeFiles, storageId, edgeFileName);
 			EdgeContainer storage = new EdgeContainer(storageId, this);
 			EdgeContainerReference reference = null;
+			reloadedContainers++;
 			if (edgeReuseQueueSize > 0) {
 				edgeReuseQueueSize--;
 				reference = new EdgeContainerReference(storage, channel, firstInEdgeReuseQueue, edgeQueue);
@@ -604,7 +606,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						edgeStorages[storageId] = reference;
 					}
 				} else {
-					System.out.println("Reloading edge storage");
 					// reload storage from disk
 					storage = reloadEdgeStorage(storageId);
 				}
@@ -677,12 +678,13 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		while (!isIncidenceStorageSaved(storageId)) {
 			try {
 				incidenceStorages.notify();
-				incidenceStorages.wait(20);
+				incidenceStorages.wait(WAITING_TIME);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		try {
+			reloadedContainers++;
 			FileChannel channel = getChannel(incidenceFiles, storageId,
 					incidenceFileName);
 			IncidenceContainer storage = new IncidenceContainer(storageId, this);

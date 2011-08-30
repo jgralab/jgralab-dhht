@@ -37,9 +37,7 @@ public class HypergraphSearchAlgorithmOptimized {
 
 		/** starts the search beginning from the vertex <code>startVertex</code> 
 		 * @throws RemoteException */
-		public void run(Vertex startVertex) throws RemoteException {
-			Graph graph = startVertex.getGraph();
-			int handlingsOf77 = 0;
+		public void run(Vertex startVertex) {
 			init(startVertex.getGraph());
 			handleRoot(startVertex);
 			handleVertex(startVertex);
