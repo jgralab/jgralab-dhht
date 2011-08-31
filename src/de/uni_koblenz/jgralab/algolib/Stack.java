@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.algolib;
 
-import java.util.LinkedList;
 
 public class Stack<T> extends java.util.Stack<T> implements Buffer<T> {
 

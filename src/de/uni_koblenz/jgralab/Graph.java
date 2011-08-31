@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;

@@ -2,7 +2,6 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
 import java.lang.ref.ReferenceQueue;
-import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;

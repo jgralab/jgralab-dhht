@@ -12,16 +12,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl;
