@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.impl;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -13,18 +12,25 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralabtest.dhht.CentralAlgorithm;
+import de.uni_koblenz.jgralabtest.dhht.SatelliteAlgorithm;
+import de.uni_koblenz.jgralabtest.dhht.SatelliteAlgorithmImpl;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
@@ -177,4 +183,10 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		this.localHostname = host;
 	}
 
+	
+	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) {
+		Graph g = getLocalGraphDatabase(uniqueGraphId).getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(partialGraphId));
+		return SatelliteAlgorithmImpl.create(g, parent);
+	}
+	
 }

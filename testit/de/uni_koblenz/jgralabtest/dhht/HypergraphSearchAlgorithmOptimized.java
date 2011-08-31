@@ -16,7 +16,7 @@ public class HypergraphSearchAlgorithmOptimized {
 
 		/* this buffer needs to be instatiated in a subclass
 		 * by the appropriate implementation class for e.g. a Queue or Stack*/
-		protected Queue<Vertex> buffer; 
+		protected Buffer<Vertex> buffer; 
 		
 		/**
 		 * Initializes the algorithm's private fields according to the number of edges
@@ -54,8 +54,8 @@ public class HypergraphSearchAlgorithmOptimized {
 						handleEdge(currentEdge);
 						parentEdgeInc[currentEdge.getLocalId()] = curIncAtVertex.getLocalId();     
 						handleTreeIncidence(curIncAtVertex); 
-						Direction opposite = Direction.EDGE_TO_VERTEX; //curIncAtVertex.getDirection().getOppositeDirection();
-						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
+						Direction opposite = Direction.BOTH; //curIncAtVertex.getDirection().getOppositeDirection();
+						Incidence curIncAtEdge = currentEdge.getFirstIncidence();
 						while (curIncAtEdge != null) {
 						//	System.out.println("Incidence at edge " + currentEdge.getLocalId() + " is " + curIncAtEdge.getLocalId());
 							Vertex omega = curIncAtEdge.getVertex();
@@ -70,7 +70,7 @@ public class HypergraphSearchAlgorithmOptimized {
 							} else {
 								handleCrossIncidence(curIncAtEdge);
 							}
-							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge(opposite);
+							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge();
 						}	  
 					} else {
 						handleCrossIncidence(curIncAtVertex);

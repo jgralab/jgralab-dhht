@@ -5,6 +5,8 @@ import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralabtest.dhht.CentralAlgorithm;
+import de.uni_koblenz.jgralabtest.dhht.SatelliteAlgorithm;
 
 public interface RemoteJGraLabServer extends Remote {
 	
@@ -21,7 +23,7 @@ public interface RemoteJGraLabServer extends Remote {
 
 	
 	/**
-	 * Creates a new GraphDatabase for the partial graph with the given
+	 * Creates a new GraphDatabase for the partial graph with the givenØ
 	 * partialGraphId belonging to the complete graph with the given
 	 * unique id stored on the host identified by the given name. The schema
 	 * named <code>schemaName</code> is used as a graph schema, it is required
@@ -39,6 +41,9 @@ public interface RemoteJGraLabServer extends Remote {
 	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName,
 			String uniqueGraphId, String hostnameOfCompleteGraph,
 			long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException, RemoteException;
+
+
+	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent);
 
 
 	

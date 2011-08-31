@@ -56,9 +56,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 																								// container
 	public static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
 	
-	public static final int ELEMENT_CONTAINER_COUNT = (int) 3500000 / CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+	public static final int ELEMENT_CONTAINER_COUNT = (int) 7000000 / CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	static final int INCIDENCE_CONTAINER_COUNT = (int) 12000000 / CONTAINER_SIZE;  //Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+	static final int INCIDENCE_CONTAINER_COUNT = (int) 13000000 / CONTAINER_SIZE;  //Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
 	
 	private static final int WAITING_TIME = 10;
