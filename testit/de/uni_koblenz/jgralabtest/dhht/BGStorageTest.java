@@ -132,8 +132,8 @@ public class BGStorageTest {
 		
 		int cycles = 50;
 		
-		for (Variant variant : variants) 
-			test.iterateTest(cycles, variant, null);
+	//	for (Variant variant : variants) 
+	//		test.iterateTest(cycles, variant, null);
 
 		
 		Variant[] distributedVariants = {Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};

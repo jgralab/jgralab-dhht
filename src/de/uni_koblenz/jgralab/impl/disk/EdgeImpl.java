@@ -308,7 +308,6 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence() {
-		System.out.println("GetFirstIncidence");
 		return getFirstIncidence(localGraphDatabase.getTraversalContext());
 	}
 
