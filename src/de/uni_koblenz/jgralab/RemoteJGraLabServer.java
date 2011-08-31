@@ -43,7 +43,7 @@ public interface RemoteJGraLabServer extends Remote {
 			long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException, RemoteException;
 
 
-	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent);
+	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) throws RemoteException;
 
 
 	

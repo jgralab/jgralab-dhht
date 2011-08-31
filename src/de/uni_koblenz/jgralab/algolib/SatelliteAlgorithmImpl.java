@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.algolib;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
@@ -61,7 +63,11 @@ public class SatelliteAlgorithmImpl
 			JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 			String remoteHostname = partialGraph.getGraphDatabase().getHostname(partialGraphId);
 			RemoteJGraLabServer remoteServer = server.getRemoteInstance(remoteHostname);
-			return remoteServer.createSatelliteAlgorithm(partialGraph.getUniqueGraphId(), partialGraphId, parent);
+			try {
+				return remoteServer.createSatelliteAlgorithm(partialGraph.getUniqueGraphId(), partialGraphId, parent);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

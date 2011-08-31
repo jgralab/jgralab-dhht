@@ -181,7 +181,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	}
 
 	
-	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) {
+	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) throws RemoteException {
 		Graph g = getLocalGraphDatabase(uniqueGraphId).getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(partialGraphId));
 		return SatelliteAlgorithmImpl.create(g, parent);
 	}
