@@ -37,7 +37,7 @@ public class BGStorageTest {
 	}
 	
 	
-	public void iterateTest(int cycles, Variant variant) {
+	public void iterateTest(int cycles, Variant variant, String[] remoteHosts) {
 		long totalTraversalTimeDFS = 0;
 		long totalTraversalTimeBFS = 0;
 		long totalCreationTime = 0;
@@ -127,15 +127,21 @@ public class BGStorageTest {
 	
 	public static void main(String[] args) {
 		BGStorageTest test = new BGStorageTest();
-		Graph graph = null;
 		Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 	//	Variant[] variants = {Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 		
 		int cycles = 50;
 		
 		for (Variant variant : variants) 
-			test.iterateTest(cycles, variant);
+			test.iterateTest(cycles, variant, null);
 
+		
+		Variant[] distributedVariants = {Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
+		String[] hosts = {"localhost", "helena.uni-koblenz.de"};
+		for (Variant variant : distributedVariants) {
+			test.iterateTest(1, variant, hosts);
+		}
+		
 
 		System.exit(0);
 	}
