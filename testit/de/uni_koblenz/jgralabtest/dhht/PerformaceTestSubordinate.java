@@ -139,7 +139,7 @@ public class PerformaceTestSubordinate {
 	public void search(Graph graph) throws RemoteException {	
 		System.out.println("Starting search");
 		long startTime = System.currentTimeMillis();
-		CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm();
+		CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(false);
 		subordinateGraphs.get(0).useAsTraversalContext();
 		System.out.println("SubordinateGraph1: "  + subordinateGraphs.get(0));
 		System.out.println(" firstV: "  + subordinateGraphs.get(0).getFirstVertex());

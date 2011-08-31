@@ -79,7 +79,7 @@ public class PerformaceTest {
 			System.out.println("Starting search");
 			long startTime = System.currentTimeMillis();
 			
-			CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm();
+			CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(false);
 			algo.run(graph.getFirstVertex());
 			
 			System.out.println("Applied BFS in " + (System.currentTimeMillis() - startTime) + " milliseconds");
