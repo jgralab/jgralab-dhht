@@ -186,4 +186,13 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		return SatelliteAlgorithmImpl.create(g, parent);
 	}
 	
+	
+	public static void main(String[] args) {
+
+				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
+
+		
+		
+	}
+	
 }
