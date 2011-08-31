@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralabtest.dhht;
+package de.uni_koblenz.jgralab.algolib;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;

@@ -1,4 +1,6 @@
-package de.uni_koblenz.jgralab.dhhttest;
+package de.uni_koblenz.jgralab.algolib;
+
+
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
@@ -6,9 +8,12 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class CountHypergraphSearchAlgorithm extends HypergraphSearchAlgorithmOptimized {
 
-	public CountHypergraphSearchAlgorithm() {
+	public CountHypergraphSearchAlgorithm(boolean dfs) {
 		super();
-		buffer = new Queue<Vertex>();
+		if (dfs)
+			buffer = new Stack<Vertex>();
+		else 
+			buffer = new Queue<Vertex>();
 	}
 	
 	private int vertices = 0;

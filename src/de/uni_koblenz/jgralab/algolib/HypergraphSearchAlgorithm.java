@@ -1,6 +1,8 @@
-package de.uni_koblenz.jgralabtest.dhht;
+package de.uni_koblenz.jgralab.algolib;
 
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -8,10 +10,10 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
-public class HypergraphSearchAlgorithmOptimized {
-	
-		protected int[] parentVertexInc;
-		protected int[] parentEdgeInc;
+public class HypergraphSearchAlgorithm {
+
+		protected Map<Vertex, Incidence> parentVertexInc;
+		protected Map<Edge, Incidence> parentEdgeInc;
 		protected int num;
 
 		/* this buffer needs to be instatiated in a subclass
@@ -30,52 +32,46 @@ public class HypergraphSearchAlgorithmOptimized {
 			int eCount;
 			vCount = (int) graph.getVCount();
 			eCount = (int) graph.getECount();
-			parentVertexInc = new int[vCount+1];
-			parentEdgeInc = new int[eCount+1];
+			parentVertexInc = new HashMap<Vertex, Incidence>(vCount);
+			parentEdgeInc = new HashMap<Edge, Incidence>(eCount);
 			num = 0;
 		}
 
 		/** starts the search beginning from the vertex <code>startVertex</code> 
 		 * @throws RemoteException */
-		public void run(Vertex startVertex) {
+		public void run(Vertex startVertex) throws RemoteException {
 			init(startVertex.getGraph());
 			handleRoot(startVertex);
 			handleVertex(startVertex);
 			buffer.add(startVertex);
 			
 			while (!buffer.isEmpty()) {
-				Vertex currentVertex = buffer.get();    
-				Incidence curIncAtVertex = currentVertex.getFirstIncidence();
+				Vertex currentVertex = buffer.get();        
+				Incidence curIncAtVertex = currentVertex.getFirstIncidence(Direction.BOTH);
 				while (curIncAtVertex != null) {
 					Edge currentEdge = curIncAtVertex.getEdge();
-				//	System.out.println("Incidence at vertex " + currentVertex.getLocalId() + " is " + curIncAtVertex.getLocalId() + " and leads to edge " + currentEdge.getLocalId());
-				//	System.out.println("ParentEdgeInd of edge is " + parentEdgeInc[currentEdge.getLocalId()]);
-					if (parentEdgeInc[currentEdge.getLocalId()]==0) { 
+					if (!parentEdgeInc.containsKey(currentEdge)) {   
 						handleEdge(currentEdge);
-						parentEdgeInc[currentEdge.getLocalId()] = curIncAtVertex.getLocalId();     
+						parentEdgeInc.put(currentEdge, curIncAtVertex);     
 						handleTreeIncidence(curIncAtVertex); 
-						Direction opposite = Direction.BOTH; //curIncAtVertex.getDirection().getOppositeDirection();
-						Incidence curIncAtEdge = currentEdge.getFirstIncidence();
+						Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
+						Incidence curIncAtEdge = currentEdge.getFirstIncidence(opposite);
 						while (curIncAtEdge != null) {
-						//	System.out.println("Incidence at edge " + currentEdge.getLocalId() + " is " + curIncAtEdge.getLocalId());
 							Vertex omega = curIncAtEdge.getVertex();
-						//	System.out.println("Omega vertex of edge is " + omega.getLocalId());
-							if ((parentVertexInc[omega.getLocalId()]==0) && (omega!=startVertex)) {
-							//	System.out.println("Omega vertex is handled");
-								parentVertexInc[omega.getLocalId()]= curIncAtEdge.getLocalId();
+							if ((!parentVertexInc.containsKey(omega)) && (omega!=startVertex)) {
+								parentVertexInc.put(omega, curIncAtEdge);
 								handleVertex(omega);
 								handleTreeIncidence(curIncAtEdge);
-							//	System.out.println("Omega vertex is enqueed");
 								buffer.add(omega);
 							} else {
 								handleCrossIncidence(curIncAtEdge);
 							}
-							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge();
+							curIncAtEdge = curIncAtEdge.getNextIncidenceAtEdge(opposite);
 						}	  
 					} else {
 						handleCrossIncidence(curIncAtVertex);
 					}
-					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex();
+					curIncAtVertex = curIncAtVertex.getNextIncidenceAtVertex(Direction.BOTH);
 				}
 			}  
 		}	

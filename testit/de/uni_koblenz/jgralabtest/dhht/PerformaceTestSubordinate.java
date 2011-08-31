@@ -7,6 +7,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
 import de.uni_koblenz.jgralab.dhhttest.schema.Activity;
 import de.uni_koblenz.jgralab.dhhttest.schema.BusinessProcess;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;

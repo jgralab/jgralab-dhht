@@ -22,15 +22,15 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
+import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithm;
+import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralabtest.dhht.CentralAlgorithm;
-import de.uni_koblenz.jgralabtest.dhht.SatelliteAlgorithm;
-import de.uni_koblenz.jgralabtest.dhht.SatelliteAlgorithmImpl;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 

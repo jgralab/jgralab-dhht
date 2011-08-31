@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralabtest.dhht;
+package de.uni_koblenz.jgralab.algolib;
 
 import java.rmi.Remote;
 

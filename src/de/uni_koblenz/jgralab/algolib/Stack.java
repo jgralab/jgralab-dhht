@@ -1,11 +1,11 @@
-package de.uni_koblenz.jgralab.dhhttest;
+package de.uni_koblenz.jgralab.algolib;
 
 import java.util.LinkedList;
 
-public class Queue<T> extends LinkedList<T> implements Buffer<T> {
+public class Stack<T> extends java.util.Stack<T> implements Buffer<T> {
 
 
-	public Queue() {
+	public Stack() {
 		super();
 	}
 	
@@ -17,7 +17,7 @@ public class Queue<T> extends LinkedList<T> implements Buffer<T> {
 
 	@Override
 	public T get() {
-		return poll();
+		return pop();
 	}
 
 

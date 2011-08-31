@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.dhhttest;
+package de.uni_koblenz.jgralab.algolib;
 
 interface Buffer<T> {
 	/** @return true if the buffer contains no elements */

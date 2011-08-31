@@ -1,5 +1,5 @@
 DHHTGraph 1;
-Schema de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
+Schema de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
 GraphClass DHHTTestGraph;
 
 VertexClass SimpleVertex;
