@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
@@ -17,7 +18,7 @@ import de.uni_koblenz.jgralab.dhhttest.schema.SimulatedIncidence_outInc;
 
 public class TreeGraphGenerator {
 
-	private DHHTTestGraph graph;
+	protected DHHTTestGraph graph;
 	
 	private int layers;
 	private int roots;
@@ -77,7 +78,8 @@ public class TreeGraphGenerator {
 		int newVertexListSize = 0;
 		int retrievedVertices = 0;
 		for (int i=0; i<roots; i++) {
-			Vertex v = graph.createSimpleVertex();
+			DHHTTestGraph partialGraph = createPartialGraph(i/getPartialGraphCount());
+			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
 			vertices.add((SimpleVertex) v);
 		}	
@@ -90,8 +92,9 @@ public class TreeGraphGenerator {
 				//System.out.println("out loop");
 				while (i<nextBranchingFactor) {
 				//	System.out.println("loop");
+					DHHTTestGraph partialGraph = getGraph(parent.getGlobalId());
 					if (useHyperedges) {
-						Edge e  = graph.createSimpleEdge();
+						Edge e  = partialGraph.createSimpleEdge();
 						e.connect(SimpleEdge_start.class, parent);
 						int j=0;
 						for (j=0; j<getNextEdgeBranchingFactor(); j++) {
@@ -106,27 +109,27 @@ public class TreeGraphGenerator {
 						int edgeBranchingFactor = getNextEdgeBranchingFactor();
 						if (edgeBranchingFactor == 1) {
 							vCount++;
-							SimpleVertex v = graph.createSimpleVertex();
+							SimpleVertex v = partialGraph.createSimpleVertex();
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v.getGlobalId();
-							Edge e  = graph.createSimpleEdge();
+							Edge e  = partialGraph.createSimpleEdge();
 							e.connect(SimpleEdge_start.class, parent);
 							e.connect(SimpleEdge_target.class, v);
 							i++;
 						} else {
 							vCount++;
-							SimulatedHyperedge hyperedge = graph.createSimulatedHyperedge();
-							Edge e  = graph.createSimulatedIncidence();
+							SimulatedHyperedge hyperedge = partialGraph.createSimulatedHyperedge();
+							Edge e  = partialGraph.createSimulatedIncidence();
 							e.connect(SimulatedIncidence_incInc.class, parent);
 							e.connect(SimulatedIncidence_outInc.class, hyperedge);
 							int j=0;
 							for (j=0; j<edgeBranchingFactor; j++) {
 						//		System.out.println("Loiop");
 								vCount++;
-								SimpleVertex v = graph.createSimpleVertex();
+								SimpleVertex v = partialGraph.createSimpleVertex();
 								vertices.add(v);
 								newVertexList[newVertexListSize++] = v.getGlobalId();
-								Edge e1 = graph.createSimulatedIncidence();
+								Edge e1 = partialGraph.createSimulatedIncidence();
 								e1.connect(SimulatedIncidence_incInc.class, hyperedge);
 								e1.connect(SimulatedIncidence_outInc.class, v);
 								i++;
@@ -150,59 +153,49 @@ public class TreeGraphGenerator {
 			int edgeBranchingFactor = getNextEdgeBranchingFactor();
 			if (edgeBranchingFactor == 1) {
 				Vertex start = getVertex(i * 7);
-				while (start instanceof SimulatedHyperedge)
-					start = start.getNextVertex();
-				if (start == null)
-					start = graph.getFirstSimpleVertex();
+				DHHTTestGraph partialGraph = getGraph(start.getGlobalId());
 				Vertex target = getVertex(i * 13);
-				while (target instanceof SimulatedHyperedge)
-					target = target.getNextVertex();
-				if (target == null)
-					target = graph.getFirstSimpleVertex().getNextSimpleVertex();
-				Edge e = graph.createSimpleEdge();
+				Edge e = partialGraph.createSimpleEdge();
 				e.connect(SimpleEdge_start.class, start);
 				e.connect(SimpleEdge_target.class, target);
 			} else {
 				List<SimpleVertex> startVertices = new LinkedList<SimpleVertex>();
 				List<SimpleVertex> targetVertices = new LinkedList<SimpleVertex>();
 				Vertex start = getVertex(i * 7);
+				DHHTTestGraph partialGraph = getGraph(start.getGlobalId());
+				int j = 1;
 				while (startVertices.size() < edgeBranchingFactor) {
-					
-					while (start instanceof SimulatedHyperedge) {
-						start = start.getNextVertex();
-						if (start == null) {
-							start = graph.getFirstSimpleVertex();
-							continue;
-						}
-					}
 					startVertices.add((SimpleVertex) start);
-					start = start.getNextVertex();
+					start = getVertex(i*7+j++);
 				}
+				j=1;
 				Vertex target = getVertex(i * 13);
 				while (targetVertices.size() < edgeBranchingFactor) {
-					while (target instanceof SimulatedHyperedge) {
-					//	System.out.println("Target inner loop, " + target.getId());
-						target = target.getNextVertex();
-						if (target == null) {
-							target = graph.getFirstSimpleVertex();
-							continue;
-						}
-					}	
 					targetVertices.add((SimpleVertex) target);
-					target = target.getNextVertex();
+					target = getVertex(i*13+j++);
 				}
-				SimulatedHyperedge simulatedHyperedge = graph.createSimulatedHyperedge();
-				for (SimpleVertex v : startVertices) {
-					Edge e = graph.createSimulatedIncidence();
-					e.connect(SimulatedIncidence_incInc.class, v);
-					e.connect(SimulatedIncidence_outInc.class, simulatedHyperedge);
+				if (useHyperedges) {
+					Edge e = partialGraph.createSimpleEdge();
+					for (Vertex v : startVertices) {
+						e.connect(SimpleEdge_start.class, v);	
+					}
+					for (Vertex v : targetVertices) {
+						e.connect(SimpleEdge_target.class, v);	
+					}					
+				} else {
+					SimulatedHyperedge simulatedHyperedge = partialGraph.createSimulatedHyperedge();
+					for (SimpleVertex v : startVertices) {
+						Edge e = partialGraph.createSimulatedIncidence();
+						e.connect(SimulatedIncidence_incInc.class, v);
+						e.connect(SimulatedIncidence_outInc.class, simulatedHyperedge);
+					}
+					for (SimpleVertex v : targetVertices) {
+						Edge e = partialGraph.createSimulatedIncidence();
+						e.connect(SimulatedIncidence_incInc.class, simulatedHyperedge);
+						e.connect(SimulatedIncidence_outInc.class, v);
+					}	
 				}
-				for (SimpleVertex v : targetVertices) {
-					Edge e = graph.createSimulatedIncidence();
-					e.connect(SimulatedIncidence_incInc.class, simulatedHyperedge);
-					e.connect(SimulatedIncidence_outInc.class, v);
-				}
-			}
+			} 
 		}
 		return graph;
 	}
@@ -215,12 +208,22 @@ public class TreeGraphGenerator {
 //			return graph.getVertex(vId+1);
 //	}
 	
+	protected DHHTTestGraph createPartialGraph(int i) {
+		return graph;
+	}
+
+	protected DHHTTestGraph getGraph(long globalId) {
+		return graph;
+	}
+
 	private Vertex getVertex(int id) {
 		int vId = (int) ( id % vertices.size());
 		return vertices.get(vId);
 	}
 	
-	
+	protected int getPartialGraphCount() {
+		return 1;
+	}
 	
 	
 }
