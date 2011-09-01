@@ -65,9 +65,9 @@ public class TreeGraphGenerator {
 	public DHHTTestGraph createGraph() {
 		if (diskBased)  {
 			graph = DHHTTestSchema.instance().createDHHTTestGraphOnDisk();
-			System.out.println("Creating disk graph");
+			//System.out.println("Creating disk graph");
 		} else {
-			System.out.println("Creating mem graph");
+		//	System.out.println("Creating mem graph");
 			graph = DHHTTestSchema.instance().createDHHTTestGraphInMem();
 		}
 

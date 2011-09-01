@@ -1,21 +1,8 @@
 package de.uni_koblenz.jgralabtest.dhht;
 
-import java.rmi.RemoteException;
-
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
-import de.uni_koblenz.jgralab.dhhttest.schema.Activity;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_start;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_target;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleVertex;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 
 public class BGStorageTest {
 	
@@ -47,7 +34,7 @@ public class BGStorageTest {
 		
 		for (int i=0; i<cycles; i++) {
 			long creationStartTime = System.currentTimeMillis();
-			graph = createGraph(variant);
+			graph = createGraph(variant, remoteHosts);
 			long thisCreationTime = System.currentTimeMillis() - creationStartTime;
 			totalCreationTime += thisCreationTime;
 			
@@ -65,7 +52,14 @@ public class BGStorageTest {
 			graph = null;
 			System.gc();
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(15000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.gc();
+			try {
+				Thread.sleep(15000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -96,27 +90,33 @@ public class BGStorageTest {
 		CLIQUEHY,
 		TREELIKEDISKHY,
 		CLIQUEDISKHY,
+		TREELIKEDISTRIBUTED,
+		CLIQUEDISTRIBUTED
 	}
 
 	
-	private Graph createGraph(Variant variant) {
+	private Graph createGraph(Variant variant, String[] hostnames) {
 		switch (variant) {
 		case TREELIKE://Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 1, 2, 7, 1500000, false, false).createGraph();
 		case TREELIKEDISK://Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 1, 2, 7, 1500000, false, true).createGraph();
 		case CLIQUE:
-			return new TreeGraphGenerator(5, 4220, 2, 7, 1500000, false, false).createGraph();
+			return new TreeGraphGenerator(5, 4500, 2, 7, 1500000, false, false).createGraph();
 		case CLIQUEDISK:
-			return new TreeGraphGenerator(5, 4220, 2, 7, 1500000, false, true).createGraph();
+			return new TreeGraphGenerator(5, 4500, 2, 7, 1500000, false, true).createGraph();
 		case TREELIKEHY://Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 1, 2, 7, 1500000, true, false).createGraph();
 		case TREELIKEDISKHY://Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 1, 2, 7, 1500000, true, true).createGraph();
 		case CLIQUEHY:
-			return new TreeGraphGenerator(5, 4220, 2, 7, 1500000, true, false).createGraph();
+			return new TreeGraphGenerator(5, 4500, 2, 7, 1500000, true, false).createGraph();
 		case CLIQUEDISKHY:
-			return new TreeGraphGenerator(5, 4220, 2, 7, 1500000, true, true).createGraph();
+			return new TreeGraphGenerator(5, 4500, 2, 7, 1500000, true, true).createGraph();
+		case TREELIKEDISTRIBUTED://Tree-like graph, 1 root, 11 levels
+			return new DistributedGraphGenerator(11, 1, 2, 7, 1500000, true, hostnames).createGraph();
+		case CLIQUEDISTRIBUTED:
+			return new DistributedGraphGenerator(5, 4500, 2, 7, 1500000, true, hostnames).createGraph();
 		}
 		return null;
 	}
@@ -127,20 +127,27 @@ public class BGStorageTest {
 	
 	public static void main(String[] args) {
 		BGStorageTest test = new BGStorageTest();
-		Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
+	//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 	//	Variant[] variants = {Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
+	
+		Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY};
+
+	//	System.out.println("Running BGStorageTests");
 		
-		int cycles = 50;
+		int cycles = 30;
 		
-	//	for (Variant variant : variants) 
-	//		test.iterateTest(cycles, variant, null);
+		for (Variant variant : variants)  {
+			//System.out.println("Iterating variant: " + variant);
+			test.iterateTest(cycles, variant, null);
+		}
+			
 
 		
-		Variant[] distributedVariants = {Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
-		String[] hosts = {"localhost", "helena.uni-koblenz.de"};
-		for (Variant variant : distributedVariants) {
-			test.iterateTest(1, variant, hosts);
-		}
+//		Variant[] distributedVariants = {Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
+//		String[] hosts = {"localhost", "helena.uni-koblenz.de"};
+//		for (Variant variant : distributedVariants) {
+//			test.iterateTest(1, variant, hosts);
+//		}
 		
 
 		System.exit(0);
