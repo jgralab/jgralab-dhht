@@ -5,17 +5,17 @@ import java.util.ArrayList;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
-import de.uni_koblenz.jgralab.dhhttest.schema.Activity;
-import de.uni_koblenz.jgralab.dhhttest.schema.BusinessProcess;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
-import de.uni_koblenz.jgralab.dhhttest.schema.Feature;
-import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink;
-import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_activity;
-import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_feature;
-import de.uni_koblenz.jgralab.dhhttest.schema.FeatureTraceabilityLink_process;
-import de.uni_koblenz.jgralab.dhhttest.schema.TraceabilityLink_rule;
-import de.uni_koblenz.jgralab.dhhttest.schema.TransformationRule;
+import de.uni_koblenz.jgralabtest.dhht.schema.Activity;
+import de.uni_koblenz.jgralabtest.dhht.schema.BusinessProcess;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralabtest.dhht.schema.Feature;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_activity;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_feature;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_process;
+import de.uni_koblenz.jgralabtest.dhht.schema.TraceabilityLink_rule;
+import de.uni_koblenz.jgralabtest.dhht.schema.TransformationRule;
 
 public class PerformaceTest {
 	

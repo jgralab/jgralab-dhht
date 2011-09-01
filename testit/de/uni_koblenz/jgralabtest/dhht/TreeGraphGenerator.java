@@ -5,16 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestGraph;
-import de.uni_koblenz.jgralab.dhhttest.schema.DHHTTestSchema;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_start;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleEdge_target;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimpleVertex;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimulatedHyperedge;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimulatedIncidence_incInc;
-import de.uni_koblenz.jgralab.dhhttest.schema.SimulatedIncidence_outInc;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedHyperedge;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_incInc;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_outInc;
 
 public class TreeGraphGenerator {
 
