@@ -42,7 +42,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
 	
-	private static String localHostname = "127.0.0.1";
+	private static String localHostname = "141.26.70.230";
 	
 	private static String localPort = "1099";
 
@@ -65,9 +65,9 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 				System.out.println("Creating local server");
 				localInstance = new JGraLabServerImpl();
 			    remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject.exportObject(localInstance, 0);
-		        Registry registry = LocateRegistry.createRegistry(0);
+		        Registry registry = LocateRegistry.createRegistry(1099);
 		        registry.bind(JGRALAB_SERVER_IDENTIFIER, remoteAccessToLocalInstance);
-		    //    RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
+		        RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
 			}
 		 } catch (Exception e) {
 			 System.out.println("Local Server: " + localInstance);
@@ -81,7 +81,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		try {
 			System.out.println("Try to connect to host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
-					.lookup("rmi://" + hostname + ":" + localPort + "/" + JGRALAB_SERVER_IDENTIFIER);
+					.lookup("rmi://" + hostname + "/" + JGRALAB_SERVER_IDENTIFIER);
 			return server;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Error in URL", e);
