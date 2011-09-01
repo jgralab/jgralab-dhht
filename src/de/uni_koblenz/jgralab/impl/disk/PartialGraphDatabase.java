@@ -19,9 +19,9 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
 		this.kindOfParentElement = kindOfParentElement;
 		try {
-			completeGraphDatabase = (CompleteGraphDatabaseImpl) localJGraLabServer
-					.getRemoteInstance(hostnameOfCompleteGraph).getGraphDatabase(
-							uniqueGraphId);
+			RemoteJGraLabServer remoteInstance = localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph);
+			System.out.println("Remote instance: " + remoteInstance);
+			completeGraphDatabase = (CompleteGraphDatabaseImpl)  remoteInstance.getGraphDatabase(uniqueGraphId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
