@@ -42,7 +42,9 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
 	
-	private String localHostname = "127.0.0.1";
+	private static String localHostname = "127.0.0.1";
+	
+	private static String localPort = "1099";
 
 	private final Map<String, GraphDatabaseBaseImpl> localGraphDatabases = new HashMap<String, GraphDatabaseBaseImpl>();
 
@@ -60,27 +62,26 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public static JGraLabServerImpl getLocalInstance() {
 		 try {
 			if (localInstance == null) {
-				System.out.println("Creatign local server");
+				System.out.println("Creating local server");
 				localInstance = new JGraLabServerImpl();
 			    remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject.exportObject(localInstance, 0);
 		        Registry registry = LocateRegistry.createRegistry(0);
 		        registry.bind(JGRALAB_SERVER_IDENTIFIER, remoteAccessToLocalInstance);
+		    //    RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
 			}
 		 } catch (Exception e) {
 			 System.out.println("Local Server: " + localInstance);
-
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+ 			 e.printStackTrace();
 		}
-
 		return (JGraLabServerImpl) localInstance;
 	}
 
 	@Override
 	public RemoteJGraLabServer getRemoteInstance(String hostname) {
 		try {
+			System.out.println("Try to connect to host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
-					.lookup(hostname + "/" + JGRALAB_SERVER_IDENTIFIER);
+					.lookup("rmi://" + hostname + ":" + localPort + "/" + JGRALAB_SERVER_IDENTIFIER);
 			return server;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Error in URL", e);
@@ -188,11 +189,13 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	
 	public static void main(String[] args) {
-
-				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
-
-		
-		
+		if (args.length > 0) {
+			localHostname = args[0];
+			if (args.length > 1) {
+				localPort = args[1];
+			}
+		}
+		JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 	}
 	
 }

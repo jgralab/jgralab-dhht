@@ -114,7 +114,7 @@ public class BGStorageTest {
 		case CLIQUEDISKHY:
 			return new TreeGraphGenerator(5, 4500, 2, 7, 1500000, true, true).createGraph();
 		case TREELIKEDISTRIBUTED://Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(11, 1, 2, 7, 1500000, true, hostnames).createGraph();
+			return new DistributedGraphGenerator(3, 2, 2, 7, 15, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(5, 4500, 2, 7, 1500000, true, hostnames).createGraph();
 		}
@@ -130,24 +130,28 @@ public class BGStorageTest {
 	//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 	//	Variant[] variants = {Variant.TREELIKEDISK, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 	
-		Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY};
+		
 
 	//	System.out.println("Running BGStorageTests");
 		
 		int cycles = 30;
 		
-		for (Variant variant : variants)  {
-			//System.out.println("Iterating variant: " + variant);
-			test.iterateTest(cycles, variant, null);
-		}
-			
-
+		boolean distributed = true;
 		
-//		Variant[] distributedVariants = {Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
-//		String[] hosts = {"localhost", "helena.uni-koblenz.de"};
-//		for (Variant variant : distributedVariants) {
-//			test.iterateTest(1, variant, hosts);
-//		}
+		if (distributed) {
+			Variant[] distributedVariants = {Variant.TREELIKEDISTRIBUTED};
+			String[] hosts = {"localhost", "helena.uni-koblenz.de"};
+			for (Variant variant : distributedVariants) {
+				test.iterateTest(1, variant, hosts);
+			}
+		} else { 	
+			Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY};
+			for (Variant variant : variants)  {
+				//System.out.println("Iterating variant: " + variant);
+				test.iterateTest(cycles, variant, null);
+			}
+		}
+		
 		
 
 		System.exit(0);

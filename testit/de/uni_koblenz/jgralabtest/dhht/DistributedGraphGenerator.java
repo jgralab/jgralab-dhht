@@ -20,15 +20,21 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 	
 	protected DHHTTestGraph getGraph(long globalId) {
 		int partialGraphId = GraphDatabaseElementaryMethods.getPartialGraphId(globalId);
-		return partialGraphs[partialGraphId];
+		System.out.println("Partial graph id : " + partialGraphId);
+		return partialGraphs[partialGraphId-1];
 	}
 	
 	protected DHHTTestGraph createPartialGraph(int i) {
+		System.out.println("Creating partial graph " + i);
 		if (partialGraphs[i] == null) {
 			if (i==0)
 				partialGraphs[i] = graph;
-			else
+			else {
 				partialGraphs[i] = (DHHTTestGraph) graph.createPartialGraphInGraph(remoteHosts[i]);
+				System.out.println("Created remote partial graph");
+				partialGraphs[i].getECount();
+			}
+				
 		}		
 		return partialGraphs[i];
 	}
@@ -36,7 +42,5 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 	protected int getPartialGraphCount() {
 		return remoteHosts.length;
 	}
-	
-	
 
 }

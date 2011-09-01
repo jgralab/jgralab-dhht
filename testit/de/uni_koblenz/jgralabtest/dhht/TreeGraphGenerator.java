@@ -78,7 +78,7 @@ public class TreeGraphGenerator {
 		int newVertexListSize = 0;
 		int retrievedVertices = 0;
 		for (int i=0; i<roots; i++) {
-			DHHTTestGraph partialGraph = createPartialGraph(i/getPartialGraphCount());
+			DHHTTestGraph partialGraph = createPartialGraph((i+1)/getPartialGraphCount());
 			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
 			vertices.add((SimpleVertex) v);
