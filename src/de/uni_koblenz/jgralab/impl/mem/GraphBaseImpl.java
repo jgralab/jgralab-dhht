@@ -403,8 +403,8 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	
 	// ------------- VERTEX LIST VARIABLES -------------
 
-	private VertexImpl firstVertex;
-	private VertexImpl lastVertex;
+	protected VertexImpl firstVertex;
+	protected VertexImpl lastVertex;
 
 	@Override
 	public Vertex getFirstVertex() {

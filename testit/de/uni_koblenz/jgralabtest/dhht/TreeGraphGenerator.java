@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralabtest.dhht;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,23 +25,33 @@ public class TreeGraphGenerator {
 	
 	private int layers;
 	private int roots;
-	private int minBranchingFactor;
-	private int maxBranchingFactor;
-	private int currentBranchingFactor;
+	private int currentBranchingFactorIndex = 0;
 	private boolean diskBased;
 	private boolean useHyperedges;
 	
 	private int additionalEdgeCount;
 	
+	private int[] branchingFactors;
+	private int[] firstLayerBranchingFactors;
+
 	
 	private int getNextBranchingFactor() {
-		int retVal = currentBranchingFactor;
-		currentBranchingFactor++;
-		if (currentBranchingFactor > maxBranchingFactor) {
-			currentBranchingFactor = minBranchingFactor;
+		if (firstLayerBranchingFactors != null) {
+			if (currentBranchingFactorIndex < firstLayerBranchingFactors.length) {
+		//		System.out.println("First layer branches " + firstLayerBranchingFactors[currentBranchingFactorIndex] + " times");
+				return firstLayerBranchingFactors[currentBranchingFactorIndex++];
+			} else {
+				firstLayerBranchingFactors = null;
+				currentBranchingFactorIndex = 0;
+			}
 		}
-		return retVal;
+		if (currentBranchingFactorIndex >= branchingFactors.length) {
+			currentBranchingFactorIndex = 0;
+		}
+		return branchingFactors[currentBranchingFactorIndex++];
 	}
+	
+	
 	private ArrayList<SimpleVertex> vertices;
 	
 	
@@ -48,13 +59,22 @@ public class TreeGraphGenerator {
 	
 	int currentEdgeBranchingFactorIndex = 0;
 	
-	public TreeGraphGenerator(int layers, int roots, int minBranchingFactor, int maxBranchingFactor, int additionalEdgeCount, boolean useHyperedges, boolean diskBased) {
+	public TreeGraphGenerator(int layers, int roots, int[] branchingFactors, int additionalEdgeCount, boolean useHyperedges, boolean diskBased) {
 		this.layers = layers;
 		this.roots = roots;
 		this.additionalEdgeCount = additionalEdgeCount;
-		this.minBranchingFactor = minBranchingFactor;
-		this.maxBranchingFactor = maxBranchingFactor;
-		this.currentBranchingFactor = minBranchingFactor;
+		this.branchingFactors = branchingFactors;
+		this.diskBased = diskBased;
+		this.useHyperedges = useHyperedges;
+		this.vertices = new ArrayList<SimpleVertex>();
+	}
+	
+	public TreeGraphGenerator(int layers, int roots, int[] branchingFactors, int[] firstLayerBranchingFactors, int additionalEdgeCount, boolean useHyperedges, boolean diskBased) {
+		this.layers = layers;
+		this.roots = roots;
+		this.additionalEdgeCount = additionalEdgeCount;
+		this.branchingFactors = branchingFactors;
+		this.firstLayerBranchingFactors = firstLayerBranchingFactors;
 		this.diskBased = diskBased;
 		this.useHyperedges = useHyperedges;
 		this.vertices = new ArrayList<SimpleVertex>();
@@ -74,7 +94,8 @@ public class TreeGraphGenerator {
 		}
 
 		int vCount = 1;       
-		int sizeOfLastLayer = 20000000;
+		int sizeOfLastLayer = 6000000;
+		Edge[] lastEdgeInSubgraph = new Edge[sizeOfLastLayer];
 		long[] vertexList = new long[sizeOfLastLayer];
 		int vertexListSize = roots;
 		int newVertexListSize = 0;
@@ -83,8 +104,11 @@ public class TreeGraphGenerator {
 			DHHTTestGraph partialGraph = createPartialGraph((i+1)/getPartialGraphCount());
 			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
+			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
 		}	
+		//System.out.println("First vertex: " + graph.getFirstVertex());
+		//System.out.println("Next vertex: " + graph.getFirstVertex().getNextVertex());
 		for (int layer=1; layer<layers; layer++) { 
 			long[] newVertexList = new long[sizeOfLastLayer];
 			while (retrievedVertices < vertexListSize) {
@@ -96,13 +120,25 @@ public class TreeGraphGenerator {
 				//	System.out.println("loop");
 					DHHTTestGraph partialGraph = getGraph(parent.getGlobalId());
 					if (useHyperedges) {
+						boolean firstEdgeInSubgraph = parent.getFirstIncidence() == parent.getLastIncidence();
 						Edge e = partialGraph.createSimpleEdge();
-						e.setSigma(parent.getSigma());
+						e.setKappa(layers-layer);
+						if (!firstEdgeInSubgraph) {
+							Edge lastEdge = lastEdgeInSubgraph[parent.getLocalId()];
+							e.putAfter(lastEdge);
+						} 
+						lastEdgeInSubgraph[parent.getLocalId()] = e;
+						e.setSigma(parent);
 						e.connect(SimpleEdge_start.class, parent);
 						int j=0;
-						for (j=0; j<getNextEdgeBranchingFactor(); j++) {
+						int nextEdgeBranchingFactor = getNextEdgeBranchingFactor();
+						if (i+nextEdgeBranchingFactor>nextBranchingFactor)
+							nextEdgeBranchingFactor = nextBranchingFactor - i;
+						for (j=0; j<nextEdgeBranchingFactor; j++) {
 							vCount++;
 							SimpleVertex v = graph.createSimpleVertex();
+							v.setKappa(layers-layer);
+							v.putAfter(parent);
 							v.setSigma(parent);
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v.getGlobalId();
@@ -165,6 +201,7 @@ public class TreeGraphGenerator {
 				Vertex target = getVertex(i * 13);
 				Edge e = partialGraph.createSimpleEdge();
 				GraphElement<?,?,?> lca = getLeastCommonAncestor(start, target);
+				if (lca != null)
 				e.setSigma(lca);
 				e.connect(SimpleEdge_start.class, start);
 				e.connect(SimpleEdge_target.class, target);
@@ -191,7 +228,12 @@ public class TreeGraphGenerator {
 					}
 					for (Vertex v : targetVertices) {
 						e.connect(SimpleEdge_target.class, v);	
-					}					
+					}			
+					GraphElement<?,?,?> lca = getLeastCommonAncestor(startVertices, targetVertices);
+					if (lca != null) {
+					//	System.out.println("Setting sigma vertex of edge " + e.getLocalId() + " to " + lca.getLocalId());
+						e.setSigma(lca);
+					}	
 				} else {
 					SimulatedHyperedge simulatedHyperedge = partialGraph.createSimulatedHyperedge();
 					for (SimpleVertex v : startVertices) {
@@ -210,6 +252,28 @@ public class TreeGraphGenerator {
 		return graph;
 	}
 	
+	
+	protected GraphElement<?, ?, ?> getLeastCommonAncestor(List<? extends Vertex> vertices, List<? extends Vertex> otherVertices) {
+		LinkedList<SimpleVertex> newList = new LinkedList<SimpleVertex>();
+		for (Vertex v : vertices) {
+			newList.add((SimpleVertex)v);
+		}
+		for (Vertex v : otherVertices) {
+			newList.add((SimpleVertex)v);
+		}
+		return getLeastCommonAncestor(newList);
+	}
+	
+	
+	
+	protected GraphElement<?, ?, ?> getLeastCommonAncestor(List<? extends Vertex> vertices) {
+		Vertex leastCommonAncestor = vertices.get(0);
+		vertices.remove(0);
+		for (Vertex v : vertices) {
+			leastCommonAncestor = (Vertex) getLeastCommonAncestor(leastCommonAncestor, v);
+		}
+		return leastCommonAncestor;
+	}
 	
 	protected GraphElement<?, ?, ?> getLeastCommonAncestor(Vertex v1, Vertex v2) {
 		Set<GraphElement<?,?,?>> v1Ancs = new HashSet<GraphElement<?, ?, ?>>();

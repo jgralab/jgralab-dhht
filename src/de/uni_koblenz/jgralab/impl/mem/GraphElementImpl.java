@@ -516,19 +516,17 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 
 	@Override
 	public final void addSubordinateElement(Vertex appendix) {
-		System.out.println("Adding vertex " + appendix
-				+ " to subordinate graph");
 		// TODO: Das gefällt mir noch nicht, dass hier schon der Graph gebaut
 		// wird
-		if (getSubordinateGraph().getLastVertex() != null) {
-			appendix.putAfter(getSubordinateGraph().getLastVertex());
-		} else {
-			// TODO: In this case it is also necessary to set first and last of
-			// subordinate graph
-			addFirstSubordinateVertex(appendix);
-		}
-		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?>) appendix).setSigma(this);
+//		if (getSubordinateGraph().getLastVertex() != null) {
+//			appendix.putAfter(getSubordinateGraph().getLastVertex());
+//		} else {
+//			// TODO: In this case it is also necessary to set first and last of
+//			// subordinate graph
+//			addFirstSubordinateVertex(appendix);
+//		}
+//		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
+//		((GraphElementImpl<?, ?, ?>) appendix).setSigma(this);
 	}
 
 	/**
@@ -579,6 +577,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param kappa
 	 *            <b>int</b>
 	 */
+	@Override
 	public final void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;

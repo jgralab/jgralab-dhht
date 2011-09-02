@@ -10,9 +10,9 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 	String[] remoteHosts;
 	
 	public DistributedGraphGenerator(int layers, int roots,
-			int minBranchingFactor, int maxBranchingFactor,
+			int[] branchingFactors, int[] firstLayerBranchingFactors,
 			int additionalEdgeCount, boolean useHyperedges, String[] remoteHosts ) {
-		super(layers, roots, minBranchingFactor, maxBranchingFactor,
+		super(layers, roots, branchingFactors, firstLayerBranchingFactors,
 				additionalEdgeCount, useHyperedges, true);
 		partialGraphs = new DHHTTestGraph[remoteHosts.length];
 		this.remoteHosts = remoteHosts;

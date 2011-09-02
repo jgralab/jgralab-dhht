@@ -134,37 +134,42 @@ public abstract class SubordinateGraphImpl extends
 	 */
 	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getType());
+	//	System.out.println("Creating subordinate graph in vertex " + containingVertex.getLocalId());
 		initializeCommonFields(containingVertex);
 		subgraphId = (int) containingVertex.getGlobalId();
-		// System.out.println("Initialozing subordinate graph " + this);
-		for (Vertex current = containingVertex.getNextVertex((Graph) null); current != null
-				&& ((GraphElementImpl<?, ?, ?>) current)
-						.isChildOf(containingElement); current = current
-				.getNextVertex((Graph) null)) {
-			if (getFirstVertex() == null) {
-				setFirstVertex((VertexImpl) current);
+		// System.out.println("Initializing subordinate graph " + this);
+		
+		Vertex currentV = containingVertex.getNextVertex((Graph) null);
+		//System.out.println("Sigma of next v : " + currentV.getSigma().getLocalId());
+		//System.out.println("Contains: " + ((GraphElementImpl<?, ?, ?>) currentV).isChildOf(containingElement));
+		while (currentV != null && ((GraphElementImpl<?, ?, ?>) currentV).isChildOf(containingElement)) {
+		//	System.out.println("Adding vertex: " + currentV);
+			if (firstVertex == null) {
+				firstVertex = (VertexImpl) currentV;
 			}
 			// System.out.println("  Iterating vertex " + current);
-			setLastVertex((VertexImpl) current);
+			lastVertex = (VertexImpl) currentV;
 			vCount++;
+			currentV = currentV.getNextVertex((Graph) null);
 		}
 		// System.out.println("Iterating edges");
 		// initialize edges
-		Edge current = containingVertex.getGraph().getFirstEdge();
-		while (current != null
-				&& !((GraphElementImpl<?, ?, ?>) current)
+		Edge currentE = containingVertex.getGraph().getFirstEdge();
+		while (currentE != null
+				&& !((GraphElementImpl<?, ?, ?>) currentE)
 						.isChildOf(containingElement)) {
-			current = current.getNextEdge();
+			currentE = currentE.getNextEdge();
 		}
-		if (current != null) {
-			setFirstEdge((EdgeImpl) current);
+		if (currentE != null) {
+			firstEdge = (EdgeImpl) currentE;
 			do {
-				setLastEdge((EdgeImpl) current);
+			//	System.out.println("Adding edge: " + currentE.getLocalId());
+				lastEdge = (EdgeImpl) currentE;
 				eCount++;
-				iCount += current.getDegree();
-				current = current.getNextEdge();
-			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?>) current)
+				iCount += currentE.getDegree();
+				currentE = currentE.getNextEdge();
+			} while (currentE != null
+					&& ((GraphElementImpl<?, ?, ?>) currentE)
 							.isChildOf(containingElement));
 		}
 		getCompleteGraph().addGraphStructureChangedListener(this);

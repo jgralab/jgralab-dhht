@@ -731,7 +731,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Graph viewGraph, int level) {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
-			de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl) viewGraphMapForMemBasedImpl
+			de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl) viewGraphMapForDiskBasedImpl
 					.get(graphClass).newInstance(viewGraph, level);
 			return g;
 		} catch (Exception ex) {
@@ -746,6 +746,8 @@ public class GraphFactoryImpl implements GraphFactory {
 			Vertex vertex) {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
+			System.out.println("Subordinate graph impl class: " + subordinateGraphForVertexMapForMemBasedImpl
+					.get(graphClass));
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
 					.get(graphClass).newInstance(vertex);
 			return g;
@@ -828,10 +830,10 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { Vertex.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
 				subordinateGraphForVertexMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramse = { Edge.class };
+				Class<?>[] paramse = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class  };
 				subordinateGraphForEdgeMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(paramse));
 			} catch (NoSuchMethodException ex) {
@@ -866,7 +868,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { originalClass, int.class };
-				viewGraphMapForMemBasedImpl.put(originalClass,
+				viewGraphMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(

@@ -1309,4 +1309,6 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 
 	void setSigma(GraphElement<?, ?, ?> elem);
 
+	void setKappa(int kappa);
+
 }

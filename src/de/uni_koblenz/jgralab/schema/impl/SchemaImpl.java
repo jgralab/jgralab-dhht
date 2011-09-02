@@ -277,7 +277,6 @@ public class SchemaImpl implements Schema {
 
 		// Needs to be created before any NamedElement can be created
 		defaultPackage = PackageImpl.createDefaultPackage(this);
-		System.out.println("Constructing domains");
 		// Creation of the BasicDomains
 		createBooleanDomain();
 		createDoubleDomain();
