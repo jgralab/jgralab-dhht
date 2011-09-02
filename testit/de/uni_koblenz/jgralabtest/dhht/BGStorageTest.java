@@ -130,13 +130,13 @@ public class BGStorageTest {
 	private Graph createGraph(Variant variant, String[] hostnames) {
 		int[] factors = {2,3,4,5,6,7};
 		int[] firstLayerFactorsTree = {5,5,5,5,5};
-		int[] firstLayerFactorsClique = {900,900,900,900,900};
+		int[] firstLayerFactorsClique = {1400,1400,1400,1400,1400};
 		
 		switch (variant) {
 		case TREELIKE://Tree-like graph, 1 root, 11 levels
-			return new TreeGraphGenerator(11, 1, factors, 1500000, false, false).createGraph();
+			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, false, false).createGraph();
 		case TREELIKEDISK://Tree-like graph, 1 root, 11 levels
-			return new TreeGraphGenerator(5, 1, factors, 15000, false, true).createGraph();
+			return new TreeGraphGenerator(5, 1, factors, firstLayerFactorsTree, 15000, false, true).createGraph();
 		case CLIQUE:
 			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, false, false).createGraph();
 		case CLIQUEDISK:
@@ -144,11 +144,11 @@ public class BGStorageTest {
 		case TREELIKEHY://Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTED:
 		case TREELIKEVIEW:	
-			return new TreeGraphGenerator(11, 5, factors, firstLayerFactorsTree, 1500000, true, false).createGraph();
+			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, false).createGraph();
 		case TREELIKEDISKHY://Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTEDDISK:
 		case TREELIKEVIEWDISK:
-			return new TreeGraphGenerator(11, 5, factors, firstLayerFactorsTree, 1500000, true, true).createGraph();
+			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, true).createGraph();
 		case CLIQUEHY:
 		case CLIQUENESTED:
 		case CLIQUEVIEW:	
@@ -158,7 +158,7 @@ public class BGStorageTest {
 		case CLIQUEVIEWSDISK:
 			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, true, true).createGraph();
 		case TREELIKEDISTRIBUTED://Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(11, 5, factors, firstLayerFactorsTree, 1500000, true, hostnames).createGraph();
+			return new DistributedGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, true, hostnames).createGraph();
 		}
@@ -177,7 +177,7 @@ public class BGStorageTest {
 		
 	//	System.out.println("Running BGStorageTests");
 		
-		int cycles = 1;
+		int cycles = 10;
 		
 		boolean distributed = false;
 		
@@ -192,7 +192,7 @@ public class BGStorageTest {
 		//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY};
 		//	Variant[] variants = {Variant.TREELIKENESTED, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
 			//Variant[] variants = {Variant.TREELIKENESTED, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
-			Variant[] variants = {Variant.CLIQUE, Variant.CLIQUEHY, Variant.CLIQUENESTED};  //, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
+			Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED, Variant.CLIQUENESTED};  //, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
 			
 			for (Variant variant : variants)  {
 				//System.out.println("Iterating variant: " + variant);
