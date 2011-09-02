@@ -1022,7 +1022,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 */
 	@Override
 	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) {
-		System.out.println("Connecting vertex " + ((int) vertexId) + " and edge " + ((int)edgeId));
+		//System.out.println("Connecting vertex " + ((int) vertexId) + " and edge " + ((int)edgeId));
 		IncidenceClass incClass = (IncidenceClass) schema
 				.getTypeForId(incidenceClassId);
 		Class<? extends Incidence> m1Class = incClass.getM1Class();

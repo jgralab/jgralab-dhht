@@ -42,7 +42,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
 	
-	private static String localHostname = "141.26.70.230";
+	private static String localHostname = "217.225.43.234";
+
 	
 	private static String localPort = "1099";
 
@@ -67,7 +68,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			    remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject.exportObject(localInstance, 0);
 		        Registry registry = LocateRegistry.createRegistry(1099);
 		        registry.bind(JGRALAB_SERVER_IDENTIFIER, remoteAccessToLocalInstance);
-		        RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
+		       // RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
 			}
 		 } catch (Exception e) {
 			 System.out.println("Local Server: " + localInstance);

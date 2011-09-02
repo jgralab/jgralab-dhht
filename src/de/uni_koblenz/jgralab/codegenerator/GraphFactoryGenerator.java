@@ -139,11 +139,13 @@ public class GraphFactoryGenerator extends CodeGenerator {
 
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
-		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		code.setVariable("graphInMemImplName", schemaRootPackageName + ".impl.mem."+ graphClass.getQualifiedName());
+		code.setVariable("graphOnDiskImplName", schemaRootPackageName + ".impl.disk."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
 			code.add("/* TODO: Uncomment line 145 of GraphFactoryGenerator */");
-			code.add("// setSubordinateGraphImplementationClass(#graphName#.class, #graphImplName#SubordinateImpl.class); ");
+			code.add("setSubordinateGraphImplementationClass(#graphName#.class, #graphInMemImplName#SubordinateImpl.class); ");
+			code.add("setSubordinateGraphImplementationClassForDiskBasedStorage(#graphName#.class, #graphOnDiskImplName#SubordinateImpl.class); ");
 		}
 		return code;
 	}
@@ -156,11 +158,13 @@ public class GraphFactoryGenerator extends CodeGenerator {
 
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
-		code.setVariable("graphImplName", schemaRootPackageName + ".impl."+ graphClass.getQualifiedName());
+		code.setVariable("graphInMemImplName", schemaRootPackageName + ".impl.mem."+ graphClass.getQualifiedName());
+		code.setVariable("graphOnDiskImplName", schemaRootPackageName + ".impl.disk."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
 			code.add("/* TODO: Uncomment line 162 of GraphFactoryGenerator */");
-			code.add("//setViewGraphImplementationClass(#graphName#.class, #graphImplName#ViewImpl.class);");
+			code.add("setViewGraphImplementationClass(#graphName#.class, #graphInMemImplName#ViewImpl.class);");
+			code.add("setViewGraphImplementationClassForDiskBasedStorage(#graphName#.class, #graphOnDiskImplName#ViewImpl.class); ");
 		}
 		return code;
 	}

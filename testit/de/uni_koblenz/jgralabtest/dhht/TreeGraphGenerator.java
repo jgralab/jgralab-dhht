@@ -1,10 +1,13 @@
 package de.uni_koblenz.jgralabtest.dhht;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
@@ -93,12 +96,14 @@ public class TreeGraphGenerator {
 				//	System.out.println("loop");
 					DHHTTestGraph partialGraph = getGraph(parent.getGlobalId());
 					if (useHyperedges) {
-						Edge e  = partialGraph.createSimpleEdge();
+						Edge e = partialGraph.createSimpleEdge();
+						e.setSigma(parent.getSigma());
 						e.connect(SimpleEdge_start.class, parent);
 						int j=0;
 						for (j=0; j<getNextEdgeBranchingFactor(); j++) {
 							vCount++;
 							SimpleVertex v = graph.createSimpleVertex();
+							v.setSigma(parent);
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v.getGlobalId();
 							e.connect(SimpleEdge_target.class, v);
@@ -109,9 +114,11 @@ public class TreeGraphGenerator {
 						if (edgeBranchingFactor == 1) {
 							vCount++;
 							SimpleVertex v = partialGraph.createSimpleVertex();
+							v.setSigma(parent);
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v.getGlobalId();
 							Edge e  = partialGraph.createSimpleEdge();
+							e.setSigma(parent.getSigma());
 							e.connect(SimpleEdge_start.class, parent);
 							e.connect(SimpleEdge_target.class, v);
 							i++;
@@ -119,6 +126,7 @@ public class TreeGraphGenerator {
 							vCount++;
 							SimulatedHyperedge hyperedge = partialGraph.createSimulatedHyperedge();
 							Edge e  = partialGraph.createSimulatedIncidence();
+							e.setSigma(parent.getSigma());
 							e.connect(SimulatedIncidence_incInc.class, parent);
 							e.connect(SimulatedIncidence_outInc.class, hyperedge);
 							int j=0;
@@ -126,6 +134,7 @@ public class TreeGraphGenerator {
 						//		System.out.println("Loiop");
 								vCount++;
 								SimpleVertex v = partialGraph.createSimpleVertex();
+								v.setSigma(parent);
 								vertices.add(v);
 								newVertexList[newVertexListSize++] = v.getGlobalId();
 								Edge e1 = partialGraph.createSimulatedIncidence();
@@ -155,6 +164,8 @@ public class TreeGraphGenerator {
 				DHHTTestGraph partialGraph = getGraph(start.getGlobalId());
 				Vertex target = getVertex(i * 13);
 				Edge e = partialGraph.createSimpleEdge();
+				GraphElement<?,?,?> lca = getLeastCommonAncestor(start, target);
+				e.setSigma(lca);
 				e.connect(SimpleEdge_start.class, start);
 				e.connect(SimpleEdge_target.class, target);
 			} else {
@@ -197,6 +208,25 @@ public class TreeGraphGenerator {
 			} 
 		}
 		return graph;
+	}
+	
+	
+	protected GraphElement<?, ?, ?> getLeastCommonAncestor(Vertex v1, Vertex v2) {
+		Set<GraphElement<?,?,?>> v1Ancs = new HashSet<GraphElement<?, ?, ?>>();
+		//Set<GraphElement<?,?,?>> v2Ancs = new HashSet<GraphElement<?, ?, ?>>();
+		GraphElement<?,?,?> v1Anc = v1;
+		GraphElement<?,?,?> v2Anc = v2;
+		while (v1Anc != null) {
+			v1Ancs.add(v1Anc);
+			v1Anc = v1Anc.getSigma();
+		}
+		while (v2Anc != null) {
+			if (v1Ancs.contains(v2Anc)) {
+				return v2Anc;
+			}
+			v2Anc = v2Anc.getSigma();
+		}
+		return null;
 	}
 	
 //	private Vertex getVertex(int id) {

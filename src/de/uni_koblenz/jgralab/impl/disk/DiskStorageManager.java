@@ -27,9 +27,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	/* Switches to toggle behaviour */
 
-	private final static int MAX_REUSE_QUEUE_SIZE = 100;
+	private final static int MAX_REUSE_QUEUE_SIZE = 0;
 
-	private final static int MAX_LRU_QUEUE_SIZE = 200;
+	private final static int MAX_LRU_QUEUE_SIZE = 1000;
 
 	private final static int CLEANUP_THREAD_WAITING_TIME = 30;
 
@@ -42,26 +42,16 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 * BITS_FOR_ELEMENT_MASK
 	 */
 
-	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK+1)); // =
-																								// 00000011
-																								// 11111111
-																								// in
-																								// binary,
-																								// 10
-																								// bit
-																								// =
-																								// 1024
-																								// elements
-																								// per
-																								// container
+	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK+1)); 
+	
 	public static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
 	
 	public static final int ELEMENT_CONTAINER_COUNT = (int) 7000000 / CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
 	static final int INCIDENCE_CONTAINER_COUNT = (int) 13000000 / CONTAINER_SIZE;  //Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	
-	private static final int WAITING_TIME = 10;
+	/* the number of milliseconds the cleaning thread will wait between two cleaning cycles */
+	private static final int WAITING_TIME = 20;
 
 
 	/* Threads to control the disk buffering */
