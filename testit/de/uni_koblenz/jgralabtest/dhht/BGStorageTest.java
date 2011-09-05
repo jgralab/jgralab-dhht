@@ -12,15 +12,15 @@ public class BGStorageTest {
 	private long visitedEdges;
 	
 	private void testGraph(Graph graph, Variant variant, boolean dfs) {
+		Vertex startVertex = graph.getFirstVertex();
 		switch (variant) {
 			case TREELIKENESTED:
 			case CLIQUENESTED:
 			case TREELIKENESTEDDISK:
 			case CLIQUENESTEDDISK:
 				/* setting traversal context to first subgraph*/
-				Vertex v = graph.getFirstVertex();
-				Graph subgraph = v.getSubordinateGraph();
-				System.out.println("Vertices in subgraph " + subgraph.getVCount());
+				startVertex = startVertex.getNextVertex();
+				Graph subgraph = startVertex.getSubordinateGraph();
 				subgraph.useAsTraversalContext();
 				break;
 			case TREELIKEVIEW:
@@ -28,12 +28,12 @@ public class BGStorageTest {
 			case TREELIKEVIEWDISK:
 			case CLIQUEVIEWSDISK:
 				/* setting traversal context to view */
-				Graph view = graph.getView(4);
+				Graph view = graph.getView(2);
 				view.useAsTraversalContext();
 		}
 		CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(dfs);
 		DiskStorageManager.reloadedContainers = 0;
-		algo.run(graph.getFirstVertex());
+		algo.run(startVertex);
 		visitedNodes = algo.getVertexCount();
 		visitedEdges = algo.getEdgeCount();
 		graph.releaseTraversalContext();
@@ -57,14 +57,14 @@ public class BGStorageTest {
 			graph = createGraph(variant, remoteHosts);
 			long thisCreationTime = System.currentTimeMillis() - creationStartTime;
 			totalCreationTime += thisCreationTime;
-			
+	//		System.out.println("Traversing dfs");
 			long traversalStartTimeDFS = System.currentTimeMillis();
 			testGraph(graph, variant, true);
 			dfsNodes = visitedNodes;
 			dfsEdges = visitedEdges;
 			long thisTraversalTimeDFS = System.currentTimeMillis() - traversalStartTimeDFS;
 			totalTraversalTimeDFS += thisTraversalTimeDFS;
-			
+		//	System.out.println("Traversing bfs");
 			long traversalStartTimeBFS = System.currentTimeMillis();
 			testGraph(graph, variant, false);
 			bfsNodes = visitedNodes;
@@ -76,14 +76,14 @@ public class BGStorageTest {
 			graph = null;
 			System.gc();
 			try {
-				Thread.sleep(15000);
+				Thread.sleep(1500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.gc();
 			try {
-				Thread.sleep(15000);
+				Thread.sleep(1500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -98,9 +98,8 @@ public class BGStorageTest {
 		System.out.println("Variant: " + variant);
 		System.out.println("  Vertices: " + vCount + " Edges: " + eCount);
 		System.out.println("  Avg creation time: " + avgCreationTime);
-		System.out.println("  Avg dfs time: " + avgTraversalTimeDFS + " visiting " + dfsNodes + " vertices and " + dfsEdges + " edges");
 		System.out.println("  Avg bfs time: " + avgTraversalTimeBFS + " visiting " + bfsNodes + " vertices and " + bfsEdges + " edges");
-
+		System.out.println("  Avg dfs time: " + avgTraversalTimeDFS + " visiting " + dfsNodes + " vertices and " + dfsEdges + " edges");
 	}
 	
 	
@@ -128,39 +127,41 @@ public class BGStorageTest {
 
 	
 	private Graph createGraph(Variant variant, String[] hostnames) {
-		int[] factors = {2,3,4,5,6,7};
-		int[] firstLayerFactorsTree = {5,5,5,5,5};
-		int[] firstLayerFactorsClique = {1400,1400,1400,1400,1400};
+		int[] factors = {2,3,4,5};
+		int[] firstLayerFactorsTree = {4,4,4,4,4};
+		int firstLayerFactorClique = 2289;
+		int addEdges = 1500000;
+		int[] firstLayerFactorsClique = {firstLayerFactorClique,firstLayerFactorClique,firstLayerFactorClique,firstLayerFactorClique,firstLayerFactorClique};
 		
 		switch (variant) {
 		case TREELIKE://Tree-like graph, 1 root, 11 levels
-			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, false, false).createGraph();
+			return new TreeGraphGenerator(11, 5, factors, firstLayerFactorsTree, addEdges, false, false).createGraph();
 		case TREELIKEDISK://Tree-like graph, 1 root, 11 levels
-			return new TreeGraphGenerator(5, 1, factors, firstLayerFactorsTree, 15000, false, true).createGraph();
+			return new TreeGraphGenerator(11, 5, factors, firstLayerFactorsTree, addEdges, false, true).createGraph();
 		case CLIQUE:
-			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, false, false).createGraph();
+			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, false, false).createGraph();
 		case CLIQUEDISK:
-			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, false, true).createGraph();
+			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, false, true).createGraph();
 		case TREELIKEHY://Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTED:
 		case TREELIKEVIEW:	
-			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, false).createGraph();
+			return new TreeGraphGenerator(11, 5, factors, firstLayerFactorsTree, addEdges, true, false).createGraph();
 		case TREELIKEDISKHY://Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTEDDISK:
 		case TREELIKEVIEWDISK:
-			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, true).createGraph();
+			return new TreeGraphGenerator(10, 5, factors, firstLayerFactorsTree, addEdges, true, true).createGraph();
 		case CLIQUEHY:
 		case CLIQUENESTED:
 		case CLIQUEVIEW:	
-			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, true, false).createGraph();
+			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, true, false).createGraph();
 		case CLIQUEDISKHY:
 		case CLIQUENESTEDDISK:
 		case CLIQUEVIEWSDISK:
-			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, true, true).createGraph();
+			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, true, true).createGraph();
 		case TREELIKEDISTRIBUTED://Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(10, 5, factors, firstLayerFactorsTree, 1500000, true, hostnames).createGraph();
+			return new DistributedGraphGenerator(5, 5, factors, firstLayerFactorsTree, addEdges, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
-			return new DistributedGraphGenerator(6, 5, factors, firstLayerFactorsClique, 1500000, true, hostnames).createGraph();
+			return new DistributedGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, true, hostnames).createGraph();
 		}
 		return null;
 	}
@@ -177,9 +178,9 @@ public class BGStorageTest {
 		
 	//	System.out.println("Running BGStorageTests");
 		
-		int cycles = 10;
+		int cycles = 7;
 		
-		boolean distributed = false;
+		boolean distributed = true;
 		
 		if (distributed) {
 			Variant[] distributedVariants = {Variant.TREELIKEDISTRIBUTED};
@@ -188,11 +189,13 @@ public class BGStorageTest {
 				test.iterateTest(1, variant, hosts);
 			}
 		} else { 	
-	//		Variant[] variants = {Variant.TREELIKEDISK /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
+			Variant[] variants = {Variant.TREELIKEDISK /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
 		//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY};
 		//	Variant[] variants = {Variant.TREELIKENESTED, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
 			//Variant[] variants = {Variant.TREELIKENESTED, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
-			Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED, Variant.CLIQUENESTED};  //, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
+		//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED, Variant.CLIQUENESTED, Variant.TREELIKEVIEW, Variant.CLIQUEVIEW};  //, Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
+		//	Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE, Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED, Variant.CLIQUENESTED, Variant.TREELIKEVIEW, Variant.CLIQUEVIEW};
+		
 			
 			for (Variant variant : variants)  {
 				//System.out.println("Iterating variant: " + variant);

@@ -100,24 +100,26 @@ public class TreeGraphGenerator {
 		int vertexListSize = roots;
 		int newVertexListSize = 0;
 		int retrievedVertices = 0;
+		Vertex root = graph.createSimpleVertex();
+		
 		for (int i=0; i<roots; i++) {
 			DHHTTestGraph partialGraph = createPartialGraph((i+1)/getPartialGraphCount());
 			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
+			Edge rootEdge = graph.createSimpleEdge();
+			rootEdge.connect(SimpleEdge_start.class, root);
+			rootEdge.connect(SimpleEdge_target.class, v);
 		}	
-		//System.out.println("First vertex: " + graph.getFirstVertex());
-		//System.out.println("Next vertex: " + graph.getFirstVertex().getNextVertex());
+
 		for (int layer=1; layer<layers; layer++) { 
 			long[] newVertexList = new long[sizeOfLastLayer];
 			while (retrievedVertices < vertexListSize) {
 				Vertex parent = graph.getVertex(vertexList[retrievedVertices++]);
 				int i = 0;
 				int nextBranchingFactor = getNextBranchingFactor();
-				//System.out.println("out loop");
 				while (i<nextBranchingFactor) {
-				//	System.out.println("loop");
 					DHHTTestGraph partialGraph = getGraph(parent.getGlobalId());
 					if (useHyperedges) {
 						boolean firstEdgeInSubgraph = parent.getFirstIncidence() == parent.getLastIncidence();
@@ -167,7 +169,6 @@ public class TreeGraphGenerator {
 							e.connect(SimulatedIncidence_outInc.class, hyperedge);
 							int j=0;
 							for (j=0; j<edgeBranchingFactor; j++) {
-						//		System.out.println("Loiop");
 								vCount++;
 								SimpleVertex v = partialGraph.createSimpleVertex();
 								v.setSigma(parent);
@@ -176,9 +177,7 @@ public class TreeGraphGenerator {
 								Edge e1 = partialGraph.createSimulatedIncidence();
 								e1.connect(SimulatedIncidence_incInc.class, hyperedge);
 								e1.connect(SimulatedIncidence_outInc.class, v);
-								i++;
 							}
-						//	System.out.println("Out");
 							i +=j;
 						}
 					}
@@ -249,6 +248,7 @@ public class TreeGraphGenerator {
 				}
 			} 
 		}
+	//	System.out.println("Finished creating graph");
 		return graph;
 	}
 	
