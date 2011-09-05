@@ -17,6 +17,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
 			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
+		System.out.println("Creating partial graph database");
 		this.kindOfParentElement = kindOfParentElement;
 		try {
 			RemoteJGraLabServer remoteInstance = localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph);
@@ -142,6 +143,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
 	@Override
 	public void setGraphVersion(long graphVersion) {
+		this.graphVersion = graphVersion;
+		if (graphVersion != 0)
 		getGraphDatabase(
 				getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
 				.setGraphVersion(graphVersion);

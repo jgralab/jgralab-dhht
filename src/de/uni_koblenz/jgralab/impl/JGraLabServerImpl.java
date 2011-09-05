@@ -42,7 +42,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
 	
-	private static String localHostname = "217.225.43.234";
+	private static String localHostname = "141.26.70.230";
 
 	
 	private static String localPort = "1099";
