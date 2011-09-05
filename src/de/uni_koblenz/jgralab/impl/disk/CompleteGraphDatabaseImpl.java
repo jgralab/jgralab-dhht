@@ -31,9 +31,9 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 			String hostname) {
 		super(schema, uniqueGraphId, 0, TOPLEVEL_PARTIAL_GRAPH_ID);
 		hostnames = new String[MAX_NUMBER_OF_PARTIAL_GRAPHS];
-		hostnames[0] = hostname;
+		hostnames[GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID] = hostname;
 		freePartialGraphIds = new LinkedList<Integer>();
-		for (int i = 0; i < MAX_NUMBER_OF_PARTIAL_GRAPHS; i++) {
+		for (int i = GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID+1; i < MAX_NUMBER_OF_PARTIAL_GRAPHS; i++) {
 			freePartialGraphIds.add(i);
 		}
 		completeGraphAttributes = new HashMap<String, Object>();
@@ -51,7 +51,11 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	public ParentEntityKind getParentEntityKind(long globalSubgraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getParentEntityKind(globalSubgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getParentEntityKind(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		//for the local toplevel graph, the value is stored in the kindOfParentElement flag
@@ -104,7 +108,9 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	@Override
 	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentGlobalEntityId, ParentEntityKind entityKind) {
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
+		System.out.println("Local partial graph id: " + getLocalPartialGraphId());
 		String localHostname =  getHostname(getLocalPartialGraphId());
+		System.out.println("Local hostname: " + localHostname);
 		int partialGraphId = allocatePartialGraphId();
 		RemoteGraphDatabaseAccess p;
 		try {
@@ -259,7 +265,11 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	public int getGraphTypeId(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getGraphTypeId(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return getGraphData(convertToLocalId(subgraphId)).typeId;
 	}

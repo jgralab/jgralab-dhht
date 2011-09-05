@@ -104,7 +104,12 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public int loadPartialGraph(String hostname) {
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
-		int partialGraphId = compDatabase.loadPartialGraph(hostname);
+		int partialGraphId;
+		try {
+			partialGraphId = compDatabase.loadPartialGraph(hostname);
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p;
 		try {
@@ -122,17 +127,29 @@ public abstract class GraphDatabaseBaseImpl extends
 	
 	@Override
 	public long createPartialGraphInGraph(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.GRAPH);
+		try {
+			return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.GRAPH);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public long createPartialGraphInEdge(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.EDGE);
+		try {
+			return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.EDGE);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public long createPartialGraphInVertex(long parentGlobalEntityId, String remoteHostname) {
-		return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.VERTEX);
+		try {
+			return internalCreatePartialGraphInEntity(remoteHostname, parentGlobalEntityId, ParentEntityKind.VERTEX);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 		
 	
@@ -149,7 +166,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public List<Integer> getPartialGraphIds(long globalSubgraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getPartialGraphIds(globalSubgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getPartialGraphIds(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		GraphData data = getGraphData(localSubgraphId);
@@ -167,7 +188,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).addPartialGraphId(globalSubgraphId, newPartialGraphId);
+			try {
+				getGraphDatabase(partialGraphId).addPartialGraphId(globalSubgraphId, newPartialGraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		GraphData data = getGraphData(localSubgraphId);
@@ -359,7 +384,11 @@ public abstract class GraphDatabaseBaseImpl extends
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeImpl edge : edges) {
-				incidenceListOfEdgeModified(edge.getGlobalId());
+				try {
+					incidenceListOfEdgeModified(edge.getGlobalId());
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
 			}
 			removeVertexFromVSeq(vertexId);
 		}
@@ -379,7 +408,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		assert vertexId != 0;
 		int partialGraphId = getPartialGraphId(vertexId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).removeVertexFromVSeq(vertexId);
+			try {
+				getGraphDatabase(partialGraphId).removeVertexFromVSeq(vertexId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		}
 
@@ -707,7 +740,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		assert edgeId != 0;
 		int partialGraphId = getPartialGraphId(edgeId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).removeEdgeFromESeq(edgeId);
+			try {
+				getGraphDatabase(partialGraphId).removeEdgeFromESeq(edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		}
 
@@ -929,8 +966,12 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (partialGraphId == localPartialGraphId) {
 			localDiskStorage.incidenceListOfVertexModified(vertexId);
 		} else {
-			getGraphDatabase(partialGraphId).incidenceListOfVertexModified(
-					vertexId);
+			try {
+				getGraphDatabase(partialGraphId).incidenceListOfVertexModified(
+						vertexId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -940,7 +981,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void increaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).increaseVCount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).vertexCount++;
 		}
@@ -950,7 +995,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void decreaseVCount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).decreaseVCount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).decreaseVCount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).vertexCount--;
 		}
@@ -960,7 +1009,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void increaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount++;
 		}
@@ -970,7 +1023,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void decreaseECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).decreaseECount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).edgeCount--;
 		}
@@ -980,7 +1037,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void increaseICount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).increaseICount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).increaseICount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).incidenceCount++;
 		}
@@ -990,7 +1051,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void decreaseICount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).decreaseICount(subgraphId);
+			try {
+				getGraphDatabase(partialGraphId).decreaseICount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(subgraphId)).incidenceCount--;
 		}
@@ -1074,7 +1139,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		//	System.out.println("First incidence is: " + getFirstIncidenceIdAtEdgeId(edgeId));
 		}
 
-		incidenceListOfEdgeModified(edgeId);
+		try {
+			incidenceListOfEdgeModified(edgeId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 
 		localDiskStorage.storeIncidence(newInc);
 		if (!isLoading()) {
@@ -1285,7 +1354,11 @@ public abstract class GraphDatabaseBaseImpl extends
 			setPreviousIncidenceIdAtEdgeId(incidenceId, lastIncidenceId);
 		}
 		setLastIncidenceIdAtEdgeId(edgeId, incidenceId);
-		incidenceListOfEdgeModified(edgeId);
+		try {
+			incidenceListOfEdgeModified(edgeId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -1309,8 +1382,12 @@ public abstract class GraphDatabaseBaseImpl extends
 		long edgeId = getConnectedEdgeId(incidenceId);
 		int partialGraphId = getPartialGraphId(edgeId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId)
-					.removeIncidenceFromLambdaSeqOfEdge(incidenceId);
+			try {
+				getGraphDatabase(partialGraphId)
+						.removeIncidenceFromLambdaSeqOfEdge(incidenceId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		} else {
 			long previousId = getPreviousIncidenceIdAtEdgeId(incidenceId);
@@ -1336,8 +1413,12 @@ public abstract class GraphDatabaseBaseImpl extends
 		long vertexId = getConnectedVertexId(incidenceId);
 		int partialGraphId = getPartialGraphId(vertexId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId)
-					.removeIncidenceFromLambdaSeqOfVertex(incidenceId);
+			try {
+				getGraphDatabase(partialGraphId)
+						.removeIncidenceFromLambdaSeqOfVertex(incidenceId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		} else {
 			long previousId = getPreviousIncidenceIdAtVertexId(incidenceId);
@@ -1436,15 +1517,24 @@ public abstract class GraphDatabaseBaseImpl extends
 		setNextIncidenceIdAtEdgeId(movedId, targetId);
 		setPreviousIncidenceIdAtEdgeId(movedId, tgtPreviousId);
 		setPreviousIncidenceIdAtEdgeId(targetId, movedId);
-		incidenceListOfEdgeModified(edgeId);
+		try {
+			incidenceListOfEdgeModified(edgeId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getContainingElementId(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getContainingElementId(
-					subgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getContainingElementId(
+						subgraphId);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return getGraphData(convertToLocalId(subgraphId)).containingElementId;
 	}
@@ -1453,7 +1543,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void setVCount(long subgraphId, long count) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).setVCount(subgraphId, count);
+			try {
+				getGraphDatabase(partialGraphId).setVCount(subgraphId, count);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		getGraphData(convertToLocalId(subgraphId)).vertexCount = count;
 	}
@@ -1462,7 +1556,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long getECount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getECount(subgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getECount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return getGraphData(convertToLocalId(subgraphId)).edgeCount;
 	}
@@ -1471,7 +1569,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void setECount(long subgraphId, long count) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).setECount(subgraphId, count);
+			try {
+				getGraphDatabase(partialGraphId).setECount(subgraphId, count);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		getGraphData(convertToLocalId(subgraphId)).edgeCount = count;
 	}

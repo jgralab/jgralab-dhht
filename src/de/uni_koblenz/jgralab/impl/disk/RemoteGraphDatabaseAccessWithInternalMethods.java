@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
+
 
 /**
  * As an extension of RemoteGraphDatabaseAccess, this interface declares all remote accessible methods
@@ -14,7 +16,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * Methods to access graph database properties
 	 * ===================================================== */
 	
-	public RemoteDiskStorageAccess getLocalDiskStorage();
+	public RemoteDiskStorageAccess getLocalDiskStorage() throws RemoteException;
 	
 	
 	
@@ -27,7 +29,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * Notifies this graph database that the vertex identified by its global vertex id
 	 * <code>vertexId</code> has been added to the distributed graph
 	 */
-	public void internalNotifyVertexAdded(long vertexId);
+	public void internalNotifyVertexAdded(long vertexId) throws RemoteException;
 	
 	/**
 	 * Notifies this graph database that the vertex identified by its global vertex id
@@ -35,14 +37,14 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * method is called, the vertex still exists by will be deleted after this method
 	 * returns.
 	 */
-	public void internalNotifyVertexDeleted(long vertexId);
+	public void internalNotifyVertexDeleted(long vertexId) throws RemoteException;
 
 	
 	/**
 	 * Notifies this graph database that the edge identified by its global edge id
 	 * <code>edgeId</code> has been added to the distributed graph
 	 */
-	public void internalNotifyEdgeAdded(long edgeId);
+	public void internalNotifyEdgeAdded(long edgeId) throws RemoteException;
 	
 	/**
 	 * Notifies this graph database that the edge identified by its global edge id
@@ -50,13 +52,13 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * method is called, the edge still exists by will be deleted after this method
 	 * returns.
 	 */
-	public void internalNotifyEdgeDeleted(long edgeId);
+	public void internalNotifyEdgeDeleted(long edgeId) throws RemoteException;
 	
 	/**
 	 * Notifies this graph database that the incidence identified by its global incidence id
 	 * <code>incidenceId</code> has been added to the distributed graph
 	 */
-	public void internalNotifyIncidenceAdded(long incidenceId);
+	public void internalNotifyIncidenceAdded(long incidenceId) throws RemoteException;
 	
 	/**
 	 * Notifies this graph database that the incidence identified by its global incidence id
@@ -64,7 +66,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * method is called, the incidence still exists by will be deleted after this method
 	 * returns.
 	 */
-	public void internalNotifyIncidenceDeleted(long incidenceId);
+	public void internalNotifyIncidenceDeleted(long incidenceId) throws RemoteException;
 
 	
 	
@@ -77,62 +79,62 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * vertex sequence of the global graph
 	 * @param vertexId
 	 */
-	public void removeVertexFromVSeq(long vertexId);
+	public void removeVertexFromVSeq(long vertexId) throws RemoteException;
 
 	/**
 	 * Removes the edge identified by its global id <code>edgeId</code> from the 
 	 * edge sequence of the global graph
 	 * @param edgeId
 	 */
-	public void removeEdgeFromESeq(long edgeId);
+	public void removeEdgeFromESeq(long edgeId) throws RemoteException;
 	
 
 	
 	
-	public void appendIncidenceToLambdaSeqOfVertex(long edgeId, long incidenceId);
+	public void appendIncidenceToLambdaSeqOfVertex(long edgeId, long incidenceId) throws RemoteException;
 
-	public void removeIncidenceFromLambdaSeqOfVertex(long incidenceId);
+	public void removeIncidenceFromLambdaSeqOfVertex(long incidenceId) throws RemoteException;
 
-	public void setFirstIncidenceIdAtVertexId(long vertexId, long incidenceId);
+	public void setFirstIncidenceIdAtVertexId(long vertexId, long incidenceId) throws RemoteException;
 		
-	public void setLastIncidenceIdAtVertexId(long vertexId, long incidenceId);
+	public void setLastIncidenceIdAtVertexId(long vertexId, long incidenceId) throws RemoteException;
 		
-	public void setNextIncidenceIdAtVertexId(long incId, long prevId);
+	public void setNextIncidenceIdAtVertexId(long incId, long prevId) throws RemoteException;
 		
-	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId);
+	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) throws RemoteException;
 
-	public void incidenceListOfVertexModified(long edgeId);
+	public void incidenceListOfVertexModified(long edgeId) throws RemoteException;
 	
 	
-	public void setFirstIncidenceIdAtEdgeId(long edgeId, long incidenceId);
+	public void setFirstIncidenceIdAtEdgeId(long edgeId, long incidenceId) throws RemoteException;
 	
-	public void setLastIncidenceIdAtEdgeId(long edgeId, long incidenceId);
+	public void setLastIncidenceIdAtEdgeId(long edgeId, long incidenceId) throws RemoteException;
 	
-	public void setNextIncidenceIdAtEdgeId(long incId, long nextId);
+	public void setNextIncidenceIdAtEdgeId(long incId, long nextId) throws RemoteException;
 		
-	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId);
+	public void setPreviousIncidenceIdAtEdgeId(long incId, long prevId) throws RemoteException;
 	
-	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId);
+	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId) throws RemoteException;
 
-	public void removeIncidenceFromLambdaSeqOfEdge(long incidenceId);
+	public void removeIncidenceFromLambdaSeqOfEdge(long incidenceId) throws RemoteException;
 		
-	public void incidenceListOfEdgeModified(long edgeId);
+	public void incidenceListOfEdgeModified(long edgeId) throws RemoteException;
 
 
 
 
-	public void setVCount(long subgraphId, long count);
+	public void setVCount(long subgraphId, long count) throws RemoteException;
 
 
 
 
-	public void graphModified(int graphId);
+	public void graphModified(int graphId) throws RemoteException;
 
 
 
 
 
-	public int loadPartialGraph(String hostname);
+	public int loadPartialGraph(String hostname) throws RemoteException;
 
 
 
@@ -141,7 +143,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * @return the kind of the parent entity (graph, edge or vertex) containing
 	 * the graph identified by its globalSubgraphId
 	 */
-	public ParentEntityKind getParentEntityKind(long globalSubgraphId);
+	public ParentEntityKind getParentEntityKind(long globalSubgraphId) throws RemoteException;
 
 
 }

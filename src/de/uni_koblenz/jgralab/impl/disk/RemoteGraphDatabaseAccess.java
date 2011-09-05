@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +32,13 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * ========================================================================
 	 */
 
-	public String getUniqueGraphId();
+	public String getUniqueGraphId() throws RemoteException;
 
-	public long getGraphVersion();
+	public long getGraphVersion() throws RemoteException;
 
-	public void setGraphVersion(long graphVersion);
+	public void setGraphVersion(long graphVersion) throws RemoteException;
 
-	public void graphModified();
+	public void graphModified() throws RemoteException;
 
 	/**
 	 * Returns the id of the type of the subgraph identified by the given
@@ -45,40 +46,40 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * 
 	 * @return
 	 */
-	public int getGraphTypeId(long subgraphId);
+	public int getGraphTypeId(long subgraphId) throws RemoteException;
 
-	public long getIdOfParentDistributedGraph();
+	public long getIdOfParentDistributedGraph() throws RemoteException;
 
-	public void setLoading(boolean isLoading);
+	public void setLoading(boolean isLoading) throws RemoteException;
 
-	public boolean isLoading();
+	public boolean isLoading() throws RemoteException;
 	
 	public abstract int internalCreatePartialGraphInEntity(
 			String remoteHostname, long parentGlobalEntityId, 
-			ParentEntityKind entityKind);
+			ParentEntityKind entityKind) throws RemoteException;
 
-	public long createPartialGraphInGraph(long parentGraphId, String hostname);
+	public long createPartialGraphInGraph(long parentGraphId, String hostname) throws RemoteException;
 	
-	public long createPartialGraphInVertex(long containingVertexId, String hostname);
+	public long createPartialGraphInVertex(long containingVertexId, String hostname) throws RemoteException;
 	
-	public long createPartialGraphInEdge(long containingVertexId, String hostname);
+	public long createPartialGraphInEdge(long containingVertexId, String hostname) throws RemoteException;
 
-	public void registerPartialGraph(int id, String hostname);
+	public void registerPartialGraph(int id, String hostname) throws RemoteException;
 	
-	public List<Integer> getPartialGraphIds(long globalSubgraphId);
+	public List<Integer> getPartialGraphIds(long globalSubgraphId) throws RemoteException;
 
-	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId);
+	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId) throws RemoteException;
 
-	public void decreaseECount(long subgraphId);
+	public void decreaseECount(long subgraphId) throws RemoteException;
 
-	public void increaseECount(long subgraphId);
+	public void increaseECount(long subgraphId) throws RemoteException;
 	
 
-	public void increaseICount(long globalSubgraphId);
+	public void increaseICount(long globalSubgraphId) throws RemoteException;
 
-	public void decreaseICount(long globalSubgraphId);
+	public void decreaseICount(long globalSubgraphId) throws RemoteException;
 
-	public int getLocalPartialGraphId();
+	public int getLocalPartialGraphId() throws RemoteException;
 	
 	
 	/**
@@ -88,7 +89,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 *         containing the graph identified by its
 	 *         <code>globalSubgraphId</code>
 	 */
-	public long getContainingElementId(long globalSubgraphId);
+	public long getContainingElementId(long globalSubgraphId) throws RemoteException;
 
 	/*
 	 * ====================================================================
@@ -96,23 +97,23 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * ====================================================================
 	 */
 	
-	public int getKappaOfVertexId(long elementId);
+	public int getKappaOfVertexId(long elementId) throws RemoteException;
 
-	public void setKappaOfVertexId(long elementId, int kappa);
+	public void setKappaOfVertexId(long elementId, int kappa) throws RemoteException;
 
-	public int getKappaOfEdgeId(long elementId);
+	public int getKappaOfEdgeId(long elementId) throws RemoteException;
 
-	public void setKappaOfEdgeId(long elementId, int kappa);
+	public void setKappaOfEdgeId(long elementId, int kappa) throws RemoteException;
 	
 	
 
-	public long getSigmaIdOfVertexId(long globalVertexId);
+	public long getSigmaIdOfVertexId(long globalVertexId) throws RemoteException;
 
-	public long getSigmaIdOfEdgeId(long globalEdgeId);
+	public long getSigmaIdOfEdgeId(long globalEdgeId) throws RemoteException;
 
-	public void setSigmaIdOfVertexId(long globalVertexId, long globalSigmaId);
+	public void setSigmaIdOfVertexId(long globalVertexId, long globalSigmaId) throws RemoteException;
 
-	public void setSigmaIdOfEdgeId(long globalEdgeId, long globalSigmaId);
+	public void setSigmaIdOfEdgeId(long globalEdgeId, long globalSigmaId) throws RemoteException;
 
 
 	/**
@@ -122,7 +123,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id
 	 * @return
 	 */
-	public long createLocalSubordinateGraphInVertex(long id);
+	public long createLocalSubordinateGraphInVertex(long id) throws RemoteException;
 
 	/**
 	 * Creates a new subordinate graph for the element identified by the given
@@ -131,7 +132,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id
 	 * @return
 	 */
-	public long createLocalSubordinateGraphInEdge(long id);
+	public long createLocalSubordinateGraphInEdge(long id) throws RemoteException;
 
 	
 	
@@ -144,19 +145,19 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * =====================================================================
 	 */
 
-	public long getMaxVCount();
+	public long getMaxVCount() throws RemoteException;
 
-	public long getVertexListVersion();
+	public long getVertexListVersion() throws RemoteException;
 
-	public void vertexListModified();
+	public void vertexListModified() throws RemoteException;
 
-	public long getVCount(long subgraphId);
+	public long getVCount(long subgraphId) throws RemoteException;
 
-	public void setVCount(long globalSubgraphId, long count);
+	public void setVCount(long globalSubgraphId, long count) throws RemoteException;
 
-	public void increaseVCount(long subgraphId);
+	public void increaseVCount(long subgraphId) throws RemoteException;
 
-	public void decreaseVCount(long subgraphId);
+	public void decreaseVCount(long subgraphId) throws RemoteException;
 
 	/**
 	 * Creates an edge of the edge class identified by its id
@@ -165,7 +166,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param edgeClassId
 	 * @return the global id of the newly created edge
 	 */
-	public long createVertex(int edgeClassId);
+	public long createVertex(int edgeClassId) throws RemoteException;
 
 	/**
 	 * Creates a vertex with the id globalVId
@@ -173,11 +174,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param globalVId
 	 * @return
 	 */
-	public long createVertex(int edgeClassId, long globalVId);
+	public long createVertex(int edgeClassId, long globalVId) throws RemoteException;
 
-	public void deleteVertex(long globalVertexId);
+	public void deleteVertex(long globalVertexId) throws RemoteException;
 
-	public boolean containsVertexId(long id);
+	public boolean containsVertexId(long id) throws RemoteException;
 
 	/**
 	 * Puts the vertex identified by <code>id2</code> directly before the vertex
@@ -188,7 +189,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id2
 	 *            the global id of the vertex to be moved
 	 */
-	public void putVertexBefore(long id1, long id2);
+	public void putVertexBefore(long id1, long id2) throws RemoteException;
 
 	/**
 	 * Puts the vertex identified by <code>id2</code> directly after the vertex
@@ -199,21 +200,21 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id2
 	 *            the global id of the vertex to be moved
 	 */
-	public void putVertexAfter(long id, long id2);
+	public void putVertexAfter(long id, long id2) throws RemoteException;
 
-	public long getNextVertexId(long vertexId);
+	public long getNextVertexId(long vertexId) throws RemoteException;
 
-	public long getPreviousVertexId(long vertexId);
+	public long getPreviousVertexId(long vertexId) throws RemoteException;
 
-	public int getVertexTypeId(long id);
+	public int getVertexTypeId(long id) throws RemoteException;
 
-	public long getFirstVertexId(long globalSubgraphId);
+	public long getFirstVertexId(long globalSubgraphId) throws RemoteException;
 
-	public long getLastVertexId(long globalSubgraphId);
+	public long getLastVertexId(long globalSubgraphId) throws RemoteException;
 
-	public void setFirstVertexId(long globalSubgraphId, long id);
+	public void setFirstVertexId(long globalSubgraphId, long id) throws RemoteException;
 
-	public void setLastVertexId(long globalSubgraphId, long id);
+	public void setLastVertexId(long globalSubgraphId, long id) throws RemoteException;
 
 	
 	
@@ -224,15 +225,15 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * ========================================================================
 	 */
 
-	public void edgeListModified();
+	public void edgeListModified() throws RemoteException;
 
-	public long getEdgeListVersion();
+	public long getEdgeListVersion() throws RemoteException;
 
-	public long getECount(long globalSubgraphId);
+	public long getECount(long globalSubgraphId) throws RemoteException;
 
-	public void setECount(long globalSubgraphId, long count);
+	public void setECount(long globalSubgraphId, long count) throws RemoteException;
 
-	public long getMaxECount();
+	public long getMaxECount() throws RemoteException;
 
 	/**
 	 * Creates an edge of the edge class identified by its id
@@ -241,7 +242,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param edgeClassId
 	 * @return the global id of the newly created edge
 	 */
-	public long createEdge(int edgeClassId);
+	public long createEdge(int edgeClassId) throws RemoteException;
 
 	/**
 	 * Creates an edge of the edge class identified by its id
@@ -255,22 +256,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 *            the global edge id
 	 * @return the global id of the newly created edge
 	 */
-	public long createEdge(int edgeClassId, long edgeId);
+	public long createEdge(int edgeClassId, long edgeId) throws RemoteException;
 
-	public void deleteEdge(long globalEdgeId);
+	public void deleteEdge(long globalEdgeId) throws RemoteException;
 
-	public boolean containsEdgeId(long id);
-
-	/**
-	 * Puts the edge identified by <code>id2</code> directly after the edge
-	 * identified by <code>id1</code>
-	 * 
-	 * @param id1
-	 *            the global id of the anchor edge
-	 * @param id2
-	 *            the global id of the edge to be moved
-	 */
-	public void putEdgeAfter(long id1, long id2);
+	public boolean containsEdgeId(long id) throws RemoteException;
 
 	/**
 	 * Puts the edge identified by <code>id2</code> directly after the edge
@@ -281,21 +271,32 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param id2
 	 *            the global id of the edge to be moved
 	 */
-	public void putEdgeBefore(long id1, long id2);
+	public void putEdgeAfter(long id1, long id2) throws RemoteException;
 
-	public int getEdgeTypeId(long id);
+	/**
+	 * Puts the edge identified by <code>id2</code> directly after the edge
+	 * identified by <code>id1</code>
+	 * 
+	 * @param id1
+	 *            the global id of the anchor edge
+	 * @param id2
+	 *            the global id of the edge to be moved
+	 */
+	public void putEdgeBefore(long id1, long id2) throws RemoteException;
 
-	public long getFirstEdgeId(long globalSubgraphId);
+	public int getEdgeTypeId(long id) throws RemoteException;
 
-	public long getLastEdgeId(long globalSubgraphId);
+	public long getFirstEdgeId(long globalSubgraphId) throws RemoteException;
 
-	public void setFirstEdgeId(long globalSubgraphId, long id);
+	public long getLastEdgeId(long globalSubgraphId) throws RemoteException;
 
-	public void setLastEdgeId(long globalSubgraphId, long id);
+	public void setFirstEdgeId(long globalSubgraphId, long id) throws RemoteException;
 
-	public long getNextEdgeId(long edgeId);
+	public void setLastEdgeId(long globalSubgraphId, long id) throws RemoteException;
 
-	public long getPreviousEdgeId(long edgeId);
+	public long getNextEdgeId(long edgeId) throws RemoteException;
+
+	public long getPreviousEdgeId(long edgeId) throws RemoteException;
 
 	
 	
@@ -306,41 +307,41 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * ========================================================================
 	 */
 
-	public long getIncidenceListVersionOfVertexId(long vertexId);
+	public long getIncidenceListVersionOfVertexId(long vertexId) throws RemoteException;
 
-	public long getFirstIncidenceIdAtVertexId(long elemId);
+	public long getFirstIncidenceIdAtVertexId(long elemId) throws RemoteException;
 
-	public long getLastIncidenceIdAtVertexId(long elemId);
+	public long getLastIncidenceIdAtVertexId(long elemId) throws RemoteException;
 
-	public long getNextIncidenceIdAtVertexId(long incId);
+	public long getNextIncidenceIdAtVertexId(long incId) throws RemoteException;
 
-	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId);
+	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId) throws RemoteException;
 
-	public void putIncidenceIdAfterAtVertexId(long id, long id2);
+	public void putIncidenceIdAfterAtVertexId(long id, long id2) throws RemoteException;
 
-	public void putIncidenceIdBeforeAtVertexId(long id, long id2);
+	public void putIncidenceIdBeforeAtVertexId(long id, long id2) throws RemoteException;
 
-	public long getIncidenceListVersionOfEdgeId(long edgeId);
+	public long getIncidenceListVersionOfEdgeId(long edgeId) throws RemoteException;
 
-	public long getFirstIncidenceIdAtEdgeId(long elemId);
+	public long getFirstIncidenceIdAtEdgeId(long elemId) throws RemoteException;
 
-	public long getLastIncidenceIdAtEdgeId(long elemId);
+	public long getLastIncidenceIdAtEdgeId(long elemId) throws RemoteException;
 
-	public long getNextIncidenceIdAtEdgeId(long incId);
+	public long getNextIncidenceIdAtEdgeId(long incId) throws RemoteException;
 
-	public long getPreviousIncidenceIdAtEdgeId(long incId);
+	public long getPreviousIncidenceIdAtEdgeId(long incId) throws RemoteException;
 
-	public void putIncidenceIdBeforeAtEdgeId(long targetId, long movedId);
+	public void putIncidenceIdBeforeAtEdgeId(long targetId, long movedId) throws RemoteException;
 
-	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId);
+	public void putIncidenceIdAfterAtEdgeId(long targetId, long movedId) throws RemoteException;
 
-	public long getEdgeIdAtIncidenceId(long id);
+	public long getEdgeIdAtIncidenceId(long id) throws RemoteException;
 
-	public long getVertexIdAtIncidenceId(long id);
+	public long getVertexIdAtIncidenceId(long id) throws RemoteException;
 
-	public long getICount(long globalSubgraphId);
+	public long getICount(long globalSubgraphId) throws RemoteException;
 
-	public int getIncidenceTypeId(long id);
+	public int getIncidenceTypeId(long id) throws RemoteException;
 
 	/**
 	 * Creates a new incidence of the IncidenceClass identified by the id
@@ -354,12 +355,11 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * @param edgeId
 	 * @return
 	 */
-	public long connect(int incidenceClassId, long vertexId, long edgeId);
+	public long connect(int incidenceClassId, long vertexId, long edgeId) throws RemoteException;
 
-	public long connect(int incidenceClassId, long vertexId, long edgeId,
-			long incId);
+	public long connect(int incidenceClassId, long vertexId, long edgeId, long incId) throws RemoteException;
 
-	public void deleteIncidence(long id);
+	public void deleteIncidence(long id) throws RemoteException;
 
 	
 	
@@ -369,17 +369,17 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * Attribute Access
 	 * ======================================================================*/
 	
-	public Object getGraphAttribute(String attributeName);
+	public Object getGraphAttribute(String attributeName) throws RemoteException;
 	
-	public void setGraphAttribute(String attributeName, Object data);
+	public void setGraphAttribute(String attributeName, Object data) throws RemoteException;
 	
-	public Object getVertexAttribute(long elementId, String attributeName);
+	public Object getVertexAttribute(long elementId, String attributeName) throws RemoteException;
 	
-	public void setVertexAttribute(long elementId, String attributeName, Object data);
+	public void setVertexAttribute(long elementId, String attributeName, Object data) throws RemoteException;
 	
-	public Object getEdgeAttribute(long elementId, String attributeName);
+	public Object getEdgeAttribute(long elementId, String attributeName) throws RemoteException;
 	
-	public void setEdgeAttribute(long elementId, String attributeName, Object data);
+	public void setEdgeAttribute(long elementId, String attributeName, Object data) throws RemoteException;
 	
 	
 	
@@ -391,38 +391,38 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * =====================================================================
 	 */
 
-	public <T> JGraLabList<T> createList();
+	public <T> JGraLabList<T> createList() throws RemoteException;
 
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection);
+	public <T> JGraLabList<T> createList(Collection<? extends T> collection) throws RemoteException;
 
-	public <T> JGraLabList<T> createList(int initialCapacity);
+	public <T> JGraLabList<T> createList(int initialCapacity) throws RemoteException;
 
-	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor);
+	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor) throws RemoteException;
 
-	public <K, V> JGraLabMap<K, V> createMap();
+	public <K, V> JGraLabMap<K, V> createMap() throws RemoteException;
 
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity);
+	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) throws RemoteException;
 
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor);
+			float loadFactor) throws RemoteException;
 
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map);
+	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) throws RemoteException;
 
-	public <T> JGraLabSet<T> createSet();
+	public <T> JGraLabSet<T> createSet() throws RemoteException;
 
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection);
+	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) throws RemoteException;
 
-	public <T> JGraLabSet<T> createSet(int initialCapacity);
+	public <T> JGraLabSet<T> createSet(int initialCapacity) throws RemoteException;
 
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor);
-
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields);
+	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) throws RemoteException;
 
 	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components);
+			Map<String, Object> fields) throws RemoteException;
 
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Object... components) throws RemoteException;
+
+	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) throws RemoteException;
 
 
 

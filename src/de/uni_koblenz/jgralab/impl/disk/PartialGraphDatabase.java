@@ -9,7 +9,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 
-	private final CompleteGraphDatabaseImpl completeGraphDatabase;
+	private final RemoteGraphDatabaseAccessWithInternalMethods completeGraphDatabase;
 	
 
 	private ParentEntityKind kindOfParentElement;
@@ -17,12 +17,12 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
 			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
-		System.out.println("Creating partial graph database");
+		System.out.println("Creating partial graph database, hostname of complete graph: " + hostnameOfCompleteGraph);
 		this.kindOfParentElement = kindOfParentElement;
 		try {
 			RemoteJGraLabServer remoteInstance = localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph);
 			System.out.println("Remote instance: " + remoteInstance);
-			completeGraphDatabase = (CompleteGraphDatabaseImpl)  remoteInstance.getGraphDatabase(uniqueGraphId);
+			completeGraphDatabase = (RemoteGraphDatabaseAccessWithInternalMethods) remoteInstance.getGraphDatabase(uniqueGraphId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

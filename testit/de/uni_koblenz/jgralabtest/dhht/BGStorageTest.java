@@ -159,7 +159,7 @@ public class BGStorageTest {
 		case CLIQUEVIEWSDISK:
 			return new TreeGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, true, true).createGraph();
 		case TREELIKEDISTRIBUTED://Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(5, 5, factors, firstLayerFactorsTree, addEdges, true, hostnames).createGraph();
+			return new DistributedGraphGenerator(5, 2, factors, firstLayerFactorsTree, addEdges, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(6, 5, factors, firstLayerFactorsClique, addEdges, true, hostnames).createGraph();
 		}
@@ -184,7 +184,7 @@ public class BGStorageTest {
 		
 		if (distributed) {
 			Variant[] distributedVariants = {Variant.TREELIKEDISTRIBUTED};
-			String[] hosts = {"localhost", "helena.uni-koblenz.de"};
+			String[] hosts = {"141.26.70.230", "helena.uni-koblenz.de"};
 			for (Variant variant : distributedVariants) {
 				test.iterateTest(1, variant, hosts);
 			}
