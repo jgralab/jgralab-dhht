@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -279,8 +280,12 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexBefore(v.getGlobalId(),
-				this.getGlobalId());
+		try {
+			storingGraphDatabase.putVertexBefore(v.getGlobalId(),
+					this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -304,8 +309,12 @@ public abstract class VertexImpl extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase
-				.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		try {
+			storingGraphDatabase
+					.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/* **********************************************************
@@ -553,10 +562,14 @@ public abstract class VertexImpl extends
 	@SuppressWarnings("unchecked")
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, long globalIdOfIncidence) {
-		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(getSchema().getClassId(incidenceClass),
-						this.getGlobalId(), elemToConnect.getGlobalId(),
-						globalIdOfIncidence));
+		try {
+			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.connect(getSchema().getClassId(incidenceClass),
+							this.getGlobalId(), elemToConnect.getGlobalId(),
+							globalIdOfIncidence));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -912,23 +925,39 @@ public abstract class VertexImpl extends
 	@Override
 	public void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteVertex(this.getGlobalId());
+		try {
+			storingGraphDatabase.deleteVertex(this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(
-				target.getGlobalId(), moved.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtVertexId(
+					target.getGlobalId(), moved.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
-				target.getGlobalId(), moved.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
+					target.getGlobalId(), moved.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void deleteIncidence(Incidence i) {
-		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		try {
+			storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	// @Override

@@ -210,6 +210,11 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	 */
 	private HashMap<Thread, Stack<Graph>> traversalContextMap;
 
+	
+	public long getTraversalContextSubgraphId() {
+		return getTraversalContext().getGlobalId();
+	}
+	
 	@Override
 	public Graph getTraversalContext() {
 		if (traversalContextMap == null) {
@@ -325,6 +330,9 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
 	}
 
 
+	public void setTraversalContext(long globalSubgraphId) {
+		setTraversalContext(getGraphObject(globalSubgraphId));
+	}
 
 			
 

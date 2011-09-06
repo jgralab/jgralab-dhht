@@ -177,7 +177,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * graph, an edge or a vertex are treated as a change.
 	 */
 	public final void graphModified() {
-		storingGraphDatabase.graphModified();
+		try {
+			storingGraphDatabase.graphModified();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 

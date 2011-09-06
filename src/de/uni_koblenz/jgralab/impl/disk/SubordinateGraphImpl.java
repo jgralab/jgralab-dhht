@@ -31,6 +31,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -133,14 +134,23 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@SuppressWarnings("rawtypes")
 	@Override
 	public AttributedElement getParentGraphOrElement() {
-		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
-				.getContainingElementId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getGraphElementObject(storingGraphDatabase
+					.getContainingElementId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
 	@Override
 	public Graph getParentGraph() {
-		long containingElementId = storingGraphDatabase.getContainingElementId(globalSubgraphId);
+		long containingElementId;
+		try {
+			containingElementId = storingGraphDatabase.getContainingElementId(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		long superordinateGraphId = 0;
 		if (containingElementId < 0)
 			superordinateGraphId = localGraphDatabase.getEdgeObject(-containingElementId).getGraph().getGlobalId();
@@ -258,7 +268,11 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public void deleteVertex(Vertex v) {
 		if (containsVertex(v)) {
-			storingGraphDatabase.deleteVertex(v.getGlobalId());
+			try {
+				storingGraphDatabase.deleteVertex(v.getGlobalId());
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			throw new GraphException("The subordinate graph of "
 					+ getParentGraphOrElement().getGlobalId()
@@ -269,7 +283,11 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
-			storingGraphDatabase.deleteEdge(e.getGlobalId());
+			try {
+				storingGraphDatabase.deleteEdge(e.getGlobalId());
+			} catch (RemoteException e1) {
+				throw new RuntimeException(e1);
+			}
 		} else {
 			throw new GraphException("The subordinate graph of "
 					+ getParentGraphOrElement().getGlobalId()
@@ -320,17 +338,29 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	
 	@Override
 	public long getVCount() {
-		return storingGraphDatabase.getVCount(globalSubgraphId);
+		try {
+			return storingGraphDatabase.getVCount(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getECount() {
-		return storingGraphDatabase.getECount(globalSubgraphId);
+		try {
+			return storingGraphDatabase.getECount(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public long getICount() {
-		return storingGraphDatabase.getICount(globalSubgraphId);
+		try {
+			return storingGraphDatabase.getICount(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -439,75 +469,131 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	
 	@Override
 	public <T> JGraLabList<T> createList() {
-		return storingGraphDatabase.createList();
+		try {
+			return storingGraphDatabase.createList();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return storingGraphDatabase.createList(collection);
+		try {
+			return storingGraphDatabase.createList(collection);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return storingGraphDatabase.createList(initialCapacity);
+		try {
+			return storingGraphDatabase.createList(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		return storingGraphDatabase.createSet();
+		try {
+			return storingGraphDatabase.createSet();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return storingGraphDatabase.createSet(collection);
+		try {
+			return storingGraphDatabase.createSet(collection);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return storingGraphDatabase.createSet(initialCapacity);
+		try {
+			return storingGraphDatabase.createSet(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return storingGraphDatabase.createSet(initialCapacity, loadFactor);
+		try {
+			return storingGraphDatabase.createSet(initialCapacity, loadFactor);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		return storingGraphDatabase.createMap();
+		try {
+			return storingGraphDatabase.createMap();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return storingGraphDatabase.createMap(map);
+		try {
+			return storingGraphDatabase.createMap(map);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return storingGraphDatabase.createMap(initialCapacity);
+		try {
+			return storingGraphDatabase.createMap(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		return storingGraphDatabase.createMap(initialCapacity, loadFactor);
+		try {
+			return storingGraphDatabase.createMap(initialCapacity, loadFactor);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return storingGraphDatabase.createRecord(recordClass, io);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, io);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		return storingGraphDatabase.createRecord(recordClass, fields);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, fields);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		return storingGraphDatabase.createRecord(recordClass, components);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, components);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -573,22 +659,39 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public void vertexAdded(Vertex v) {
 		if (containsVertex(v)) {
-			storingGraphDatabase.increaseVCount(globalSubgraphId);
+			try {
+				storingGraphDatabase.increaseVCount(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			if (v.getPreviousVertex() == getParentGraphOrElement()) {
 				// this is a new first vertex
-				storingGraphDatabase.setFirstVertexId(globalSubgraphId, v.getGlobalId());
+				try {
+					storingGraphDatabase.setFirstVertexId(globalSubgraphId, v.getGlobalId());
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
 				if (getLastVertex() == null) {
-					storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+					try {
+						storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+					} catch (RemoteException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			} else if (v.getPreviousVertex() == getLastVertex()) {
 				// this is a new last vertex
-				storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+				try {
+					storingGraphDatabase.setLastVertexId(globalSubgraphId, v.getGlobalId());
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}
 
 	@Override
 	public void vertexDeleted(Vertex v) {
+		try {
 		if (containsVertex(v)) {
 			storingGraphDatabase.decreaseVCount(globalSubgraphId);
 			if (getLastVertex() == getFirstVertex() && getFirstVertex() == v) {
@@ -604,10 +707,14 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 				}
 			}
 		}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void edgeAdded(Edge e) {
+		try { 
 		if (containsEdge(e)) {
 			storingGraphDatabase.increaseECount(globalSubgraphId);
 			if (e.getPreviousEdge() == getParentGraphOrElement()) {
@@ -621,10 +728,14 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 				}
 			}
 		}
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 	@Override
 	public void edgeDeleted(Edge e) {
+		try { 
 		if (containsEdge(e)) {
 			storingGraphDatabase.decreaseECount(globalSubgraphId);
 			if (getLastEdge() == getFirstEdge() && getFirstEdge() == e) {
@@ -639,6 +750,9 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 					storingGraphDatabase.setFirstEdgeId(globalSubgraphId, e.getNextEdge().getGlobalId());
 				}
 			}
+		}
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
 		}
 	}
 
@@ -657,14 +771,22 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public void incidenceAdded(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			storingGraphDatabase.increaseICount(globalSubgraphId);
+			try {
+				storingGraphDatabase.increaseICount(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	@Override
 	public void incidenceDeleted(Incidence i) {
 		if (containsEdge(i.getEdge())) {
-			storingGraphDatabase.decreaseICount(globalSubgraphId);
+			try {
+				storingGraphDatabase.decreaseICount(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

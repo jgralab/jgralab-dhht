@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.RemoteException;
 
+import de.uni_koblenz.jgralab.Graph;
+
 
 /**
  * As an extension of RemoteGraphDatabaseAccess, this interface declares all remote accessible methods
@@ -144,6 +146,31 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * the graph identified by its globalSubgraphId
 	 */
 	public ParentEntityKind getParentEntityKind(long globalSubgraphId) throws RemoteException;
+
+
+
+
+	public String getHostname(int id) throws RemoteException;
+
+
+
+
+	public void deletePartialGraph(int partialGraphId) throws RemoteException;
+
+
+
+
+	public long getTraversalContextSubgraphId() throws RemoteException;
+
+
+
+
+	public void releaseTraversalContext() throws RemoteException;
+
+
+
+
+	public void setTraversalContext(long globalId) throws RemoteException;
 
 
 }

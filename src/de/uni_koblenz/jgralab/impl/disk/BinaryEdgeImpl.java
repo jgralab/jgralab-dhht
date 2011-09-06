@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
@@ -48,9 +49,13 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 					.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		}
 		Vertex v = i.getVertex();
-		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
-				elementId);
-		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		try {
+			storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
+					elementId);
+			storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -77,9 +82,13 @@ public abstract class BinaryEdgeImpl extends EdgeImpl implements BinaryEdge {
 					.getIncidenceObject(container.lastIncidenceId[getIdInStorage(elementId)]);
 		}
 		Vertex v = i.getVertex();
+		try {
 		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
 				elementId);
 		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

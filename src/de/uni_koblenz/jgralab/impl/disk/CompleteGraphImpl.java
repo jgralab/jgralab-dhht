@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -164,8 +165,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public AttributedElement getParentGraphOrElement() {
 		if (globalSubgraphId == GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)
 			return null;
-		return localGraphDatabase.getGraphElementObject(storingGraphDatabase
-				.getContainingElementId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getGraphElementObject(storingGraphDatabase.getContainingElementId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 
@@ -421,7 +425,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	
 	@Override
 	public boolean isLoading() {
-		return storingGraphDatabase.isLoading();
+		try {
+			return storingGraphDatabase.isLoading();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -431,14 +439,22 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 * @param isLoading
 	 */
 	public void setLoading(boolean isLoading) {
-		storingGraphDatabase.setLoading(isLoading);
+		try {
+			storingGraphDatabase.setLoading(isLoading);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	
 	
 	@Override
 	public long getGraphVersion() {
-		return storingGraphDatabase.getGraphVersion();
+		try {
+			return storingGraphDatabase.getGraphVersion();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -450,7 +466,11 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 *            new version value
 	 */
 	public void setGraphVersion(long graphVersion) {
-		storingGraphDatabase.setGraphVersion(graphVersion);
+		try {
+			storingGraphDatabase.setGraphVersion(graphVersion);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -462,28 +482,44 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	@Override
 	public void graphModified() {
-		storingGraphDatabase.graphModified();
+		try {
+			storingGraphDatabase.graphModified();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
 	
 	@Override
 	public long getVertexListVersion() {
-		return storingGraphDatabase.getVertexListVersion();
+		try {
+			return storingGraphDatabase.getVertexListVersion();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 
 
 	@Override
 	public long getEdgeListVersion() {
-		return storingGraphDatabase.getEdgeListVersion();
+		try {
+			return storingGraphDatabase.getEdgeListVersion();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
 	@Override
 	protected void edgeListModified() {
-		storingGraphDatabase.edgeListModified();
-		storingGraphDatabase.graphModified();
+		try {
+			storingGraphDatabase.edgeListModified();
+			storingGraphDatabase.graphModified();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	
@@ -494,8 +530,12 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	 */
 	@Override
 	protected void vertexListModified() {
-		storingGraphDatabase.vertexListModified();
-		storingGraphDatabase.graphModified();
+		try {
+			storingGraphDatabase.vertexListModified();
+			storingGraphDatabase.graphModified();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -518,33 +558,57 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public <T> JGraLabList<T> createList() {
-		return storingGraphDatabase.createList();
+		try {
+			return storingGraphDatabase.createList();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return storingGraphDatabase.createList(collection);
+		try {
+			return storingGraphDatabase.createList(collection);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return storingGraphDatabase.createList(initialCapacity);
+		try {
+			return storingGraphDatabase.createList(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap() {
-		return storingGraphDatabase.createMap();
+		try {
+			return storingGraphDatabase.createMap();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return storingGraphDatabase.createMap(initialCapacity);
+		try {
+			return storingGraphDatabase.createMap(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
 			float loadFactor) {
-		return storingGraphDatabase.createMap(initialCapacity, loadFactor);
+		try {
+			return storingGraphDatabase.createMap(initialCapacity, loadFactor);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -554,39 +618,67 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public <T> JGraLabSet<T> createSet() {
-		return storingGraphDatabase.createSet();
+		try {
+			return storingGraphDatabase.createSet();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return storingGraphDatabase.createSet(collection);
+		try {
+			return storingGraphDatabase.createSet(collection);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return storingGraphDatabase.createSet(initialCapacity);
+		try {
+			return storingGraphDatabase.createSet(initialCapacity);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return storingGraphDatabase.createSet(initialCapacity, loadFactor);
+		try {
+			return storingGraphDatabase.createSet(initialCapacity, loadFactor);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return storingGraphDatabase.createRecord(recordClass, io);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, io);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		return storingGraphDatabase.createRecord(recordClass, fields);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, fields);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		return storingGraphDatabase.createRecord(recordClass, components);
+		try {
+			return storingGraphDatabase.createRecord(recordClass, components);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 

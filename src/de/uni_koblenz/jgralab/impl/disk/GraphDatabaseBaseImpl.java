@@ -1582,7 +1582,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long getICount(long subgraphId) {
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getICount(subgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getICount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return getGraphData(convertToLocalId(subgraphId)).incidenceCount;
 	}
@@ -1590,14 +1594,22 @@ public abstract class GraphDatabaseBaseImpl extends
 	protected void notifyEdgeAdded(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyEdgeAdded(edgeId);
+			try {
+				gdb.internalNotifyEdgeAdded(edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	protected void notifyEdgeDeleted(long edgeId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyEdgeDeleted(edgeId);
+			try {
+				gdb.internalNotifyEdgeDeleted(edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -1618,14 +1630,22 @@ public abstract class GraphDatabaseBaseImpl extends
 	protected void notifyVertexAdded(long vertexId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyVertexAdded(vertexId);
+			try {
+				gdb.internalNotifyVertexAdded(vertexId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	protected void notifyVertexDeleted(long vertexId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyVertexDeleted(vertexId);
+			try {
+				gdb.internalNotifyVertexDeleted(vertexId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -1646,14 +1666,22 @@ public abstract class GraphDatabaseBaseImpl extends
 	protected void notifyIncidenceAdded(long incidenceId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyIncidenceAdded(incidenceId);
+			try {
+				gdb.internalNotifyIncidenceAdded(incidenceId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	protected void notifyIncidenceDeleted(long incidenceId) {
 		for (RemoteGraphDatabaseAccessWithInternalMethods gdb : partialGraphDatabases
 				.values()) {
-			gdb.internalNotifyIncidenceDeleted(incidenceId);
+			try {
+				gdb.internalNotifyIncidenceDeleted(incidenceId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
@@ -1677,7 +1705,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void setVertexAttribute(long elementId, String attributeName, Object data) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).setVertexAttribute(elementId, attributeName, data);
+			try {
+				getGraphDatabase(partialGraphId).setVertexAttribute(elementId, attributeName, data);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getVertexObject(elementId).setAttribute(attributeName, data);
 		}
@@ -1688,7 +1720,11 @@ public abstract class GraphDatabaseBaseImpl extends
 			Object data) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId != localPartialGraphId) {
-			getGraphDatabase(partialGraphId).setEdgeAttribute(elementId, attributeName, data);
+			try {
+				getGraphDatabase(partialGraphId).setEdgeAttribute(elementId, attributeName, data);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getEdgeObject(elementId).setAttribute(attributeName, data);
 		}
@@ -1698,7 +1734,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public Object getVertexAttribute(long elementId, String attributeName) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getVertexAttribute(elementId, attributeName);
+			try {
+				return getGraphDatabase(partialGraphId).getVertexAttribute(elementId, attributeName);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getVertexObject(elementId).getAttribute(attributeName);
 		}
@@ -1708,7 +1748,11 @@ public abstract class GraphDatabaseBaseImpl extends
 	public Object getEdgeAttribute(long elementId, String attributeName) {
 		int partialGraphId = getPartialGraphId(elementId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getEdgeAttribute(elementId, attributeName);
+			try {
+				return getGraphDatabase(partialGraphId).getEdgeAttribute(elementId, attributeName);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getEdgeObject(elementId).getAttribute(attributeName);
 		}

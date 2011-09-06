@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.lang.ref.WeakReference;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -193,7 +194,12 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	@Override
 	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
-		long pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalId(), hostnameOfPartialGraph);
+		long pgId;
+		try {
+			pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalId(), hostnameOfPartialGraph);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		return localGraphDatabase.getGraphObject(pgId);
 	}
 	
@@ -255,8 +261,12 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	@Override
 	public boolean isLocalElementId(long id) {
-		return GraphDatabaseElementaryMethods.getPartialGraphId(id) ==
-			storingGraphDatabase.getLocalPartialGraphId();
+		try {
+			return GraphDatabaseElementaryMethods.getPartialGraphId(id) ==
+				storingGraphDatabase.getLocalPartialGraphId();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -366,25 +376,41 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	public void deleteVertex(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
-		storingGraphDatabase.deleteVertex(v.getGlobalId());
+		try {
+			storingGraphDatabase.deleteVertex(v.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
-		storingGraphDatabase.deleteEdge(e.getGlobalId());
+		try {
+			storingGraphDatabase.deleteEdge(e.getGlobalId());
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 
 	@Override
 	public Vertex getFirstVertex() {
-		return localGraphDatabase.getVertexObject(storingGraphDatabase.getFirstVertexId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getVertexObject(storingGraphDatabase.getFirstVertexId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
 	@Override
 	public Vertex getLastVertex() {
-		return localGraphDatabase.getVertexObject(storingGraphDatabase.getLastVertexId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getVertexObject(storingGraphDatabase.getLastVertexId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -433,13 +459,21 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public Edge getFirstEdge() {
-		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdgeId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdgeId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	
 	@Override
 	public Edge getLastEdge() {
-		return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdgeId(globalSubgraphId));
+		try {
+			return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdgeId(globalSubgraphId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
@@ -500,13 +534,21 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	@Override
 	public long getMaxVCount() {
-		return storingGraphDatabase.getMaxVCount();
+		try {
+			return storingGraphDatabase.getMaxVCount();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	
 	@Override
 	public long getMaxECount() {
-		return storingGraphDatabase.getMaxECount();
+		try {
+			return storingGraphDatabase.getMaxECount();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
@@ -517,13 +559,21 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	@Override
 	public long getVCount() {
-		return storingGraphDatabase.getVCount(globalSubgraphId);
+		try {
+			return storingGraphDatabase.getVCount(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 
 	@Override
 	public long getECount() {
-		return storingGraphDatabase.getECount(globalSubgraphId);
+		try {
+			return storingGraphDatabase.getECount(globalSubgraphId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -644,16 +694,24 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
-			storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+			try {
+				storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
+				storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
-				storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+				try {
+					storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
+					storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
 				edgeListModified();
 				return;
 			}
@@ -785,16 +843,24 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
-			storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
-			storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+			try {
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
+				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			return;
 		}
 
 		while (true) {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
-				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
-				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+				try {
+					storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
+					storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+				} catch (RemoteException e) {
+					throw new RuntimeException(e);
+				}
 				edgeListModified();
 				return;
 			}

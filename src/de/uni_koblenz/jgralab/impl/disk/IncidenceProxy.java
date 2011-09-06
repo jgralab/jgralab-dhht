@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -101,22 +103,35 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Edge getEdge() {
-		return localGraphDatabase.getEdgeObject(storingGraphDatabase
-				.getEdgeIdAtIncidenceId(id));
+		try {
+			return localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.getEdgeIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public Vertex getVertex() {
-		return localGraphDatabase.getVertexObject(storingGraphDatabase
-				.getVertexIdAtIncidenceId(id));
+		try {
+			return localGraphDatabase.getVertexObject(storingGraphDatabase
+					.getVertexIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getNextIncidenceIdAtEdgeId(storingGraphDatabase
-								.getEdgeIdAtIncidenceId(id)));
+		Incidence currentIncidence;
+		try {
+			currentIncidence = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getNextIncidenceIdAtEdgeId(storingGraphDatabase
+									.getEdgeIdAtIncidenceId(id)));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		while ((traversalContext != null)
 				&& (currentIncidence != null)
 				&& (!traversalContext.containsVertex(currentIncidence
@@ -128,10 +143,15 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getNextIncidenceIdAtVertexId(storingGraphDatabase
-								.getVertexIdAtIncidenceId(id)));
+		Incidence currentIncidence;
+		try {
+			currentIncidence = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getNextIncidenceIdAtVertexId(storingGraphDatabase
+									.getVertexIdAtIncidenceId(id)));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		while ((traversalContext != null) && (currentIncidence != null)
 				&& (!traversalContext.containsEdge(currentIncidence.getEdge()))) {
 			currentIncidence = currentIncidence.getNextIncidenceAtVertex();
@@ -141,10 +161,15 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getPreviousIncidenceIdAtEdgeId(storingGraphDatabase
-								.getEdgeIdAtIncidenceId(id)));
+		Incidence currentIncidence;
+		try {
+			currentIncidence = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getPreviousIncidenceIdAtEdgeId(storingGraphDatabase
+									.getEdgeIdAtIncidenceId(id)));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		while ((traversalContext != null)
 				&& (currentIncidence != null)
 				&& (!traversalContext.containsVertex(currentIncidence
@@ -156,10 +181,15 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getPreviousIncidenceIdAtVertexId(storingGraphDatabase
-								.getVertexIdAtIncidenceId(id)));
+		Incidence currentIncidence;
+		try {
+			currentIncidence = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getPreviousIncidenceIdAtVertexId(storingGraphDatabase
+									.getVertexIdAtIncidenceId(id)));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		while ((traversalContext != null) && (currentIncidence != null)
 				&& (!traversalContext.containsEdge(currentIncidence.getEdge()))) {
 			currentIncidence = currentIncidence.getPreviousIncidenceAtVertex();
@@ -169,16 +199,26 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
-		Vertex vertex = localGraphDatabase.getVertexObject(storingGraphDatabase
-				.getVertexIdAtIncidenceId(id));
+		Vertex vertex;
+		try {
+			vertex = localGraphDatabase.getVertexObject(storingGraphDatabase
+					.getVertexIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		assert getGraph().getTraversalContext().containsVertex(vertex);
 		return vertex.getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
-		Vertex vertex = localGraphDatabase.getVertexObject(storingGraphDatabase
-				.getVertexIdAtIncidenceId(id));
+		Vertex vertex;
+		try {
+			vertex = localGraphDatabase.getVertexObject(storingGraphDatabase
+					.getVertexIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		assert getGraph().getTraversalContext().containsVertex(vertex);
 		return vertex.getIncidentEdges(traversalContext, getDirection()
 				.getOppositeDirection());
@@ -186,34 +226,48 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Vertex getThis(Graph traversalContext) {
-		if (!localGraphDatabase.getEdgeObject(
-				storingGraphDatabase.getEdgeIdAtIncidenceId(id)).isBinary()) {
-			throw new UnsupportedOperationException(
-					"This method is only supported by binary Edges.");
-		} else {
-			Vertex vertex = localGraphDatabase
-					.getVertexObject(storingGraphDatabase
-							.getVertexIdAtIncidenceId(id));
-			if (getGraph().getTraversalContext().containsVertex(vertex)) {
-				return vertex;
+		try {
+			if (!localGraphDatabase.getEdgeObject(
+					storingGraphDatabase.getEdgeIdAtIncidenceId(id)).isBinary()) {
+				throw new UnsupportedOperationException(
+						"This method is only supported by binary Edges.");
 			} else {
-				return null;
+				Vertex vertex = localGraphDatabase
+						.getVertexObject(storingGraphDatabase
+								.getVertexIdAtIncidenceId(id));
+				if (getGraph().getTraversalContext().containsVertex(vertex)) {
+					return vertex;
+				} else {
+					return null;
+				}
 			}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
-		Edge edge = localGraphDatabase.getEdgeObject(storingGraphDatabase
-				.getEdgeIdAtIncidenceId(id));
+		Edge edge;
+		try {
+			edge = localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.getEdgeIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		assert getGraph().getTraversalContext().containsEdge(edge);
 		return edge.getIncidentVertices(traversalContext, getDirection());
 	}
 
 	@Override
 	public Vertex getThat(Graph traversalContext) {
-		Edge incidentEdge = localGraphDatabase
-				.getEdgeObject(storingGraphDatabase.getEdgeIdAtIncidenceId(id));
+		Edge incidentEdge;
+		try {
+			incidentEdge = localGraphDatabase
+					.getEdgeObject(storingGraphDatabase.getEdgeIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
@@ -234,8 +288,13 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
-		Edge edge = localGraphDatabase.getEdgeObject(storingGraphDatabase
-				.getEdgeIdAtIncidenceId(id));
+		Edge edge;
+		try {
+			edge = localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.getEdgeIdAtIncidenceId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		assert getGraph().getTraversalContext().containsEdge(edge);
 		return edge.getIncidentVertices(traversalContext, getDirection()
 				.getOppositeDirection());
@@ -243,22 +302,38 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public void putAfterAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putBeforeAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putAfterAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putBeforeAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -280,8 +355,12 @@ public abstract class IncidenceProxy implements Incidence {
 	@Override
 	public Incidence getNextIncidenceAtEdge() {
 		if (getGraph().getTraversalContext() == null) {
-			return localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.getNextIncidenceIdAtEdgeId(id));
+			try {
+				return localGraphDatabase.getIncidenceObject(storingGraphDatabase
+						.getNextIncidenceIdAtEdgeId(id));
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 		}
@@ -290,9 +369,14 @@ public abstract class IncidenceProxy implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = localGraphDatabase
-					.getIncidenceObject(storingGraphDatabase
-							.getNextIncidenceIdAtEdgeId(id));
+			Incidence i;
+			try {
+				i = localGraphDatabase
+						.getIncidenceObject(storingGraphDatabase
+								.getNextIncidenceIdAtEdgeId(id));
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection())) {
 					i.getNextIncidenceAtEdge();
@@ -389,9 +473,14 @@ public abstract class IncidenceProxy implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Direction direction) {
-		Incidence i = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getNextIncidenceIdAtEdgeId(id));
+		Incidence i;
+		try {
+			i = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getNextIncidenceIdAtEdgeId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
@@ -528,9 +617,14 @@ public abstract class IncidenceProxy implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = localGraphDatabase
-					.getIncidenceObject(storingGraphDatabase
-							.getNextIncidenceIdAtVertexId(id));
+			Incidence i;
+			try {
+				i = localGraphDatabase
+						.getIncidenceObject(storingGraphDatabase
+								.getNextIncidenceIdAtVertexId(id));
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection())) {
 					i = i.getNextIncidenceAtVertex();
@@ -617,9 +711,14 @@ public abstract class IncidenceProxy implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Direction direction) {
-		Incidence i = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getNextIncidenceIdAtVertexId(id));
+		Incidence i;
+		try {
+			i = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getNextIncidenceIdAtVertexId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i

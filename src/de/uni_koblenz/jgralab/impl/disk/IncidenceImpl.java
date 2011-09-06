@@ -31,6 +31,8 @@
 
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -206,22 +208,38 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public void putAfterAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtVertexId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putBeforeAtVertex(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtVertexId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public void putAfterAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtEdgeId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Override
 	public void putBeforeAtEdge(Incidence i) {
-		storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtEdgeId(id, i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	

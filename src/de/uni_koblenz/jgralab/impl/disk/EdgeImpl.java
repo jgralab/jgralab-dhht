@@ -287,7 +287,11 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
+		try {
+			storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 	@Override
@@ -298,7 +302,11 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
+		try {
+			storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 	}
 
 	/* ***********************************************************
@@ -676,8 +684,12 @@ public abstract class EdgeImpl extends
      	int classId = schema.getClassId(incidenceClass);
 		long globalVId = elemToConnect.getGlobalId();
 		
-		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(classId, globalVId,  this.getGlobalId()));
+		try {
+			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.connect(classId, globalVId,  this.getGlobalId()));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -745,7 +757,11 @@ public abstract class EdgeImpl extends
 		connect(incidentIc, v);
 		v.connect(adjacentIc, other);
 
-		storingGraphDatabase.edgeListModified();
+		try {
+			storingGraphDatabase.edgeListModified();
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		return v;
 	}
 
@@ -1114,8 +1130,12 @@ public abstract class EdgeImpl extends
 	@Override
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
-			subordinateGraphId = storingGraphDatabase
-					.createLocalSubordinateGraphInEdge(this.getGlobalId());
+			try {
+				subordinateGraphId = storingGraphDatabase
+						.createLocalSubordinateGraphInEdge(this.getGlobalId());
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
@@ -1178,13 +1198,21 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final boolean isValid() {
-		return storingGraphDatabase.containsEdgeId(this.getGlobalId());
+		try {
+			return storingGraphDatabase.containsEdgeId(this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteEdge(this.getGlobalId());
+		try {
+			storingGraphDatabase.deleteEdge(this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

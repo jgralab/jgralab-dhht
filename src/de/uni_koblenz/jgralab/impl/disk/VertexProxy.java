@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -115,9 +116,14 @@ public abstract class VertexProxy extends
 	@Override
 	public Vertex getNextVertex(Graph traversalContext) {
 		assert isValid();
-		Vertex nextVertex = localGraphDatabase
-				.getVertexObject(storingGraphDatabase
-						.getNextVertexId(elementId));
+		Vertex nextVertex;
+		try {
+			nextVertex = localGraphDatabase
+					.getVertexObject(storingGraphDatabase
+							.getNextVertexId(elementId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (nextVertex == null) {
 			return null;
 		} else if ((traversalContext == null)
@@ -131,9 +137,14 @@ public abstract class VertexProxy extends
 	@Override
 	public Vertex getPreviousVertex(Graph traversalContext) {
 		assert isValid();
-		Vertex previousVertex = localGraphDatabase
-				.getVertexObject(storingGraphDatabase
-						.getPreviousVertexId(elementId));
+		Vertex previousVertex;
+		try {
+			previousVertex = localGraphDatabase
+					.getVertexObject(storingGraphDatabase
+							.getPreviousVertexId(elementId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (previousVertex == null) {
 			return null;
 		} else if ((traversalContext == null)
@@ -267,8 +278,12 @@ public abstract class VertexProxy extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase.putVertexBefore(v.getGlobalId(),
-				this.getGlobalId());
+		try {
+			storingGraphDatabase.putVertexBefore(v.getGlobalId(),
+					this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -292,8 +307,12 @@ public abstract class VertexProxy extends
 		assert v != this;
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
-		storingGraphDatabase
-				.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		try {
+			storingGraphDatabase
+					.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/* **********************************************************
@@ -543,10 +562,14 @@ public abstract class VertexProxy extends
 	@SuppressWarnings("unchecked")
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, long incidenceId) {
-		return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-				.connect(getSchema().getClassId(incidenceClass),
-						this.getGlobalId(), elemToConnect.getGlobalId(),
-						incidenceId));
+		try {
+			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.connect(getSchema().getClassId(incidenceClass),
+							this.getGlobalId(), elemToConnect.getGlobalId(),
+							incidenceId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -569,7 +592,12 @@ public abstract class VertexProxy extends
 
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
-		long sigmaId = storingGraphDatabase.getSigmaIdOfVertexId(elementId);
+		long sigmaId;
+		try {
+			sigmaId = storingGraphDatabase.getSigmaIdOfVertexId(elementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
 		} else {
@@ -581,22 +609,38 @@ public abstract class VertexProxy extends
 	public void setSigma(GraphElement<?, ?, ?> elem) {
 		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
-			storingGraphDatabase.setSigmaIdOfVertexId(elementId, -sigmaId);
+			try {
+				storingGraphDatabase.setSigmaIdOfVertexId(elementId, -sigmaId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
-			storingGraphDatabase.setSigmaIdOfVertexId(elementId, sigmaId);
+			try {
+				storingGraphDatabase.setSigmaIdOfVertexId(elementId, sigmaId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
 	@Override
 	public int getKappa() {
-		return storingGraphDatabase.getKappaOfVertexId(elementId);
+		try {
+			return storingGraphDatabase.getKappaOfVertexId(elementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
-		storingGraphDatabase.setKappaOfVertexId(elementId, kappa);
+		try {
+			storingGraphDatabase.setKappaOfVertexId(elementId, kappa);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/* **********************************************************
@@ -901,23 +945,39 @@ public abstract class VertexProxy extends
 	@Override
 	public void delete() {
 		assert isValid() : this + " is not valid!";
-		storingGraphDatabase.deleteVertex(this.getGlobalId());
+		try {
+			storingGraphDatabase.deleteVertex(this.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putIncidenceAfter(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdAfterAtVertexId(
-				target.getGlobalId(), moved.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdAfterAtVertexId(
+					target.getGlobalId(), moved.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void putIncidenceBefore(Incidence target, Incidence moved) {
-		storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
-				target.getGlobalId(), moved.getGlobalId());
+		try {
+			storingGraphDatabase.putIncidenceIdBeforeAtVertexId(
+					target.getGlobalId(), moved.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void deleteIncidence(Incidence i) {
-		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		try {
+			storingGraphDatabase.deleteIncidence(i.getGlobalId());
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	// @Override
@@ -1196,17 +1256,29 @@ public abstract class VertexProxy extends
 	@Override
 	public final long getIncidenceListVersion() {
 		assert isValid();
-		return storingGraphDatabase
-				.getIncidenceListVersionOfVertexId(elementId);
+		try {
+			return storingGraphDatabase
+					.getIncidenceListVersionOfVertexId(elementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Object getAttribute(String attributeName) {
-		return storingGraphDatabase
-				.getVertexAttribute(elementId, attributeName);
+		try {
+			return storingGraphDatabase
+					.getVertexAttribute(elementId, attributeName);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void setAttribute(String attributeName, Object data) {
-		storingGraphDatabase.setVertexAttribute(elementId, attributeName, data);
+		try {
+			storingGraphDatabase.setVertexAttribute(elementId, attributeName, data);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

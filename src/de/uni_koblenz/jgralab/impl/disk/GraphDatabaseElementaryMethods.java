@@ -243,7 +243,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		remoteIncidences = new HashMap<Long, Reference<Incidence>>();
 		//initialize fields
 		graphVersion = -1;
-		setGraphVersion(0);
+		try {
+			setGraphVersion(0);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 
 		//register graph database at server
 		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
@@ -305,7 +309,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	}
 
 	protected boolean canAddGraphElement(long eId) {
-		return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
+		try {
+			return ! (eId < 0 ? containsEdgeId(eId) : containsVertexId(eId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -327,7 +335,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	protected RemoteDiskStorageAccess getDiskStorageForPartialGraph(int partialGraphId) {
 		RemoteDiskStorageAccess remoteAccess = remoteDiskStorages.get(partialGraphId);
 		if (remoteAccess == null) {
-			remoteAccess = getGraphDatabase(partialGraphId).getLocalDiskStorage();
+			try {
+				remoteAccess = getGraphDatabase(partialGraphId).getLocalDiskStorage();
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			remoteDiskStorages.put(partialGraphId, remoteAccess);
 		}
 		return remoteAccess;
@@ -391,7 +403,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	public int getGraphTypeId(long globalSubgraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
-			return getGraphDatabase(partialGraphId).getGraphTypeId(globalSubgraphId);
+			try {
+				return getGraphDatabase(partialGraphId).getGraphTypeId(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}	
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		return getGraphData(localSubgraphId).typeId;
@@ -572,28 +588,44 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 	public int getKappaOfVertexId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		return getGraphDatabase(partialGraphId).getKappaOfVertexId(localElementId);
+		try {
+			return getGraphDatabase(partialGraphId).getKappaOfVertexId(localElementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setKappaOfVertexId(long globalElementId, int kappa) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		getGraphDatabase(partialGraphId).setKappaOfVertexId(localElementId, kappa);
+		try {
+			getGraphDatabase(partialGraphId).setKappaOfVertexId(localElementId, kappa);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public int getKappaOfEdgeId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		return getGraphDatabase(partialGraphId).getKappaOfEdgeId(localElementId);
+		try {
+			return getGraphDatabase(partialGraphId).getKappaOfEdgeId(localElementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setKappaOfEdgeId(long globalElementId, int kappa) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		getGraphDatabase(partialGraphId).setKappaOfEdgeId(localElementId, kappa);
+		try {
+			getGraphDatabase(partialGraphId).setKappaOfEdgeId(localElementId, kappa);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	
@@ -607,7 +639,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(subgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getVCount(subgraphId);
+			try {
+				return remoteDb.getVCount(subgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getGraphData(convertToLocalId(subgraphId)).vertexCount;
 		}
@@ -623,7 +659,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getFirstVertexId(globalSubgraphId);
+			try {
+				return remoteDb.getFirstVertexId(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getGraphData(convertToLocalId(globalSubgraphId)).firstVertexId;
 		}
@@ -634,7 +674,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setFirstVertexId(globalSubgraphId, edgeId);
+			try {
+				remoteDb.setFirstVertexId(globalSubgraphId, edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(globalSubgraphId)).firstVertexId = edgeId;
 		}
@@ -645,7 +689,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getLastVertexId(globalSubgraphId);
+			try {
+				return remoteDb.getLastVertexId(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getGraphData(convertToLocalId(globalSubgraphId)).lastVertexId;
 		}
@@ -656,7 +704,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setLastVertexId(globalSubgraphId, edgeId);
+			try {
+				remoteDb.setLastVertexId(globalSubgraphId, edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(globalSubgraphId)).lastVertexId = edgeId;
 		}
@@ -700,7 +752,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getFirstEdgeId(globalSubgraphId);
+			try {
+				return remoteDb.getFirstEdgeId(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getGraphData(convertToLocalId(globalSubgraphId)).firstEdgeId;
 		}
@@ -712,7 +768,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setFirstEdgeId(globalSubgraphId, edgeId);
+			try {
+				remoteDb.setFirstEdgeId(globalSubgraphId, edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(globalSubgraphId)).firstEdgeId = edgeId;
 		}
@@ -723,7 +783,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			return remoteDb.getLastEdgeId(globalSubgraphId);
+			try {
+				return remoteDb.getLastEdgeId(globalSubgraphId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			return getGraphData(convertToLocalId(globalSubgraphId)).lastEdgeId;
 		}
@@ -735,7 +799,11 @@ public abstract class GraphDatabaseElementaryMethods implements RemoteGraphDatab
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			RemoteGraphDatabaseAccess remoteDb = getGraphDatabase(partialGraphId);
-			remoteDb.setLastEdgeId(globalSubgraphId, edgeId);
+			try {
+				remoteDb.setLastEdgeId(globalSubgraphId, edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		} else {
 			getGraphData(convertToLocalId(globalSubgraphId)).lastEdgeId = edgeId;
 		}

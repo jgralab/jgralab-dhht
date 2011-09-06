@@ -189,7 +189,11 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case PROXIES:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
+					"\ttry {",
+					 "\t\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
+					 "\t} catch (RemoteException ex) {",
+					 "\t\ttthrow new RuntimeException(ex);",
+					 "\t}",
 					 "}");
 			break;
 		}
