@@ -292,7 +292,8 @@ public abstract class EdgeProxy extends
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
 		try {
-			storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putEdgeAfter(e.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
@@ -307,7 +308,8 @@ public abstract class EdgeProxy extends
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
 		try {
-			storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putEdgeBefore(e.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
@@ -355,16 +357,15 @@ public abstract class EdgeProxy extends
 		assert isValid();
 		Incidence i;
 		try {
-			i = localGraphDatabase
-					.getIncidenceObject(storingGraphDatabase
-							.getFirstIncidenceIdAtEdgeId(elementId));
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.getFirstIncidenceIdAtEdgeId(elementId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtEdge();
 			}
 		} else {
@@ -701,21 +702,22 @@ public abstract class EdgeProxy extends
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
 		try {
-			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.connect(getSchema().getClassId(incidenceClass),
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(
+							getSchema().getClassId(incidenceClass),
 							elemToConnect.getGlobalId(), this.getGlobalId()));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect, long incidenceId) {
 		try {
-			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.connect(getSchema().getClassId(incidenceClass),
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(
+							getSchema().getClassId(incidenceClass),
 							elemToConnect.getGlobalId(), this.getGlobalId(),
 							incidenceId));
 		} catch (RemoteException e) {
@@ -730,10 +732,15 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
+	public final Incidence connect(IncidenceClass incidenceClass,
+			Vertex elemToConnect, long incidenceId) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, incidenceId);
+	}
+
+	@Override
 	public final Incidence connect(String rolename, Vertex elemToConnect) {
 		return connect(getIncidenceClassForRolename(rolename), elemToConnect);
 	}
-
 
 	@Override
 	protected void putIncidenceAfter(Incidence target, Incidence moved) {
@@ -1137,9 +1144,8 @@ public abstract class EdgeProxy extends
 	public void setAlpha(Vertex vertex) {
 		Incidence i;
 		try {
-			i = localGraphDatabase
-					.getIncidenceObject(storingGraphDatabase
-							.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
+					.getFirstIncidenceIdAtEdgeId(getGlobalId()));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -1163,17 +1169,17 @@ public abstract class EdgeProxy extends
 
 	public void setOmega(Vertex vertex) {
 		try {
-		Incidence i = localGraphDatabase
-				.getIncidenceObject(storingGraphDatabase
-						.getFirstIncidenceIdAtEdgeId(getGlobalId()));
-		if (i.getDirection() != Direction.EDGE_TO_VERTEX) {
-			i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.getLastIncidenceIdAtEdgeId(getGlobalId()));
-		}
-		Vertex v = i.getVertex();
-		storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
-				elementId);
-		storingGraphDatabase.deleteIncidence(i.getGlobalId());
+			Incidence i = localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase
+							.getFirstIncidenceIdAtEdgeId(getGlobalId()));
+			if (i.getDirection() != Direction.EDGE_TO_VERTEX) {
+				i = localGraphDatabase.getIncidenceObject(storingGraphDatabase
+						.getLastIncidenceIdAtEdgeId(getGlobalId()));
+			}
+			Vertex v = i.getVertex();
+			storingGraphDatabase.connect(i.getType().getId(), v.getGlobalId(),
+					elementId);
+			storingGraphDatabase.deleteIncidence(i.getGlobalId());
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -1370,7 +1376,8 @@ public abstract class EdgeProxy extends
 	public final long getIncidenceListVersion() {
 		assert isValid();
 		try {
-			return storingGraphDatabase.getIncidenceListVersionOfEdgeId(elementId);
+			return storingGraphDatabase
+					.getIncidenceListVersionOfEdgeId(elementId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -1378,7 +1385,8 @@ public abstract class EdgeProxy extends
 
 	public Object getAttribute(String attributeName) {
 		try {
-			return storingGraphDatabase.getEdgeAttribute(elementId, attributeName);
+			return storingGraphDatabase.getEdgeAttribute(elementId,
+					attributeName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -1386,7 +1394,8 @@ public abstract class EdgeProxy extends
 
 	public void setAttribute(String attributeName, Object data) {
 		try {
-			storingGraphDatabase.setEdgeAttribute(elementId, attributeName, data);
+			storingGraphDatabase.setEdgeAttribute(elementId, attributeName,
+					data);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

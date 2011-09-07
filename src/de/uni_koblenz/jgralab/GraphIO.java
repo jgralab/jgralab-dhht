@@ -3004,7 +3004,7 @@ public class GraphIO {
 											v);
 						} else {
 							((de.uni_koblenz.jgralab.impl.disk.EdgeImpl) e)
-									.connect(incidence.getKey(), ic, v);
+									.connect(ic, v, incidence.getKey());
 						}
 						break;
 					}

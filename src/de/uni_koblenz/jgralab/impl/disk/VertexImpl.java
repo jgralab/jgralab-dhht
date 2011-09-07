@@ -84,7 +84,8 @@ public abstract class VertexImpl extends
 		super(localGraphDatabase);
 		this.elementId = id;
 		this.container = localGraphDatabase.getLocalDiskStorage()
-				.getVertexContainer(DiskStorageManager.getContainerId(getLocalId()));
+				.getVertexContainer(
+						DiskStorageManager.getContainerId(getLocalId()));
 	}
 
 	protected VertexImpl(long id, GraphDatabaseBaseImpl localGraphDatabase,
@@ -310,8 +311,8 @@ public abstract class VertexImpl extends
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
 		try {
-			storingGraphDatabase
-					.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putVertexAfter(v.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -342,7 +343,7 @@ public abstract class VertexImpl extends
 		}
 		return firstIncidence;
 	}
-	
+
 	@Override
 	public Incidence getLastIncidence(Graph traversalContext) {
 		Incidence lastIncidence = localGraphDatabase
@@ -371,7 +372,7 @@ public abstract class VertexImpl extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {
@@ -559,20 +560,25 @@ public abstract class VertexImpl extends
 		return elemToConnect.connect(incidenceClass, this);
 	}
 
+	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect,
+			long incidenceId) {
+		return ((GraphElementImpl) elemToConnect).connect(incidenceClass, this,
+				incidenceId);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, long globalIdOfIncidence) {
 		try {
-			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.connect(getSchema().getClassId(incidenceClass),
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(
+							getSchema().getClassId(incidenceClass),
 							this.getGlobalId(), elemToConnect.getGlobalId(),
 							globalIdOfIncidence));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
-
 
 	/* **********************************************************
 	 * Access sigma and kappa information

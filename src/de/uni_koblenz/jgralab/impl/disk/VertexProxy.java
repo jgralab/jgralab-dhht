@@ -308,8 +308,8 @@ public abstract class VertexProxy extends
 		assert getGraph() == v.getGraph();
 		assert isValid() && v.isValid();
 		try {
-			storingGraphDatabase
-					.putVertexAfter(v.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putVertexAfter(v.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -371,7 +371,7 @@ public abstract class VertexProxy extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {
@@ -559,19 +559,25 @@ public abstract class VertexProxy extends
 		return elemToConnect.connect(incidenceClass, this);
 	}
 
+	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect,
+			long incidenceId) {
+		return ((GraphElementImpl) elemToConnect).connect(incidenceClass, this,
+				incidenceId);
+	}
+
 	@SuppressWarnings("unchecked")
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, long incidenceId) {
 		try {
-			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.connect(getSchema().getClassId(incidenceClass),
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(
+							getSchema().getClassId(incidenceClass),
 							this.getGlobalId(), elemToConnect.getGlobalId(),
 							incidenceId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	/* **********************************************************
 	 * Access sigma and kappa information
@@ -1266,8 +1272,8 @@ public abstract class VertexProxy extends
 
 	public Object getAttribute(String attributeName) {
 		try {
-			return storingGraphDatabase
-					.getVertexAttribute(elementId, attributeName);
+			return storingGraphDatabase.getVertexAttribute(elementId,
+					attributeName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -1275,7 +1281,8 @@ public abstract class VertexProxy extends
 
 	public void setAttribute(String attributeName, Object data) {
 		try {
-			storingGraphDatabase.setVertexAttribute(elementId, attributeName, data);
+			storingGraphDatabase.setVertexAttribute(elementId, attributeName,
+					data);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

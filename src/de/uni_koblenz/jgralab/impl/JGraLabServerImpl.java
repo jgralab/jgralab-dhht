@@ -26,7 +26,6 @@ import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
-import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -40,40 +39,37 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	private static final String JGRALAB_SERVER_IDENTIFIER = "JGraLabServer";
 
 	private static JGraLabServerImpl localInstance = null;
-	
+
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
-	
+
 	private static String localHostname = "141.26.70.230";
 
-	
 	private static String localPort = "1099";
 
 	private final Map<String, RemoteGraphDatabaseAccessWithInternalMethods> localGraphDatabases = new HashMap<String, RemoteGraphDatabaseAccessWithInternalMethods>();
 
 	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
 
-	
-	
-	
 	private JGraLabServerImpl() {
 
 	}
-	
-
 
 	public static JGraLabServerImpl getLocalInstance() {
-		 try {
+		try {
 			if (localInstance == null) {
 				System.out.println("Creating local server");
 				localInstance = new JGraLabServerImpl();
-			    remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject.exportObject(localInstance, 0);
-		        Registry registry = LocateRegistry.createRegistry(1099);
-		        registry.bind(JGRALAB_SERVER_IDENTIFIER, remoteAccessToLocalInstance);
-		       // RemoteJGraLabServer remote = localInstance.getRemoteInstance(localInstance.localHostname);
+				remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject
+						.exportObject(localInstance, 0);
+				Registry registry = LocateRegistry.createRegistry(1099);
+				registry.bind(JGRALAB_SERVER_IDENTIFIER,
+						remoteAccessToLocalInstance);
+				// RemoteJGraLabServer remote =
+				// localInstance.getRemoteInstance(localInstance.localHostname);
 			}
-		 } catch (Exception e) {
-			 System.out.println("Local Server: " + localInstance);
- 			 e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("Local Server: " + localInstance);
+			e.printStackTrace();
 		}
 		return (JGraLabServerImpl) localInstance;
 	}
@@ -83,7 +79,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		try {
 			System.out.println("Try to connect to host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
-					.lookup("rmi://" + hostname + "/" + JGRALAB_SERVER_IDENTIFIER);
+					.lookup("rmi://" + hostname + "/"
+							+ JGRALAB_SERVER_IDENTIFIER);
 			return server;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException("Error in URL", e);
@@ -94,13 +91,16 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
-	public RemoteGraphDatabaseAccessWithInternalMethods loadGraph(String uid) throws GraphIOException {
-		RemoteGraphDatabaseAccessWithInternalMethods db = localGraphDatabases.get(uid);
+	public RemoteGraphDatabaseAccessWithInternalMethods loadGraph(String uid)
+			throws GraphIOException {
+		RemoteGraphDatabaseAccessWithInternalMethods db = localGraphDatabases
+				.get(uid);
 		if (db == null) {
-			//Depending on the data stored in the GraphIO file, either a
-			//complete or a partial graph database will be created
+			// Depending on the data stored in the GraphIO file, either a
+			// complete or a partial graph database will be created
 			String filename = localFilesContainingGraphs.get(uid);
-			Graph graph = GraphIO.loadGraphFromFile(filename, null,  ImplementationType.DISK);
+			Graph graph = GraphIO.loadGraphFromFile(filename, null,
+					ImplementationType.DISK);
 			db = graph.getGraphDatabase();
 			localGraphDatabases.put(uid, db);
 		}
@@ -118,10 +118,14 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public void registerFileForUid(String uid, String fileName) {
 		localFilesContainingGraphs.put(uid, fileName);
 	}
-	
-	@Override 
-	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException {
-		
+
+	@Override
+	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(
+			String schemaName, String uniqueGraphId,
+			String hostnameOfCompleteGraph, long parentGlobalEntityId,
+			ParentEntityKind parent, int localPartialGraphId)
+			throws ClassNotFoundException {
+
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
 		@SuppressWarnings("rawtypes")
@@ -131,27 +135,37 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		try {
 			instanceMethod = schemaClass.getMethod("instance", formalParams);
 		} catch (SecurityException e) {
-			throw new ClassNotFoundException("Class for schema " + schemaName + " does not provide a static instance() method", e);
+			throw new ClassNotFoundException("Class for schema " + schemaName
+					+ " does not provide a static instance() method", e);
 		} catch (NoSuchMethodException e) {
-			throw new ClassNotFoundException("Class for schema " + schemaName + " does not provide a static instance() method", e);
+			throw new ClassNotFoundException("Class for schema " + schemaName
+					+ " does not provide a static instance() method", e);
 		}
 		try {
 			schema = (Schema) instanceMethod.invoke(null, actualParams);
 		} catch (IllegalArgumentException e) {
-			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+			throw new ClassNotFoundException(
+					"Static instance method of class for schema " + schemaName
+							+ " can not be invoked", e);
 		} catch (IllegalAccessException e) {
-			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+			throw new ClassNotFoundException(
+					"Static instance method of class for schema " + schemaName
+							+ " can not be invoked", e);
 		} catch (InvocationTargetException e) {
-			throw new ClassNotFoundException("Static instance method of class for schema " + schemaName + " can not be invoked", e);
+			throw new ClassNotFoundException(
+					"Static instance method of class for schema " + schemaName
+							+ " can not be invoked", e);
 		}
-		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema, uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId, parent, localPartialGraphId);
+		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema,
+				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
+				parent, localPartialGraphId);
 		localGraphDatabases.put(uniqueGraphId, db);
 		return db;
 	}
-	
 
 	@Override
-	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(String uid) {
+	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(
+			String uid) {
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);
@@ -161,7 +175,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 		try {
 			System.out.println("Try to export graph database");
-			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject.exportObject(localGraphDatabases.get(uid));
+			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+					.exportObject(localGraphDatabases.get(uid), 0);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -188,13 +203,14 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		this.localHostname = host;
 	}
 
-	
-	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) throws RemoteException {
-		Graph g = ((GraphDatabaseBaseImpl)getLocalGraphDatabase(uniqueGraphId)).getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(partialGraphId));
+	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId,
+			int partialGraphId, CentralAlgorithm parent) throws RemoteException {
+		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
+				.getGraphObject(GraphDatabaseElementaryMethods
+						.getToplevelGraphForPartialGraphId(partialGraphId));
 		return SatelliteAlgorithmImpl.create(g, parent);
 	}
-	
-	
+
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			localHostname = args[0];
@@ -204,5 +220,5 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 		JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 	}
-	
+
 }
