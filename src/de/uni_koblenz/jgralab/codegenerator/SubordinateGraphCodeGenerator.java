@@ -466,7 +466,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			code.add("public #type# #isOrGet#_#name#()  {",
 					"\ttry {",
 					"\t\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
-					"\t} catch (RemoteException ex) {",
+					"\t} catch (java.rmi.RemoteException ex) {",
 					"\t\tthrow new RuntimeException(ex);",
 					"\t}",
 					"}");
@@ -495,7 +495,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			code.add("public void set_#name#(#type# _#name#)  {",
 					"\ttry {",
 					"\t\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);",
-					"\t} catch (RemoteException ex) {",
+					"\t} catch (java.rmi.RemoteException ex) {",
 					"\t\tthrow new RuntimeException(ex);",
 					"\t}",
 					"}");
