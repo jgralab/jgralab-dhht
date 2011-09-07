@@ -2,10 +2,8 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 
 import java.rmi.RemoteException;
-import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 

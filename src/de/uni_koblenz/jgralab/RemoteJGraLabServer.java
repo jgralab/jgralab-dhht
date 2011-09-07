@@ -7,6 +7,7 @@ import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithm;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 
 public interface RemoteJGraLabServer extends Remote {
 	
@@ -19,7 +20,7 @@ public interface RemoteJGraLabServer extends Remote {
 	 * @param uniqueGraphId 
 	 * @param graphDatabase
 	 */
-	public RemoteGraphDatabaseAccess getGraphDatabase(String graphUid) throws RemoteException;
+	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(String graphUid) throws RemoteException;
 
 	
 	/**
@@ -38,7 +39,7 @@ public interface RemoteJGraLabServer extends Remote {
 	 * @return
 	 * @throws ClassNotFoundException if the schema class can not be loaded
 	 */
-	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName,
+	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(String schemaName,
 			String uniqueGraphId, String hostnameOfCompleteGraph,
 			long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException, RemoteException;
 

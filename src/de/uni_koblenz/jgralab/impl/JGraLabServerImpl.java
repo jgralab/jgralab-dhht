@@ -27,6 +27,7 @@ import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
@@ -47,7 +48,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	private static String localPort = "1099";
 
-	private final Map<String, GraphDatabaseBaseImpl> localGraphDatabases = new HashMap<String, GraphDatabaseBaseImpl>();
+	private final Map<String, RemoteGraphDatabaseAccessWithInternalMethods> localGraphDatabases = new HashMap<String, RemoteGraphDatabaseAccessWithInternalMethods>();
 
 	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
 
@@ -93,8 +94,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
-	public GraphDatabaseBaseImpl loadGraph(String uid) throws GraphIOException {
-		GraphDatabaseBaseImpl db = localGraphDatabases.get(uid);
+	public RemoteGraphDatabaseAccessWithInternalMethods loadGraph(String uid) throws GraphIOException {
+		RemoteGraphDatabaseAccessWithInternalMethods db = localGraphDatabases.get(uid);
 		if (db == null) {
 			//Depending on the data stored in the GraphIO file, either a
 			//complete or a partial graph database will be created
@@ -119,7 +120,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	}
 	
 	@Override 
-	public RemoteGraphDatabaseAccess createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException {
+	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(String schemaName, String uniqueGraphId, String hostnameOfCompleteGraph, long parentGlobalEntityId, ParentEntityKind parent, int localPartialGraphId) throws ClassNotFoundException {
 		
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
@@ -150,7 +151,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 
 	@Override
-	public RemoteGraphDatabaseAccess getGraphDatabase(String uid) {
+	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(String uid) {
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);
@@ -169,7 +170,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	 * @return
 	 */
 	public GraphDatabaseBaseImpl getLocalGraphDatabase(String uid) {
-		return localGraphDatabases.get(uid);
+		return (GraphDatabaseBaseImpl) localGraphDatabases.get(uid);
 	}
 
 	@Override
@@ -184,7 +185,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
 	
 	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId, int partialGraphId, CentralAlgorithm parent) throws RemoteException {
-		Graph g = getLocalGraphDatabase(uniqueGraphId).getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(partialGraphId));
+		Graph g = ((GraphDatabaseBaseImpl)getLocalGraphDatabase(uniqueGraphId)).getGraphObject(GraphDatabaseElementaryMethods.getToplevelGraphForPartialGraphId(partialGraphId));
 		return SatelliteAlgorithmImpl.create(g, parent);
 	}
 	
