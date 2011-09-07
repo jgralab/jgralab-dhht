@@ -1196,6 +1196,15 @@ public class Rsa2Tg extends XmlProcessor {
 			if (current.getDegree(ConnectsToEdgeClass_connectedEdgeClass.class) != 2) {
 				return false;
 			}
+			// both incidences have to have different directions
+			Incidence first = current
+					.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class);
+			Incidence last = first
+					.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class);
+			if (((IncidenceClass) first.getThat()).get_direction() == ((IncidenceClass) last
+					.getThat()).get_direction()) {
+				return false;
+			}
 
 			// every superclass and subclass of a BinaryEdgeClass must be a
 			// BinaryEdgeClass candidate, too
