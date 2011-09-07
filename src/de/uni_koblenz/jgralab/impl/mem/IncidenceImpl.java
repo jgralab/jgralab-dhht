@@ -129,7 +129,6 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	private IncidenceImpl previousIncidenceAtEdge;
 
-
 	public void setIncidentVertex(VertexImpl incidentVertex) {
 		this.incidentVertex = incidentVertex;
 	}
@@ -217,7 +216,8 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
-		return incidentVertex.getIncidentEdges(traversalContext, getDirection());
+		return incidentVertex
+				.getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
@@ -234,7 +234,9 @@ public abstract class IncidenceImpl implements Incidence {
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
-		} else if (getGraph().getTraversalContext().containsElement(incidentVertex)) {
+		} else if (getGraph().getTraversalContext() == null
+				|| getGraph().getTraversalContext().containsElement(
+						incidentVertex)) {
 			return incidentVertex;
 		} else {
 			return null;
@@ -243,8 +245,11 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsElement(incidentEdge);
-		return incidentEdge.getIncidentVertices(traversalContext, getDirection());
+		assert getGraph().getTraversalContext() == null
+				|| getGraph().getTraversalContext().containsElement(
+						incidentEdge);
+		return incidentEdge.getIncidentVertices(traversalContext,
+				getDirection());
 	}
 
 	@Override
@@ -255,7 +260,8 @@ public abstract class IncidenceImpl implements Incidence {
 		}
 		Vertex vertex = (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge)
 				.getOmega() : ((BinaryEdge) incidentEdge).getAlpha();
-		if (getGraph().getTraversalContext().containsElement(vertex)) {
+		if (getGraph().getTraversalContext() == null
+				|| getGraph().getTraversalContext().containsElement(vertex)) {
 			return vertex;
 		} else {
 			return null;
@@ -264,7 +270,9 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
-		assert getGraph().getTraversalContext().containsElement(incidentEdge);
+		assert getGraph().getTraversalContext() == null
+				|| getGraph().getTraversalContext().containsElement(
+						incidentEdge);
 		return incidentEdge
 				.getIncidentVertices(
 						traversalContext,
@@ -593,7 +601,7 @@ public abstract class IncidenceImpl implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = ((IncidenceImpl) i).nextIncidenceAtEdge;
 			}
 		} else {
@@ -817,7 +825,7 @@ public abstract class IncidenceImpl implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = ((IncidenceImpl) i).nextIncidenceAtVertex;
 			}
 		} else {
@@ -1071,12 +1079,12 @@ public abstract class IncidenceImpl implements Incidence {
 	public void setId(int iId) {
 		this.id = iId;
 	}
-	
+
 	@Override
 	public int getLocalId() {
 		return id;
 	}
-	
+
 	@Override
 	public void delete() {
 		incidentVertex.removeIncidenceFromLambdaSeq(this);

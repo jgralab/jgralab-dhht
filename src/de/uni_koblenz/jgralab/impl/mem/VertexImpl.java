@@ -90,7 +90,7 @@ public abstract class VertexImpl extends
 		assert isValid();
 		if (prevVertexInGraph == null) {
 			return null;
-		} else if ((traversalContext == null)
+		} else if (traversalContext == null
 				|| traversalContext.containsVertex(prevVertexInGraph)) {
 			return prevVertexInGraph;
 		} else {
