@@ -3046,15 +3046,24 @@ public class Rsa2Tg extends XmlProcessor {
 				.removeIncidenceFromLambdaSeq((IncidenceImpl) incidence);
 		((IncidenceImpl) incidence)
 				.setIncidentVertex((VertexImpl) newIncidentVertex);
-		if (newIncidentVertex.getLastIncidence() != null) {
-			((VertexImpl) newIncidentVertex).putIncidenceAfter(
-					(IncidenceImpl) newIncidentVertex.getLastIncidence(),
-					(IncidenceImpl) incidence);
-		} else {
+		if (newIncidentVertex.getLastIncidence() == null) {
 			((VertexImpl) newIncidentVertex)
 					.setFirstIncidence((IncidenceImpl) incidence);
 			((VertexImpl) newIncidentVertex)
 					.setLastIncidence((IncidenceImpl) incidence);
+		} else if (newIncidentVertex.getFirstIncidence() == newIncidentVertex
+				.getLastIncidence()) {
+			((IncidenceImpl) newIncidentVertex.getFirstIncidence())
+					.setNextIncidenceAtVertex((IncidenceImpl) incidence);
+			((IncidenceImpl) incidence)
+					.setPreviousIncidenceAtVertex((IncidenceImpl) newIncidentVertex
+							.getFirstIncidence());
+			((VertexImpl) newIncidentVertex)
+					.setLastIncidence((IncidenceImpl) incidence);
+		} else {
+			((VertexImpl) newIncidentVertex).putIncidenceAfter(
+					(IncidenceImpl) newIncidentVertex.getLastIncidence(),
+					(IncidenceImpl) incidence);
 		}
 	}
 
