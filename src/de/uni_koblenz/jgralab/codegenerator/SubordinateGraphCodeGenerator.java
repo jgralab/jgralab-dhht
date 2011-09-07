@@ -464,7 +464,11 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case DISKBASED:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					"\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
+					"\ttry {",
+					"\t\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
+					"\t} catch (RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
 					"}");
 			break;
 		}
@@ -489,7 +493,12 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					"\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);","}");
+					"\ttry {",
+					"\t\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);",
+					"\t} catch (RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
+					"}");
 			break;
 		}
 		return code;
