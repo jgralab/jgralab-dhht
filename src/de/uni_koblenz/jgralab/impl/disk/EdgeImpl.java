@@ -75,10 +75,13 @@ public abstract class EdgeImpl extends
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(DiskStorageManager.getContainerId(DiskStorageManager.getContainerId(getLocalId())));
+		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(
+				DiskStorageManager.getContainerId(DiskStorageManager
+						.getContainerId(getLocalId())));
 	}
 
-	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) throws IOException {
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase,
+			EdgeContainer container) throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
 		this.container = container;
@@ -90,16 +93,15 @@ public abstract class EdgeImpl extends
 	 * *********************************************************
 	 */
 
-//	protected final void setId(int id) {
-//		assert id >= 0;
-//		this.elementId = id;
-//	}
+	// protected final void setId(int id) {
+	// assert id >= 0;
+	// this.elementId = id;
+	// }
 
 	@Override
 	public final long getGlobalId() {
 		return elementId;
 	}
-	
 
 	/* ***********************************************************
 	 * Access Eseq ***********************************************************
@@ -288,7 +290,8 @@ public abstract class EdgeImpl extends
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
 		try {
-			storingGraphDatabase.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putEdgeAfter(e.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
@@ -303,7 +306,8 @@ public abstract class EdgeImpl extends
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
 		try {
-			storingGraphDatabase.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
+			storingGraphDatabase.putEdgeBefore(e.getGlobalId(),
+					this.getGlobalId());
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
@@ -322,7 +326,8 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
 		long firstIncId = container.firstIncidenceId[getIdInStorage(elementId)];
-		Incidence firstIncidence = localGraphDatabase.getIncidenceObject(firstIncId);
+		Incidence firstIncidence = localGraphDatabase
+				.getIncidenceObject(firstIncId);
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext
@@ -348,7 +353,7 @@ public abstract class EdgeImpl extends
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-					.getDirection()))) {
+						.getDirection()))) {
 				i = i.getNextIncidenceAtEdge();
 			}
 		} else {
@@ -536,143 +541,144 @@ public abstract class EdgeImpl extends
 				anIncidenceClass.getM1Class(), direction);
 	}
 
-	
 	@Override
 	public final void sortIncidences(Comparator<Incidence> comp) {
 		throw new RuntimeException("Not yet implemented");
-	// assert isValid();
-	//
-	// if (getFirstIncidence() == null) {
-	// // no sorting required for empty incidence lists
-	// return;
-	// }
-	// class IncidenceList {
-	// IncidenceImpl first;
-	// IncidenceImpl last;
-	//
-	// public void add(IncidenceImpl i) {
-	// if (first == null) {
-	// first = i;
-	// assert (last == null);
-	// last = i;
-	// } else {
-	// i.setPreviousIncidenceAtEdge(last);
-	// last.setNextIncidenceAtEdge(i);
-	// last = i;
-	// }
-	// i.setNextIncidenceAtEdge(null);
-	// }
-	//
-	// public boolean isEmpty() {
-	// assert ((first == null) == (last == null));
-	// return first == null;
-	// }
-	//
-	// public IncidenceImpl remove() {
-	// if (first == null) {
-	// throw new NoSuchElementException();
-	// }
-	// IncidenceImpl out;
-	// if (first == last) {
-	// out = first;
-	// first = null;
-	// last = null;
-	// return out;
-	// }
-	// out = first;
-	// first = (IncidenceImpl) out.getNextIncidenceAtEdge();
-	// first.setPreviousIncidenceAtEdge(null);
-	// return out;
-	// }
-	//
-	// }
-	//
-	// IncidenceList a = new IncidenceList();
-	// IncidenceList b = new IncidenceList();
-	// IncidenceList out = a;
-	//
-	// // split
-	// IncidenceImpl last;
-	// IncidenceList l = new IncidenceList();
-	// l.first = (IncidenceImpl) getFirstIncidence();
-	// l.last = (IncidenceImpl) getLastIncidence();
-	//
-	// out.add(last = l.remove());
-	// while (!l.isEmpty()) {
-	// IncidenceImpl current = l.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == a) ? b : a;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	// if (a.isEmpty() || b.isEmpty()) {
-	// out = a.isEmpty() ? b : a;
-	// storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
-	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-	// return;
-	// }
-	//
-	// while (true) {
-	// if (a.isEmpty() || b.isEmpty()) {
-	// out = a.isEmpty() ? b : a;
-	// storingGraphDatabase.setFirstIncidenceId(elementId, out.first.getId());
-	// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
-	// storingGraphDatabase.incidenceListModified(elementId);
-	// return;
-	// }
-	//
-	// IncidenceList c = new IncidenceList();
-	// IncidenceList d = new IncidenceList();
-	// out = c;
-	//
-	// last = null;
-	// while (!a.isEmpty() && !b.isEmpty()) {
-	// int compareAToLast = last != null ? comp.compare(a.first, last)
-	// : 0;
-	// int compareBToLast = last != null ? comp.compare(b.first, last)
-	// : 0;
-	//
-	// if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
-	// if (comp.compare(a.first, b.first) <= 0) {
-	// out.add(last = a.remove());
-	// } else {
-	// out.add(last = b.remove());
-	// }
-	// } else if ((compareAToLast < 0) && (compareBToLast < 0)) {
-	// out = (out == c) ? d : c;
-	// last = null;
-	// } else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
-	// out.add(last = b.remove());
-	// } else {
-	// out.add(last = a.remove());
-	// }
-	// }
-	//
-	// // copy rest of A
-	// while (!a.isEmpty()) {
-	// IncidenceImpl current = a.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == c) ? d : c;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	//
-	// // copy rest of B
-	// while (!b.isEmpty()) {
-	// IncidenceImpl current = b.remove();
-	// if (comp.compare(current, last) < 0) {
-	// out = (out == c) ? d : c;
-	// }
-	// out.add(current);
-	// last = current;
-	// }
-	//
-	// a = c;
-	// b = d;
-	// }
-	//
+		// assert isValid();
+		//
+		// if (getFirstIncidence() == null) {
+		// // no sorting required for empty incidence lists
+		// return;
+		// }
+		// class IncidenceList {
+		// IncidenceImpl first;
+		// IncidenceImpl last;
+		//
+		// public void add(IncidenceImpl i) {
+		// if (first == null) {
+		// first = i;
+		// assert (last == null);
+		// last = i;
+		// } else {
+		// i.setPreviousIncidenceAtEdge(last);
+		// last.setNextIncidenceAtEdge(i);
+		// last = i;
+		// }
+		// i.setNextIncidenceAtEdge(null);
+		// }
+		//
+		// public boolean isEmpty() {
+		// assert ((first == null) == (last == null));
+		// return first == null;
+		// }
+		//
+		// public IncidenceImpl remove() {
+		// if (first == null) {
+		// throw new NoSuchElementException();
+		// }
+		// IncidenceImpl out;
+		// if (first == last) {
+		// out = first;
+		// first = null;
+		// last = null;
+		// return out;
+		// }
+		// out = first;
+		// first = (IncidenceImpl) out.getNextIncidenceAtEdge();
+		// first.setPreviousIncidenceAtEdge(null);
+		// return out;
+		// }
+		//
+		// }
+		//
+		// IncidenceList a = new IncidenceList();
+		// IncidenceList b = new IncidenceList();
+		// IncidenceList out = a;
+		//
+		// // split
+		// IncidenceImpl last;
+		// IncidenceList l = new IncidenceList();
+		// l.first = (IncidenceImpl) getFirstIncidence();
+		// l.last = (IncidenceImpl) getLastIncidence();
+		//
+		// out.add(last = l.remove());
+		// while (!l.isEmpty()) {
+		// IncidenceImpl current = l.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == a) ? b : a;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		// if (a.isEmpty() || b.isEmpty()) {
+		// out = a.isEmpty() ? b : a;
+		// storingGraphDatabase.setFirstIncidenceId(elementId,
+		// out.first.getId());
+		// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+		// return;
+		// }
+		//
+		// while (true) {
+		// if (a.isEmpty() || b.isEmpty()) {
+		// out = a.isEmpty() ? b : a;
+		// storingGraphDatabase.setFirstIncidenceId(elementId,
+		// out.first.getId());
+		// storingGraphDatabase.setLastIncidenceId(elementId, out.last.getId());
+		// storingGraphDatabase.incidenceListModified(elementId);
+		// return;
+		// }
+		//
+		// IncidenceList c = new IncidenceList();
+		// IncidenceList d = new IncidenceList();
+		// out = c;
+		//
+		// last = null;
+		// while (!a.isEmpty() && !b.isEmpty()) {
+		// int compareAToLast = last != null ? comp.compare(a.first, last)
+		// : 0;
+		// int compareBToLast = last != null ? comp.compare(b.first, last)
+		// : 0;
+		//
+		// if ((compareAToLast >= 0) && (compareBToLast >= 0)) {
+		// if (comp.compare(a.first, b.first) <= 0) {
+		// out.add(last = a.remove());
+		// } else {
+		// out.add(last = b.remove());
+		// }
+		// } else if ((compareAToLast < 0) && (compareBToLast < 0)) {
+		// out = (out == c) ? d : c;
+		// last = null;
+		// } else if ((compareAToLast < 0) && (compareBToLast >= 0)) {
+		// out.add(last = b.remove());
+		// } else {
+		// out.add(last = a.remove());
+		// }
+		// }
+		//
+		// // copy rest of A
+		// while (!a.isEmpty()) {
+		// IncidenceImpl current = a.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == c) ? d : c;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		//
+		// // copy rest of B
+		// while (!b.isEmpty()) {
+		// IncidenceImpl current = b.remove();
+		// if (comp.compare(current, last) < 0) {
+		// out = (out == c) ? d : c;
+		// }
+		// out.add(current);
+		// last = current;
+		// }
+		//
+		// a = c;
+		// b = d;
+		// }
+		//
 	}
 
 	@SuppressWarnings("unchecked")
@@ -681,15 +687,36 @@ public abstract class EdgeImpl extends
 			Vertex elemToConnect) {
 
 		Schema schema = getSchema();
-     	int classId = schema.getClassId(incidenceClass);
+		int classId = schema.getClassId(incidenceClass);
 		long globalVId = elemToConnect.getGlobalId();
-		
+
 		try {
-			return (T) localGraphDatabase.getIncidenceObject(storingGraphDatabase
-					.connect(classId, globalVId,  this.getGlobalId()));
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(classId,
+							globalVId, this.getGlobalId()));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public final <T extends Incidence> T connect(Class<T> incidenceClass,
+			Vertex elemToConnect, long globalIdOfIncidence) {
+		try {
+			return (T) localGraphDatabase
+					.getIncidenceObject(storingGraphDatabase.connect(
+							getSchema().getClassId(incidenceClass),
+							elemToConnect.getGlobalId(), this.getGlobalId(),
+							globalIdOfIncidence));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public Incidence connect(long id, IncidenceClass incidenceClass,
+			Vertex elemToConnect) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, id);
 	}
 
 	@Override
@@ -1143,30 +1170,32 @@ public abstract class EdgeImpl extends
 	@Override
 	public GraphElement<?, ?, ?> getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
-		if (sigmaId < 0)
+		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
-		else
+		} else {
 			return localGraphDatabase.getVertexObject(sigmaId);
+		}
 	}
 
 	@Override
 	public void setSigma(GraphElement<?, ?, ?> elem) {
 		long sigmaId = 0;
-		if (elem != null)
+		if (elem != null) {
 			elem.getGlobalId();
+		}
 		if (elem instanceof Edge) {
 			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;
 		} else {
 			container.sigmaId[getIdInStorage(elementId)] = sigmaId;
 		}
 	}
-	
+
 	@Override
 	public int getKappa() {
 		return (int) container.kappa[getIdInStorage(elementId)];
 	}
 
-
+	@Override
 	public void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
@@ -1220,24 +1249,27 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		return "+e" + elementId + ": " + getType().getQualifiedName();
 	}
-	
+
 	/**
 	 * @return long the internal incidence list version
 	 * @see #isIncidenceListModified(long)
 	 */
+	@Override
 	public final long getIncidenceListVersion() {
 		assert isValid();
 		return container.incidenceListVersion[getIdInStorage(elementId)];
 	}
-	
+
 	@Override
 	protected void putIncidenceAfter(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+		localGraphDatabase.putIncidenceIdAfterAtEdgeId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 	@Override
 	protected void putIncidenceBefore(Incidence target, Incidence moved) {
-		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(), moved.getGlobalId());
+		localGraphDatabase.putIncidenceIdBeforeAtEdgeId(target.getGlobalId(),
+				moved.getGlobalId());
 	}
 
 }
