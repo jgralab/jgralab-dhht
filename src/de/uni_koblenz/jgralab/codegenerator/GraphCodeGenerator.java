@@ -377,8 +377,12 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		} else if (currentCycle.isDiskbasedImpl()) {
 			code.setVariable("ecKind", gec instanceof VertexClass ? "Vertex" : "Edge");
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.get#ecKind#Object(storingGraphDatabase.create#ecKind#(getSchema().getClassId(#ecJavaClassName#.class), #newActualParams#));",
-					 "\treturn new#ecType#;", 
+					 "\ttry {",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.get#ecKind#Object(storingGraphDatabase.create#ecKind#(getSchema().getClassId(#ecJavaClassName#.class), #newActualParams#));",
+					 "\t\treturn new#ecType#;", 
+					 "\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\t throw new RuntimeException(ex);",
+					 "\t}",
 					 "}");
 		}
 		code.setVariable("formalParams", (withId ? "int id" : ""));
@@ -398,13 +402,23 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			code.add("*/",
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
-			code.setVariable("memOrDisk", currentCycle.isMembasedImpl() ? "" : "DiskBasedStorage");
+		if (currentCycle.isMembasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType##memOrDisk#(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
-					 "#connectToAlpha#",
-					 "#connectToOmega#",
-					 "\treturn new#ecType#;", 
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\talpha.connect(#alphaInc#.class, new#ecType#);",
+					 "\tomega.connect(#omegaInc#.class, new#ecType#);",
+					 "\treturn new#ecType#;",
+				 "}");
+		} else if  (currentCycle.isDiskbasedImpl()) {
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
+				//	"\ttry {",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
+					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
+					 "\t\treturn new#ecType#;",
+				//	 "\t} catch (java.rmi.RemoteException ex) {",
+				//	 "\t\t throw new RuntimeException(ex);",
+				//	 "\t}",
 				 "}");
 		}
 		IncidenceClass alphaInc = null;
@@ -424,8 +438,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.setVariable("omegaVertex", absoluteName(toClass));
 		code.setVariable("alphaInc", absoluteName(alphaInc));
 		code.setVariable("omegaInc", absoluteName(omegaInc));
-		code.setVariable("connectToAlpha", "\talpha.connect(#alphaInc#.class, new#ecType#);");
-		code.setVariable("connectToOmega", "\tomega.connect(#omegaInc#.class, new#ecType#);");
 		code.setVariable("formalParams", "#alphaVertex# alpha, #omegaVertex# omega");
 		return code;
 	}
@@ -529,7 +541,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			break;
 		case DISKBASED:
 			code.add("public #type# #isOrGet#_#name#()  {",
-					 "\treturn (#typeCast#) storingGraphDatabase.getGraphAttribute(\"#name#\");",
+					 "\ttry {",
+					 "\t\treturn (#typeCast#) storingGraphDatabase.getGraphAttribute(\"#name#\");",
+					 "\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\tthrow new RuntimeException(ex);",
+					 "\t}",
 					 "}");
 			break;
 		}
@@ -554,7 +570,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
-					 "\tstoringGraphDatabase.set#graphElementClass#Attribute(\"#name#\", _#name#);",
+					 "\ttry {",
+					 "\t\tstoringGraphDatabase.set#graphElementClass#Attribute(\"#name#\", _#name#);",
+					 "\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\tthrow new RuntimeException(ex);",
+					 "\t}",
 					 "}");
 			break;
 		}
