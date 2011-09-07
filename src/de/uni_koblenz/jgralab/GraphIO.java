@@ -3000,8 +3000,8 @@ public class GraphIO {
 							incidenceTypes.get(incidence.getKey()))) {
 						if (implementationType == ImplementationType.MEMORY) {
 							((de.uni_koblenz.jgralab.impl.mem.EdgeImpl) e)
-									.connect(incidence.getKey().intValue(), ic,
-											v);
+									.connect(ic, v, incidence.getKey()
+											.intValue());
 						} else {
 							((de.uni_koblenz.jgralab.impl.disk.EdgeImpl) e)
 									.connect(ic, v, incidence.getKey());
