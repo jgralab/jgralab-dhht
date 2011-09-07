@@ -135,14 +135,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	/**
-	 * @param id
-	 *            the id of the created incidence
 	 * @param incidenceClass
 	 * @param elemToConnect
+	 * @param incidenceId
+	 *            the id of the created incidence
 	 * @return
 	 */
-	public abstract Incidence connect(int id, IncidenceClass incidenceClass,
-			DualType elemToConnect);
+	public abstract Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect,
+			int incidenceId);
 
 	@Override
 	public final boolean containsElement(GraphElement<?, ?, ?> element) {
