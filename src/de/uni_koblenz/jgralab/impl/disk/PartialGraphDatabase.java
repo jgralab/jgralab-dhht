@@ -7,7 +7,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
+public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements RemoteGraphDatabaseAccessWithInternalMethods {
 
 	private final RemoteGraphDatabaseAccessWithInternalMethods completeGraphDatabase;
 	

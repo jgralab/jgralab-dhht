@@ -160,6 +160,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			}
 		}
 		try {
+			System.out.println("Try to export graph database");
 			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject.exportObject(localGraphDatabases.get(uid));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);

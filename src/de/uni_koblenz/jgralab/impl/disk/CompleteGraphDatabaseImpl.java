@@ -11,7 +11,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl {
+public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements RemoteGraphDatabaseAccessWithInternalMethods {
 
 	private static final int MAX_NUMBER_OF_PARTIAL_GRAPHS = 500;
 
