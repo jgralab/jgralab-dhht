@@ -22,7 +22,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl {
 		try {
 			RemoteJGraLabServer remoteInstance = localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph);
 			System.out.println("Remote instance: " + remoteInstance);
-			completeGraphDatabase = (RemoteGraphDatabaseAccessWithInternalMethods) remoteInstance.getGraphDatabase(uniqueGraphId);
+			completeGraphDatabase = remoteInstance.getGraphDatabase(uniqueGraphId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
