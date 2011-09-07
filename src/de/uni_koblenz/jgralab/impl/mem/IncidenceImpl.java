@@ -258,7 +258,7 @@ public abstract class IncidenceImpl implements Incidence {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
 		}
-		Vertex vertex = (getDirection() == Direction.EDGE_TO_VERTEX) ? ((BinaryEdge) incidentEdge)
+		Vertex vertex = (getDirection() == Direction.VERTEX_TO_EDGE) ? ((BinaryEdge) incidentEdge)
 				.getOmega() : ((BinaryEdge) incidentEdge).getAlpha();
 		if (getGraph().getTraversalContext() == null
 				|| getGraph().getTraversalContext().containsElement(vertex)) {
