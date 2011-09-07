@@ -1324,7 +1324,7 @@ public class Rsa2Tg extends XmlProcessor {
 		newIncidenceClass.set_maxEdgesAtVertex(atVertex.get_maxEdgesAtVertex());
 		newIncidenceClass.set_maxVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
 		newIncidenceClass.set_minEdgesAtVertex(atVertex.get_minEdgesAtVertex());
-		newIncidenceClass.set_minVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
+		newIncidenceClass.set_minVerticesAtEdge(atEdge.get_minEdgesAtVertex());
 		newIncidenceClass.set_roleName(extractSimpleName(oldEdgeClass
 				.get_qualifiedName()));
 
@@ -2480,7 +2480,7 @@ public class Rsa2Tg extends XmlProcessor {
 			String domainId = attributeType.getMark(att);
 			if (domainId == null) {
 				assert att.getDegree(HasAttribute_attribute.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1 : "Attribute '"
+						de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
 						+ att.getFirst_attribute(false).getThat().getM1Class()
@@ -2490,7 +2490,7 @@ public class Rsa2Tg extends XmlProcessor {
 								false).getThat()).get_qualifiedName()
 						+ "' has "
 						+ att.getDegree(HasDomain_domain.class,
-								de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)
+								de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)
 						+ " domain(s)";
 				continue;
 			}
