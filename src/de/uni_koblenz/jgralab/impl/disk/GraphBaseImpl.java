@@ -83,14 +83,13 @@ public abstract class GraphBaseImpl implements Graph {
 	 * remote graph database
 	 */
 	protected final RemoteGraphDatabaseAccess storingGraphDatabase;
-	
 
 	/**
 	 * The id of this complete or partial graph identifying it in the complete
 	 * graph
 	 */
 	protected final long globalSubgraphId;
-	
+
 	/**
 	 * Creates a graph of the given GraphClass with the given id
 	 * 
@@ -99,12 +98,14 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param cls
 	 *            the GraphClass of this Graph
 	 */
-	protected GraphBaseImpl(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {
+	protected GraphBaseImpl(long globalSubgraphId,
+			GraphDatabaseBaseImpl localGraphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		this.globalSubgraphId = globalSubgraphId;
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = storingGraphDatabase;
 	}
-	
+
 	@Override
 	public int compareTo(Graph arg0) {
 		int comVal = (int) (globalSubgraphId - arg0.getGlobalId());
@@ -112,35 +113,35 @@ public abstract class GraphBaseImpl implements Graph {
 			return getUniqueGraphId().compareTo(arg0.getUniqueGraphId());
 		}
 		return comVal;
-//		if (getCompleteGraph() == arg0) {
-//			// each graph is smaller than the complete graph
-//			return -1;
-//		} else if (arg0.getParentGraphOrElement() != null) {
-//			// this is a SubordinateGraphImpl
-//			GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>) arg0.getParentGraphOrElement();
-//			boolean isArg0Vertex = ce instanceof Vertex;
-//			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
-//			if (isArg0Vertex && isThisVertex) {
-//				// both are vertices
-//				return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
-//			} else if (!isArg0Vertex && !isThisVertex) {
-//				// both are edges
-//				return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
-//			} else {
-//				// the subordinate graph of a vertex is greater
-//				return isThisVertex ? 1 : -1;
-//			}
-//		} else {
-//			// this is a ViewGraphImpl or PartialGraphImpl
-//			return -arg0.compareTo(this);
-//		}
+		// if (getCompleteGraph() == arg0) {
+		// // each graph is smaller than the complete graph
+		// return -1;
+		// } else if (arg0.getParentGraphOrElement() != null) {
+		// // this is a SubordinateGraphImpl
+		// GraphElement<?, ?, ?> ce = (GraphElement<?, ?, ?>)
+		// arg0.getParentGraphOrElement();
+		// boolean isArg0Vertex = ce instanceof Vertex;
+		// boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
+		// if (isArg0Vertex && isThisVertex) {
+		// // both are vertices
+		// return ((Vertex) getParentGraphOrElement()).compareTo((Vertex) ce);
+		// } else if (!isArg0Vertex && !isThisVertex) {
+		// // both are edges
+		// return ((Edge) getParentGraphOrElement()).compareTo((Edge) ce);
+		// } else {
+		// // the subordinate graph of a vertex is greater
+		// return isThisVertex ? 1 : -1;
+		// }
+		// } else {
+		// // this is a ViewGraphImpl or PartialGraphImpl
+		// return -arg0.compareTo(this);
+		// }
 	}
-	
-	
+
 	// ============================================================================
-	// Methods to manage the current traversal context 
+	// Methods to manage the current traversal context
 	// ============================================================================
-	
+
 	@Override
 	public Graph getTraversalContext() {
 		return localGraphDatabase.getTraversalContext();
@@ -155,8 +156,7 @@ public abstract class GraphBaseImpl implements Graph {
 	public void releaseTraversalContext() {
 		localGraphDatabase.releaseTraversalContext();
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access hierarchy and distribution
 	//
@@ -166,44 +166,42 @@ public abstract class GraphBaseImpl implements Graph {
 	// - Distribution
 	// - Graph IDs
 	// ============================================================================
-	
 
 	@Override
 	public abstract Graph getCompleteGraph();
-	
 
 	@Override
 	public abstract Graph getLocalPartialGraph();
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public abstract AttributedElement getParentGraphOrElement();
-	
+
 	@Override
 	public abstract Graph getParentGraph();
 
 	@Override
 	public abstract boolean isPartOfGraph(Graph other);
-	
+
 	@Override
 	public abstract Graph getView(int kappa);
-	
+
 	@Override
 	public abstract Graph getViewedGraph();
-	
-	
+
 	@Override
 	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
 		long pgId;
 		try {
-			pgId = storingGraphDatabase.createPartialGraphInGraph(getGlobalId(), hostnameOfPartialGraph);
+			pgId = storingGraphDatabase.createPartialGraphInGraph(
+					getGlobalId(), hostnameOfPartialGraph);
+			System.out.println("Partial graph id: " + pgId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 		return localGraphDatabase.getGraphObject(pgId);
 	}
-	
-	
+
 	/* list of all partial graphs contained in this partial or complete one */
 	protected List<Integer> containedPartialGraphIds;
 
@@ -218,14 +216,16 @@ public abstract class GraphBaseImpl implements Graph {
 		return list;
 	}
 
-	
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
-		return getGraphDatabase().getGraphObject(GraphDatabaseBaseImpl.getToplevelGraphForPartialGraphId(partialGraphId));
+		return getGraphDatabase().getGraphObject(
+				GraphDatabaseBaseImpl
+						.getToplevelGraphForPartialGraphId(partialGraphId));
 	}
-	
+
 	/**
 	 * Saves the partial graphs of this graph
+	 * 
 	 * @param graphIO
 	 */
 	@Deprecated
@@ -233,8 +233,7 @@ public abstract class GraphBaseImpl implements Graph {
 	public void savePartialGraphs(GraphIO graphIO) {
 		throw new RuntimeException("Operation not yet implemented");
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access ids
 	// ============================================================================
@@ -243,33 +242,32 @@ public abstract class GraphBaseImpl implements Graph {
 	public String getUniqueGraphId() {
 		return localGraphDatabase.getUniqueGraphId();
 	}
-	
+
 	@Override
 	public long getGlobalId() {
 		return globalSubgraphId;
 	}
-	
+
 	@Override
 	public int getLocalId() {
 		return GraphDatabaseBaseImpl.convertToLocalId(globalSubgraphId);
 	}
-	
+
 	@Override
 	public int getPartialGraphId() {
 		return GraphDatabaseBaseImpl.getPartialGraphId(globalSubgraphId);
 	}
-	
+
 	@Override
 	public boolean isLocalElementId(long id) {
 		try {
-			return GraphDatabaseElementaryMethods.getPartialGraphId(id) ==
-				storingGraphDatabase.getLocalPartialGraphId();
+			return GraphDatabaseElementaryMethods.getPartialGraphId(id) == storingGraphDatabase
+					.getLocalPartialGraphId();
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access vertices and edges of the graph
 	// ============================================================================
@@ -288,28 +286,29 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-	
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
 		try {
-			return (T) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(cls)));
+			return (T) localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.createEdge(getSchema().getClassId(cls)));
 		} catch (Exception exception) {
 			if (exception instanceof GraphException) {
 				throw (GraphException) exception;
 			} else {
-				throw new GraphException("Error creating edge of class " + cls.getName(), exception);
+				throw new GraphException("Error creating edge of class "
+						+ cls.getName(), exception);
 			}
 		}
 	}
-	
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega) {
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega) {
 		try {
-			T edge = (T) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(cls)));
+			T edge = (T) localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.createEdge(getSchema().getClassId(cls)));
 			IncidenceClass fromClass = null;
 			IncidenceClass toClass = null;
 			EdgeClass metaClass = edge.getType();
@@ -338,14 +337,13 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
 		T newIncidence = vertex.connect(cls, edge);
 		return newIncidence;
 	}
 
-	
 	@Override
 	public boolean containsEdge(Edge e) {
 		if (containsEdgeLocally(e)) {
@@ -362,17 +360,16 @@ public abstract class GraphBaseImpl implements Graph {
 		return v.getContainingGraph().isPartOfGraph(this);
 	}
 
-	
 	@Override
-	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+	public boolean containsElement(
+			@SuppressWarnings("rawtypes") GraphElement elem) {
 		if (elem instanceof Edge) {
 			return containsEdge((Edge) elem);
 		} else {
 			return containsVertex((Vertex) elem);
 		}
 	}
-	
-	
+
 	@Override
 	public void deleteVertex(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
@@ -382,7 +379,7 @@ public abstract class GraphBaseImpl implements Graph {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public void deleteEdge(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
@@ -393,50 +390,47 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-
 	@Override
 	public Vertex getFirstVertex() {
 		try {
-			return localGraphDatabase.getVertexObject(storingGraphDatabase.getFirstVertexId(globalSubgraphId));
+			return localGraphDatabase.getVertexObject(storingGraphDatabase
+					.getFirstVertexId(globalSubgraphId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	@Override
 	public Vertex getLastVertex() {
 		try {
-			return localGraphDatabase.getVertexObject(storingGraphDatabase.getLastVertexId(globalSubgraphId));
+			return localGraphDatabase.getVertexObject(storingGraphDatabase
+					.getLastVertexId(globalSubgraphId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass) {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass, false);
 	}
 
-	
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass.getM1Class(), noSubclasses);
 	}
-	
-	
+
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
 		assert vertexClass != null;
 		return getFirstVertex(vertexClass, false);
 	}
 
-	
 	@Override
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass, boolean noSubclasses) {
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
+			boolean noSubclasses) {
 		assert vertexClass != null;
 		Vertex firstVertex = getFirstVertex();
 		if (firstVertex == null) {
@@ -454,42 +448,39 @@ public abstract class GraphBaseImpl implements Graph {
 		return firstVertex.getNextVertex(this, vertexClass, noSubclasses);
 	}
 
-	
 	// ------------- EDGE LIST VARIABLES -------------
 
 	@Override
 	public Edge getFirstEdge() {
 		try {
-			return localGraphDatabase.getEdgeObject(storingGraphDatabase.getFirstEdgeId(globalSubgraphId));
+			return localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.getFirstEdgeId(globalSubgraphId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	
 	@Override
 	public Edge getLastEdge() {
 		try {
-			return localGraphDatabase.getEdgeObject(storingGraphDatabase.getLastEdgeId(globalSubgraphId));
+			return localGraphDatabase.getEdgeObject(storingGraphDatabase
+					.getLastEdgeId(globalSubgraphId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass) {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass.getM1Class(), false);
 	}
-	
-	
+
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
 		assert edgeClass != null;
 		return getFirstEdge(edgeClass.getM1Class(), noSubclasses);
 	}
-	
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
@@ -497,9 +488,9 @@ public abstract class GraphBaseImpl implements Graph {
 		return getFirstEdge(edgeClass, false);
 	}
 
-	
 	@Override
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass, boolean noSubclasses) {
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
+			boolean noSubclasses) {
 		assert edgeClass != null;
 		Edge currentEdge = getFirstEdge();
 		while (currentEdge != null) {
@@ -517,21 +508,18 @@ public abstract class GraphBaseImpl implements Graph {
 		return null;
 	}
 
-
 	@Override
 	public Vertex getVertex(long vId) {
 		assert (vId > 0) : "The vertex id must be > 0, given was " + vId;
 		return localGraphDatabase.getVertexObject(vId);
 	}
-	
-	
+
 	@Override
 	public Edge getEdge(long eId) {
 		assert eId != 0 : "The edge id must be != 0, given was " + eId;
 		return localGraphDatabase.getEdgeObject(eId);
 	}
-	
-	
+
 	@Override
 	public long getMaxVCount() {
 		try {
@@ -540,8 +528,7 @@ public abstract class GraphBaseImpl implements Graph {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	@Override
 	public long getMaxECount() {
 		try {
@@ -550,13 +537,12 @@ public abstract class GraphBaseImpl implements Graph {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public long getMaxICount() {
 		throw new UnsupportedOperationException();
 	}
-	
-	
+
 	@Override
 	public long getVCount() {
 		try {
@@ -565,7 +551,6 @@ public abstract class GraphBaseImpl implements Graph {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
 	@Override
 	public long getECount() {
@@ -576,12 +561,10 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-
 	@Override
 	public long getICount() {
 		return localGraphDatabase.getICount(globalSubgraphId);
 	}
-
 
 	@Override
 	public Iterable<Vertex> getVertices() {
@@ -602,7 +585,6 @@ public abstract class GraphBaseImpl implements Graph {
 	public Iterable<Edge> getEdges() {
 		return new EdgeIterable<Edge>(this);
 	}
-	
 
 	@Override
 	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
@@ -614,12 +596,10 @@ public abstract class GraphBaseImpl implements Graph {
 		return new EdgeIterable<Edge>(this, edgeClass);
 	}
 
-	
 	// ============================================================================
 	// Methods to sort vertices and edges of the graph
 	// ============================================================================
-	
-	
+
 	// sort vertices
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
@@ -695,8 +675,10 @@ public abstract class GraphBaseImpl implements Graph {
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
 			try {
-				storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
-				storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+				storingGraphDatabase.setFirstVertexId(globalSubgraphId,
+						out.first.getGlobalId());
+				storingGraphDatabase.setLastVertexId(globalSubgraphId,
+						out.last.getGlobalId());
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -707,8 +689,10 @@ public abstract class GraphBaseImpl implements Graph {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
 				try {
-					storingGraphDatabase.setFirstVertexId(globalSubgraphId, out.first.getGlobalId());
-					storingGraphDatabase.setLastVertexId(globalSubgraphId, out.last.getGlobalId());
+					storingGraphDatabase.setFirstVertexId(globalSubgraphId,
+							out.first.getGlobalId());
+					storingGraphDatabase.setLastVertexId(globalSubgraphId,
+							out.last.getGlobalId());
 				} catch (RemoteException e) {
 					throw new RuntimeException(e);
 				}
@@ -844,8 +828,10 @@ public abstract class GraphBaseImpl implements Graph {
 		if (a.isEmpty() || b.isEmpty()) {
 			out = a.isEmpty() ? b : a;
 			try {
-				storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
-				storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+				storingGraphDatabase.setFirstEdgeId(globalSubgraphId,
+						out.first.getGlobalId());
+				storingGraphDatabase.setLastEdgeId(globalSubgraphId,
+						out.last.getGlobalId());
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -856,8 +842,10 @@ public abstract class GraphBaseImpl implements Graph {
 			if (a.isEmpty() || b.isEmpty()) {
 				out = a.isEmpty() ? b : a;
 				try {
-					storingGraphDatabase.setFirstEdgeId(globalSubgraphId, out.first.getGlobalId());
-					storingGraphDatabase.setLastEdgeId(globalSubgraphId, out.last.getGlobalId());
+					storingGraphDatabase.setFirstEdgeId(globalSubgraphId,
+							out.first.getGlobalId());
+					storingGraphDatabase.setLastEdgeId(globalSubgraphId,
+							out.last.getGlobalId());
 				} catch (RemoteException e) {
 					throw new RuntimeException(e);
 				}
@@ -918,16 +906,9 @@ public abstract class GraphBaseImpl implements Graph {
 
 	}
 
-
-
-	
-	
-	
-	
 	// ============================================================================
 	// Methods to handle graph listeners
 	// ============================================================================
-	
 
 	/**
 	 * A list of all registered <code>GraphStructureChangedListener</code> as
@@ -1020,7 +1001,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param v
 	 *            the vertex that is about to be deleted.
 	 */
-	protected void notifyVertexDeleted(Vertex v)  {
+	protected void notifyVertexDeleted(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -1050,7 +1031,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param v
 	 *            the vertex that has been created.
 	 */
-	protected void notifyVertexAdded(Vertex v)  {
+	protected void notifyVertexAdded(Vertex v) {
 		assert (v != null) && v.isValid() && containsVertex(v);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -1080,7 +1061,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param i
 	 *            the incidence that has been created.
 	 */
-	protected void notifyIncidenceAdded(Incidence i)  {
+	protected void notifyIncidenceAdded(Incidence i) {
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
 			while (iterator.hasNext()) {
@@ -1109,7 +1090,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param e
 	 *            the edge that is about to be deleted.
 	 */
-	protected void notifyEdgeDeleted(Edge e)  {
+	protected void notifyEdgeDeleted(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -1139,7 +1120,7 @@ public abstract class GraphBaseImpl implements Graph {
 	 * @param e
 	 *            the edge that has been created.
 	 */
-	protected void notifyEdgeAdded(Edge e)  {
+	protected void notifyEdgeAdded(Edge e) {
 		assert (e != null) && e.isValid() && containsEdge(e);
 		if (graphStructureChangedListenersWithAutoRemoval != null) {
 			Iterator<WeakReference<GraphStructureChangedListener>> iterator = getListenerListIteratorForAutoRemove();
@@ -1159,16 +1140,10 @@ public abstract class GraphBaseImpl implements Graph {
 			graphStructureChangedListeners.get(i).edgeAdded(e);
 		}
 	}
-	
-	
-	
-	
-	
-	
+
 	// ============================================================================
 	// Methods to access graph state and version (loading etc.)
 	// ============================================================================
-
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
@@ -1194,10 +1169,6 @@ public abstract class GraphBaseImpl implements Graph {
 		attr.setDefaultValue(this);
 	}
 
-
-
-
-
 	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
 			GraphElement<?, ?, ?> child) {
 		try {
@@ -1207,8 +1178,6 @@ public abstract class GraphBaseImpl implements Graph {
 		}
 	}
 
-
-
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
 	 * graph is changed, all changes like adding, creating and reordering of
@@ -1216,76 +1185,56 @@ public abstract class GraphBaseImpl implements Graph {
 	 * vertex are treated as a change.
 	 */
 	public abstract void graphModified();
-	
-	
+
 	@Override
 	public boolean isGraphModified(long previousVersion) {
 		return getGraphVersion() != previousVersion;
 	}
-	
-	
-	
+
 	/**
-	 * Changes the vertex list version of this graph. vertexListModified() is 
-	 * called whenever the vertices of a graph are changes, all changes like adding, 
-	 * creating and reordering of vertices are treated as a change. 
+	 * Changes the vertex list version of this graph. vertexListModified() is
+	 * called whenever the vertices of a graph are changes, all changes like
+	 * adding, creating and reordering of vertices are treated as a change.
 	 */
 	protected abstract void vertexListModified();
-	
-	
+
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
 		return getVertexListVersion() != previousVersion;
 	}
 
-
 	@Override
 	abstract public long getVertexListVersion();
 
-	
-	
-	
 	/**
-	 * Changes the edge list version of this graph. edgeListModified() is 
-	 * called whenever the edges of a graph are changes, all changes like adding, 
-	 * creating and reordering of edges  are treated as a change. 
+	 * Changes the edge list version of this graph. edgeListModified() is called
+	 * whenever the edges of a graph are changes, all changes like adding,
+	 * creating and reordering of edges are treated as a change.
 	 */
 	protected abstract void edgeListModified();
 
-
-
-	
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
 		return getEdgeListVersion() != edgeListVersion;
 	}
 
-	
 	@Override
 	abstract public long getEdgeListVersion();
 
-
-	
 	@Override
 	public GraphFactory getGraphFactory() {
 		return localGraphDatabase.getGraphFactory();
 	}
-
 
 	@Override
 	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return localGraphDatabase;
 	}
 
-
-	
 	@Override
 	public GraphClass getGraphClass() {
 		return getType();
 	}
-
-
-
 
 	/**
 	 * checks if the vertex v is contained directly in this graph, ant not as a
@@ -1298,29 +1247,27 @@ public abstract class GraphBaseImpl implements Graph {
 	 * member of one of its partial graphs
 	 */
 	public abstract boolean containsEdgeLocally(Edge e);
-	
 
-	
 	/**
-	 * Retrieves the Vertex object representing the vertex with the id vid
-	 * that is part of the global graph this graph belongs to.
+	 * Retrieves the Vertex object representing the vertex with the id vid that
+	 * is part of the global graph this graph belongs to.
+	 * 
 	 * @param id
 	 * @return
 	 */
 	Vertex getVertexObjectForId(int vid) {
 		return getGraphDatabase().getVertexObject(vid);
 	}
-	
+
 	/**
-	 * Retrieves the Edge object representing the edge with the id eid
-	 * that is part of the global graph this graph belongs to. 
+	 * Retrieves the Edge object representing the edge with the id eid that is
+	 * part of the global graph this graph belongs to.
+	 * 
 	 * @param id
 	 * @return
 	 */
 	Edge getEdgeObjectForId(int eid) {
 		return getGraphDatabase().getEdgeObject(eid);
 	}
-	
-	
-	
+
 }

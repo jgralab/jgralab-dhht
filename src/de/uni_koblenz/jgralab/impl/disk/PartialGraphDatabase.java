@@ -1,28 +1,32 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.schema.Schema;
 
-public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements RemoteGraphDatabaseAccessWithInternalMethods {
+public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
+		RemoteGraphDatabaseAccessWithInternalMethods {
 
 	private final RemoteGraphDatabaseAccessWithInternalMethods completeGraphDatabase;
-	
 
 	private ParentEntityKind kindOfParentElement;
 
 	public PartialGraphDatabase(Schema schema, String uniqueGraphId,
-			String hostnameOfCompleteGraph, long parentSubgraphId, ParentEntityKind kindOfParentElement, int localPartialGraphId) {
+			String hostnameOfCompleteGraph, long parentSubgraphId,
+			ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
-		System.out.println("Creating partial graph database, hostname of complete graph: " + hostnameOfCompleteGraph);
+		System.out
+				.println("Creating partial graph database, hostname of complete graph: "
+						+ hostnameOfCompleteGraph);
 		this.kindOfParentElement = kindOfParentElement;
 		try {
-			RemoteJGraLabServer remoteInstance = localJGraLabServer.getRemoteInstance(hostnameOfCompleteGraph);
+			RemoteJGraLabServer remoteInstance = localJGraLabServer
+					.getRemoteInstance(hostnameOfCompleteGraph);
 			System.out.println("Remote instance: " + remoteInstance);
-			completeGraphDatabase = remoteInstance.getGraphDatabase(uniqueGraphId);
+			completeGraphDatabase = remoteInstance
+					.getGraphDatabase(uniqueGraphId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -37,30 +41,30 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 		}
 	}
 
-	
-	
-	//for partial graph database
-	public int internalCreatePartialGraphInEntity(String remoteHostname, long parentEntityGlobalId, ParentEntityKind parentEntityKind) {
+	// for partial graph database
+	public long internalCreatePartialGraphInEntity(String remoteHostname,
+			long parentEntityGlobalId, ParentEntityKind parentEntityKind) {
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
-		int partialGraphId;
+		long partialGraphId;
 		try {
-			partialGraphId = compDatabase.internalCreatePartialGraphInEntity(remoteHostname, parentEntityGlobalId, parentEntityKind);
+			partialGraphId = compDatabase.internalCreatePartialGraphInEntity(
+					remoteHostname, parentEntityGlobalId, parentEntityKind);
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
-		RemoteJGraLabServer remoteServer = localJGraLabServer.getRemoteInstance(remoteHostname);
+		RemoteJGraLabServer remoteServer = localJGraLabServer
+				.getRemoteInstance(remoteHostname);
 		RemoteGraphDatabaseAccess p;
 		try {
 			p = remoteServer.getGraphDatabase(uniqueGraphId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		partialGraphDatabases.put(partialGraphId, (RemoteGraphDatabaseAccessWithInternalMethods) p);
+		partialGraphDatabases.put(getPartialGraphId(partialGraphId),
+				(RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return partialGraphId;
 	}
-	
-	
-	
+
 	@Override
 	public void registerPartialGraph(int id, String hostname) {
 		try {
@@ -69,33 +73,31 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-	
+
 	public ParentEntityKind getParentEntityKind(long globalSubgraphId) {
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				return getGraphDatabase(partialGraphId).getParentEntityKind(globalSubgraphId);
+				return getGraphDatabase(partialGraphId).getParentEntityKind(
+						globalSubgraphId);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
-		//for the local toplevel graph, the value is stored in the kindOfParentElement flag
-		//of the partial graph database
+		// for the local toplevel graph, the value is stored in the
+		// kindOfParentElement flag
+		// of the partial graph database
 		if (localSubgraphId == TOPLEVEL_LOCAL_SUBGRAPH_ID) {
 			return kindOfParentElement;
 		}
-		//a non-toplevel graph is implemented by subordinate graph
-		//and thus nested either in a vertex or a edge, which is 
-		//encoded by the sign of its sigma value 
-	
-		return getGraphData(localSubgraphId).containingElementId < 0 ? ParentEntityKind.EDGE : ParentEntityKind.VERTEX;
-	}
+		// a non-toplevel graph is implemented by subordinate graph
+		// and thus nested either in a vertex or a edge, which is
+		// encoded by the sign of its sigma value
 
-	
-	
+		return getGraphData(localSubgraphId).containingElementId < 0 ? ParentEntityKind.EDGE
+				: ParentEntityKind.VERTEX;
+	}
 
 	@Override
 	public void deletePartialGraph(int partialGraphId) {
@@ -104,7 +106,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		//remove from list of partial graph ids
+		// remove from list of partial graph ids
 	}
 
 	@Override
@@ -145,7 +147,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 	@Override
 	public Graph getTraversalContext() {
 		try {
-			return getGraphObject(completeGraphDatabase.getTraversalContextSubgraphId());
+			return getGraphObject(completeGraphDatabase
+					.getTraversalContextSubgraphId());
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -163,7 +166,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 	@Override
 	public void setTraversalContext(Graph traversalContext) {
 		try {
-			completeGraphDatabase.setTraversalContext(traversalContext.getGlobalId());
+			completeGraphDatabase.setTraversalContext(traversalContext
+					.getGlobalId());
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -206,24 +210,27 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 				throw new RuntimeException(e);
 			}
 	}
-	
+
 	public Object getGraphAttribute(String attributeName) {
 		try {
-			return getGraphDatabase(getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)).getGraphAttribute(attributeName);
+			return getGraphDatabase(
+					getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
+					.getGraphAttribute(attributeName);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
+
 	@Override
 	public void setGraphAttribute(String attributeName, Object data) {
 		try {
-			getGraphDatabase(getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)).setGraphAttribute(attributeName, data);
+			getGraphDatabase(
+					getPartialGraphId(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID))
+					.setGraphAttribute(attributeName, data);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-
-
 
 	@Override
 	public long getTraversalContextSubgraphId() throws RemoteException {
@@ -234,8 +241,5 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements Remot
 	public void setTraversalContext(long globalId) throws RemoteException {
 		completeGraphDatabase.setTraversalContext(globalId);
 	}
-
-
-
 
 }
