@@ -160,7 +160,12 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
 				parent, localPartialGraphId);
 		localGraphDatabases.put(uniqueGraphId, db);
-		return db;
+		try {
+			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+					.exportObject(db, 0);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
