@@ -140,6 +140,7 @@ import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
 import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_connectedEdgeClass;
@@ -1113,6 +1114,9 @@ public class Rsa2Tg extends XmlProcessor {
 		linkRecordDomainComponents();
 		linkAttributeDomains();
 
+		// convert EdgeClass to BinaryEdgeClass where possible
+		convertEdgeClassesToBinaryEdgeClasses();
+
 		removeIgnoredPackages();
 
 		if (isUseNavigability()) {
@@ -1159,11 +1163,107 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
+	/**
+	 * Converts all EdgeClasses which have exactly 2 connected IncidenceClasses
+	 * as well as all super and sub classes into BinaryEdgeClasses.
+	 */
+	private void convertEdgeClassesToBinaryEdgeClasses() {
+		System.out
+				.println("Converting EdgeClasses to BinaryEdgeClasses if possible...");
+		EdgeClass ec = sg.getFirstEdgeClass(true);
+		while (ec != null) {
+			EdgeClass current = ec;
+			ec = ec.getNextEdgeClass(true);
+			if (isValidBinaryEdgeClassCandidate(current)) {
+				convertToBinaryEdgeClass(current);
+			} else {
+				// every IncidenceClass must have the inicdenceType EDGE
+				checkIncidenceTypes(current);
+			}
+		}
+
+	}
+
+	private void checkIncidenceTypes(EdgeClass ec) {
+		for (ConnectsToEdgeClass_connectedEdgeClass inc : ec
+				.getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+			IncidenceClass incidenceClass = (IncidenceClass) inc.getThat();
+			if (incidenceClass.get_incidenceType() != IncidenceType.EDGE) {
+				throw new ProcessingException(getParser(), getFileName(),
+						"The IncidenceClass '" + incidenceClass.get_roleName()
+								+ "' of HyperEdgeClass '"
+								+ ec.get_qualifiedName()
+								+ "' must not have the IncidenceType '"
+								+ incidenceClass.get_incidenceType() + "'.");
+			}
+		}
+	}
+
+	private boolean isValidBinaryEdgeClassCandidate(EdgeClass ec) {
+		LocalBooleanGraphMarker alreadySeenMarker = new LocalBooleanGraphMarker(
+				sg);
+		Stack<EdgeClass> workingList = new Stack<EdgeClass>();
+		workingList.add(ec);
+		alreadySeenMarker.mark(ec);
+		while (!workingList.isEmpty()) {
+			EdgeClass current = workingList.pop();
+			if (BinaryEdgeClass.class.isInstance(current)) {
+				continue;
+			}
+			// a BinaryEdgeClass must have exactly two IncidenceClasses
+			if (current.getDegree(ConnectsToEdgeClass_connectedEdgeClass.class) != 2) {
+				return false;
+			}
+			// both incidences have to have different directions and both
+			// incidences are not abstract
+			Incidence first = current
+					.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class);
+			Incidence last = first
+					.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class);
+			if (((IncidenceClass) first.getThat()).get_direction() == ((IncidenceClass) last
+					.getThat()).get_direction()
+					&& (((IncidenceClass) first.getThat()).is_abstract() || ((IncidenceClass) last
+							.getThat()).is_abstract())) {
+				return false;
+			}
+
+			// every superclass and subclass of a BinaryEdgeClass must be a
+			// BinaryEdgeClass candidate, too
+			for (SpecializesEdgeClass sec : current
+					.getIncidentEdges(SpecializesEdgeClass.class)) {
+				EdgeClass genEC = (EdgeClass) (sec.getAlpha() == current ? sec
+						.getOmega() : sec.getAlpha());
+				if (alreadySeenMarker.isMarked(genEC)) {
+					continue;
+				} else {
+					workingList.push(genEC);
+				}
+			}
+		}
+		return true;
+	}
+
+	private void convertToBinaryEdgeClass(EdgeClass ec) {
+		BinaryEdgeClass bec = sg.createBinaryEdgeClass();
+		bec.set_abstract(ec.is_abstract());
+		bec.set_maxKappa(ec.get_maxKappa());
+		bec.set_minKappa(ec.get_minKappa());
+		bec.set_qualifiedName(ec.get_qualifiedName());
+
+		Incidence i = ec.getFirstIncidence();
+		while (i != null) {
+			Incidence current = i;
+			i = i.getNextIncidenceAtVertex();
+			setIncidentVertex(current, bec);
+		}
+		ec.delete();
+	}
+
 	private void convertToEdgeClasses() {
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
-			EdgeClass ec = sg.createBinaryEdgeClass();
+			EdgeClass ec = sg.createEdgeClass();
 			ec.set_qualifiedName(oldVertexClass.get_qualifiedName());
 			ec.set_abstract(oldVertexClass.is_abstract());
 			ec.set_maxKappa(oldVertexClass.get_maxKappa());
@@ -1173,7 +1273,7 @@ public class Rsa2Tg extends XmlProcessor {
 			while (i != null) {
 				Incidence n = i.getNextIncidenceAtVertex();
 				if (i.getEdge() instanceof ConnectsToVertexClass) {
-					BinaryEdge e = (BinaryEdge) i.getEdge();
+					Edge e = i.getEdge();
 					IncidenceClass incidenceClass = (IncidenceClass) (e
 							.getFirstIncidence() == i ? e.getLastIncidence()
 							.getVertex() : e.getFirstIncidence().getVertex());
@@ -1245,9 +1345,11 @@ public class Rsa2Tg extends XmlProcessor {
 		newIncidenceClass.set_maxEdgesAtVertex(atVertex.get_maxEdgesAtVertex());
 		newIncidenceClass.set_maxVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
 		newIncidenceClass.set_minEdgesAtVertex(atVertex.get_minEdgesAtVertex());
-		newIncidenceClass.set_minVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
-		newIncidenceClass.set_roleName(extractSimpleName(oldEdgeClass
-				.get_qualifiedName()));
+		newIncidenceClass.set_minVerticesAtEdge(atEdge.get_minEdgesAtVertex());
+		String roleName = extractSimpleName(oldEdgeClass.get_qualifiedName());
+		newIncidenceClass
+				.set_roleName(Character.toLowerCase(roleName.charAt(0))
+						+ (roleName.length() > 1 ? roleName.substring(1) : ""));
 
 		// set specializations
 		if (generalizations.isMarked(oldEdgeClass)) {
@@ -1497,54 +1599,57 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void createSubsetsAndRedefinesRelations() {
 		System.out.println("Creating subsets and redefines relationships...");
-		// for each specialization between edge classes, add a subsets edge
-		// between their incidence classes
+		// for each specialization between binary edge classes, add a subsets
+		// edge between their incidence classes
 		SpecializesEdgeClass spec = sg.getFirstSpecializesEdgeClass();
 		while (spec != null) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
+			if (BinaryEdgeClass.class.isInstance(superClass)
+					&& BinaryEdgeClass.class.isInstance(subClass)) {
 
-			IncidenceClass cfSubClass = null;
-			IncidenceClass gtSubClass = null;
-			for (ConnectsToEdgeClass ctec : subClass
-					.getIncidentEdges(ConnectsToEdgeClass.class)) {
-				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
-				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
-					if (cfSubClass == null) {
-						cfSubClass = ic;
-					}
-				} else {
-					if (gtSubClass == null) {
-						gtSubClass = ic;
-					}
-				}
-			}
-
-			IncidenceClass cfSuperClass = null;
-			IncidenceClass gtSuperClass = null;
-			for (ConnectsToEdgeClass ctec : superClass
-					.getIncidentEdges(ConnectsToEdgeClass.class)) {
-				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
-				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
-					if (cfSuperClass == null) {
-						cfSuperClass = ic;
-					}
-				} else {
-					if (gtSuperClass == null) {
-						gtSuperClass = ic;
+				IncidenceClass cfSubClass = null;
+				IncidenceClass gtSubClass = null;
+				for (ConnectsToEdgeClass ctec : subClass
+						.getIncidentEdges(ConnectsToEdgeClass.class)) {
+					IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
+					if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+						if (cfSubClass == null) {
+							cfSubClass = ic;
+						}
+					} else {
+						if (gtSubClass == null) {
+							gtSubClass = ic;
+						}
 					}
 				}
+
+				IncidenceClass cfSuperClass = null;
+				IncidenceClass gtSuperClass = null;
+				for (ConnectsToEdgeClass ctec : superClass
+						.getIncidentEdges(ConnectsToEdgeClass.class)) {
+					IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
+					if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+						if (cfSuperClass == null) {
+							cfSuperClass = ic;
+						}
+					} else {
+						if (gtSuperClass == null) {
+							gtSuperClass = ic;
+						}
+					}
+				}
+
+				assert cfSubClass != null;
+				assert cfSuperClass != null;
+				createSpecializesIncidenceClassForIncidences(subClass,
+						superClass, cfSubClass, cfSuperClass);
+
+				assert gtSubClass != null;
+				assert gtSuperClass != null;
+				createSpecializesIncidenceClassForIncidences(subClass,
+						superClass, gtSubClass, gtSuperClass);
 			}
-
-			assert cfSubClass != null;
-			assert cfSuperClass != null;
-			createSpecializesIncidenceClassForIncidences(subClass, superClass,
-					cfSubClass, cfSuperClass);
-
-			assert gtSubClass != null;
-			assert gtSuperClass != null;
-			createSpecializesIncidenceClassForIncidences(subClass, superClass,
-					gtSubClass, gtSuperClass);
 			spec = spec.getNextSpecializesEdgeClass();
 		}
 
@@ -1920,6 +2025,10 @@ public class Rsa2Tg extends XmlProcessor {
 			sg.createConnectsToEdgeClass(inc, ec);
 			sg.createConnectsToVertexClass(inc, vc);
 			idMap.put(targetEnd, inc);
+		}
+		String isDerived = getAttribute(XMIConstants.UML_ATTRIBUTE_ISDERIVED);
+		if (isDerived != null && isDerived.equals(XMIConstants.UML_TRUE)) {
+			ec.set_abstract(true);
 		}
 		return ec;
 	}
@@ -2401,7 +2510,7 @@ public class Rsa2Tg extends XmlProcessor {
 			String domainId = attributeType.getMark(att);
 			if (domainId == null) {
 				assert att.getDegree(HasAttribute_attribute.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1 : "Attribute '"
+						de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
 						+ att.getFirst_attribute(false).getThat().getM1Class()
@@ -2411,7 +2520,7 @@ public class Rsa2Tg extends XmlProcessor {
 								false).getThat()).get_qualifiedName()
 						+ "' has "
 						+ att.getDegree(HasDomain_domain.class,
-								de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)
+								de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)
 						+ " domain(s)";
 				continue;
 			}
@@ -3047,24 +3156,21 @@ public class Rsa2Tg extends XmlProcessor {
 		((IncidenceImpl) incidence)
 				.setIncidentVertex((VertexImpl) newIncidentVertex);
 		if (newIncidentVertex.getLastIncidence() == null) {
+			// incidence is the first incidence at newIncidentVertex
 			((VertexImpl) newIncidentVertex)
 					.setFirstIncidence((IncidenceImpl) incidence);
 			((VertexImpl) newIncidentVertex)
 					.setLastIncidence((IncidenceImpl) incidence);
-		} else if (newIncidentVertex.getFirstIncidence() == newIncidentVertex
-				.getLastIncidence()) {
-			((IncidenceImpl) newIncidentVertex.getFirstIncidence())
+		} else {
+			((IncidenceImpl) newIncidentVertex.getLastIncidence())
 					.setNextIncidenceAtVertex((IncidenceImpl) incidence);
 			((IncidenceImpl) incidence)
 					.setPreviousIncidenceAtVertex((IncidenceImpl) newIncidentVertex
-							.getFirstIncidence());
+							.getLastIncidence());
 			((VertexImpl) newIncidentVertex)
 					.setLastIncidence((IncidenceImpl) incidence);
-		} else {
-			((VertexImpl) newIncidentVertex).putIncidenceAfter(
-					(IncidenceImpl) newIncidentVertex.getLastIncidence(),
-					(IncidenceImpl) incidence);
 		}
+		((VertexImpl) newIncidentVertex).incidenceListModified();
 	}
 
 	/**

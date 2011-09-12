@@ -1270,9 +1270,9 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public final Incidence connect(int id, IncidenceClass incidenceClass,
-			Edge elemToConnect) {
-		return connect(incidenceClass.getM1Class(), elemToConnect, id);
+	public final Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect,
+			int incidenceId) {
+		return connect(incidenceClass.getM1Class(), elemToConnect, incidenceId);
 	}
 
 	@Override

@@ -243,7 +243,7 @@ public abstract class IncidenceImpl implements Incidence {
 		}
 		Vertex vertex = null;
 
-		if (getDirection() == Direction.EDGE_TO_VERTEX) {
+		if (getDirection() == Direction.VERTEX_TO_EDGE) {
 			vertex = ((BinaryEdge) incidentEdge).getOmega();
 		} else {
 			vertex = ((BinaryEdge) incidentEdge).getAlpha();
