@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 /**
  * Remote interface of DiskStorage used to access properties of the stored
@@ -16,60 +17,59 @@ public interface RemoteDiskStorageAccess extends Remote {
 	 * access hierarchy ========================================================
 	 */
 
-	public long getSigmaIdOfVertexId(int localElementId)
-			throws RuntimeException;
+	public long getSigmaIdOfVertexId(int localElementId) throws RemoteException;
 
 	public void setSigmaIdOfVertexId(int localElementId, long globalSigmaId)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public int getKappaOfVertexId(int localIncidenceId) throws RuntimeException;
+	public int getKappaOfVertexId(int localIncidenceId) throws RemoteException;
 
 	public void setKappaOfVertexId(int localIncidenceId, int kappa)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public long getSigmaIdOfEdgeId(int localElementId) throws RuntimeException;
+	public long getSigmaIdOfEdgeId(int localElementId) throws RemoteException;
 
 	public void setSigmaIdOfEdgeId(int localElementId, long globalSigmaId)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public int getKappaOfEdgeId(int localIncidenceId) throws RuntimeException;
+	public int getKappaOfEdgeId(int localIncidenceId) throws RemoteException;
 
 	public void setKappaOfEdgeId(int localIncidenceId, int kappa)
-			throws RuntimeException;
+			throws RemoteException;
 
 	/*
 	 * ======================================================== Methods to
 	 * access vertices ========================================================
 	 */
 
-	public int getVertexTypeId(int localVertexId) throws RuntimeException;
+	public int getVertexTypeId(int localVertexId) throws RemoteException;
 
-	public long getNextVertexId(int localVertexId) throws RuntimeException;
+	public long getNextVertexId(int localVertexId) throws RemoteException;
 
 	public void setNextVertexId(int localVertexId, long nextVertexId)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public long getPreviousVertexId(int localVertexId) throws RuntimeException;
+	public long getPreviousVertexId(int localVertexId) throws RemoteException;
 
 	public void setPreviousVertexId(int localVertexId, long previousVertexId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	/*
 	 * ======================================================== Methods to
 	 * access edges ========================================================
 	 */
 
-	public int getEdgeTypeId(int localEdgeId) throws RuntimeException;
+	public int getEdgeTypeId(int localEdgeId) throws RemoteException;
 
-	public long getNextEdgeId(int localEdgeId) throws RuntimeException;
+	public long getNextEdgeId(int localEdgeId) throws RemoteException;
 
 	public void setNextEdgeId(int localEdgeId, long nextEdgeId)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public long getPreviousEdgeId(int localEdgeId) throws RuntimeException;
+	public long getPreviousEdgeId(int localEdgeId) throws RemoteException;
 
 	public void setPreviousEdgeId(int localEdgeId, long previousEdgeId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	/*
 	 * ======================================================== Methods to
@@ -78,69 +78,69 @@ public interface RemoteDiskStorageAccess extends Remote {
 	 */
 
 	public long getFirstIncidenceIdAtVertexId(int localElementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setFirstIncidenceIdAtVertexId(int localElementId, long id)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getLastIncidenceIdAtVertexId(int localElementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setLastIncidenceIdAtVertexId(int localElementId, long id)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getNextIncidenceIdAtVertexId(int convertToLocalId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getPreviousIncidenceIdAtVertexId(int convertToLocalId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setPreviousIncidenceAtVertexId(int localIncidenceId,
-			long previousIncId) throws RuntimeException;
+			long previousIncId) throws RemoteException;
 
-	public long getConnectedVertexId(int incidenceId) throws RuntimeException;
+	public long getConnectedVertexId(int incidenceId) throws RemoteException;
 
 	public long getIncidenceListVersionOfVertexId(int elementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void increaseIncidenceListVersionOfVertexId(int elementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getFirstIncidenceIdAtEdgeId(int localElementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setFirstIncidenceIdAtEdgeId(int localElementId, long l)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getLastIncidenceIdAtEdgeId(int localElementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setLastIncidenceIdAtEdgeId(int localElementId, long id)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getNextIncidenceIdAtEdgeId(int convertToLocalId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public long getPreviousIncidenceIdAtEdgeId(int convertToLocalId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void setPreviousIncidenceAtEdgeId(int localIncidenceId,
-			long previousIncId) throws RuntimeException;
+			long previousIncId) throws RemoteException;
 
-	public long getConnectedEdgeId(int incidenceId) throws RuntimeException;
+	public long getConnectedEdgeId(int incidenceId) throws RemoteException;
 
 	public long getIncidenceListVersionOfEdgeId(int elementId)
-			throws RuntimeException;
+			throws RemoteException;
 
 	public void increaseIncidenceListVersionOfEdgeId(int elementId)
-			throws RuntimeException;
+			throws RemoteException;
 
-	public int getIncidenceTypeId(int localIncidenceId) throws RuntimeException;
+	public int getIncidenceTypeId(int localIncidenceId) throws RemoteException;
 
 }

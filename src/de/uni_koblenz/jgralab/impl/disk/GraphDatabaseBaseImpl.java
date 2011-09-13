@@ -1177,30 +1177,46 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long getIncidenceListVersionOfVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getIncidenceListVersionOfEdgeId(convertToLocalId(vertexId));
+		try {
+			return diskStore
+					.getIncidenceListVersionOfEdgeId(convertToLocalId(vertexId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getIncidenceListVersionOfEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
+		try {
+			return diskStore
+					.getIncidenceListVersionOfVertexId(convertToLocalId(edgeId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getEdgeIdAtIncidenceId(long id) {
 		int partialGraphId = getPartialGraphId(id);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getConnectedEdgeId(convertToLocalId(id));
+		try {
+			return diskStore.getConnectedEdgeId(convertToLocalId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getVertexIdAtIncidenceId(long id) {
 		int partialGraphId = getPartialGraphId(id);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getConnectedVertexId(convertToLocalId(id));
+		try {
+			return diskStore.getConnectedVertexId(convertToLocalId(id));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -1285,73 +1301,118 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	private long getConnectedVertexId(long incidenceId) {
 		int partialGraphId = getPartialGraphId(incidenceId);
-		return getDiskStorageForPartialGraph(partialGraphId)
-				.getConnectedVertexId(convertToLocalId(incidenceId));
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getConnectedVertexId(convertToLocalId(incidenceId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private long getConnectedEdgeId(long incidenceId) {
 		int partialGraphId = getPartialGraphId(incidenceId);
-		return getDiskStorageForPartialGraph(partialGraphId)
-				.getConnectedEdgeId(convertToLocalId(incidenceId));
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getConnectedEdgeId(convertToLocalId(incidenceId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getFirstIncidenceIdAtVertexId(long elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getFirstIncidenceIdAtVertexId(convertToLocalId(elemId));
+		try {
+			return diskStore
+					.getFirstIncidenceIdAtVertexId(convertToLocalId(elemId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getLastIncidenceIdAtVertexId(long elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getLastIncidenceIdAtVertexId(convertToLocalId(elemId));
+		try {
+			return diskStore
+					.getLastIncidenceIdAtVertexId(convertToLocalId(elemId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getFirstIncidenceIdAtEdgeId(long elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getFirstIncidenceIdAtEdgeId(convertToLocalId(elemId));
+		try {
+			return diskStore
+					.getFirstIncidenceIdAtEdgeId(convertToLocalId(elemId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getLastIncidenceIdAtEdgeId(long elemId) {
 		int partialGraphId = getPartialGraphId(elemId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getLastIncidenceIdAtEdgeId(convertToLocalId(elemId));
+		try {
+			return diskStore
+					.getLastIncidenceIdAtEdgeId(convertToLocalId(elemId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getNextIncidenceIdAtVertexId(long incId) {
 		int partialGraphId = getPartialGraphId(incId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getNextIncidenceIdAtVertexId(convertToLocalId(incId));
+		try {
+			return diskStore
+					.getNextIncidenceIdAtVertexId(convertToLocalId(incId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getPreviousIncidenceIdAtVertexId(long globalIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getPreviousIncidenceIdAtVertexId(convertToLocalId(globalIncidenceId));
+		try {
+			return diskStore
+					.getPreviousIncidenceIdAtVertexId(convertToLocalId(globalIncidenceId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getNextIncidenceIdAtEdgeId(long incId) {
 		int partialGraphId = getPartialGraphId(incId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getNextIncidenceIdAtEdgeId(convertToLocalId(incId));
+		try {
+			return diskStore
+					.getNextIncidenceIdAtEdgeId(convertToLocalId(incId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getPreviousIncidenceIdAtEdgeId(long incId) {
 		int partialGraphId = getPartialGraphId(incId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore
-				.getPreviousIncidenceIdAtEdgeId(convertToLocalId(incId));
+		try {
+			return diskStore
+					.getPreviousIncidenceIdAtEdgeId(convertToLocalId(incId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

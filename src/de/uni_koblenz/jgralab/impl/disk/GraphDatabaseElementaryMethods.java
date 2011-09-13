@@ -446,20 +446,32 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	public int getVertexTypeId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		return getDiskStorageForPartialGraph(partialGraphId).getVertexTypeId(
-				convertToLocalId(vertexId));
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getVertexTypeId(convertToLocalId(vertexId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public int getEdgeTypeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		return getDiskStorageForPartialGraph(partialGraphId).getEdgeTypeId(
-				convertToLocalId(edgeId));
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId).getEdgeTypeId(
+					convertToLocalId(edgeId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public int getIncidenceTypeId(long incidenceId) {
 		int partialGraphId = getPartialGraphId(incidenceId);
-		return getDiskStorageForPartialGraph(partialGraphId)
-				.getIncidenceTypeId(convertToLocalId(incidenceId));
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getIncidenceTypeId(convertToLocalId(incidenceId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*
@@ -608,32 +620,48 @@ public abstract class GraphDatabaseElementaryMethods implements
 	public long getSigmaIdOfVertexId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		return getDiskStorageForPartialGraph(partialGraphId)
-				.getSigmaIdOfVertexId(localElementId);
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getSigmaIdOfVertexId(localElementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setSigmaIdOfVertexId(long globalElementId, long globalSigmaId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfVertexId(
-				localElementId, globalSigmaId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfVertexId(
+					localElementId, globalSigmaId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getSigmaIdOfEdgeId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		return getDiskStorageForPartialGraph(partialGraphId)
-				.getSigmaIdOfEdgeId(localElementId);
+		try {
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getSigmaIdOfEdgeId(localElementId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setSigmaIdOfEdgeId(long globalElementId, long globalSigmaId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
-		getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfEdgeId(
-				localElementId, globalSigmaId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId).setSigmaIdOfEdgeId(
+					localElementId, globalSigmaId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -769,27 +797,43 @@ public abstract class GraphDatabaseElementaryMethods implements
 	public long getNextVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getNextVertexId(convertToLocalId(vertexId));
+		try {
+			return diskStore.getNextVertexId(convertToLocalId(vertexId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public long getPreviousVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getPreviousVertexId(convertToLocalId(vertexId));
+		try {
+			return diskStore.getPreviousVertexId(convertToLocalId(vertexId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void setNextVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setNextVertexId(convertToLocalId(modifiedVertexId),
-				nextVertexId);
+		try {
+			diskStore.setNextVertexId(convertToLocalId(modifiedVertexId),
+					nextVertexId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void setPreviousVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setPreviousVertexId(convertToLocalId(modifiedVertexId),
-				nextVertexId);
+		try {
+			diskStore.setPreviousVertexId(convertToLocalId(modifiedVertexId),
+					nextVertexId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/*
@@ -863,27 +907,44 @@ public abstract class GraphDatabaseElementaryMethods implements
 	public long getNextEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getNextEdgeId(convertToLocalId(edgeId));
+		try {
+			return diskStore.getNextEdgeId(convertToLocalId(edgeId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setNextEdgeId(convertToLocalId(modifiedEdgeId), nextEdgeId);
+		try {
+			diskStore.setNextEdgeId(convertToLocalId(modifiedEdgeId),
+					nextEdgeId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public long getPreviousEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		return diskStore.getPreviousEdgeId(convertToLocalId(edgeId));
+		try {
+			return diskStore.getPreviousEdgeId(convertToLocalId(edgeId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
-		diskStore.setPreviousEdgeId(convertToLocalId(modifiedEdgeId),
-				nextEdgeId);
+		try {
+			diskStore.setPreviousEdgeId(convertToLocalId(modifiedEdgeId),
+					nextEdgeId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected boolean containsIncidenceId(long iId) {
@@ -893,69 +954,106 @@ public abstract class GraphDatabaseElementaryMethods implements
 	@Override
 	public void setFirstIncidenceIdAtVertexId(long vertexId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setFirstIncidenceIdAtVertexId(convertToLocalId(vertexId),
-						incidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setFirstIncidenceIdAtVertexId(convertToLocalId(vertexId),
+							incidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setLastIncidenceIdAtVertexId(long vertexId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setLastIncidenceIdAtVertexId(convertToLocalId(vertexId),
-						incidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setLastIncidenceIdAtVertexId(convertToLocalId(vertexId),
+							incidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setNextIncidenceIdAtVertexId(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setNextIncidenceAtVertexId(
-						convertToLocalId(globalIncidenceId), nextIncidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setNextIncidenceAtVertexId(
+							convertToLocalId(globalIncidenceId),
+							nextIncidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setPreviousIncidenceAtVertexId(
-						convertToLocalId(globalIncidenceId), nextIncidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setPreviousIncidenceAtVertexId(
+							convertToLocalId(globalIncidenceId),
+							nextIncidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 
 	@Override
 	public void setFirstIncidenceIdAtEdgeId(long edgeId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setFirstIncidenceIdAtEdgeId(convertToLocalId(edgeId),
-						incidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setFirstIncidenceIdAtEdgeId(convertToLocalId(edgeId),
+							incidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setLastIncidenceIdAtEdgeId(long edgeId, long incidenceId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setLastIncidenceIdAtEdgeId(convertToLocalId(edgeId),
-						incidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setLastIncidenceIdAtEdgeId(convertToLocalId(edgeId),
+							incidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setNextIncidenceIdAtEdgeId(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		getDiskStorageForPartialGraph(partialGraphId).setNextIncidenceAtEdgeId(
-				convertToLocalId(globalIncidenceId), nextIncidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setNextIncidenceAtEdgeId(
+							convertToLocalId(globalIncidenceId),
+							nextIncidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void setPreviousIncidenceIdAtEdgeId(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
-		getDiskStorageForPartialGraph(partialGraphId)
-				.setPreviousIncidenceAtEdgeId(
-						convertToLocalId(globalIncidenceId), nextIncidenceId);
+		try {
+			getDiskStorageForPartialGraph(partialGraphId)
+					.setPreviousIncidenceAtEdgeId(
+							convertToLocalId(globalIncidenceId),
+							nextIncidenceId);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
