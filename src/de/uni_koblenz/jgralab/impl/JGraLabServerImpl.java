@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
@@ -47,6 +46,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	private static String localPort = "1099";
 
 	private final Map<String, RemoteGraphDatabaseAccessWithInternalMethods> localGraphDatabases = new HashMap<String, RemoteGraphDatabaseAccessWithInternalMethods>();
+
+	private final Map<String, RemoteGraphDatabaseAccessWithInternalMethods> localStubs = new HashMap<String, RemoteGraphDatabaseAccessWithInternalMethods>();
 
 	private final Map<String, String> localFilesContainingGraphs = new HashMap<String, String>();
 
@@ -102,17 +103,27 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			Graph graph = GraphIO.loadGraphFromFile(filename, null,
 					ImplementationType.DISK);
 			db = graph.getGraphDatabase();
-			localGraphDatabases.put(uid, db);
+			registerLocalGraphDatabase((GraphDatabaseBaseImpl) db);
 		}
 		return db;
 	}
 
 	@Override
 	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl localDb) {
+		String uniqueId = localDb.getUniqueGraphId();
 		System.out.println("Registering graph db with unique id "
 				+ localDb.getUniqueGraphId());
-		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId())) {
-			localGraphDatabases.put(localDb.getUniqueGraphId(), localDb);
+		if (!localGraphDatabases.containsKey(uniqueId)) {
+			localGraphDatabases.put(uniqueId, localDb);
+			RemoteGraphDatabaseAccessWithInternalMethods stub;
+			try {
+				stub = (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+						.exportObject(localGraphDatabases.get(uniqueId), 0);
+				localStubs.put(uniqueId, stub);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+
 		}
 	}
 
@@ -161,13 +172,9 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema,
 				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
 				parent, localPartialGraphId);
+		registerLocalGraphDatabase(db);
 		localGraphDatabases.put(uniqueGraphId, db);
-		try {
-			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
-					.exportObject(db, 0);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		return getGraphDatabase(uniqueGraphId);
 	}
 
 	@Override
@@ -177,17 +184,11 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);
-			} catch (GraphIOException e) {
-				throw new GraphException(e);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
 			}
 		}
-		try {
-			System.out.println("Try to export graph database");
-			return (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
-					.exportObject(localGraphDatabases.get(uid), 0);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		return localStubs.get(uid);
 	}
 
 	/**
@@ -198,6 +199,13 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	 * @return
 	 */
 	public GraphDatabaseBaseImpl getLocalGraphDatabase(String uid) {
+		if (!localGraphDatabases.containsKey(uid)) {
+			try {
+				loadGraph(uid);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 		return (GraphDatabaseBaseImpl) localGraphDatabases.get(uid);
 	}
 
