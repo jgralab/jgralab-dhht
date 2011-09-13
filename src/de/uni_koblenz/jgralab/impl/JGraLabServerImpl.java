@@ -109,6 +109,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
 	@Override
 	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl localDb) {
+		System.out.println("Registering graph db with unique id "
+				+ localDb.getUniqueGraphId());
 		if (!localGraphDatabases.containsKey(localDb.getUniqueGraphId())) {
 			localGraphDatabases.put(localDb.getUniqueGraphId(), localDb);
 		}
@@ -171,6 +173,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(
 			String uid) {
+		System.out.println("Retrieving graph database with id " + uid);
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);

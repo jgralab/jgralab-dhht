@@ -27,6 +27,11 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 			System.out.println("Remote instance: " + remoteInstance);
 			completeGraphDatabase = remoteInstance
 					.getGraphDatabase(uniqueGraphId);
+			GraphData data = new GraphData();
+			data.globalSubgraphId = GraphDatabaseElementaryMethods
+					.getToplevelGraphForPartialGraphId(localPartialGraphId);
+			data.typeId = schema.getClassId(schema.getGraphClass());
+			localSubgraphData.add(data);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -42,10 +47,10 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 	}
 
 	// for partial graph database
-	public long internalCreatePartialGraphInEntity(String remoteHostname,
+	public int internalCreatePartialGraphInEntity(String remoteHostname,
 			long parentEntityGlobalId, ParentEntityKind parentEntityKind) {
 		RemoteGraphDatabaseAccessWithInternalMethods compDatabase = getGraphDatabase(GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID);
-		long partialGraphId;
+		int partialGraphId;
 		try {
 			partialGraphId = compDatabase.internalCreatePartialGraphInEntity(
 					remoteHostname, parentEntityGlobalId, parentEntityKind);
@@ -60,7 +65,12 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
-		partialGraphDatabases.put(getPartialGraphId(partialGraphId),
+		GraphData data = new GraphData();
+		data.globalSubgraphId = getToplevelGraphForPartialGraphId(partialGraphId);
+		data.containingElementId = parentEntityGlobalId;
+		data.parentEntityKind = parentEntityKind;
+		localSubgraphData.add(data);
+		partialGraphDatabases.put(partialGraphId,
 				(RemoteGraphDatabaseAccessWithInternalMethods) p);
 		return partialGraphId;
 	}

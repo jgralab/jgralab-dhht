@@ -122,8 +122,9 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long createPartialGraphInGraph(long parentGlobalEntityId,
 			String remoteHostname) {
 		try {
-			return internalCreatePartialGraphInEntity(remoteHostname,
-					parentGlobalEntityId, ParentEntityKind.GRAPH);
+			return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(
+					remoteHostname, parentGlobalEntityId,
+					ParentEntityKind.GRAPH));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -133,8 +134,8 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long createPartialGraphInEdge(long parentGlobalEntityId,
 			String remoteHostname) {
 		try {
-			return internalCreatePartialGraphInEntity(remoteHostname,
-					parentGlobalEntityId, ParentEntityKind.EDGE);
+			return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(
+					remoteHostname, parentGlobalEntityId, ParentEntityKind.EDGE));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -144,8 +145,9 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long createPartialGraphInVertex(long parentGlobalEntityId,
 			String remoteHostname) {
 		try {
-			return internalCreatePartialGraphInEntity(remoteHostname,
-					parentGlobalEntityId, ParentEntityKind.VERTEX);
+			return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(
+					remoteHostname, parentGlobalEntityId,
+					ParentEntityKind.VERTEX));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

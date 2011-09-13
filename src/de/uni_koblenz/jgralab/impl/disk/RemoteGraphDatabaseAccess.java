@@ -54,7 +54,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public boolean isLoading() throws RemoteException;
 
-	public abstract long internalCreatePartialGraphInEntity(
+	public abstract int internalCreatePartialGraphInEntity(
 			String remoteHostname, long parentGlobalEntityId,
 			ParentEntityKind entityKind) throws RemoteException;
 

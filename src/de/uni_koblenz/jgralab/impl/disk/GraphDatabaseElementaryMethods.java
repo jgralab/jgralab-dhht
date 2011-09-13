@@ -477,6 +477,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			System.out
 					.println("Try to get storing graph db for partial graph with id "
 							+ partialGraphId);
+			System.out.println("Global subgraph id is " + globalSubgraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
 			System.out.println("Try tp create graph object");
 			g = graphFactory.createGraphDiskBasedStorage(
