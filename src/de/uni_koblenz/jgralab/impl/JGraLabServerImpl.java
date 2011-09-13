@@ -58,7 +58,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public static JGraLabServerImpl getLocalInstance() {
 		try {
 			if (localInstance == null) {
-				System.out.println("Creating local server");
 				localInstance = new JGraLabServerImpl();
 				remoteAccessToLocalInstance = (RemoteJGraLabServer) UnicastRemoteObject
 						.exportObject(localInstance, 0);
@@ -69,7 +68,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 				// localInstance.getRemoteInstance(localInstance.localHostname);
 			}
 		} catch (Exception e) {
-			System.out.println("Local Server: " + localInstance);
 			e.printStackTrace();
 		}
 		return (JGraLabServerImpl) localInstance;
@@ -78,7 +76,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteJGraLabServer getRemoteInstance(String hostname) {
 		try {
-			System.out.println("Try to connect to host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
 					.lookup("rmi://" + hostname + "/"
 							+ JGRALAB_SERVER_IDENTIFIER);
@@ -111,8 +108,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl localDb) {
 		String uniqueId = localDb.getUniqueGraphId();
-		System.out.println("Registering graph db with unique id "
-				+ localDb.getUniqueGraphId());
 		if (!localGraphDatabases.containsKey(uniqueId)) {
 			localGraphDatabases.put(uniqueId, localDb);
 			RemoteGraphDatabaseAccessWithInternalMethods stub;
@@ -138,7 +133,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			String hostnameOfCompleteGraph, long parentGlobalEntityId,
 			ParentEntityKind parent, int localPartialGraphId)
 			throws ClassNotFoundException {
-
+		System.out.println("Creating partial graph");
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
 		@SuppressWarnings("rawtypes")
@@ -180,7 +175,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(
 			String uid) {
-		System.out.println("Retrieving graph database with id " + uid);
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
 				loadGraph(uid);

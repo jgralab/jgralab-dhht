@@ -9,6 +9,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
@@ -105,10 +106,19 @@ public class TreeGraphGenerator {
 		Vertex root = graph.createSimpleVertex();
 
 		for (int i = 0; i < roots; i++) {
-			int partialGraphId = (i + 1) / getPartialGraphCount();
+			int partialGraphId = 1;
+			if (i == 1)
+				partialGraphId = 2;
 			System.out.println("Partial graph: " + partialGraphId);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
+			System.out.println("Created partial graph " + partialGraph);
+
 			Vertex v = partialGraph.createSimpleVertex();
+			System.out.println("P Create vertex "
+					+ v.getLocalId()
+					+ " on partial graph "
+					+ GraphDatabaseElementaryMethods.getPartialGraphId(v
+							.getGlobalId()));
 			vertexList[i] = v.getGlobalId();
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
@@ -116,6 +126,8 @@ public class TreeGraphGenerator {
 			rootEdge.connect(SimpleEdge_start.class, root);
 			rootEdge.connect(SimpleEdge_target.class, v);
 		}
+
+		System.out.println("\n Iteration \n");
 
 		for (int layer = 1; layer < layers; layer++) {
 			long[] newVertexList = new long[sizeOfLastLayer];
@@ -150,6 +162,13 @@ public class TreeGraphGenerator {
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
+							System.out
+									.println("Create vertex "
+											+ v.getLocalId()
+											+ " on partial graph "
+											+ GraphDatabaseElementaryMethods
+													.getPartialGraphId(v
+															.getGlobalId()));
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v
 									.getGlobalId();

@@ -17,14 +17,10 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 			String hostnameOfCompleteGraph, long parentSubgraphId,
 			ParentEntityKind kindOfParentElement, int localPartialGraphId) {
 		super(schema, uniqueGraphId, parentSubgraphId, localPartialGraphId);
-		System.out
-				.println("Creating partial graph database, hostname of complete graph: "
-						+ hostnameOfCompleteGraph);
 		this.kindOfParentElement = kindOfParentElement;
 		try {
 			RemoteJGraLabServer remoteInstance = localJGraLabServer
 					.getRemoteInstance(hostnameOfCompleteGraph);
-			System.out.println("Remote instance: " + remoteInstance);
 			completeGraphDatabase = remoteInstance
 					.getGraphDatabase(uniqueGraphId);
 			GraphData data = new GraphData();

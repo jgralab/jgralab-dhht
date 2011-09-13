@@ -14,26 +14,27 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 			int additionalEdgeCount, boolean useHyperedges, String[] remoteHosts) {
 		super(layers, roots, branchingFactors, firstLayerBranchingFactors,
 				additionalEdgeCount, useHyperedges, true);
-		partialGraphs = new DHHTTestGraph[remoteHosts.length];
+		partialGraphs = new DHHTTestGraph[remoteHosts.length + 1];
 		this.remoteHosts = remoteHosts;
 	}
 
 	protected DHHTTestGraph getGraph(long globalId) {
 		int partialGraphId = GraphDatabaseElementaryMethods
 				.getPartialGraphId(globalId);
-		System.out.println("Partial graph id : " + partialGraphId);
-		return partialGraphs[partialGraphId - 1];
+		// System.out.println("Creating graph with partial graph id : "
+		// + partialGraphId);
+		return partialGraphs[partialGraphId];
 	}
 
 	protected DHHTTestGraph createPartialGraph(int i) {
 		System.out.println("Creating partial graph " + i);
 		if (partialGraphs[i] == null) {
-			if (i == 0)
+			if (i == 1)
 				partialGraphs[i] = graph;
 			else {
-				System.out.println("Host is: " + remoteHosts[i]);
+				System.out.println("Host is: " + remoteHosts[i - 1]);
 				partialGraphs[i] = (DHHTTestGraph) graph
-						.createPartialGraphInGraph(remoteHosts[i]);
+						.createPartialGraphInGraph(remoteHosts[i - 1]);
 				System.out.println("Created remote partial graph");
 				partialGraphs[i].getECount();
 			}

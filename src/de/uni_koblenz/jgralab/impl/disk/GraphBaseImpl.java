@@ -195,7 +195,6 @@ public abstract class GraphBaseImpl implements Graph {
 		try {
 			pgId = storingGraphDatabase.createPartialGraphInGraph(
 					getGlobalId(), hostnameOfPartialGraph);
-			System.out.println("Partial graph id: " + pgId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
