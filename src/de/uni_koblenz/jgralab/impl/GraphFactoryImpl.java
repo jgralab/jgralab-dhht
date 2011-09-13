@@ -174,7 +174,8 @@ public class GraphFactoryImpl implements GraphFactory {
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
 			Graph g = graphMapForDiskBasedImpl.get(graphClass).newInstance(
-					uniqueGraphId, subgraphId, graphDatabase, graphDatabase);
+					uniqueGraphId, subgraphId, graphDatabase,
+					storingGraphDatabase);
 			return g;
 		} catch (Exception ex) {
 			throw new M1ClassAccessException("Cannot create graph of class "
@@ -602,10 +603,12 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, long.class, long.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+						long.class, long.class };
 				incidenceMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramsDisk = { long.class, GraphDatabaseBaseImpl.class, IncidenceContainer.class };
+				Class<?>[] paramsDisk = { long.class,
+						GraphDatabaseBaseImpl.class, IncidenceContainer.class };
 				incidenceMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
@@ -746,8 +749,9 @@ public class GraphFactoryImpl implements GraphFactory {
 			Vertex vertex) {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			System.out.println("Subordinate graph impl class: " + subordinateGraphForVertexMapForMemBasedImpl
-					.get(graphClass));
+			System.out.println("Subordinate graph impl class: "
+					+ subordinateGraphForVertexMapForMemBasedImpl
+							.get(graphClass));
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMapForMemBasedImpl
 					.get(graphClass).newInstance(vertex);
 			return g;
@@ -830,10 +834,12 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class };
+				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForVertexMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramse = { long.class, GraphDatabaseBaseImpl.class, RemoteGraphDatabaseAccess.class  };
+				Class<?>[] paramse = { long.class, GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForEdgeMapForDiskBasedImpl.put(originalClass,
 						implementationClass.getConstructor(paramse));
 			} catch (NoSuchMethodException ex) {

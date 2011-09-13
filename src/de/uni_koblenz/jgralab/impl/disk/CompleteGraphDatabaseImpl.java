@@ -124,9 +124,11 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 		int partialGraphId = allocatePartialGraphId();
 		RemoteGraphDatabaseAccess p;
 		try {
+			System.out.println("Remote server " + remoteServer);
 			p = remoteServer.createPartialGraphDatabase(
 					schema.getQualifiedName(), uniqueGraphId, localHostname,
 					parentGlobalEntityId, entityKind, partialGraphId);
+			System.out.println("Remote access: " + p);
 		} catch (Exception e) {
 			throw new RuntimeException(
 					"Cannot create remote graph database of host "
@@ -136,11 +138,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 		partialGraphDatabases.put(partialGraphId,
 				(RemoteGraphDatabaseAccessWithInternalMethods) p);
 
-		GraphData data = new GraphData();
-		data.globalSubgraphId = getToplevelGraphForPartialGraphId(partialGraphId);
-		data.containingElementId = parentGlobalEntityId;
-		data.parentEntityKind = entityKind;
-		localSubgraphData.add(data);
+		System.out.println("Partial graph id: " + partialGraphId);
 		return partialGraphId;
 	}
 

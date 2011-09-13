@@ -495,9 +495,12 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (ref != null) {
 			g = ref.get();
 		}
+		System.out.println("Creating graph object");
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
+			System.out.println("Partial Graph id: " + partialGraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
+			System.out.println("Storign graph database: " + storingDb);
 			g = graphFactory.createGraphDiskBasedStorage(
 					getGraphType(globalSubgraphId), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);

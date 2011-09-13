@@ -76,6 +76,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteJGraLabServer getRemoteInstance(String hostname) {
 		try {
+			System.out.println("Try to get remote server on host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
 					.lookup("rmi://" + hostname + "/"
 							+ JGRALAB_SERVER_IDENTIFIER);
@@ -167,8 +168,9 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema,
 				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
 				parent, localPartialGraphId);
+		System.out.println("Created graph database " + db);
 		registerLocalGraphDatabase(db);
-		localGraphDatabases.put(uniqueGraphId, db);
+		System.out.println("Returning " + getGraphDatabase(uniqueGraphId));
 		return getGraphDatabase(uniqueGraphId);
 	}
 
