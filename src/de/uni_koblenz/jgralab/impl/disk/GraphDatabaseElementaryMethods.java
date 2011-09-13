@@ -1,9 +1,9 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
-import java.io.FileNotFoundException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -110,6 +110,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	 * The disk storage storing local graph elements
 	 */
 	protected final DiskStorageManager localDiskStorage;
+
+	/**
+	 * Stub for the disk storage
+	 */
+	protected final RemoteDiskStorageAccess diskStorageStub;
 
 	/**
 	 * The GraphFactory to create graphs and graph elements and proxies
@@ -228,7 +233,9 @@ public abstract class GraphDatabaseElementaryMethods implements
 		try {
 			this.localDiskStorage = new DiskStorageManager(
 					(GraphDatabaseBaseImpl) this);
-		} catch (FileNotFoundException e) {
+			this.diskStorageStub = (RemoteDiskStorageAccess) UnicastRemoteObject
+					.exportObject(localDiskStorage, 0);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccessWithInternalMethods>();
@@ -358,6 +365,10 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	public DiskStorageManager getLocalDiskStorage() {
 		return localDiskStorage;
+	}
+
+	public RemoteDiskStorageAccess getDiskStorage() {
+		return diskStorageStub;
 	}
 
 	public Schema getSchema() {
