@@ -1257,6 +1257,12 @@ public class Rsa2Tg extends XmlProcessor {
 			i = i.getNextIncidenceAtVertex();
 			setIncidentVertex(current, bec);
 		}
+
+		String id = getId(ec);
+		if (id != null) {
+			idMap.put(id, bec);
+		}
+
 		ec.delete();
 	}
 
@@ -1296,9 +1302,21 @@ public class Rsa2Tg extends XmlProcessor {
 				generalizations.removeMark(oldVertexClass);
 			}
 
-			idMap.put(currentClassId, ec);
+			String id = getId(oldVertexClass);
+			if (id != null) {
+				idMap.put(id, ec);
+			}
 			oldVertexClass.delete();
 		}
+	}
+
+	private String getId(Vertex v) {
+		for (Entry<String, Vertex> entry : idMap.entrySet()) {
+			if (entry.getValue().equals(v)) {
+				return entry.getKey();
+			}
+		}
+		return null;
 	}
 
 	private void convertToIncidenceClass(EdgeClass oldEdgeClass,
