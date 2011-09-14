@@ -1227,10 +1227,11 @@ public class Rsa2Tg extends XmlProcessor {
 				return false;
 			}
 
-			// every superclass and subclass of a BinaryEdgeClass must be a
+			// every superclass of a BinaryEdgeClass must be a
 			// BinaryEdgeClass candidate, too
-			for (SpecializesEdgeClass sec : current
-					.getIncidentEdges(SpecializesEdgeClass.class)) {
+			for (SpecializesEdgeClass sec : current.getIncidentEdges(
+					SpecializesEdgeClass.class,
+					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
 				EdgeClass genEC = (EdgeClass) (sec.getAlpha() == current ? sec
 						.getOmega() : sec.getAlpha());
 				if (alreadySeenMarker.isMarked(genEC)) {
@@ -1932,7 +1933,7 @@ public class Rsa2Tg extends XmlProcessor {
 			preliminaryVertices.remove(ae);
 			ec = (EdgeClass) ae;
 		} else {
-			ec = sg.createEdgeClass();
+			ec = sg.createBinaryEdgeClass();
 		}
 		currentClassId = xmiId;
 		currentClass = ec;
