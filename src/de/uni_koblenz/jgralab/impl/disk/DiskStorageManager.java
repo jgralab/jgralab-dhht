@@ -42,17 +42,21 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 * BITS_FOR_ELEMENT_MASK
 	 */
 
-	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK+1)); 
-	
+	static final int CONTAINER_MASK = Integer.MAX_VALUE >> (32 - (BITS_FOR_ELEMENT_MASK + 1));
+
 	public static final int CONTAINER_SIZE = CONTAINER_MASK + 1;
-	
-	public static final int ELEMENT_CONTAINER_COUNT = (int) 7000000 / CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	static final int INCIDENCE_CONTAINER_COUNT = (int) 13000000 / CONTAINER_SIZE;  //Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+	public static final int ELEMENT_CONTAINER_COUNT = (int) 7000000
+			/ CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
 
-	/* the number of milliseconds the cleaning thread will wait between two cleaning cycles */
+	static final int INCIDENCE_CONTAINER_COUNT = (int) 13000000
+			/ CONTAINER_SIZE; // Integer.MAX_VALUE >> (BITS_FOR_ELEMENT_MASK);
+
+	/*
+	 * the number of milliseconds the cleaning thread will wait between two
+	 * cleaning cycles
+	 */
 	private static final int WAITING_TIME = 20;
-
 
 	/* Threads to control the disk buffering */
 
@@ -143,7 +147,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	private IncidenceContainerReference firstInIncidenceReuseQueue;
 
 	private int incidenceReuseQueueSize = 0;
-	
+
 	public static int reloadedContainers = 0;
 
 	public DiskStorageManager(GraphDatabaseBaseImpl database)
@@ -259,7 +263,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	public static final int getElementIdInContainer(int l) {
 		return ((int) l) & CONTAINER_MASK & Integer.MAX_VALUE;
 	}
-	
 
 	private final int clearUnusedVertexContainers() {
 		int count = 0;
@@ -445,7 +448,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						firstInVertexReuseQueue, vertexQueue);
 				firstInVertexReuseQueue = (VertexContainerReference) firstInVertexReuseQueue.nextInReuseQueue;
 			} else {
-				reference = new VertexContainerReference(storage, channel, vertexQueue);
+				reference = new VertexContainerReference(storage, channel,
+						vertexQueue);
 			}
 			vertexStorages[storageId] = reference;
 			return storage;
@@ -454,10 +458,10 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 		}
 	}
 
-	
 	/**
 	 * 
 	 * Retrieves the vertex container with the container id <code>id<code>
+	 * 
 	 * @param storageId
 	 * @return
 	 */
@@ -506,8 +510,10 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (v == null) {
 				@SuppressWarnings("unchecked")
 				Class<? extends Vertex> c = (Class<? extends Vertex>) schema
-						.getM1ClassForId((int)type);
-				v = factory.reloadLocalVertex(c, graphDatabase.convertToGlobalId(id), graphDatabase, container);
+						.getM1ClassForId((int) type);
+				v = factory.reloadLocalVertex(c,
+						graphDatabase.convertToGlobalId(id), graphDatabase,
+						container);
 				container.vertices[idInStorage] = v;
 			}
 			return v;
@@ -561,10 +567,12 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			reloadedContainers++;
 			if (edgeReuseQueueSize > 0) {
 				edgeReuseQueueSize--;
-				reference = new EdgeContainerReference(storage, channel, firstInEdgeReuseQueue, edgeQueue);
+				reference = new EdgeContainerReference(storage, channel,
+						firstInEdgeReuseQueue, edgeQueue);
 				firstInEdgeReuseQueue = (EdgeContainerReference) firstInEdgeReuseQueue.nextInReuseQueue;
 			} else {
-				reference = new EdgeContainerReference(storage, channel, edgeQueue);
+				reference = new EdgeContainerReference(storage, channel,
+						edgeQueue);
 			}
 			edgeStorages[storageId] = reference;
 			return storage;
@@ -576,6 +584,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	/**
 	 * 
 	 * Retrieves the edge container with the container id <code>id<code>
+	 * 
 	 * @param storageId
 	 * @return
 	 */
@@ -592,7 +601,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 						reference.setReused();
 						// create new container
 						storage = new EdgeContainer(storageId, this);
-						reference = new EdgeContainerReference(storage,	reference, edgeQueue);
+						reference = new EdgeContainerReference(storage,
+								reference, edgeQueue);
 						edgeStorages[storageId] = reference;
 					}
 				} else {
@@ -624,7 +634,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (e == null) {
 				e = factory.reloadLocalEdge(
 						(Class<? extends Edge>) schema.getM1ClassForId(type),
-						graphDatabase.convertToGlobalId(id), graphDatabase, container);
+						graphDatabase.convertToGlobalId(id), graphDatabase,
+						container);
 				container.edges[idInStorage] = e;
 			}
 			return e;
@@ -698,11 +709,12 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	/**
 	 * 
 	 * Retrieves the incidence container with the container id <code>id<code>
+	 * 
 	 * @param storageId
 	 * @return
 	 */
 	final IncidenceContainer getIncidenceContainer(int storageId) {
-		//int storageId = getContainerId(incidenceId);
+		// int storageId = getContainerId(incidenceId);
 		IncidenceContainer storage = null;
 		IncidenceContainerReference reference = null;
 		if (storageId < incidenceStorageCount) {
@@ -751,7 +763,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 			if (i == null) {
 				i = factory.reloadLocalIncidence(
 						(Class<? extends Incidence>) schema
-								.getM1ClassForId(type),graphDatabase.convertToGlobalId(id), graphDatabase,
+								.getM1ClassForId(type), graphDatabase
+								.convertToGlobalId(id), graphDatabase,
 						container);
 				container.incidences[idInStorage] = i;
 			}
@@ -893,6 +906,9 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	@Override
 	public void setNextIncidenceAtVertexId(int localIncidenceId,
 			long nextIncidenceId) {
+		System.out.println("Setting next incidence of incidence "
+				+ graphDatabase.convertToGlobalId(localIncidenceId) + " to "
+				+ nextIncidenceId);
 		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
 	}
 

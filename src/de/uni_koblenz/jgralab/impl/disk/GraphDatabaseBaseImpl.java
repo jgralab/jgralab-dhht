@@ -299,6 +299,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			}
 		}
 		// instantiate object
+		@SuppressWarnings("unchecked")
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema
 				.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage(
