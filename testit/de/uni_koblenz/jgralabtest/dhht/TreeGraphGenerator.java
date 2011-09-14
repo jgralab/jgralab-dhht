@@ -9,7 +9,6 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
@@ -109,21 +108,21 @@ public class TreeGraphGenerator {
 			int partialGraphId = 1;
 			if (i == 1)
 				partialGraphId = 2;
-			System.out.println("TGG: Partial graph: " + partialGraphId);
+			// System.out.println("TGG: Partial graph: " + partialGraphId);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
-			System.out.println("TGG: Created partial graph " + partialGraph
-					+ " \n \t\twith id " + partialGraph.getPartialGraphId());
+			// System.out.println("TGG: Created partial graph " + partialGraph
+			// + " \n \t\twith id " + partialGraph.getPartialGraphId());
 
 			Vertex v = partialGraph.createSimpleVertex();
-			System.out.println("TGG: Created vertex "
-					+ v.getLocalId()
-					+ " on partial graph "
-					+ GraphDatabaseElementaryMethods.getPartialGraphId(v
-							.getGlobalId()));
-			System.out.println("Global vertex id " + v.getGlobalId());
+			// System.out.println("TGG: Created vertex "
+			// + v.getLocalId()
+			// + " on partial graph "
+			// + GraphDatabaseElementaryMethods.getPartialGraphId(v
+			// .getGlobalId()));
+			// System.out.println("Global vertex id " + v.getGlobalId());
 			vertexList[i] = v.getGlobalId();
-			System.out.println("Retrieved vertex "
-					+ graph.getVertex(vertexList[i]).getGlobalId());
+			// System.out.println("Retrieved vertex "
+			// + graph.getVertex(vertexList[i]).getGlobalId());
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
 			Edge rootEdge = graph.createSimpleEdge();
@@ -138,7 +137,7 @@ public class TreeGraphGenerator {
 			while (retrievedVertices < vertexListSize) {
 				Vertex parent = graph
 						.getVertex(vertexList[retrievedVertices++]);
-				System.out.println("Parent vertex " + parent.getGlobalId());
+				// System.out.println("Parent vertex " + parent.getGlobalId());
 				int i = 0;
 				int nextBranchingFactor = getNextBranchingFactor();
 				while (i < nextBranchingFactor) {
@@ -167,13 +166,13 @@ public class TreeGraphGenerator {
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
-							System.out
-									.println("Create vertex "
-											+ v.getLocalId()
-											+ " on partial graph "
-											+ GraphDatabaseElementaryMethods
-													.getPartialGraphId(v
-															.getGlobalId()));
+							// System.out
+							// .println("Create vertex "
+							// + v.getLocalId()
+							// + " on partial graph "
+							// + GraphDatabaseElementaryMethods
+							// .getPartialGraphId(v
+							// .getGlobalId()));
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v
 									.getGlobalId();

@@ -23,24 +23,24 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 				.getPartialGraphId(globalId);
 		// System.out.println("Creating graph with partial graph id : "
 		// + partialGraphId);
-		System.out.println("Partial graph id: " + partialGraphId);
-		System.out.println("Retrived partial graph "
-				+ partialGraphs[partialGraphId]);
-		System.out.println("Retrived partial graph id "
-				+ partialGraphs[partialGraphId].getPartialGraphId());
+		// System.out.println("Partial graph id: " + partialGraphId);
+		// System.out.println("Retrived partial graph "
+		// + partialGraphs[partialGraphId]);
+		// System.out.println("Retrived partial graph id "
+		// + partialGraphs[partialGraphId].getPartialGraphId());
 		return partialGraphs[partialGraphId];
 	}
 
 	protected DHHTTestGraph createPartialGraph(int i) {
-		System.out.println("Creating partial graph " + i);
+		// System.out.println("Creating partial graph " + i);
 		if (partialGraphs[i] == null) {
 			if (i == 1)
 				partialGraphs[i] = graph;
 			else {
-				System.out.println("Host is: " + remoteHosts[i - 1]);
+				// System.out.println("Host is: " + remoteHosts[i - 1]);
 				partialGraphs[i] = (DHHTTestGraph) graph
 						.createPartialGraphInGraph(remoteHosts[i - 1]);
-				System.out.println("Created remote partial graph");
+				// System.out.println("Created remote partial graph");
 				partialGraphs[i].getECount();
 			}
 

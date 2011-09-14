@@ -906,9 +906,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	@Override
 	public void setNextIncidenceAtVertexId(int localIncidenceId,
 			long nextIncidenceId) {
-		System.out.println("Setting next incidence of incidence "
-				+ graphDatabase.convertToGlobalId(localIncidenceId) + " to "
-				+ nextIncidenceId);
 		if (graphDatabase.convertToGlobalId(localIncidenceId) == nextIncidenceId)
 			throw new RuntimeException();
 		getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)] = nextIncidenceId;
