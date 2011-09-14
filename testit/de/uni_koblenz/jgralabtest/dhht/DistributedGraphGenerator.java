@@ -23,6 +23,11 @@ public class DistributedGraphGenerator extends TreeGraphGenerator {
 				.getPartialGraphId(globalId);
 		// System.out.println("Creating graph with partial graph id : "
 		// + partialGraphId);
+		System.out.println("Partial graph id: " + partialGraphId);
+		System.out.println("Retrived partial graph "
+				+ partialGraphs[partialGraphId]);
+		System.out.println("Retrived partial graph id "
+				+ partialGraphs[partialGraphId].getPartialGraphId());
 		return partialGraphs[partialGraphId];
 	}
 

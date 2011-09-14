@@ -58,7 +58,7 @@ public class BGStorageTest {
 			long thisCreationTime = System.currentTimeMillis()
 					- creationStartTime;
 			totalCreationTime += thisCreationTime;
-			// System.out.println("Traversing dfs");
+			System.out.println("Traversing dfs");
 			long traversalStartTimeDFS = System.currentTimeMillis();
 			testGraph(graph, variant, true);
 			dfsNodes = visitedNodes;
@@ -66,7 +66,7 @@ public class BGStorageTest {
 			long thisTraversalTimeDFS = System.currentTimeMillis()
 					- traversalStartTimeDFS;
 			totalTraversalTimeDFS += thisTraversalTimeDFS;
-			// System.out.println("Traversing bfs");
+			System.out.println("Traversing bfs");
 			long traversalStartTimeBFS = System.currentTimeMillis();
 			testGraph(graph, variant, false);
 			bfsNodes = visitedNodes;

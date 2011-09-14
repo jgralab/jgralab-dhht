@@ -116,19 +116,15 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public int internalCreatePartialGraphInEntity(String remoteHostname,
 			long parentGlobalEntityId, ParentEntityKind entityKind) {
-		System.out.println("Internal creating partial graph on hostname "
-				+ remoteHostname);
 		RemoteJGraLabServer remoteServer = localJGraLabServer
 				.getRemoteInstance(remoteHostname);
 		String localHostname = getHostname(getLocalPartialGraphId());
 		int partialGraphId = allocatePartialGraphId();
 		RemoteGraphDatabaseAccess p;
 		try {
-			System.out.println("Remote server " + remoteServer);
 			p = remoteServer.createPartialGraphDatabase(
 					schema.getQualifiedName(), uniqueGraphId, localHostname,
 					parentGlobalEntityId, entityKind, partialGraphId);
-			System.out.println("Remote access: " + p);
 		} catch (Exception e) {
 			throw new RuntimeException(
 					"Cannot create remote graph database of host "
@@ -137,8 +133,6 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 
 		partialGraphDatabases.put(partialGraphId,
 				(RemoteGraphDatabaseAccessWithInternalMethods) p);
-
-		System.out.println("Partial graph id: " + partialGraphId);
 		return partialGraphId;
 	}
 

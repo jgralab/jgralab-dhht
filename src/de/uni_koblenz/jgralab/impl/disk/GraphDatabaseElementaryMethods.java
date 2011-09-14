@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -495,16 +496,18 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (ref != null) {
 			g = ref.get();
 		}
-		System.out.println("Creating graph object");
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
+			System.out.println("Creating new graph object for subgraph "
+					+ globalSubgraphId + " in the partial graph "
+					+ partialGraphId);
 			System.out.println("Partial Graph id: " + partialGraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
 			System.out.println("Storign graph database: " + storingDb);
 			g = graphFactory.createGraphDiskBasedStorage(
 					getGraphType(globalSubgraphId), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);
-			subgraphObjects.put(globalSubgraphId, new WeakReference<Graph>(g));
+			subgraphObjects.put(globalSubgraphId, new SoftReference<Graph>(g));
 		}
 		return g;
 	}

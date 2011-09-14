@@ -144,6 +144,9 @@ public abstract class IncidenceProxy implements Incidence {
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
 		Incidence currentIncidence;
 		try {
+			System.out.println("Vertex id at incidence: "
+					+ storingGraphDatabase.getVertexIdAtIncidenceId(id));
+			System.out.println("");
 			currentIncidence = localGraphDatabase
 					.getIncidenceObject(storingGraphDatabase
 							.getNextIncidenceIdAtVertexId(storingGraphDatabase
@@ -494,7 +497,7 @@ public abstract class IncidenceProxy implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtEdge();
 			}
 		} else {
@@ -730,7 +733,7 @@ public abstract class IncidenceProxy implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {

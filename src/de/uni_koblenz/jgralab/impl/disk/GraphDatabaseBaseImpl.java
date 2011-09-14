@@ -1112,49 +1112,8 @@ public abstract class GraphDatabaseBaseImpl extends
 						edgeId, this);
 
 		// append created incidence to lambda sequences of vertex and edge
-
-		// add this incidence to the sequence of incidences of v
-		if (getFirstIncidenceIdAtVertexId(vertexId) == 0) {
-			// v has no incidences
-			setFirstIncidenceIdAtVertexId(vertexId, incId);
-			setLastIncidenceIdAtVertexId(vertexId, incId);
-		} else {
-			long lastIncId = getLastIncidenceIdAtVertexId(vertexId);
-			setNextIncidenceIdAtVertexId(lastIncId, incId);
-			setPreviousIncidenceIdAtVertexId(incId, lastIncId);
-			setLastIncidenceIdAtVertexId(vertexId, incId);
-		}
-
-		incidenceListOfVertexModified(vertexId);
-
-		if (getFirstIncidenceIdAtEdgeId(edgeId) == 0) {
-			// v has no incidences
-			// System.out.println("Setting first incidence at edge " +
-			// convertToLocalId(edgeId) + " to " + incId);
-			setFirstIncidenceIdAtEdgeId(edgeId, incId);
-			// System.out.println("First incidence is: " +
-			// getFirstIncidenceIdAtEdgeId(edgeId));
-			setLastIncidenceIdAtEdgeId(edgeId, incId);
-		} else {
-			long lastIncId = getLastIncidenceIdAtEdgeId(edgeId);
-			// System.out.println("Setting next incidence at edge " +
-			// convertToLocalId(edgeId));
-			setNextIncidenceIdAtEdgeId(lastIncId, incId);
-			// System.out.println("First incidence is: " +
-			// getFirstIncidenceIdAtEdgeId(edgeId));
-			setPreviousIncidenceIdAtEdgeId(incId, lastIncId);
-			// System.out.println("First incidence is: " +
-			// getFirstIncidenceIdAtEdgeId(edgeId));
-			setLastIncidenceIdAtEdgeId(edgeId, incId);
-			// System.out.println("First incidence is: " +
-			// getFirstIncidenceIdAtEdgeId(edgeId));
-		}
-
-		try {
-			incidenceListOfEdgeModified(edgeId);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		appendIncidenceToLambdaSeqOfVertex(vertexId, incId);
+		appendIncidenceToLambdaSeqOfEdge(edgeId, incId);
 
 		localDiskStorage.storeIncidence(newInc);
 		if (!isLoading()) {

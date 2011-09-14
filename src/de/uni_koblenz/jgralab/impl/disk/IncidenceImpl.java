@@ -441,7 +441,7 @@ public abstract class IncidenceImpl implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtEdge();
 			}
 		} else {
@@ -568,6 +568,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex() {
+		System.out.println("Incidence iml: getNextIncidenceAtVertex()");
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext());
 	}
 
@@ -667,7 +668,7 @@ public abstract class IncidenceImpl implements Incidence {
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
-						.getDirection()))) {
+					.getDirection()))) {
 				i = i.getNextIncidenceAtVertex();
 			}
 		} else {

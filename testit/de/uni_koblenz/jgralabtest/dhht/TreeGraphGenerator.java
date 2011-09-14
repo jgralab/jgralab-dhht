@@ -109,17 +109,21 @@ public class TreeGraphGenerator {
 			int partialGraphId = 1;
 			if (i == 1)
 				partialGraphId = 2;
-			System.out.println("Partial graph: " + partialGraphId);
+			System.out.println("TGG: Partial graph: " + partialGraphId);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
-			System.out.println("Created partial graph " + partialGraph);
+			System.out.println("TGG: Created partial graph " + partialGraph
+					+ " \n \t\twith id " + partialGraph.getPartialGraphId());
 
 			Vertex v = partialGraph.createSimpleVertex();
-			System.out.println("P Create vertex "
+			System.out.println("TGG: Created vertex "
 					+ v.getLocalId()
 					+ " on partial graph "
 					+ GraphDatabaseElementaryMethods.getPartialGraphId(v
 							.getGlobalId()));
+			System.out.println("Global vertex id " + v.getGlobalId());
 			vertexList[i] = v.getGlobalId();
+			System.out.println("Retrieved vertex "
+					+ graph.getVertex(vertexList[i]).getGlobalId());
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
 			Edge rootEdge = graph.createSimpleEdge();
@@ -134,6 +138,7 @@ public class TreeGraphGenerator {
 			while (retrievedVertices < vertexListSize) {
 				Vertex parent = graph
 						.getVertex(vertexList[retrievedVertices++]);
+				System.out.println("Parent vertex " + parent.getGlobalId());
 				int i = 0;
 				int nextBranchingFactor = getNextBranchingFactor();
 				while (i < nextBranchingFactor) {
@@ -158,7 +163,7 @@ public class TreeGraphGenerator {
 							nextEdgeBranchingFactor = nextBranchingFactor - i;
 						for (j = 0; j < nextEdgeBranchingFactor; j++) {
 							vCount++;
-							SimpleVertex v = graph.createSimpleVertex();
+							SimpleVertex v = partialGraph.createSimpleVertex();
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
@@ -287,7 +292,7 @@ public class TreeGraphGenerator {
 				}
 			}
 		}
-		// System.out.println("Finished creating graph");
+		System.out.println("Finished creating graph");
 		return graph;
 	}
 
