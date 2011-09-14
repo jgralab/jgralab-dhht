@@ -347,6 +347,11 @@ public class Rsa2Tg extends XmlProcessor {
 	private LocalGenericGraphMarker<Set<String>> redefines;
 
 	/**
+	 * marks incidence classes with the set of subsetted rolenames
+	 */
+	private LocalGenericGraphMarker<Set<String>> subsets;
+
+	/**
 	 * Stores the {@link VertexClass}es which have an edge stereotype.
 	 */
 	private Set<VertexClass> edgeStereotypedVertexClasses;
@@ -648,6 +653,7 @@ public class Rsa2Tg extends XmlProcessor {
 		constraints = new HashMap<String, List<String>>();
 		comments = new HashMap<String, List<String>>();
 		redefines = new LocalGenericGraphMarker<Set<String>>(sg);
+		subsets = new LocalGenericGraphMarker<Set<String>>(sg);
 		edgeStereotypedVertexClasses = new HashSet<VertexClass>();
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
@@ -1215,15 +1221,19 @@ public class Rsa2Tg extends XmlProcessor {
 				return false;
 			}
 			// both incidences have to have different directions and both
-			// incidences are not abstract
+			// incidences are not abstract and the multiplicities must fit
 			Incidence first = current
 					.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class);
 			Incidence last = first
 					.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class);
-			if (((IncidenceClass) first.getThat()).get_direction() == ((IncidenceClass) last
-					.getThat()).get_direction()
-					&& (((IncidenceClass) first.getThat()).is_abstract() || ((IncidenceClass) last
-							.getThat()).is_abstract())) {
+			IncidenceClass firstIC = (IncidenceClass) first.getThat();
+			IncidenceClass lastIC = (IncidenceClass) last.getThat();
+			if (firstIC.get_direction() == lastIC.get_direction()
+					&& (firstIC.is_abstract() || lastIC.is_abstract())
+					&& (firstIC.get_minVerticesAtEdge() == 1
+							&& firstIC.get_maxVerticesAtEdge() == 1
+							&& lastIC.get_minVerticesAtEdge() == 1 && lastIC
+							.get_maxVerticesAtEdge() == 1)) {
 				return false;
 			}
 
@@ -1386,8 +1396,16 @@ public class Rsa2Tg extends XmlProcessor {
 			redefines.mark(newIncidenceClass, redefines.getMark(to));
 			redefines.removeMark(to);
 		}
-		// TODO store information marked at vertex or edge side
-		// TODO set subsets -> SpecializesIncidenceClass
+
+		// set subsets
+		if (subsets.isMarked(from)) {
+			subsets.mark(newIncidenceClass, subsets.getMark(from));
+			subsets.removeMark(from);
+		}
+		if (subsets.isMarked(to)) {
+			subsets.mark(newIncidenceClass, subsets.getMark(to));
+			subsets.removeMark(to);
+		}
 
 		// connect IncidenceClass with new EdgeClass and original VertexClass
 		sg.createConnectsToVertexClass(
@@ -2310,15 +2328,18 @@ public class Rsa2Tg extends XmlProcessor {
 			} else if (ae instanceof IncidenceClass) {
 				if (((IncidenceClass) ae).isValid()) {
 					for (String text : l) {
-						if (!text.startsWith("redefines")) {
+						if (text.startsWith("redefines")
+								|| text.startsWith("subsets")) {
+							addRedefinesOrSubsetsConstraint(
+									(IncidenceClass) ae, text);
+						} else {
 							throw new ProcessingException(
 									getFileName(),
-									"Only 'redefines' constraints are allowed at association ends. Offending element: "
+									"Only 'redefines' and 'subsets' constraints are allowed at association ends. Offending element: "
 											+ ae
 											+ " (XMI id "
 											+ constrainedElementId + ")");
 						}
-						addRedefinesConstraint((IncidenceClass) ae, text);
 					}
 				}
 			} else {
@@ -2598,7 +2619,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 * {@link AttributedElementClass} objects to their direct superclass(es).
 	 */
 	private void linkGeneralizations() {
-		// TODO IncidenceClass
 		for (String clientId : realizations.keySet()) {
 			Set<String> suppliers = realizations.get(clientId);
 			AttributedElementClass client = (AttributedElementClass) idMap
@@ -2827,10 +2847,18 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 			l.add(text);
 		} else if (text.startsWith("subsets")) {
-			System.err
-					.println("warning: {subsets ...} constraint at element "
-							+ constrainedElementId
-							+ " ignored (don't forget to model generalizations between associations)");
+			List<String> l = constraints.get(constrainedElementId);
+			if (l == null) {
+				l = new LinkedList<String>();
+				constraints.put(constrainedElementId, l);
+			}
+			l.add(text);
+			// TODO
+			// System.err
+			// .println("warning: {subsets ...} constraint at element "
+			// + constrainedElementId
+			// +
+			// " ignored (don't forget to model generalizations between associations)");
 		} else if (text.startsWith("union")) {
 			System.err
 					.println("warning: {union} constraint at element "
@@ -2848,54 +2876,72 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Adds redefinesConstraint {@link String} objects to a specific
+	 * Adds redefines or subsets constraint {@link String} objects to a specific
 	 * {@link Edge}.
 	 * 
 	 * @param constrainedEnd
 	 *            Edge, to which all redefinesConstraint String objects will be
 	 *            added.
 	 * @param text
-	 *            RedefinedConstraint String, which can contain multiple
-	 *            constraints.
+	 *            Redefined or subsetted constraint String, which can contain
+	 *            multiple constraints.
 	 * @throws XMLStreamException
 	 */
-	private void addRedefinesConstraint(IncidenceClass constrainedEnd,
+	private void addRedefinesOrSubsetsConstraint(IncidenceClass constrainedEnd,
 			String text) throws XMLStreamException {
 		text = text.trim().replaceAll("\\s+", " ");
-		if (!text.startsWith("redefines ")) {
+
+		/*
+		 * typeOfConstraing == 1 => redefines typeOfConstraing == 2 => subsets
+		 * otherwise => neither redefines nor subsets
+		 */
+		byte typeOfConstraint = 0;
+		if (text.startsWith("redefines ")) {
+			typeOfConstraint = 1;
+		} else if (text.startsWith("subsets ")) {
+			typeOfConstraint = 2;
+		} else {
 			throw new ProcessingException(getFileName(),
-					"Wrong redefines constraint format.");
+					"Wrong redefines or subsets constraint format.");
 		}
+		assert typeOfConstraint == 1 || typeOfConstraint == 2;
+
 		String[] roles = text.substring(10).split("\\s*,\\s*");
 
 		// String array of 'roles' must not be empty.
 		if (roles.length < 1) {
 			throw new ProcessingException(getFileName(),
-					"Redefines constraint without rolenames");
+					(typeOfConstraint == 1 ? "Redefines" : "Subsets")
+							+ " constraint without rolenames");
 		}
-		Set<String> redefinedRoles = new TreeSet<String>();
+		Set<String> affectedRoles = new TreeSet<String>();
 		for (String role : roles) {
 
 			// A role String must not be empty.
 			if (role.length() < 1) {
 				throw new ProcessingException(getFileName(),
-						"Empty role name in redefines constraint");
+						"Empty role name in "
+								+ (typeOfConstraint == 1 ? "redefines"
+										: "subsets") + " constraint");
 			}
-			redefinedRoles.add(role);
+			affectedRoles.add(role);
 		}
 
-		// At least one redefined role must have been added.
-		if (redefinedRoles.size() < 1) {
+		// At least one affected role must have been added.
+		if (affectedRoles.size() < 1) {
 			throw new ProcessingException(getFileName(),
-					"Redefines constraint without rolenames");
+					(typeOfConstraint == 1 ? "Redefines" : "Subsets")
+							+ " constraint without rolenames");
 		}
 
-		// remember the set of redefined role names
-		Set<String> oldRedefinesRoles = redefines.getMark(constrainedEnd);
-		if (oldRedefinesRoles == null) {
-			redefines.mark(constrainedEnd, redefinedRoles);
+		// remember the set of redefined or subsetted role names
+		Set<String> oldAffectedRoles = (typeOfConstraint == 1 ? redefines
+				: subsets).getMark(constrainedEnd);
+		if (oldAffectedRoles == null) {
+			(typeOfConstraint == 1 ? redefines : subsets).mark(constrainedEnd,
+					affectedRoles);
 		} else {
-			oldRedefinesRoles.addAll(redefinedRoles);
+			oldAffectedRoles.addAll(affectedRoles);
 		}
 	}
 
@@ -2994,7 +3040,6 @@ public class Rsa2Tg extends XmlProcessor {
 			assert n >= 1;
 			currentAssociationEnd.set_maxEdgesAtVertex(n);
 			currentAssociationEnd.set_maxVerticesAtEdge(1);
-			// TODO check for non BinaryEdges
 		}
 	}
 
