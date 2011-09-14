@@ -568,7 +568,6 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtVertex() {
-		System.out.println("Incidence iml: getNextIncidenceAtVertex()");
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext());
 	}
 

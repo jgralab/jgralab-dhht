@@ -147,10 +147,6 @@ public abstract class IncidenceProxy implements Incidence {
 			long vertexId = storingGraphDatabase.getVertexIdAtIncidenceId(id);
 			long nextIncId = storingGraphDatabase
 					.getNextIncidenceIdAtVertexId(id);
-
-			System.out.println("Incidence id: " + id);
-			System.out.println("Vertex id at incidence: " + vertexId);
-			System.out.println("Next incidence id: " + nextIncId);
 			currentIncidence = localGraphDatabase.getIncidenceObject(nextIncId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);

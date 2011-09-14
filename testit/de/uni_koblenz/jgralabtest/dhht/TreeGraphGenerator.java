@@ -89,9 +89,7 @@ public class TreeGraphGenerator {
 	public DHHTTestGraph createGraph() {
 		if (diskBased) {
 			graph = DHHTTestSchema.instance().createDHHTTestGraphOnDisk();
-			// System.out.println("Creating disk graph");
 		} else {
-			// System.out.println("Creating mem graph");
 			graph = DHHTTestSchema.instance().createDHHTTestGraphInMem();
 		}
 
@@ -106,23 +104,10 @@ public class TreeGraphGenerator {
 
 		for (int i = 0; i < roots; i++) {
 			int partialGraphId = 1;
-			if (i == 1)
-				partialGraphId = 2;
-			// System.out.println("TGG: Partial graph: " + partialGraphId);
+			partialGraphId = i / (roots / 2) + 1;
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
-			// System.out.println("TGG: Created partial graph " + partialGraph
-			// + " \n \t\twith id " + partialGraph.getPartialGraphId());
-
 			Vertex v = partialGraph.createSimpleVertex();
-			// System.out.println("TGG: Created vertex "
-			// + v.getLocalId()
-			// + " on partial graph "
-			// + GraphDatabaseElementaryMethods.getPartialGraphId(v
-			// .getGlobalId()));
-			// System.out.println("Global vertex id " + v.getGlobalId());
 			vertexList[i] = v.getGlobalId();
-			// System.out.println("Retrieved vertex "
-			// + graph.getVertex(vertexList[i]).getGlobalId());
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
 			Edge rootEdge = graph.createSimpleEdge();
@@ -130,14 +115,11 @@ public class TreeGraphGenerator {
 			rootEdge.connect(SimpleEdge_target.class, v);
 		}
 
-		System.out.println("\n Iteration \n");
-
 		for (int layer = 1; layer < layers; layer++) {
 			long[] newVertexList = new long[sizeOfLastLayer];
 			while (retrievedVertices < vertexListSize) {
 				Vertex parent = graph
 						.getVertex(vertexList[retrievedVertices++]);
-				// System.out.println("Parent vertex " + parent.getGlobalId());
 				int i = 0;
 				int nextBranchingFactor = getNextBranchingFactor();
 				while (i < nextBranchingFactor) {
@@ -166,13 +148,6 @@ public class TreeGraphGenerator {
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
-							// System.out
-							// .println("Create vertex "
-							// + v.getLocalId()
-							// + " on partial graph "
-							// + GraphDatabaseElementaryMethods
-							// .getPartialGraphId(v
-							// .getGlobalId()));
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v
 									.getGlobalId();
@@ -291,7 +266,6 @@ public class TreeGraphGenerator {
 				}
 			}
 		}
-		System.out.println("Finished creating graph");
 		return graph;
 	}
 

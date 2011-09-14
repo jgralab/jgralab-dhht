@@ -52,18 +52,9 @@ public class HypergraphSearchAlgorithmOptimized {
 
 		while (!buffer.isEmpty()) {
 			Vertex currentVertex = buffer.get();
-			System.out
-					.println("Handling vertex " + currentVertex.getGlobalId());
 			Incidence curIncAtVertex = currentVertex.getFirstIncidence();
 			while (curIncAtVertex != null) {
 				Edge currentEdge = curIncAtVertex.getEdge();
-				System.out.println("incidence at vertex "
-						+ curIncAtVertex.getGlobalId());
-				// currentVertex.getLocalId() + " is " +
-				// curIncAtVertex.getLocalId() + " and leads to edge " +
-				// currentEdge.getLocalId());
-				// System.out.println("ParentEdgeInd of edge is " +
-				// parentEdgeInc[currentEdge.getLocalId()]);
 				if (parentEdgeInc[currentEdge.getLocalId()] == 0) {
 					handleEdge(currentEdge);
 					parentEdgeInc[currentEdge.getLocalId()] = curIncAtVertex
@@ -72,12 +63,7 @@ public class HypergraphSearchAlgorithmOptimized {
 					Direction opposite = Direction.BOTH; // curIncAtVertex.getDirection().getOppositeDirection();
 					Incidence curIncAtEdge = currentEdge.getFirstIncidence();
 					while (curIncAtEdge != null) {
-						// System.out.println("Incidence at edge " +
-						// currentEdge.getLocalId() + " is " +
-						// curIncAtEdge.getLocalId());
 						Vertex omega = curIncAtEdge.getVertex();
-						// System.out.println("Omega vertex of edge is " +
-						// omega.getLocalId());
 						if ((parentVertexInc[omega.getLocalId()] == 0)
 								&& (omega != startVertex)) {
 							// System.out.println("Omega vertex is handled");
