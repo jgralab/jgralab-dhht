@@ -1636,14 +1636,13 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void createSubsetsAndRedefinesRelations() {
 		System.out.println("Creating subsets and redefines relationships...");
-		// for each specialization between binary edge classes, add a subsets
-		// edge between their incidence classes
-		SpecializesEdgeClass spec = sg.getFirstSpecializesEdgeClass();
-		while (spec != null) {
+		for (SpecializesEdgeClass spec : getSpecializesEdgeClassInTopologicalOrder()) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
 			if (BinaryEdgeClass.class.isInstance(superClass)
 					&& BinaryEdgeClass.class.isInstance(subClass)) {
+				// for each specialization between binary edge classes, add a
+				// subsets edge between their incidence classes
 
 				IncidenceClass cfSubClass = null;
 				IncidenceClass gtSubClass = null;
@@ -1686,8 +1685,45 @@ public class Rsa2Tg extends XmlProcessor {
 				assert gtSuperClass != null;
 				createSpecializesIncidenceClassForIncidences(subClass,
 						superClass, gtSubClass, gtSuperClass);
+			} else {
+				// create subsets for hyper edgeClasses
+				for (ConnectsToEdgeClass ctec : subClass
+						.getIncidentEdges(ConnectsToEdgeClass.class)) {
+					IncidenceClass subIC = (IncidenceClass) ctec.getAlpha();
+					List<IncidenceClass> possibleSubsettedICs = findPossibleSubsettedIncidenceClasses(
+							superClass, subIC);
+					if (possibleSubsettedICs.isEmpty()) {
+						throw new ProcessingException(
+								getFileName(),
+								"IncidenceClass '"
+										+ subIC.get_roleName()
+										+ "' of EdgeClass '"
+										+ subClass.get_qualifiedName()
+										+ "' has no subsetted IncidenceClass at EdgeClass '"
+										+ superClass.get_qualifiedName() + "'.");
+					} else if (possibleSubsettedICs.size() == 1) {
+						createSpecializesIncidenceClassForIncidences(subClass,
+								superClass, subIC, possibleSubsettedICs.get(0));
+					} else {
+						Set<String> subsettedRoleName = subsets.getMark(subIC);
+						int counter = 0;
+						for (IncidenceClass superIC : possibleSubsettedICs) {
+							if (subsettedRoleName.contains(superIC)) {
+								createSpecializesIncidenceClassForIncidences(
+										subClass, superClass, subIC, superIC);
+								counter++;
+							}
+						}
+						if (subsettedRoleName.size() != counter) {
+							throw new ProcessingException(getFileName(),
+									"IncidenceClass '" + subIC.get_roleName()
+											+ "' of EdgeClass '"
+											+ subClass.get_qualifiedName()
+											+ "' subsets unknown role names.");
+						}
+					}
+				}
 			}
-			spec = spec.getNextSpecializesEdgeClass();
 		}
 
 		// Generalization hierarchy is complete, now process redefinitions.
@@ -1753,11 +1789,32 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
+	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private List<IncidenceClass> findPossibleSubsettedIncidenceClasses(
+			EdgeClass superClass, IncidenceClass ic) {
+		// TODO recursively search topwards
+		return null;
+	}
+
 	private void createSpecializesIncidenceClassForIncidences(
 			EdgeClass subClass, EdgeClass superClass, IncidenceClass subInc,
 			IncidenceClass superInc) {
 		assert subInc.get_direction() != null;
 		assert superInc.get_direction() != null;
+
+		for (SpecializesIncidenceClass spic : subInc.getIncidentEdges(
+				SpecializesIncidenceClass.class,
+				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+			if (spic.getOmega() == superInc) {
+				// there already exists a SpecializesIncidenceClass between both
+				// incidences
+				return;
+			}
+		}
 
 		// Check incidence directions
 		if (subInc.get_direction() != superInc.get_direction()) {
