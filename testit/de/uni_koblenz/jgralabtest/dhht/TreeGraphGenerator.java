@@ -144,13 +144,6 @@ public class TreeGraphGenerator {
 						for (j = 0; j < nextEdgeBranchingFactor; j++) {
 							vCount++;
 							SimpleVertex v = partialGraph.createSimpleVertex();
-							// System.out
-							// .println("Created vertex "
-							// + v.getLocalId()
-							// + " on partial graph "
-							// + GraphDatabaseElementaryMethods
-							// .getPartialGraphId(v
-							// .getGlobalId()));
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
