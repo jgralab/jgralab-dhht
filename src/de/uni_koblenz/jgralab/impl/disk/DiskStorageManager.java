@@ -880,6 +880,11 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getFirstIncidenceIdAtVertexId(int elemId) {
+		System.out
+				.println("Get first incidence of vertex "
+						+ elemId
+						+ " which is "
+						+ getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)]);
 		return getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
 	}
 
