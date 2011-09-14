@@ -86,12 +86,12 @@ public abstract class EdgeProxy extends
 
 	protected final void setId(int id) {
 		assert id >= 0;
-		this.elementId = -id;
+		this.elementId = id;
 	}
 
 	@Override
 	public final long getGlobalId() {
-		return -elementId;
+		return elementId;
 	}
 
 	/* ***********************************************************
