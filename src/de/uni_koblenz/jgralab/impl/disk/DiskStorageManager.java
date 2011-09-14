@@ -900,6 +900,8 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getNextIncidenceIdAtVertexId(int localIncidenceId) {
+		System.out.println("Retrieving next incidence id of incidence "
+				+ localIncidenceId);
 		return getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)];
 	}
 

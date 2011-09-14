@@ -9,6 +9,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
@@ -103,8 +104,7 @@ public class TreeGraphGenerator {
 		Vertex root = graph.createSimpleVertex();
 
 		for (int i = 0; i < roots; i++) {
-			int partialGraphId = 1;
-			partialGraphId = i / (roots / 2) + 1;
+			int partialGraphId = getInitialPartialGraphId(i);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
 			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
@@ -145,6 +145,13 @@ public class TreeGraphGenerator {
 						for (j = 0; j < nextEdgeBranchingFactor; j++) {
 							vCount++;
 							SimpleVertex v = partialGraph.createSimpleVertex();
+							System.out
+									.println("Created vertex "
+											+ v.getLocalId()
+											+ " on partial graph "
+											+ GraphDatabaseElementaryMethods
+													.getPartialGraphId(v
+															.getGlobalId()));
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
@@ -336,6 +343,12 @@ public class TreeGraphGenerator {
 
 	protected int getPartialGraphCount() {
 		return 1;
+	}
+
+	protected int getInitialPartialGraphId(int i) {
+		double range = (roots + 1) / getPartialGraphCount();
+		double val = i / range;
+		return (int) val + 1;
 	}
 
 }
