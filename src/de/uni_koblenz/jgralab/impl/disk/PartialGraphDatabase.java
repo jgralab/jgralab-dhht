@@ -21,6 +21,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 		try {
 			RemoteJGraLabServer remoteInstance = localJGraLabServer
 					.getRemoteInstance(hostnameOfCompleteGraph);
+
 			completeGraphDatabase = remoteInstance
 					.getGraphDatabase(uniqueGraphId);
 			GraphData data = new GraphData();
@@ -36,6 +37,10 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 	@Override
 	public String getHostname(int id) {
 		try {
+			System.out
+					.println("Asking complete graph db for hostname of partial graph "
+							+ id);
+			System.out.println("CompleteGraphDb: " + completeGraphDatabase);
 			return completeGraphDatabase.getHostname(id);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
