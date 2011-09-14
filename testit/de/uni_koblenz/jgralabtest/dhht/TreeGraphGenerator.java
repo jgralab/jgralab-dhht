@@ -103,8 +103,7 @@ public class TreeGraphGenerator {
 		Vertex root = graph.createSimpleVertex();
 
 		for (int i = 0; i < roots; i++) {
-			int partialGraphId = 1;
-			partialGraphId = i / (roots / 2) + 1;
+			int partialGraphId = getInitialPartialGraphId(i);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
 			Vertex v = partialGraph.createSimpleVertex();
 			vertexList[i] = v.getGlobalId();
@@ -336,6 +335,12 @@ public class TreeGraphGenerator {
 
 	protected int getPartialGraphCount() {
 		return 1;
+	}
+
+	protected int getInitialPartialGraphId(int i) {
+		double range = (roots + 1) / getPartialGraphCount();
+		double val = i / range;
+		return (int) val + 1;
 	}
 
 }

@@ -1120,10 +1120,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (!isLoading()) {
 			notifyIncidenceAdded(incId);
 		}
-		// System.out.println("First incidence of edge " + edgeId + " is: " +
-		// getFirstIncidenceIdAtEdgeId(edgeId));
-		// System.out.println("Incidence object: " +
-		// getIncidenceObject(getFirstIncidenceIdAtEdgeId(edgeId)));
 		return incId;
 	}
 
