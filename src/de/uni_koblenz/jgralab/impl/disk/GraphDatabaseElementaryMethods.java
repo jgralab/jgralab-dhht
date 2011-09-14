@@ -667,8 +667,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
 		try {
-			return getGraphDatabase(partialGraphId).getKappaOfVertexId(
-					localElementId);
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getKappaOfVertexId(localElementId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -679,8 +679,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
 		try {
-			getGraphDatabase(partialGraphId).setKappaOfVertexId(localElementId,
-					kappa);
+			getDiskStorageForPartialGraph(partialGraphId).setKappaOfVertexId(
+					localElementId, kappa);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -691,8 +691,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
 		try {
-			return getGraphDatabase(partialGraphId).getKappaOfEdgeId(
-					localElementId);
+			return getDiskStorageForPartialGraph(partialGraphId)
+					.getKappaOfEdgeId(localElementId);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -703,8 +703,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 		int partialGraphId = getPartialGraphId(globalElementId);
 		int localElementId = convertToLocalId(globalElementId);
 		try {
-			getGraphDatabase(partialGraphId).setKappaOfEdgeId(localElementId,
-					kappa);
+			getDiskStorageForPartialGraph(partialGraphId).setKappaOfEdgeId(
+					localElementId, kappa);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
