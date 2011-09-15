@@ -40,8 +40,13 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	}
 
 	/** creates a local algorithm object as central instance of a search */
-	public CentralAlgorithmImpl(Graph partialGraph) {
+	public CentralAlgorithmImpl(Graph partialGraph, boolean dfs) {
 		this.graph = partialGraph;
+		if (dfs) {
+			this.buffer = new Stack<Long>();
+		} else {
+			this.buffer = new Queue<Long>();
+		}
 		// create satellite algorithms for all partial graphs incl. the local
 		// one
 		try {

@@ -4,8 +4,8 @@ import de.uni_koblenz.jgralab.Graph;
 
 public class CountCentralAlgorithm extends CentralAlgorithmImpl {
 
-	public CountCentralAlgorithm(Graph partialGraph) {
-		super(partialGraph);
+	public CountCentralAlgorithm(Graph partialGraph, boolean dfs) {
+		super(partialGraph, dfs);
 	}
 
 	private int eCount = 0;

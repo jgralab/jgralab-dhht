@@ -35,7 +35,7 @@ public class BGStorageTest {
 			view.useAsTraversalContext();
 		}
 		if (variant == Variant.TREELIKEDISTRIBUTED) {
-			CountCentralAlgorithm algo = new CountCentralAlgorithm(graph);
+			CountCentralAlgorithm algo = new CountCentralAlgorithm(graph, dfs);
 			try {
 				algo.run(startVertex);
 			} catch (RemoteException e) {
