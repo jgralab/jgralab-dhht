@@ -134,6 +134,8 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 */
 	public boolean containsElement(GraphElement<?, ?, ?> element);
 
+	public long getIncidenceListVersion();
+
 	/**
 	 * Returns the first {@link Incidence} of this {@link GraphElement}. If such
 	 * an {@link Incidence} does not exist, <code>null</code> is returned.

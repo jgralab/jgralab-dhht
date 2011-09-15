@@ -35,6 +35,8 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	/* returns the SatelliteAlgorithm for the graph the element belongs to */
 	private SatelliteAlgorithmRemoteAccess getAlgorithmForElementId(
 			Long elementId) {
+		System.out.println("Retrieving algorithm for partial graph id: "
+				+ GraphDatabaseElementaryMethods.getPartialGraphId(elementId));
 		return remoteAlgorithms.get(GraphDatabaseElementaryMethods
 				.getPartialGraphId(elementId));
 	}
@@ -55,7 +57,11 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
+		remoteAlgorithms.put(partialGraph.getPartialGraphId(),
+				SatelliteAlgorithmImpl.createRemote(partialGraph, stub));
 		for (Graph pg : partialGraph.getCompleteGraph().getPartialGraphs()) {
+			System.out.println("Creatign remote algorithm for paretia lgraph "
+					+ pg.getPartialGraphId());
 			remoteAlgorithms.put(pg.getPartialGraphId(),
 					SatelliteAlgorithmImpl.createRemote(pg, stub));
 		}

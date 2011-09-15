@@ -108,13 +108,12 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(
 				Graph traversalContext,
 				GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
-				Class<? extends Incidence> ic, Direction dir)  {
+				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;
 			this.dir = dir;
 			this.traversalContext = traversalContext;
-			incidenceListVersion = ((GraphElementImpl<OwnTypeClass, OwnType, DualType>) graphElement)
-					.getIncidenceListVersion();
+			incidenceListVersion = graphElement.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
 					: graphElement.getFirstIncidence(ic, dir));
 		}
