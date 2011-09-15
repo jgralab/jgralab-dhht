@@ -214,7 +214,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return boolean true if <code>incidenceListVersion</code> differs from
 	 *         {@link #incidenceListVersion}
 	 */
-	final boolean isIncidenceListModified(long incidenceListVersion) {
+	public final boolean isIncidenceListModified(long incidenceListVersion) {
 		assert isValid();
 		return (this.getIncidenceListVersion() != incidenceListVersion);
 	}
@@ -515,8 +515,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 *            the id of the created incidence
 	 * @return
 	 */
-	public abstract Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect,
-			long incidenceId);
+	public abstract Incidence connect(IncidenceClass incidenceClass,
+			DualType elemToConnect, long incidenceId);
 
 	/**
 	 * @return <code>true</code> if <code>{@link #subOrdinateGraph}==null</code>
