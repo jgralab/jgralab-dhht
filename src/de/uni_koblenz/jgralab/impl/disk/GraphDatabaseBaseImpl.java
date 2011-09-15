@@ -178,12 +178,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		int localSubgraphId = convertToLocalId(globalSubgraphId);
 		GraphData data = getGraphData(localSubgraphId);
 		if (data.partialGraphs == null)
-			return null;
+			return new LinkedList<Integer>();
 		List<Integer> value = new LinkedList<Integer>();
 		for (Integer pgId : data.partialGraphs) {
 			value.add(pgId);
-			value.addAll(getPartialGraphIds(GraphDatabaseElementaryMethods
-					.getToplevelGraphForPartialGraphId(pgId)));
+			List<Integer> pgsOfPg = getPartialGraphIds(GraphDatabaseElementaryMethods
+					.getToplevelGraphForPartialGraphId(pgId));
+			value.addAll(pgsOfPg);
 		}
 		return value;
 	}

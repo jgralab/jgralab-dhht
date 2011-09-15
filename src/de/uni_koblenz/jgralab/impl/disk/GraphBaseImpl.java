@@ -211,7 +211,7 @@ public abstract class GraphBaseImpl implements Graph {
 		for (Integer i : getGraphDatabase().getPartialGraphIds(getGlobalId())) {
 			Graph p = getGraphDatabase().getGraphObject(i);
 			list.add(p);
-			list.addAll(p.getPartialGraphs());
+			// list.addAll(p.getPartialGraphs());
 		}
 		return list;
 	}
