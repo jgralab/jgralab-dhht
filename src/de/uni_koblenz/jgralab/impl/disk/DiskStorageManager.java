@@ -880,23 +880,11 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getFirstIncidenceIdAtVertexId(int elemId) {
-		System.out
-				.println("Get first incidence of vertex "
-						+ elemId
-						+ " which is "
-						+ getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)]);
 		return getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
 	}
 
 	@Override
 	public void setFirstIncidenceIdAtVertexId(int elemId, long incidenceId) {
-		System.out
-				.println("Set first incidence of vertex "
-						+ elemId
-						+ " to "
-						+ incidenceId
-						+ " which is "
-						+ getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)]);
 		getVertexContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)] = incidenceId;
 	}
 
@@ -912,8 +900,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getNextIncidenceIdAtVertexId(int localIncidenceId) {
-		System.out.println("Retrieving next incidence id of incidence "
-				+ localIncidenceId);
 		return getIncidenceContainer(getContainerId(localIncidenceId)).nextIncidenceAtVertexId[getElementIdInContainer(localIncidenceId)];
 	}
 
@@ -955,7 +941,6 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getFirstIncidenceIdAtEdgeId(int elemId) {
-		int containerId = getContainerId(elemId);
 		return getEdgeContainer(getContainerId(elemId)).firstIncidenceId[getElementIdInContainer(elemId)];
 	}
 
