@@ -19,8 +19,8 @@ import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
-import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl;
+import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
@@ -42,8 +42,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	private static RemoteJGraLabServer remoteAccessToLocalInstance = null;
 
 	private static String localHostname = "141.26.70.230";
-
-	private static String localPort = "1099";
 
 	private final Map<String, RemoteGraphDatabaseAccessWithInternalMethods> localGraphDatabases = new HashMap<String, RemoteGraphDatabaseAccessWithInternalMethods>();
 
@@ -212,25 +210,24 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
 	@Override
 	public void setHostname(String host) {
-		this.localHostname = host;
+		localHostname = host;
 	}
 
-	public SatelliteAlgorithm createSatelliteAlgorithm(String uniqueGraphId,
-			int partialGraphId, CentralAlgorithm parent) throws RemoteException {
+	public SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
+			String uniqueGraphId, int partialGraphId, CentralAlgorithm parent)
+			throws RemoteException {
 		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
 				.getGraphObject(GraphDatabaseElementaryMethods
 						.getToplevelGraphForPartialGraphId(partialGraphId));
-		return SatelliteAlgorithmImpl.create(g, parent);
+		return (SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
+				.exportObject(SatelliteAlgorithmImpl.create(g, parent), 0);
 	}
 
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			localHostname = args[0];
-			if (args.length > 1) {
-				localPort = args[1];
-			}
 		}
-		JGraLabServer server = JGraLabServerImpl.getLocalInstance();
+		JGraLabServerImpl.getLocalInstance();
 	}
 
 }

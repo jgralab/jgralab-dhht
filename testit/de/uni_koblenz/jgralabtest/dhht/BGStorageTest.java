@@ -1,7 +1,10 @@
 package de.uni_koblenz.jgralabtest.dhht;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.algolib.CountCentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 
@@ -31,12 +34,25 @@ public class BGStorageTest {
 			Graph view = graph.getView(2);
 			view.useAsTraversalContext();
 		}
-		CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(
-				dfs);
-		DiskStorageManager.reloadedContainers = 0;
-		algo.run(startVertex);
-		visitedNodes = algo.getVertexCount();
-		visitedEdges = algo.getEdgeCount();
+		if (variant == Variant.TREELIKEDISTRIBUTED) {
+			CountCentralAlgorithm algo = new CountCentralAlgorithm(graph);
+			try {
+				algo.run(startVertex);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			visitedNodes = algo.getVertexCount();
+			visitedEdges = algo.getEdgeCount();
+		} else {
+			CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(
+					dfs);
+			DiskStorageManager.reloadedContainers = 0;
+			algo.run(startVertex);
+			visitedNodes = algo.getVertexCount();
+			visitedEdges = algo.getEdgeCount();
+		}
+
 		graph.releaseTraversalContext();
 	}
 
@@ -160,7 +176,7 @@ public class BGStorageTest {
 					firstLayerFactorsClique, addEdges, true, true)
 					.createGraph();
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(3, 5, factors,
+			return new DistributedGraphGenerator(8, 5, factors,
 					firstLayerFactorsTree, 0, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(6, 5, factors,
