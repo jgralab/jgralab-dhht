@@ -62,6 +62,11 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 	public static SatelliteAlgorithmRemoteAccess create(Graph partialGraph,
 			CentralAlgorithm parent) {
+		return new SatelliteAlgorithmImpl(partialGraph, parent);
+	}
+
+	public static SatelliteAlgorithmRemoteAccess createRemote(
+			Graph partialGraph, CentralAlgorithm parent) {
 		int centralAlgorithmPartialGraphId;
 		try {
 			centralAlgorithmPartialGraphId = parent.getPartialGraphId();
@@ -84,10 +89,13 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 			RemoteJGraLabServer remoteServer = server
 					.getRemoteInstance(remoteHostname);
 			try {
-				return remoteServer
+				System.out.println("Try to create satellite algorithm");
+				SatelliteAlgorithmRemoteAccess remoteAlgo = remoteServer
 						.createSatelliteAlgorithm(
 								partialGraph.getUniqueGraphId(),
 								partialGraphId, parent);
+				System.out.println("Sucessfully created algorithm");
+				return remoteAlgo;
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}

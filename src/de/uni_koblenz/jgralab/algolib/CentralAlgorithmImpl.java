@@ -52,7 +52,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		}
 		for (Graph pg : partialGraph.getCompleteGraph().getPartialGraphs()) {
 			remoteAlgorithms.put(pg.getPartialGraphId(),
-					SatelliteAlgorithmImpl.create(pg, stub));
+					SatelliteAlgorithmImpl.createRemote(pg, stub));
 		}
 	}
 
@@ -66,7 +66,10 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		buffer.add(vertexId);
 		remoteAlgorithm.processRoot(vertexId);
 		while (!buffer.isEmpty()) {
-			getAlgorithmForElementId(vertexId).processVertex(buffer.get());
+			long vId = buffer.get();
+			System.out.println("Processing vertex " + vId);
+			getAlgorithmForElementId(vertexId)
+					.processVertex(vId /* buffer.get() */);
 		}
 	}
 
