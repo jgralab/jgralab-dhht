@@ -86,13 +86,6 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	}
 
 	@Override
-	public long createPartialGraphInGraph(long parentGlobalEntityId,
-			String remoteHostname) {
-		return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(
-				remoteHostname, parentGlobalEntityId, ParentEntityKind.GRAPH));
-	}
-
-	@Override
 	public long createPartialGraphInEdge(long parentGlobalEntityId,
 			String remoteHostname) {
 		return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(

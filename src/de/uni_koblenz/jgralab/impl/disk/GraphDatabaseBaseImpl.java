@@ -122,9 +122,12 @@ public abstract class GraphDatabaseBaseImpl extends
 	public long createPartialGraphInGraph(long parentGlobalEntityId,
 			String remoteHostname) {
 		try {
-			return getToplevelGraphForPartialGraphId(internalCreatePartialGraphInEntity(
+			int partialgaphId = internalCreatePartialGraphInEntity(
 					remoteHostname, parentGlobalEntityId,
-					ParentEntityKind.GRAPH));
+					ParentEntityKind.GRAPH);
+			long globalSubgraphId = getToplevelGraphForPartialGraphId(partialgaphId);
+			addPartialGraphId(parentGlobalEntityId, partialgaphId);
+			return globalSubgraphId;
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -165,6 +168,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
+				System.out.println("Delegating");
 				return getGraphDatabase(partialGraphId).getPartialGraphIds(
 						globalSubgraphId);
 			} catch (RemoteException e) {
@@ -186,6 +190,8 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	@Override
 	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId) {
+		System.out.println("Adding partial graph id " + newPartialGraphId
+				+ " to global graph " + globalSubgraphId);
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			try {

@@ -61,7 +61,6 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
-	
 	/**
 	 * Creates a graph
 	 * 
@@ -73,53 +72,44 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			RemoteGraphDatabaseAccess graphData) {
 		super(partialGraphId, localDatabase, graphData);
 	}
-	
-	
+
 	// ==============================================================
 	// Methods to access schema and type
 	// ==============================================================
-	
 
 	@Override
 	public Schema getSchema() {
 		return localGraphDatabase.getSchema();
 	}
-	
 
 	@Override
 	public abstract Class<? extends Graph> getM1Class();
 
-
 	@Override
 	public abstract GraphClass getType();
 
+	// @Override
+	// public int compareTo(Graph a) {
+	// int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
+	// if (compVal == 0) {
+	// return a.getPartialGraphId() - getPartialGraphId();
+	// } else {
+	// return compVal;
+	// }
+	// }
 
-//	@Override
-//	public int compareTo(Graph a) {
-//		int compVal = getUniqueGraphId().compareTo(a.getUniqueGraphId());
-//		if (compVal == 0) {
-//			return a.getPartialGraphId() - getPartialGraphId();
-//		} else {
-//			return compVal;
-//		}
-//	}
-
-
-	public void saveGraph(String filename, ProgressFunction pf, LocalBooleanGraphMarker subGraph) throws GraphIOException {
-	//	if (subGraph != null) {
-			GraphIO.saveGraphToFile(filename, this, pf);
-//		} else {
-//			GraphIO.saveGraphToFile(filename, subGraph, pf);
-//		}
+	public void saveGraph(String filename, ProgressFunction pf,
+			LocalBooleanGraphMarker subGraph) throws GraphIOException {
+		// if (subGraph != null) {
+		GraphIO.saveGraphToFile(filename, this, pf);
+		// } else {
+		// GraphIO.saveGraphToFile(filename, subGraph, pf);
+		// }
 	}
 
-
-
-	
 	// ==============================================================
 	// Methods to access traversal context
 	// ==============================================================
-
 
 	@Override
 	public void useAsTraversalContext() {
@@ -135,8 +125,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public Graph getTraversalContext() {
 		return localGraphDatabase.getTraversalContext();
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access hierarchy and distribution
 	//
@@ -147,31 +136,31 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	// - Graph IDs
 	// ============================================================================
 
-	
 	@Override
 	public Graph getCompleteGraph() {
-		return localGraphDatabase.getGraphObject(0);
+		return localGraphDatabase
+				.getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID);
 	}
-	
-	
+
 	@Override
 	public Graph getLocalPartialGraph() {
-		return localGraphDatabase.getGraphObject(0);
+		return localGraphDatabase
+				.getGraphObject(GraphDatabaseElementaryMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID);
 	}
-	
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public AttributedElement getParentGraphOrElement() {
 		if (globalSubgraphId == GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID)
 			return null;
 		try {
-			return localGraphDatabase.getGraphElementObject(storingGraphDatabase.getContainingElementId(globalSubgraphId));
+			return localGraphDatabase
+					.getGraphElementObject(storingGraphDatabase
+							.getContainingElementId(globalSubgraphId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -180,18 +169,16 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			return null;
 		AttributedElement elem = getParentGraphOrElement();
 		if (elem instanceof Graph)
-			return (Graph) elem; 
+			return (Graph) elem;
 		return ((GraphElement) elem).getGraph();
 	}
-	
-	
+
 	@Override
 	public boolean isPartOfGraph(Graph other) {
 		Graph parentGraph = getParentGraph();
 		return ((parentGraph == other) || (parentGraph.isPartOfGraph(other)));
 	}
 
-	
 	@Override
 	public Graph getView(int kappa) {
 		return localGraphDatabase.getGraphFactory()
@@ -202,65 +189,55 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public Graph getViewedGraph() {
 		return this;
 	}
-	
-	//inherited from GraphBaseImpl
-	//public Graph createPartialGraphInGraph(String hostnameOfPartialGraph)  
-	
-	
+
+	// inherited from GraphBaseImpl
+	// public Graph createPartialGraphInGraph(String hostnameOfPartialGraph)
+
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
 		long globalId = (partialGraphId << 32) + 1;
 		return localGraphDatabase.getGraphObject(globalId);
 	}
-	
-	
-	//Inherited from GraphBaseImpl
-	//@Deprecated
-	//public void savePartialGraphs(GraphIO graphIO)
-	
-	
-	//Inherited from GraphBaseImpl
-	//public String getUniqueGraphId() {}
-	
-	//Inherited from GraphBaseImpl
-	//public long getGlobalId() {}
-	
-	//Inherited from GraphBaseImpl
-	//public int getLocalId() {}
-	
 
-	//Inherited from GraphBaseImpl
-	//public int getPartialGraphId() {}
-	
-	//Inherited from GraphBaseImpl
-	//public int isLocalElementId(long id) {}
-	
-	
-	
-	
+	// Inherited from GraphBaseImpl
+	// @Deprecated
+	// public void savePartialGraphs(GraphIO graphIO)
+
+	// Inherited from GraphBaseImpl
+	// public String getUniqueGraphId() {}
+
+	// Inherited from GraphBaseImpl
+	// public long getGlobalId() {}
+
+	// Inherited from GraphBaseImpl
+	// public int getLocalId() {}
+
+	// Inherited from GraphBaseImpl
+	// public int getPartialGraphId() {}
+
+	// Inherited from GraphBaseImpl
+	// public int isLocalElementId(long id) {}
+
 	// ============================================================================
 	// Methods to access vertices and edges of the graph
 	// ============================================================================
 
-	//Inherited from GraphBaseImpl
-	//public <T extends Vertex> T createVertex(Class<T> cls) {}
-	
-	
-	
-	//Inherited from GraphBaseImpl
-	//public <T extends Edge> T createEdge(Class<T> cls)
-	
-	
-	//Inherited from GraphBaseImpl
-	//public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega)
-	
-	
+	// Inherited from GraphBaseImpl
+	// public <T extends Vertex> T createVertex(Class<T> cls) {}
+
+	// Inherited from GraphBaseImpl
+	// public <T extends Edge> T createEdge(Class<T> cls)
+
+	// Inherited from GraphBaseImpl
+	// public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+	// Vertex omega)
+
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
 		return vertex.connect(cls, edge);
 	}
-	
-	
+
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return (v != null) && (v.getGlobalId() > 0)
@@ -273,7 +250,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 				&& (localGraphDatabase.getVertexObject(v.getGlobalId()) == v);
 	}
 
-	
 	@Override
 	public boolean containsEdge(Edge e) {
 		return (e != null) && (e.getGlobalId() > 0)
@@ -286,143 +262,137 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 				&& (localGraphDatabase.getEdgeObject(e.getGlobalId()) == e);
 	}
 
-	
-	//Inherited from GraphBaseImpl
-	//public boolean containsElement(GraphElement elem);
-	
-	//Inherited from GraphBaseImpl
-	//public boolean deleteVertex(Vertex v);
-	
-	//Inherited from GraphBaseImpl
-	//public boolean deleteEdge(Edge e);
-	
-	//Inherited from GraphBaseImpl
-	//public Vertex getFirstVertex()
-	
-	//Inherited from GraphBaseImpl
-	//public Vertex getLastVertex()
-	
-	//Inherited from GraphBaseImpl
-	//public Edge getFirstEdge()
-	
-	//Inherited from GraphBaseImpl
-	//public Edge getLastEdge()
-	
-	//Inherited from GraphBaseImpl
-	//public Vertex getVertex(long id)
-	
-	//Inherited from GraphBaseImpl
-	//public Edge getEdge(long id)
-	
-	//Inherited from GraphBaseImpl
-	//public long getMaxVCount()
-	
-	//Inherited from GraphBaseImpl
-	//public long getMaxECount()
-	
-	//Inherited from GraphBaseImpl
-	//public long getVCount()
-	
-	//Inherited from GraphBaseImpl
-	//public long getECount()
-	
-	//Inherited from GraphBaseImpl
-	//public long getICount()
-	
-	//Inherited from GraphBaseImpl
-	//public Iterable<Vertex> getVertices()
-	
-	//Inherited from GraphBaseImpl
-	//public Iterable<Edge> getEdges()
-	
-	//Inherited from GraphBaseImpl
-	//public void sortVertices(Comparator<Vertex> comp)
-	
-	//Inherited from GraphBaseImpl
-	//public void sortEdges(Comparator<Edge> comp)
-	
-	
+	// Inherited from GraphBaseImpl
+	// public boolean containsElement(GraphElement elem);
+
+	// Inherited from GraphBaseImpl
+	// public boolean deleteVertex(Vertex v);
+
+	// Inherited from GraphBaseImpl
+	// public boolean deleteEdge(Edge e);
+
+	// Inherited from GraphBaseImpl
+	// public Vertex getFirstVertex()
+
+	// Inherited from GraphBaseImpl
+	// public Vertex getLastVertex()
+
+	// Inherited from GraphBaseImpl
+	// public Edge getFirstEdge()
+
+	// Inherited from GraphBaseImpl
+	// public Edge getLastEdge()
+
+	// Inherited from GraphBaseImpl
+	// public Vertex getVertex(long id)
+
+	// Inherited from GraphBaseImpl
+	// public Edge getEdge(long id)
+
+	// Inherited from GraphBaseImpl
+	// public long getMaxVCount()
+
+	// Inherited from GraphBaseImpl
+	// public long getMaxECount()
+
+	// Inherited from GraphBaseImpl
+	// public long getVCount()
+
+	// Inherited from GraphBaseImpl
+	// public long getECount()
+
+	// Inherited from GraphBaseImpl
+	// public long getICount()
+
+	// Inherited from GraphBaseImpl
+	// public Iterable<Vertex> getVertices()
+
+	// Inherited from GraphBaseImpl
+	// public Iterable<Edge> getEdges()
+
+	// Inherited from GraphBaseImpl
+	// public void sortVertices(Comparator<Vertex> comp)
+
+	// Inherited from GraphBaseImpl
+	// public void sortEdges(Comparator<Edge> comp)
+
 	@Override
 	public void defragment() {
 
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access vertex and edge order
 	// ============================================================================
-	
-	
-	
-//	/**
-//	 * Modifies eSeq such that the movedEdge is immediately after the
-//	 * targetEdge.
-//	 * 
-//	 * @param targetEdge
-//	 *            an edge
-//	 * @param movedEdge
-//	 *            the edge to be moved
-//	 */
-//	protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-//		storingGraphDatabase
-//				.putEdgeAfter(targetEdge.getGlobalId(), movedEdge.getGlobalId());
-//	}
-//
-//	/**
-//	 * Modifies eSeq such that the movedEdge is immediately before the
-//	 * targetEdge.
-//	 * 
-//	 * @param targetEdge
-//	 *            an edge
-//	 * @param movedEdge
-//	 *            the edge to be moved
-//	 */
-//	protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl movedEdge) {
-//		storingGraphDatabase.putEdgeBefore(targetEdge.getGlobalId(),
-//				movedEdge.getGlobalId());
-//	}
-//
-//	/**
-//	 * Modifies vSeq such that the movedVertex is immediately after the
-//	 * targetVertex.
-//	 * 
-//	 * @param targetVertex
-//	 *            an edge
-//	 * @param movedVertex
-//	 *            the edge to be moved
-//	 */
-//	protected void putVertexAfterInGraph(VertexImpl targetVertex,
-//			VertexImpl movedVertex) {
-//		storingGraphDatabase.putVertexAfter(targetVertex.getGlobalId(),
-//				movedVertex.getGlobalId());
-//	}
-//
-//	/**
-//	 * Modifies eSeq such that the movedVertex is immediately before the
-//	 * targetVertex.
-//	 * 
-//	 * @param targetVertex
-//	 *            an edge
-//	 * @param movedVertex
-//	 *            the edge to be moved
-//	 */
-//	protected void putVertexBeforeInGraph(VertexImpl targetVertex,
-//			VertexImpl movedVertex) {
-//		storingGraphDatabase.putVertexBefore(targetVertex.getGlobalId(),
-//				movedVertex.getGlobalId());
-//	}
 
-	
-	
+	// /**
+	// * Modifies eSeq such that the movedEdge is immediately after the
+	// * targetEdge.
+	// *
+	// * @param targetEdge
+	// * an edge
+	// * @param movedEdge
+	// * the edge to be moved
+	// */
+	// protected void putEdgeAfterInGraph(EdgeImpl targetEdge, EdgeImpl
+	// movedEdge) {
+	// storingGraphDatabase
+	// .putEdgeAfter(targetEdge.getGlobalId(), movedEdge.getGlobalId());
+	// }
+	//
+	// /**
+	// * Modifies eSeq such that the movedEdge is immediately before the
+	// * targetEdge.
+	// *
+	// * @param targetEdge
+	// * an edge
+	// * @param movedEdge
+	// * the edge to be moved
+	// */
+	// protected void putEdgeBeforeInGraph(EdgeImpl targetEdge, EdgeImpl
+	// movedEdge) {
+	// storingGraphDatabase.putEdgeBefore(targetEdge.getGlobalId(),
+	// movedEdge.getGlobalId());
+	// }
+	//
+	// /**
+	// * Modifies vSeq such that the movedVertex is immediately after the
+	// * targetVertex.
+	// *
+	// * @param targetVertex
+	// * an edge
+	// * @param movedVertex
+	// * the edge to be moved
+	// */
+	// protected void putVertexAfterInGraph(VertexImpl targetVertex,
+	// VertexImpl movedVertex) {
+	// storingGraphDatabase.putVertexAfter(targetVertex.getGlobalId(),
+	// movedVertex.getGlobalId());
+	// }
+	//
+	// /**
+	// * Modifies eSeq such that the movedVertex is immediately before the
+	// * targetVertex.
+	// *
+	// * @param targetVertex
+	// * an edge
+	// * @param movedVertex
+	// * the edge to be moved
+	// */
+	// protected void putVertexBeforeInGraph(VertexImpl targetVertex,
+	// VertexImpl movedVertex) {
+	// storingGraphDatabase.putVertexBefore(targetVertex.getGlobalId(),
+	// movedVertex.getGlobalId());
+	// }
+
 	// ============================================================================
 	// Listener methods inherited from GraphBaseImpl
 	// ============================================================================
-	
-	
+
 	// ============================================================================
 	// Methods to access graph state and version (loading etc.)
 	// ============================================================================
-	
+
 	@Override
 	public boolean isLoading() {
 		try {
@@ -431,8 +401,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	/**
 	 * Sets the loading flag.
 	 * 
@@ -446,8 +415,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	
-	
 	@Override
 	public long getGraphVersion() {
 		try {
@@ -456,8 +423,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	/**
 	 * Sets the version counter of this graph. Should only be called immediately
 	 * after loading and in graphModified.
@@ -472,8 +438,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	/**
 	 * Changes this graph's version. graphModified() is called whenever the
 	 * graph is changed, all changes like adding, creating and reordering of
@@ -488,9 +453,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-	
+
 	@Override
 	public long getVertexListVersion() {
 		try {
@@ -499,8 +462,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-
 
 	@Override
 	public long getEdgeListVersion() {
@@ -510,8 +471,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
 	@Override
 	protected void edgeListModified() {
 		try {
@@ -522,7 +482,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	
 	/**
 	 * Changes the vertex sequence version of this graph. Should be called
 	 * whenever the vertex list of this graph is changed, for instance by
@@ -538,19 +497,15 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-
 	@Override
 	public final GraphFactory getGraphFactory() {
 		return localGraphDatabase.getGraphFactory();
 	}
-	
-	
+
 	@Override
 	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return localGraphDatabase;
 	}
-	
-
 
 	// ====================================================
 	// Methods to create domain objects
@@ -680,14 +635,5 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 			throw new RuntimeException(e);
 		}
 	}
-
-
-
-	
-
-
-
-
-
 
 }

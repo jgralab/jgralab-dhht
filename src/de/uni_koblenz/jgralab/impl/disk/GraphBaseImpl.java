@@ -201,13 +201,14 @@ public abstract class GraphBaseImpl implements Graph {
 		return localGraphDatabase.getGraphObject(pgId);
 	}
 
-	/* list of all partial graphs contained in this partial or complete one */
-	protected List<Integer> containedPartialGraphIds;
-
 	@Override
 	public List<Graph> getPartialGraphs() {
 		LinkedList<Graph> list = new LinkedList<Graph>();
-		for (Integer i : containedPartialGraphIds) {
+		System.out.println("Graph db: " + getGraphDatabase());
+		System.out.println("Global graph id: " + globalSubgraphId);
+		System.out.println("Partial graphs: "
+				+ getGraphDatabase().getPartialGraphIds(getGlobalId()));
+		for (Integer i : getGraphDatabase().getPartialGraphIds(getGlobalId())) {
 			Graph p = getGraphDatabase().getGraphObject(i);
 			list.add(p);
 			list.addAll(p.getPartialGraphs());
