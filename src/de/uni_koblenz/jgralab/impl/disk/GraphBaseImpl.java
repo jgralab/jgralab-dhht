@@ -209,7 +209,9 @@ public abstract class GraphBaseImpl implements Graph {
 		System.out.println("Partial graphs: "
 				+ getGraphDatabase().getPartialGraphIds(getGlobalId()));
 		for (Integer i : getGraphDatabase().getPartialGraphIds(getGlobalId())) {
-			Graph p = getGraphDatabase().getGraphObject(i);
+			Graph p = getGraphDatabase().getGraphObject(
+					GraphDatabaseElementaryMethods
+							.getToplevelGraphForPartialGraphId(i));
 			list.add(p);
 			// list.addAll(p.getPartialGraphs());
 		}

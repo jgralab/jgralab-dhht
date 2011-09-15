@@ -54,6 +54,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 		} catch (RemoteException e1) {
 			throw new RuntimeException(e1);
 		}
+		registerPartialGraph(partialGraphId, remoteHostname);
 		RemoteJGraLabServer remoteServer = localJGraLabServer
 				.getRemoteInstance(remoteHostname);
 		RemoteGraphDatabaseAccess p;

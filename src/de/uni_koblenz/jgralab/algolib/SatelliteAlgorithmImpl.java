@@ -69,10 +69,13 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 			// create satellite algorithm on station of central algorithm
 			return new SatelliteAlgorithmImpl(partialGraph, parent);
 		} else {
+
 			// create SatelliteAlgorithm object on remote station
 			JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 			String remoteHostname = partialGraph.getGraphDatabase()
 					.getHostname(partialGraphId);
+			System.out.println("Remote host for partial graph id: "
+					+ partialGraphId + " is " + remoteHostname);
 			RemoteJGraLabServer remoteServer = server
 					.getRemoteInstance(remoteHostname);
 			try {
