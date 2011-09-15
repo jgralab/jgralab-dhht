@@ -204,16 +204,11 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	public List<Graph> getPartialGraphs() {
 		LinkedList<Graph> list = new LinkedList<Graph>();
-		System.out.println("Graph db: " + getGraphDatabase());
-		System.out.println("Global graph id: " + globalSubgraphId);
-		System.out.println("Partial graphs: "
-				+ getGraphDatabase().getPartialGraphIds(getGlobalId()));
 		for (Integer i : getGraphDatabase().getPartialGraphIds(getGlobalId())) {
 			Graph p = getGraphDatabase().getGraphObject(
 					GraphDatabaseElementaryMethods
 							.getToplevelGraphForPartialGraphId(i));
 			list.add(p);
-			// list.addAll(p.getPartialGraphs());
 		}
 		return list;
 	}

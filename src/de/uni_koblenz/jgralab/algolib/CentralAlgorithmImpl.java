@@ -35,8 +35,6 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	/* returns the SatelliteAlgorithm for the graph the element belongs to */
 	private SatelliteAlgorithmRemoteAccess getAlgorithmForElementId(
 			Long elementId) {
-		System.out.println("Retrieving algorithm for partial graph id: "
-				+ GraphDatabaseElementaryMethods.getPartialGraphId(elementId));
 		return remoteAlgorithms.get(GraphDatabaseElementaryMethods
 				.getPartialGraphId(elementId));
 	}
@@ -60,8 +58,6 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		remoteAlgorithms.put(partialGraph.getPartialGraphId(),
 				SatelliteAlgorithmImpl.createRemote(partialGraph, stub));
 		for (Graph pg : partialGraph.getCompleteGraph().getPartialGraphs()) {
-			System.out.println("Creatign remote algorithm for paretia lgraph "
-					+ pg.getPartialGraphId());
 			remoteAlgorithms.put(pg.getPartialGraphId(),
 					SatelliteAlgorithmImpl.createRemote(pg, stub));
 		}
@@ -77,14 +73,11 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		buffer.add(vertexId);
 		remoteAlgorithm.processRoot(vertexId);
 		while (!buffer.isEmpty()) {
-			long vId = buffer.get();
-			System.out.println("Processing vertex " + vId);
-			getAlgorithmForElementId(vertexId)
-					.processVertex(vId /* buffer.get() */);
+			getAlgorithmForElementId(vertexId).processVertex(buffer.get());
 		}
 	}
 
-	public boolean testAndProcessEdge(Long edgeId, Long incId)
+	public boolean testAndProcessEdge(long edgeId, long incId)
 			throws RemoteException {
 		if (!parentEdgeInc.containsKey(edgeId)) {
 			parentEdgeInc.put(edgeId, incId);
@@ -96,7 +89,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		return false;
 	}
 
-	public boolean testAndProcessVertex(Long vertexId, Long incId)
+	public boolean testAndProcessVertex(long vertexId, long incId)
 			throws RemoteException {
 		if (!number.containsKey(vertexId)) {
 			number.put(vertexId, ++num);

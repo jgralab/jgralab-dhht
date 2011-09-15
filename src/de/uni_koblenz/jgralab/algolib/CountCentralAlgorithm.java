@@ -13,29 +13,29 @@ public class CountCentralAlgorithm extends CentralAlgorithmImpl {
 	private int vCount = 0;
 
 	@Override
-	public void handleRoot(Long rootId) {
+	public void handleRoot(long rootId) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void handleVertex(Long vertexId) {
+	public void handleVertex(long vertexId) {
 		vCount++;
 	}
 
 	@Override
-	public void handleEdge(Long edgeId) {
+	public void handleEdge(long edgeId) {
 		eCount++;
 	}
 
 	@Override
-	public void handleTreeIncidence(Long incidenceId) {
+	public void handleTreeIncidence(long incidenceId) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void handleCrossIncidence(Long incidenceId) {
+	public void handleCrossIncidence(long incidenceId) {
 		// TODO Auto-generated method stub
 
 	}
