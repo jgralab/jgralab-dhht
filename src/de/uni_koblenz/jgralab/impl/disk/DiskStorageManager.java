@@ -1008,7 +1008,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	@Override
 	public long getConnectedEdgeId(int incidenceId) {
-		return getIncidenceContainer(getContainerId(incidenceId)).vertexId[getElementIdInContainer(incidenceId)];
+		return getIncidenceContainer(getContainerId(incidenceId)).edgeId[getElementIdInContainer(incidenceId)];
 	}
 
 	// hierarchy of vertices
