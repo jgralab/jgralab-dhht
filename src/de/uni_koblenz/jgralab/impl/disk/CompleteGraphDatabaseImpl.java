@@ -113,6 +113,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 				.getRemoteInstance(remoteHostname);
 		String localHostname = getHostname(getLocalPartialGraphId());
 		int partialGraphId = allocatePartialGraphId();
+		registerPartialGraph(partialGraphId, remoteHostname);
 		RemoteGraphDatabaseAccess p;
 		try {
 			p = remoteServer.createPartialGraphDatabase(

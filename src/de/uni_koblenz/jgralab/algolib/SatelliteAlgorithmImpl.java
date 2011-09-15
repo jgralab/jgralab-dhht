@@ -62,7 +62,12 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 	public static SatelliteAlgorithmRemoteAccess create(Graph partialGraph,
 			CentralAlgorithm parent) {
-		int centralAlgorithmPartialGraphId = parent.getPartialGraphId();
+		int centralAlgorithmPartialGraphId;
+		try {
+			centralAlgorithmPartialGraphId = parent.getPartialGraphId();
+		} catch (RemoteException e1) {
+			throw new RuntimeException(e1);
+		}
 		int partialGraphId = partialGraph.getPartialGraphId();
 
 		if (partialGraphId == centralAlgorithmPartialGraphId) {

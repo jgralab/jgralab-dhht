@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.algolib;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	protected long num = 0;
 	protected Buffer<Long> buffer;
 	protected Graph graph;
+	protected CentralAlgorithm stub;
 
 	/* maps partial graph Ids to the remote algorithms stored as local proxies */
 	private Map<Integer, SatelliteAlgorithmRemoteAccess> remoteAlgorithms = new HashMap<Integer, SatelliteAlgorithmRemoteAccess>();
@@ -42,9 +44,15 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		this.graph = partialGraph;
 		// create satellite algorithms for all partial graphs incl. the local
 		// one
+		try {
+			this.stub = (CentralAlgorithm) UnicastRemoteObject.exportObject(
+					this, 0);
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		for (Graph pg : partialGraph.getCompleteGraph().getPartialGraphs()) {
 			remoteAlgorithms.put(pg.getPartialGraphId(),
-					SatelliteAlgorithmImpl.create(pg, this));
+					SatelliteAlgorithmImpl.create(pg, stub));
 		}
 	}
 

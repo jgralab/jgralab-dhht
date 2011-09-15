@@ -64,6 +64,6 @@ public interface CentralAlgorithm extends Remote {
 	public void handleCrossIncidence(Long incidenceId) throws RemoteException;
 
 	/** @return the partial graph id of the graph handles by this algorithm */
-	public int getPartialGraphId();
+	public int getPartialGraphId() throws RemoteException;
 
 }
