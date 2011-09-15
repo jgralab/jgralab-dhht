@@ -7,12 +7,13 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 
 public class HypergraphSearchAlgorithmOptimized {
 
-	protected int[] parentVertexInc;
-	protected int[] parentEdgeInc;
-	protected int num;
+	protected int[][] parentVertexInc;
+	protected int[][] parentEdgeInc;
+	protected long num;
 
 	/*
 	 * this buffer needs to be instatiated in a subclass by the appropriate
@@ -34,8 +35,8 @@ public class HypergraphSearchAlgorithmOptimized {
 		int eCount;
 		vCount = (int) graph.getVCount();
 		eCount = (int) graph.getECount();
-		parentVertexInc = new int[vCount + 1];
-		parentEdgeInc = new int[eCount + 1];
+		parentVertexInc = new int[5][vCount + 1];
+		parentEdgeInc = new int[5][eCount + 1];
 		num = 0;
 	}
 
@@ -55,19 +56,23 @@ public class HypergraphSearchAlgorithmOptimized {
 			Incidence curIncAtVertex = currentVertex.getFirstIncidence();
 			while (curIncAtVertex != null) {
 				Edge currentEdge = curIncAtVertex.getEdge();
-				if (parentEdgeInc[currentEdge.getLocalId()] == 0) {
+				int ePgId = GraphDatabaseElementaryMethods
+						.getPartialGraphId(currentEdge.getGlobalId());
+				if (parentEdgeInc[ePgId][currentEdge.getLocalId()] == 0) {
 					handleEdge(currentEdge);
-					parentEdgeInc[currentEdge.getLocalId()] = curIncAtVertex
+					parentEdgeInc[ePgId][currentEdge.getLocalId()] = curIncAtVertex
 							.getLocalId();
 					handleTreeIncidence(curIncAtVertex);
 					Direction opposite = Direction.BOTH; // curIncAtVertex.getDirection().getOppositeDirection();
 					Incidence curIncAtEdge = currentEdge.getFirstIncidence();
 					while (curIncAtEdge != null) {
 						Vertex omega = curIncAtEdge.getVertex();
-						if ((parentVertexInc[omega.getLocalId()] == 0)
+						int omegaPgId = GraphDatabaseElementaryMethods
+								.getPartialGraphId(omega.getGlobalId());
+						if ((parentVertexInc[omegaPgId][omega.getLocalId()] == 0)
 								&& (omega != startVertex)) {
 							// System.out.println("Omega vertex is handled");
-							parentVertexInc[omega.getLocalId()] = curIncAtEdge
+							parentVertexInc[omegaPgId][omega.getLocalId()] = curIncAtEdge
 									.getLocalId();
 							handleVertex(omega);
 							handleTreeIncidence(curIncAtEdge);
