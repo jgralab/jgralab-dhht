@@ -38,7 +38,6 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
@@ -131,8 +130,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 * @throws ConcurrentModificationException
 		 */
 		protected void checkConcurrentModification() {
-			if (((GraphElementImpl<?, ?, ?>) graphElement)
-					.isIncidenceListModified(incidenceListVersion)) {
+			if (graphElement.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
 						"The incidence list of this graphelement has been modified - the iterator is not longer valid");
 			}
