@@ -74,7 +74,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteJGraLabServer getRemoteInstance(String hostname) {
 		try {
-			System.out.println("Try to get remote server on host " + hostname);
 			RemoteJGraLabServer server = (RemoteJGraLabServer) Naming
 					.lookup("rmi://" + hostname + "/"
 							+ JGRALAB_SERVER_IDENTIFIER);
@@ -132,7 +131,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			String hostnameOfCompleteGraph, long parentGlobalEntityId,
 			ParentEntityKind parent, int localPartialGraphId)
 			throws ClassNotFoundException {
-		System.out.println("Creating partial graph");
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
 		@SuppressWarnings("rawtypes")

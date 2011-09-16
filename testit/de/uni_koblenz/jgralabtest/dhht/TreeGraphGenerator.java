@@ -27,6 +27,7 @@ public class TreeGraphGenerator {
 	private int currentBranchingFactorIndex = 0;
 	private boolean diskBased;
 	private boolean useHyperedges;
+	private int createdVertices = 0;
 
 	private int additionalEdgeCount;
 
@@ -101,11 +102,13 @@ public class TreeGraphGenerator {
 		int newVertexListSize = 0;
 		int retrievedVertices = 0;
 		Vertex root = graph.createSimpleVertex();
+		createdVertices++;
 
 		for (int i = 0; i < roots; i++) {
 			int partialGraphId = getInitialPartialGraphId(i);
 			DHHTTestGraph partialGraph = createPartialGraph(partialGraphId);
 			Vertex v = partialGraph.createSimpleVertex();
+			createdVertices++;
 			vertexList[i] = v.getGlobalId();
 			v.setKappa(layers);
 			vertices.add((SimpleVertex) v);
@@ -144,6 +147,7 @@ public class TreeGraphGenerator {
 						for (j = 0; j < nextEdgeBranchingFactor; j++) {
 							vCount++;
 							SimpleVertex v = partialGraph.createSimpleVertex();
+							createdVertices++;
 							v.setKappa(layers - layer);
 							v.putAfter(parent);
 							v.setSigma(parent);
@@ -158,6 +162,7 @@ public class TreeGraphGenerator {
 						if (edgeBranchingFactor == 1) {
 							vCount++;
 							SimpleVertex v = partialGraph.createSimpleVertex();
+							createdVertices++;
 							v.setSigma(parent);
 							vertices.add(v);
 							newVertexList[newVertexListSize++] = v
@@ -171,6 +176,7 @@ public class TreeGraphGenerator {
 							vCount++;
 							SimulatedHyperedge hyperedge = partialGraph
 									.createSimulatedHyperedge();
+							createdVertices++;
 							Edge e = partialGraph.createSimulatedIncidence();
 							e.setSigma(parent.getSigma());
 							e.connect(SimulatedIncidence_incInc.class, parent);
@@ -181,6 +187,7 @@ public class TreeGraphGenerator {
 								vCount++;
 								SimpleVertex v = partialGraph
 										.createSimpleVertex();
+								createdVertices++;
 								v.setSigma(parent);
 								vertices.add(v);
 								newVertexList[newVertexListSize++] = v
@@ -250,6 +257,7 @@ public class TreeGraphGenerator {
 				} else {
 					SimulatedHyperedge simulatedHyperedge = partialGraph
 							.createSimulatedHyperedge();
+					createdVertices++;
 					for (SimpleVertex v : startVertices) {
 						Edge e = partialGraph.createSimulatedIncidence();
 						e.connect(SimulatedIncidence_incInc.class, v);
@@ -265,6 +273,7 @@ public class TreeGraphGenerator {
 				}
 			}
 		}
+		System.out.println("Created " + createdVertices + " vertices");
 		return graph;
 	}
 

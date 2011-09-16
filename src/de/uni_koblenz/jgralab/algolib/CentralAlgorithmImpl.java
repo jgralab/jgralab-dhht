@@ -21,6 +21,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	// each element is identified by a combination of the partial graph Id it
 	// belongs to and its element Id local to the partial graph
 	protected Map<Long, Long> number = new HashMap<Long, Long>();
+	protected long[][] numberA = new long[3][1000];
 	protected List<Long> order = new ArrayList<Long>();
 	protected Map<Long, Long> parentVertexInc = new HashMap<Long, Long>();
 	protected Map<Long, Long> parentEdgeInc = new HashMap<Long, Long>();
@@ -64,7 +65,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	}
 
 	public void run(Vertex startVertex) throws RemoteException {
-		Long vertexId = startVertex.getGlobalId();
+		long vertexId = startVertex.getGlobalId();
 		SatelliteAlgorithmRemoteAccess remoteAlgorithm = getAlgorithmForElementId(vertexId);
 		number.put(vertexId, ++num); // number first vertex with 1
 		order.add(vertexId);
@@ -91,11 +92,12 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 
 	public boolean testAndProcessVertex(long vertexId, long incId)
 			throws RemoteException {
-		if (!number.containsKey(vertexId)) {
-			number.put(vertexId, ++num);
-			order.add(vertexId);
-			parentVertexInc.put(vertexId, incId);
-			buffer.add(vertexId);
+		Long key = Long.valueOf(vertexId);
+		if (!number.containsKey(key)) {
+			number.put(key, ++num);
+			order.add(key);
+			parentVertexInc.put(key, incId);
+			buffer.add(key);
 			handleVertex(vertexId);
 			handleTreeIncidence(incId);
 			return true;

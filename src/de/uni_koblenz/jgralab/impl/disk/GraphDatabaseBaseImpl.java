@@ -168,7 +168,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				System.out.println("Delegating");
 				return getGraphDatabase(partialGraphId).getPartialGraphIds(
 						globalSubgraphId);
 			} catch (RemoteException e) {
@@ -191,8 +190,6 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	@Override
 	public void addPartialGraphId(long globalSubgraphId, int newPartialGraphId) {
-		System.out.println("Adding partial graph id " + newPartialGraphId
-				+ " to global graph " + globalSubgraphId);
 		int partialGraphId = getPartialGraphId(globalSubgraphId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
