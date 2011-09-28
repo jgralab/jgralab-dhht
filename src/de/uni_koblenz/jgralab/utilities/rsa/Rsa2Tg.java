@@ -167,6 +167,7 @@ import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
@@ -1790,13 +1791,55 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
-		// TODO Auto-generated method stub
-		return null;
+		List<SpecializesEdgeClass> resultList = new ArrayList<SpecializesEdgeClass>();
+		Map<SpecializesEdgeClass, Integer> map = new HashMap<SpecializesEdgeClass, Integer>();
+		List<SpecializesEdgeClass> zeroValued = new ArrayList<SpecializesEdgeClass>();
+
+		// initialize working list
+		for (SpecializesEdgeClass sec : sg.getSpecializesEdgeClassEdges()) {
+			int numberOfPredecessor = sec
+					.getOmega()
+					.getDegree(
+							SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass.class,
+							de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE);
+			map.put(sec, numberOfPredecessor);
+			if (numberOfPredecessor == 0) {
+				// find sec without predecessors
+				zeroValued.add(sec);
+			}
+		}
+
+		// handle zero valued sec
+		List<SpecializesEdgeClass> newZeroValued = new ArrayList<SpecializesEdgeClass>();
+		for (SpecializesEdgeClass sec : zeroValued) {
+			resultList.add(sec);
+			// decrement number of predecessors for all
+			// SpecialicesEdgeClasses which have current.getAlpha as omega
+			// vertex
+			for (SpecializesEdgeClass sec2 : sec.getAlpha().getIncidentEdges(
+					SpecializesEdgeClass.class,
+					de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)) {
+				Integer value = map.get(sec2);
+				if (sec2 != null) {
+					if (value == 1) {
+						newZeroValued.add(sec2);
+						map.remove(sec2);
+					} else {
+						map.put(sec2, value--);
+					}
+				}
+			}
+		}
+
+		zeroValued = newZeroValued;
+
+		return resultList;
 	}
 
 	private List<IncidenceClass> findPossibleSubsettedIncidenceClasses(
 			EdgeClass superClass, IncidenceClass ic) {
 		// TODO recursively search topwards
+		// does it need the rolenames????
 		return null;
 	}
 
