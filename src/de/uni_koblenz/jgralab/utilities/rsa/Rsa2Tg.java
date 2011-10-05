@@ -343,9 +343,16 @@ public class Rsa2Tg extends XmlProcessor {
 	private Map<String, List<String>> comments;
 
 	/**
-	 * marks incidence classes with the set of redefined rolenames
+	 * marks incidence classes with the set of redefined rolenames at the verex
+	 * class
 	 */
-	private LocalGenericGraphMarker<Set<String>> redefines;
+	private LocalGenericGraphMarker<Set<String>> redefinesAtVertex;
+
+	/**
+	 * marks incidence classes with the set of redefined rolenames at the edge
+	 * class
+	 */
+	private LocalGenericGraphMarker<Set<String>> redefinesAtEdge;
 
 	/**
 	 * marks incidence classes with the set of subsetted rolenames
@@ -653,7 +660,8 @@ public class Rsa2Tg extends XmlProcessor {
 		ownedEnds = new HashSet<IncidenceClass>();
 		constraints = new HashMap<String, List<String>>();
 		comments = new HashMap<String, List<String>>();
-		redefines = new LocalGenericGraphMarker<Set<String>>(sg);
+		redefinesAtVertex = new LocalGenericGraphMarker<Set<String>>(sg);
+		redefinesAtEdge = new LocalGenericGraphMarker<Set<String>>(sg);
 		subsets = new LocalGenericGraphMarker<Set<String>>(sg);
 		edgeStereotypedVertexClasses = new HashSet<VertexClass>();
 		ignoredPackages = new HashSet<Package>();
@@ -1389,13 +1397,15 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// set redefines
-		if (redefines.isMarked(from)) {
-			redefines.mark(newIncidenceClass, redefines.getMark(from));
-			redefines.removeMark(from);
+		if (redefinesAtVertex.isMarked(from)) {
+			redefinesAtVertex.mark(newIncidenceClass,
+					redefinesAtVertex.getMark(from));
+			redefinesAtVertex.removeMark(from);
 		}
-		if (redefines.isMarked(to)) {
-			redefines.mark(newIncidenceClass, redefines.getMark(to));
-			redefines.removeMark(to);
+		if (redefinesAtVertex.isMarked(to)) {
+			redefinesAtEdge.mark(newIncidenceClass,
+					redefinesAtVertex.getMark(to));
+			redefinesAtVertex.removeMark(to);
 		}
 
 		// set subsets
@@ -1658,9 +1668,9 @@ public class Rsa2Tg extends XmlProcessor {
 		// indirect superclass is redefined, this results in a redefines edge to
 		// that incidence class, without replacing a subsets edge.
 
-		for (AttributedElement<?, ?> ae : redefines.getMarkedElements()) {
+		for (AttributedElement<?, ?> ae : redefinesAtVertex.getMarkedElements()) {
 			IncidenceClass inc = (IncidenceClass) ae;
-			Set<String> redefinedRolenames = redefines.getMark(inc);
+			Set<String> redefinedRolenames = redefinesAtVertex.getMark(inc);
 			for (String rolename : redefinedRolenames) {
 				// breadth first search over SpecializesIncidenceClass edges for
 				// closest superclass with correct rolename
@@ -1693,6 +1703,7 @@ public class Rsa2Tg extends XmlProcessor {
 				} else {
 					// delete direct SpecializedIncidenceClass edge from inc to
 					// sup
+					// TODO this does not work!!!
 					for (Incidence i = inc
 							.getFirstIncidence(
 									SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
@@ -2141,9 +2152,8 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// The Graph is always validated, but not always written to a hard
-		// drive.
-		// validateGraph(filenameValidation); TODO if GraphValidator works again
-		// comment it in
+		// drive.validateGraph(filenameValidation);
+		// TODO if GraphValidator works again comment it in
 		if (filenameValidation != null) {
 			printTypeAndFilename("validation report", filenameValidation);
 			fileCreated = true;
@@ -2614,6 +2624,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void attachConstraints() throws XMLStreamException {
+		// TODO redefines must not be handled here!!
 		System.out.println("Attaching constraints...");
 		for (String constrainedElementId : constraints.keySet()) {
 			List<String> l = constraints.get(constrainedElementId);
@@ -3161,6 +3172,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleConstraint(String text) throws XMLStreamException {
+		// TODO handle redefines here !!!
 		if (text.startsWith("redefines") || text.startsWith("\"")) {
 			List<String> l = constraints.get(constrainedElementId);
 			if (l == null) {
@@ -3175,12 +3187,6 @@ public class Rsa2Tg extends XmlProcessor {
 				constraints.put(constrainedElementId, l);
 			}
 			l.add(text);
-			// TODO
-			// System.err
-			// .println("warning: {subsets ...} constraint at element "
-			// + constrainedElementId
-			// +
-			// " ignored (don't forget to model generalizations between associations)");
 		} else if (text.startsWith("union")) {
 			System.err
 					.println("warning: {union} constraint at element "
@@ -3258,11 +3264,11 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// remember the set of redefined or subsetted role names
-		Set<String> oldAffectedRoles = (typeOfConstraint == 1 ? redefines
+		Set<String> oldAffectedRoles = (typeOfConstraint == 1 ? redefinesAtVertex
 				: subsets).getMark(constrainedEnd);
 		if (oldAffectedRoles == null) {
-			(typeOfConstraint == 1 ? redefines : subsets).mark(constrainedEnd,
-					affectedRoles);
+			(typeOfConstraint == 1 ? redefinesAtVertex : subsets).mark(
+					constrainedEnd, affectedRoles);
 		} else {
 			oldAffectedRoles.addAll(affectedRoles);
 		}
@@ -3398,7 +3404,6 @@ public class Rsa2Tg extends XmlProcessor {
 			assert n >= 0;
 			currentAssociationEnd.set_minEdgesAtVertex(n);
 			currentAssociationEnd.set_minVerticesAtEdge(1);
-			// TODO check for non BinaryEdges
 		}
 	}
 
@@ -3757,7 +3762,7 @@ public class Rsa2Tg extends XmlProcessor {
 		boolean aggregation = (agg != null) && agg.equals(UML_SHARED);
 		boolean composition = (agg != null) && agg.equals(UML_COMPOSITE);
 
-		// TODO id of the uml:Class of the other side of the association
+		// id of the uml:Class of the other side of the association
 		String typeId = getAttribute(UML_ATTRIBUTE_TYPE);
 
 		if (typeId == null) {
@@ -3777,7 +3782,6 @@ public class Rsa2Tg extends XmlProcessor {
 			AttributedElement<?, ?> ae = idMap.get(typeId);
 			if (ae != null) {
 				if (!(ae instanceof VertexClass)) {
-					// TODO the other end can be an EdgeClass too
 					throw new ProcessingException(getParser(), getFileName(),
 							"Type attribute of association end (XMI id "
 									+ xmiId
