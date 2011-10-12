@@ -1280,6 +1280,13 @@ public class Rsa2Tg extends XmlProcessor {
 		return true;
 	}
 
+	/**
+	 * The incidenceType information are corrected again e.g. the incidence type
+	 * of both IncidenceClasses are interchanged.
+	 * 
+	 * @see #convertToEdgeClasses()
+	 * @param ec
+	 */
 	private void convertToBinaryEdgeClass(EdgeClass ec) {
 		BinaryEdgeClass bec = sg.createBinaryEdgeClass();
 		bec.set_abstract(ec.is_abstract());
@@ -1287,14 +1294,30 @@ public class Rsa2Tg extends XmlProcessor {
 		bec.set_minKappa(ec.get_minKappa());
 		bec.set_qualifiedName(ec.get_qualifiedName());
 
+		IncidenceClass first = null, last = null;
+
 		Incidence i = ec.getFirstIncidence();
 		while (i != null) {
+			if (ConnectsToEdgeClass_connectedEdgeClass.class.isInstance(i)) {
+				if (first == null) {
+					first = (IncidenceClass) i.getThat();
+				} else {
+					last = (IncidenceClass) i.getThat();
+				}
+			}
 			Incidence current = i;
 			i = i.getNextIncidenceAtVertex();
 			setIncidentVertex(current, bec);
 		}
 
-		String id = getId(ec);
+		assert first != null && last != null;
+
+		// set the correct IncidenceTypes again
+		IncidenceType incType = first.get_incidenceType();
+		first.set_incidenceType(last.get_incidenceType());
+		last.set_incidenceType(incType);
+
+		String id = getXMIId(ec);
 		if (id != null) {
 			idMap.put(id, bec);
 		}
@@ -1302,6 +1325,21 @@ public class Rsa2Tg extends XmlProcessor {
 		ec.delete();
 	}
 
+	/**
+	 * After converting<br>
+	 * VC1--EC1-ic1->VC_EC-ic2-EC2-->VC2<br>
+	 * into<br>
+	 * VC1-new_ic1-newEC-new_ic2->VC2<br>
+	 * the incidenceTypes should have the values<br>
+	 * new_ic2.set_incidenceType(ic1.get_incidenceType())<br>
+	 * new_ic1.set_incidenceType(ic2.get_incidenceType())<br>
+	 * but they have the form<br>
+	 * new_ic2.set_incidenceType(ic2.get_incidenceType())<br>
+	 * new_ic1.set_incidenceType(ic1.get_incidenceType())<br>
+	 * In case of a HyperEdge all IncidenceTypes must be
+	 * {@link IncidenceType#EDGE}. In case of a BinaryEdge the IncidentTypes are
+	 * corrected in {@link #convertToBinaryEdgeClass(EdgeClass)}.
+	 */
 	private void convertToEdgeClasses() {
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
@@ -1338,7 +1376,7 @@ public class Rsa2Tg extends XmlProcessor {
 				generalizations.removeMark(oldVertexClass);
 			}
 
-			String id = getId(oldVertexClass);
+			String id = getXMIId(oldVertexClass);
 			if (id != null) {
 				idMap.put(id, ec);
 			}
@@ -1346,7 +1384,7 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
-	private String getId(Vertex v) {
+	private String getXMIId(Vertex v) {
 		for (Entry<String, Vertex> entry : idMap.entrySet()) {
 			if (entry.getValue().equals(v)) {
 				return entry.getKey();
@@ -1395,12 +1433,9 @@ public class Rsa2Tg extends XmlProcessor {
 		IncidenceClass newIncidenceClass = sg.createIncidenceClass();
 		newIncidenceClass.set_abstract(oldEdgeClass.is_abstract());
 		newIncidenceClass.set_direction(directionOfNewIncidence);
-		newIncidenceClass.set_incidenceType(atVertex.get_incidenceType());
-		// TODO save aggregation information
-		// VC1--EC1-ic1->VC_EC-ic2-EC2-->VC2
-		// VC1-new_ic1-newEC-new_ic2->VC2
-		// new_ic2.set_incidenceType(ic1.get_incidenceType())
-		// new_ic1.set_incidenceType(ic2.get_incidenceType())
+		// store the IncidenceType at the wrong IncidenceClass
+		// @see convertToEdgeClasses()
+		newIncidenceClass.set_incidenceType(atEdge.get_incidenceType());
 		newIncidenceClass.set_maxEdgesAtVertex(atVertex.get_maxEdgesAtVertex());
 		newIncidenceClass.set_maxVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
 		newIncidenceClass.set_minEdgesAtVertex(atVertex.get_minEdgesAtVertex());
@@ -1409,15 +1444,6 @@ public class Rsa2Tg extends XmlProcessor {
 		newIncidenceClass
 				.set_roleName(Character.toLowerCase(roleName.charAt(0))
 						+ (roleName.length() > 1 ? roleName.substring(1) : ""));
-		System.err.println(newIncidenceClass.get_roleName() + " "
-				+ newIncidenceClass.get_incidenceType() + ": \n"
-				+ "\tatVertex: " + atVertex.get_roleName() + " ("
-				+ atVertex.get_minEdgesAtVertex() + ","
-				+ atVertex.get_maxEdgesAtVertex() + ") "
-				+ atVertex.get_incidenceType() + "\n" + "\tatEdge: "
-				+ atEdge.get_roleName() + " (" + atEdge.get_minEdgesAtVertex()
-				+ "," + atEdge.get_maxEdgesAtVertex() + ") "
-				+ atEdge.get_incidenceType());// TODO
 
 		// set specializations
 		if (generalizations.isMarked(oldEdgeClass)) {
@@ -1926,6 +1952,7 @@ public class Rsa2Tg extends XmlProcessor {
 					if (numberOfSubsettedRolenames > 0) {
 						createSpecializesIncidenceClassForIncidences(subClass,
 								superClass, subIC, superIC);
+						// TODO store several superICs and check multiplicities
 						counter += numberOfSubsettedRolenames;
 					}
 				}
