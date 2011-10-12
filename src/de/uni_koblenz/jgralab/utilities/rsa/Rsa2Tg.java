@@ -183,7 +183,8 @@ import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
  * SAX parser. As intermediate format, a grUML schema graph is created from the
  * XMI elements.
  * 
- * TODO check setting of IncidenceTypes
+ * TODO check setting of IncidenceTypes<br>
+ * TODO check rolenames
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -1389,13 +1390,17 @@ public class Rsa2Tg extends XmlProcessor {
 		IncidenceClass atVertex = directionOfNewIncidence == Direction.VERTEX_TO_EDGE ? from
 				: to;
 		IncidenceClass atEdge = atVertex == from ? to : from;
-		assert atEdge.get_incidenceType() == IncidenceType.EDGE : "The IncidenceClass at the EdgeClass must not have an IncidenceType != EDGE.";
 
 		// create a new IncidenceClass and set its attributes
 		IncidenceClass newIncidenceClass = sg.createIncidenceClass();
 		newIncidenceClass.set_abstract(oldEdgeClass.is_abstract());
 		newIncidenceClass.set_direction(directionOfNewIncidence);
 		newIncidenceClass.set_incidenceType(atVertex.get_incidenceType());
+		// TODO save aggregation information
+		// VC1--EC1-ic1->VC_EC-ic2-EC2-->VC2
+		// VC1-new_ic1-newEC-new_ic2->VC2
+		// new_ic2.set_incidenceType(ic1.get_incidenceType())
+		// new_ic1.set_incidenceType(ic2.get_incidenceType())
 		newIncidenceClass.set_maxEdgesAtVertex(atVertex.get_maxEdgesAtVertex());
 		newIncidenceClass.set_maxVerticesAtEdge(atEdge.get_maxEdgesAtVertex());
 		newIncidenceClass.set_minEdgesAtVertex(atVertex.get_minEdgesAtVertex());
@@ -1404,6 +1409,15 @@ public class Rsa2Tg extends XmlProcessor {
 		newIncidenceClass
 				.set_roleName(Character.toLowerCase(roleName.charAt(0))
 						+ (roleName.length() > 1 ? roleName.substring(1) : ""));
+		System.err.println(newIncidenceClass.get_roleName() + " "
+				+ newIncidenceClass.get_incidenceType() + ": \n"
+				+ "\tatVertex: " + atVertex.get_roleName() + " ("
+				+ atVertex.get_minEdgesAtVertex() + ","
+				+ atVertex.get_maxEdgesAtVertex() + ") "
+				+ atVertex.get_incidenceType() + "\n" + "\tatEdge: "
+				+ atEdge.get_roleName() + " (" + atEdge.get_minEdgesAtVertex()
+				+ "," + atEdge.get_maxEdgesAtVertex() + ") "
+				+ atEdge.get_incidenceType());// TODO
 
 		// set specializations
 		if (generalizations.isMarked(oldEdgeClass)) {
@@ -1973,52 +1987,7 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private boolean isSubsetable(IncidenceClass subInc, IncidenceClass superInc) {
-		assert subInc.get_direction() != null;
-		assert superInc.get_direction() != null;
-
-		// Check incidence directions
-		if (subInc.get_direction() != superInc.get_direction()) {
-			return false;
-		}
-
-		// Check multiplicities: Subclass must not have greater upper bound than
-		// superclass
-		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()
-				|| subInc.get_minVerticesAtEdge() < superInc
-						.get_minVerticesAtEdge()
-				|| subInc.get_maxEdgesAtVertex() > superInc
-						.get_maxEdgesAtVertex()
-				|| subInc.get_minEdgesAtVertex() < superInc
-						.get_minEdgesAtVertex()) {
-			return false;
-		}
-
-		// COMPOSITION end may specialize any other end
-		// AGGREGATION end may specialize only AGGREGATION and EDGE ends
-		// EDGE end may specialize only EDGE ends
-		IncidenceType subType = subInc.get_incidenceType();
-		IncidenceType superType = superInc.get_incidenceType();
-		if (((subType == IncidenceType.AGGREGATION) && (superType == IncidenceType.COMPOSITION))
-				|| ((subType == IncidenceType.EDGE) && (superType != IncidenceType.EDGE))) {
-			return false;
-
-		}
-
-		// both IncidenceClasses must have the same EdgeClass
-		EdgeClass subEC = getConnectedEdgeClass(subInc);
-		EdgeClass superEC = getConnectedEdgeClass(superInc);
-		if (!isSubclassOf(subEC, superEC)) {
-			return false;
-		}
-
-		// both IncidenceClasses must have the same VertexClass
-		VertexClass subVC = getConnectedVertexClass(subInc);
-		VertexClass superVC = getConnectedVertexClass(superInc);
-		if (!isSubclassOf(subVC, superVC)) {
-			return false;
-		}
-
-		return true;
+		return checkSubsetability(subInc, superInc) == null;
 	}
 
 	private boolean isSubclassOf(GraphElementClass subclass,
@@ -2034,22 +2003,6 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 		return false;
-	}
-
-	private VertexClass getConnectedVertexClass(IncidenceClass ic) {
-		for (ConnectsToVertexClass ctec : ic
-				.getIncidentEdges(ConnectsToVertexClass.class)) {
-			return (VertexClass) ctec.getOmega();
-		}
-		return null;
-	}
-
-	private EdgeClass getConnectedEdgeClass(IncidenceClass ic) {
-		for (ConnectsToEdgeClass ctec : ic
-				.getIncidentEdges(ConnectsToEdgeClass.class)) {
-			return (EdgeClass) ctec.getOmega();
-		}
-		return null;
 	}
 
 	private int countSubsettedRolenames(Set<String> subsettedRoleName,
@@ -2097,14 +2050,29 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
+		ProcessingException exception = checkSubsetability(subInc, superInc);
+		if (exception != null) {
+			throw exception;
+		}
+
+		sg.createSpecializesIncidenceClass(subInc, superInc);
+	}
+
+	private ProcessingException checkSubsetability(IncidenceClass subInc,
+			IncidenceClass superInc) {
 		assert subInc.get_direction() != null;
 		assert superInc.get_direction() != null;
 
+		EdgeClass subEC = getConnectedEdgeClass(subInc);
+		EdgeClass superEC = getConnectedEdgeClass(superInc);
+		VertexClass subVC = getConnectedVertexClass(subInc);
+		VertexClass superVC = getConnectedVertexClass(superInc);
+
 		// Check incidence directions
 		if (subInc.get_direction() != superInc.get_direction()) {
-			throw new ProcessingException(getFileName(),
+			return new ProcessingException(getFileName(),
 					"Incompatible incidence direction in specialisation "
-							+ subClass + " --> " + superClass);
+							+ subEC + " --> " + superEC);
 		}
 
 		// Check multiplicities: Subclass must not have greater upper bound than
@@ -2112,7 +2080,7 @@ public class Rsa2Tg extends XmlProcessor {
 		if (subInc.get_maxEdgesAtVertex() > superInc.get_maxEdgesAtVertex()
 				|| subInc.get_minEdgesAtVertex() < superInc
 						.get_minEdgesAtVertex()) {
-			throw new ProcessingException(
+			return new ProcessingException(
 					getFileName(),
 					"The multiplicity at the vertex of the subclass ("
 							+ subInc.get_minEdgesAtVertex()
@@ -2124,13 +2092,13 @@ public class Rsa2Tg extends XmlProcessor {
 							+ ","
 							+ (superInc.get_maxEdgesAtVertex() == Integer.MAX_VALUE ? "*"
 									: superInc.get_maxEdgesAtVertex())
-							+ ") in specialisation " + subClass + " --> "
-							+ superClass);
+							+ ") in specialisation " + subEC + " --> "
+							+ superEC);
 		}
 		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()
 				|| subInc.get_minVerticesAtEdge() < superInc
 						.get_minVerticesAtEdge()) {
-			throw new ProcessingException(
+			return new ProcessingException(
 					getFileName(),
 					"The multiplicity at the edge of the subclass ("
 							+ subInc.get_minVerticesAtEdge()
@@ -2142,8 +2110,8 @@ public class Rsa2Tg extends XmlProcessor {
 							+ ","
 							+ (superInc.get_maxVerticesAtEdge() == Integer.MAX_VALUE ? "*"
 									: superInc.get_maxVerticesAtEdge())
-							+ ") in specialisation " + subClass + " --> "
-							+ superClass);
+							+ ") in specialisation " + subEC + " --> "
+							+ superEC);
 		}
 
 		// COMPOSITION end may specialize any other end
@@ -2153,37 +2121,49 @@ public class Rsa2Tg extends XmlProcessor {
 		IncidenceType superType = superInc.get_incidenceType();
 		if (((subType == IncidenceType.AGGREGATION) && (superType == IncidenceType.COMPOSITION))
 				|| ((subType == IncidenceType.EDGE) && (superType != IncidenceType.EDGE))) {
-			throw new ProcessingException(getFileName(),
+			return new ProcessingException(getFileName(),
 					"Incompatible aggregation kinds (" + subType
 							+ " specialises " + superType
-							+ ") in generalisation " + subClass + " --> "
-							+ superClass);
+							+ ") in generalisation " + subEC + " --> "
+							+ superEC);
 
 		}
 
 		// both IncidenceClasses must have the same EdgeClass
-		EdgeClass subEC = getConnectedEdgeClass(subInc);
-		EdgeClass superEC = getConnectedEdgeClass(superInc);
 		if (!isSubclassOf(subEC, superEC)) {
-			throw new ProcessingException(getFileName(), "The IncidenceClass "
+			return new ProcessingException(getFileName(), "The IncidenceClass "
 					+ subInc.get_roleName()
 					+ " is not connected to the same EdgeClass "
-					+ superInc.get_roleName() + ") in generalisation "
-					+ subClass + " --> " + superClass);
+					+ superInc.get_roleName() + ") in generalisation " + subEC
+					+ " --> " + superEC);
 		}
 
 		// both IncidenceClasses must have the same VertexClass
-		VertexClass subVC = getConnectedVertexClass(subInc);
-		VertexClass superVC = getConnectedVertexClass(superInc);
 		if (!isSubclassOf(subVC, superVC)) {
-			throw new ProcessingException(getFileName(), "The IncidenceClass "
+			return new ProcessingException(getFileName(), "The IncidenceClass "
 					+ subInc.get_roleName()
 					+ " is not connected to the same VertexClass "
-					+ superInc.get_roleName() + ") in generalisation "
-					+ subClass + " --> " + superClass);
+					+ superInc.get_roleName() + ") in generalisation " + subEC
+					+ " --> " + superEC);
 		}
 
-		sg.createSpecializesIncidenceClass(subInc, superInc);
+		return null;
+	}
+
+	private VertexClass getConnectedVertexClass(IncidenceClass ic) {
+		for (ConnectsToVertexClass ctec : ic
+				.getIncidentEdges(ConnectsToVertexClass.class)) {
+			return (VertexClass) ctec.getOmega();
+		}
+		return null;
+	}
+
+	private EdgeClass getConnectedEdgeClass(IncidenceClass ic) {
+		for (ConnectsToEdgeClass ctec : ic
+				.getIncidentEdges(ConnectsToEdgeClass.class)) {
+			return (EdgeClass) ctec.getOmega();
+		}
+		return null;
 	}
 
 	/**
