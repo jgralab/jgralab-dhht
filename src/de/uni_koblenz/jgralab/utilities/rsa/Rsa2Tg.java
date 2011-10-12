@@ -338,6 +338,21 @@ public class Rsa2Tg extends XmlProcessor {
 	private Map<String, List<String>> constraints;
 
 	/**
+	 * During the conversion of a VertexClass to a EdgeClass the old EdgeClasses
+	 * are replaced by IncidenceClasses.<br>
+	 * An old EdgeClass: VC--oldICatVC--oldEC--oldICatNewEC->oldVC<br>
+	 * The new IncidenceClass: VC--newIC->NewEC<br>
+	 * Now the id of oldICatVC, oldICatNewEC and oldEC belongs to newIC.<br>
+	 * {@link #constraints} stores GReQL, subsets and redefines constraints.
+	 * These constrained elements are identified by their id. If a EdgeClass is
+	 * converted into a IncidenceClass the new IncidenceClass has three ids as
+	 * described above. To determine if a redefined constraint hides rolenames
+	 * at at the EdgeClass the ids of the oldICatNewEC must be stored. By
+	 * default a redefined constraint hides the rolenames at the VertexClass.
+	 */
+	private Set<String> idsOfOldIncidenceclassAtNewEdgeClass;
+
+	/**
 	 * Maps the XMI Id of commented elements to the list of comments.
 	 */
 	private Map<String, List<String>> comments;
@@ -659,6 +674,7 @@ public class Rsa2Tg extends XmlProcessor {
 		preliminaryVertices = new HashSet<Vertex>();
 		ownedEnds = new HashSet<IncidenceClass>();
 		constraints = new HashMap<String, List<String>>();
+		idsOfOldIncidenceclassAtNewEdgeClass = new HashSet<String>();
 		comments = new HashMap<String, List<String>>();
 		redefinesAtVertex = new LocalGenericGraphMarker<Set<String>>(sg);
 		redefinesAtEdge = new LocalGenericGraphMarker<Set<String>>(sg);
@@ -1449,6 +1465,11 @@ public class Rsa2Tg extends XmlProcessor {
 		idMap.put(xmiIdOldAtEdgeIncidenceClass, newIncidenceClass);
 		idMap.put(xmiIdOldAtVertexIncidenceClass, newIncidenceClass);
 
+		// store the id of the old IncidenceClass which is connected to the
+		// replaces old VertexClass, which is now an EdgeClass
+		// @see #idsOfOldIncidenceclassAtNewEdgeClass
+		idsOfOldIncidenceclassAtNewEdgeClass.add(xmiIdOldAtEdgeIncidenceClass);
+
 		// delete old EdgeClass
 		oldEdgeClass.delete();
 		atVertex.delete();
@@ -1668,61 +1689,97 @@ public class Rsa2Tg extends XmlProcessor {
 		// indirect superclass is redefined, this results in a redefines edge to
 		// that incidence class, without replacing a subsets edge.
 
-		for (AttributedElement<?, ?> ae : redefinesAtVertex.getMarkedElements()) {
-			IncidenceClass inc = (IncidenceClass) ae;
-			Set<String> redefinedRolenames = redefinesAtVertex.getMark(inc);
-			for (String rolename : redefinedRolenames) {
-				// breadth first search over SpecializesIncidenceClass edges for
-				// closest superclass with correct rolename
-				IncidenceClass sup = null;
-				Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
-				LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
-				m.mark(inc);
-				q.offer(inc);
-				while (!q.isEmpty()) {
-					IncidenceClass curr = q.poll();
-					m.mark(curr);
-					if ((curr != inc) && rolename.equals(curr.get_roleName())) {
-						sup = curr;
-						break;
-					}
-					for (SpecializesIncidenceClass sic : curr.getIncidentEdges(
-							SpecializesIncidenceClass.class,
-							de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-						IncidenceClass i = (IncidenceClass) sic.getOmega();
-						if (!m.isMarked(i)) {
-							m.mark(i);
-							q.offer(i);
-						}
-					}
+		createRedefines(true);
+		createRedefines(false);
+	}
 
-				}
+	private void createRedefines(boolean atVertex) {
+		for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
+				: redefinesAtEdge).getMarkedElements()) {
+			IncidenceClass inc = (IncidenceClass) ae;
+			Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
+					: redefinesAtEdge).getMark(inc);
+			for (String rolename : redefinedRolenames) {
+				IncidenceClass sup = findClosestSuperclassWithRolename(inc,
+						rolename);
 				if (sup == null) {
 					throw new ProcessingException(getFileName(),
 							"Redefined rolename '" + rolename + "' not found");
 				} else {
-					// delete direct SpecializedIncidenceClass edge from inc to
-					// sup
-					// TODO this does not work!!!
-					for (Incidence i = inc
-							.getFirstIncidence(
-									SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
-									de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
-							.getNextIncidenceAtVertex(
-									SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
-									de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-						SpecializesIncidenceClass sic = (SpecializesIncidenceClass) i
-								.getEdge();
-						IncidenceClass i2 = (IncidenceClass) sic.getOmega();
-						if (i2 == sup) {
-							sic.delete();
-							break;
-						}
-					}
+					// deleteDirectSpecializedIncidenceClassEdgesBetween(inc,
+					// sup);
 				}
-				sg.createHidesIncidenceClassAtVertexClass(inc, sup);
+				if (atVertex) {
+					sg.createHidesIncidenceClassAtVertexClass(inc, sup);
+				} else {
+					sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
+				}
 			}
 		}
+	}
+
+	/**
+	 * delete direct SpecializedIncidenceClass edge from inc to sup
+	 * 
+	 * @param inc
+	 * @param sup
+	 */
+	private void deleteDirectSpecializedIncidenceClassEdgesBetween(
+			IncidenceClass inc, IncidenceClass sup) {
+		// TODO this does not work!!!
+		// TODO perhaps there must be created a specializedIncidenceClass if
+		// there is a redefinition
+		for (Incidence i = inc
+				.getFirstIncidence(
+						SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
+						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
+				.getNextIncidenceAtVertex(
+						SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
+						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+			SpecializesIncidenceClass sic = (SpecializesIncidenceClass) i
+					.getEdge();
+			IncidenceClass i2 = (IncidenceClass) sic.getOmega();
+			if (i2 == sup) {
+				sic.delete();
+				break;
+			}
+		}
+	}
+
+	/**
+	 * breadth first search over SpecializesIncidenceClass edges for closest
+	 * superclass with correct rolename
+	 * 
+	 * @param inc
+	 * @param rolename
+	 * @return
+	 */
+	private IncidenceClass findClosestSuperclassWithRolename(
+			IncidenceClass inc, String rolename) {
+		IncidenceClass sup = null;
+		Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
+		LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
+		m.mark(inc);
+		q.offer(inc);
+		while (!q.isEmpty()) {
+			IncidenceClass curr = q.poll();
+			m.mark(curr);
+			if ((curr != inc) && rolename.equals(curr.get_roleName())) {
+				sup = curr;
+				break;
+			}
+			for (SpecializesIncidenceClass sic : curr.getIncidentEdges(
+					SpecializesIncidenceClass.class,
+					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+				IncidenceClass i = (IncidenceClass) sic.getOmega();
+				if (!m.isMarked(i)) {
+					m.mark(i);
+					q.offer(i);
+				}
+			}
+
+		}
+		return sup;
 	}
 
 	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
@@ -2664,7 +2721,8 @@ public class Rsa2Tg extends XmlProcessor {
 						if (text.startsWith("redefines")
 								|| text.startsWith("subsets")) {
 							addRedefinesOrSubsetsConstraint(
-									(IncidenceClass) ae, text);
+									(IncidenceClass) ae, text,
+									constrainedElementId);
 						} else {
 							throw new ProcessingException(
 									getFileName(),
@@ -3172,15 +3230,8 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleConstraint(String text) throws XMLStreamException {
-		// TODO handle redefines here !!!
-		if (text.startsWith("redefines") || text.startsWith("\"")) {
-			List<String> l = constraints.get(constrainedElementId);
-			if (l == null) {
-				l = new LinkedList<String>();
-				constraints.put(constrainedElementId, l);
-			}
-			l.add(text);
-		} else if (text.startsWith("subsets")) {
+		if (text.startsWith("redefines") || text.startsWith("\"")
+				|| text.startsWith("subsets")) {
 			List<String> l = constraints.get(constrainedElementId);
 			if (l == null) {
 				l = new LinkedList<String>();
@@ -3213,10 +3264,11 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @param text
 	 *            Redefined or subsetted constraint String, which can contain
 	 *            multiple constraints.
+	 * @param constrainedElementId
 	 * @throws XMLStreamException
 	 */
 	private void addRedefinesOrSubsetsConstraint(IncidenceClass constrainedEnd,
-			String text) throws XMLStreamException {
+			String text, String constrainedElementId) throws XMLStreamException {
 		text = text.trim().replaceAll("\\s+", " ");
 
 		/*
@@ -3264,11 +3316,16 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// remember the set of redefined or subsetted role names
-		Set<String> oldAffectedRoles = (typeOfConstraint == 1 ? redefinesAtVertex
-				: subsets).getMark(constrainedEnd);
+		Set<String> oldAffectedRoles = (typeOfConstraint == 2 ? subsets
+				: (idsOfOldIncidenceclassAtNewEdgeClass
+						.contains(constrainedElementId) ? redefinesAtEdge
+						: redefinesAtVertex)).getMark(constrainedEnd);
 		if (oldAffectedRoles == null) {
-			(typeOfConstraint == 1 ? redefinesAtVertex : subsets).mark(
-					constrainedEnd, affectedRoles);
+			(typeOfConstraint == 2 ? subsets
+					: (idsOfOldIncidenceclassAtNewEdgeClass
+							.contains(constrainedElementId) ? redefinesAtEdge
+							: redefinesAtVertex)).mark(constrainedEnd,
+					affectedRoles);
 		} else {
 			oldAffectedRoles.addAll(affectedRoles);
 		}
