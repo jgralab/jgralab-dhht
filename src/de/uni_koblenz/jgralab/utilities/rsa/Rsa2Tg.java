@@ -2681,7 +2681,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void attachConstraints() throws XMLStreamException {
-		// TODO redefines must not be handled here!!
 		System.out.println("Attaching constraints...");
 		for (String constrainedElementId : constraints.keySet()) {
 			List<String> l = constraints.get(constrainedElementId);
