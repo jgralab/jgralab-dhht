@@ -169,7 +169,6 @@ import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.TypedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
@@ -1574,12 +1573,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// remove all GraphElementClasses
 		for (Incidence i = pkg
-				.getFirstIncidence(
-						ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
-				.getNextIncidenceAtVertex(
-						ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+				.getFirstIncidence(ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class); i != null; i = i
+				.getNextIncidenceAtVertex(ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class)) {
 			ContainsGraphElementClass c = (ContainsGraphElementClass) i
 					.getEdge();
 			GraphElementClass gec = (GraphElementClass) c.getOmega();
@@ -1637,12 +1632,8 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private void removeAttributes(AttributedElementClass aec) {
 		for (Incidence inc = aec
-				.getFirstIncidence(
-						HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); inc != null; inc = inc
-				.getNextIncidenceAtVertex(
-						HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+				.getFirstIncidence(HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class); inc != null; inc = inc
+				.getNextIncidenceAtVertex(HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class)) {
 			HasAttribute ha = (HasAttribute) inc.getEdge();
 			ha.getOmega().delete();
 		}
@@ -1711,115 +1702,13 @@ public class Rsa2Tg extends XmlProcessor {
 		for (SpecializesEdgeClass spec : getSpecializesEdgeClassInTopologicalOrder()) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
-			if (BinaryEdgeClass.class.isInstance(superClass)
-					&& BinaryEdgeClass.class.isInstance(subClass)) {
-				// for each specialization between binary edge classes, add a
-				// subsets edge between their incidence classes
-				createSubsetsForBinaryEdgeClass(subClass, superClass);
-			} else {
-				// create subsets for hyper edgeClasses
-				createSubsetsForHyperEdges(subClass, superClass);
-			}
+			createSubsets(subClass, superClass);
 		}
 
 		// Generalization hierarchy is complete, now process redefinitions.
 
-		// When a rolename of a direct superclass is redefined, the subsets
-		// edge is replaced by a redefines edge. When a rolename of an
-		// indirect superclass is redefined, this results in a redefines edge to
-		// that incidence class, without replacing a subsets edge.
-
 		createRedefines(true);
 		createRedefines(false);
-	}
-
-	private void createRedefines(boolean atVertex) {
-		for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
-				: redefinesAtEdge).getMarkedElements()) {
-			IncidenceClass inc = (IncidenceClass) ae;
-			Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
-					: redefinesAtEdge).getMark(inc);
-			for (String rolename : redefinedRolenames) {
-				IncidenceClass sup = findClosestSuperclassWithRolename(inc,
-						rolename);
-				if (sup == null) {
-					throw new ProcessingException(getFileName(),
-							"Redefined rolename '" + rolename + "' not found");
-				} else {
-					// deleteDirectSpecializedIncidenceClassEdgesBetween(inc,
-					// sup);
-				}
-				if (atVertex) {
-					sg.createHidesIncidenceClassAtVertexClass(inc, sup);
-				} else {
-					sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
-				}
-			}
-		}
-	}
-
-	/**
-	 * delete direct SpecializedIncidenceClass edge from inc to sup
-	 * 
-	 * @param inc
-	 * @param sup
-	 */
-	private void deleteDirectSpecializedIncidenceClassEdgesBetween(
-			IncidenceClass inc, IncidenceClass sup) {
-		// TODO this does not work!!!
-		// TODO perhaps there must be created a specializedIncidenceClass if
-		// there is a redefinition
-		for (Incidence i = inc
-				.getFirstIncidence(
-						SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE); i != null; i = i
-				.getNextIncidenceAtVertex(
-						SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class,
-						de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-			SpecializesIncidenceClass sic = (SpecializesIncidenceClass) i
-					.getEdge();
-			IncidenceClass i2 = (IncidenceClass) sic.getOmega();
-			if (i2 == sup) {
-				sic.delete();
-				break;
-			}
-		}
-	}
-
-	/**
-	 * breadth first search over SpecializesIncidenceClass edges for closest
-	 * superclass with correct rolename
-	 * 
-	 * @param inc
-	 * @param rolename
-	 * @return
-	 */
-	private IncidenceClass findClosestSuperclassWithRolename(
-			IncidenceClass inc, String rolename) {
-		IncidenceClass sup = null;
-		Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
-		LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
-		m.mark(inc);
-		q.offer(inc);
-		while (!q.isEmpty()) {
-			IncidenceClass curr = q.poll();
-			m.mark(curr);
-			if ((curr != inc) && rolename.equals(curr.get_roleName())) {
-				sup = curr;
-				break;
-			}
-			for (SpecializesIncidenceClass sic : curr.getIncidentEdges(
-					SpecializesIncidenceClass.class,
-					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-				IncidenceClass i = (IncidenceClass) sic.getOmega();
-				if (!m.isMarked(i)) {
-					m.mark(i);
-					q.offer(i);
-				}
-			}
-
-		}
-		return sup;
 	}
 
 	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
@@ -1832,8 +1721,7 @@ public class Rsa2Tg extends XmlProcessor {
 			int numberOfPredecessor = sec
 					.getOmega()
 					.getDegree(
-							SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass.class,
-							de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE);
+							SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass.class);
 			map.put(sec, numberOfPredecessor);
 			if (numberOfPredecessor == 0) {
 				// find sec without predecessors
@@ -1868,62 +1756,15 @@ public class Rsa2Tg extends XmlProcessor {
 		return resultList;
 	}
 
-	private void createSubsetsForBinaryEdgeClass(EdgeClass subClass,
-			EdgeClass superClass) {
-		IncidenceClass cfSubClass = null;
-		IncidenceClass gtSubClass = null;
+	private void createSubsets(EdgeClass subClass, EdgeClass superClass) {
 		for (ConnectsToEdgeClass ctec : subClass
 				.getIncidentEdges(ConnectsToEdgeClass.class)) {
-			IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
-			if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
-				if (cfSubClass == null) {
-					cfSubClass = ic;
-				}
-			} else {
-				if (gtSubClass == null) {
-					gtSubClass = ic;
-				}
-			}
-		}
 
-		IncidenceClass cfSuperClass = null;
-		IncidenceClass gtSuperClass = null;
-		for (ConnectsToEdgeClass ctec : superClass
-				.getIncidentEdges(ConnectsToEdgeClass.class)) {
-			IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
-			if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
-				if (cfSuperClass == null) {
-					cfSuperClass = ic;
-				}
-			} else {
-				if (gtSuperClass == null) {
-					gtSuperClass = ic;
-				}
-			}
-		}
-
-		assert cfSubClass != null;
-		assert cfSuperClass != null;
-		createSpecializesIncidenceClassForIncidences(subClass, superClass,
-				cfSubClass, cfSuperClass);
-
-		assert gtSubClass != null;
-		assert gtSuperClass != null;
-		createSpecializesIncidenceClassForIncidences(subClass, superClass,
-				gtSubClass, gtSuperClass);
-	}
-
-	private void createSubsetsForHyperEdges(EdgeClass subClass,
-			EdgeClass superClass) {
-		for (ConnectsToEdgeClass ctec : subClass
-				.getIncidentEdges(ConnectsToEdgeClass.class)) {
 			IncidenceClass subIC = (IncidenceClass) ctec.getAlpha();
 			List<IncidenceClass> possibleSubsettedICs = findPossibleSubsettedIncidenceClasses(
 					superClass, subIC);
-			Set<String> subsettedRoleName = subsets.getMark(subIC);
-			if (subsettedRoleName == null) {
-				subsettedRoleName = new HashSet<String>();
-			}
+			Set<String> subsettedRoleName = getExplicitlySubsettedAndRedefinedRolenames(subIC);
+
 			if (possibleSubsettedICs.isEmpty()) {
 				throw new ProcessingException(getFileName(), "IncidenceClass '"
 						+ subIC.get_roleName() + "' of EdgeClass '"
@@ -1931,8 +1772,8 @@ public class Rsa2Tg extends XmlProcessor {
 						+ "' has no subsetted IncidenceClass at EdgeClass '"
 						+ superClass.get_qualifiedName() + "'.");
 			} else if (possibleSubsettedICs.size() == 1) {
-				createSpecializesIncidenceClassForIncidences(subClass,
-						superClass, subIC, possibleSubsettedICs.get(0));
+				createSpecializesIncidenceClassForIncidences(subIC,
+						possibleSubsettedICs.get(0));
 				for (String rolename : subsettedRoleName) {
 					if (!isIncidenceClassSubsettingRolename(
 							possibleSubsettedICs.get(0), rolename)) {
@@ -1950,8 +1791,8 @@ public class Rsa2Tg extends XmlProcessor {
 					int numberOfSubsettedRolenames = countSubsettedRolenames(
 							subsettedRoleName, superIC);
 					if (numberOfSubsettedRolenames > 0) {
-						createSpecializesIncidenceClassForIncidences(subClass,
-								superClass, subIC, superIC);
+						createSpecializesIncidenceClassForIncidences(subIC,
+								superIC);
 						// TODO store several superICs and check multiplicities
 						counter += numberOfSubsettedRolenames;
 					}
@@ -1965,6 +1806,30 @@ public class Rsa2Tg extends XmlProcessor {
 				}
 			}
 		}
+	}
+
+	private Set<String> getExplicitlySubsettedAndRedefinedRolenames(
+			IncidenceClass subIC) {
+		// If a rolename is redefined there has to be a
+		// SpecializedIncidenceClass too
+		Set<String> roleNames = new HashSet<String>();
+
+		Set<String> setOfRoleNames = subsets.getMark(subIC);
+		if (setOfRoleNames != null) {
+			roleNames.addAll(setOfRoleNames);
+		}
+
+		setOfRoleNames = redefinesAtEdge.getMark(subIC);
+		if (setOfRoleNames != null) {
+			roleNames.addAll(setOfRoleNames);
+		}
+
+		setOfRoleNames = redefinesAtVertex.getMark(subIC);
+		if (setOfRoleNames != null) {
+			roleNames.addAll(setOfRoleNames);
+		}
+
+		return setOfRoleNames;
 	}
 
 	private List<IncidenceClass> findPossibleSubsettedIncidenceClasses(
@@ -2064,8 +1929,7 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private void createSpecializesIncidenceClassForIncidences(
-			EdgeClass subClass, EdgeClass superClass, IncidenceClass subInc,
-			IncidenceClass superInc) {
+			IncidenceClass subInc, IncidenceClass superInc) {
 
 		for (SpecializesIncidenceClass spic : subInc.getIncidentEdges(
 				SpecializesIncidenceClass.class,
@@ -2104,9 +1968,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// Check multiplicities: Subclass must not have greater upper bound than
 		// superclass
-		if (subInc.get_maxEdgesAtVertex() > superInc.get_maxEdgesAtVertex()
-				|| subInc.get_minEdgesAtVertex() < superInc
-						.get_minEdgesAtVertex()) {
+		if (subInc.get_maxEdgesAtVertex() > superInc.get_maxEdgesAtVertex()) {
 			return new ProcessingException(
 					getFileName(),
 					"The multiplicity at the vertex of the subclass ("
@@ -2122,9 +1984,7 @@ public class Rsa2Tg extends XmlProcessor {
 							+ ") in specialisation " + subEC + " --> "
 							+ superEC);
 		}
-		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()
-				|| subInc.get_minVerticesAtEdge() < superInc
-						.get_minVerticesAtEdge()) {
+		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()) {
 			return new ProcessingException(
 					getFileName(),
 					"The multiplicity at the edge of the subclass ("
@@ -2191,6 +2051,71 @@ public class Rsa2Tg extends XmlProcessor {
 			return (EdgeClass) ctec.getOmega();
 		}
 		return null;
+	}
+
+	/**
+	 * @param atVertex
+	 *            <code>true</code> means that the
+	 *            HidesIncidenceClassAtVertexClass edges are created.
+	 *            <code>false</code> means that the
+	 *            HidesIncidenceClassAtEdgeClass edges are created.
+	 */
+	private void createRedefines(boolean atVertex) {
+		for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
+				: redefinesAtEdge).getMarkedElements()) {
+			IncidenceClass inc = (IncidenceClass) ae;
+			Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
+					: redefinesAtEdge).getMark(inc);
+			for (String rolename : redefinedRolenames) {
+				IncidenceClass sup = findClosestSuperclassWithRolename(inc,
+						rolename);
+				if (sup == null) {
+					throw new ProcessingException(getFileName(),
+							"Redefined rolename '" + rolename + "' not found");
+				}
+				if (atVertex) {
+					sg.createHidesIncidenceClassAtVertexClass(inc, sup);
+				} else {
+					sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
+				}
+			}
+		}
+	}
+
+	/**
+	 * breadth first search over SpecializesIncidenceClass edges for closest
+	 * superclass with correct rolename
+	 * 
+	 * @param inc
+	 * @param rolename
+	 * @return
+	 */
+	private IncidenceClass findClosestSuperclassWithRolename(
+			IncidenceClass inc, String rolename) {
+		IncidenceClass sup = null;
+		Queue<IncidenceClass> q = new LinkedList<IncidenceClass>();
+		LocalBooleanGraphMarker m = new LocalBooleanGraphMarker(sg);
+		m.mark(inc);
+		q.offer(inc);
+		while (!q.isEmpty()) {
+			IncidenceClass curr = q.poll();
+			m.mark(curr);
+			if ((curr != inc) && rolename.equals(curr.get_roleName())) {
+				sup = curr;
+				break;
+			}
+			for (SpecializesIncidenceClass sic : curr.getIncidentEdges(
+					SpecializesIncidenceClass.class,
+					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+				IncidenceClass i = (IncidenceClass) sic.getOmega();
+				if (!m.isMarked(i)) {
+					m.mark(i);
+					q.offer(i);
+				}
+			}
+
+		}
+		return sup;
 	}
 
 	/**
@@ -2876,8 +2801,7 @@ public class Rsa2Tg extends XmlProcessor {
 			// unused if in-degree of all but Annotates edges is <=1 (one
 			// incoming edge is the ContainsDomain edge from a Package)
 			if (d.getDegree(de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)
-					- d.getDegree(Annotates_annotatedElement.class,
-							de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX) <= 1) {
+					- d.getDegree(Annotates_annotatedElement.class) <= 1) {
 				// System.out.println("...remove unused domain '"
 				// + d.getQualifiedName() + "'");
 
@@ -2946,8 +2870,7 @@ public class Rsa2Tg extends XmlProcessor {
 		for (Attribute att : sg.getAttributeVertices()) {
 			String domainId = attributeType.getMark(att);
 			if (domainId == null) {
-				assert att.getDegree(HasAttribute_attribute.class,
-						de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX) == 1 : "Attribute '"
+				assert att.getDegree(HasAttribute_attribute.class) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
 						+ att.getFirst_attribute(false).getThat().getM1Class()
@@ -2956,8 +2879,7 @@ public class Rsa2Tg extends XmlProcessor {
 						+ ((AttributedElementClass) att.getFirst_attribute(
 								false).getThat()).get_qualifiedName()
 						+ "' has "
-						+ att.getDegree(HasDomain_domain.class,
-								de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)
+						+ att.getDegree(HasDomain_domain.class)
 						+ " domain(s)";
 				continue;
 			}
@@ -2971,8 +2893,7 @@ public class Rsa2Tg extends XmlProcessor {
 						"Undefined Domain with ID '" + domainId + "' found.");
 			}
 
-			assert att.getDegree(HasDomain_domain.class,
-					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE) == 1;
+			assert att.getDegree(HasDomain_domain.class) == 1;
 		}
 
 		// If 'attributeType' is not empty, there will be a Domain objects
