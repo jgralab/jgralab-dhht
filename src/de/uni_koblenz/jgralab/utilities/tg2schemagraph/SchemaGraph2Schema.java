@@ -361,10 +361,9 @@ public class SchemaGraph2Schema {
 			// find all EdgeClass objects which have no outgoing
 			// SpecializesEdgeClass
 			if ((gGraphElementClass instanceof EdgeClass)
-					&& (((EdgeClass) gGraphElementClass).getDegree(
-							gGraphElementClass
-									.getIncidenceClassForRolename("subclass"),
-							OUTGOING) == 0)) {
+					&& (((EdgeClass) gGraphElementClass)
+							.getDegree(gGraphElementClass
+									.getIncidenceClassForRolename("subclass")) == 0)) {
 				gSuperEdgeClasses.add((EdgeClass) gGraphElementClass);
 			}
 		}

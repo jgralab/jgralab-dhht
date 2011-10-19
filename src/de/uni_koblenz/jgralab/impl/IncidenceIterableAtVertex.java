@@ -24,7 +24,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 * @param vertex
 	 *            {@link Vertex}
 	 */
-	public IncidenceIterableAtVertex(Vertex vertex)  {
+	public IncidenceIterableAtVertex(Vertex vertex) {
 		this(vertex.getGraph().getTraversalContext(), vertex, null, null);
 	}
 
@@ -37,7 +37,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
-	public IncidenceIterableAtVertex(Vertex vertex, Direction direction)  {
+	public IncidenceIterableAtVertex(Vertex vertex, Direction direction) {
 		this(vertex.getGraph().getTraversalContext(), vertex, null, direction);
 	}
 
@@ -52,7 +52,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 *            that class or subclasses
 	 */
 	public IncidenceIterableAtVertex(Vertex vertex,
-			Class<? extends Incidence> ic)  {
+			Class<? extends Incidence> ic) {
 		this(vertex.getGraph().getTraversalContext(), vertex, ic, null);
 	}
 
@@ -69,8 +69,9 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 * @param direction
 	 *            {@link Direction}
 	 */
+	@Deprecated
 	public IncidenceIterableAtVertex(Vertex vertex,
-			Class<? extends Incidence> ic, Direction direction)  {
+			Class<? extends Incidence> ic, Direction direction) {
 		assert vertex != null && vertex.isValid();
 		iter = new IncidenceIteratorAtVertex(vertex.getGraph()
 				.getTraversalContext(), vertex, ic, direction);
@@ -85,7 +86,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 * @param vertex
 	 *            {@link Vertex}
 	 */
-	public IncidenceIterableAtVertex(Graph traversalContext, Vertex vertex)  {
+	public IncidenceIterableAtVertex(Graph traversalContext, Vertex vertex) {
 		this(traversalContext, vertex, null, null);
 	}
 
@@ -101,7 +102,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtVertex(Graph traversalContext, Vertex vertex,
-			Direction direction)  {
+			Direction direction) {
 		this(traversalContext, vertex, null, direction);
 	}
 
@@ -118,7 +119,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 *            that class or subclasses
 	 */
 	public IncidenceIterableAtVertex(Graph traversalContext, Vertex vertex,
-			Class<? extends Incidence> ic)  {
+			Class<? extends Incidence> ic) {
 		this(traversalContext, vertex, ic, null);
 	}
 
@@ -138,7 +139,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 	 *            {@link Direction}
 	 */
 	public IncidenceIterableAtVertex(Graph traversalContext, Vertex vertex,
-			Class<? extends Incidence> ic, Direction direction)  {
+			Class<? extends Incidence> ic, Direction direction) {
 		assert vertex != null && vertex.isValid();
 		iter = new IncidenceIteratorAtVertex(traversalContext, vertex, ic,
 				direction);
@@ -168,7 +169,7 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		public IncidenceIteratorAtVertex(Graph traversalContext, Vertex vertex,
-				Class<? extends Incidence> ic, Direction dir)  {
+				Class<? extends Incidence> ic, Direction dir) {
 			super(traversalContext, vertex, ic, dir);
 		}
 
@@ -180,9 +181,9 @@ public class IncidenceIterableAtVertex<I extends Incidence> extends
 				throw new NoSuchElementException();
 			}
 			I result = current;
-				current = (I) ((ic == null) ? current.getNextIncidenceAtVertex(
-						traversalContext, dir) : current.getNextIncidenceAtVertex(
-						traversalContext, ic, dir));
+			current = (I) ((ic == null) ? current.getNextIncidenceAtVertex(
+					traversalContext, dir) : current.getNextIncidenceAtVertex(
+					traversalContext, ic));
 			return result;
 		}
 

@@ -226,6 +226,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction);
 
@@ -241,6 +242,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			Direction direction);
 
@@ -295,6 +297,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses);
 
@@ -315,6 +318,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public <T extends Incidence> T getFirstIncidence(Class<T> anIncidenceClass,
 			Direction direction, boolean noSubclasses);
 
@@ -421,6 +425,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction);
 
@@ -438,6 +443,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Direction} of the {@link Incidence}s.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
 			Class<T> anIncidenceClass, Direction direction);
 
@@ -498,6 +504,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -521,6 +528,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            boolean
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
 			Class<T> anIncidenceClass, Direction direction, boolean noSubclasses);
 
@@ -596,6 +604,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
+	@Deprecated
 	public <T extends Incidence> Iterable<T> getIncidences(
 			Class<T> anIncidenceClass, Direction direction);
 
@@ -612,6 +621,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
+	@Deprecated
 	public Iterable<Incidence> getIncidences(IncidenceClass anIncidenceClass,
 			Direction direction);
 
@@ -683,6 +693,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
+	@Deprecated
 	public <T extends Incidence> Iterable<T> getIncidences(
 			Graph traversalContext, Class<T> anIncidenceClass,
 			Direction direction);
@@ -702,6 +713,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 *            {@link Incidence}s.
 	 * @return {@link Iterable}&lt;{@link Incidence}&gt;
 	 */
+	@Deprecated
 	public Iterable<Incidence> getIncidences(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction);
 
@@ -787,6 +799,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(IncidenceClass ic, Direction direction);
 
 	/**
@@ -801,6 +814,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Class<? extends Incidence> ic, Direction direction);
 
 	/**
@@ -818,6 +832,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(IncidenceClass ic, Direction direction,
 			boolean noSubClasses);
 
@@ -836,6 +851,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Class<? extends Incidence> ic, Direction direction,
 			boolean noSubClasses);
 
@@ -937,6 +953,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Graph traversalContext, IncidenceClass ic,
 			Direction direction);
 
@@ -954,6 +971,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
 			Direction direction);
 
@@ -974,6 +992,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Graph traversalContext, IncidenceClass ic,
 			Direction direction, boolean noSubClasses);
 
@@ -994,6 +1013,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClas
 	 * @return int number of {@link Incidence}s of desired direction which are
 	 *         an instance of <code>ic</code>
 	 */
+	@Deprecated
 	public int getDegree(Graph traversalContext, Class<? extends Incidence> ic,
 			Direction direction, boolean noSubClasses);
 

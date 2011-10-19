@@ -114,7 +114,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 			this.traversalContext = traversalContext;
 			incidenceListVersion = graphElement.getIncidenceListVersion();
 			current = (I) ((ic == null) ? graphElement.getFirstIncidence(dir)
-					: graphElement.getFirstIncidence(ic, dir));
+					: graphElement.getFirstIncidence(ic));
 		}
 
 		@Override

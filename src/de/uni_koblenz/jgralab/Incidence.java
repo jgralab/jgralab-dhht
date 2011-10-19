@@ -142,6 +142,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
 			Direction direction);
 
@@ -154,6 +155,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
@@ -198,6 +200,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses);
 
@@ -214,6 +217,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -305,6 +309,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction);
 
@@ -319,6 +324,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
@@ -369,6 +375,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -388,6 +395,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -465,6 +473,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
 			Direction direction);
 
@@ -477,6 +486,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
@@ -521,6 +531,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
 			Direction direction, boolean noSubclasses);
 
@@ -537,6 +548,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -627,6 +639,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction);
 
@@ -641,6 +654,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            have.
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
@@ -691,6 +705,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			IncidenceClass anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -710,6 +725,7 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 *            <code>anIncidenceClass</code>
 	 * @return {@link Incidence}
 	 */
+	@Deprecated
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, Direction direction,
 			boolean noSubclasses);
@@ -983,12 +999,9 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 */
 	public void putAfterAtEdge(Incidence i);
 
-
 	/**
 	 * Deletes this incidence and disconnects the connected vertex and edge
 	 */
 	public void delete();
-
-
 
 }
