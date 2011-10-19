@@ -1702,19 +1702,96 @@ public class Rsa2Tg extends XmlProcessor {
 		for (SpecializesEdgeClass spec : getSpecializesEdgeClassInTopologicalOrder()) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
-			createSubsets(subClass, superClass);
+
+			for (ConnectsToEdgeClass ctec : subClass
+					.getIncidentEdges(ConnectsToEdgeClass.class)) {
+
+				IncidenceClass subIC = (IncidenceClass) ctec.getAlpha();
+				List<IncidenceClass> possibleSubsettedICs = findPossibleSubsettedIncidenceClasses(
+						superClass, subIC);
+				Set<String> subsettedRoleNames = getExplicitlySubsettedAndRedefinedRolenames(subIC);
+
+				if (possibleSubsettedICs.isEmpty()) {
+					// there does not exist an IncidenceClass which can be
+					// subsetted
+					throw new ProcessingException(
+							getFileName(),
+							"IncidenceClass '"
+									+ subIC.get_roleName()
+									+ "' of EdgeClass '"
+									+ subClass.get_qualifiedName()
+									+ "' has no subsetted IncidenceClass at EdgeClass '"
+									+ superClass.get_qualifiedName() + "'.");
+				} else if (subsettedRoleNames.isEmpty()
+						&& possibleSubsettedICs.size() == 1) {
+					// there exists only one subsettable IncidenceClass
+					// this case is the implicit subsetting
+					createSpecializesIncidenceClassForIncidences(subIC,
+							possibleSubsettedICs.get(0));
+				} else if (subsettedRoleNames.isEmpty()
+						&& possibleSubsettedICs.size() > 1) {
+					// there should be an implicit subsetting but several
+					// IncidenceClasses could be subsetted
+					StringBuilder sb = new StringBuilder();
+					for (IncidenceClass supClass : possibleSubsettedICs) {
+						sb.append("\n\t'"
+								+ supClass.get_roleName()
+								+ "' of EdgeClass '"
+								+ ((NamedElementClass) supClass
+										.getFirstIncidence(
+												ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
+										.getThat()).get_qualifiedName() + "'");
+					}
+					throw new ProcessingException(
+							getFileName(),
+							"\nIncidenceClass '"
+									+ subIC.get_roleName()
+									+ "' of EdgeClass '"
+									+ subClass.get_qualifiedName()
+									+ "' has "
+									+ possibleSubsettedICs.size()
+									+ " IncidenceClasses which can be subsetted:"
+									+ sb.toString());
+				} else {
+					for (String rolename : subsettedRoleNames) {
+						IncidenceClass superIC = null;
+						for (IncidenceClass ic : possibleSubsettedICs) {
+							superIC = findClosestSuperclassWithRolename(ic,
+									rolename);
+							if (superIC != null) {
+								break;
+							}
+						}
+						if (superIC == null) {
+							throw new ProcessingException(getFileName(),
+									"IncidenceClass '" + subIC.get_roleName()
+											+ "' of EdgeClass '"
+											+ subClass.get_qualifiedName()
+											+ "' subsets unknown role names: '"
+											+ rolename + "'.");
+						}
+						createSpecializesIncidenceClassForIncidences(subIC,
+								superIC);
+						// set redefinitions
+						if (redefinesAtEdge.getMark(subIC).contains(rolename)) {
+							sg.createHidesIncidenceClassAtEdgeClass(subIC,
+									superIC);
+						} else if (redefinesAtVertex.getMark(subIC).contains(
+								rolename)) {
+							sg.createHidesIncidenceClassAtVertexClass(subIC,
+									superIC);
+						}
+					}
+					// TODO
+				}
+			}
 		}
-
-		// Generalization hierarchy is complete, now process redefinitions.
-
-		createRedefines(true);
-		createRedefines(false);
 	}
 
 	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
 		List<SpecializesEdgeClass> resultList = new ArrayList<SpecializesEdgeClass>();
 		Map<SpecializesEdgeClass, Integer> map = new HashMap<SpecializesEdgeClass, Integer>();
-		List<SpecializesEdgeClass> zeroValued = new ArrayList<SpecializesEdgeClass>();
+		List<SpecializesEdgeClass> zeroValued = new LinkedList<SpecializesEdgeClass>();
 
 		// initialize working list
 		for (SpecializesEdgeClass sec : sg.getSpecializesEdgeClassEdges()) {
@@ -1722,27 +1799,33 @@ public class Rsa2Tg extends XmlProcessor {
 					.getOmega()
 					.getDegree(
 							SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass.class);
-			map.put(sec, numberOfPredecessor);
 			if (numberOfPredecessor == 0) {
 				// find sec without predecessors
 				zeroValued.add(sec);
+				// TODO wurde ComponentCreationLink von
+				// TransformationTraceabilityLink abgeleitet?????????????????
+				System.out.println("#"
+						+ ((NamedElementClass) sec.getAlpha())
+								.get_qualifiedName());
+			} else {
+				map.put(sec, numberOfPredecessor);
 			}
 		}
 
 		// handle zero valued sec
-		List<SpecializesEdgeClass> newZeroValued = new ArrayList<SpecializesEdgeClass>();
-		for (SpecializesEdgeClass sec : zeroValued) {
+		while (!zeroValued.isEmpty()) {
+			SpecializesEdgeClass sec = zeroValued.get(0);
+			zeroValued.remove(0);
 			resultList.add(sec);
-			// decrement number of predecessors for all
-			// SpecialicesEdgeClasses which have current.getAlpha as omega
-			// vertex
+			// decrement number of predecessors for all SpecialicesEdgeClasses
+			// which have sec.getAlpha as omega vertex
 			for (SpecializesEdgeClass sec2 : sec.getAlpha().getIncidentEdges(
 					SpecializesEdgeClass.class,
 					de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)) {
 				Integer value = map.get(sec2);
-				if (sec2 != null) {
+				if (value != null) {
 					if (value == 1) {
-						newZeroValued.add(sec2);
+						zeroValued.add(sec2);
 						map.remove(sec2);
 					} else {
 						map.put(sec2, value--);
@@ -1751,61 +1834,13 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		zeroValued = newZeroValued;
-
-		return resultList;
-	}
-
-	private void createSubsets(EdgeClass subClass, EdgeClass superClass) {
-		for (ConnectsToEdgeClass ctec : subClass
-				.getIncidentEdges(ConnectsToEdgeClass.class)) {
-
-			IncidenceClass subIC = (IncidenceClass) ctec.getAlpha();
-			List<IncidenceClass> possibleSubsettedICs = findPossibleSubsettedIncidenceClasses(
-					superClass, subIC);
-			Set<String> subsettedRoleName = getExplicitlySubsettedAndRedefinedRolenames(subIC);
-
-			if (possibleSubsettedICs.isEmpty()) {
-				throw new ProcessingException(getFileName(), "IncidenceClass '"
-						+ subIC.get_roleName() + "' of EdgeClass '"
-						+ subClass.get_qualifiedName()
-						+ "' has no subsetted IncidenceClass at EdgeClass '"
-						+ superClass.get_qualifiedName() + "'.");
-			} else if (possibleSubsettedICs.size() == 1) {
-				createSpecializesIncidenceClassForIncidences(subIC,
-						possibleSubsettedICs.get(0));
-				for (String rolename : subsettedRoleName) {
-					if (!isIncidenceClassSubsettingRolename(
-							possibleSubsettedICs.get(0), rolename)) {
-						throw new ProcessingException(getFileName(),
-								"IncidenceClass '" + subIC.get_roleName()
-										+ "' of EdgeClass '"
-										+ subClass.get_qualifiedName()
-										+ "' subsets unknown role name '"
-										+ rolename + "'.");
-					}
-				}
-			} else {
-				int counter = 0;
-				for (IncidenceClass superIC : possibleSubsettedICs) {
-					int numberOfSubsettedRolenames = countSubsettedRolenames(
-							subsettedRoleName, superIC);
-					if (numberOfSubsettedRolenames > 0) {
-						createSpecializesIncidenceClassForIncidences(subIC,
-								superIC);
-						// TODO store several superICs and check multiplicities
-						counter += numberOfSubsettedRolenames;
-					}
-				}
-				if (subsettedRoleName.size() != counter) {
-					throw new ProcessingException(getFileName(),
-							"IncidenceClass '" + subIC.get_roleName()
-									+ "' of EdgeClass '"
-									+ subClass.get_qualifiedName()
-									+ "' subsets unknown role names.");
-				}
-			}
+		System.out.println("topological sorted: ");// TODO
+		for (SpecializesEdgeClass specializesEdgeClass : resultList) {
+			System.out.println("\t"
+					+ ((NamedElementClass) specializesEdgeClass.getAlpha())
+							.get_qualifiedName());
 		}
+		return resultList;
 	}
 
 	private Set<String> getExplicitlySubsettedAndRedefinedRolenames(
@@ -1829,9 +1864,21 @@ public class Rsa2Tg extends XmlProcessor {
 			roleNames.addAll(setOfRoleNames);
 		}
 
-		return setOfRoleNames;
+		return roleNames;
 	}
 
+	// TODO bei test.Edge.xmi die Position von Aggregate
+	// kontrollieren!!!!!!!!!!!
+	/**
+	 * Finds possible IncidenceClasses of <code>ec</code> or its superclasses
+	 * which can be subsetted by <code>currentIc</code>. If there is an
+	 * generalization of several possible subsettable IncidenceClasses than the
+	 * most specific one is returned.
+	 * 
+	 * @param ec
+	 * @param currentIc
+	 * @return
+	 */
 	private List<IncidenceClass> findPossibleSubsettedIncidenceClasses(
 			EdgeClass ec, IncidenceClass currentIc) {
 		return findPossibleSubsettedIncidenceClasses(ec, currentIc,
@@ -1891,37 +1938,6 @@ public class Rsa2Tg extends XmlProcessor {
 				SpecializesTypedElementClass.class,
 				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
 			if (isSubclassOf((GraphElementClass) stec.getOmega(), superclass)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private int countSubsettedRolenames(Set<String> subsettedRoleName,
-			IncidenceClass ic) {
-		int numberOfSubsettedRolenames = 0;
-		if (subsettedRoleName.contains(ic.get_roleName())) {
-			numberOfSubsettedRolenames++;
-		}
-		for (SpecializesIncidenceClass sic : ic.getIncidentEdges(
-				SpecializesIncidenceClass.class,
-				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-			numberOfSubsettedRolenames += countSubsettedRolenames(
-					subsettedRoleName, (IncidenceClass) sic.getOmega());
-		}
-		return numberOfSubsettedRolenames;
-	}
-
-	private boolean isIncidenceClassSubsettingRolename(IncidenceClass ic,
-			String rolename) {
-		if (ic.get_roleName().equals(rolename)) {
-			return true;
-		}
-		for (SpecializesIncidenceClass sic : ic.getIncidentEdges(
-				SpecializesIncidenceClass.class,
-				de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
-			if (isIncidenceClassSubsettingRolename(
-					(IncidenceClass) sic.getOmega(), rolename)) {
 				return true;
 			}
 		}
@@ -2053,34 +2069,34 @@ public class Rsa2Tg extends XmlProcessor {
 		return null;
 	}
 
-	/**
-	 * @param atVertex
-	 *            <code>true</code> means that the
-	 *            HidesIncidenceClassAtVertexClass edges are created.
-	 *            <code>false</code> means that the
-	 *            HidesIncidenceClassAtEdgeClass edges are created.
-	 */
-	private void createRedefines(boolean atVertex) {
-		for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
-				: redefinesAtEdge).getMarkedElements()) {
-			IncidenceClass inc = (IncidenceClass) ae;
-			Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
-					: redefinesAtEdge).getMark(inc);
-			for (String rolename : redefinedRolenames) {
-				IncidenceClass sup = findClosestSuperclassWithRolename(inc,
-						rolename);
-				if (sup == null) {
-					throw new ProcessingException(getFileName(),
-							"Redefined rolename '" + rolename + "' not found");
-				}
-				if (atVertex) {
-					sg.createHidesIncidenceClassAtVertexClass(inc, sup);
-				} else {
-					sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
-				}
-			}
-		}
-	}
+	// /** TODO delete
+	// * @param atVertex
+	// * <code>true</code> means that the
+	// * HidesIncidenceClassAtVertexClass edges are created.
+	// * <code>false</code> means that the
+	// * HidesIncidenceClassAtEdgeClass edges are created.
+	// */
+	// private void createRedefines(boolean atVertex) {
+	// for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
+	// : redefinesAtEdge).getMarkedElements()) {
+	// IncidenceClass inc = (IncidenceClass) ae;
+	// Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
+	// : redefinesAtEdge).getMark(inc);
+	// for (String rolename : redefinedRolenames) {
+	// IncidenceClass sup = findClosestSuperclassWithRolename(inc,
+	// rolename);
+	// if (sup == null) {
+	// throw new ProcessingException(getFileName(),
+	// "Redefined rolename '" + rolename + "' not found");
+	// }
+	// if (atVertex) {
+	// sg.createHidesIncidenceClassAtVertexClass(inc, sup);
+	// } else {
+	// sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
+	// }
+	// }
+	// }
+	// }
 
 	/**
 	 * breadth first search over SpecializesIncidenceClass edges for closest
