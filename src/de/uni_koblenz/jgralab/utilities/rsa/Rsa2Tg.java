@@ -167,9 +167,9 @@ import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass_subclass;
 import de.uni_koblenz.jgralab.grumlschema.structure.TypedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.impl.mem.IncidenceImpl;
@@ -456,7 +456,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		System.out.println("RSA to TG");
+		System.out.println("RSA to DHHTG");
 		System.out.println("=========");
 		JGraLab.setLogLevel(Level.OFF);
 
@@ -489,7 +489,7 @@ public class Rsa2Tg extends XmlProcessor {
 				&& !cli.hasOption(OPTION_FILENAME_VALIDATION);
 		if (noOutputOptionSelected) {
 			System.out.println("No output option has been selected. "
-					+ "A TG-file for the Schema will be written.");
+					+ "A DHHTG-file for the Schema will be written.");
 
 			// filename have to be set
 			r.setFilenameSchema(createFilename(input));
@@ -1756,8 +1756,12 @@ public class Rsa2Tg extends XmlProcessor {
 					for (String rolename : subsettedRoleNames) {
 						IncidenceClass superIC = null;
 						for (IncidenceClass ic : possibleSubsettedICs) {
-							superIC = findClosestSuperclassWithRolename(ic,
-									rolename);
+							if (ic.get_roleName().equals(rolename)) {
+								superIC = ic;
+							} else {
+								superIC = findClosestSuperclassWithRolename(ic,
+										rolename);
+							}
 							if (superIC != null) {
 								break;
 							}
@@ -1773,14 +1777,20 @@ public class Rsa2Tg extends XmlProcessor {
 						createSpecializesIncidenceClassForIncidences(subIC,
 								superIC);
 						// set redefinitions
-						if (redefinesAtEdge.getMark(subIC).contains(rolename)) {
+						if (redefinesAtEdge.isMarked(subIC)
+								&& redefinesAtEdge.getMark(subIC).contains(
+										rolename)) {
 							sg.createHidesIncidenceClassAtEdgeClass(subIC,
 									superIC);
-						} else if (redefinesAtVertex.getMark(subIC).contains(
-								rolename)) {
+						}
+						if (redefinesAtVertex.isMarked(superIC)
+								&& redefinesAtVertex.getMark(subIC).contains(
+										rolename)) {
 							sg.createHidesIncidenceClassAtVertexClass(subIC,
 									superIC);
 						}
+						// TODO Test.xmi transformationTarget: transformation
+						// redefinition is not set!!!!!!!!
 					}
 					// TODO
 				}
@@ -1795,18 +1805,11 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// initialize working list
 		for (SpecializesEdgeClass sec : sg.getSpecializesEdgeClassEdges()) {
-			int numberOfPredecessor = sec
-					.getOmega()
-					.getDegree(
-							SpecializesEdgeClass_specializesEdgeClass_ComesFrom_EdgeClass.class);
+			int numberOfPredecessor = sec.getOmega().getDegree(
+					SpecializesTypedElementClass_subclass.class);
 			if (numberOfPredecessor == 0) {
 				// find sec without predecessors
 				zeroValued.add(sec);
-				// TODO wurde ComponentCreationLink von
-				// TransformationTraceabilityLink abgeleitet?????????????????
-				System.out.println("#"
-						+ ((NamedElementClass) sec.getAlpha())
-								.get_qualifiedName());
 			} else {
 				map.put(sec, numberOfPredecessor);
 			}
@@ -1834,12 +1837,6 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		System.out.println("topological sorted: ");// TODO
-		for (SpecializesEdgeClass specializesEdgeClass : resultList) {
-			System.out.println("\t"
-					+ ((NamedElementClass) specializesEdgeClass.getAlpha())
-							.get_qualifiedName());
-		}
 		return resultList;
 	}
 
@@ -3051,7 +3048,8 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Checks whether the edge class generalization hierarchy is acyclic.
+	 * Checks whether the edge class generalization hierarchy is acyclic. TODO
+	 * here is a bug (not all classes are tested!!
 	 * 
 	 * @return true iff the edge class generalization hierarchy is acyclic.
 	 */
@@ -3066,7 +3064,8 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Checks whether the vertex class generalization hierarchy is acyclic.
+	 * Checks whether the vertex class generalization hierarchy is acyclic. TODO
+	 * here is a bug (not all classes are tested!!
 	 * 
 	 * @return true iff the vertex class generalization hierarchy is acyclic.
 	 */
@@ -3082,6 +3081,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 	/**
 	 * Checks whether the incidence class generalization hierarchy is acyclic.
+	 * TODO here is a bug (not all classes are tested!!
 	 * 
 	 * @return true iff the incidence class generalization hierarchy is acyclic.
 	 */
