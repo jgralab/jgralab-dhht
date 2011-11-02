@@ -1262,16 +1262,15 @@ public class Rsa2Tg extends XmlProcessor {
 				return false;
 			}
 
-			// every superclass of a BinaryEdgeClass must be a
+			// every subclass and superclass of a BinaryEdgeClass must be a
 			// BinaryEdgeClass candidate, too
-			for (SpecializesEdgeClass sec : current.getIncidentEdges(
-					SpecializesEdgeClass.class,
-					de.uni_koblenz.jgralab.Direction.VERTEX_TO_EDGE)) {
+			for (SpecializesEdgeClass sec : current
+					.getIncidentEdges(SpecializesEdgeClass.class)) {
 				EdgeClass genEC = (EdgeClass) (sec.getAlpha() == current ? sec
 						.getOmega() : sec.getAlpha());
 				if (alreadySeenMarker.isMarked(genEC)) {
 					continue;
-				} else {
+				} else if (!workingList.contains(genEC)) {
 					workingList.push(genEC);
 				}
 			}
@@ -1783,14 +1782,12 @@ public class Rsa2Tg extends XmlProcessor {
 							sg.createHidesIncidenceClassAtEdgeClass(subIC,
 									superIC);
 						}
-						if (redefinesAtVertex.isMarked(superIC)
+						if (redefinesAtVertex.isMarked(subIC)
 								&& redefinesAtVertex.getMark(subIC).contains(
 										rolename)) {
 							sg.createHidesIncidenceClassAtVertexClass(subIC,
 									superIC);
 						}
-						// TODO Test.xmi transformationTarget: transformation
-						// redefinition is not set!!!!!!!!
 					}
 					// TODO
 				}
