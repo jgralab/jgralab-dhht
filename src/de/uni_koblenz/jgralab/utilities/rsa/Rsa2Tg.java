@@ -1152,9 +1152,6 @@ public class Rsa2Tg extends XmlProcessor {
 		linkRecordDomainComponents();
 		linkAttributeDomains();
 
-		// convert EdgeClass to BinaryEdgeClass where possible
-		convertEdgeClassesToBinaryEdgeClasses();
-
 		removeIgnoredPackages();
 
 		if (isUseNavigability()) {
@@ -1167,6 +1164,9 @@ public class Rsa2Tg extends XmlProcessor {
 		// the following depends on correct edge directions and edgeclass
 		// generalizations
 		createSubsetsAndRedefinesRelations();
+
+		// convert EdgeClass to BinaryEdgeClass where possible
+		convertEdgeClassesToBinaryEdgeClasses();
 
 		createEdgeClassNames();
 
@@ -1238,6 +1238,7 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private boolean isValidBinaryEdgeClassCandidate(EdgeClass ec) {
+		// TODO store inherited IncidenceClasses
 		LocalBooleanGraphMarker alreadySeenMarker = new LocalBooleanGraphMarker(
 				sg);
 		Stack<EdgeClass> workingList = new Stack<EdgeClass>();
@@ -1249,6 +1250,9 @@ public class Rsa2Tg extends XmlProcessor {
 				continue;
 			}
 			// a BinaryEdgeClass must have exactly two IncidenceClasses
+			// TODO search all incidenceclasses from here to the top and if the
+			// set is two (concerning subsetting) then this condition is
+			// fullfilled
 			if (current.getDegree(ConnectsToEdgeClass_connectedEdgeClass.class) != 2) {
 				return false;
 			}
