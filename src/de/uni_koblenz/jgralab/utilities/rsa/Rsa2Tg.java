@@ -380,6 +380,12 @@ public class Rsa2Tg extends XmlProcessor {
 	private Set<VertexClass> edgeStereotypedVertexClasses;
 
 	/**
+	 * Stores the {@link EdgeClass}es which were modeled as an
+	 * {@link VertexClass} with an edge stereotype.
+	 */
+	private Set<EdgeClass> edgeStereotypedEdgeClasses;
+
+	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
 	 * 'from' end.
 	 */
@@ -680,6 +686,7 @@ public class Rsa2Tg extends XmlProcessor {
 		redefinesAtEdge = new LocalGenericGraphMarker<Set<String>>(sg);
 		subsets = new LocalGenericGraphMarker<Set<String>>(sg);
 		edgeStereotypedVertexClasses = new HashSet<VertexClass>();
+		edgeStereotypedEdgeClasses = new HashSet<EdgeClass>();
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
@@ -1280,7 +1287,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 	/**
 	 * The incidenceType information are corrected again e.g. the incidence type
-	 * of both IncidenceClasses are interchanged.
+	 * of both IncidenceClasses are interchanged if they were modelled as
+	 * UML:classes with stereotype &lt;edge&gt;.
 	 * 
 	 * @see #convertToEdgeClasses()
 	 * @param ec
@@ -1310,10 +1318,12 @@ public class Rsa2Tg extends XmlProcessor {
 
 		assert first != null && last != null;
 
-		// set the correct IncidenceTypes again
-		IncidenceType incType = first.get_incidenceType();
-		first.set_incidenceType(last.get_incidenceType());
-		last.set_incidenceType(incType);
+		if (edgeStereotypedEdgeClasses.contains(ec)) {
+			// set the correct IncidenceTypes again
+			IncidenceType incType = first.get_incidenceType();
+			first.set_incidenceType(last.get_incidenceType());
+			last.set_incidenceType(incType);
+		}
 
 		String id = getXMIId(ec);
 		if (id != null) {
@@ -1343,6 +1353,7 @@ public class Rsa2Tg extends XmlProcessor {
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
 			EdgeClass ec = sg.createEdgeClass();
+			edgeStereotypedEdgeClasses.add(ec);
 			ec.set_qualifiedName(oldVertexClass.get_qualifiedName());
 			ec.set_abstract(oldVertexClass.is_abstract());
 			ec.set_maxKappa(oldVertexClass.get_maxKappa());
@@ -1789,7 +1800,6 @@ public class Rsa2Tg extends XmlProcessor {
 									superIC);
 						}
 					}
-					// TODO
 				}
 			}
 		}
@@ -1861,8 +1871,6 @@ public class Rsa2Tg extends XmlProcessor {
 		return roleNames;
 	}
 
-	// TODO bei test.Edge.xmi die Position von Aggregate
-	// kontrollieren!!!!!!!!!!!
 	/**
 	 * Finds possible IncidenceClasses of <code>ec</code> or its superclasses
 	 * which can be subsetted by <code>currentIc</code>. If there is an
@@ -2062,35 +2070,6 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 		return null;
 	}
-
-	// /** TODO delete
-	// * @param atVertex
-	// * <code>true</code> means that the
-	// * HidesIncidenceClassAtVertexClass edges are created.
-	// * <code>false</code> means that the
-	// * HidesIncidenceClassAtEdgeClass edges are created.
-	// */
-	// private void createRedefines(boolean atVertex) {
-	// for (AttributedElement<?, ?> ae : (atVertex ? redefinesAtVertex
-	// : redefinesAtEdge).getMarkedElements()) {
-	// IncidenceClass inc = (IncidenceClass) ae;
-	// Set<String> redefinedRolenames = (atVertex ? redefinesAtVertex
-	// : redefinesAtEdge).getMark(inc);
-	// for (String rolename : redefinedRolenames) {
-	// IncidenceClass sup = findClosestSuperclassWithRolename(inc,
-	// rolename);
-	// if (sup == null) {
-	// throw new ProcessingException(getFileName(),
-	// "Redefined rolename '" + rolename + "' not found");
-	// }
-	// if (atVertex) {
-	// sg.createHidesIncidenceClassAtVertexClass(inc, sup);
-	// } else {
-	// sg.createHidesIncidenceClassAtEdgeClass(inc, sup);
-	// }
-	// }
-	// }
-	// }
 
 	/**
 	 * breadth first search over SpecializesIncidenceClass edges for closest
