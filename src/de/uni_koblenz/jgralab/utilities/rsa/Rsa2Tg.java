@@ -1709,7 +1709,7 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void createSubsetsAndRedefinesRelations() {
 		System.out.println("Creating subsets and redefines relationships...");
-		for (SpecializesEdgeClass spec : getSpecializesEdgeClassInTopologicalOrder()) {
+		for (SpecializesTypedElementClass spec : getSpecializesTypedElementClassInTopologicalOrder(1)) {
 			EdgeClass subClass = (EdgeClass) spec.getAlpha();
 			EdgeClass superClass = (EdgeClass) spec.getOmega();
 
@@ -1805,13 +1805,25 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
-	private List<SpecializesEdgeClass> getSpecializesEdgeClassInTopologicalOrder() {
-		List<SpecializesEdgeClass> resultList = new ArrayList<SpecializesEdgeClass>();
-		Map<SpecializesEdgeClass, Integer> map = new HashMap<SpecializesEdgeClass, Integer>();
-		List<SpecializesEdgeClass> zeroValued = new LinkedList<SpecializesEdgeClass>();
+	/**
+	 * @param type
+	 *            <ui> <li><code>type==1</code> means SpecializesEdgeClass</li>
+	 *            <li><code>type==2</code> means SpecializesVertexClass</li> <li>
+	 *            <code>type==3</code> means SpecializesIncidenceClass</li>
+	 *            </ui>
+	 * @return <code>null</code> if the specialization hierarchy is not acyclic
+	 */
+	private List<SpecializesTypedElementClass> getSpecializesTypedElementClassInTopologicalOrder(
+			int type) {
+		List<SpecializesTypedElementClass> resultList = new ArrayList<SpecializesTypedElementClass>();
+		Map<SpecializesTypedElementClass, Integer> map = new HashMap<SpecializesTypedElementClass, Integer>();
+		List<SpecializesTypedElementClass> zeroValued = new LinkedList<SpecializesTypedElementClass>();
 
 		// initialize working list
-		for (SpecializesEdgeClass sec : sg.getSpecializesEdgeClassEdges()) {
+		for (SpecializesTypedElementClass sec : type == 1 ? sg
+				.getSpecializesEdgeClassEdges() : type == 2 ? sg
+				.getSpecializesVertexClassEdges() : sg
+				.getSpecializesIncidenceClassEdges()) {
 			int numberOfPredecessor = sec.getOmega().getDegree(
 					SpecializesTypedElementClass_subclass.class);
 			if (numberOfPredecessor == 0) {
@@ -1824,14 +1836,14 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// handle zero valued sec
 		while (!zeroValued.isEmpty()) {
-			SpecializesEdgeClass sec = zeroValued.get(0);
+			SpecializesTypedElementClass sec = zeroValued.get(0);
 			zeroValued.remove(0);
 			resultList.add(sec);
 			// decrement number of predecessors for all SpecialicesEdgeClasses
 			// which have sec.getAlpha as omega vertex
-			for (SpecializesEdgeClass sec2 : sec.getAlpha().getIncidentEdges(
-					SpecializesEdgeClass.class,
-					de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)) {
+			for (SpecializesTypedElementClass sec2 : sec.getAlpha()
+					.getIncidentEdges(SpecializesTypedElementClass.class,
+							de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)) {
 				Integer value = map.get(sec2);
 				if (value != null) {
 					if (value == 1) {
@@ -1844,7 +1856,11 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		return resultList;
+		if (!map.isEmpty()) {
+			return null;
+		} else {
+			return resultList;
+		}
 	}
 
 	private Set<String> getExplicitlySubsettedAndRedefinedRolenames(
@@ -3024,13 +3040,12 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Checks whether the edge class generalization hierarchy is acyclic. TODO
-	 * here is a bug (not all classes are tested!!
+	 * Checks whether the edge class generalization hierarchy is acyclic.
 	 * 
 	 * @return true iff the edge class generalization hierarchy is acyclic.
 	 */
 	private boolean edgeClassHierarchyIsAcyclic() {
-		return isClassHierarchyAcyclic(sg.getFirstEdgeClass());
+		return getSpecializesTypedElementClassInTopologicalOrder(1) != null;
 		// if (edgeClassAcyclicEvaluator == null) {
 		// edgeClassAcyclicEvaluator = new GreqlEvaluator(
 		// "isAcyclic(vSubgraph{structure.EdgeClass})", sg, null);
@@ -3040,13 +3055,12 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Checks whether the vertex class generalization hierarchy is acyclic. TODO
-	 * here is a bug (not all classes are tested!!
+	 * Checks whether the vertex class generalization hierarchy is acyclic.
 	 * 
 	 * @return true iff the vertex class generalization hierarchy is acyclic.
 	 */
 	private boolean vertexClassHierarchyIsAcyclic() {
-		return isClassHierarchyAcyclic(sg.getFirstVertexClass());
+		return getSpecializesTypedElementClassInTopologicalOrder(2) != null;
 		// if (vertexClassAcyclicEvaluator == null) {
 		// vertexClassAcyclicEvaluator = new GreqlEvaluator(
 		// "isAcyclic(vSubgraph{structure.VertexClass})", sg, null);
@@ -3057,47 +3071,17 @@ public class Rsa2Tg extends XmlProcessor {
 
 	/**
 	 * Checks whether the incidence class generalization hierarchy is acyclic.
-	 * TODO here is a bug (not all classes are tested!!
 	 * 
 	 * @return true iff the incidence class generalization hierarchy is acyclic.
 	 */
 	private boolean incidenceClassHierarchyIsAcyclic() {
-		return isClassHierarchyAcyclic(sg.getFirstIncidenceClass());
+		return getSpecializesTypedElementClassInTopologicalOrder(3) != null;
 		// if (vertexClassAcyclicEvaluator == null) {
 		// vertexClassAcyclicEvaluator = new GreqlEvaluator(
 		// "isAcyclic(vSubgraph{structure.VertexClass})", sg, null);
 		// }
 		// vertexClassAcyclicEvaluator.startEvaluation();
 		// return vertexClassAcyclicEvaluator.getEvaluationResult().toBoolean();
-	}
-
-	private <V extends TypedElementClass> boolean isClassHierarchyAcyclic(V tec) {
-		assert tec != null;
-		LocalBooleanGraphMarker marker = new LocalBooleanGraphMarker(sg);
-		ArrayList<V> workList = new ArrayList<V>();
-		workList.add(tec);
-		for (int i = 0; i < workList.size(); i++) {
-			V currentElement = workList.get(i);
-			if (marker.isMarked(currentElement)) {
-				// current element was already seen thus a cycle is detected
-				return false;
-			} else {
-				// mark current element as seen
-				marker.mark(currentElement);
-				// add all sub and superclasses of current Element, if they are
-				// not yet seen, to working list
-				for (SpecializesTypedElementClass stec : currentElement
-						.getIncidentEdges(SpecializesTypedElementClass.class)) {
-					@SuppressWarnings("unchecked")
-					V otherEnd = (V) (stec.getAlpha() == currentElement ? stec
-							.getOmega() : stec.getAlpha());
-					if (!workList.contains(otherEnd)) {
-						workList.add(otherEnd);
-					}
-				}
-			}
-		}
-		return true;
 	}
 
 	/**
