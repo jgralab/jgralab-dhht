@@ -225,6 +225,8 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	private HashMap<Thread, Stack<Graph>> traversalContextMap;
 
 	public long getTraversalContextSubgraphId() {
+		if (getTraversalContext() == null)
+			return GLOBAL_GRAPH_ID;
 		return getTraversalContext().getGlobalId();
 	}
 
