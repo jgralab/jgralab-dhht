@@ -39,35 +39,45 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 		buffer = new Queue<Vertex>();
 		parentVertexInc = new long[6000000];
 		parentEdgeInc = new long[6000000];
-		try {
-			run();
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Thread t = new Thread() {
+			public void run() {
+				try {
+					runAlgo();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		t.start();
 	}
 
 	public void enqueueRoot(long vertexId) throws RemoteException {
+		System.out.println("Enqueue root");
 		Vertex rootVertex = graph.getVertex(vertexId);
 		handleRoot(rootVertex);
 		handleVertex(rootVertex);
 		buffer.add(rootVertex);
+		System.out.println("Buffer empty: " + buffer.isEmpty());
 	}
 
 	
-	public void run() throws RemoteException {
+	public void runAlgo() throws RemoteException {
+		System.out.println("Running algo ");
 		while (!isStopped) {
+		//	System.out.println("Not stopped ");
 			if (!buffer.isEmpty()) {
 				synchronized (this) {
 					working = true;		
 				}
+				System.out.println("Processing buffer ");
 				processBuffer();
 			} else {
+				//System.out.println("sleeping ");
 				synchronized (this) {
 					working = false;		
 				}
 				try {
-					Thread.sleep(50);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -89,7 +99,9 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 	}
 	
 	public void processBuffer() throws RemoteException {
+		System.out.println("Processing buffer ");
 		while (!buffer.isEmpty()) {
+			System.out.println("Taking element from buffer");
 			Vertex currentVertex = buffer.get();
 			for (Incidence curIncAtVertex : currentVertex
 				.getIncidences(Direction.VERTEX_TO_EDGE)) {
@@ -144,6 +156,7 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 	
 	
 	private boolean processVertex(Vertex omega, Incidence curIncAtEdge) {
+		System.out.println("Processing vertex " + omega.getGlobalId());
 		int localOmegaId = omega.getLocalId();
 		if (parentVertexInc[localOmegaId] == 0) {
 			parentVertexInc[localOmegaId] = curIncAtEdge.getGlobalId();
@@ -167,6 +180,7 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 	public static SatelliteAlgorithmRemoteAccess createRemote(
 			Graph partialGraph, CentralAlgorithm parent) {
+		System.out.println("Creating remote algorithm");
 		int centralAlgorithmPartialGraphId;
 		try {
 			centralAlgorithmPartialGraphId = parent.getPartialGraphId();
@@ -176,10 +190,13 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 		int partialGraphId = partialGraph.getPartialGraphId();
 
 		if (partialGraphId == centralAlgorithmPartialGraphId) {
+			System.out.println("Creating local algorithm");
 			// create satellite algorithm on station of central algorithm
-			return new SatelliteAlgorithmImpl(partialGraph, parent);
+			SatelliteAlgorithmRemoteAccess algo = new SatelliteAlgorithmImpl(partialGraph, parent);
+			System.out.println("Algo is: " + algo);
+			return algo;
 		} else {
-
+			System.out.println("Creating rmeote algorithm");
 			// create SatelliteAlgorithm object on remote station
 			JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 			String remoteHostname = partialGraph.getGraphDatabase()
@@ -187,6 +204,7 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 			RemoteJGraLabServer remoteServer = server
 					.getRemoteInstance(remoteHostname);
 			try {
+				System.out.println("Try to instantiate remote algo on server " + remoteHostname);
 				SatelliteAlgorithmRemoteAccess remoteAlgo = remoteServer
 						.createUniversalSatelliteAlgorithm(
 								partialGraph.getUniqueGraphId(),

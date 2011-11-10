@@ -42,16 +42,20 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
+		System.out.println("Creating remote algos");
 		remoteAlgorithms.put(partialGraph.getPartialGraphId(),
 				SatelliteAlgorithmImpl.createRemote(partialGraph, stub));
 		for (Graph pg : partialGraph.getCompleteGraph().getPartialGraphs()) {
+			System.out.println("Creating remote algorithm");
 			remoteAlgorithms.put(pg.getPartialGraphId(),
 					SatelliteAlgorithmImpl.createRemote(pg, stub));
 		}
+		System.out.println("Created remote algos");
 	}
 
 	
 	public void run(Vertex startVertex) throws RemoteException {
+		System.out.println("Starting generic search from vertex " + startVertex.getLocalId() + " on pg: " + GraphDatabaseElementaryMethods.getPartialGraphId(startVertex.getGlobalId()));
 		long vertexId = startVertex.getGlobalId();
 		SatelliteAlgorithmRemoteAccess remoteAlgorithm = getAlgorithmForElementId(vertexId);
 		remoteAlgorithm.enqueueRoot(vertexId);

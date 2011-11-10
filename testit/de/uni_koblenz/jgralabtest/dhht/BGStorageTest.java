@@ -15,7 +15,7 @@ public class BGStorageTest {
 
 	private long visitedEdges;
 
-	private boolean genericSearch = false;
+	private boolean genericSearch = true;
 	
 	private void testGraph(Graph graph, Variant variant, boolean dfs) {
 		Vertex startVertex = graph.getFirstVertex();
@@ -38,9 +38,13 @@ public class BGStorageTest {
 			view.useAsTraversalContext();
 		}
 		if (variant == Variant.TREELIKEDISTRIBUTED) {
+			System.out.println("Performing distributed search");
 			if (genericSearch) {
+				System.out.println("Generic search");
 				MyCentralAlgorithm algo = new MyCentralAlgorithm(graph, dfs);
+				System.out.println("Created object");
 				try {
+					System.out.println("Running generic search algo");
 					algo.run(startVertex);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
