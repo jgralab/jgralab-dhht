@@ -54,6 +54,7 @@ public class SubgraphGenerator implements RemoteGraphGenerator {
 	
 	/* creates a subgraph with the given number of levels and returns the id of the root vertex */
 	public long createSubgraph() {
+		vertices = new ArrayList<SimpleVertex>();
 		int branchingFactorIndex = 0;
 		int vCount = 1;
 		int sizeOfLastLayer = 6000000;
