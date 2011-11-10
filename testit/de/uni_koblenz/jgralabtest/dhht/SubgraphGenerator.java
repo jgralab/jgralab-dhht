@@ -72,14 +72,10 @@ public class SubgraphGenerator implements RemoteGraphGenerator {
 		for (int layer = 1; layer < layers; layer++) {
 			long[] newVertexList = new long[sizeOfLastLayer];
 			while (retrievedVertices < vertexListSize) {
-				Vertex parent = graph
-						.getVertex(vertexList[retrievedVertices++]);
+				Vertex parent = graph.getVertex(vertexList[retrievedVertices++]);
 				int i = 0;
 				int nextBranchingFactor = getNextBranchingFactor();
 				while (i < nextBranchingFactor) {
-						boolean firstEdgeInSubgraph = parent
-								.getFirstIncidence() == parent
-								.getLastIncidence();
 						Edge e = graph.createSimpleEdge();
 							e.connect(SimpleEdge_start.class, parent);
 						int j = 0;

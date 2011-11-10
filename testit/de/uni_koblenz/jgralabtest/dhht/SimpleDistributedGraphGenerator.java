@@ -53,20 +53,17 @@ public class SimpleDistributedGraphGenerator {
 		SimpleEdge e = topGraph.createSimpleEdge();
 		e.connect(SimpleEdge_start.class, root);
 		e.connect(SimpleEdge_target.class, firstPartRootV);
-		
+		System.out.println("Creating remot graph");
 		RemoteGraphGenerator remoteGenerator = null;
 		try {
 			remoteGenerator = (RemoteGraphGenerator) JGraLabServerImpl.getLocalInstance().getRemoteInstance(remoteHosts[1]).createSubgraphGenerator(topGraph.getUniqueGraphId(), layers, branchingFactors);
-		} catch (RemoteException e3) {
-			// TODO Auto-generated catch block
-			e3.printStackTrace();
-		}
-		try {
+			System.out.println("Got server, start creation");
 			long secondPartRootId = remoteGenerator.createSubgraph();
 		} catch (RemoteException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		System.out.println("Created remote graph");
 		Vertex secondPartRootV = topGraph.getVertex(firstPartRootId);
 		SimpleEdge e2 = topGraph.createSimpleEdge();
 		e.connect(SimpleEdge_start.class, root);
