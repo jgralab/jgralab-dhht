@@ -241,7 +241,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public Remote createSubgraphGenerator(String uniqueGraphId,
 			int layers, int[] branchingFactors) throws RemoteException {
 		try {
-			Class c = Class.forName("SubgraphGenerator");
+			Class c = Class.forName("de.uni_koblenz.jgralabtest.dhht.SubgraphGenerator");
 			Constructor m = c.getConstructor(String.class, int.class, int[].class);
 			Object o =  m.newInstance(uniqueGraphId, layers, branchingFactors);
 		return UnicastRemoteObject
