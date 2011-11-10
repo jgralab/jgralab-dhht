@@ -58,7 +58,7 @@ public interface RemoteJGraLabServer extends Remote {
 			int partialGraphId,
 			de.uni_koblenz.jgralab.algolib.universalsearch.CentralAlgorithm parent) throws RemoteException;
 
-	public RemoteGraphGenerator createSubgraphGenerator(String uniqueGraphId,
+	public Remote createSubgraphGenerator(String uniqueGraphId,
 			int layers, int[] branchingFactors) throws RemoteException;
 
 }

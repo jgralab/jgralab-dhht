@@ -56,7 +56,7 @@ public class SimpleDistributedGraphGenerator {
 		
 		RemoteGraphGenerator remoteGenerator = null;
 		try {
-			remoteGenerator = JGraLabServerImpl.getLocalInstance().getRemoteInstance(remoteHosts[1]).createSubgraphGenerator(topGraph.getUniqueGraphId(), layers, branchingFactors);
+			remoteGenerator = (RemoteGraphGenerator) JGraLabServerImpl.getLocalInstance().getRemoteInstance(remoteHosts[1]).createSubgraphGenerator(topGraph.getUniqueGraphId(), layers, branchingFactors);
 		} catch (RemoteException e3) {
 			// TODO Auto-generated catch block
 			e3.printStackTrace();
