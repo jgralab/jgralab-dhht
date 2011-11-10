@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -12,15 +13,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
-import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl;
-import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
@@ -243,9 +242,15 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	@Override
 	public RemoteGraphGenerator createSubgraphGenerator(String uniqueGraphId,
 			int layers, int[] branchingFactors) throws RemoteException {
-		SubgraphGenerator sg = new SubgraphGenerator(uniqueGraphId, layers, branchingFactors);
+		try {
+			Class c = Class.forName("SubgraphGenerator");
+			Constructor m = c.getConstructor(String.class, int.class, int[].class);
+			SubgraphGenerator sg = (SubgraphGenerator) m.newInstance(uniqueGraphId, layers, branchingFactors);
 		return (RemoteGraphGenerator) UnicastRemoteObject
 				.exportObject(sg, 0);
+		} catch (Exception e) {
+			throw new RuntimeException("Error");
+		}
 	}
 
 }
