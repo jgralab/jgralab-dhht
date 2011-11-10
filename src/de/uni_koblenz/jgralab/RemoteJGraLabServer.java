@@ -3,12 +3,9 @@ package de.uni_koblenz.jgralab;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
-import de.uni_koblenz.jgralabtest.dhht.RemoteGraphGenerator;
-import de.uni_koblenz.jgralabtest.dhht.SubgraphGenerator;
 
 public interface RemoteJGraLabServer extends Remote {
 
