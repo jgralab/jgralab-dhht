@@ -460,6 +460,11 @@ public class Rsa2Tg extends XmlProcessor {
 	private boolean inSpecification;
 
 	/**
+	 * Stores the ProcessingExceptions durcing the call of isSubsettable
+	 */
+	private Set<ProcessingException> subsettibilityErrors;
+
+	/**
 	 * Processes an XMI-file to a TG-file as schema or a schema in a grUML
 	 * graph. For all command line options see
 	 * {@link Rsa2Tg#processCommandLineOptions(String[])}.
@@ -1217,18 +1222,58 @@ public class Rsa2Tg extends XmlProcessor {
 	private void convertEdgeClassesToBinaryEdgeClasses() {
 		System.out
 				.println("Converting EdgeClasses to BinaryEdgeClasses if possible...");
-		EdgeClass ec = sg.getFirstEdgeClass(true);
-		while (ec != null) {
-			EdgeClass current = ec;
-			ec = ec.getNextEdgeClass(true);
-			if (isValidBinaryEdgeClassCandidate(current)) {
-				convertToBinaryEdgeClass(current);
+		for (EdgeClass ec : getEdgeClassesInTopologicalOrder()) {
+			if (isValidBinaryEdgeClassCandidate(ec)) {
+				convertToBinaryEdgeClass(ec);
 			} else {
 				// every IncidenceClass must have the inicdenceType EDGE
-				checkIncidenceTypes(current);
+				checkIncidenceTypes(ec);
 			}
 		}
 
+	}
+
+	private List<EdgeClass> getEdgeClassesInTopologicalOrder() {
+		List<EdgeClass> result = new ArrayList<EdgeClass>();
+		Map<EdgeClass, Integer> numberOfPredecessors = new HashMap<EdgeClass, Integer>();
+		LinkedList<EdgeClass> zeroValued = new LinkedList<EdgeClass>();
+
+		for (EdgeClass ec : sg.getEdgeClassVertices()) {
+			if (!BinaryEdgeClass.class.isInstance(ec)) {
+				int numberOfPred = ec
+						.getDegree(SpecializesTypedElementClass_subclass.class);
+				if (numberOfPred == 0) {
+					zeroValued.add(ec);
+				} else {
+					numberOfPredecessors.put(ec, numberOfPred);
+				}
+			}
+		}
+
+		while (!zeroValued.isEmpty()) {
+			EdgeClass current = zeroValued.removeFirst();
+			result.add(current);
+			for (SpecializesEdgeClass sec : current.getIncidentEdges(
+					SpecializesEdgeClass.class,
+					de.uni_koblenz.jgralab.Direction.EDGE_TO_VERTEX)) {
+				EdgeClass otherEnd = (EdgeClass) sec.getAlpha();
+				Integer numberOfPred = numberOfPredecessors.get(otherEnd);
+				if (numberOfPred != null) {
+					if (numberOfPred == 1) {
+						numberOfPredecessors.remove(otherEnd);
+						zeroValued.add(otherEnd);
+					} else {
+						numberOfPredecessors.put(otherEnd, --numberOfPred);
+					}
+				}
+			}
+		}
+
+		if (numberOfPredecessors.isEmpty()) {
+			return result;
+		} else {
+			return null;
+		}
 	}
 
 	private void checkIncidenceTypes(EdgeClass ec) {
@@ -1254,6 +1299,7 @@ public class Rsa2Tg extends XmlProcessor {
 		alreadySeenMarker.mark(ec);
 		while (!workingList.isEmpty()) {
 			EdgeClass current = workingList.pop();
+			alreadySeenMarker.mark(current);
 			if (BinaryEdgeClass.class.isInstance(current)) {
 				continue;
 			}
@@ -1281,26 +1327,6 @@ public class Rsa2Tg extends XmlProcessor {
 				return false;
 			}
 
-			// // check incidence type
-			// boolean isFirstICDefined = false, isLastICDefined = false;
-			// for (ConnectsToEdgeClass_connectedEdgeClass ceInc : current
-			// .getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
-			// IncidenceClass ic = (IncidenceClass) ceInc.getThat();
-			// isFirstICDefined = isFirstICDefined || ic == firstIC;
-			// isLastICDefined = isLastICDefined || ic == lastIC;
-			// }
-			// if (isFirstICDefined || isLastICDefined) {
-			// // at least one IC is defined
-			// if (isFirstICDefined != isLastICDefined) {
-			// // one IncidenceClass is defined the other one is inherited
-			// if(firstIC.get_incidenceType()!=lastIC.get_incidenceType()){
-			// if((isFirstICDefined?firstIC:lastIC).get_incidenceType()!=IncidenceType.EDGE){
-			// //TODO
-			// }
-			// }
-			// }
-			// }
-
 			// every subclass and superclass of a BinaryEdgeClass must be a
 			// BinaryEdgeClass candidate, too
 			for (SpecializesEdgeClass sec : current
@@ -1309,7 +1335,8 @@ public class Rsa2Tg extends XmlProcessor {
 						.getOmega() : sec.getAlpha());
 				if (alreadySeenMarker.isMarked(genEC)) {
 					continue;
-				} else if (!workingList.contains(genEC)) {
+				} else if (!workingList.contains(genEC)
+						&& !BinaryEdgeClass.class.isInstance(genEC)) {
 					workingList.push(genEC);
 				}
 			}
@@ -1420,6 +1447,7 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		if (first != null && last != null) {
+			// this BinaryEdge has two defined IncidenceClasses
 			if (edgeStereotypedEdgeClasses.contains(ec)) {
 				// set the correct IncidenceTypes again
 				IncidenceType incType = first.get_incidenceType();
@@ -1427,6 +1455,10 @@ public class Rsa2Tg extends XmlProcessor {
 				last.set_incidenceType(incType);
 			}
 		} else if (first != null || last != null) {
+			// if one of both IncidenceClasses is inherited, it has to be
+			// checked, that their incidence Type is equal because the
+			// IncidenceType of the current BinaryEdgeClass must still be
+			// changed (have a look at the JavaDoc of this method)
 			IncidenceClass definedIC = first != null ? first : last;
 			IncidenceClass inheritedIC = null;
 			for (IncidenceClass ic : getAllIncidenceClasses(bec)) {
@@ -1437,13 +1469,29 @@ public class Rsa2Tg extends XmlProcessor {
 				}
 			}
 			assert inheritedIC != null;
-			EdgeClass superEc = getConnectedEdgeClass(inheritedIC);
-			if (!isBinaryEdgeAlreadyConverted.mark(superEc)) {
-				// the incidenceType of super EdgeClass was not turned around
-				// get the other IncidenceClass
-				// TODO rekursiver Aufruf
-				// TODO warnung bei nicht gleicher IncidenctType vererbung
-				// (aggregation von edge geerbt)
+
+			// At this point the EdgeClasses must be handled in topological
+			// order because the incidence type of all superclasses is set
+			// correctly
+			if (inheritedIC.get_incidenceType() == definedIC
+					.get_incidenceType()) {
+				// change the incidence type of the current BinaryEdgeClass
+				definedIC.set_incidenceType(IncidenceType.EDGE);
+			} else {
+				throw new ProcessingException(
+						getParser(),
+						getFileName(),
+						"At the BinaryEdgeClass '"
+								+ bec.get_qualifiedName()
+								+ "the IncidenceType of the inherited IncidenceClass '"
+								+ inheritedIC.get_roleName()
+								+ "' is set to "
+								+ definedIC.get_incidenceType()
+								+ ". But at the BinaryEdgeClass '"
+								+ getConnectedEdgeClass(inheritedIC)
+										.get_qualifiedName()
+								+ "' where the IncidenceClass is defined, its IncidenceType was set to "
+								+ inheritedIC.get_incidenceType() + ".");
 			}
 		}
 
@@ -1839,6 +1887,7 @@ public class Rsa2Tg extends XmlProcessor {
 			for (ConnectsToEdgeClass ctec : subClass
 					.getIncidentEdges(ConnectsToEdgeClass.class)) {
 
+				subsettibilityErrors = new HashSet<ProcessingException>();
 				IncidenceClass subIC = (IncidenceClass) ctec.getAlpha();
 				List<IncidenceClass> possibleSubsettedICs = findPossibleSubsettedIncidenceClasses(
 						superClass, subIC);
@@ -1847,6 +1896,10 @@ public class Rsa2Tg extends XmlProcessor {
 				if (possibleSubsettedICs.isEmpty()) {
 					// there does not exist an IncidenceClass which can be
 					// subsetted
+					StringBuilder sb = new StringBuilder();
+					for (ProcessingException pe : subsettibilityErrors) {
+						sb.append(pe.getMessage() + "\n");
+					}
 					throw new ProcessingException(
 							getFileName(),
 							"IncidenceClass '"
@@ -1854,7 +1907,8 @@ public class Rsa2Tg extends XmlProcessor {
 									+ "' of EdgeClass '"
 									+ subClass.get_qualifiedName()
 									+ "' has no subsetted IncidenceClass at EdgeClass '"
-									+ superClass.get_qualifiedName() + "'.");
+									+ superClass.get_qualifiedName()
+									+ "'. Causes are:\n" + sb.toString());
 				} else if (subsettedRoleNames.isEmpty()
 						&& possibleSubsettedICs.size() == 1) {
 					// there exists only one subsettable IncidenceClass
@@ -2067,7 +2121,9 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private boolean isSubsetable(IncidenceClass subInc, IncidenceClass superInc) {
-		return checkSubsetability(subInc, superInc) == null;
+		ProcessingException error = checkSubsetability(subInc, superInc);
+		subsettibilityErrors.add(error);
+		return error == null;
 	}
 
 	private boolean isSubclassOf(GraphElementClass subclass,
@@ -2120,7 +2176,10 @@ public class Rsa2Tg extends XmlProcessor {
 		if (subInc.get_direction() != superInc.get_direction()) {
 			return new ProcessingException(getFileName(),
 					"Incompatible incidence direction in specialisation "
-							+ subEC + " --> " + superEC);
+							+ subEC.get_qualifiedName() + ".."
+							+ subInc.get_roleName() + " --> "
+							+ superEC.get_qualifiedName() + ".."
+							+ superInc.get_roleName());
 		}
 
 		// Check multiplicities: Subclass must not have greater upper bound than
@@ -2138,8 +2197,11 @@ public class Rsa2Tg extends XmlProcessor {
 							+ ","
 							+ (superInc.get_maxEdgesAtVertex() == Integer.MAX_VALUE ? "*"
 									: superInc.get_maxEdgesAtVertex())
-							+ ") in specialisation " + subEC + " --> "
-							+ superEC);
+							+ ") in specialisation "
+							+ subEC.get_qualifiedName() + ".."
+							+ subInc.get_roleName() + " --> "
+							+ superEC.get_qualifiedName() + ".."
+							+ superInc.get_roleName());
 		}
 		if (subInc.get_maxVerticesAtEdge() > superInc.get_maxVerticesAtEdge()) {
 			return new ProcessingException(
@@ -2154,8 +2216,11 @@ public class Rsa2Tg extends XmlProcessor {
 							+ ","
 							+ (superInc.get_maxVerticesAtEdge() == Integer.MAX_VALUE ? "*"
 									: superInc.get_maxVerticesAtEdge())
-							+ ") in specialisation " + subEC + " --> "
-							+ superEC);
+							+ ") in specialisation "
+							+ subEC.get_qualifiedName() + ".."
+							+ subInc.get_roleName() + " --> "
+							+ superEC.get_qualifiedName() + ".."
+							+ superInc.get_roleName());
 		}
 
 		// COMPOSITION end may specialize any other end
@@ -2168,8 +2233,11 @@ public class Rsa2Tg extends XmlProcessor {
 			return new ProcessingException(getFileName(),
 					"Incompatible aggregation kinds (" + subType
 							+ " specialises " + superType
-							+ ") in generalisation " + subEC + " --> "
-							+ superEC);
+							+ ") in specialisation "
+							+ subEC.get_qualifiedName() + ".."
+							+ subInc.get_roleName() + " --> "
+							+ superEC.get_qualifiedName() + ".."
+							+ superInc.get_roleName());
 
 		}
 
@@ -2178,8 +2246,9 @@ public class Rsa2Tg extends XmlProcessor {
 			return new ProcessingException(getFileName(), "The IncidenceClass "
 					+ subInc.get_roleName()
 					+ " is not connected to the same EdgeClass "
-					+ superInc.get_roleName() + ") in generalisation " + subEC
-					+ " --> " + superEC);
+					+ superInc.get_roleName() + ") in specialisation "
+					+ subEC.get_qualifiedName() + " --> "
+					+ superEC.get_qualifiedName());
 		}
 
 		// both IncidenceClasses must have the same VertexClass
@@ -2187,8 +2256,10 @@ public class Rsa2Tg extends XmlProcessor {
 			return new ProcessingException(getFileName(), "The IncidenceClass "
 					+ subInc.get_roleName()
 					+ " is not connected to the same VertexClass "
-					+ superInc.get_roleName() + ") in generalisation " + subEC
-					+ " --> " + superEC);
+					+ superInc.get_roleName() + ") in specialisation "
+					+ subEC.get_qualifiedName() + ".." + subInc.get_roleName()
+					+ " --> " + superEC.get_qualifiedName() + ".."
+					+ superInc.get_roleName());
 		}
 
 		return null;
