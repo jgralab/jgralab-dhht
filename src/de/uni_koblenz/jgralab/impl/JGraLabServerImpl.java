@@ -247,7 +247,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		return UnicastRemoteObject
 				.exportObject((Remote) o, 0);
 		} catch (Exception e) {
-			throw new RemoteException(e);
+			throw new RuntimeException(e);
 		}
 	}
 
