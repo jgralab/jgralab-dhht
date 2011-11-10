@@ -193,7 +193,7 @@ public class BGStorageTest {
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
 			//return new DistributedGraphGenerator(5, 2, factors,
 			//		firstLayerFactorsTree, 20, true, hostnames).createGraph();
-			return new SimpleDistributedGraphGenerator(5, 2, factors,
+			return new SimpleDistributedGraphGenerator(8, 2, factors,
 							firstLayerFactorsTree, 20, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(2, 3, factors,

@@ -27,11 +27,11 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 
 	/* Switches to toggle behaviour */
 
-	private final static int MAX_REUSE_QUEUE_SIZE = 0;
+	private final static int MAX_REUSE_QUEUE_SIZE = 200;
 
 	private final static int MAX_LRU_QUEUE_SIZE = 1000;
 
-	private final static int CLEANUP_THREAD_WAITING_TIME = 30;
+	private final static int CLEANUP_THREAD_WAITING_TIME = 100;
 
 	private final static int BITS_FOR_ELEMENT_MASK = 14;
 
@@ -56,7 +56,7 @@ public final class DiskStorageManager implements RemoteDiskStorageAccess {
 	 * the number of milliseconds the cleaning thread will wait between two
 	 * cleaning cycles
 	 */
-	private static final int WAITING_TIME = 20;
+	private static final int WAITING_TIME = 100;
 
 	/* Threads to control the disk buffering */
 

@@ -77,9 +77,9 @@ public class SimpleDistributedGraphGenerator {
 		
 		for (int i=0; i<additionalEdgeCount; i++) {
 			SimpleEdge crosslinks = topGraph.createSimpleEdge();
-			long localVId = topGraph.getGraphDatabase().convertToGlobalId((int) (i%(topGraph.getVCount()-1)));
+			long localVId = topGraph.getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex local = topGraph.getVertex(localVId);
-			long remoteVId = partialGraphs[2].getGraphDatabase().convertToGlobalId((int) (i%(topGraph.getVCount()-1)));
+			long remoteVId = partialGraphs[2].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex remote = partialGraphs[2].getVertex(localVId);
 			if (i%2 == 0) {
 				e.connect(SimpleEdge_start.class, local);

@@ -56,14 +56,14 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		SatelliteAlgorithmRemoteAccess remoteAlgorithm = getAlgorithmForElementId(vertexId);
 		remoteAlgorithm.enqueueRoot(vertexId);
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		while (true) {
 			try {
-				Thread.sleep(500);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
