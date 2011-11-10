@@ -22,7 +22,7 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 	protected CentralAlgorithm stub;
 
 	/* maps partial graph Ids to the remote algorithms stored as local proxies */
-	private Map<Integer, SatelliteAlgorithmRemoteAccess> remoteAlgorithms = new HashMap<Integer, SatelliteAlgorithmRemoteAccess>();
+	protected Map<Integer, SatelliteAlgorithmRemoteAccess> remoteAlgorithms = new HashMap<Integer, SatelliteAlgorithmRemoteAccess>();
 
 	/* returns the SatelliteAlgorithm for the graph the element belongs to */
 	private SatelliteAlgorithmRemoteAccess getAlgorithmForElementId(

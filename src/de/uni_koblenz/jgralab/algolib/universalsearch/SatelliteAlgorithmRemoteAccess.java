@@ -15,4 +15,8 @@ public interface SatelliteAlgorithmRemoteAccess extends Remote {
 	
 	public void stop() throws RemoteException;
 
+	public long getVCount() throws RemoteException;
+	
+	public long getECount() throws RemoteException;
+	
 }

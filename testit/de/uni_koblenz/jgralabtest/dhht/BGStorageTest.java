@@ -6,6 +6,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.algolib.CountCentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
+import de.uni_koblenz.jgralab.algolib.universalsearch.MyCentralAlgorithm;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
 
 public class BGStorageTest {
@@ -14,6 +15,8 @@ public class BGStorageTest {
 
 	private long visitedEdges;
 
+	private boolean genericSearch = false;
+	
 	private void testGraph(Graph graph, Variant variant, boolean dfs) {
 		Vertex startVertex = graph.getFirstVertex();
 		switch (variant) {
@@ -35,15 +38,27 @@ public class BGStorageTest {
 			view.useAsTraversalContext();
 		}
 		if (variant == Variant.TREELIKEDISTRIBUTED) {
-			CountCentralAlgorithm algo = new CountCentralAlgorithm(graph, dfs);
-			try {
-				algo.run(startVertex);
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (genericSearch) {
+				MyCentralAlgorithm algo = new MyCentralAlgorithm(graph, dfs);
+				try {
+					algo.run(startVertex);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				visitedNodes = algo.getVertexCount();
+				visitedEdges = algo.getEdgeCount();
+			} else {
+				CountCentralAlgorithm algo = new CountCentralAlgorithm(graph, dfs);
+				try {
+					algo.run(startVertex);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				visitedNodes = algo.getVertexCount();
+				visitedEdges = algo.getEdgeCount();
 			}
-			visitedNodes = algo.getVertexCount();
-			visitedEdges = algo.getEdgeCount();
 		} else {
 			CountHypergraphSearchAlgorithm algo = new CountHypergraphSearchAlgorithm(
 					dfs);
@@ -176,10 +191,10 @@ public class BGStorageTest {
 					firstLayerFactorsClique, addEdges, true, true)
 					.createGraph();
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(8, 5, factors,
+			return new DistributedGraphGenerator(2, 5, factors,
 					firstLayerFactorsTree, 0, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
-			return new DistributedGraphGenerator(3, 5, factors,
+			return new DistributedGraphGenerator(2, 3, factors,
 					firstLayerFactorsClique, addEdges, true, hostnames)
 					.createGraph();
 		}
@@ -198,7 +213,9 @@ public class BGStorageTest {
 
 		int cycles = 7;
 
-		boolean distributed = false;
+		boolean distributed = true;
+		
+
 
 		if (distributed) {
 			Variant[] distributedVariants = { Variant.TREELIKEDISTRIBUTED };

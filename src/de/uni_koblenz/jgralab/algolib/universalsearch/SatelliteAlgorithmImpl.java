@@ -27,6 +27,10 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 	protected boolean working = false;
 	protected boolean isStopped = false;
 	
+	private long vCount = 0;
+	private long eCount = 0;
+	
+	
 	protected SatelliteAlgorithmImpl(Graph partialGraph,
 			CentralAlgorithm centralAlgorithm) {
 		this.graph = partialGraph;
@@ -202,12 +206,12 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 	@Override
 	public void handleVertex(Vertex vertex) {
-
+		vCount++;
 	}
 
 	@Override
 	public void handleEdge(Edge edge) {
-
+		eCount++;
 	}
 
 	@Override
@@ -217,6 +221,16 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 	@Override
 	public void handleCrossIncidence(Incidence incidence) {
+	}
+
+	@Override
+	public long getVCount() throws RemoteException {
+		return vCount;
+	}
+
+	@Override
+	public long getECount() throws RemoteException {
+		return eCount;
 	}
 
 
