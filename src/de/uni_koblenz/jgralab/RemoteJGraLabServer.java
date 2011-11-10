@@ -48,7 +48,12 @@ public interface RemoteJGraLabServer extends Remote {
 			throws ClassNotFoundException, RemoteException;
 
 	public SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
-			String uniqueGraphId, int partialGraphId, CentralAlgorithm parent)
+			String uniqueGraphId, int partialGraphId, de.uni_koblenz.jgralab.algolib.CentralAlgorithm parent)
 			throws RemoteException;
+
+	public de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmRemoteAccess createUniversalSatelliteAlgorithm(
+			String uniqueGraphId,
+			int partialGraphId,
+			de.uni_koblenz.jgralab.algolib.universalsearch.CentralAlgorithm parent) throws RemoteException;
 
 }

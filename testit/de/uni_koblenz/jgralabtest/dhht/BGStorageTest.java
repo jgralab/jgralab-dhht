@@ -198,7 +198,7 @@ public class BGStorageTest {
 
 		int cycles = 7;
 
-		boolean distributed = true;
+		boolean distributed = false;
 
 		if (distributed) {
 			Variant[] distributedVariants = { Variant.TREELIKEDISTRIBUTED };
@@ -207,7 +207,7 @@ public class BGStorageTest {
 				test.iterateTest(1, variant, hosts);
 			}
 		} else {
-			Variant[] variants = { Variant.TREELIKEDISK /*
+			Variant[] variants = { Variant.TREELIKE /*
 														 * , Variant.CLIQUEDISK,
 														 * Variant
 														 * .TREELIKEDISKHY,
