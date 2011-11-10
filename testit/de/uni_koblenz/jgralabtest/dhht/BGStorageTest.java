@@ -40,11 +40,8 @@ public class BGStorageTest {
 		if (variant == Variant.TREELIKEDISTRIBUTED) {
 			System.out.println("Performing distributed search");
 			if (genericSearch) {
-				System.out.println("Generic search");
 				MyCentralAlgorithm algo = new MyCentralAlgorithm(graph, dfs);
-				System.out.println("Created object");
 				try {
-					System.out.println("Running generic search algo");
 					algo.run(startVertex);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
@@ -133,7 +130,6 @@ public class BGStorageTest {
 		long avgCreationTime = totalCreationTime / cycles;
 
 		System.out.println("Variant: " + variant);
-		System.out.println("  Vertices: " + vCount + " Edges: " + eCount);
 		System.out.println("  Avg creation time: " + avgCreationTime);
 		System.out.println("  Avg bfs time: " + avgTraversalTimeBFS
 				+ " visiting " + bfsNodes + " vertices and " + bfsEdges
@@ -195,8 +191,10 @@ public class BGStorageTest {
 					firstLayerFactorsClique, addEdges, true, true)
 					.createGraph();
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
-			return new DistributedGraphGenerator(2, 5, factors,
-					firstLayerFactorsTree, 0, true, hostnames).createGraph();
+			//return new DistributedGraphGenerator(5, 2, factors,
+			//		firstLayerFactorsTree, 20, true, hostnames).createGraph();
+			return new SimpleDistributedGraphGenerator(5, 2, factors,
+							firstLayerFactorsTree, 20, true, hostnames).createGraph();
 		case CLIQUEDISTRIBUTED:
 			return new DistributedGraphGenerator(2, 3, factors,
 					firstLayerFactorsClique, addEdges, true, hostnames)

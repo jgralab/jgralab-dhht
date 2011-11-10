@@ -320,14 +320,6 @@ public class TreeGraphGenerator {
 		return null;
 	}
 
-	// private Vertex getVertex(int id) {
-	// int vId = (int) ( id % graph.getVCount());
-	// if (diskBased)
-	// return
-	// graph.getVertex(graph.getGraphDatabase().convertToGlobalId(vId+1));
-	// else
-	// return graph.getVertex(vId+1);
-	// }
 
 	protected DHHTTestGraph createPartialGraph(int i) {
 		return graph;

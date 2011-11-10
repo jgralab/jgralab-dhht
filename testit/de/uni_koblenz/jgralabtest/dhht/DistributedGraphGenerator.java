@@ -3,7 +3,7 @@ package de.uni_koblenz.jgralabtest.dhht;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 
-public class DistributedGraphGenerator extends TreeGraphGenerator {
+public class DistributedGraphGenerator extends TreeGraphGenerator  {
 
 	DHHTTestGraph[] partialGraphs;
 

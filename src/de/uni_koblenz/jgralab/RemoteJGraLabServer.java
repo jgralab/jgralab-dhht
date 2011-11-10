@@ -7,6 +7,8 @@ import de.uni_koblenz.jgralab.algolib.CentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
+import de.uni_koblenz.jgralabtest.dhht.RemoteGraphGenerator;
+import de.uni_koblenz.jgralabtest.dhht.SubgraphGenerator;
 
 public interface RemoteJGraLabServer extends Remote {
 
@@ -55,5 +57,8 @@ public interface RemoteJGraLabServer extends Remote {
 			String uniqueGraphId,
 			int partialGraphId,
 			de.uni_koblenz.jgralab.algolib.universalsearch.CentralAlgorithm parent) throws RemoteException;
+
+	public RemoteGraphGenerator createSubgraphGenerator(String uniqueGraphId,
+			int layers, int[] branchingFactors) throws RemoteException;
 
 }

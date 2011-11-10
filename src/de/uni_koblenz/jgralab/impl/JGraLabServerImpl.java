@@ -27,6 +27,8 @@ import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralabtest.dhht.RemoteGraphGenerator;
+import de.uni_koblenz.jgralabtest.dhht.SubgraphGenerator;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
@@ -236,6 +238,14 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			localHostname = args[0];
 		}
 		JGraLabServerImpl.getLocalInstance();
+	}
+
+	@Override
+	public RemoteGraphGenerator createSubgraphGenerator(String uniqueGraphId,
+			int layers, int[] branchingFactors) throws RemoteException {
+		SubgraphGenerator sg = new SubgraphGenerator(uniqueGraphId, layers, branchingFactors);
+		return (RemoteGraphGenerator) UnicastRemoteObject
+				.exportObject(sg, 0);
 	}
 
 }
