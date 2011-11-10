@@ -1,17 +1,12 @@
 package de.uni_koblenz.jgralab.algolib.universalsearch;
 
-import de.uni_koblenz.jgralab.algolib.Buffer;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.Queue;
-import de.uni_koblenz.jgralab.algolib.Stack;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 
 /**
@@ -60,18 +55,42 @@ public abstract class CentralAlgorithmImpl implements CentralAlgorithm {
 		long vertexId = startVertex.getGlobalId();
 		SatelliteAlgorithmRemoteAccess remoteAlgorithm = getAlgorithmForElementId(vertexId);
 		remoteAlgorithm.enqueueRoot(vertexId);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (true) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			boolean stopped = true;
+			for (SatelliteAlgorithmRemoteAccess remoteAlgo : remoteAlgorithms.values()) {
+				if (remoteAlgo.isWorking())
+					stopped = false;
+			}
+			if (stopped) {
+				for (SatelliteAlgorithmRemoteAccess remoteAlgo : remoteAlgorithms.values()) {
+					remoteAlgo.stop();
+				}
+				return;
+			}
+		}
+		
 	}
 
 	public boolean testAndProcessEdge(long edgeId, long incId)
 			throws RemoteException {
-		Long key = Long.valueOf(edgeId);
 		SatelliteAlgorithmRemoteAccess remoteAlgo = getAlgorithmForElementId(edgeId);
 		return remoteAlgo.testAndEnqueueEdge(edgeId, incId);
 	}
 
 	public boolean testAndProcessVertex(long vertexId, long incId)
 			throws RemoteException {
-		Long key = Long.valueOf(vertexId);
 		SatelliteAlgorithmRemoteAccess remoteAlgo = getAlgorithmForElementId(vertexId);
 		return remoteAlgo.testAndEnqueueVertex(vertexId, incId);
 	}

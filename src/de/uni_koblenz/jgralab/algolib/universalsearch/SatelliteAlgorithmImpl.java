@@ -90,7 +90,6 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 			for (Incidence curIncAtVertex : currentVertex
 				.getIncidences(Direction.VERTEX_TO_EDGE)) {
 				Edge currentEdge = curIncAtVertex.getEdge();
-				long curIncAtVertexId = curIncAtVertex.getGlobalId();
 				long curEdgeId = currentEdge.getGlobalId();
 				if (GraphDatabaseElementaryMethods.getPartialGraphId(curEdgeId) != localPartialGraphId) {
 					//remote edge should be handled on remote machine
