@@ -211,14 +211,24 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		localHostname = host;
 	}
 
-	public SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
-			String uniqueGraphId, int partialGraphId, CentralAlgorithm parent)
+	public de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
+			String uniqueGraphId, int partialGraphId, de.uni_koblenz.jgralab.algolib.CentralAlgorithm parent)
 			throws RemoteException {
 		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
 				.getGraphObject(GraphDatabaseElementaryMethods
 						.getToplevelGraphForPartialGraphId(partialGraphId));
-		return (SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
-				.exportObject(SatelliteAlgorithmImpl.create(g, parent), 0);
+		return (de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
+				.exportObject(de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl.create(g, parent), 0);
+	}
+	
+	public de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmRemoteAccess createUniversalSatelliteAlgorithm(
+			String uniqueGraphId, int partialGraphId, de.uni_koblenz.jgralab.algolib.universalsearch.CentralAlgorithm parent)
+			throws RemoteException {
+		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
+				.getGraphObject(GraphDatabaseElementaryMethods
+						.getToplevelGraphForPartialGraphId(partialGraphId));
+		return (de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
+				.exportObject(de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmImpl.create(g, parent), 0);
 	}
 
 	public static void main(String[] args) {

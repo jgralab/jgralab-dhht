@@ -1,6 +1,6 @@
 package de.uni_koblenz.jgralab.algolib;
 
-interface Buffer<T> {
+public interface Buffer<T> {
 	/** @return true if the buffer contains no elements */
 	public boolean isEmpty();
 	
