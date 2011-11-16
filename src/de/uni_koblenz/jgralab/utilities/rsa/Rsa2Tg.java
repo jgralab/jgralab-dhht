@@ -2842,7 +2842,13 @@ public class Rsa2Tg extends XmlProcessor {
 			if (ae instanceof AttributedElementClass) {
 				if (((AttributedElementClass) ae).isValid()) {
 					for (String text : l) {
-						addGreqlConstraint((AttributedElementClass) ae, text);
+						if (text.startsWith("kappa")
+								&& ae instanceof GraphElementClass) {
+							setKappaValues((GraphElementClass) ae, text);
+						} else {
+							addGreqlConstraint((AttributedElementClass) ae,
+									text);
+						}
 					}
 				}
 			} else if (ae instanceof IncidenceClass) {
@@ -2867,6 +2873,30 @@ public class Rsa2Tg extends XmlProcessor {
 				throw new ProcessingException(getFileName(),
 						"Don't know what to do with constraint(s) at element "
 								+ ae + " (XMI id " + constrainedElementId + ")");
+			}
+		}
+	}
+
+	private void setKappaValues(GraphElementClass gec, String text) {
+		// TODO kappa-Werte gehen bei Transformation von SchemaGraph in Schema
+		// verloren
+		String value = text.substring(6).trim();
+		if (value.contains("..")) {
+			String[] values = value
+					.split("\\s*" + Pattern.quote("..") + "\\s*");
+			assert values.length == 2;
+			assert !values[0].equals("*");
+			gec.set_minKappa(Integer.parseInt(values[0]));
+			gec.set_maxKappa(values[1].equals("*") ? Integer.MAX_VALUE
+					: Integer.parseInt(values[1]));
+		} else {
+			if (value.equals("*")) {
+				gec.set_minKappa(0);
+				gec.set_maxKappa(Integer.MAX_VALUE);
+			} else {
+				int kappa = Integer.parseInt(value);
+				gec.set_minKappa(kappa);
+				gec.set_maxKappa(kappa);
 			}
 		}
 	}
@@ -3328,7 +3358,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private void handleConstraint(String text) throws XMLStreamException {
 		if (text.startsWith("redefines") || text.startsWith("\"")
-				|| text.startsWith("subsets")) {
+				|| text.startsWith("subsets") || text.startsWith("kappa")) {
 			List<String> l = constraints.get(constrainedElementId);
 			if (l == null) {
 				l = new LinkedList<String>();
