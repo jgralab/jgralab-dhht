@@ -3365,7 +3365,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleConstraint(String text) throws XMLStreamException {
-		System.out.println(text);
 		if (text.startsWith("redefines") || text.startsWith("\"")
 				|| text.startsWith("subsets") || text.startsWith("kappa")) {
 			List<String> l = constraints.get(constrainedElementId);
