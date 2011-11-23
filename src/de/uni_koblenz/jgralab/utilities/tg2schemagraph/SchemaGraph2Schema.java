@@ -642,6 +642,10 @@ public class SchemaGraph2Schema {
 		element.setAbstract(gElement.is_abstract());
 		assert (element.isAbstract() == gElement.is_abstract()) : "FIXME! The attribute \"isAbstract\" is not equal.";
 
+		// sets the kappa values
+		element.setAllowedKappaRange(gElement.get_minKappa(),
+				gElement.get_maxKappa());
+
 		// Sets all Attribute objects
 		createAllAttributes(element, gElement);
 		// Sets all Constraint objects

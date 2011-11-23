@@ -494,7 +494,13 @@ public class GraphIO {
 						writeIncidenceClassDefintion(pkg, ic);
 					}
 				}
-
+				if (ec.hasAttributes()
+						|| (ec.getAllowedSigmaClasses() != null && !ec
+								.getAllowedSigmaClasses().isEmpty())
+						|| ec.getAllowedMinKappa() != 0
+						|| ec.getAllowedMaxKappa() != Integer.MAX_VALUE) {
+					write("\n\t");
+				}
 				writeAttributes(pkg, ec);
 				writeSigmaDefinition(ec);
 				writeKappaDefintion(ec);
@@ -518,7 +524,11 @@ public class GraphIO {
 			write("(");
 			writeInteger(gec.getAllowedMinKappa());
 			write(",");
-			writeInteger(gec.getAllowedMaxKappa());
+			if (gec.getAllowedMaxKappa() == Integer.MAX_VALUE) {
+				write("*");
+			} else {
+				writeInteger(gec.getAllowedMaxKappa());
+			}
 			write(")");
 		}
 	}
@@ -1332,8 +1342,9 @@ public class GraphIO {
 			if (inputStream != null) {
 				close(inputStream);
 			}
-			if (fileStream != null)
+			if (fileStream != null) {
 				close(fileStream);
+			}
 		}
 	}
 
@@ -3030,8 +3041,7 @@ public class GraphIO {
 				}
 				if (implementationType == ImplementationType.MEMORY) {
 					((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) sigma
-							.getKey())
-							.setSigma((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) parent);
+							.getKey()).setSigma(parent);
 				} else {
 					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) sigma
 							.getKey()).setSigma(parent);
@@ -3250,7 +3260,7 @@ public class GraphIO {
 							incidenceId)
 							: (((long) GraphDatabaseElementaryMethods
 									.getPartialGraphId(edge.getGlobalId())) << 32)
-									| ((long) incidenceId));
+									| incidenceId);
 			incidenceTypes.put(incidenceId, incidenceName);
 			setIncidence(eId, incidenceId, false);
 		}

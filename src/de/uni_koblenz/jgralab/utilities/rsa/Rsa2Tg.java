@@ -2455,6 +2455,8 @@ public class Rsa2Tg extends XmlProcessor {
 		String abs = getAttribute(UML_ATTRIBUTE_IS_ABSRACT);
 		vc.set_abstract((abs != null) && abs.equals(UML_TRUE));
 		vc.set_qualifiedName(getQualifiedName(getAttribute(UML_ATTRIBUTE_NAME)));
+		vc.set_minKappa(0);
+		vc.set_maxKappa(Integer.MAX_VALUE);
 		sg.createContainsGraphElementClass(packageStack.peek(), vc);
 
 		// System.out.println("currentClass = " + currentClass + " "
@@ -2490,6 +2492,8 @@ public class Rsa2Tg extends XmlProcessor {
 			ec = (EdgeClass) ae;
 		} else {
 			ec = sg.createBinaryEdgeClass();
+			ec.set_minKappa(0);
+			ec.set_maxKappa(Integer.MAX_VALUE);
 		}
 		currentClassId = xmiId;
 		currentClass = ec;
@@ -2520,6 +2524,8 @@ public class Rsa2Tg extends XmlProcessor {
 			VertexClass vc = sg.createVertexClass();
 			preliminaryVertices.add(vc);
 			vc.set_qualifiedName("preliminary for source end " + sourceEnd);
+			vc.set_minKappa(0);
+			vc.set_maxKappa(Integer.MAX_VALUE);
 			inc = sg.createIncidenceClass();
 			inc.set_incidenceType(IncidenceType.EDGE);
 			inc.set_abstract(false);
@@ -2571,6 +2577,8 @@ public class Rsa2Tg extends XmlProcessor {
 			VertexClass vc = sg.createVertexClass();
 			preliminaryVertices.add(vc);
 			vc.set_qualifiedName("preliminary for target end " + targetEnd);
+			vc.set_minKappa(0);
+			vc.set_maxKappa(Integer.MAX_VALUE);
 			inc = sg.createIncidenceClass();
 			inc.set_incidenceType(IncidenceType.EDGE);
 			inc.set_abstract(false);
@@ -3357,6 +3365,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleConstraint(String text) throws XMLStreamException {
+		System.out.println(text);
 		if (text.startsWith("redefines") || text.startsWith("\"")
 				|| text.startsWith("subsets") || text.startsWith("kappa")) {
 			List<String> l = constraints.get(constrainedElementId);
@@ -3978,6 +3987,8 @@ public class Rsa2Tg extends XmlProcessor {
 				// create a preliminary vertex class
 				vc = sg.createVertexClass();
 				vc.set_qualifiedName(typeId);
+				vc.set_minKappa(0);
+				vc.set_maxKappa(Integer.MAX_VALUE);
 				preliminaryVertices.add(vc);
 				idMap.put(typeId, vc);
 			}
@@ -4015,6 +4026,8 @@ public class Rsa2Tg extends XmlProcessor {
 				} else {
 					// create a preliminary edge class
 					ec = sg.createEdgeClass();
+					ec.set_minKappa(0);
+					ec.set_maxKappa(Integer.MAX_VALUE);
 				}
 
 				preliminaryVertices.add(ec);
