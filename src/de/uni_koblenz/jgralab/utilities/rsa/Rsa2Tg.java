@@ -2886,8 +2886,6 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	private void setKappaValues(GraphElementClass gec, String text) {
-		// TODO kappa-Werte gehen bei Transformation von SchemaGraph in Schema
-		// verloren
 		String value = text.substring(6).trim();
 		if (value.contains("..")) {
 			String[] values = value
