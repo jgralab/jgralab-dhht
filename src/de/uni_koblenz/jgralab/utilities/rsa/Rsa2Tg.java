@@ -163,6 +163,7 @@ import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain_domain;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceType;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn;
 import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
@@ -392,6 +393,12 @@ public class Rsa2Tg extends XmlProcessor {
 	 * a BinaryEdgeClass.
 	 */
 	private LocalBooleanGraphMarker isBinaryEdgeAlreadyConverted;
+
+	/**
+	 * Stores all nestedIn information to set the {@link MayBeNestedIn} edges
+	 * later on.
+	 */
+	private LocalGenericGraphMarker<EdgeClass> mayBeNestedIn;
 
 	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
@@ -701,6 +708,7 @@ public class Rsa2Tg extends XmlProcessor {
 		edgeStereotypedVertexClasses = new HashSet<VertexClass>();
 		edgeStereotypedEdgeClasses = new HashSet<EdgeClass>();
 		isBinaryEdgeAlreadyConverted = new LocalBooleanGraphMarker(sg);
+		mayBeNestedIn = new LocalGenericGraphMarker<EdgeClass>(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
@@ -1190,6 +1198,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 		attachComments();
 
+		createMayBeNestedIn();
+
 		if (!isKeepEmptyPackages()) {
 			removeEmptyPackages();
 		}
@@ -1213,6 +1223,25 @@ public class Rsa2Tg extends XmlProcessor {
 				throw new XMLStreamException(e);
 			}
 		}
+	}
+
+	private void createMayBeNestedIn() {
+		System.out.println("Create MayBeNestedIn relations ...");
+		// for (EdgeClass ec : compositionEdges) {
+		// GraphElementClass containingClass = null, containedClass = null;
+		// for (Incidence i : ec
+		// .getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+		// IncidenceClass ic = (IncidenceClass) i.getThat();
+		// if (ic.get_incidenceType() == IncidenceType.COMPOSITION) {
+		// containedClass = getConnectedVertexClass(ic);
+		// } else {
+		// containingClass = getConnectedVertexClass(ic);
+		// }
+		// }
+		// assert containedClass != null && containingClass != null;
+		// sg.createMayBeNestedIn(containedClass, containingClass);
+		// }
+		// TODO at work
 	}
 
 	/**
@@ -1522,6 +1551,7 @@ public class Rsa2Tg extends XmlProcessor {
 	private void convertToEdgeClasses() {
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
+		// TODO handle Compositions
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
 			EdgeClass ec = sg.createEdgeClass();
 			edgeStereotypedEdgeClasses.add(ec);
@@ -4041,6 +4071,9 @@ public class Rsa2Tg extends XmlProcessor {
 			inc.set_direction(Direction.VERTEX_TO_EDGE);
 			sg.createConnectsToEdgeClass(inc, ec);
 			sg.createConnectsToVertexClass(inc, vc);
+			if (composition) {
+				setMayBeNestedInInformation(ec, vc);
+			}
 		} else {
 			// at this point the IncidenceClass was already created because the
 			// association was seen before via memberEnd
@@ -4109,6 +4142,9 @@ public class Rsa2Tg extends XmlProcessor {
 							"FIXME: Unexpected type. You should not get here!");
 				}
 			}
+			if (composition) {
+				setMayBeNestedInInformation(ec, vc);
+			}
 		}
 
 		assert inc != null;
@@ -4120,6 +4156,11 @@ public class Rsa2Tg extends XmlProcessor {
 				: composition ? IncidenceType.COMPOSITION : IncidenceType.EDGE);
 		idMap.put(xmiId, inc);
 		inc.set_roleName(endName);
+	}
+
+	private void setMayBeNestedInInformation(EdgeClass ec, VertexClass vc) {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
