@@ -400,6 +400,12 @@ public class Rsa2Tg extends XmlProcessor {
 	private LocalGenericGraphMarker<Set<GraphElementClass>> nestedElements;
 
 	/**
+	 * Stores the information, if the CncidenceClass created out of a EdgeClass
+	 * is a composition.
+	 */
+	private LocalBooleanGraphMarker isCompositeIncidenceClasses;
+
+	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
 	 * 'from' end.
 	 */
@@ -708,6 +714,7 @@ public class Rsa2Tg extends XmlProcessor {
 		edgeStereotypedEdgeClasses = new HashSet<EdgeClass>();
 		isBinaryEdgeAlreadyConverted = new LocalBooleanGraphMarker(sg);
 		nestedElements = new LocalGenericGraphMarker<Set<GraphElementClass>>(sg);
+		isCompositeIncidenceClasses = new LocalBooleanGraphMarker(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
@@ -1229,13 +1236,16 @@ public class Rsa2Tg extends XmlProcessor {
 	private void deleteCompositionsWhichRepresentsNoBinaryEdgeClass() {
 		for (EdgeClass ec = sg.getFirstEdgeClass(true); ec != null; ec = ec
 				.getNextEdgeClass(true)) {
-			if (!isValidBinaryEdgeClassCandidate(ec)) {
+			boolean isBinaryEdgeClassCandidate = isValidBinaryEdgeClassCandidate(ec);
+			if (!isBinaryEdgeClassCandidate) {
 				for (Incidence i = ec
-						.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class); i != null; i = i
-						.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+						.getFirstIncidence(ConnectsToEdgeClass_connectedEdgeClass.class); i != null;) {
 					IncidenceClass incidenceClass = (IncidenceClass) i
 							.getThat();
-					if (incidenceClass.get_incidenceType() == IncidenceType.COMPOSITION) {
+					i = i.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class);
+					if (incidenceClass.get_incidenceType() == IncidenceType.COMPOSITION
+							|| isCompositeIncidenceClasses
+									.isMarked(incidenceClass)) {
 						// at this point a composition edge which ends at a
 						// EdgeClass was transformed into a IncidenceClass
 						deleteIncidenceClass(incidenceClass);
@@ -1286,8 +1296,6 @@ public class Rsa2Tg extends XmlProcessor {
 			assert !nestedElements.getMark(containingGEC).isEmpty();
 			for (GraphElementClass containedGEC : nestedElements
 					.getMark(containingGEC)) {
-				System.out.println(containedGEC.get_qualifiedName()
-						+ " sigma: " + containingGEC.get_qualifiedName());
 				sg.createMayBeNestedIn(containedGEC, containingGEC);
 			}
 		}
@@ -1725,6 +1733,11 @@ public class Rsa2Tg extends XmlProcessor {
 		newIncidenceClass
 				.set_roleName(Character.toLowerCase(roleName.charAt(0))
 						+ (roleName.length() > 1 ? roleName.substring(1) : ""));
+
+		if (atVertex.get_incidenceType() == IncidenceType.COMPOSITION
+				|| atEdge.get_incidenceType() == IncidenceType.COMPOSITION) {
+			isCompositeIncidenceClasses.mark(newIncidenceClass);
+		}
 
 		// set specializations
 		if (generalizations.isMarked(oldEdgeClass)) {
