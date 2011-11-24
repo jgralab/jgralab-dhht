@@ -82,9 +82,9 @@ import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
+import de.uni_koblenz.jgralab.schema.impl.GraphElementClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
-import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
 
 /**
  * Converts a GrumlSchema SchemaGraph into a Schema.
@@ -939,12 +939,14 @@ public class SchemaGraph2Schema {
 		for (Edge gEdge : gSchema.getGraph().getEdges(MayBeNestedIn.class)) {
 			MayBeNestedIn gMbni = (MayBeNestedIn) gEdge;
 
-			VertexClass gContainedVC = (VertexClass) gMbni.getAlpha();
-			VertexClass gContainingVC = (VertexClass) gMbni.getOmega();
+			GraphElementClass gContainedVC = (GraphElementClass) gMbni
+					.getAlpha();
+			GraphElementClass gContainingVC = (GraphElementClass) gMbni
+					.getOmega();
 
-			VertexClassImpl xContainedVC = (VertexClassImpl) xSchema
+			GraphElementClassImpl<?, ?> xContainedVC = (GraphElementClassImpl<?, ?>) xSchema
 					.getAttributedElementClass(gContainedVC.get_qualifiedName());
-			VertexClassImpl xContainingVC = (VertexClassImpl) xSchema
+			GraphElementClassImpl<?, ?> xContainingVC = (GraphElementClassImpl<?, ?>) xSchema
 					.getAttributedElementClass(gContainingVC
 							.get_qualifiedName());
 
