@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
@@ -71,6 +72,7 @@ import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtVertexClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn;
 import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Package;
 import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
@@ -82,6 +84,7 @@ import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
+import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
 
 /**
  * Converts a GrumlSchema SchemaGraph into a Schema.
@@ -215,6 +218,8 @@ public class SchemaGraph2Schema {
 			createAllGraphElementClasses();
 
 			linkSuperClasses();
+
+			setSigmaValues();
 
 			schema = this.xSchema;
 
@@ -927,6 +932,23 @@ public class SchemaGraph2Schema {
 		for (de.uni_koblenz.jgralab.schema.VertexClass superClass : superClasses) {
 			// Adds the superclass
 			vertexClass.addSuperClass(superClass);
+		}
+	}
+
+	private void setSigmaValues() {
+		for (Edge gEdge : gSchema.getGraph().getEdges(MayBeNestedIn.class)) {
+			MayBeNestedIn gMbni = (MayBeNestedIn) gEdge;
+
+			VertexClass gContainedVC = (VertexClass) gMbni.getAlpha();
+			VertexClass gContainingVC = (VertexClass) gMbni.getOmega();
+
+			VertexClassImpl xContainedVC = (VertexClassImpl) xSchema
+					.getAttributedElementClass(gContainedVC.get_qualifiedName());
+			VertexClassImpl xContainingVC = (VertexClassImpl) xSchema
+					.getAttributedElementClass(gContainingVC
+							.get_qualifiedName());
+
+			xContainedVC.addAllowedSigmaClass(xContainingVC);
 		}
 	}
 
