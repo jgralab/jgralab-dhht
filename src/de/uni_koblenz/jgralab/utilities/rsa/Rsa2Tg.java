@@ -1286,6 +1286,8 @@ public class Rsa2Tg extends XmlProcessor {
 			assert !nestedElements.getMark(containingGEC).isEmpty();
 			for (GraphElementClass containedGEC : nestedElements
 					.getMark(containingGEC)) {
+				System.out.println(containedGEC.get_qualifiedName()
+						+ " sigma: " + containingGEC.get_qualifiedName());
 				sg.createMayBeNestedIn(containedGEC, containingGEC);
 			}
 		}
@@ -1615,12 +1617,17 @@ public class Rsa2Tg extends XmlProcessor {
 					IncidenceClass incidenceClass = (IncidenceClass) (e
 							.getFirstIncidence() == i ? e.getLastIncidence()
 							.getVertex() : e.getFirstIncidence().getVertex());
-					convertToIncidenceClass(
-							(EdgeClass) ((BinaryEdge) incidenceClass
-									.getFirstIncidence(
-											ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
-									.getEdge()).getOmega(), i.getDirection(),
-							oldVertexClass, ec);
+					EdgeClass oldEdgeClass = (EdgeClass) ((BinaryEdge) incidenceClass
+							.getFirstIncidence(
+									ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
+							.getEdge()).getOmega();
+					if (!edgeStereotypedEdgeClasses.contains(oldEdgeClass)) {
+						// this is not a composition edge between two
+						// EdgeClasses. This could happen if the "oldEdgeClass"
+						// was already transformed into a EdgeClas
+						convertToIncidenceClass(oldEdgeClass, i.getDirection(),
+								oldVertexClass, ec);
+					}
 				} else {
 					setIncidentVertex(i, ec);
 				}
