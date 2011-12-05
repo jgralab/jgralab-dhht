@@ -15,7 +15,9 @@ public class BGStorageTest {
 
 	private long visitedEdges;
 
-	private boolean genericSearch = false;
+	private boolean genericSearch = true;
+	
+	private boolean useDistributedSearch = false;
 	
 	private void testGraph(Graph graph, Variant variant, boolean dfs) {
 		Vertex startVertex = graph.getFirstVertex();
@@ -36,8 +38,13 @@ public class BGStorageTest {
 			/* setting traversal context to view */
 			Graph view = graph.getView(2);
 			view.useAsTraversalContext();
+			break;
+		case TREELIKEDISTRIBUTED:
+		case CLIQUEDISTRIBUTED:
+			Graph partial = graph.getLocalPartialGraph();
+			partial.useAsTraversalContext();
 		}
-		if (variant == Variant.TREELIKEDISTRIBUTED) {
+		if (useDistributedSearch && ((variant == Variant.TREELIKEDISTRIBUTED) || (variant == Variant.CLIQUEDISTRIBUTED))) {
 			System.out.println("Performing distributed search");
 			if (genericSearch) {
 				MyCentralAlgorithm algo = new MyCentralAlgorithm(graph, dfs);
@@ -145,8 +152,8 @@ public class BGStorageTest {
 
 	private Graph createGraph(Variant variant, String[] hostnames) {
 		int[] factors = { 2, 3, 4, 5 };
-		int[] firstLayerFactorsTree = { 4, 4, 4, 4, 4 };
-		int firstLayerFactorClique = 2289;
+		int[] firstLayerFactorsTree = { 4, 4, 4, 4 };
+		int firstLayerFactorClique = (int) (2289 * 0.75);
 		int addEdges = 1500000;
 		int[] firstLayerFactorsClique = { firstLayerFactorClique,
 				firstLayerFactorClique, firstLayerFactorClique,
@@ -191,72 +198,47 @@ public class BGStorageTest {
 					firstLayerFactorsClique, addEdges, true, true)
 					.createGraph();
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
+			genericSearch = false;
 			if (!genericSearch) {
 				return new DistributedGraphGenerator(5, 2, factors,
-						firstLayerFactorsTree, 20, true, hostnames).createGraph();
+						firstLayerFactorsTree, 7, true, hostnames).createGraph();
 			} else {
-				return new SimpleDistributedGraphGenerator(9, 2, factors,
-						firstLayerFactorsTree, 20, true, hostnames).createGraph();
+				return new SimpleDistributedGraphGenerator(10, 2, factors,
+						firstLayerFactorsTree, 70000, true, hostnames).createGraph();
 			}
 			//
 
 		case CLIQUEDISTRIBUTED:
-			return new DistributedGraphGenerator(2, 3, factors,
-					firstLayerFactorsClique, addEdges, true, hostnames)
-					.createGraph();
+			genericSearch = true;
+			if (!genericSearch) {
+				return new DistributedGraphGenerator(4, 2, factors,
+						firstLayerFactorsClique, 70000, true, hostnames).createGraph();
+			} else {
+				return new SimpleDistributedGraphGenerator(4, 2, factors,
+						firstLayerFactorsClique, 70000, true, hostnames).createGraph();
+			}
 		}
 		return null;
 	}
 
 	public static void main(String[] args) {
 		BGStorageTest test = new BGStorageTest();
-		// Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE,
-		// Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKEDISK,
-		// Variant.CLIQUEDISK, Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
-		// Variant[] variants = {Variant.TREELIKEDISK, Variant.CLIQUEDISK,
-		// Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY};
 
-		// System.out.println("Running BGStorageTests");
-
-		int cycles = 7;
+		int cycles = 2;
 
 		boolean distributed = true;
 		
 
 
 		if (distributed) {
-			Variant[] distributedVariants = { Variant.TREELIKEDISTRIBUTED };
+			Variant[] distributedVariants = { Variant.TREELIKE };
 			String[] hosts = { "141.26.70.230", "helena.uni-koblenz.de" };
 			for (Variant variant : distributedVariants) {
 				test.iterateTest(1, variant, hosts);
 			}
 		} else {
-			Variant[] variants = { Variant.TREELIKE /*
-														 * , Variant.CLIQUEDISK,
-														 * Variant
-														 * .TREELIKEDISKHY,
-														 * Variant.CLIQUEDISKHY
-														 */};
-			// Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE,
-			// Variant.TREELIKEHY, Variant.CLIQUEHY};
-			// Variant[] variants = {Variant.TREELIKENESTED,
-			// Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW
-			// /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY,
-			// Variant.CLIQUEDISKHY */};
-			// Variant[] variants = {Variant.TREELIKENESTED,
-			// Variant.TREELIKEVIEW, Variant.CLIQUENESTED, Variant.CLIQUEVIEW
-			// /*, Variant.CLIQUEDISK, Variant.TREELIKEDISKHY,
-			// Variant.CLIQUEDISKHY */};
-			// Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE,
-			// Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED,
-			// Variant.CLIQUENESTED, Variant.TREELIKEVIEW, Variant.CLIQUEVIEW};
-			// //, Variant.TREELIKEVIEW, Variant.CLIQUENESTED,
-			// Variant.CLIQUEVIEW /*, Variant.CLIQUEDISK,
-			// Variant.TREELIKEDISKHY, Variant.CLIQUEDISKHY */};
-			// Variant[] variants = {Variant.TREELIKE, Variant.CLIQUE,
-			// Variant.TREELIKEHY, Variant.CLIQUEHY, Variant.TREELIKENESTED,
-			// Variant.CLIQUENESTED, Variant.TREELIKEVIEW, Variant.CLIQUEVIEW};
-
+			Variant[] variants = { Variant.CLIQUE}; 
+			
 			for (Variant variant : variants) {
 				// System.out.println("Iterating variant: " + variant);
 				test.iterateTest(cycles, variant, null);

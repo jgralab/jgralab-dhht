@@ -35,8 +35,8 @@ public class HypergraphSearchAlgorithmOptimized {
 		int eCount;
 		vCount = (int) graph.getVCount();
 		eCount = (int) graph.getECount();
-		parentVertexInc = new int[5][vCount + 1];
-		parentEdgeInc = new int[5][eCount + 1];
+		parentVertexInc = new int[3][vCount*2+1];
+		parentEdgeInc = new int[3][eCount*2 + 1];
 		num = 0;
 	}
 
@@ -63,7 +63,7 @@ public class HypergraphSearchAlgorithmOptimized {
 					parentEdgeInc[ePgId][currentEdge.getLocalId()] = curIncAtVertex
 							.getLocalId();
 					handleTreeIncidence(curIncAtVertex);
-					Direction opposite = Direction.BOTH; // curIncAtVertex.getDirection().getOppositeDirection();
+					Direction opposite = curIncAtVertex.getDirection().getOppositeDirection();
 					Incidence curIncAtEdge = currentEdge.getFirstIncidence();
 					while (curIncAtEdge != null) {
 						Vertex omega = curIncAtEdge.getVertex();

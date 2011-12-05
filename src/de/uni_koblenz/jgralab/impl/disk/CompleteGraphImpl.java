@@ -144,8 +144,10 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getLocalPartialGraph() {
+		int localGraphId = GraphDatabaseElementaryMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID;
+		long globalId = getGraphDatabase().convertToGlobalId(localGraphId);
 		return localGraphDatabase
-				.getGraphObject(GraphDatabaseElementaryMethods.TOPLEVEL_LOCAL_SUBGRAPH_ID);
+				.getGraphObject(globalId);
 	}
 
 	@SuppressWarnings("rawtypes")

@@ -191,8 +191,10 @@ public class GraphFactoryGenerator extends CodeGenerator {
 
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("recordName", schemaRootPackageName + "." + recordDomain.getQualifiedName());
-		code.setVariable("recordImplName", schemaRootPackageName + ".impl."	+ recordDomain.getQualifiedName());
-		code.add("setRecordImplementationClass(#recordName#.class, #recordImplName#Impl.class);");
+		code.setVariable("recordMemImplName", schemaRootPackageName + ".impl.mem."	+ recordDomain.getQualifiedName());
+		code.setVariable("recordDiskImplName", schemaRootPackageName + ".impl.disk." + recordDomain.getQualifiedName());
+		code.add("setRecordMemImplementationClass(#recordName#.class, #recordMemImplName#Impl.class);");
+		code.add("setRecordDiskImplementationClass(#recordName#.class, #recordDiskImplName#Impl.class);");
 		return code;
 	}
 

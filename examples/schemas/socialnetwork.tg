@@ -2,13 +2,13 @@ DHHTGraph 1;
 Schema de.uni_koblenz.jgralabexamples.socialnetworks.schema.SocialNetworkSchema;
 GraphClass SocialNetworkGraph;
 
-Record Data {day: Integer; month: Integer; Year: Integer};
-VertexClass Person {firstname : String; lastname: String; birthdate: Date};
+RecordDomain Date (day: Integer, month: Integer, year: Integer);
+VertexClass Person {firstname : String, lastname: String, birthdate: Date};
 VertexClass Group {name: String};
+//EdgeClass HasNember described membership of persons in groups
 EdgeClass HasMember from Group role group (1,1) (0,*) to Person role member (0,*) (0,*);
 EdgeClass FoundedBy from Group role foundedGroup (1,1) (1,1) to Person role founder (0,*) (1,*);
-abstract EdgeClass IsRelatedTo {creationDate : Date} from Person (1,1) (0,*) to Person (1,1) (0,*);
+abstract EdgeClass IsRelatedTo  from Person (1,1) (0,*) to Person (1,1) (0,*) {creationDate : Date};
 EdgeClass IsRelativeOf:IsRelatedTo from Person (1,1) (0,*) to Person (1,1) (0,*);
 EdgeClass IsFriendOf:IsRelatedTo from Person (1,1) (0,*) to Person (1,1) (0,*);
-
- 
+EdgeClass HasSubgroup from Group role parentGroup (1,1) (0,*) to Group role subgroup (0,*) (1,1) ;
