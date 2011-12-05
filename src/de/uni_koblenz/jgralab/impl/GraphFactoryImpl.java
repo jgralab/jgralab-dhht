@@ -42,7 +42,6 @@ import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.db.GraphImpl;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;

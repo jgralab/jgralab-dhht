@@ -316,7 +316,10 @@ public interface GraphFactory {
 	 * @param record
 	 * @param implementationClass
 	 */
-	public void setRecordImplementationClass(Class<? extends Record> record,
+	public void setRecordMemImplementationClass(Class<? extends Record> record,
+			Class<? extends Record> implementationClass);
+	
+	public void setRecordDiskImplementationClass(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
 
 	void setIncidenceProxyImplementationClass(
