@@ -123,6 +123,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerVertexMarker;
 import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.grumlschema.GrumlSchema;
@@ -1297,6 +1298,7 @@ public class Rsa2Tg extends XmlProcessor {
 		// stores the GraphElementClass which have nested elements but are not
 		// nested in another GraphElementClass
 		Queue<GraphElementClass> workingList = new LinkedList<GraphElementClass>();
+		Queue<GraphElementClass> topLevelNestingElements = new LinkedList<GraphElementClass>();
 
 		// stores which GraphElementClasses are nested
 		LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs = new LocalGenericGraphMarker<Set<GraphElementClass>>(
@@ -1314,10 +1316,12 @@ public class Rsa2Tg extends XmlProcessor {
 				storeNestingInformation(nestedGECs, containingGEC, containedGEC);
 				insertContainingGECIntoWorkingList(containingGEC, containedGEC,
 						workingList);
+				insertContainingGECIntoWorkingList(containingGEC, containedGEC,
+						topLevelNestingElements);
 			}
 		}
 
-		checkAcyclicityOfMayBeNestedIn();
+		checkAcyclicityOfMayBeNestedIn(topLevelNestingElements);
 
 		// check correctness of explicit modeled MayBeNestedIn edges and create
 		// implicit MayBeNestedIn edges during a breadth first search over the
@@ -1354,7 +1358,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
-		checkAcyclicityOfMayBeNestedIn();
+		checkAcyclicityOfMayBeNestedIn(topLevelNestingElements);
 		// TODO at work
 	}
 
@@ -1367,9 +1371,25 @@ public class Rsa2Tg extends XmlProcessor {
 		return nestingGECs;
 	}
 
-	private void checkAcyclicityOfMayBeNestedIn() {
-		// TODO Auto-generated method stub
+	private void checkAcyclicityOfMayBeNestedIn(
+			Queue<GraphElementClass> topLevelNestingElements) {
+		LocalIntegerVertexMarker number = new LocalIntegerVertexMarker(sg);
+		LocalIntegerVertexMarker rnumber = new LocalIntegerVertexMarker(sg);
+		int num = 0;
+		int rnum = 0;
 
+		Stack<GraphElementClass> stack = new Stack<GraphElementClass>();
+		for (GraphElementClass root : topLevelNestingElements) {
+			stack.push(root);
+			while (!stack.isEmpty()) {
+				GraphElementClass current = stack.pop();
+				number.mark(current, ++num);
+				for (MayBeNestedIn_nestingElement i : current
+						.getIncidences(MayBeNestedIn_nestingElement.class)) {
+					GraphElementClass child = (GraphElementClass) i.getThat();
+				}
+			}
+		}
 	}
 
 	private void checkNestingConstraints(GraphElementClass containingGEC,
@@ -1422,6 +1442,13 @@ public class Rsa2Tg extends XmlProcessor {
 		return false;
 	}
 
+	/**
+	 * @param containingGEC
+	 * @param containedGEC
+	 * @param workingList
+	 *            {@link Queue} which contains all elements which are nesting
+	 *            some element but are not nested in any element
+	 */
 	private void insertContainingGECIntoWorkingList(
 			GraphElementClass containingGEC, GraphElementClass containedGEC,
 			Queue<GraphElementClass> workingList) {
@@ -1444,21 +1471,33 @@ public class Rsa2Tg extends XmlProcessor {
 	private void storeNestingInformation(
 			LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs,
 			GraphElementClass containingGEC, GraphElementClass containedGEC) {
-		Set<GraphElementClass> nGEC = nestedGECs.getMark(containingGEC);
-		if (nGEC == null) {
-			nGEC = new HashSet<GraphElementClass>();
-			nestedGECs.mark(containingGEC, nGEC);
+		Set<GraphElementClass> nGECOfContainingGEC = nestedGECs
+				.getMark(containingGEC);
+		if (nGECOfContainingGEC == null) {
+			nGECOfContainingGEC = new HashSet<GraphElementClass>();
+			nestedGECs.mark(containingGEC, nGECOfContainingGEC);
 		}
-		nGEC.add(containedGEC);
+		Set<GraphElementClass> nGECOfContainedGEC = nestedGECs
+				.getMark(containedGEC);
+		if (nGECOfContainedGEC == null) {
+			nGECOfContainingGEC.add(containedGEC);
+		} else {
+			nGECOfContainingGEC.addAll(nGECOfContainedGEC);
+		}
+
+		if (VertexClass.class.isInstance(containingGEC)) {
+			for (MayBeNestedIn_nestedElement i : containingGEC
+					.getIncidences(MayBeNestedIn_nestedElement.class)) {
+				GraphElementClass subClass = (GraphElementClass) i.getThat();
+				storeNestingInformation(nestedGECs, subClass, containedGEC);
+			}
+		}
 
 		for (SpecializesTypedElementClass_superclass i : containingGEC
 				.getIncidences(SpecializesTypedElementClass_superclass.class)) {
 			GraphElementClass subClass = (GraphElementClass) i.getThat();
 			storeNestingInformation(nestedGECs, subClass, containedGEC);
 		}
-
-		// TODO Knoten A enthält Knoten B. B enhält C. Dann kann auch A C
-		// enthalten
 	}
 
 	/**
