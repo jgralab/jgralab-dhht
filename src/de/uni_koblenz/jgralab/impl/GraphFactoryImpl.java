@@ -87,7 +87,8 @@ public class GraphFactoryImpl implements GraphFactory {
 	protected HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>> vertexMapForProxies;
 	protected HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>> incidenceMapForProxies;
 
-	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMap;
+	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordMemMap;
+	protected HashMap<Class<? extends Record>, Constructor<? extends Record>> recordDiskMap;
 
 	/*
 	 * maps elements to their constructors needed to reload the element from the
@@ -140,7 +141,8 @@ public class GraphFactoryImpl implements GraphFactory {
 		edgeMapForDiskStorageReloading = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		vertexMapForDiskStorageReloading = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMapForDiskStorageReloading = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
-		recordMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
+		recordMemMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
+		recordDiskMap = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
 
 	public Graph createGraphInMemoryStorage(Class<? extends Graph> graphClass,
@@ -637,12 +639,27 @@ public class GraphFactoryImpl implements GraphFactory {
 		}
 	}
 
-	public void setRecordImplementationClass(Class<? extends Record> m1Class,
+	public void setRecordMemImplementationClass(Class<? extends Record> m1Class,
 			Class<? extends Record> implementationClass) {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordMap.put(m1Class,
+				recordMemMap.put(m1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new M1ClassAccessException(
+						"Unable to locate default constructor for record"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	public void setRecordDiskImplementationClass(Class<? extends Record> m1Class,
+			Class<? extends Record> implementationClass) {
+		if (isSuperclassOrEqual(m1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { Graph.class };
+				recordDiskMap.put(m1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new M1ClassAccessException(
@@ -655,8 +672,13 @@ public class GraphFactoryImpl implements GraphFactory {
 	@SuppressWarnings("unchecked")
 	public <T extends Record> T createRecord(Class<T> recordDomain, Graph g) {
 		try {
-			T r = (T) recordMap.get(recordDomain).newInstance(g);
-			return r;
+			if (g instanceof de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl) {
+				T r = (T) recordDiskMap.get(recordDomain).newInstance(g);
+				return r;
+			} else {
+				T r = (T) recordMemMap.get(recordDomain).newInstance(g);
+				return r;
+			}
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
 				throw new GraphException(ex.getCause().getLocalizedMessage(),

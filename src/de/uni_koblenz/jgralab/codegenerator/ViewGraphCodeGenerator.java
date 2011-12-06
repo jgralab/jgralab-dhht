@@ -173,16 +173,18 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		if (currentCycle.isMemOrDiskImpl()) {
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
+				addImports("#jgPackage#.GraphIO");
+				addImports("#jgPackage#.GraphIOException");
 			}
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
 				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\treturn getCompleteGraph().create#rname#(io);");
+				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(io);");
 				cs.add("}");
 				cs.add("");
 
 				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\treturn getCompleteGraph().create#rname#(fields);");
+				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(fields);");
 				cs.add("}");
 				cs.add("");
 
@@ -191,7 +193,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\treturn getCompleteGraph().create#rname#(#parawtypes#);");
+				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawtypes#);");
 				cs.add("}");
 				cs.add("");
 
@@ -205,7 +207,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		return code;
 	}
-
+	
 	/**
 	 * 
 	 * @param components

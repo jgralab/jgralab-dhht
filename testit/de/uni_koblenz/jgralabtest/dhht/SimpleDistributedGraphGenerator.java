@@ -72,12 +72,28 @@ public class SimpleDistributedGraphGenerator {
 		
 		//add some edges 
 		
-		for (int i=0; i<additionalEdgeCount; i++) {
+		for (int i=0; i<20; i++) {
 			SimpleEdge crosslinks = topGraph.createSimpleEdge();
 			long localVId = topGraph.getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex local = topGraph.getVertex(localVId);
 			long remoteVId = partialGraphs[2].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex remote = partialGraphs[2].getVertex(localVId);
+			if (i%2 == 0) {
+				e.connect(SimpleEdge_start.class, local);
+				e.connect(SimpleEdge_target.class, remote);
+			} else {
+				e.connect(SimpleEdge_start.class, remote);
+				e.connect(SimpleEdge_target.class, local);
+			}
+		}
+		
+		for (int i=0; i<additionalEdgeCount-2000; i++) {
+			int pg = i%2 + 1;
+			SimpleEdge crosslinks = topGraph.createSimpleEdge();
+			long localVId = partialGraphs[pg].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			Vertex local = partialGraphs[pg].getVertex(localVId);
+			long remoteVId = partialGraphs[pg].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			Vertex remote = partialGraphs[pg].getVertex(localVId);
 			if (i%2 == 0) {
 				e.connect(SimpleEdge_start.class, local);
 				e.connect(SimpleEdge_target.class, remote);
