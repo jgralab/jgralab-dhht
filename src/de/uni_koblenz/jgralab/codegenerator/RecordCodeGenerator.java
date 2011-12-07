@@ -275,6 +275,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 				getterCode.add("public abstract #type# #isOrGet#_#name#();");
 				break;
 			case MEMORYBASED:
+			case DISKBASED:
 				getterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));
@@ -309,6 +310,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 				setterCode.add("public abstract void #setter#;");
 				break;
 			case MEMORYBASED:
+			case DISKBASED:
 				setterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));

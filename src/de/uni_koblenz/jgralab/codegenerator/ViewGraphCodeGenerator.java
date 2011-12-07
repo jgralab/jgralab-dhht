@@ -152,6 +152,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				addImports("java.util.Map");
 				addImports("#jgPackage#.GraphIO");
 				addImports("#jgPackage#.GraphIOException");
+				addImports("#schemaPackage#.#simpleClassName#");
 			}
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
@@ -175,6 +176,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				addImports("java.util.Map");
 				addImports("#jgPackage#.GraphIO");
 				addImports("#jgPackage#.GraphIOException");
+				addImports("#schemaPackage#.#simpleClassName#");
 			}
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
@@ -193,7 +195,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawtypes#);");
+				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawotypes#);");
 				cs.add("}");
 				cs.add("");
 
