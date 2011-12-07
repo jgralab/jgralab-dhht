@@ -76,7 +76,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				System.out.println("Writing code to file " + implClassName);
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
-				System.out.println("Written‚ code to file " + implClassName);
+				System.out.println("Written code to file " + implClassName);
 			} 
 			currentCycle = getNextCycle();
 		}
@@ -138,6 +138,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				addImports("java.util.Map");
 				addImports("#jgPackage#.GraphIO");
 				addImports("#jgPackage#.GraphIOException");
+				addImports("#schemaPackage#.#simpleClassName#");
 			}
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
@@ -156,7 +157,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawtypes#);");
+				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawotypes#);");
 				cs.add("}");
 				cs.add("");
 
