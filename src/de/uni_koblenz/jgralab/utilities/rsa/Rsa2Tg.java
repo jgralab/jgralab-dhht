@@ -404,10 +404,10 @@ public class Rsa2Tg extends XmlProcessor {
 	private LocalGenericGraphMarker<Set<GraphElementClass>> nestedElements;
 
 	/**
-	 * Stores the information, if the CncidenceClass created out of a EdgeClass
-	 * is a composition.
+	 * Stores the information, if the IncidenceClass created out of a EdgeClass
+	 * is a nesting composition.
 	 */
-	private LocalBooleanGraphMarker isCompositeIncidenceClasses;
+	private LocalBooleanGraphMarker isNestingIncidenceOrEdgeClass;
 
 	/**
 	 * When creating {@link EdgeClass} names, also use the role name of the
@@ -718,7 +718,7 @@ public class Rsa2Tg extends XmlProcessor {
 		edgeStereotypedEdgeClasses = new HashSet<EdgeClass>();
 		isBinaryEdgeAlreadyConverted = new LocalBooleanGraphMarker(sg);
 		nestedElements = new LocalGenericGraphMarker<Set<GraphElementClass>>(sg);
-		isCompositeIncidenceClasses = new LocalBooleanGraphMarker(sg);
+		isNestingIncidenceOrEdgeClass = new LocalBooleanGraphMarker(sg);
 		ignoredPackages = new HashSet<Package>();
 		modelRootElementNestingDepth = 1;
 	}
@@ -1247,9 +1247,7 @@ public class Rsa2Tg extends XmlProcessor {
 					IncidenceClass incidenceClass = (IncidenceClass) i
 							.getThat();
 					i = i.getNextIncidenceAtVertex(ConnectsToEdgeClass_connectedEdgeClass.class);
-					if (incidenceClass.get_incidenceType() == IncidenceType.COMPOSITION
-							|| isCompositeIncidenceClasses
-									.isMarked(incidenceClass)) {
+					if (isNestingIncidenceOrEdgeClass.isMarked(incidenceClass)) {
 						// at this point a composition edge which ends at a
 						// EdgeClass was transformed into a IncidenceClass
 						deleteIncidenceClass(incidenceClass);
@@ -1294,30 +1292,17 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void createMayBeNestedIn() {
 		System.out.println("Create MayBeNestedIn relations ...");
+		updateNestedElements();
 
 		// stores the GraphElementClass which have nested elements but are not
 		// nested in another GraphElementClass
 		Queue<GraphElementClass> workingList = new LinkedList<GraphElementClass>();
 		Queue<GraphElementClass> topLevelNestingElements = new LinkedList<GraphElementClass>();
 
-		// // stores which GraphElementClasses are nested in the marked
-		// // GraphElementClass
-		// LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs = new
-		// LocalGenericGraphMarker<Set<GraphElementClass>>(
-		// sg);
-		//
-		// // stores which GraphElementClasses are nesting the
-		// // marked GraphElementClass
-		// LocalGenericGraphMarker<Set<GraphElementClass>> nestingGECs = new
-		// LocalGenericGraphMarker<Set<GraphElementClass>>(
-		// sg);
-
 		// all edges have to be treated
 		for (EdgeClass ec : sg.getEdgeClassVertices()) {
 			workingList.add(ec);
 			topLevelNestingElements.add(ec);
-			// nestedGECs.mark(ec, new HashSet<GraphElementClass>());
-			// nestingGECs.mark(ec, new HashSet<GraphElementClass>());
 		}
 
 		// create the explicitly modeled MayBeNestedIn edges
@@ -1329,11 +1314,6 @@ public class Rsa2Tg extends XmlProcessor {
 			for (GraphElementClass containedGEC : nestedElements
 					.getMark(containingGEC)) {
 				sg.createMayBeNestedIn(containedGEC, containingGEC);
-				// storeNestedInformation(nestedGECs, containingGEC,
-				// containedGEC);
-				// storeNestingInformation(nestingGECs, nestedGECs,
-				// containingGEC,
-				// containedGEC);
 				insertContainingGECIntoWorkingList(containingGEC, containedGEC,
 						workingList);
 				insertContainingGECIntoWorkingList(containingGEC, containedGEC,
@@ -1359,12 +1339,6 @@ public class Rsa2Tg extends XmlProcessor {
 					GraphElementClass containingGEC = (GraphElementClass) i
 							.getThat();
 					checkNestingConstraints(containedEC, containingGEC);
-					// ProcessingException pe = checkNestingConstraints(
-					// (GraphElementClass) i.getThat(), containedEC,
-					// nestedGECs);
-					// if (pe != null) {
-					// throw pe;
-					// }
 				}
 
 				// create implicit MayBeNestedIn edges
@@ -1374,21 +1348,6 @@ public class Rsa2Tg extends XmlProcessor {
 						topLevelNestingElements.remove(containedEC);
 					}
 				}
-
-				// for (GraphElementClass containingGEC : getAllNestingElements(
-				// containedEC, nestedGECs, nestingGECs)) {
-				// System.out.println("\timplicit edge from: '"
-				// + containedEC.get_qualifiedName() + "'->'"
-				// + containingGEC.get_qualifiedName());// TODO
-				// sg.createMayBeNestedIn(containedEC, containingGEC);
-				// if (topLevelNestingElements.contains(containedEC)) {
-				// topLevelNestingElements.remove(containedEC);
-				// }
-				// storeNestedInformation(nestedGECs, containingGEC,
-				// containedEC);
-				// storeNestingInformation(nestingGECs, nestedGECs,
-				// containingGEC, containedEC);
-				// }
 			}
 
 			// insert all nested GraphElementClasses into workingList
@@ -1404,8 +1363,64 @@ public class Rsa2Tg extends XmlProcessor {
 		// TODO at work
 	}
 
+	/**
+	 * If an EdgeClass ec is nested in {@link #nestedElements} and ec is a
+	 * BinaryEdgClass candidate which has not the stereotype nested, than ec
+	 * must be replaced by the incident VertexClass, which is not key in
+	 * {@link #nestedElements}.
+	 */
+	private void updateNestedElements() {
+		for (GraphElement<?, ?, ?> ge : nestedElements.getMarkedElements()) {
+			GraphElementClass key = (GraphElementClass) ge;
+
+			Set<GraphElementClass> toDelete = new HashSet<GraphElementClass>();
+			Set<GraphElementClass> toAdd = new HashSet<GraphElementClass>();
+			Set<GraphElementClass> values = nestedElements.getMark(key);
+			for (GraphElementClass value : values) {
+				if (EdgeClass.class.isInstance(value)
+						&& isValidBinaryEdgeClassCandidate((EdgeClass) value)) {
+
+					for (ConnectsToEdgeClass_connectedEdgeClass i : value
+							.getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+						if (!isNestingIncidenceOrEdgeClass
+								.isMarked(i.getThat())
+								&& VertexClass.class.isInstance(key)) {
+							VertexClass vc = getConnectedVertexClass((IncidenceClass) i
+									.getThat());
+							if (vc != key) {
+								toAdd.add(vc);
+								toDelete.add(value);
+							}
+						}
+					}
+				}
+			}
+
+			for (GraphElementClass del : toDelete) {
+				values.remove(del);
+			}
+
+			for (GraphElementClass add : toAdd) {
+				values.add(add);
+			}
+		}
+		// TODO delete this
+		printNestedElements(nestedElements);
+	}
+
 	private Set<GraphElementClass> getAllNestingElements(EdgeClass containedEC) {
 		Set<GraphElementClass> nestedGECs = new HashSet<GraphElementClass>();
+
+		Set<IncidenceClass> allIncidenceClasses = getAllIncidenceClasses(containedEC);
+
+		int numberOfIncidentVCs = allIncidenceClasses.size();
+		LocalGenericGraphMarker<Set<VertexClass>> nestedIncidentVertexClasses = new LocalGenericGraphMarker<Set<VertexClass>>(
+				sg);
+
+		for (IncidenceClass ic : allIncidenceClasses) {
+			VertexClass vc = getConnectedVertexClass(ic);
+		}
+
 		// TODO Auto-generated method stub
 		return nestedGECs;
 	}
@@ -1549,131 +1564,6 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
-	// private List<GraphElementClass> getAllNestingElements(
-	// EdgeClass containedEC,
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs,
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestingGECs) {
-	// List<GraphElementClass> nestingCandidates = new
-	// LinkedList<GraphElementClass>();
-	//
-	// LocalBitSetVertexMarker isContained = new LocalBitSetVertexMarker(sg);
-	//
-	// Set<IncidenceClass> allIncidenceClasses =
-	// getAllIncidenceClasses(containedEC);
-	// for (IncidenceClass ic : allIncidenceClasses) {
-	// VertexClass vc = getConnectedVertexClass(ic);
-	// // the incident VertexClass vc cannot contain containedEC
-	// // thus find an element gec which contains vc
-	// for (MayBeNestedIn_nestedElement i : vc
-	// .getIncidences(MayBeNestedIn_nestedElement.class)) {
-	// GraphElementClass gec = (GraphElementClass) i.getThat();
-	// // check if gec is a candidate
-	// ProcessingException pe = checkNestingConstraints(gec,
-	// containedEC, nestedGECs);
-	// if (pe == null && !isContained.isMarked(gec)
-	// && !allIncidenceClasses.contains(gec)) {
-	// nestingCandidates.add(gec);
-	// isContained.mark(gec);
-	// }
-	// if (nestingGECs.isMarked(gec)) {
-	// for (GraphElementClass g : nestingGECs.getMark(gec)) {
-	// // check all elements in which gec can be nested
-	// pe = null;
-	// pe = checkNestingConstraints(g, containedEC, nestedGECs);
-	// if (pe == null && !isContained.isMarked(g)
-	// && !allIncidenceClasses.contains(g)) {
-	// nestingCandidates.add(g);
-	// isContained.mark(g);
-	// }
-	// }
-	// }
-	// }
-	// }
-	//
-	// // nestingCandidates contains all candidates
-	//
-	// // remove all already existing nestedElements
-	// for (MayBeNestedIn_nestedElement i : containedEC
-	// .getIncidences(MayBeNestedIn_nestedElement.class)) {
-	// if (isContained.isMarked(i.getThat())) {
-	// nestingCandidates.remove(i.getThat());
-	// isContained.removeMark(i.getThat());
-	// }
-	// }
-	//
-	// // remove all B out of nestingCandidates which have a nested A which is
-	// // in nestingCandidates, too
-	// for (int i = 0; i < nestingCandidates.size(); i++) {
-	// Set<GraphElementClass> nestingClasses = nestingGECs
-	// .getMark(nestingCandidates.get(i));
-	// for (int j = i; j < nestingCandidates.size();) {
-	// GraphElementClass current = nestingCandidates.get(j);
-	// if (nestingClasses != null && nestingClasses.contains(current)) {
-	// nestingCandidates.remove(j);
-	// isContained.removeMark(current);
-	// } else {
-	// j++;
-	// }
-	// }
-	// }
-	//
-	// return nestingCandidates;
-	// }
-	//
-	// private ProcessingException checkNestingConstraints(
-	// GraphElementClass containingGEC, EdgeClass containedEC,
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs) {
-	// ProcessingException pe = null;
-	// if (VertexClass.class.isInstance(containingGEC)) {
-	// if (!containsAllIncidences(containedEC,
-	// nestedGECs.getMark(containingGEC))) {
-	// pe = new ProcessingException(
-	// getParser(),
-	// getFileName(),
-	// "The VertexClass '"
-	// + containingGEC.get_qualifiedName()
-	// + "' does not contain all incident VertexClasses of EdgeClass '"
-	// + containedEC.get_qualifiedName()
-	// + "'. That is why they cannot be nested.");
-	// }
-	// } else {
-	// if (!containesOneIncidence(containedEC,
-	// nestedGECs.getMark(containingGEC))) {
-	// pe = new ProcessingException(
-	// getParser(),
-	// getFileName(),
-	// "The EdgeClass '"
-	// + containingGEC.get_qualifiedName()
-	// + "' does not contain any incident VertexClasses of EdgeClass '"
-	// + containedEC.get_qualifiedName()
-	// + "'. That is why they cannot be nested.");
-	// }
-	// }
-	// return pe;
-	// }
-	//
-	// private boolean containsAllIncidences(EdgeClass containedEC,
-	// Set<GraphElementClass> mark) {
-	// for (IncidenceClass ic : getAllIncidenceClasses(containedEC)) {
-	// VertexClass connectedVertexClass = getConnectedVertexClass(ic);
-	// if (connectedVertexClass != null
-	// && !mark.contains(connectedVertexClass)) {
-	// return false;
-	// }
-	// }
-	// return true;
-	// }
-	//
-	// private boolean containesOneIncidence(EdgeClass containedEC,
-	// Set<GraphElementClass> mark) {
-	// for (IncidenceClass ic : getAllIncidenceClasses(containedEC)) {
-	// if (mark.contains(getConnectedVertexClass(ic))) {
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-
 	/**
 	 * @param containingGEC
 	 * @param containedGEC
@@ -1691,109 +1581,6 @@ public class Rsa2Tg extends XmlProcessor {
 			workingList.add(containingGEC);
 		}
 	}
-
-	// /**
-	// * Stores which elements <code>containingGEC</code> could containe.<br>
-	// * Adds <code>containedGEC</code> to the mark in <code>nestedGECs</code>
-	// of
-	// * <code>containingGEC</code> and all of its subclasses and all of its
-	// * elements in which it is nested.
-	// *
-	// * @param nestedGECs
-	// * @param containingGEC
-	// * @param containedGEC
-	// */
-	// private void storeNestedInformation(
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs,
-	// GraphElementClass containingGEC, GraphElementClass containedGEC) {
-	// Set<GraphElementClass> nGECOfContainingGEC = nestedGECs
-	// .getMark(containingGEC);
-	// if (nGECOfContainingGEC == null) {
-	// nGECOfContainingGEC = new HashSet<GraphElementClass>();
-	// nestedGECs.mark(containingGEC, nGECOfContainingGEC);
-	// }
-	// Set<GraphElementClass> nGECOfContainedGEC = nestedGECs
-	// .getMark(containedGEC);
-	// if (nGECOfContainedGEC == null
-	// || EdgeClass.class.isInstance(containedGEC)) {
-	// nGECOfContainingGEC.add(containedGEC);
-	// } else {
-	// nGECOfContainingGEC.addAll(nGECOfContainedGEC);
-	// }
-	//
-	// if (VertexClass.class.isInstance(containingGEC)) {
-	// for (MayBeNestedIn_nestedElement i : containingGEC
-	// .getIncidences(MayBeNestedIn_nestedElement.class)) {
-	// // all elements which nest the containing VertexClass, nest the
-	// // containedGEC too
-	// GraphElementClass nestingElement = (GraphElementClass) i
-	// .getThat();
-	// storeNestedInformation(nestedGECs, nestingElement, containedGEC);
-	// }
-	// }
-	//
-	// for (SpecializesTypedElementClass_superclass i : containingGEC
-	// .getIncidences(SpecializesTypedElementClass_superclass.class)) {
-	// // all subclasses of the containingGEC contain the containedGEC, too
-	// GraphElementClass subClass = (GraphElementClass) i.getThat();
-	// storeNestedInformation(nestedGECs, subClass, containedGEC);
-	// }
-	// }
-	//
-	// /**
-	// * Stores in which elements <code>containedGEC</code> could be
-	// contained.<br>
-	// * Adds <code>containingGEC</code> to the mark of
-	// <code>containedGEC</code>
-	// * in <code>nestingGECs</code> and all of its subclasses and all of its
-	// * elements in which it is nested.
-	// *
-	// * @param nestingGECs
-	// * @param containingGEC
-	// * @param containedGEC
-	// */
-	// private void storeNestingInformation(
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestingGECs,
-	// LocalGenericGraphMarker<Set<GraphElementClass>> nestedGECs,
-	// GraphElementClass containingGEC, GraphElementClass containedGEC) {
-	// // TODO bugfix
-	// Set<GraphElementClass> nGECOfContainedGEC = nestingGECs
-	// .getMark(containedGEC);
-	// if (nGECOfContainedGEC == null) {
-	// nGECOfContainedGEC = new HashSet<GraphElementClass>();
-	// nestingGECs.mark(containedGEC, nGECOfContainedGEC);
-	// }
-	// Set<GraphElementClass> nGECOfContainingGEC = nestingGECs
-	// .getMark(containingGEC);
-	// if (nGECOfContainingGEC == null) {
-	// nGECOfContainingGEC = new HashSet<GraphElementClass>();
-	// nestingGECs.mark(containingGEC, nGECOfContainingGEC);
-	// }
-	//
-	// if (nestedGECs.isMarked(containingGEC)
-	// && nestedGECs.getMark(containingGEC).contains(containedGEC)) {
-	// nGECOfContainedGEC.add(containingGEC);
-	// }
-	//
-	// if (VertexClass.class.isInstance(containingGEC)) {
-	// for (MayBeNestedIn_nestedElement i : containingGEC
-	// .getIncidences(MayBeNestedIn_nestedElement.class)) {
-	// // if contained GEC is nested in containing VertexClass then it
-	// // could be nested in all GECs which contain the containing
-	// // VertexClass
-	// storeNestingInformation(nestingGECs, nestedGECs,
-	// (GraphElementClass) i.getThat(), containedGEC);
-	// }
-	// }
-	//
-	// for (SpecializesTypedElementClass_superclass i : containingGEC
-	// .getIncidences(SpecializesTypedElementClass_superclass.class)) {
-	// // if contained GEC is nested in containing GEC then it could be
-	// // nested in all subclasses of containing GEC,too
-	// storeNestingInformation(nestingGECs, nestedGECs,
-	// (GraphElementClass) i.getThat(), containedGEC);
-	// }
-	// }
 
 	/**
 	 * Converts all EdgeClasses which have exactly 2 connected IncidenceClasses
@@ -1909,7 +1696,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 			if ((firstIC.get_incidenceType() != IncidenceType.EDGE && (lastIC
 					.get_incidenceType() != IncidenceType.EDGE))
-					|| (isCompositeIncidenceClasses.isMarked(firstIC) && isCompositeIncidenceClasses
+					|| (isNestingIncidenceOrEdgeClass.isMarked(firstIC) || isNestingIncidenceOrEdgeClass
 							.isMarked(lastIC))) {
 				return false;
 			}
@@ -2234,9 +2021,9 @@ public class Rsa2Tg extends XmlProcessor {
 				.set_roleName(Character.toLowerCase(roleName.charAt(0))
 						+ (roleName.length() > 1 ? roleName.substring(1) : ""));
 
-		if (atVertex.get_incidenceType() == IncidenceType.COMPOSITION
-				|| atEdge.get_incidenceType() == IncidenceType.COMPOSITION) {
-			isCompositeIncidenceClasses.mark(newIncidenceClass);
+		if (isNestingIncidenceOrEdgeClass.isMarked(oldEdgeClass)) {
+			isNestingIncidenceOrEdgeClass.mark(newIncidenceClass);
+			isNestingIncidenceOrEdgeClass.removeMark(oldEdgeClass);
 		}
 
 		// set specializations
@@ -4212,17 +3999,27 @@ public class Rsa2Tg extends XmlProcessor {
 	}
 
 	/**
-	 * Handles the stereotypes '<<graphclass>>', '<<record>>' and '<<abstract>>'
-	 * by taking the appropriate action for every stereotype.
+	 * Handles the stereotypes '&lt;&lt;graphclass&gt;&gt;',
+	 * '&lt;&lt;record&gt;&gt;', '&lt;&lt;edge&gt;&gt;',
+	 * '&lt;&lt;nested&gt;&gt;' and '&lt;&lt;abstract&gt;&gt;' by taking the
+	 * appropriate action for every stereotype.
 	 * 
-	 * '<<graphclass>>': The GraphClass will get the qualified name and all edge
-	 * of the stereotyped class. The stereotyped class will be deleted.
-	 * 
-	 * '<<record>>': A RecordDomain will be created and the qualified name and
-	 * all attributes will be transfered to it. The stereotyped class will be
+	 * '&lt;&lt;graphclass&gt;&gt;': The GraphClass will get the qualified name
+	 * and all edge of the stereotyped class. The stereotyped class will be
 	 * deleted.
 	 * 
-	 * '<<abstract>>': The stereotype will be set to abstract.
+	 * '&lt;&lt;record&gt;&gt;': A RecordDomain will be created and the
+	 * qualified name and all attributes will be transfered to it. The
+	 * stereotyped class will be deleted.
+	 * 
+	 * '&lt;&lt;edge&gt;&gt;': An EdgeClass will be created out of a VertexClass
+	 * marked with this stereotype. The marked VertexClass will be deleted.
+	 * 
+	 * '&lt;&lt;abstract&gt;&gt;': The stereotype will be set to abstract.
+	 * 
+	 * '&lt;&lt;nested&gt;&gt;': An Association with this stereotype will be
+	 * tranformed into a MayBeNestedIn edge. The stereotyped EdgeClass will be
+	 * deleted.
 	 * 
 	 * @throws XMLStreamException
 	 */
@@ -4338,6 +4135,16 @@ public class Rsa2Tg extends XmlProcessor {
 		} else if (key.equals("edge")) {
 			edgeStereotypedVertexClasses.add((VertexClass) currentClass);
 		} else if (key.equals("abstract edge")) {
+			edgeStereotypedVertexClasses.add((VertexClass) currentClass);
+			setCurrentClassToAbstract();
+		} else if (key.equals("nested")) {
+			isNestingIncidenceOrEdgeClass.mark(currentClass);
+		} else if (key.equals("nested edge")) {
+			isNestingIncidenceOrEdgeClass.mark(currentClass);
+			edgeStereotypedVertexClasses.add((VertexClass) currentClass);
+		} else if (key.equals("nested abstract edge")
+				|| key.equals("abstract nested edge")) {
+			isNestingIncidenceOrEdgeClass.mark(currentClass);
 			edgeStereotypedVertexClasses.add((VertexClass) currentClass);
 			setCurrentClassToAbstract();
 		} else {
@@ -4739,15 +4546,13 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void setMayBeNestedInInformation(IncidenceClass inc,
 			boolean isIncidenceTypeSetAtTheWrongIncidenceClass) {
+
+		EdgeClass compositionEC = getConnectedEdgeClass(inc);
+
 		if (!isIncidenceTypeSetAtTheWrongIncidenceClass) {
 			boolean isComposition = false;
 			VertexClass containingVC = null;
 			VertexClass containedVC = null;
-
-			EdgeClass compositionEC = (EdgeClass) inc
-					.getFirstIncidence(
-							ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
-					.getThat();
 			for (Incidence i : compositionEC
 					.getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
 				IncidenceClass ic = (IncidenceClass) i.getThat();
@@ -4755,17 +4560,11 @@ public class Rsa2Tg extends XmlProcessor {
 					// this end of the edge has the composition attribute
 					isComposition = true;
 					assert containedVC == null;
-					containedVC = (VertexClass) ic
-							.getFirstIncidence(
-									ConnectsToVertexClass_connectsToVertexClass_ComesFrom_IncidenceClass.class)
-							.getThat();
+					containedVC = getConnectedVertexClass(ic);
 				} else {
 					// this end of the edge has no composition attribute
 					assert !isComposition || containingVC == null;
-					containingVC = (VertexClass) ic
-							.getFirstIncidence(
-									ConnectsToVertexClass_connectsToVertexClass_ComesFrom_IncidenceClass.class)
-							.getThat();
+					containingVC = getConnectedVertexClass(ic);
 				}
 			}
 
@@ -4781,8 +4580,6 @@ public class Rsa2Tg extends XmlProcessor {
 				}
 			}
 		}
-		// TODO delete this
-		printNestedElements(nestedElements);
 	}
 
 	// TODO delete this method
