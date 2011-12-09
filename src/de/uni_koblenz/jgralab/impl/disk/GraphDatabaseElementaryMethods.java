@@ -20,6 +20,8 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public abstract class GraphDatabaseElementaryMethods implements
@@ -499,7 +501,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
-			g = graphFactory.createGraphDiskBasedStorage(
+			g = graphFactory.createGraph_DiskBasedStorage(
 					getGraphType(globalSubgraphId), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);
 			subgraphObjects.put(globalSubgraphId, new SoftReference<Graph>(g));
@@ -571,7 +573,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Edge> ec = getEdgeType(id);
-			proxy = graphFactory.createEdgeProxy(ec, id,
+			proxy = graphFactory.createEdgeProxy_DiskBasedStorage(ec, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Edge>(proxy);
 			remoteEdges.put(id, ref);
@@ -599,7 +601,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Incidence> vc = getIncidenceType(id);
-			proxy = graphFactory.createIncidenceProxy(vc, id,
+			proxy = graphFactory.createIncidenceProxy_DiskBasedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Incidence>(proxy);
 			remoteIncidences.put(id, ref);

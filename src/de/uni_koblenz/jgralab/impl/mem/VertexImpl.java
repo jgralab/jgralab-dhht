@@ -145,7 +145,7 @@ public abstract class VertexImpl extends
 	public Graph getSubordinateGraph() {
 		if (subOrdinateGraph == null) {
 			subOrdinateGraph = getLocalGraph().getGraphFactory()
-					.createSubordinateGraph(this);
+					.createSubordinateGraphInVertex_InMemoryStorage(this);
 		}
 		return subOrdinateGraph;
 	}
@@ -1284,7 +1284,7 @@ public abstract class VertexImpl extends
 
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, int id) {
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+		return getSchema().getGraphFactory().createIncidence_InMemoryStorage(incidenceClass,
 				id, this, elemToConnect);
 	}
 

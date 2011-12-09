@@ -589,7 +589,7 @@ public abstract class VertexImpl extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			Graph subordinateGraph = localGraphDatabase.getGraphFactory()
-					.createSubordinateGraph(this);
+					.createSubordinateGraphInVertex_InMemoryStorage(this);
 			subordinateGraphId = subordinateGraph.getGlobalId();
 			return subordinateGraph;
 		} else {

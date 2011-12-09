@@ -9,6 +9,8 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements

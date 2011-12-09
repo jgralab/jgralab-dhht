@@ -199,7 +199,7 @@ public abstract class ViewGraphImpl implements Graph,
 		if (level < lowestVisibleKappaLevel) {
 			level = lowestVisibleKappaLevel;
 		}
-		return ((GraphBaseImpl) viewedGraph).getGraphFactory().createViewGraph(
+		return ((GraphBaseImpl) viewedGraph).getGraphFactory().createViewGraph_InMemoryStorage(
 				this, level);
 	}
 	

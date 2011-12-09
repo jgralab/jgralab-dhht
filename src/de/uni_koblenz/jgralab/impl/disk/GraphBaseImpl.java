@@ -56,6 +56,7 @@ import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -273,7 +274,7 @@ public abstract class GraphBaseImpl implements Graph {
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
 		try {
-			return (T) getGraphFactory().createVertex(cls, 0, this);
+			return (T) getGraphFactory().createVertex_InMemoryStorage(cls, 0, this);
 		} catch (Exception ex) {
 			if (ex instanceof GraphException) {
 				throw (GraphException) ex;

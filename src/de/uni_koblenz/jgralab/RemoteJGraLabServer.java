@@ -4,8 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 
 public interface RemoteJGraLabServer extends Remote {
 

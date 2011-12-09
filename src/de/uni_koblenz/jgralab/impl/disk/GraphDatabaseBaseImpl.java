@@ -23,6 +23,8 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -306,7 +308,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema
 				.getM1ClassForId(m1ClassId);
-		VertexImpl v = (VertexImpl) graphFactory.createVertexDiskBasedStorage(
+		VertexImpl v = (VertexImpl) graphFactory.createVertex_DiskBasedStorage(
 				m1Class, vertexId, this);
 		localDiskStorage.storeVertex(v);
 
@@ -690,7 +692,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Edge> m1Class = (Class<? extends Edge>) schema
 				.getM1ClassForId(m1ClassId);
-		EdgeImpl e = (EdgeImpl) graphFactory.createEdgeDiskBasedStorage(
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_DiskBasedStorage(
 				m1Class, edgeId, this);
 		localDiskStorage.storeEdge(e);
 
@@ -1111,7 +1113,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		// call graph factory to create object
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
-				.createIncidenceDiskBasedStorage(m1Class, incId, vertexId,
+				.createIncidence_DiskBasedStorage(m1Class, incId, vertexId,
 						edgeId, this);
 
 		// append created incidence to lambda sequences of vertex and edge
@@ -1795,7 +1797,7 @@ public abstract class GraphDatabaseBaseImpl extends
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass,
+		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
 				getGraphObject(convertToGlobalId(1)));
 		try {
 			record.readComponentValues(io);
@@ -1808,7 +1810,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		T record = graphFactory.createRecord(recordClass,
+		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
 				getGraphObject(convertToGlobalId(1)));
 		record.setComponentValues(components);
 		return record;
@@ -1842,7 +1844,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	public Graph createViewGraph(Graph g, int kappa) {
-		return graphFactory.createViewGraphDiskBasedStorage(g, kappa);
+		return graphFactory.createViewGraph_DiskBasedStorage(g, kappa);
 	}
 
 	public Graph loadRemotePartialGraph(String hostname, int id) {

@@ -237,7 +237,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public Graph getView(int kappa) {
-		return graphFactory.createViewGraph(this, kappa);
+		return graphFactory.createViewGraph_InMemoryStorage(this, kappa);
 	}
 
 	@Override
@@ -1614,7 +1614,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
 		try {
 			record.readComponentValues(io);
 		} catch (GraphIOException e) {
@@ -1626,7 +1626,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
 		record.setComponentValues(fields);
 		return record;
 	}
@@ -1634,7 +1634,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
-		T record = graphFactory.createRecord(recordClass, this);
+		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
 		record.setComponentValues(components);
 		return record;
 	}

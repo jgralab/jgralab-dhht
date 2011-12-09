@@ -45,7 +45,7 @@ import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
  */
 public class GreqlSerializationTest {
 	static {
-		Greql2Schema.instance().getGraphFactory().setGraphInMemoryImplementationClass(
+		Greql2Schema.instance().getGraphFactory().setGraphImplementationClass_InMemoryStorage(
 				Greql2.class, SerializableGreql2Impl.class);
 
 		Greql2FunctionLibrary.instance().registerUserDefinedFunction(

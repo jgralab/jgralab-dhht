@@ -1,8 +1,10 @@
-package de.uni_koblenz.jgralab.impl.disk;
+package de.uni_koblenz.jgralab.impl;
 
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
+import de.uni_koblenz.jgralab.impl.disk.RemoteDiskStorageAccess;
 
 
 /**

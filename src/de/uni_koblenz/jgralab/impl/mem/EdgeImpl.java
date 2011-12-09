@@ -149,7 +149,7 @@ public abstract class EdgeImpl extends
 
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect, int id) {
-		return getSchema().getGraphFactory().createIncidence(incidenceClass,
+		return getSchema().getGraphFactory().createIncidence_InMemoryStorage(incidenceClass,
 				id, elemToConnect, this);
 	}
 
@@ -835,7 +835,7 @@ public abstract class EdgeImpl extends
 	public final Graph getSubordinateGraph() {
 		if (subOrdinateGraph == null) {
 			subOrdinateGraph = getLocalGraph().getGraphFactory()
-					.createSubordinateGraph(this);
+					.createSubordinateGraphInEdge_InMemoryStorage(this);
 		}
 		return subOrdinateGraph;
 	}

@@ -51,6 +51,7 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -184,7 +185,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	@Override
 	public Graph getView(int kappa) {
 		return localGraphDatabase.getGraphFactory()
-				.createViewGraph(this, kappa);
+				.createViewGraph_InMemoryStorage(this, kappa);
 	}
 
 	@Override
