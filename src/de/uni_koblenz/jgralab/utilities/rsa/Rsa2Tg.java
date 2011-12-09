@@ -1348,6 +1348,7 @@ public class Rsa2Tg extends XmlProcessor {
 						checkNestingConstraints(containedEC, containingGEC);
 					}
 				}
+				// TODO testHierarchie2 must cause an exception but it does not
 
 				// create implicit MayBeNestedIn edges
 				for (GraphElementClass containingGEC : getAllNestingElements(containedEC)) {
@@ -1432,66 +1433,16 @@ public class Rsa2Tg extends XmlProcessor {
 
 		LocalGenericGraphMarker<Set<GraphElementClass>> nestedIncidentVertexClasses = new LocalGenericGraphMarker<Set<GraphElementClass>>(
 				sg);
-
-		// used to find least common ancestor
-		LocalGenericGraphMarker<Set<GraphElementClass>> parent = new LocalGenericGraphMarker<Set<GraphElementClass>>(
+		LocalGenericGraphMarker<Set<Edge>> edgesInPath = new LocalGenericGraphMarker<Set<Edge>>(
 				sg);
-		LocalGenericGraphMarker<Set<GraphElementClass>> child = new LocalGenericGraphMarker<Set<GraphElementClass>>(
-				sg);
-		LocalBooleanGraphMarker roots = new LocalBooleanGraphMarker(sg);
 
 		// depth first search started at each incident VertexClass
 		for (IncidenceClass ic : getAllIncidenceClasses(containedEC)) {
 			VertexClass vc = getConnectedVertexClass(ic);
 			if (!incidentVertexClasses.contains(vc)) {
-				roots.mark(vc);
 				markAllNestingGraphElementClasses(nestedIncidentVertexClasses,
-						vc, parent, child, roots);
+						vc, edgesInPath);
 				incidentVertexClasses.add(vc);
-			}
-		}
-
-		// set numbers via inverted DepthFirstSearch
-		LocalIntegerVertexMarker number = new LocalIntegerVertexMarker(sg);
-		int num = 1;
-
-		for (GraphElement<?, ?, ?> root : roots.getMarkedElements()) {
-			num = setNumber((GraphElementClass) root, number, num, child);
-		}
-
-		System.out.println("\n" + containedEC.get_qualifiedName());
-		System.out.println("parent:");
-		prettyPrint(parent);
-		System.out.println("child:");
-		prettyPrint(child);
-		System.out.println("roots:");
-		prettyPrint(roots);
-		prettyPrint(number);// TODO delete
-
-		// add the least common ancestors of all incident VertexClasses
-		Set<GraphElementClass> prev = new HashSet<GraphElementClass>();
-		for (VertexClass vc : incidentVertexClasses) {
-			if (prev.isEmpty()) {
-				prev.add(vc);
-			} else {
-				prev = findLeastCommonNotIncidentAncestorsWhichContainAllIncidences(
-						prev, vc, parent, number, incidentVertexClasses,
-						nestedIncidentVertexClasses);
-				HashSet<GraphElementClass> toDelete = new HashSet<GraphElementClass>();
-				for (GraphElementClass gec : prev) {
-					// add all least common ancestors to nestedGECs
-					if (gec != containedEC
-							&& nestedIncidentVertexClasses.getMark(gec).size() == incidentVertexClasses
-									.size()) {
-						nestedGECs.add(gec);
-						toDelete.add(gec);
-					}
-				}
-				prev.removeAll(toDelete);
-				if (prev.isEmpty()) {
-					// there does not exist a least common ancestor
-					break;
-				}
 			}
 		}
 
@@ -1503,8 +1454,48 @@ public class Rsa2Tg extends XmlProcessor {
 				if (ge != containedEC) {
 					nestedGECs.add((EdgeClass) ge);
 				}
+			} else {
+				if (nestedIncidentVertexClasses.getMark(ge).size() == incidentVertexClasses
+						.size()) {
+					// ge must nest all incident VertetexClasses of containedEC
+					nestedGECs.add((VertexClass) ge);
+				}
 			}
 		}
+		System.out.println("\n" + containedEC.get_qualifiedName());
+		prettyPrint2(edgesInPath);// TODO
+
+		Set<GraphElementClass> toDelete = new HashSet<GraphElementClass>();
+		for (int i = 0; i < nestedGECs.size(); i++) {
+			GraphElementClass currentI = nestedGECs.get(i);
+			Set<Edge> edgesOfI = edgesInPath.getMark(currentI);
+			for (int j = 0; j < nestedGECs.size(); j++) {
+				if (j == i) {
+					continue;
+				}
+				GraphElementClass currentJ = nestedGECs.get(j);
+				Set<Edge> edgesOfJ = edgesInPath.getMark(currentJ);
+				prettyPrint(currentJ, edgesOfJ);
+				prettyPrint(currentI, edgesOfI);
+				System.out.println(currentI.get_qualifiedName()
+						+ " is subset of " + currentJ.get_qualifiedName()
+						+ " = " + edgesOfJ.containsAll(edgesOfI));
+				System.out
+						.println("exists a path to "
+								+ currentJ.get_qualifiedName()
+								+ " = "
+								+ existsAPath(incidentVertexClasses, currentJ,
+										edgesOfI));
+				if (edgesOfJ.containsAll(edgesOfI)
+						&& !existsAPath(incidentVertexClasses, currentJ,
+								edgesOfI)) {
+					System.out.println(currentJ.get_qualifiedName()
+							+ " deleted");
+					toDelete.add(currentJ);
+				}
+			}
+		}
+		nestedGECs.removeAll(toDelete);
 
 		System.out.println("nested GECs:");
 		prettyPrint(nestedGECs);// TODO
@@ -1523,6 +1514,81 @@ public class Rsa2Tg extends XmlProcessor {
 		// nestedGECs.removeAll(toDelete);
 
 		return nestedGECs;
+	}
+
+	private void prettyPrint2(LocalGenericGraphMarker<Set<Edge>> edgesInPath) {
+		System.out.println("stored edges:");
+		for (GraphElement<?, ?, ?> ge : edgesInPath.getMarkedElements()) {
+			GraphElementClass gec = (GraphElementClass) ge;
+			Set<Edge> mark = edgesInPath.getMark(gec);
+			System.out.print("\t");
+			prettyPrint(gec, mark);
+		}
+	}
+
+	private void prettyPrint(GraphElementClass gec, Set<Edge> mark) {
+		System.out.print(gec.get_qualifiedName() + "=");
+		prettyPrint(mark);
+	}
+
+	private void prettyPrint(Set<Edge> mark) {
+		System.out.print("{");
+		String delim = "";
+		for (Edge e : mark) {
+			System.out.print(delim + e);
+			delim = ", ";
+		}
+		System.out.print("}\n");
+	}
+
+	private boolean existsAPath(Set<VertexClass> starts,
+			GraphElementClass target, Set<Edge> forbiddenEdges) {
+		for (VertexClass start : starts) {
+			if (existsAPath(start, target, forbiddenEdges)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean existsAPath(VertexClass start, GraphElementClass target,
+			Set<Edge> forbiddenEdges) {
+		if (start == target) {
+			return true;
+		}
+
+		// if incidentVertexClass could be nested in gec, it could be nested in
+		// all subclasses of gec, too
+		for (SpecializesTypedElementClass_superclass i : start
+				.getIncidences(SpecializesTypedElementClass_superclass.class)) {
+			if (!forbiddenEdges.contains(i.getEdge())) {
+				if (existsAPath((VertexClass) i.getThat(), target,
+						forbiddenEdges)) {
+					return true;
+				}
+			}
+		}
+
+		// if incidentVertexClass could be nested in gec, it could be nested in
+		// all nesting GraphElementClasses of gec, too
+		for (MayBeNestedIn_nestedElement i : start
+				.getIncidences(MayBeNestedIn_nestedElement.class)) {
+			if (!forbiddenEdges.contains(i.getEdge())) {
+				if (VertexClass.class.isInstance(i.getThat())) {
+					if (existsAPath((VertexClass) i.getThat(), target,
+							forbiddenEdges)) {
+						return true;
+					}
+				} else {
+					// EdgeClasses do not propagate the nesting information to
+					// its nesting elements
+					if (i.getThat() == target) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	private int setNumber(GraphElementClass root,
@@ -1699,57 +1765,75 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void markAllNestingGraphElementClasses(
 			LocalGenericGraphMarker<Set<GraphElementClass>> nestedIncidentVertexClasses,
-			VertexClass vc,
-			LocalGenericGraphMarker<Set<GraphElementClass>> parent,
-			LocalGenericGraphMarker<Set<GraphElementClass>> child,
-			LocalBooleanGraphMarker roots) {
+			VertexClass vc, LocalGenericGraphMarker<Set<Edge>> edgesInPath) {
 
 		// mark all gec in which vc could be nested directly
 		for (MayBeNestedIn_nestedElement i : vc
 				.getIncidences(MayBeNestedIn_nestedElement.class)) {
-			roots.removeMark(vc);
-			markNestingGEC(nestedIncidentVertexClasses, vc, i, parent, child,
-					roots);
+
+			Set<Edge> currentEdges = edgesInPath.getMark(i.getThat());
+			if (currentEdges == null) {
+				currentEdges = new HashSet<Edge>();
+				edgesInPath.mark(i.getThat(), currentEdges);
+			}
+			if (edgesInPath.isMarked(i.getThis())) {
+				currentEdges.addAll(edgesInPath.getMark(i.getThis()));
+			}
+			currentEdges.add(i.getEdge());
+
+			markNestingGEC(nestedIncidentVertexClasses, vc, i, edgesInPath);
 		}
 		// mark all gec in which a superclass of vc could be nested
 		// directly
 		markAllNestingSuperClassesOfGraphElementClass(vc,
-				nestedIncidentVertexClasses, vc, parent, child, roots);
+				nestedIncidentVertexClasses, vc, edgesInPath);
 	}
 
 	private void markAllNestingSuperClassesOfGraphElementClass(
 			GraphElementClass gec,
 			LocalGenericGraphMarker<Set<GraphElementClass>> nestedIncidentVertexClasses,
-			VertexClass vc,
-			LocalGenericGraphMarker<Set<GraphElementClass>> parent,
-			LocalGenericGraphMarker<Set<GraphElementClass>> child,
-			LocalBooleanGraphMarker roots) {
+			VertexClass vc, LocalGenericGraphMarker<Set<Edge>> edgesInPath) {
 		for (SpecializesTypedElementClass_subclass subI : gec
 				.getIncidences(SpecializesTypedElementClass_subclass.class)) {
-			roots.removeMark(gec);
-			roots.mark(subI.getThat());
+
+			Set<Edge> currentEdges = edgesInPath.getMark(subI.getThat());
+			if (currentEdges == null) {
+				currentEdges = new HashSet<Edge>();
+				edgesInPath.mark(subI.getThat(), currentEdges);
+			}
+			if (edgesInPath.isMarked(subI.getThis())) {
+				currentEdges.addAll(edgesInPath.getMark(subI.getThis()));
+			}
+			currentEdges.add(subI.getEdge());
+
 			for (MayBeNestedIn_nestedElement i : subI.getThat().getIncidences(
 					MayBeNestedIn_nestedElement.class)) {
-				roots.removeMark(subI.getThat());
-				markNestingGEC(nestedIncidentVertexClasses, vc, i, parent,
-						child, roots);
+
+				currentEdges = edgesInPath.getMark(i.getThat());
+				if (currentEdges == null) {
+					currentEdges = new HashSet<Edge>();
+					edgesInPath.mark(i.getThat(), currentEdges);
+				}
+				if (edgesInPath.isMarked(i.getThis())) {
+					currentEdges.addAll(edgesInPath.getMark(i.getThis()));
+				}
+				currentEdges.add(i.getEdge());
+
+				markNestingGEC(nestedIncidentVertexClasses, vc, i, edgesInPath);
 			}
 			markAllNestingSuperClassesOfGraphElementClass(
 					(GraphElementClass) subI.getThat(),
-					nestedIncidentVertexClasses, vc, parent, child, roots);
+					nestedIncidentVertexClasses, vc, edgesInPath);
 		}
 	}
 
 	private void markNestingGEC(
 			LocalGenericGraphMarker<Set<GraphElementClass>> nestedIncidentVertexClasses,
 			VertexClass vc, MayBeNestedIn_nestedElement i,
-			LocalGenericGraphMarker<Set<GraphElementClass>> parent,
-			LocalGenericGraphMarker<Set<GraphElementClass>> child,
-			LocalBooleanGraphMarker roots) {
-		roots.mark(i.getThat());
+			LocalGenericGraphMarker<Set<Edge>> edgesInPath) {
 		if (VertexClass.class.isInstance(i.getThat())) {
 			markAllNestingGraphElementClasses((GraphElementClass) i.getThat(),
-					vc, nestedIncidentVertexClasses, parent, vc, child, roots);
+					vc, nestedIncidentVertexClasses, edgesInPath);
 		} else {
 			// EdgeClasses do not propagate the nesting information to
 			// its nesting elements
@@ -1760,20 +1844,6 @@ public class Rsa2Tg extends XmlProcessor {
 				nestedIncidentVertexClasses.mark(i.getThat(), incidentVCs);
 			}
 			incidentVCs.add(vc);
-
-			Set<GraphElementClass> parentSet = parent.getMark(vc);
-			if (parentSet == null) {
-				parentSet = new HashSet<GraphElementClass>();
-				parent.mark(vc, parentSet);
-			}
-			parentSet.add((GraphElementClass) i.getThat());
-
-			Set<GraphElementClass> childSet = child.getMark(i.getThat());
-			if (childSet == null) {
-				childSet = new HashSet<GraphElementClass>();
-				child.mark(i.getThat(), childSet);
-			}
-			childSet.add(vc);
 		}
 	}
 
@@ -1781,73 +1851,7 @@ public class Rsa2Tg extends XmlProcessor {
 			GraphElementClass gec,
 			VertexClass incidentVertexClass,
 			LocalGenericGraphMarker<Set<GraphElementClass>> nestedIncidentVertexClasses,
-			LocalGenericGraphMarker<Set<GraphElementClass>> parent,
-			GraphElementClass parentGEC,
-			LocalGenericGraphMarker<Set<GraphElementClass>> child,
-			LocalBooleanGraphMarker roots) {
-		roots.mark(gec);
-
-		Set<GraphElementClass> parentSet = parent.getMark(parentGEC);
-		if (parentSet == null) {
-			parentSet = new HashSet<GraphElementClass>();
-			parent.mark(parentGEC, parentSet);
-		}
-		parentSet.add(gec);
-
-		Set<GraphElementClass> childSet = child.getMark(gec);
-		if (childSet == null) {
-			childSet = new HashSet<GraphElementClass>();
-			child.mark(gec, childSet);
-		}
-		childSet.add(parentGEC);
-
-		// if incidentVertexClass could be nested in gec, it could be nested in
-		// all subclasses of gec, too
-		for (SpecializesTypedElementClass_superclass i : gec
-				.getIncidences(SpecializesTypedElementClass_superclass.class)) {
-			roots.removeMark(gec);
-			markAllNestingGraphElementClasses((GraphElementClass) i.getThat(),
-					incidentVertexClass, nestedIncidentVertexClasses, parent,
-					parentGEC, child, roots);
-		}
-
-		// if incidentVertexClass could be nested in gec, it could be nested in
-		// all nesting GraphElementClasses of gec, too
-		for (MayBeNestedIn_nestedElement i : gec
-				.getIncidences(MayBeNestedIn_nestedElement.class)) {
-			roots.removeMark(gec);
-			if (VertexClass.class.isInstance(i.getThat())) {
-				markAllNestingGraphElementClasses(
-						(GraphElementClass) i.getThat(), incidentVertexClass,
-						nestedIncidentVertexClasses, parent, gec, child, roots);
-			} else {
-				// EdgeClasses do not propagate the nesting information to its
-				// nesting elements
-				Set<GraphElementClass> incidentVCs = nestedIncidentVertexClasses
-						.getMark(i.getThat());
-				if (incidentVCs == null) {
-					incidentVCs = new HashSet<GraphElementClass>();
-					nestedIncidentVertexClasses.mark(i.getThat(), incidentVCs);
-				}
-				incidentVCs.add(incidentVertexClass);
-
-				roots.mark(i.getThat());
-
-				parentSet = parent.getMark(gec);
-				if (parentSet == null) {
-					parentSet = new HashSet<GraphElementClass>();
-					parent.mark(gec, parentSet);
-				}
-				parentSet.add((GraphElementClass) i.getThat());
-
-				childSet = child.getMark(i.getThat());
-				if (childSet == null) {
-					childSet = new HashSet<GraphElementClass>();
-					child.mark(i.getThat(), childSet);
-				}
-				childSet.add(gec);
-			}
-		}
+			LocalGenericGraphMarker<Set<Edge>> edgesInPath) {
 
 		// insert incidentVertexClass into mark of gec
 		Set<GraphElementClass> incidentVCs = nestedIncidentVertexClasses
@@ -1857,6 +1861,57 @@ public class Rsa2Tg extends XmlProcessor {
 			nestedIncidentVertexClasses.mark(gec, incidentVCs);
 		}
 		incidentVCs.add(incidentVertexClass);
+
+		// if incidentVertexClass could be nested in gec, it could be nested in
+		// all subclasses of gec, too
+		for (SpecializesTypedElementClass_superclass i : gec
+				.getIncidences(SpecializesTypedElementClass_superclass.class)) {
+
+			Set<Edge> currentEdges = edgesInPath.getMark(i.getThat());
+			if (currentEdges == null) {
+				currentEdges = new HashSet<Edge>();
+				edgesInPath.mark(i.getThat(), currentEdges);
+			}
+			if (edgesInPath.isMarked(i.getThis())) {
+				currentEdges.addAll(edgesInPath.getMark(i.getThis()));
+			}
+			currentEdges.add(i.getEdge());
+
+			markAllNestingGraphElementClasses((GraphElementClass) i.getThat(),
+					incidentVertexClass, nestedIncidentVertexClasses,
+					edgesInPath);
+		}
+
+		// if incidentVertexClass could be nested in gec, it could be nested in
+		// all nesting GraphElementClasses of gec, too
+		for (MayBeNestedIn_nestedElement i : gec
+				.getIncidences(MayBeNestedIn_nestedElement.class)) {
+
+			Set<Edge> currentEdges = edgesInPath.getMark(i.getThat());
+			if (currentEdges == null) {
+				currentEdges = new HashSet<Edge>();
+				edgesInPath.mark(i.getThat(), currentEdges);
+			}
+			if (edgesInPath.isMarked(i.getThis())) {
+				currentEdges.addAll(edgesInPath.getMark(i.getThis()));
+			}
+			currentEdges.add(i.getEdge());
+
+			if (VertexClass.class.isInstance(i.getThat())) {
+				markAllNestingGraphElementClasses(
+						(GraphElementClass) i.getThat(), incidentVertexClass,
+						nestedIncidentVertexClasses, edgesInPath);
+			} else {
+				// EdgeClasses do not propagate the nesting information to its
+				// nesting elements
+				incidentVCs = nestedIncidentVertexClasses.getMark(i.getThat());
+				if (incidentVCs == null) {
+					incidentVCs = new HashSet<GraphElementClass>();
+					nestedIncidentVertexClasses.mark(i.getThat(), incidentVCs);
+				}
+				incidentVCs.add(incidentVertexClass);
+			}
+		}
 	}
 
 	private void checkNestingConstraints(EdgeClass containedEC,
