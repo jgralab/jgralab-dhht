@@ -3424,10 +3424,10 @@ public class Rsa2Tg extends XmlProcessor {
 				oldMBNI = (MayBeNestedIn) currI.getEdge();
 			} else if (ConnectsToVertexClass_connectedVertexClass.class
 					.isInstance(currI)) {
-				getConnectedEdgeClass((IncidenceClass) currI.getThat());
+				oldEC = getConnectedEdgeClass((IncidenceClass) currI.getThat());
 				wrongEdgeClasses.add(oldEC);
 
-				currI.delete();
+				// currI.getEdge().delete();
 			}
 			currI = nextI;
 		}
