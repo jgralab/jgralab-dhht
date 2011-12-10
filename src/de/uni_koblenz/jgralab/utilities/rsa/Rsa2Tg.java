@@ -1315,6 +1315,39 @@ public class Rsa2Tg extends XmlProcessor {
 		incidenceClass.delete();
 	}
 
+	private void deleteEdgeClass(EdgeClass edgeClass) {
+		if (generalizations.isMarked(edgeClass)) {
+			generalizations.removeMark(edgeClass);
+		}
+
+		if (redefinesAtVertex.isMarked(edgeClass)) {
+			redefinesAtVertex.removeMark(edgeClass);
+		}
+		if (redefinesAtEdge.isMarked(edgeClass)) {
+			redefinesAtEdge.removeMark(edgeClass);
+		}
+
+		if (subsets.isMarked(edgeClass)) {
+			subsets.removeMark(edgeClass);
+		}
+
+		ArrayList<String> ids = new ArrayList<String>();
+		for (Entry<String, Vertex> entry : idMap.entrySet()) {
+			if (entry.getValue() == edgeClass) {
+				ids.add(entry.getKey());
+			}
+		}
+
+		for (String id : ids) {
+			idMap.remove(id);
+			idsOfOldIncidenceclassAtNewEdgeClass.remove(id);
+			constraints.remove(id);
+			comments.remove(id);
+		}
+
+		edgeClass.delete();
+	}
+
 	/**
 	 * 
 	 */
@@ -1379,9 +1412,9 @@ public class Rsa2Tg extends XmlProcessor {
 				mbni.delete();
 				sg.createMayBeNestedIn(containedMbniEnd, containingGEC);
 			}
-			oldEC.delete();
-			containedIC.delete();
-			containingIC.delete();
+			deleteIncidenceClass(containedIC);
+			deleteIncidenceClass(containingIC);
+			deleteEdgeClass(oldEC);
 		}
 		// all preliminary MayBeNested in edges must be removed
 		if (preliminaryMayBeNestedInVertexClass.getDegree() == 0) {
@@ -3250,6 +3283,8 @@ public class Rsa2Tg extends XmlProcessor {
 		return vc;
 	}
 
+	int i = 0;// TODO
+
 	/**
 	 * Handles a 'uml:Association' or a 'uml:AssociationClass' element by
 	 * creating a corresponding {@link EdgeClass} element.
@@ -3262,6 +3297,8 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private Vertex handleAssociation(String xmiId, boolean isAssociationClass)
 			throws XMLStreamException {
+		System.out.println("association" + (isAssociationClass ? "Class" : "")
+				+ ": " + xmiId);// TODO
 
 		// create an EdgeClass at first, probably, this has to
 		// become an Aggregation or Composition later...
@@ -3370,6 +3407,7 @@ public class Rsa2Tg extends XmlProcessor {
 				// represented by the deleted preliminary VertexClass
 				// TODO check
 				wrongEdgeClasses.add(ec);
+				System.out.println("added " + ec.get_qualifiedName());// TODO
 			}
 
 			if (ownedEnds.contains(from)) {
@@ -3400,6 +3438,13 @@ public class Rsa2Tg extends XmlProcessor {
 		if (isDerived != null && isDerived.equals(XMIConstants.UML_TRUE)) {
 			ec.set_abstract(true);
 		}
+		try {
+			GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
+					+ ".dhhtg", sg, null);
+		} catch (GraphIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return ec;
 	}
 
@@ -3425,7 +3470,9 @@ public class Rsa2Tg extends XmlProcessor {
 			} else if (ConnectsToVertexClass_connectedVertexClass.class
 					.isInstance(currI)) {
 				oldEC = getConnectedEdgeClass((IncidenceClass) currI.getThat());
+				assert oldEC != null;
 				wrongEdgeClasses.add(oldEC);
+				System.out.println("added " + oldEC.get_qualifiedName());// TODO
 
 				// currI.getEdge().delete();
 			}
@@ -4824,6 +4871,8 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleAssociationEnd(String xmiId) throws XMLStreamException {
+		System.out.println("AssociationEnd: " + xmiId);// TODO
+
 		String endName = getAttribute(UML_ATTRIBUTE_NAME);
 		if ((currentClass == null) || (currentRecordDomain != null)) {
 			throw new ProcessingException(getParser(), getFileName(),
@@ -4834,6 +4883,8 @@ public class Rsa2Tg extends XmlProcessor {
 		String agg = getAttribute(UML_ATTRIBUTE_AGGREGATION);
 		boolean aggregation = (agg != null) && agg.equals(UML_SHARED);
 		boolean composition = (agg != null) && agg.equals(UML_COMPOSITE);
+
+		String associationId = getAttribute(UML_ATTRIBUTE_ASSOCIATION);
 
 		// id of the uml:Class of the other side of the association
 		String typeId = getAttribute(UML_ATTRIBUTE_TYPE);
@@ -4890,7 +4941,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 			// try to find the end's EdgeClass
 			EdgeClass ec = null;
-			if (EdgeClass.class.isInstance(currentClass)) {
+			if (EdgeClass.class.isInstance(currentClass)
+					&& idMap.get(associationId) == currentClass) {
 				// we have an "ownedEnd", so the end's Edge is the
 				// currentClass
 				ec = (EdgeClass) currentClass;
@@ -4898,7 +4950,6 @@ public class Rsa2Tg extends XmlProcessor {
 			} else {
 				// we have an ownedAttribute
 				// edge class id is in "association"
-				String associationId = getAttribute(UML_ATTRIBUTE_ASSOCIATION);
 
 				if (associationId == null) {
 					throw new ProcessingException(getParser(), getFileName(),
@@ -4941,6 +4992,7 @@ public class Rsa2Tg extends XmlProcessor {
 				sg.createConnectsToVertexClass(inc, vc);
 			} else {
 				wrongEdgeClasses.add(ec);
+				System.out.println("added " + ec.get_qualifiedName());// TODO
 			}
 			sg.createConnectsToEdgeClass(inc, ec);
 		} else {
@@ -4996,6 +5048,7 @@ public class Rsa2Tg extends XmlProcessor {
 						// vc is a preliminary VertexClass created at the
 						// memberEnd of the parent Association
 						wrongEdgeClasses.add(ec);
+						System.out.println("added " + ec.get_qualifiedName());// TODO
 						updateMayBeNestedIn(vc, (GraphElementClass) ae, ec);
 						// TODO
 					} else {
@@ -5041,7 +5094,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 		assert inc != null;
 		currentAssociationEnd = inc;
-		if (currentClass instanceof EdgeClass) {
+		if (currentClass instanceof EdgeClass
+				&& idMap.get(associationId) == currentClass) {
 			ownedEnds.add(inc);
 		}
 		inc.set_incidenceType(aggregation ? IncidenceType.AGGREGATION
@@ -5061,6 +5115,13 @@ public class Rsa2Tg extends XmlProcessor {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		try {
+			GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
+					+ ".dhhtg", sg, null);
+		} catch (GraphIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
