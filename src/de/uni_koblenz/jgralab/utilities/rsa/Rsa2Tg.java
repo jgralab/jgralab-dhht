@@ -1200,6 +1200,10 @@ public class Rsa2Tg extends XmlProcessor {
 		// Checks whether each enum domain has at least one literal
 		checkEnumDomains();
 
+		// replace old edges of compositions with an incident associationClass
+		// with proper MayBeNestedIn edges
+		tidyUpMayBeNestedInAtAssociationClasses();
+
 		// transform the VertexClasses with an edge stereotype to EdgeClasses
 		convertToEdgeClasses();
 
@@ -1360,91 +1364,6 @@ public class Rsa2Tg extends XmlProcessor {
 		Queue<GraphElementClass> workingList = new LinkedList<GraphElementClass>();
 		Queue<GraphElementClass> topLevelNestingElements = new LinkedList<GraphElementClass>();
 
-		// handle MayBeNestedIn edges which were created as compositions with
-		// incident associationClasses
-		for (GraphElement<?, ?, ?> ge : getMayBeNestedInRepresentation
-				.getMarkedElements()) {
-			EdgeClass oldEC = (EdgeClass) ge;
-			assert oldEC.getDegree() == 3;
-
-			IncidenceClass containingIC = null, containedIC = null;
-			for (ConnectsToEdgeClass_connectedEdgeClass i : oldEC
-					.getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
-				IncidenceClass ic = (IncidenceClass) i.getThat();
-				if (ic.get_incidenceType() == IncidenceType.AGGREGATION
-						|| (ic.get_incidenceType() == IncidenceType.EDGE && containingIC != null)) {
-					throw new ProcessingException(
-							getParser(),
-							getFileName(),
-							"Association '"
-									+ oldEC.get_qualifiedName()
-									+ "' has an incident EdgeClass. This implies, that it must be a composition.");
-				} else if (ic.get_incidenceType() == IncidenceType.COMPOSITION) {
-					assert containedIC == null;
-					containedIC = ic;
-				} else {
-					assert containingIC == null;
-					containingIC = ic;
-				}
-			}
-
-			assert containedIC != null && containingIC != null;
-
-			GraphElementClass containingGEC = getConnectedVertexClass(containingIC);
-			GraphElementClass containedGEC = getConnectedVertexClass(containedIC);
-			assert containingGEC != containedGEC
-					&& (containingGEC != null || containedGEC != null);
-
-			MayBeNestedIn mbni = getMayBeNestedInRepresentation.getMark(ge);
-			assert mbni != null;
-			GraphElementClass containedMbniEnd = (GraphElementClass) mbni
-					.getAlpha();
-			GraphElementClass containingMbniEnd = (GraphElementClass) mbni
-					.getOmega();
-			if (containedMbniEnd == preliminaryMayBeNestedInVertexClass) {
-				assert containedGEC != null;
-				assert containingMbniEnd != preliminaryMayBeNestedInVertexClass;
-				mbni.delete();
-				sg.createMayBeNestedIn(containedGEC, containingMbniEnd);
-			} else if (containingMbniEnd == preliminaryMayBeNestedInVertexClass) {
-				assert containingGEC != null;
-				assert containedMbniEnd != preliminaryMayBeNestedInVertexClass;
-				mbni.delete();
-				sg.createMayBeNestedIn(containedMbniEnd, containingGEC);
-			}
-			deleteIncidenceClass(containedIC);
-			deleteIncidenceClass(containingIC);
-			deleteEdgeClass(oldEC);
-		}
-		// all preliminary MayBeNested in edges must be removed
-		if (preliminaryMayBeNestedInVertexClass.getDegree() == 0) {
-			preliminaryMayBeNestedInVertexClass.delete();
-		} else {
-			StringBuilder sb = new StringBuilder();
-			for (Incidence i : preliminaryMayBeNestedInVertexClass
-					.getIncidences()) {
-				MayBeNestedIn mbni = (MayBeNestedIn) i.getEdge();
-				sb.append("\n"
-						+ ((GraphElementClass) mbni.getAlpha())
-								.get_qualifiedName()
-						+ "-->"
-						+ ((GraphElementClass) mbni.getOmega())
-								.get_qualifiedName());
-			}
-			throw new ProcessingException(getParser(), getFileName(),
-					"There still exists MaBeNestedIn edges which werde not created completely:"
-							+ sb.toString());
-
-		}
-
-		try {
-			GraphIO.saveGraphToFile("D:\\Beispiele\\_test2.dhhtg", sg, null);
-		} catch (GraphIOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// TODO Sonderknoten behandeln
-
 		// all edges have to be treated
 		for (EdgeClass ec : sg.getEdgeClassVertices()) {
 			workingList.add(ec);
@@ -1511,6 +1430,101 @@ public class Rsa2Tg extends XmlProcessor {
 
 		checkAcyclicityOfMayBeNestedIn(topLevelNestingElements);
 		// TODO at work
+	}
+
+	private void tidyUpMayBeNestedInAtAssociationClasses() {
+		System.out
+				.println("Replace compositions with incident uml:AssociationClass by MayBeNestedIn edges...");
+		ArrayList<Vertex> delete = new ArrayList<Vertex>();
+		// handle MayBeNestedIn edges which were created as compositions with
+		// incident associationClasses
+		for (GraphElementClass gec : wrongEdgeClasses) {
+			EdgeClass oldEC = (EdgeClass) gec;
+			assert oldEC.getDegree() == 3;
+
+			IncidenceClass containingIC = null, containedIC = null;
+			for (ConnectsToEdgeClass_connectedEdgeClass i : oldEC
+					.getIncidences(ConnectsToEdgeClass_connectedEdgeClass.class)) {
+				IncidenceClass ic = (IncidenceClass) i.getThat();
+				if (ic.get_incidenceType() == IncidenceType.AGGREGATION
+						|| (ic.get_incidenceType() == IncidenceType.EDGE && containingIC != null)) {
+					throw new ProcessingException(
+							getParser(),
+							getFileName(),
+							"Association '"
+									+ oldEC.get_qualifiedName()
+									+ "' has an incident EdgeClass. This implies, that it must be a composition.");
+				} else if (ic.get_incidenceType() == IncidenceType.COMPOSITION) {
+					assert containedIC == null;
+					containedIC = ic;
+				} else {
+					assert containingIC == null;
+					containingIC = ic;
+				}
+			}
+			assert containedIC != null && containingIC != null;
+
+			GraphElementClass containingGEC = getConnectedVertexClass(containingIC);
+			GraphElementClass containedGEC = getConnectedVertexClass(containedIC);
+
+			if (containingGEC != null || containedGEC != null) {
+
+				MayBeNestedIn mbni = getMayBeNestedInRepresentation
+						.getMark(gec);
+				assert mbni != null;
+				GraphElementClass containedMbniEnd = (GraphElementClass) mbni
+						.getAlpha();
+				GraphElementClass containingMbniEnd = (GraphElementClass) mbni
+						.getOmega();
+				if (containedMbniEnd == preliminaryMayBeNestedInVertexClass) {
+					assert containedGEC != null;
+					assert containingMbniEnd != preliminaryMayBeNestedInVertexClass;
+					mbni.delete();
+					sg.createMayBeNestedIn(containedGEC, containingMbniEnd);
+				} else if (containingMbniEnd == preliminaryMayBeNestedInVertexClass) {
+					assert containingGEC != null;
+					assert containedMbniEnd != preliminaryMayBeNestedInVertexClass;
+					mbni.delete();
+					sg.createMayBeNestedIn(containedMbniEnd, containingGEC);
+				}
+			}
+			delete.add(oldEC);
+			delete.add(containedIC);
+			delete.add(containingIC);
+		}
+
+		// delete old EdgeClasses and IncidenceClasses
+		for (Vertex v : delete) {
+			if (EdgeClass.class.isInstance(v)) {
+				deleteEdgeClass((EdgeClass) v);
+			} else if (IncidenceClass.class.isInstance(v)) {
+				deleteIncidenceClass((IncidenceClass) v);
+			} else {
+				assert false;
+			}
+		}
+		delete = null;
+
+		// all preliminary MayBeNested in edges must be removed
+		if (preliminaryMayBeNestedInVertexClass.getDegree() == 0) {
+			preliminaryMayBeNestedInVertexClass.delete();
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for (Incidence i : preliminaryMayBeNestedInVertexClass
+					.getIncidences()) {
+				MayBeNestedIn mbni = (MayBeNestedIn) i.getEdge();
+				sb.append("\n"
+						+ ((GraphElementClass) mbni.getAlpha())
+								.get_qualifiedName()
+						+ "-->"
+						+ ((GraphElementClass) mbni.getOmega())
+								.get_qualifiedName());
+			}
+			throw new ProcessingException(getParser(), getFileName(),
+					"There still exists MaBeNestedIn edges which werde not created completely:"
+							+ sb.toString());
+
+		}
 	}
 
 	/**
@@ -2302,6 +2316,12 @@ public class Rsa2Tg extends XmlProcessor {
 	 * corrected in {@link #convertToBinaryEdgeClass(EdgeClass)}.
 	 */
 	private void convertToEdgeClasses() {
+		try {
+			GraphIO.saveGraphToFile("D:\\Beispiele\\_test2.dhhtg", sg, null);
+		} catch (GraphIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
@@ -3450,44 +3470,68 @@ public class Rsa2Tg extends XmlProcessor {
 
 	private void replacePreliminaryVertexClassWithEdgeClass(VertexClass vc,
 			EdgeClass ec) {
-		EdgeClass oldEC = null;
-		MayBeNestedIn oldMBNI = null;
-		MayBeNestedIn newMBNI = null;
 		for (Incidence currI = vc.getFirstIncidence(); currI != null;) {
 			Incidence nextI = currI.getNextIncidenceAtVertex();
-			if (MayBeNestedIn_nestedElement.class.isInstance(currI)) {
-				// ec is nested
-				newMBNI = sg.createMayBeNestedIn(ec,
-						(GraphElementClass) ((MayBeNestedIn) currI.getEdge())
-								.getOmega());
+			if (MayBeNestedIn.class.isInstance(currI.getEdge())) {
+				MayBeNestedIn oldMBNI = null;
+				MayBeNestedIn newMBNI = null;
+				if (MayBeNestedIn_nestedElement.class.isInstance(currI)) {
+					// ec is nested
+					newMBNI = sg.createMayBeNestedIn(ec,
+							(GraphElementClass) ((MayBeNestedIn) currI
+									.getEdge()).getOmega());
+				} else {
+					// ec is nesting
+					newMBNI = sg.createMayBeNestedIn(
+							(GraphElementClass) ((MayBeNestedIn) currI
+									.getEdge()).getOmega(), ec);
+				}
 				oldMBNI = (MayBeNestedIn) currI.getEdge();
-			} else if (MayBeNestedIn_nestingElement.class.isInstance(currI)) {
-				// ec is nesting
-				newMBNI = sg.createMayBeNestedIn(
-						(GraphElementClass) ((MayBeNestedIn) currI.getEdge())
-								.getOmega(), ec);
-				oldMBNI = (MayBeNestedIn) currI.getEdge();
+
+				if (newMBNI != null) {
+					for (GraphElement<?, ?, ?> ge : getMayBeNestedInRepresentation
+							.getMarkedElements()) {
+						GraphElementClass gec = (GraphElementClass) ge;
+						MayBeNestedIn mbni = getMayBeNestedInRepresentation
+								.getMark(ge);
+						if (oldMBNI == mbni) {
+							getMayBeNestedInRepresentation.mark(gec, newMBNI);
+						}
+					}
+					oldMBNI.delete();
+				}
 			} else if (ConnectsToVertexClass_connectedVertexClass.class
 					.isInstance(currI)) {
-				oldEC = getConnectedEdgeClass((IncidenceClass) currI.getThat());
+				IncidenceClass oldIC = (IncidenceClass) currI.getThat();
+				EdgeClass oldEC = getConnectedEdgeClass(oldIC);
 				assert oldEC != null;
 				wrongEdgeClasses.add(oldEC);
 				System.out.println("added " + oldEC.get_qualifiedName());// TODO
 
-				// currI.getEdge().delete();
+				if (oldIC.get_incidenceType() == IncidenceType.AGGREGATION) {
+					throw new ProcessingException(
+							getParser(),
+							getFileName(),
+							"Association '"
+									+ oldEC.get_qualifiedName()
+									+ "' has an incident EdgeClass. This implies, that it must be a composition.");
+				} else {
+					MayBeNestedIn mbni = null;
+					if (oldIC.get_incidenceType() == IncidenceType.COMPOSITION) {
+						mbni = sg.createMayBeNestedIn(ec,
+								preliminaryMayBeNestedInVertexClass);
+					} else {
+						mbni = sg.createMayBeNestedIn(
+								preliminaryMayBeNestedInVertexClass, ec);
+					}
+					getMayBeNestedInRepresentation.mark(oldEC, mbni);
+				}
 			}
 			currI = nextI;
 		}
 
-		if (newMBNI != null) {
-			getMayBeNestedInRepresentation.mark(oldEC, newMBNI);
-			oldMBNI.delete();
-		} else {
-			updateMayBeNestedIn(vc, ec, oldEC);
-		}
-
 		for (GraphElement<?, ?, ?> ge : nestedElements.getMarkedElements()) {
-			Set<GraphElementClass> mark = nestedElements.getMark(vc);
+			Set<GraphElementClass> mark = nestedElements.getMark(ge);
 			if (mark.contains(vc)) {
 				mark.remove(vc);
 				mark.add(ec);
@@ -4863,6 +4907,8 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
+	// TODO remove duplicated MayBeNestedIn
+
 	/**
 	 * Handles a 'ownedEnd' XML element of type 'uml:Property' by creating an
 	 * appropriate {@link From} edge.
@@ -5156,6 +5202,7 @@ public class Rsa2Tg extends XmlProcessor {
 	private void updateMayBeNestedIn(GraphElementClass preliminary,
 			GraphElementClass real, EdgeClass oldEC) {
 		MayBeNestedIn mbni = getMayBeNestedInRepresentation.getMark(oldEC);
+		MayBeNestedIn newMBNI = null;
 		if (mbni == null) {
 			IncidenceClass ic = null;
 			for (ConnectsToEdgeClass_connectedEdgeClass i : oldEC
@@ -5164,25 +5211,33 @@ public class Rsa2Tg extends XmlProcessor {
 				if (getConnectedVertexClass(ic) == preliminary) {
 					if (ic.get_incidenceType() == IncidenceType.COMPOSITION) {
 						// TODO
-						mbni = sg.createMayBeNestedIn(real,
+						newMBNI = sg.createMayBeNestedIn(real,
 								preliminaryMayBeNestedInVertexClass);
 					} else {
-						mbni = sg.createMayBeNestedIn(
+						newMBNI = sg.createMayBeNestedIn(
 								preliminaryMayBeNestedInVertexClass, real);
 					}
 				}
 			}
 		} else {
-			if (mbni.getAlpha() == preliminary) {
-				mbni = sg.createMayBeNestedIn(real,
+			if (mbni.getAlpha() == preliminary
+					|| mbni.getAlpha() == preliminaryMayBeNestedInVertexClass) {
+				newMBNI = sg.createMayBeNestedIn(real,
 						(GraphElementClass) mbni.getOmega());
 			} else {
-				assert mbni.getOmega() == preliminary;
-				mbni = sg.createMayBeNestedIn(
+				assert mbni.getOmega() == preliminary
+						|| mbni.getOmega() == preliminaryMayBeNestedInVertexClass;
+				newMBNI = sg.createMayBeNestedIn(
 						(GraphElementClass) mbni.getAlpha(), real);
 			}
 		}
-		getMayBeNestedInRepresentation.mark(oldEC, mbni);
+		assert newMBNI != null;
+		getMayBeNestedInRepresentation.mark(oldEC, newMBNI);
+		if (newMBNI.getAlpha() != preliminaryMayBeNestedInVertexClass
+				&& newMBNI.getOmega() != preliminaryMayBeNestedInVertexClass) {
+			mbni.delete();
+			getMayBeNestedInRepresentation.removeMark(newMBNI);
+		}
 	}
 
 	private void setMayBeNestedInInformation(IncidenceClass inc,
