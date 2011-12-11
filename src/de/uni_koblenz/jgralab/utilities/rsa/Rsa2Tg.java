@@ -90,7 +90,6 @@ import static de.uni_koblenz.jgralab.utilities.rsa.XMIConstants.XMI_XMI;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -174,7 +173,6 @@ import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_specializesIncidenceClass_GoesTo_IncidenceClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass_subclass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass_superclass;
@@ -835,7 +833,7 @@ public class Rsa2Tg extends XmlProcessor {
 		// Type is retrieved
 		String type = getAttribute(XMI_NAMESPACE_PREFIX, UML_ATTRIBUTE_TYPE);
 		Vertex vertexId = null;
-		// Package element, which TODO
+		// Package element, which
 		if (name.equals(UML_PACKAGED_ELEMENT)) {
 			if (type.equals(UML_PACKAGE)) {
 				vertexId = handlePackage();
@@ -1431,7 +1429,6 @@ public class Rsa2Tg extends XmlProcessor {
 		deleteDuplicateMayBeNestedIn();
 
 		checkAcyclicityOfMayBeNestedIn(topLevelNestingElements);
-		// TODO at work
 	}
 
 	private void deleteDuplicateMayBeNestedIn() {
@@ -2128,9 +2125,7 @@ public class Rsa2Tg extends XmlProcessor {
 			if (allIncidenceClasses.size() != 2) {
 				return false;
 			}
-			// both incidences have to have different directions and both
-			// incidences are not abstract and the multiplicities must fit and
-			// only one of both may have a IncidenceType different from EDGE
+
 			IncidenceClass firstIC = null, lastIC = null;
 			for (IncidenceClass ic : allIncidenceClasses) {
 				if (firstIC == null) {
@@ -2139,18 +2134,18 @@ public class Rsa2Tg extends XmlProcessor {
 					lastIC = ic;
 				}
 			}
+			if (isNestingIncidenceOrEdgeClass.isMarked(firstIC)
+					|| isNestingIncidenceOrEdgeClass.isMarked(lastIC)) {
+				return false;
+			}
+			// both incidences have to have different directions and both
+			// incidences are not abstract and the multiplicities must fit
 			if (firstIC.get_direction() == lastIC.get_direction()
 					&& (firstIC.is_abstract() || lastIC.is_abstract())
 					&& (firstIC.get_minVerticesAtEdge() == 1
 							&& firstIC.get_maxVerticesAtEdge() == 1
 							&& lastIC.get_minVerticesAtEdge() == 1 && lastIC
 							.get_maxVerticesAtEdge() == 1)) {
-				return false;
-			}
-			if ((firstIC.get_incidenceType() != IncidenceType.EDGE && (lastIC
-					.get_incidenceType() != IncidenceType.EDGE))
-					|| (isNestingIncidenceOrEdgeClass.isMarked(firstIC) || isNestingIncidenceOrEdgeClass
-							.isMarked(lastIC))) {
 				return false;
 			}
 
@@ -2233,7 +2228,7 @@ public class Rsa2Tg extends XmlProcessor {
 			return true;
 		}
 		for (Incidence inc : ic
-				.getIncidences(SpecializesIncidenceClass_specializesIncidenceClass_GoesTo_IncidenceClass.class)) {
+				.getIncidences(SpecializesTypedElementClass_superclass.class)) {
 			if (isSubIncidenceClassContained((IncidenceClass) inc.getThat(),
 					subsettingIncidenceClasses)) {
 				return true;
@@ -2347,12 +2342,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 * corrected in {@link #convertToBinaryEdgeClass(EdgeClass)}.
 	 */
 	private void convertToEdgeClasses() {
-		// try {
-		// GraphIO.saveGraphToFile("D:\\Beispiele\\_test2.dhhtg", sg, null);
-		// } catch (GraphIOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
@@ -3334,8 +3323,6 @@ public class Rsa2Tg extends XmlProcessor {
 		return vc;
 	}
 
-	int i = 0;// TODO
-
 	/**
 	 * Handles a 'uml:Association' or a 'uml:AssociationClass' element by
 	 * creating a corresponding {@link EdgeClass} element.
@@ -3348,9 +3335,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private Vertex handleAssociation(String xmiId, boolean isAssociationClass)
 			throws XMLStreamException {
-		System.out.println("association" + (isAssociationClass ? "Class" : "")
-				+ ": " + xmiId);// TODO
-
 		// create an EdgeClass at first, probably, this has to
 		// become an Aggregation or Composition later...
 		AttributedElement<?, ?> ae = idMap.get(xmiId);
@@ -3456,9 +3440,7 @@ public class Rsa2Tg extends XmlProcessor {
 				// the incident VertexClass was deleted, because this is a
 				// composition with an incident associationClass, which was
 				// represented by the deleted preliminary VertexClass
-				// TODO check
 				wrongEdgeClasses.add(ec);
-				System.out.println("added " + ec.get_qualifiedName());// TODO
 			}
 
 			if (ownedEnds.contains(from)) {
@@ -3489,13 +3471,6 @@ public class Rsa2Tg extends XmlProcessor {
 		if (isDerived != null && isDerived.equals(XMIConstants.UML_TRUE)) {
 			ec.set_abstract(true);
 		}
-		// try {
-		// GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
-		// + ".dhhtg", sg, null);
-		// } catch (GraphIOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 		return ec;
 	}
 
@@ -3537,7 +3512,6 @@ public class Rsa2Tg extends XmlProcessor {
 				EdgeClass oldEC = getConnectedEdgeClass(oldIC);
 				assert oldEC != null;
 				wrongEdgeClasses.add(oldEC);
-				System.out.println("added " + oldEC.get_qualifiedName());// TODO
 
 				if (oldIC.get_incidenceType() == IncidenceType.AGGREGATION) {
 					throw new ProcessingException(
@@ -4938,8 +4912,6 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 	}
 
-	// TODO remove duplicated MayBeNestedIn
-
 	/**
 	 * Handles a 'ownedEnd' XML element of type 'uml:Property' by creating an
 	 * appropriate {@link From} edge.
@@ -4948,8 +4920,6 @@ public class Rsa2Tg extends XmlProcessor {
 	 * @throws XMLStreamException
 	 */
 	private void handleAssociationEnd(String xmiId) throws XMLStreamException {
-		System.out.println("AssociationEnd: " + xmiId);// TODO
-
 		String endName = getAttribute(UML_ATTRIBUTE_NAME);
 		if ((currentClass == null) || (currentRecordDomain != null)) {
 			throw new ProcessingException(getParser(), getFileName(),
@@ -4996,7 +4966,6 @@ public class Rsa2Tg extends XmlProcessor {
 										+ ae.getType().getQualifiedName()
 										+ ". That's why this association end must belong to a composition.");
 					}
-					// TODO
 				} else {
 					throw new ProcessingException(
 							getParser(),
@@ -5069,7 +5038,6 @@ public class Rsa2Tg extends XmlProcessor {
 				sg.createConnectsToVertexClass(inc, vc);
 			} else {
 				wrongEdgeClasses.add(ec);
-				System.out.println("added " + ec.get_qualifiedName());// TODO
 			}
 			sg.createConnectsToEdgeClass(inc, ec);
 		} else {
@@ -5125,9 +5093,7 @@ public class Rsa2Tg extends XmlProcessor {
 						// vc is a preliminary VertexClass created at the
 						// memberEnd of the parent Association
 						wrongEdgeClasses.add(ec);
-						System.out.println("added " + ec.get_qualifiedName());// TODO
 						updateMayBeNestedIn(vc, (GraphElementClass) ae, ec);
-						// TODO
 					} else {
 						throw new ProcessingException(
 								getParser(),
@@ -5181,53 +5147,7 @@ public class Rsa2Tg extends XmlProcessor {
 		inc.set_roleName(endName);
 		if (!wrongEdgeClasses.contains(getConnectedEdgeClass(inc))) {
 			setMayBeNestedInInformation(inc, composition);
-		} else {
-			System.out.print("\twrongEdgeClasses=");
-			prettyPrint2(wrongEdgeClasses);// TODO delete
-			System.out.println("\tgetMayBeNestedInRepresentation:");
-			prettyPrint(getMayBeNestedInRepresentation);
-			try {
-				GraphIO.saveGraphToFile("D:\\Beispiele\\_test.dhhtg", sg, null);
-			} catch (GraphIOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
-		// try {
-		// GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
-		// + ".dhhtg", sg, null);
-		// } catch (GraphIOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-	}
-
-	private void prettyPrint(
-			LocalGenericGraphMarker<MayBeNestedIn> getMayBeNestedInRepresentation2) {
-		// TODO delete
-		for (GraphElement<?, ?, ?> ge : getMayBeNestedInRepresentation2
-				.getMarkedElements()) {
-			GraphElementClass gec = (GraphElementClass) ge;
-			System.out.print(gec.get_qualifiedName() + " = ");
-			MayBeNestedIn mbni = getMayBeNestedInRepresentation2.getMark(gec);
-			System.out
-					.println(((GraphElementClass) mbni.getAlpha())
-							.get_qualifiedName()
-							+ "-->"
-							+ ((GraphElementClass) mbni.getOmega())
-									.get_qualifiedName());
-		}
-	}
-
-	private void prettyPrint2(Set<EdgeClass> wrongEdgeClasses2) {
-		// TODO Delete
-		System.out.print("{");
-		String delim = "";
-		for (EdgeClass ec : wrongEdgeClasses2) {
-			System.out.print(delim + ec.get_qualifiedName());
-			delim = ", ";
-		}
-		System.out.print("}\n");
 	}
 
 	private void updateMayBeNestedIn(GraphElementClass preliminary,
@@ -5241,7 +5161,6 @@ public class Rsa2Tg extends XmlProcessor {
 				ic = (IncidenceClass) i.getThat();
 				if (getConnectedVertexClass(ic) == preliminary) {
 					if (ic.get_incidenceType() == IncidenceType.COMPOSITION) {
-						// TODO
 						newMBNI = sg.createMayBeNestedIn(real,
 								preliminaryMayBeNestedInVertexClass);
 					} else {
@@ -5306,30 +5225,8 @@ public class Rsa2Tg extends XmlProcessor {
 				if (containedGEC != null) {
 					containedElements.add(containedGEC);
 				}
-				// printNestedElements(nestedElements);// TODO delete
 			}
 		}
-	}
-
-	// TODO delete this method
-	private void printNestedElements(
-			LocalGenericGraphMarker<Set<GraphElementClass>> nestedElements) {
-		for (GraphElement<?, ?, ?> elem : nestedElements.getMarkedElements()) {
-			GraphElementClass e = (GraphElementClass) elem;
-			System.out.print(e.get_qualifiedName() + "=");
-			prettyPrint(nestedElements.getMark(e));
-		}
-	}
-
-	// TODO delete this method
-	private void prettyPrint(Collection<GraphElementClass> set) {
-		System.out.print("{");
-		String delim = "";
-		for (GraphElementClass gec : set) {
-			System.out.print(delim + gec.get_qualifiedName());
-			delim = ", ";
-		}
-		System.out.print("}\n");
 	}
 
 	/**
