@@ -1428,8 +1428,39 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 		}
 
+		deleteDuplicateMayBeNestedIn();
+
 		checkAcyclicityOfMayBeNestedIn(topLevelNestingElements);
 		// TODO at work
+	}
+
+	private void deleteDuplicateMayBeNestedIn() {
+		for (MayBeNestedIn mbni = sg.getFirstMayBeNestedIn(); mbni != null;) {
+			MayBeNestedIn nextMBNI = mbni.getNextMayBeNestedIn();
+			for (MayBeNestedIn mbni2 = sg.getFirstMayBeNestedIn(); mbni2 != null;) {
+				MayBeNestedIn nextMBNI2 = mbni2.getNextMayBeNestedIn();
+				if (mbni2 == mbni) {
+					mbni2 = nextMBNI2;
+					continue;
+				}
+				if (isDuplicateMayBeNestedIn(mbni, mbni2)) {
+					if (mbni2 == nextMBNI) {
+						nextMBNI = nextMBNI.getNextMayBeNestedIn();
+					}
+					mbni2.delete();
+				}
+				mbni2 = nextMBNI2;
+			}
+			mbni = nextMBNI;
+		}
+	}
+
+	private boolean isDuplicateMayBeNestedIn(MayBeNestedIn original,
+			MayBeNestedIn duplicate) {
+		return isSubclassOf((GraphElementClass) duplicate.getAlpha(),
+				(GraphElementClass) original.getAlpha())
+				&& isSubclassOf((GraphElementClass) duplicate.getOmega(),
+						(GraphElementClass) original.getOmega());
 	}
 
 	private void tidyUpMayBeNestedInAtAssociationClasses() {
@@ -2316,12 +2347,12 @@ public class Rsa2Tg extends XmlProcessor {
 	 * corrected in {@link #convertToBinaryEdgeClass(EdgeClass)}.
 	 */
 	private void convertToEdgeClasses() {
-		try {
-			GraphIO.saveGraphToFile("D:\\Beispiele\\_test2.dhhtg", sg, null);
-		} catch (GraphIOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// try {
+		// GraphIO.saveGraphToFile("D:\\Beispiele\\_test2.dhhtg", sg, null);
+		// } catch (GraphIOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		System.out
 				.println("Converting VertexClasses with stereotype <<edge>> to EdgeClasses...");
 		for (VertexClass oldVertexClass : edgeStereotypedVertexClasses) {
@@ -3458,13 +3489,13 @@ public class Rsa2Tg extends XmlProcessor {
 		if (isDerived != null && isDerived.equals(XMIConstants.UML_TRUE)) {
 			ec.set_abstract(true);
 		}
-		try {
-			GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
-					+ ".dhhtg", sg, null);
-		} catch (GraphIOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// try {
+		// GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
+		// + ".dhhtg", sg, null);
+		// } catch (GraphIOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 		return ec;
 	}
 
@@ -5162,13 +5193,13 @@ public class Rsa2Tg extends XmlProcessor {
 				e.printStackTrace();
 			}
 		}
-		try {
-			GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
-					+ ".dhhtg", sg, null);
-		} catch (GraphIOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// try {
+		// GraphIO.saveGraphToFile("D:\\Beispiele\\_" + (i++) + xmiId
+		// + ".dhhtg", sg, null);
+		// } catch (GraphIOException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
 	}
 
 	private void prettyPrint(
