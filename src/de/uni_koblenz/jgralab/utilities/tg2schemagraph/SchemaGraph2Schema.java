@@ -52,6 +52,7 @@ import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.SetDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
 import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
@@ -466,8 +467,8 @@ public class SchemaGraph2Schema {
 	private String[] createComments(NamedElementClass gNamedElement) {
 
 		// create array of all comment Strings
-		String[] comments = new String[gNamedElement.getDegree(gNamedElement
-				.getIncidenceClassForRolename("comment"))];
+		String[] comments = new String[gNamedElement
+				.getDegree(Annotates_annotatedElement.class)];
 		int i = 0;
 		for (Annotates a : gNamedElement.getIncidentEdges(Annotates.class)) {
 			Comment comment = (Comment) a.getAlpha();
