@@ -544,7 +544,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Vertex> vc = getVertexType(id);
-			proxy = graphFactory.createVertexProxy(vc, id,
+			proxy = graphFactory.createVertexProxy_DiskBasedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Vertex>(proxy);
 			remoteVertices.put(id, ref);
