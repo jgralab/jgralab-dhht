@@ -3,8 +3,6 @@ package de.uni_koblenz.jgralab.impl;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.disk.RemoteDiskStorageAccess;
 
 
 /**
@@ -20,7 +18,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * Methods to access graph database properties
 	 * ===================================================== */
 	
-	public RemoteDiskStorageAccess getLocalDiskStorage() throws RemoteException;
+	public RemoteStorageAccess getLocalDiskStorage() throws RemoteException;
 	
 	
 	

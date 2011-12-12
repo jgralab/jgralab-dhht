@@ -9,6 +9,8 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
+import de.uni_koblenz.jgralab.impl.ParentEntityKind;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -194,7 +196,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public void incidenceListOfVertexModified(long elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore
 					.increaseIncidenceListVersionOfVertexId(convertToLocalId(elementId));
@@ -206,7 +208,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public void incidenceListOfEdgeModified(long elementId) {
 		int partialGraphId = getPartialGraphId(elementId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore
 					.increaseIncidenceListVersionOfEdgeId(convertToLocalId(elementId));
@@ -300,7 +302,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public long getFirstIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore
 					.getFirstIncidenceIdAtVertexId(convertToLocalId(vertexId));
@@ -312,7 +314,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public long getFirstIncidenceIdAtEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore
 					.getFirstIncidenceIdAtEdgeId(convertToLocalId(edgeId));
@@ -324,7 +326,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public long getLastIncidenceIdAtVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore
 					.getLastIncidenceIdAtVertexId(convertToLocalId(vertexId));
@@ -336,7 +338,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public long getLastIncidenceIdAtEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore
 					.getLastIncidenceIdAtEdgeId(convertToLocalId(edgeId));

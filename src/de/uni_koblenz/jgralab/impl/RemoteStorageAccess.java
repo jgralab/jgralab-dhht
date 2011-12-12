@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.impl.disk;
+package de.uni_koblenz.jgralab.impl;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
  * @author dbildh
  * 
  */
-public interface RemoteDiskStorageAccess extends Remote {
+public interface RemoteStorageAccess extends Remote {
 
 	/*
 	 * ======================================================== Methods to

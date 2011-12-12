@@ -20,6 +20,8 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.ParentEntityKind;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -117,7 +119,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	/**
 	 * Stub for the disk storage
 	 */
-	protected final RemoteDiskStorageAccess diskStorageStub;
+	protected final RemoteStorageAccess diskStorageStub;
 
 	/**
 	 * The GraphFactory to create graphs and graph elements and proxies
@@ -174,7 +176,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	 */
 	protected Map<Integer, RemoteGraphDatabaseAccessWithInternalMethods> partialGraphDatabases;
 
-	protected final Map<Integer, RemoteDiskStorageAccess> remoteDiskStorages;
+	protected final Map<Integer, RemoteStorageAccess> remoteDiskStorages;
 
 	/**
 	 * The map of global subgraph ids to the local representation objects. Those
@@ -236,13 +238,13 @@ public abstract class GraphDatabaseElementaryMethods implements
 		try {
 			this.localDiskStorage = new DiskStorageManager(
 					(GraphDatabaseBaseImpl) this);
-			this.diskStorageStub = (RemoteDiskStorageAccess) UnicastRemoteObject
+			this.diskStorageStub = (RemoteStorageAccess) UnicastRemoteObject
 					.exportObject(localDiskStorage, 0);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		partialGraphDatabases = new HashMap<Integer, RemoteGraphDatabaseAccessWithInternalMethods>();
-		remoteDiskStorages = new HashMap<Integer, RemoteDiskStorageAccess>();
+		remoteDiskStorages = new HashMap<Integer, RemoteStorageAccess>();
 		remoteDiskStorages.put(localPartialGraphId, localDiskStorage);
 		this.freeVertexList = new FreeIndexList(Integer.MAX_VALUE);
 		this.freeEdgeList = new FreeIndexList(Integer.MAX_VALUE);
@@ -350,9 +352,9 @@ public abstract class GraphDatabaseElementaryMethods implements
 		return remoteAccess;
 	}
 
-	protected RemoteDiskStorageAccess getDiskStorageForPartialGraph(
+	protected RemoteStorageAccess getDiskStorageForPartialGraph(
 			int partialGraphId) {
-		RemoteDiskStorageAccess remoteAccess = remoteDiskStorages
+		RemoteStorageAccess remoteAccess = remoteDiskStorages
 				.get(partialGraphId);
 		if (remoteAccess == null) {
 			try {
@@ -370,7 +372,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		return localDiskStorage;
 	}
 
-	public RemoteDiskStorageAccess getDiskStorage() {
+	public RemoteStorageAccess getDiskStorage() {
 		return diskStorageStub;
 	}
 
@@ -794,7 +796,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	public long getNextVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore.getNextVertexId(convertToLocalId(vertexId));
 		} catch (RemoteException e) {
@@ -804,7 +806,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	public long getPreviousVertexId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore.getPreviousVertexId(convertToLocalId(vertexId));
 		} catch (RemoteException e) {
@@ -814,7 +816,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	protected void setNextVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore.setNextVertexId(convertToLocalId(modifiedVertexId),
 					nextVertexId);
@@ -825,7 +827,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	protected void setPreviousVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore.setPreviousVertexId(convertToLocalId(modifiedVertexId),
 					nextVertexId);
@@ -904,7 +906,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	@Override
 	public long getNextEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore.getNextEdgeId(convertToLocalId(edgeId));
 		} catch (RemoteException e) {
@@ -914,7 +916,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	protected void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore.setNextEdgeId(convertToLocalId(modifiedEdgeId),
 					nextEdgeId);
@@ -926,7 +928,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	@Override
 	public long getPreviousEdgeId(long edgeId) {
 		int partialGraphId = getPartialGraphId(edgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			return diskStore.getPreviousEdgeId(convertToLocalId(edgeId));
 		} catch (RemoteException e) {
@@ -936,7 +938,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	protected void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
-		RemoteDiskStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
+		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
 			diskStore.setPreviousEdgeId(convertToLocalId(modifiedEdgeId),
 					nextEdgeId);

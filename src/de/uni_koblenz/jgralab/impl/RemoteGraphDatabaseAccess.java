@@ -11,7 +11,6 @@ import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Record;
-import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 
 /**
  * This interface defines all methods needed to access properties of the graph

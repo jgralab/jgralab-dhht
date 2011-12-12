@@ -41,6 +41,7 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -97,7 +98,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 */
 	protected RemoteGraphDatabaseAccess storingGraphDatabase;
 
-	protected RemoteDiskStorageAccess storingDiskStorage;
+	protected RemoteStorageAccess storingDiskStorage;
 
 	/**
 	 * The id of the subordinate graph nested in this element
