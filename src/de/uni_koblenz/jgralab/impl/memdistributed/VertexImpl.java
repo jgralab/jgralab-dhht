@@ -44,8 +44,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtVertex;
 import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;

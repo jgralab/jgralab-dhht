@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.memdistributed;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,8 +44,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtEdge;
 import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
-import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;

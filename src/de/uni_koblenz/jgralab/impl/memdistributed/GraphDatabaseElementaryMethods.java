@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -180,6 +182,9 @@ public abstract class GraphDatabaseElementaryMethods implements
 	protected final Map<Long, Reference<Edge>> remoteEdges;
 	protected final Map<Long, Reference<Incidence>> remoteIncidences;
 
+	
+	protected final MemStorageManager inMemoryStorage;
+	
 	/*
 	 * ==========================================================================
 	 * ======== Graph listeners
@@ -227,7 +232,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 		this.freeEdgeList = new FreeIndexList(Integer.MAX_VALUE);
 		this.freeIncidenceList = new FreeIndexList(Integer.MAX_VALUE);
 		this.deleteVertexList = new LinkedList<Long>();
-
+		this.inMemoryStorage = new MemStorageManager((GraphDatabaseBaseImpl) this);
+		
 		localSubgraphData = new ArrayList<GraphData>();
 		subgraphObjects = new HashMap<Long, Reference<Graph>>();
 		remoteVertices = new HashMap<Long, Reference<Vertex>>();
@@ -463,7 +469,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
-			g = graphFactory.createGraph_DiskBasedStorage(
+			g = graphFactory.createGraph_DistributedStorage(
 					getGraphType(globalSubgraphId), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);
 			subgraphObjects.put(globalSubgraphId, new SoftReference<Graph>(g));
@@ -495,7 +501,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			return null;
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return localDiskStorage.getVertexObject(convertToLocalId(id));
+			return inMemoryStorage.getVertexObject(convertToLocalId(id));
 		}
 		Reference<Vertex> ref = remoteVertices.get(id);
 		Vertex proxy = null;
@@ -506,7 +512,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Vertex> vc = getVertexType(id);
-			proxy = graphFactory.createVertexProxy_DiskBasedStorage(vc, id,
+			proxy = graphFactory.createVertexProxy_DistributedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Vertex>(proxy);
 			remoteVertices.put(id, ref);
@@ -524,7 +530,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		}
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return localDiskStorage.getEdgeObject(convertToLocalId(id));
+			return inMemoryStorage.getEdgeObject(convertToLocalId(id));
 		}
 		Reference<Edge> ref = remoteEdges.get(id);
 		Edge proxy = null;
@@ -535,7 +541,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Edge> ec = getEdgeType(id);
-			proxy = graphFactory.createEdgeProxy_DiskBasedStorage(ec, id,
+			proxy = graphFactory.createEdgeProxy_DistributedStorage(ec, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Edge>(proxy);
 			remoteEdges.put(id, ref);
@@ -552,7 +558,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			return null;
 		int partialGraphId = getPartialGraphId(id);
 		if (partialGraphId == localPartialGraphId) {
-			return localDiskStorage.getIncidenceObject(convertToLocalId(id));
+			return inMemoryStorage.getIncidenceObject(convertToLocalId(id));
 		}
 		Reference<Incidence> ref = remoteIncidences.get(id);
 		Incidence proxy = null;
@@ -563,7 +569,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Incidence> vc = getIncidenceType(id);
-			proxy = graphFactory.createIncidenceProxy_DiskBasedStorage(vc, id,
+			proxy = graphFactory.createIncidenceProxy_DistributedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Incidence>(proxy);
 			remoteIncidences.put(id, ref);
@@ -627,48 +633,60 @@ public abstract class GraphDatabaseElementaryMethods implements
 	@Override
 	public int getKappaOfVertexId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		try {
-			return getDiskStorageForPartialGraph(partialGraphId)
-					.getKappaOfVertexId(localElementId);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+		if (partialGraphId != localPartialGraphId) {
+			try {
+				return getGraphDatabase(partialGraphId).getKappaOfVertexId(globalElementId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			int localElementId = convertToLocalId(globalElementId);
+			return inMemoryStorage.getVertexObject(localElementId).getKappa();
 		}
 	}
 
 	@Override
 	public void setKappaOfVertexId(long globalElementId, int kappa) {
 		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		try {
-			getDiskStorageForPartialGraph(partialGraphId).setKappaOfVertexId(
-					localElementId, kappa);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+		if (partialGraphId != localPartialGraphId) {
+			try {
+				getGraphDatabase(partialGraphId).setKappaOfVertexId(globalElementId, kappa);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			int localElementId = convertToLocalId(globalElementId);
+			inMemoryStorage.getVertexObject(localElementId).setKappa(kappa);
 		}
 	}
 
 	@Override
 	public int getKappaOfEdgeId(long globalElementId) {
 		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		try {
-			return getDiskStorageForPartialGraph(partialGraphId)
-					.getKappaOfEdgeId(localElementId);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+		if (partialGraphId != localPartialGraphId) {
+			try {
+				return getGraphDatabase(partialGraphId).getKappaOfEdgeId(globalElementId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			int localElementId = convertToLocalId(globalElementId);
+			return inMemoryStorage.getEdgeObject(localElementId).getKappa();
 		}
 	}
 
 	@Override
 	public void setKappaOfEdgeId(long globalElementId, int kappa) {
 		int partialGraphId = getPartialGraphId(globalElementId);
-		int localElementId = convertToLocalId(globalElementId);
-		try {
-			getDiskStorageForPartialGraph(partialGraphId).setKappaOfEdgeId(
-					localElementId, kappa);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
+		if (partialGraphId != localPartialGraphId) {
+			try {
+				getGraphDatabase(partialGraphId).setKappaOfEdgeId(globalElementId, kappa);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			int localElementId = convertToLocalId(globalElementId);
+			inMemoryStorage.getEdgeObject(localElementId).setKappa(kappa);
 		}
 	}
 

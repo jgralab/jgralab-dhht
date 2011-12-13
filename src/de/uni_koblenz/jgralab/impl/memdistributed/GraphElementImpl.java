@@ -40,7 +40,6 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -131,7 +130,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param graph
 	 *            {@link Graph}
 	 */
-	protected GraphElementImpl(long id, GraphDatabaseBaseImpl graphDatabase) {
+	protected GraphElementImpl(long id, de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase) {
 		this.graphDb = graphDatabase;
 		this.id = id;
 	}

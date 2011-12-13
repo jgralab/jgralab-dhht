@@ -23,12 +23,9 @@ import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
+import de.uni_koblenz.jgralab.impl.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
-import de.uni_koblenz.jgralab.impl.mem.EdgeImpl;
-import de.uni_koblenz.jgralab.impl.mem.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.mem.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -43,9 +40,6 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class GraphDatabaseBaseImpl extends
 		GraphDatabaseElementaryMethods implements RemoteGraphDatabaseAccess {
 
-	
-
-	
 	/**
 	 * Creates a new graph database to store all local subgraphs of the complete
 	 * graph identified by the given <code>uniqueGraphId</code>. All those local
@@ -75,9 +69,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		localSubgraphData.add(data);
 		data.containingElementId = containingVertexId;
 
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
-
 		data.typeId = schema.getClassId(m1Class);
 		data.vertexCount = 0;
 		data.edgeCount = 0;
@@ -93,9 +84,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
 		localSubgraphData.add(data);
 		data.containingElementId = -containingEdged;
-
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
 
 		data.typeId = schema.getClassId(m1Class);
 		data.vertexCount = 0;
@@ -315,9 +303,9 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema
 				.getM1ClassForId(m1ClassId);
-		VertexImpl v = (VertexImpl) graphFactory.createVertex_DiskBasedStorage(
+		VertexImpl v = (VertexImpl) graphFactory.createVertex_DistributedStorage(
 				m1Class, vertexId, this);
-		localDiskStorage.storeVertex(v);
+		localInMemoryStorage.storeVertex(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
