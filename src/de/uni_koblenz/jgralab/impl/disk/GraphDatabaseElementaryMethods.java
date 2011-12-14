@@ -814,7 +814,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		}
 	}
 
-	protected void setNextVertexId(long modifiedVertexId, long nextVertexId) {
+	public void setNextVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
@@ -825,7 +825,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		}
 	}
 
-	protected void setPreviousVertexId(long modifiedVertexId, long nextVertexId) {
+	public void setPreviousVertexId(long modifiedVertexId, long nextVertexId) {
 		int partialGraphId = getPartialGraphId(modifiedVertexId);
 		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
@@ -914,7 +914,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		}
 	}
 
-	protected void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
+	public void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {
@@ -936,7 +936,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		}
 	}
 
-	protected void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
+	public void setPreviousEdgeId(long modifiedEdgeId, long nextEdgeId) {
 		int partialGraphId = getPartialGraphId(modifiedEdgeId);
 		RemoteStorageAccess diskStore = getDiskStorageForPartialGraph(partialGraphId);
 		try {

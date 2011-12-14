@@ -2,8 +2,6 @@ package de.uni_koblenz.jgralab.impl;
 
 import java.rmi.RemoteException;
 
-import de.uni_koblenz.jgralab.Graph;
-
 
 /**
  * As an extension of RemoteGraphDatabaseAccess, this interface declares all remote accessible methods
@@ -172,5 +170,16 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 	public void setTraversalContext(long globalId) throws RemoteException;
 
+
+
+
+	public void setNextVertexId(long modifiedVertexId, long nextVertexId) throws RemoteException;
+
+	
+	public void setPreviousVertexId(long modifiedVertexId, long previousVertexId) throws RemoteException;
+	
+	public void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) throws RemoteException;
+	
+	public void setPreviousEdgeId(long modifiedEdgeId, long previousEdgeId) throws RemoteException;
 
 }

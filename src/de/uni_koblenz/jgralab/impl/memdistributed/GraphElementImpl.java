@@ -90,6 +90,22 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	protected long firstIncidenceId;
 	
 	protected long lastIncidenceId;
+	
+	public void setFirstIncidenceId(long incidenceId) {
+		this.firstIncidenceId = incidenceId;
+	}
+	
+	public long getFirstIncidenceId() {
+		return firstIncidenceId;
+	}
+	
+	public void setLastIncidenceId(long incidenceId) {
+		this.lastIncidenceId = incidenceId;
+	}
+	
+	public long getLastIncidenceId() {
+		return lastIncidenceId;
+	}
 
 	/**
 	 * The kappa value, which represents the highest level in which this
@@ -118,7 +134,23 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	
 	protected long nextElementId;
 	
+	public void setNextElementId(long nextElemId) {
+		this.nextElementId = nextElemId;
+	}
+	
+	public long getNextElementId() {
+		return nextElementId;
+	}
+	
 	protected long previousElementId;
+	
+	public void setPreviousElementId(long previousElemId) {
+		this.previousElementId = previousElemId;
+	}
+	
+	public long getPreviousElementId() {
+		return previousElementId;
+	}
 	
 	private long sigmaId;
 
@@ -139,6 +171,14 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	@Override
 	public final GraphElement<?, ?, ?> getSigma() {
 		return (sigmaId > 0) ? graphDb.getVertexObject(sigmaId) : graphDb.getEdgeObject(-sigmaId);
+	}
+	
+	public long getSigmaId() {
+		return sigmaId;
+	}
+	
+	public void setSigmaId(long newSigmaId) {
+		sigmaId = newSigmaId;
 	}
 
 	@Override

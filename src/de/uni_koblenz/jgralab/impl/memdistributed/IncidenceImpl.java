@@ -98,37 +98,70 @@ public abstract class IncidenceImpl implements Incidence {
 	/**
 	 * The incident {@link VertexImpl}.
 	 */
-	private VertexImpl incidentVertex;
+	private long incidentVertexId;
 
 	/**
 	 * The next {@link Incidence} in the lambda-sequence of
 	 * {@link IncidenceImpl#incidentVertex}.
 	 */
-	IncidenceImpl nextIncidenceAtVertex;
+	private long nextIncidenceIdAtVertex;
+	
+	public void setNextIncidenceIdAtVertex(long nextIncidenceId) {
+		this.nextIncidenceIdAtVertex = nextIncidenceId;
+	}
 
+	public long getNextIncidenceIdAtVertex() {
+		return nextIncidenceIdAtVertex;
+	}
+	
 	/**
 	 * The previous {@link Incidence} in the lambda-sequence of
 	 * {@link IncidenceImpl#incidentVertex}.
 	 */
-	private IncidenceImpl previousIncidenceAtVertex;
+	private long previousIncidenceIdAtVertex;
+	
+	public void setPreviousIncidenceIdAtVertex(long previousIncidenceId) {
+		this.previousIncidenceIdAtVertex = previousIncidenceId;
+	}
+	
+	public long getPreviousIncidenceIdAtVertex() {
+		return previousIncidenceIdAtVertex;
+	}
 
 	/**
 	 * The incident {@link EdgeImpl}.
 	 */
-	private EdgeImpl incidentEdge;
+	private long incidentEdgeId;
 
 	/**
 	 * The next {@link Incidence} in the lambda-sequence of
 	 * {@link IncidenceImpl#incidentEdge}.
 	 */
-	IncidenceImpl nextIncidenceAtEdge;
+	private long nextIncidenceIdAtEdge;
+	
+	public void setNextIncidenceIdAtEdge(long nextIncidenceId) {
+		this.nextIncidenceIdAtEdge = nextIncidenceId;
+	}
+	
+	public long getNextIncidenceIdAtEdge() {
+		return nextIncidenceIdAtEdge;
+	}
 
 	/**
 	 * The previous {@link Incidence} in the lambda-sequence of
 	 * {@link IncidenceImpl#incidentEdge}.
 	 */
-	private IncidenceImpl previousIncidenceAtEdge;
+	private long previousIncidenceIdAtEdge;
 
+	public void setPreviousIncidenceIdAtEdge(long previousIncidenceId) {
+		this.previousIncidenceIdAtEdge = previousIncidenceId;
+	}
+	
+	public long getPreviousIncidenceIdAtEdge() {
+		return previousIncidenceIdAtEdge;
+	}
+	
+	
 	public void setIncidentVertex(VertexImpl incidentVertex) {
 		this.incidentVertex = incidentVertex;
 	}

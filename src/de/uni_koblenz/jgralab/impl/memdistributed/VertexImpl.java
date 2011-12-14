@@ -1299,4 +1299,6 @@ public abstract class VertexImpl extends
 		appendix.putAfter(this);
 	}
 
+
+
 }

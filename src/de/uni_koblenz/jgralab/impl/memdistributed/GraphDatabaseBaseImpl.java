@@ -305,7 +305,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory.createVertex_DistributedStorage(
 				m1Class, vertexId, this);
-		localInMemoryStorage.storeVertex(v);
+		inMemoryStorage.storeVertex(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
