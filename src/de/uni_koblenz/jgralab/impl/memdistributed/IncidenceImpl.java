@@ -50,6 +50,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
  */
 public abstract class IncidenceImpl implements Incidence {
 
+	private GraphDatabaseBaseImpl graphDb;
+	
 	/**
 	 * Creates a new instance of IncidenceImpl and appends it to the lambda
 	 * sequences of <code>v</code> and <code>e</code>.
@@ -64,6 +66,7 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	protected IncidenceImpl(long id, VertexImpl v, EdgeImpl e) {
 		this.id = (int) id;
+		graphDb = v.getGraphDatabase();
 		setIncidentEdge(e);
 		setIncidentVertex(v);
 
@@ -153,6 +156,8 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	private long previousIncidenceIdAtEdge;
 
+
+
 	public void setPreviousIncidenceIdAtEdge(long previousIncidenceId) {
 		this.previousIncidenceIdAtEdge = previousIncidenceId;
 	}
@@ -163,103 +168,104 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	
 	public void setIncidentVertex(VertexImpl incidentVertex) {
-		this.incidentVertex = incidentVertex;
+		this.incidentVertexId = incidentVertex.getGlobalId();
 	}
 
 	public void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
-		this.nextIncidenceAtVertex = nextIncidenceAtVertex;
+		this.nextIncidenceIdAtVertex = nextIncidenceAtVertex.getGlobalId();
 	}
 
 	public void setPreviousIncidenceAtVertex(
 			IncidenceImpl previousIncidenceAtVertex) {
-		this.previousIncidenceAtVertex = previousIncidenceAtVertex;
+		this.previousIncidenceIdAtVertex = previousIncidenceAtVertex.getGlobalId();
 	}
 
 	public void setIncidentEdge(EdgeImpl edgeImpl) {
-		this.incidentEdge = edgeImpl;
+		this.incidentEdgeId = edgeImpl.getGlobalId();
 	}
 
 	public void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
-		this.nextIncidenceAtEdge = nextIncidenceAtEdge;
+		this.nextIncidenceIdAtEdge = nextIncidenceAtEdge.getGlobalId();
 	}
 
 	public void setPreviousIncidenceAtEdge(IncidenceImpl previousIncidenceAtEdge) {
-		this.previousIncidenceAtEdge = previousIncidenceAtEdge;
+		this.previousIncidenceIdAtEdge = previousIncidenceAtEdge.getGlobalId();
 	}
 
 	@Override
 	public Graph getGraph() {
-		// an Incidence belongs to the same partial graph as the incident edge
-		return incidentEdge.getGraph();
+		return graphDb.getEdgeObject(incidentEdgeId).getGraph();
 	}
 
 	@Override
 	public Edge getEdge() {
-		return incidentEdge;
+		return graphDb.getEdgeObject(incidentEdgeId);
 	}
 
 	@Override
 	public Vertex getVertex() {
-		return incidentVertex;
+		return graphDb.getVertexObject(incidentVertexId);
 	}
 
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = nextIncidenceAtEdge;
+		Incidence currentIncidence = graphDb.getIncidenceObject(nextIncidenceIdAtEdge);
 		while ((traversalContext != null)
 				&& (currentIncidence != null)
 				&& (!traversalContext.containsVertex(currentIncidence
 						.getVertex()))) {
-			currentIncidence = ((IncidenceImpl) currentIncidence).nextIncidenceAtEdge;
+			currentIncidence = graphDb.getIncidenceObject(graphDb.getNextIncidenceIdAtEdgeId(currentIncidence.getGlobalId()));
 		}
 		return currentIncidence;
 	}
 
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = nextIncidenceAtVertex;
-		while ((traversalContext != null) && (currentIncidence != null)
-				&& (!traversalContext.containsEdge(currentIncidence.getEdge()))) {
-			currentIncidence = ((IncidenceImpl) currentIncidence).nextIncidenceAtVertex;
+		Incidence currentIncidence = graphDb.getIncidenceObject(nextIncidenceIdAtVertex);
+		while ((traversalContext != null)
+				&& (currentIncidence != null)
+				&& (!traversalContext.containsEdge(currentIncidence
+						.getEdge()))) {
+			currentIncidence = graphDb.getIncidenceObject(graphDb.getNextIncidenceIdAtVertexId(currentIncidence.getGlobalId()));
 		}
 		return currentIncidence;
 	}
 
+
 	@Override
-	public Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
-		Incidence currentIncidence = previousIncidenceAtEdge;
+	public final Incidence getPreviousIncidenceAtEdge(Graph traversalContext) {
+		Incidence currentIncidence = graphDb.getIncidenceObject(previousIncidenceIdAtEdge);
 		while ((traversalContext != null)
 				&& (currentIncidence != null)
 				&& (!traversalContext.containsVertex(currentIncidence
 						.getVertex()))) {
-			currentIncidence = ((IncidenceImpl) currentIncidence).previousIncidenceAtEdge;
+			currentIncidence = graphDb.getIncidenceObject(graphDb.getPreviousIncidenceIdAtEdgeId(currentIncidence.getGlobalId()));
 		}
 		return currentIncidence;
 	}
 
 	@Override
-	public Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
-		Incidence currentIncidence = previousIncidenceAtVertex;
-		while ((traversalContext != null) && (currentIncidence != null)
-				&& (!traversalContext.containsEdge(currentIncidence.getEdge()))) {
-			currentIncidence = ((IncidenceImpl) currentIncidence).previousIncidenceAtVertex;
+	public final Incidence getPreviousIncidenceAtVertex(Graph traversalContext) {
+		Incidence currentIncidence = graphDb.getIncidenceObject(previousIncidenceIdAtVertex);
+		while ((traversalContext != null)
+				&& (currentIncidence != null)
+				&& (!traversalContext.containsEdge(currentIncidence
+						.getEdge()))) {
+			currentIncidence = graphDb.getIncidenceObject(graphDb.getPreviousIncidenceIdAtVertexId(currentIncidence.getGlobalId()));
 		}
 		return currentIncidence;
 	}
 
 	@Override
 	public Iterable<Edge> getTheseEdges(Graph traversalContext) {
-		return incidentVertex
+		return graphDb.getVertexObject(incidentVertexId)
 				.getIncidentEdges(traversalContext, getDirection());
 	}
 
 	@Override
 	public Iterable<Edge> getThoseEdges(Graph traversalContext) {
-		return incidentVertex
-				.getIncidentEdges(
-						traversalContext,
-						getDirection() == Direction.EDGE_TO_VERTEX ? Direction.VERTEX_TO_EDGE
-								: Direction.EDGE_TO_VERTEX);
+		return graphDb.getVertexObject(incidentVertexId)
+				.getIncidentEdges(traversalContext, getDirection().getOppositeDirection());
 	}
 
 	@Override

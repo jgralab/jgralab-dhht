@@ -1299,6 +1299,10 @@ public abstract class VertexImpl extends
 		appendix.putAfter(this);
 	}
 
+	public GraphDatabaseBaseImpl getGraphDatabase() {
+		return graphDb;
+	}
+
 
 
 }
