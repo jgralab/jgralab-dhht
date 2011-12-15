@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.memdistributed;
 
+import sun.security.jca.GetInstance;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -270,10 +271,13 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Vertex getThis(Graph traversalContext) {
+		Edge incidentEdge = graphDb.getEdgeObject(incidentEdgeId);
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
-		} else if (getGraph().getTraversalContext() == null
+		} 
+		Vertex incidentVertex = graphDb.getVertexObject(incidentVertexId);
+		if (getGraph().getTraversalContext() == null
 				|| getGraph().getTraversalContext().containsElement(
 						incidentVertex)) {
 			return incidentVertex;
@@ -284,6 +288,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext) {
+		Edge incidentEdge = graphDb.getEdgeObject(incidentEdgeId);
 		assert getGraph().getTraversalContext() == null
 				|| getGraph().getTraversalContext().containsElement(
 						incidentEdge);
@@ -293,6 +298,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Vertex getThat(Graph traversalContext) {
+		Edge incidentEdge = graphDb.getEdgeObject(incidentEdgeId);
 		if (!incidentEdge.isBinary()) {
 			throw new UnsupportedOperationException(
 					"This method is only supported by binary Edges.");
@@ -309,6 +315,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Iterable<Vertex> getThoseVertices(Graph traversalContext) {
+		Edge incidentEdge = graphDb.getEdgeObject(incidentEdgeId);
 		assert getGraph().getTraversalContext() == null
 				|| getGraph().getTraversalContext().containsElement(
 						incidentEdge);
@@ -529,8 +536,9 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge() {
+		
 		if (getGraph().getTraversalContext() == null) {
-			return nextIncidenceAtEdge;
+			return graphDb.getIncidenceObject(nextIncidenceIdAtEdge);
 		} else {
 			return getNextIncidenceAtEdge(getGraph().getTraversalContext());
 		}
@@ -539,10 +547,10 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = nextIncidenceAtEdge;
+			Incidence i = graphDb.getIncidenceObject(nextIncidenceIdAtEdge);
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection())) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtEdge);
 				}
 			}
 			return i;
@@ -636,24 +644,24 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Direction direction) {
-		Incidence i = nextIncidenceAtEdge;
+		Incidence i = graphDb.getIncidenceObject(nextIncidenceIdAtEdge);
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
 						.getDirection()))) {
-				i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+				i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtEdge);
 			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null)
 						&& ((!traversalContext.containsVertex(i.getVertex())) || (direction != i
 								.getDirection()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtEdge);
 				}
 			} else {
 				while ((i != null)
 						&& (!traversalContext.containsVertex(i.getVertex()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtEdge);
 				}
 			}
 
@@ -773,10 +781,10 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Direction direction) {
 		if (getGraph().getTraversalContext() == null) {
-			Incidence i = nextIncidenceAtVertex;
+			Incidence i = graphDb.getIncidenceObject(nextIncidenceIdAtVertex);
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null) && (direction != i.getDirection())) {
-					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtVertex);
 				}
 			}
 			return i;
@@ -860,24 +868,24 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Direction direction) {
-		Incidence i = nextIncidenceAtVertex;
+		Incidence i =  graphDb.getIncidenceObject(nextIncidenceIdAtVertex);
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
 						.getDirection()))) {
-				i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+				i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtVertex);
 			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null)
 						&& ((!traversalContext.containsEdge(i.getEdge())) || (direction != i
 								.getDirection()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtVertex);
 				}
 			} else {
 				while ((i != null)
 						&& (!traversalContext.containsEdge(i.getEdge()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+					i = graphDb.getIncidenceObject(((IncidenceImpl) i).nextIncidenceIdAtVertex);
 				}
 			}
 
@@ -1126,14 +1134,16 @@ public abstract class IncidenceImpl implements Incidence {
 
 	@Override
 	public void delete() {
+		VertexImpl incidentVertex = (VertexImpl) graphDb.getVertexObject(incidentVertexId);
+		EdgeImpl incidentEdge = (EdgeImpl) graphDb.getEdgeObject(incidentEdgeId);
 		incidentVertex.removeIncidenceFromLambdaSeq(this);
 		incidentEdge.removeIncidenceFromLambdaSeq(this);
-		incidentVertex = null;
-		incidentEdge = null;
-		nextIncidenceAtEdge = null;
-		nextIncidenceAtVertex = null;
-		previousIncidenceAtEdge = null;
-		previousIncidenceAtVertex = null;
+		incidentVertexId = 0;
+		incidentEdgeId = 0;
+		nextIncidenceIdAtEdge = 0;
+		nextIncidenceIdAtVertex = 0;
+		previousIncidenceIdAtEdge = 0;
+		previousIncidenceIdAtVertex = 0;
 	}
 
 }
