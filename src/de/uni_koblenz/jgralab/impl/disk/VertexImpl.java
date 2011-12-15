@@ -83,7 +83,7 @@ public abstract class VertexImpl extends
 			throws IOException {
 		super(localGraphDatabase);
 		this.elementId = id;
-		this.container = localGraphDatabase.getLocalDiskStorage()
+		this.container = localGraphDatabase.getLocalStorage()
 				.getVertexContainer(
 						DiskStorageManager.getContainerId(getLocalId()));
 	}

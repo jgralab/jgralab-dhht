@@ -82,11 +82,12 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 
 			// create SatelliteAlgorithm object on remote station
 			JGraLabServer server = JGraLabServerImpl.getLocalInstance();
-			String remoteHostname = partialGraph.getGraphDatabase()
-					.getHostname(partialGraphId);
-			RemoteJGraLabServer remoteServer = server
-					.getRemoteInstance(remoteHostname);
+			String remoteHostname;
 			try {
+				remoteHostname = partialGraph.getGraphDatabase()
+						.getHostname(partialGraphId);
+				RemoteJGraLabServer remoteServer = server
+					.getRemoteInstance(remoteHostname);
 				SatelliteAlgorithmRemoteAccess remoteAlgo = remoteServer
 						.createSatelliteAlgorithm(
 								partialGraph.getUniqueGraphId(),

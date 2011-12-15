@@ -461,7 +461,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setPreviousVertexId(vertexId, 0);
 		setNextVertexId(vertexId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getLocalDiskStorage().removeVertexFromDiskStorage(
+		getLocalStorage().removeVertexFromDiskStorage(
 				convertToLocalId(vertexId));
 		notifyVertexDeleted(vertexId);
 	}
@@ -794,7 +794,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setPreviousEdgeId(edgeId, 0);
 		setNextEdgeId(edgeId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getLocalDiskStorage().removeEdgeFromDiskStorage(
+		getLocalStorage().removeEdgeFromDiskStorage(
 				convertToLocalId(edgeId));
 		notifyEdgeDeleted(edgeId);
 	}

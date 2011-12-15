@@ -454,8 +454,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		setPreviousVertexId(vertexId, 0);
 		setNextVertexId(vertexId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getLocalDiskStorage().removeVertexFromDiskStorage(
-				convertToLocalId(vertexId));
+		try {
+			((MemStorageManager) getLocalStorage()).removeVertexFromStorage(convertToLocalId(vertexId));
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
+		}
 		notifyVertexDeleted(vertexId);
 	}
 
@@ -687,9 +690,9 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Edge> m1Class = (Class<? extends Edge>) schema
 				.getM1ClassForId(m1ClassId);
-		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_DiskBasedStorage(
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_DistributedStorage(
 				m1Class, edgeId, this);
-		localDiskStorage.storeEdge(e);
+		inMemoryStorage.storeEdge(e);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
@@ -787,7 +790,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setPreviousEdgeId(edgeId, 0);
 		setNextEdgeId(edgeId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
-		getLocalDiskStorage().removeEdgeFromDiskStorage(
+		getLocalStorage().removeEdgeFromDiskStorage(
 				convertToLocalId(edgeId));
 		notifyEdgeDeleted(edgeId);
 	}

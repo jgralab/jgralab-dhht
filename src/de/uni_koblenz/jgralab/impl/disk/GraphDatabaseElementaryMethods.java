@@ -359,7 +359,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (remoteAccess == null) {
 			try {
 				remoteAccess = getGraphDatabase(partialGraphId)
-						.getLocalDiskStorage();
+						.getLocalStorage();
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -368,7 +368,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		return remoteAccess;
 	}
 
-	public DiskStorageManager getLocalDiskStorage() {
+	public DiskStorageManager getLocalStorage() {
 		return localDiskStorage;
 	}
 

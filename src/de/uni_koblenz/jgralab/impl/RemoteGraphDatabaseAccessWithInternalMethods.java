@@ -16,7 +16,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * Methods to access graph database properties
 	 * ===================================================== */
 	
-	public RemoteStorageAccess getLocalDiskStorage() throws RemoteException;
+	public RemoteStorageAccess getLocalStorage() throws RemoteException;
 	
 	
 	

@@ -75,7 +75,7 @@ public abstract class IncidenceImpl implements Incidence {
 		this.localGraphDatabase = localGraphDatabase;
 		this.storingGraphDatabase = localGraphDatabase;
 		this.container = localGraphDatabase
-				.getLocalDiskStorage()
+				.getLocalStorage()
 				.getIncidenceContainer(
 						GraphDatabaseBaseImpl.convertToLocalId(DiskStorageManager
 								.getContainerId(GraphDatabaseElementaryMethods
