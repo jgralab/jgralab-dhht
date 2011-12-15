@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.impl.disk;
+package de.uni_koblenz.jgralab.impl.memdistributed;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -24,7 +24,6 @@ import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.impl.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
@@ -70,9 +69,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		localSubgraphData.add(data);
 		data.containingElementId = containingVertexId;
 
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
-
 		data.typeId = schema.getClassId(m1Class);
 		data.vertexCount = 0;
 		data.edgeCount = 0;
@@ -88,9 +84,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		data.globalSubgraphId = convertToGlobalId(localSubgraphData.size());
 		localSubgraphData.add(data);
 		data.containingElementId = -containingEdged;
-
-		// Graph subordinateGraph =
-		// graphFactory.createSubordinateGraphDiskBasedStorage(data.globalSubgraphId);
 
 		data.typeId = schema.getClassId(m1Class);
 		data.vertexCount = 0;
@@ -310,9 +303,9 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema
 				.getM1ClassForId(m1ClassId);
-		VertexImpl v = (VertexImpl) graphFactory.createVertex_DiskBasedStorage(
+		VertexImpl v = (VertexImpl) graphFactory.createVertex_DistributedStorage(
 				m1Class, vertexId, this);
-		localDiskStorage.storeVertex(v);
+		inMemoryStorage.storeVertex(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 

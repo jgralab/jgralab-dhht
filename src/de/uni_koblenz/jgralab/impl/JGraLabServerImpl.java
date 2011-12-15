@@ -22,9 +22,7 @@ import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
-import de.uni_koblenz.jgralab.impl.disk.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
-import de.uni_koblenz.jgralab.impl.disk.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
@@ -103,7 +101,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	}
 
 	@Override
-	public void registerLocalGraphDatabase(GraphDatabaseBaseImpl localDb) {
+	public void registerLocalGraphDatabase(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localDb) {
 		String uniqueId = localDb.getUniqueGraphId();
 		if (!localGraphDatabases.containsKey(uniqueId)) {
 			localGraphDatabases.put(uniqueId, localDb);
@@ -119,6 +117,25 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
+	
+	@Override
+	public void registerLocalGraphDatabase(
+			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl localDb) {
+		String uniqueId = localDb.getUniqueGraphId();
+		if (!localGraphDatabases.containsKey(uniqueId)) {
+			localGraphDatabases.put(uniqueId, localDb);
+			RemoteGraphDatabaseAccessWithInternalMethods stub;
+			try {
+				stub = (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+						.exportObject(localGraphDatabases.get(uniqueId), 0);
+				localStubs.put(uniqueId, stub);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+	
 	@Override
 	public void registerFileForUid(String uid, String fileName) {
 		localFilesContainingGraphs.put(uid, fileName);
@@ -250,5 +267,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			throw new RuntimeException(e);
 		}
 	}
+
+
 
 }

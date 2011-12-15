@@ -28,7 +28,7 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
-package de.uni_koblenz.jgralab.impl.mem;
+package de.uni_koblenz.jgralab.impl.memdistributed;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -66,7 +66,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
  * @author ist@uni-koblenz.de
  */
 public abstract class SubordinateGraphImpl extends
-		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
+		de.uni_koblenz.jgralab.impl.memdistributed.GraphBaseImpl implements
 		GraphStructureChangedListener {
 
 	private GraphElement<?, ?, ?> containingElement;
@@ -301,7 +301,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Graph getView(int kappa) {
 		return containingElement.getGraph().getGraphFactory()
-				.createViewGraph_InMemoryStorage(this, kappa);
+				.createViewGraph_DistributedStorage(this, kappa);
 	}
 
 	@Override
@@ -436,7 +436,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
-		T edge = super.createEdge(cls, alpha, omega);
+		T edge = super.createEdge(cls, alpha.getGlobalId(), omega.getGlobalId());
 		containingElement.addSubordinateElement(edge);
 		return edge;
 	}

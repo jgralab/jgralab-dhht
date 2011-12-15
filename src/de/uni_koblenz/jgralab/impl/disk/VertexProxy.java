@@ -48,6 +48,7 @@ import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtVertex;
 import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -588,7 +589,7 @@ public abstract class VertexProxy extends
 	public Graph getSubordinateGraph() {
 		if (subordinateGraphId == 0) {
 			Graph subordinateGraph = localGraphDatabase.getGraphFactory()
-					.createSubordinateGraph(this);
+					.createSubordinateGraphInVertex_InMemoryStorage(this);
 			subordinateGraphId = subordinateGraph.getGlobalId();
 			return subordinateGraph;
 		} else {
