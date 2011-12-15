@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
@@ -450,4 +451,12 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
 			throws RemoteException;
 
+	public String getHostname(int partialGraphId) throws RemoteException;
+
+
+	public long getTraversalContextSubgraphId() throws RemoteException;
+
+	public void releaseTraversalContext() throws RemoteException;
+
+	public void setTraversalContext(long globalId) throws RemoteException;
 }

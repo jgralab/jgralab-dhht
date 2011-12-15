@@ -84,9 +84,9 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
-	public RemoteGraphDatabaseAccessWithInternalMethods loadGraph(String uid)
+	public RemoteGraphDatabaseAccess loadGraph(String uid)
 			throws GraphIOException {
-		RemoteGraphDatabaseAccessWithInternalMethods db = localGraphDatabases
+		RemoteGraphDatabaseAccess db = localGraphDatabases
 				.get(uid);
 		if (db == null) {
 			// Depending on the data stored in the GraphIO file, either a

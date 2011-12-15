@@ -31,7 +31,7 @@
 
 package de.uni_koblenz.jgralab.impl.memdistributed;
 
-import sun.security.jca.GetInstance;
+
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;

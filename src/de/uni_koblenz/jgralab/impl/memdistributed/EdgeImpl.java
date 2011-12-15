@@ -417,7 +417,7 @@ public abstract class EdgeImpl extends
 				&& (traversalContext != null)
 				&& (!traversalContext
 						.containsVertex(firstIncidence.getVertex()))) {
-			firstIncidence = ((IncidenceImpl) firstIncidence).nextIncidenceAtEdge;
+			firstIncidence = ((IncidenceImpl) firstIncidence).getNextIncidenceAtEdge((Graph) null);
 		}
 		return firstIncidence;
 	}
@@ -476,19 +476,19 @@ public abstract class EdgeImpl extends
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
 						.getDirection()))) {
-				i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+				i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null)
 						&& ((!traversalContext.containsVertex(i.getVertex())) || (direction != i
 								.getDirection()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 				}
 			} else {
 				while ((i != null)
 						&& (!traversalContext.containsVertex(i.getVertex()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 				}
 			}
 

@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +25,7 @@ import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -129,17 +131,17 @@ public abstract class ViewGraphImpl implements Graph,
 	
 	@Override
 	public Graph getTraversalContext() {
-		return getGraphDatabase().getTraversalContext();
+		return ((GraphDatabaseBaseImpl)getGraphDatabase()).getTraversalContext();
 	}
 
 	@Override
 	public void useAsTraversalContext() {
-		getGraphDatabase().setTraversalContext(this);
+		 ((GraphDatabaseBaseImpl)getGraphDatabase()).setTraversalContext(this);
 	}
 
 	@Override
 	public void releaseTraversalContext() {
-		getGraphDatabase().releaseTraversalContext();
+		 ((GraphDatabaseBaseImpl)getGraphDatabase()).releaseTraversalContext();
 	}
 	
 	
@@ -650,7 +652,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public GraphDatabaseBaseImpl getGraphDatabase() {
+	public RemoteGraphDatabaseAccess getGraphDatabase() {
 		return viewedGraph.getGraphDatabase();
 	}
 

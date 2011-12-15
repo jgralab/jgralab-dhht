@@ -98,7 +98,7 @@ public abstract class VertexImpl extends
 		Incidence firstIncidence = graphDb.getIncidenceObject(firstIncidenceId);
 		while ((firstIncidence != null) && (traversalContext != null)
 				&& (!traversalContext.containsEdge(firstIncidence.getEdge()))) {
-			firstIncidence = ((IncidenceImpl) firstIncidence).nextIncidenceAtVertex;
+			firstIncidence = ((IncidenceImpl) firstIncidence).getNextIncidenceAtVertex((Graph) null);
 		}
 		return firstIncidence;
 	}
@@ -208,19 +208,19 @@ public abstract class VertexImpl extends
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
 						.getDirection()))) {
-				i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+				i =  ((IncidenceImpl) i).getNextIncidenceAtVertex((Graph)null);
 			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null)
 						&& ((!traversalContext.containsEdge(i.getEdge())) || (direction != i
 								.getDirection()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+					i = ((IncidenceImpl) i).getNextIncidenceAtVertex((Graph)null);
 				}
 			} else {
 				while ((i != null)
 						&& (!traversalContext.containsEdge(i.getEdge()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtVertex;
+					i = ((IncidenceImpl) i).getNextIncidenceAtVertex((Graph)null);
 				}
 			}
 
