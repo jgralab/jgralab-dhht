@@ -99,7 +99,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	private CodeBlock createDiskBasedConstructor() {
 		CodeList code = new CodeList();
-		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		if (currentCycle.isDiskbasedImpl()) {
+			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");	
+		} else {
+			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+		}
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",

@@ -207,6 +207,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 		for (RecordComponent entry : recordDomain.getComponents()) {
 			switch (currentCycle) {
 			case MEMORYBASED:
+			case DISTRIBUTED:
 				codeSnippet = new CodeSnippet(true);
 				if (entry.getDomain().isComposite()) {
 					codeSnippet.add("\tif(!(_#name#.equals(record._#name#)))");
@@ -240,6 +241,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 					"public abstract class #simpleClassName# implements de.uni_koblenz.jgralab.Record {");
 			break;
 		case DISKBASED:	
+		case DISTRIBUTED:	
 		case MEMORYBASED:
 			addImports("#jgPackage#.Graph");
 			addImports("#schemaPackage#.#simpleClassName#");
@@ -276,6 +278,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 				break;
 			case MEMORYBASED:
 			case DISKBASED:
+			case DISTRIBUTED:	
 				getterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));
@@ -311,6 +314,7 @@ public class RecordCodeGenerator extends CodeGenerator {
 				break;
 			case MEMORYBASED:
 			case DISKBASED:
+			case DISTRIBUTED:	
 				setterCode.setVariable("ctype", rdc.getDomain()
 						.getJavaAttributeImplementationTypeName(
 								schemaRootPackageName));
