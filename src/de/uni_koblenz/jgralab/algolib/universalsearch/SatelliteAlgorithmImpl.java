@@ -113,13 +113,13 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 	
 	public boolean testAndEnqueueEdge(long edgeId, long curIncAtVertexId) throws RemoteException {
 		Edge currentEdge = graph.getEdge(edgeId);
-		Incidence currentIncidence = graph.getGraphDatabase().getIncidenceObject(curIncAtVertexId);
+		Incidence currentIncidence = ((GraphDatabaseElementaryMethods) graph.getGraphDatabase()).getIncidenceObject(curIncAtVertexId);
 		return processEdge(currentEdge, currentIncidence);
 	}
 	
 	public boolean testAndEnqueueVertex(long vertexId, long curIncAtEdgeId) {
 		Vertex currentVertex = graph.getVertex(vertexId);
-		Incidence currentIncidence = graph.getGraphDatabase().getIncidenceObject(curIncAtEdgeId);
+		Incidence currentIncidence = ((GraphDatabaseElementaryMethods) graph.getGraphDatabase()).getIncidenceObject(curIncAtEdgeId);
 		return processVertex(currentVertex, currentIncidence);
 	}
 	
@@ -188,11 +188,12 @@ public class SatelliteAlgorithmImpl implements SatelliteAlgorithm,
 		} else {
 			// create SatelliteAlgorithm object on remote station
 			JGraLabServer server = JGraLabServerImpl.getLocalInstance();
-			String remoteHostname = partialGraph.getGraphDatabase()
-					.getHostname(partialGraphId);
-			RemoteJGraLabServer remoteServer = server
-					.getRemoteInstance(remoteHostname);
+			String remoteHostname;
 			try {
+				remoteHostname = partialGraph.getGraphDatabase()
+						.getHostname(partialGraphId);
+				RemoteJGraLabServer remoteServer = server
+					.getRemoteInstance(remoteHostname);
 				SatelliteAlgorithmRemoteAccess remoteAlgo = remoteServer
 						.createUniversalSatelliteAlgorithm(
 								partialGraph.getUniqueGraphId(),

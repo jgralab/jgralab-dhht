@@ -8,6 +8,7 @@ import java.util.Map;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;
@@ -459,4 +460,5 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void releaseTraversalContext() throws RemoteException;
 
 	public void setTraversalContext(long globalId) throws RemoteException;
+
 }
