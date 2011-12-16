@@ -344,6 +344,10 @@ public abstract class CodeGenerator {
 				code.add("package #schemaMemImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
 				break;
+			case DISTRIBUTED:
+				code.add("package #schemaDistributedImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDistributedImplPackage"));
+				break;
 			case DISKBASED:
 			case PROXIES:	
 				code.add("package #schemaDiskImplPackage#;");
