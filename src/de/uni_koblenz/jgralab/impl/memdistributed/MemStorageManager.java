@@ -86,14 +86,22 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 
 
-
 	public void removeVertexFromStorage(int convertToLocalId) {
 		vertexArray[convertToLocalId] = null;
 	}
 
+	public void storeEdge(EdgeImpl e) {
+		edgeArray[e.getLocalId()] = e;
+	}
+	
 	
 	public void removeEdgeFromStorage(int convertToLocalId) {
 		edgeArray[convertToLocalId] = null;
+	}
+	
+	
+	public void storeIncidence(IncidenceImpl i) {
+		incidenceArray[i.getLocalId()] = i;
 	}
 
 	public void removeIncidenceFromStorage(int convertToLocalId) {
@@ -453,6 +461,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
+
+
 
 
 }

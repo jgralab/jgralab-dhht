@@ -103,6 +103,10 @@ public abstract class IncidenceImpl implements Incidence {
 	 * The incident {@link VertexImpl}.
 	 */
 	private long incidentVertexId;
+	
+	public long getIncidentVertexId() {
+		return incidentVertexId;
+	}
 
 	/**
 	 * The next {@link Incidence} in the lambda-sequence of
@@ -136,6 +140,10 @@ public abstract class IncidenceImpl implements Incidence {
 	 * The incident {@link EdgeImpl}.
 	 */
 	private long incidentEdgeId;
+	
+	public long getIncidentEdgeId() {
+		return incidentEdgeId;
+	}
 
 	/**
 	 * The next {@link Incidence} in the lambda-sequence of
