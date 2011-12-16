@@ -175,6 +175,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add("public #type# #isOrGet#_#name#();");
 			break;
 		case MEMORYBASED:
+		case DISTRIBUTED:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\treturn _#name#;",
 					 "}");
@@ -211,6 +212,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#);");
 			break;
+		case DISTRIBUTED:	
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# new_#name#) {",
 					 "\t_#name# = new_#name#;", 

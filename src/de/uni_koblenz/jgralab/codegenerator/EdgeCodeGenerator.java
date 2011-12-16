@@ -70,7 +70,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 	
 	protected CodeBlock createLoadAttributeContainer() {
-		if (currentCycle.isImplementationVariant()) {
+		if (currentCycle.isDiskbasedImpl()) {
 			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			return new CodeSnippet(
 					true,
