@@ -72,7 +72,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeList code = (CodeList) super.createBody();
 		code.setVariable("graphFactory", currentCycle.isDiskbasedImpl() ? "getGraphFactory()" : "graphFactory");
 		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 			addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
@@ -152,7 +152,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			}
 		}
 
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
 			}
@@ -346,7 +346,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		if (gec instanceof BinaryEdgeClass) {
 			code.addNoIndent(createFactoryMethodForBinaryEdge((EdgeClass) gec));
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			code.addNoIndent(createFactoryMethod(gec, true));
 		}
 		return code;
@@ -456,7 +456,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		block.setVariable("elemClassName", "Vertex");
 		block.setVariable("elemClassLowName", "vertex"); 
 		block.setVariable("elemClassPluralName", "Vertices");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#jgImplPackage#.VertexIterable");
 		}
 		code.add(block);
@@ -464,7 +464,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		block.setVariable("elemClassName", "Edge");
 		block.setVariable("elemClassLowName", "edge"); 
 		block.setVariable("elemClassPluralName", "Edges");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#jgImplPackage#.EdgeIterable");
 		}
 		code.add(block);
@@ -498,7 +498,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			s.add(" */");
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#();");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");
