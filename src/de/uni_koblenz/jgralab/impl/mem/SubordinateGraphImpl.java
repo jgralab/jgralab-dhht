@@ -301,7 +301,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Graph getView(int kappa) {
 		return containingElement.getGraph().getGraphFactory()
-				.createViewGraph(this, kappa);
+				.createViewGraph_InMemoryStorage(this, kappa);
 	}
 
 	@Override

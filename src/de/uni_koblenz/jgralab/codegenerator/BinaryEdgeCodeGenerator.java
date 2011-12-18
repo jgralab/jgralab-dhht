@@ -17,7 +17,7 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 	BinaryEdgeClass bec;
 	
 	protected void createMethodsForBinaryEdge(CodeList code) {
-		if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
+		if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
 			code.add(createGetSemanticsMethod());
 			code.add(createGetAlphaSemanticsMethod());
 			code.add(createGetOmegaSemanticsMethod());

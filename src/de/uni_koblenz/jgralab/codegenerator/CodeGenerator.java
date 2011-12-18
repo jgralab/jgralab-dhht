@@ -58,13 +58,14 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, MEMORYBASED, DISKBASED, PROXIES, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, PROXIES, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
+			out.add(DISTRIBUTED);
 			out.add(DISKBASED);
 			out.add(PROXIES);
 			out.add(CLASSONLY);
@@ -77,6 +78,15 @@ public abstract class CodeGenerator {
 		 */
 		protected boolean isMembasedImpl() {
 			return this == MEMORYBASED;
+		}
+		
+		
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isDistributedImpl() {
+			return this == DISKBASED;
 		}
 		
 		/**
@@ -92,8 +102,8 @@ public abstract class CodeGenerator {
 		 * 
 		 * @return
 		 */
-		protected boolean isMemOrDiskImpl() {
-			return this == DISKBASED || this == MEMORYBASED;
+		protected boolean isImplementationVariant() {
+			return this == DISKBASED || this == MEMORYBASED || this == DISTRIBUTED;
 		}
 
 
@@ -170,6 +180,7 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
 		rootBlock.setVariable("jgDiskImplPackage", "de.uni_koblenz.jgralab.impl.disk");
+		rootBlock.setVariable("jgDistributedImplPackage", "de.uni_koblenz.jgralab.impl.memdistributed");
 		rootBlock.setVariable("jgMemImplPackage", "de.uni_koblenz.jgralab.impl.mem");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
 		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
@@ -178,10 +189,12 @@ public abstract class CodeGenerator {
 		if ((packageName != null) && !packageName.equals("")) {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."	+ packageName);
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem." + packageName);
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.memdistributed." + packageName);
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem");
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.memdistributed");
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
@@ -271,14 +284,18 @@ public abstract class CodeGenerator {
 				logger.finer("Creating interface for class: "+ simpleClassName);
 				logger.finer("Writing file to: " + pathPrefix + "/"	+ schemaPackage);
 			}
-			if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
+			if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
 				if (currentCycle.isMembasedImpl()) {
 					schemaImplPackage = rootBlock.getVariable("schemaMemImplPackage");
-				} else {
+				} 
+				if (currentCycle.isDistributedImpl()) {
+					schemaImplPackage = rootBlock.getVariable("schemaDistributedImplPackage");
+				} 
+				if (currentCycle.isDiskbasedImpl()) {
 					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
 				} 
 				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
-				if (currentCycle.isMemOrDiskImpl()) {
+				if (currentCycle.isImplementationVariant()) {
 					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
 				} else if (hasProxySupport()) {
 					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
@@ -326,6 +343,10 @@ public abstract class CodeGenerator {
 			case MEMORYBASED:
 				code.add("package #schemaMemImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
+				break;
+			case DISTRIBUTED:
+				code.add("package #schemaDistributedImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDistributedImplPackage"));
 				break;
 			case DISKBASED:
 			case PROXIES:	
@@ -380,7 +401,7 @@ public abstract class CodeGenerator {
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isMemOrDiskImpl()) {
+			if (currentCycle.isImplementationVariant()) {
 				javaSources.add(new JavaSourceFromString(implClassName,	rootBlock.getCode()));
 			} else if (currentCycle.isProxies()) {
 				javaSources.add(new JavaSourceFromString(proxyClassName,	rootBlock.getCode()));

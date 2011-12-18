@@ -57,7 +57,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		if (currentCycle.isProxies())
 			addImports("#jgDiskImplPackage#.EdgeProxy");
 		CodeList code = (CodeList) super.createConstructor();
-		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
+		code.setVariable("implOrProxy", currentCycle.isImplementationVariant() ? "Impl" : "Proxy");
 		if (currentCycle.isDiskbasedImpl()) {
 			code.addNoIndent(new CodeSnippet("/** Constructor only to be used by Background-Storage backend */"));
 			code.addNoIndent(new CodeSnippet(
@@ -70,7 +70,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 	}
 	
 	protected CodeBlock createLoadAttributeContainer() {
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isDiskbasedImpl()) {
 			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			return new CodeSnippet(
 					true,

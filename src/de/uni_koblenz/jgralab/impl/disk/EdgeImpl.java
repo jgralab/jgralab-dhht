@@ -75,7 +75,7 @@ public abstract class EdgeImpl extends
 			throws IOException {
 		super(graphDatabase);
 		this.elementId = id;
-		this.container = graphDatabase.getLocalDiskStorage().getEdgeContainer(
+		this.container = graphDatabase.getLocalStorage().getEdgeContainer(
 				DiskStorageManager.getContainerId(DiskStorageManager
 						.getContainerId(getLocalId())));
 	}

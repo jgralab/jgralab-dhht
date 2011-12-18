@@ -29,8 +29,9 @@
  * the parts of JGraLab used as well as that of the covered work.
  */
 
-package de.uni_koblenz.jgralab.impl.mem;
+package de.uni_koblenz.jgralab.impl.memdistributed;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -46,6 +47,7 @@ import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -57,12 +59,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 public abstract class EdgeImpl extends
 		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
 
-	// global edge sequence
-	protected EdgeImpl nextEdgeInGraph;
-	protected EdgeImpl prevEdgeInGraph;
-
-	protected IncidenceImpl firstIncidenceAtEdge;
-	protected IncidenceImpl lastIncidenceAtEdge;
 
 	/**
 	 * 
@@ -77,12 +73,11 @@ public abstract class EdgeImpl extends
 	 * @param graph
 	 *            {@link Graph} its corresponding graph
 	 */
-	protected EdgeImpl(int anId, Graph graph) {
-		super(graph);
-		setId(anId);
-		((CompleteGraphImpl) graph).addEdge(this);
+	protected EdgeImpl(long id, GraphDatabaseBaseImpl graphDatabase)
+			throws IOException {
+		super(id, graphDatabase);
 	}
-
+	
 	@Override
 	public final Vertex addAdjacence(IncidenceClass incidentIc,
 			IncidenceClass adjacentIc, Edge other) {
@@ -143,8 +138,13 @@ public abstract class EdgeImpl extends
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
-		int id = graph.allocateIncidenceIndex(0);
-		return connect(incidenceClass, elemToConnect, id);
+
+		Schema schema = getSchema();
+		int classId = schema.getClassId(incidenceClass);
+		long globalVId = elemToConnect.getGlobalId();
+
+		return (T) graphDb.getIncidenceObject(graphDb.connect(classId,
+							globalVId, this.getGlobalId()));
 	}
 
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
@@ -412,12 +412,12 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext) {
-		Incidence firstIncidence = firstIncidenceAtEdge;
+		Incidence firstIncidence = graphDb.getIncidenceObject(firstIncidenceId);
 		while ((firstIncidence != null)
 				&& (traversalContext != null)
 				&& (!traversalContext
 						.containsVertex(firstIncidence.getVertex()))) {
-			firstIncidence = ((IncidenceImpl) firstIncidence).nextIncidenceAtEdge;
+			firstIncidence = ((IncidenceImpl) firstIncidence).getNextIncidenceAtEdge((Graph) null);
 		}
 		return firstIncidence;
 	}
@@ -471,24 +471,24 @@ public abstract class EdgeImpl extends
 	public final Incidence getFirstIncidence(Graph traversalContext,
 			Direction direction) {
 		assert isValid();
-		Incidence i = firstIncidenceAtEdge;
+		Incidence i = graphDb.getIncidenceObject(firstIncidenceId);
 		if (traversalContext == null) {
 			while (((i != null) && (direction != null)
 					&& (direction != Direction.BOTH) && (direction != i
 						.getDirection()))) {
-				i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+				i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 			}
 		} else {
 			if ((direction != null) && (direction != Direction.BOTH)) {
 				while ((i != null)
 						&& ((!traversalContext.containsVertex(i.getVertex())) || (direction != i
 								.getDirection()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 				}
 			} else {
 				while ((i != null)
 						&& (!traversalContext.containsVertex(i.getVertex()))) {
-					i = ((IncidenceImpl) i).nextIncidenceAtEdge;
+					i = ((IncidenceImpl) i).getNextIncidenceAtEdge((Graph) null);
 				}
 			}
 
@@ -667,7 +667,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final Incidence getLastIncidence(Graph traversalContext) {
-		Incidence lastIncidence = lastIncidenceAtEdge;
+		Incidence lastIncidence = graphDb.getIncidenceObject(lastIncidenceId);
 		if ((lastIncidence == null) || (traversalContext == null)
 				|| (traversalContext.containsVertex(lastIncidence.getVertex()))) {
 			return lastIncidence;
@@ -717,7 +717,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getNextEdge(Graph traversalContext) {
 		assert isValid();
-		Edge nextEdge = nextEdgeInGraph;
+		Edge nextEdge = graphDb.getEdgeObject(nextElementId);
 		if (nextEdge == null) {
 			return null;
 		} else if ((traversalContext == null)
@@ -820,7 +820,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final Edge getPreviousEdge(Graph traversalContext) {
 		assert isValid();
-		Edge previousEdge = prevEdgeInGraph;
+		Edge previousEdge = graphDb.getEdgeObject(previousElementId);
 		if (previousEdge == null
 				|| (traversalContext != null && !traversalContext
 						.containsElement(previousEdge))) {
@@ -832,13 +832,14 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public final Graph getSubordinateGraph() {
-		if (subOrdinateGraph == null) {
-			subOrdinateGraph = getLocalGraph().getGraphFactory()
-					.createSubordinateGraphInEdge_InMemoryStorage(this);
+	public Graph getSubordinateGraph() {
+		if (subOrdinateGraphId == 0) {
+				subOrdinateGraphId = graphDb
+						.createLocalSubordinateGraphInEdge(this.getGlobalId());
 		}
-		return subOrdinateGraph;
+		return graphDb.getGraphObject(subOrdinateGraphId);
 	}
+
 
 	@Override
 	public final boolean isAfter(Edge e) {
@@ -897,7 +898,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeAfterInGraph((EdgeImpl) e, this);
+		graphDb.putEdgeAfter(e.getGlobalId(), this.getGlobalId());
 	}
 
 	@Override
@@ -908,7 +909,7 @@ public abstract class EdgeImpl extends
 		assert e.isValid();
 		assert getGraph() == e.getGraph();
 		assert isValid() && e.isValid();
-		graph.putEdgeBeforeInGraph((EdgeImpl) e, this);
+		graphDb.putEdgeBefore(e.getGlobalId(), this.getGlobalId());
 	}
 
 	@Override
@@ -1105,12 +1106,12 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final void setFirstIncidence(IncidenceImpl firstIncidence) {
-		firstIncidenceAtEdge = firstIncidence;
+		firstIncidenceId = firstIncidence.getGlobalId();
 	}
 
 	@Override
 	public final void setLastIncidence(IncidenceImpl lastIncidence) {
-		lastIncidenceAtEdge = lastIncidence;
+		lastIncidenceId = lastIncidence.getGlobalId();
 	}
 
 	/**
@@ -1121,7 +1122,7 @@ public abstract class EdgeImpl extends
 	 *            {@link Edge} which should be put after this {@link Edge}
 	 */
 	protected final void setNextEdge(Edge nextEdge) {
-		nextEdgeInGraph = (EdgeImpl) nextEdge;
+		nextElementId = nextEdge.getGlobalId();
 	}
 
 	/**
@@ -1132,7 +1133,7 @@ public abstract class EdgeImpl extends
 	 *            {@link Edge} which should be put before this {@link Edge}
 	 */
 	protected final void setPreviousEdge(Edge prevEdge) {
-		prevEdgeInGraph = (EdgeImpl) prevEdge;
+		previousElementId = prevEdge.getGlobalId();
 	}
 
 	@Override

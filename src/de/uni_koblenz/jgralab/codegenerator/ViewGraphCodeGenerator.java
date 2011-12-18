@@ -73,7 +73,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isMemOrDiskImpl()) {
+			if (currentCycle.isImplementationVariant()) {
 				javaSources.add(new JavaSourceFromString(implClassName,
 						rootBlock.getCode()));
 			} 
@@ -171,7 +171,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			}
 		}
 
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
 				addImports("#jgPackage#.GraphIO");
@@ -323,7 +323,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		}
 		CodeList code = new CodeList();
 		code.addNoIndent(createFactoryMethod(gec, false));
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			code.addNoIndent(createFactoryMethod(gec, true));
 		}
 		return code;
@@ -346,7 +346,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			code.add("*/",
 					 "public #ecJavaClassName# create#ecCamelName#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
 					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) create#ecType#(#ecJavaClassName#.class);",
 					 "\treturn new#ecType#;", "}");
@@ -398,7 +398,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		block.setVariable("elemClassName", "Vertex");
 		block.setVariable("elemClassLowName", "vertex"); 
 		block.setVariable("elemClassPluralName", "Vertices");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#jgImplPackage#.VertexIterable");
 		}
 		code.add(block);
@@ -406,7 +406,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		block.setVariable("elemClassName", "Edge");
 		block.setVariable("elemClassLowName", "edge"); 
 		block.setVariable("elemClassPluralName", "Edges");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#jgImplPackage#.EdgeIterable");
 		}
 		code.add(block);
@@ -440,7 +440,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			s.add(" */");
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#();");
 		}
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			s.add("public Iterable<#elemJavaClassName#> get#elemCamelName##elemClassPluralName#() {");
 			s.add("\treturn new #elemClassName#Iterable<#elemJavaClassName#>(this, #elemJavaClassName#.class);");
 			s.add("}");

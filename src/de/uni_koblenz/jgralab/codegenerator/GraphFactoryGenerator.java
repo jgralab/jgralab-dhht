@@ -126,8 +126,9 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		code.setVariable("graphImplName", graphClass.getSimpleName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
-			code.add("setGraphInMemoryImplementationClass(#graphName#.class, #schemaMemImplPackage#.#graphImplName#Impl.class);");
-			code.add("setGraphDiskBasedImplementationClass(#graphName#.class, #schemaDiskImplPackage#.#graphImplName#Impl.class);");
+			code.add("setGraphImplementationClass_InMemoryStorage(#graphName#.class, #schemaMemImplPackage#.#graphImplName#Impl.class);");
+			code.add("setGraphImplementationClass_DistributedStorage(#graphName#.class, #schemaDistributedImplPackage#.#graphImplName#Impl.class);");
+			code.add("setGraphImplementationClass_DiskBasedStorage(#graphName#.class, #schemaDiskImplPackage#.#graphImplName#Impl.class);");
 		}
 		return code;
 	}
@@ -144,8 +145,9 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
 			code.add("/* TODO: Uncomment line 145 of GraphFactoryGenerator */");
-			code.add("setSubordinateGraphImplementationClass(#graphName#.class, #graphInMemImplName#SubordinateImpl.class); ");
-			code.add("setSubordinateGraphImplementationClassForDiskBasedStorage(#graphName#.class, #graphOnDiskImplName#SubordinateImpl.class); ");
+			code.add("setSubordinateGraphImplementationClass_InMemoryStorage(#graphName#.class, #graphInMemImplName#SubordinateImpl.class); ");
+			code.add("setSubordinateGraphImplementationClass_DistributedStorage(#graphName#.class, #graphDistributedImplName#SubordinateImpl.class); ");
+			code.add("setSubordinateGraphImplementationClass_DiskBasedStorage(#graphName#.class, #graphOnDiskImplName#SubordinateImpl.class); ");
 		}
 		return code;
 	}
@@ -159,12 +161,14 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
 		code.setVariable("graphInMemImplName", schemaRootPackageName + ".impl.mem."+ graphClass.getQualifiedName());
+		code.setVariable("graphDistributedImplName", schemaRootPackageName + ".impl.memdistributed."+ graphClass.getQualifiedName());
 		code.setVariable("graphOnDiskImplName", schemaRootPackageName + ".impl.disk."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
 			code.add("/* TODO: Uncomment line 162 of GraphFactoryGenerator */");
-			code.add("setViewGraphImplementationClass(#graphName#.class, #graphInMemImplName#ViewImpl.class);");
-			code.add("setViewGraphImplementationClassForDiskBasedStorage(#graphName#.class, #graphOnDiskImplName#ViewImpl.class); ");
+			code.add("setViewGraphImplementationClass_InMemoryStorage(#graphName#.class, #graphInMemImplName#ViewImpl.class);");
+			code.add("setViewGraphImplementationClass_DistributedStorage(#graphName#.class, #graphDistributedImplName#ViewImpl.class);");
+			code.add("setViewGraphImplementationClass_DiskBasedStorage(#graphName#.class, #graphOnDiskImplName#ViewImpl.class); ");
 		}
 		return code;
 	}
@@ -178,11 +182,14 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("vertexName", schemaRootPackageName + "."	+ vertexClass.getQualifiedName());
 		code.setVariable("vertexMemImplName", schemaRootPackageName + ".impl.mem." 	+ vertexClass.getQualifiedName());
+		code.setVariable("vertexDistributedImplName", schemaRootPackageName + ".impl.memdistributed." 	+ vertexClass.getQualifiedName());
 		code.setVariable("vertexDiskImplName", schemaRootPackageName + ".impl.disk." 	+ vertexClass.getQualifiedName());
 		if (!vertexClass.isAbstract()) {
-			code.add("setVertexInMemoryImplementationClass(#vertexName#.class, #vertexMemImplName#Impl.class);");
-			code.add("setVertexDiskBasedImplementationClass(#vertexName#.class, #vertexDiskImplName#Impl.class);");
-			code.add("setVertexProxyImplementationClass(#vertexName#.class, #vertexDiskImplName#Proxy.class);");
+			code.add("setVertexImplementationClass_InMemoryStorage(#vertexName#.class, #vertexMemImplName#Impl.class);");
+			code.add("setVertexImplementationClass_DistributedStorage(#vertexName#.class, #vertexDistributedImplName#Impl.class);");
+			code.add("setVertexProxyImplementationClass_DistributedStorage(#vertexName#.class, #vertexDistributedImplName#Proxy.class);");
+			code.add("setVertexImplementationClass_DiskBasedStorage(#vertexName#.class, #vertexDiskImplName#Impl.class);");
+			code.add("setVertexProxyImplementationClass_DiskBasedStorage(#vertexName#.class, #vertexDiskImplName#Proxy.class);");
 		}
 		return code;
 	}
@@ -192,9 +199,11 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("recordName", schemaRootPackageName + "." + recordDomain.getQualifiedName());
 		code.setVariable("recordMemImplName", schemaRootPackageName + ".impl.mem."	+ recordDomain.getQualifiedName());
+		code.setVariable("recordDistributedImplName", schemaRootPackageName + ".impl.memdistributed."	+ recordDomain.getQualifiedName());
 		code.setVariable("recordDiskImplName", schemaRootPackageName + ".impl.disk." + recordDomain.getQualifiedName());
-		code.add("setRecordMemImplementationClass(#recordName#.class, #recordMemImplName#Impl.class);");
-		code.add("setRecordDiskImplementationClass(#recordName#.class, #recordDiskImplName#Impl.class);");
+		code.add("setRecordImplementationClass_InMemoryStorage(#recordName#.class, #recordMemImplName#Impl.class);");
+		code.add("setRecordImplementationClass_DistributedStorage(#recordName#.class, #recordDistributedImplName#Impl.class);");
+		code.add("setRecordImplementationClass_DiskBasedStorage(#recordName#.class, #recordDiskImplName#Impl.class);");
 		return code;
 	}
 
@@ -202,12 +211,15 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("edgeName", schemaRootPackageName + "." + edgeClass.getQualifiedName());
 		code.setVariable("edgeMemImplName", schemaRootPackageName + ".impl.mem." + edgeClass.getQualifiedName());
+		code.setVariable("edgeDistributedImplName", schemaRootPackageName + ".impl.memdistributed." + edgeClass.getQualifiedName());
 		code.setVariable("edgeDiskImplName", schemaRootPackageName + ".impl.disk." + edgeClass.getQualifiedName());
 
 		if (!edgeClass.isAbstract()) {
-			code.add("setEdgeInMemoryImplementationClass(#edgeName#.class, #edgeMemImplName#Impl.class);");
-			code.add("setEdgeDiskBasedImplementationClass(#edgeName#.class, #edgeDiskImplName#Impl.class);");
-			code.add("setEdgeProxyImplementationClass(#edgeName#.class, #edgeDiskImplName#Proxy.class);");
+			code.add("setEdgeImplementationClass_InMemoryStorage(#edgeName#.class, #edgeMemImplName#Impl.class);");
+			code.add("setEdgeImplementationClass_DistributedStorage(#edgeName#.class, #edgeDistributedImplName#Impl.class);");
+			code.add("setEdgeProxyImplementationClass_DistributedStorage(#edgeName#.class, #edgeDistributedImplName#Proxy.class);");
+			code.add("setEdgeImplementationClass_DiskBasedStorage(#edgeName#.class, #edgeDiskImplName#Impl.class);");
+			code.add("setEdgeProxyImplementationClass_DiskBasedStorage(#edgeName#.class, #edgeDiskImplName#Proxy.class);");
 		}
 		return code;
 	}
@@ -216,12 +228,15 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("incName", schemaRootPackageName + "." + incClass.getQualifiedName());
 		code.setVariable("incMemImplName", schemaRootPackageName + ".impl.mem." + incClass.getQualifiedName());
+		code.setVariable("incDistributedImplName", schemaRootPackageName + ".impl.memdistributed." + incClass.getQualifiedName());
 		code.setVariable("incDiskImplName", schemaRootPackageName + ".impl.disk." + incClass.getQualifiedName());
 
 		if (!incClass.isAbstract()) {
-			code.add("setIncidenceInMemoryImplementationClass(#incName#.class, #incMemImplName#Impl.class);");
-			code.add("setIncidenceDiskBasedImplementationClass(#incName#.class, #incDiskImplName#Impl.class);");
-			code.add("setIncidenceProxyImplementationClass(#incName#.class, #incDiskImplName#Proxy.class);");
+			code.add("setIncidenceImplementationClass_InMemoryStorage(#incName#.class, #incMemImplName#Impl.class);");
+			code.add("setIncidenceImplementationClass_DistributedBasedStorage(#incName#.class, #incDistributedImplName#Impl.class);");
+			code.add("setIncidenceProxyImplementationClass_DistributedBasedStorage(#incName#.class, #incDistributedImplName#Proxy.class);");
+			code.add("setIncidenceImplementationClass_DiskBasedStorage(#incName#.class, #incDiskImplName#Impl.class);");
+			code.add("setIncidenceProxyImplementationClass_DiskBasedStorage(#incName#.class, #incDiskImplName#Proxy.class);");
 		}
 		return code;
 	}

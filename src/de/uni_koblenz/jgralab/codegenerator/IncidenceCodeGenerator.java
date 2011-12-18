@@ -99,7 +99,11 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 	
 	private CodeBlock createDiskBasedConstructor() {
 		CodeList code = new CodeList();
-		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		if (currentCycle.isDiskbasedImpl()) {
+			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");	
+		} else {
+			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+		}
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
@@ -194,7 +198,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			code.add(" */",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl()  || currentCycle.isProxies() ) {
+		if (currentCycle.isImplementationVariant()  || currentCycle.isProxies() ) {
 			code.add("@Override",
 					 "public #mcFileName# getNext#mcCamelName#At#connectedElement#(#formalParams#) {",
 					 "\treturn (#mcFileName#)getNextIncidenceAt#connectedElement#(#mcFileName#.class#actualParams#);",
@@ -208,7 +212,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("direction", aec.getDirection().toString());
 		addImports("#jgPackage#.Direction");
-		if (currentCycle.isMemOrDiskImpl()  || currentCycle.isProxies() ) {
+		if (currentCycle.isImplementationVariant()  || currentCycle.isProxies() ) {
 			code.add("@Override",
 					 "public Direction getDirection() {",
 					 "\treturn Direction.#direction#;",

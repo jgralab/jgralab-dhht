@@ -275,7 +275,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	protected Vertex internalCreateVertex(Class<? extends Vertex> cls) {
-		return getGraphFactory().createVertex(cls, 0, this);
+		return getGraphFactory().createVertex_InMemoryStorage(cls, 0, this);
 	}
 	
 	/**
@@ -336,7 +336,7 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 	}
 
 	protected Edge internalCreateEdge(Class<? extends Edge> cls) {
-		return getGraphFactory().createEdge(cls, 0, this);
+		return getGraphFactory().createEdge_InMemoryStorage(cls, 0, this);
 	}
 
 	

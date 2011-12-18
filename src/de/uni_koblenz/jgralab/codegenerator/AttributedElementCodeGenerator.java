@@ -63,7 +63,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 	@Override
 	protected CodeList createBody() {
 		CodeList code = super.createBody();
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			// code.add(createConstructor());
 			code.add(createFields(aec.getAttributeList()));
 			code.add(createGenericGetter(aec.getAttributeList()));
@@ -132,7 +132,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		}
 		snip.add("public void setAttribute(String attributeName, Object data) {");
 		code.addNoIndent(snip);
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 		for (Attribute attr : attrSet) {
 			CodeSnippet s = new CodeSnippet();
 			s.setVariable("name", attr.getName());
@@ -296,7 +296,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				snippet.setVariable("setterName", "set_" + attribute.getName());
 				snippet.setVariable("variableName", attribute.getName());
 				snippet.setVariable("attributeContainer", attributeContainer);
-				if (currentCycle.isMemOrDiskImpl()) {
+				if (currentCycle.isImplementationVariant()) {
 					code.add(attribute.getDomain().getReadMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io", attributeContainer));
@@ -325,7 +325,7 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 		if ((attrSet != null) && !attrSet.isEmpty()) {
 			code.add(new CodeSnippet("io.space();"));
 			for (Attribute attribute : attrSet) {
-				if (currentCycle.isMemOrDiskImpl()) {
+				if (currentCycle.isImplementationVariant()) {
 					code.add(attribute.getDomain().getWriteMethod(
 							schemaRootPackageName, "_" + attribute.getName(),
 							"io", attributeContainer));

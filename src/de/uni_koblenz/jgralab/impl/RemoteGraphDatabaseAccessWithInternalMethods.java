@@ -1,8 +1,6 @@
-package de.uni_koblenz.jgralab.impl.disk;
+package de.uni_koblenz.jgralab.impl;
 
 import java.rmi.RemoteException;
-
-import de.uni_koblenz.jgralab.Graph;
 
 
 /**
@@ -18,7 +16,7 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 	 * Methods to access graph database properties
 	 * ===================================================== */
 	
-	public RemoteDiskStorageAccess getLocalDiskStorage() throws RemoteException;
+	public RemoteStorageAccess getLocalStorage() throws RemoteException;
 	
 	
 	
@@ -172,5 +170,16 @@ public interface RemoteGraphDatabaseAccessWithInternalMethods extends RemoteGrap
 
 	public void setTraversalContext(long globalId) throws RemoteException;
 
+
+
+
+	public void setNextVertexId(long modifiedVertexId, long nextVertexId) throws RemoteException;
+
+	
+	public void setPreviousVertexId(long modifiedVertexId, long previousVertexId) throws RemoteException;
+	
+	public void setNextEdgeId(long modifiedEdgeId, long nextEdgeId) throws RemoteException;
+	
+	public void setPreviousEdgeId(long modifiedEdgeId, long previousEdgeId) throws RemoteException;
 
 }

@@ -56,7 +56,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 	@Override
 	protected CodeBlock createConstructor() {
 		CodeList code = (CodeList) super.createConstructor();
-		code.setVariable("implOrProxy", currentCycle.isMemOrDiskImpl() ? "Impl" : "Proxy");
+		code.setVariable("implOrProxy", currentCycle.isImplementationVariant() ? "Impl" : "Proxy");
 		if (currentCycle.isProxies())
 			addImports("#jgDiskImplPackage#.VertexProxy");
 		if (currentCycle.isDiskbasedImpl()) {

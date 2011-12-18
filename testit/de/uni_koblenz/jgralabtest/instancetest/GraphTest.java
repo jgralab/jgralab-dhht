@@ -250,20 +250,20 @@ public class GraphTest extends InstanceTest {
 	@Test
 	public void testCreateEdge() throws CommitFailedException {
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(SubLink.class, v9, v5);
-		Edge e2 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e3 = g1.createEdge(SubLink.class, v12, v8);
-		Edge e4 = g1.createEdge(Link.class, v1, v5);
-		Edge e5 = g1.createEdge(Link.class, v2, v6);
-		Edge e6 = g1.createEdge(Link.class, v9, v6);
-		Edge e7 = g1.createEdge(Link.class, v10, v5);
-		Edge e8 = g1.createEdge(Link.class, v11, v6);
-		Edge e9 = g1.createEdge(LinkBack.class, v5, v1);
-		Edge e10 = g1.createEdge(LinkBack.class, v6, v2);
-		Edge e11 = g1.createEdge(LinkBack.class, v5, v9);
-		Edge e12 = g1.createEdge(LinkBack.class, v6, v10);
-		Edge e13 = g1.createEdge(LinkBack.class, v5, v12);
-		Edge e14 = g1.createEdge(LinkBack.class, v6, v10); // the same as e12
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
+		Edge e2 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e3 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(Link.class, v1, v5);
+		Edge e5 = g1.createEdge_InMemoryStorage(Link.class, v2, v6);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v6);
+		Edge e7 = g1.createEdge_InMemoryStorage(Link.class, v10, v5);
+		Edge e8 = g1.createEdge_InMemoryStorage(Link.class, v11, v6);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
+		Edge e10 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v2);
+		Edge e11 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v9);
+		Edge e12 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v10);
+		Edge e13 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v12);
+		Edge e14 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v10); // the same as e12
 		commit(g1);
 
 		// tests whether the edge is an instance of the expected class
@@ -379,7 +379,7 @@ public class GraphTest extends InstanceTest {
 
 		createTransaction(g1);
 		createTransaction(g2);
-		g1.createEdge(SubLink.class, v9, v5);
+		g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
 		g2.createSubNode();
 		commit(g1);
 		commit(g2);
@@ -395,7 +395,7 @@ public class GraphTest extends InstanceTest {
 
 		createTransaction(g1);
 		createTransaction(g2);
-		Edge e1 = g1.createEdge(Link.class, v1, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v1, v6);
 		g2.createSuperNode();
 		commit(g1);
 		commit(g2);
@@ -411,7 +411,7 @@ public class GraphTest extends InstanceTest {
 
 		createTransaction(g1);
 		createTransaction(g2);
-		g1.createEdge(LinkBack.class, v7, v10);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v7, v10);
 		g2.createDoubleSubNode();
 		commit(g1);
 		commit(g2);
@@ -426,7 +426,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(SubLink.class, v9, v5);
+		Edge e2 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -591,7 +591,7 @@ public class GraphTest extends InstanceTest {
 
 		// makes sure that changing edges does not affect the vertexList
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v1, v2);
+		g1.createEdge_InMemoryStorage(SubLink.class, v1, v2);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -599,7 +599,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v1, v2);
+		g1.createEdge_InMemoryStorage(Link.class, v1, v2);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -904,7 +904,7 @@ public class GraphTest extends InstanceTest {
 
 		// makes sure that editing edges does not change the vertexList
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v15, v14);
+		g1.createEdge_InMemoryStorage(SubLink.class, v15, v14);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -912,7 +912,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v14, v15);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v14, v15);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -1029,11 +1029,11 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v11, v7);
+		g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		createTransaction(g2);
-		Edge e1 = g2.createEdge(Link.class, v15, v19);
+		Edge e1 = g2.createEdge_InMemoryStorage(Link.class, v15, v19);
 		commit(g2);
 
 		createReadOnlyTransaction(g1);
@@ -1063,7 +1063,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(LinkBack.class, v19, v15);
+		g2.createEdge_InMemoryStorage(LinkBack.class, v19, v15);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1074,7 +1074,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(Link.class, v15, v19);
+		g2.createEdge_InMemoryStorage(Link.class, v15, v19);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1084,7 +1084,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e2 = g2.createEdge(SubLink.class, v23, v19);
+		Edge e2 = g2.createEdge_InMemoryStorage(SubLink.class, v23, v19);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1094,7 +1094,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(Link.class, v16, v20);
+		g2.createEdge_InMemoryStorage(Link.class, v16, v20);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1104,7 +1104,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e3 = g2.createEdge(Link.class, v23, v20);
+		Edge e3 = g2.createEdge_InMemoryStorage(Link.class, v23, v20);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1114,7 +1114,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(Link.class, v24, v19);
+		g2.createEdge_InMemoryStorage(Link.class, v24, v19);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1124,7 +1124,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(LinkBack.class, v20, v16);
+		g2.createEdge_InMemoryStorage(LinkBack.class, v20, v16);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1134,7 +1134,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e4 = g2.createEdge(SubLink.class, v24, v20);
+		Edge e4 = g2.createEdge_InMemoryStorage(SubLink.class, v24, v20);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1154,7 +1154,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(LinkBack.class, v19, v23);
+		g2.createEdge_InMemoryStorage(LinkBack.class, v19, v23);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1164,7 +1164,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(LinkBack.class, v20, v24);
+		g2.createEdge_InMemoryStorage(LinkBack.class, v20, v24);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1194,7 +1194,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e5 = g2.createEdge(SubLink.class, v21, v17);
+		Edge e5 = g2.createEdge_InMemoryStorage(SubLink.class, v21, v17);
 		commit(g2);
 
 		createTransaction(g2);
@@ -1204,7 +1204,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e6 = g2.createEdge(Link.class, v13, v18);
+		Edge e6 = g2.createEdge_InMemoryStorage(Link.class, v13, v18);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1214,7 +1214,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		Edge e7 = g2.createEdge(LinkBack.class, v17, v14);
+		Edge e7 = g2.createEdge_InMemoryStorage(LinkBack.class, v17, v14);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1224,7 +1224,7 @@ public class GraphTest extends InstanceTest {
 		commit(g2);
 
 		createTransaction(g2);
-		g2.createEdge(Link.class, v22, v18);
+		g2.createEdge_InMemoryStorage(Link.class, v22, v18);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1289,7 +1289,7 @@ public class GraphTest extends InstanceTest {
 
 		// changing the attributes of an edge does not change the edgeList
 		createTransaction(g2);
-		Edge e8 = g2.createEdge(SubLink.class, v25, v26);
+		Edge e8 = g2.createEdge_InMemoryStorage(SubLink.class, v25, v26);
 		commit(g2);
 
 		createReadOnlyTransaction(g2);
@@ -1361,7 +1361,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(SubLink.class, v9, v7);
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
@@ -1374,91 +1374,91 @@ public class GraphTest extends InstanceTest {
 
 		// normal cases
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v10, v5);
+		g1.createEdge_InMemoryStorage(SubLink.class, v10, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v10, v6);
+		g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v10, v7);
+		g1.createEdge_InMemoryStorage(SubLink.class, v10, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v10, v8);
+		g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v11, v5);
+		g1.createEdge_InMemoryStorage(SubLink.class, v11, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v11, v6);
+		g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v11, v7);
+		g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v11, v8);
+		g1.createEdge_InMemoryStorage(SubLink.class, v11, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v12, v5);
+		g1.createEdge_InMemoryStorage(SubLink.class, v12, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v12, v6);
+		g1.createEdge_InMemoryStorage(SubLink.class, v12, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v12, v7);
+		g1.createEdge_InMemoryStorage(SubLink.class, v12, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(SubLink.class, v12, v8);
+		Edge e3 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v9, v6);
+		g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v9, v7);
+		g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(SubLink.class, v9, v8);
+		g1.createEdge_InMemoryStorage(SubLink.class, v9, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
@@ -1474,7 +1474,7 @@ public class GraphTest extends InstanceTest {
 		createTransaction(g1);
 		Vertex v13 = g1.createVertex(DoubleSubNode.class);
 		Vertex v14 = g1.createVertex(DoubleSubNode.class);
-		g1.createEdge(Link.class, v13, v14);
+		g1.createEdge_InMemoryStorage(Link.class, v13, v14);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
@@ -1495,122 +1495,122 @@ public class GraphTest extends InstanceTest {
 		checkIfEdgeListVersionRemained(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v1, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v1, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v2, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v2, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v3, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v3, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v4, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v4, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v10, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v10, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v11, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v11, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v12, v5);
+		g1.createEdge_InMemoryStorage(Link.class, v12, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		// v6 does not exist anymore
 		createTransaction(g1);
-		g1.createEdge(Link.class, v1, v6);
+		g1.createEdge_InMemoryStorage(Link.class, v1, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v1, v7);
+		g1.createEdge_InMemoryStorage(Link.class, v1, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v1, v8);
+		g1.createEdge_InMemoryStorage(Link.class, v1, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(Link.class, v3, v7);
+		Edge e4 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(Link.class, v11, v8);
+		g1.createEdge_InMemoryStorage(Link.class, v11, v8);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v5, v1);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v6, v2);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v6, v2);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v7, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v3);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v8, v4);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v8, v4);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v8, v9);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v8, v9);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v7, v10);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v7, v10);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		g1.createEdge(LinkBack.class, v6, v11);
+		g1.createEdge_InMemoryStorage(LinkBack.class, v6, v11);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(LinkBack.class, v5, v12);
+		Edge e6 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v12);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
@@ -1635,19 +1635,19 @@ public class GraphTest extends InstanceTest {
 
 		// reordering edges does change the edgeListVersion
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v9, v5);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v12, v7);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v7);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(SubLink.class, v11, v6);
+		Edge e9 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
 		commit(g1);
 
 		elv1 = checkIfEdgeListVersionChanged(elv1);
@@ -1850,20 +1850,20 @@ public class GraphTest extends InstanceTest {
 		SuperNode v17 = g2.createSuperNode();
 		SuperNode v18 = g2.createSuperNode();
 
-		Edge e1 = g1.createEdge(SubLink.class, v9, v7);
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
 		SubLink e2 = g2.createSubLink(v13, v17);
-		Edge e3 = g1.createEdge(Link.class, v10, v5);
+		Edge e3 = g1.createEdge_InMemoryStorage(Link.class, v10, v5);
 		de.uni_koblenz.jgralabtest.schemas.vertextest.Link e4 = g2.createLink(
 				v15, v17);
-		Edge e5 = g1.createEdge(LinkBack.class, v7, v1);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v1);
 		LinkBack e6 = g2.createLinkBack(v17, v13);
-		Edge e7 = g1.createEdge(SubLink.class, v10, v5);
-		Edge e8 = g1.createEdge(Link.class, v3, v7);
-		Edge e9 = g1.createEdge(LinkBack.class, v5, v9);
-		Edge e10 = g1.createEdge(SubLink.class, v9, v5);
-		Edge e11 = g2.createEdge(SubLink.class, v14, v17);
-		Edge e12 = g2.createEdge(Link.class, v16, v18);
-		Edge e13 = g2.createEdge(LinkBack.class, v18, v13);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v5);
+		Edge e8 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v9);
+		Edge e10 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
+		Edge e11 = g2.createEdge_InMemoryStorage(SubLink.class, v14, v17);
+		Edge e12 = g2.createEdge_InMemoryStorage(Link.class, v16, v18);
+		Edge e13 = g2.createEdge_InMemoryStorage(LinkBack.class, v18, v13);
 		commit(g1);
 		commit(g2);
 
@@ -1904,9 +1904,9 @@ public class GraphTest extends InstanceTest {
 		// when a vertex is deleted, the edges to which it belonged are deleted
 		// as well
 		createTransaction(g1);
-		e1 = g1.createEdge(SubLink.class, v10, v12);
-		Edge e14 = g1.createEdge(SubLink.class, v9, v6);
-		Edge e17 = g1.createEdge(LinkBack.class, v8, v10);
+		e1 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v12);
+		Edge e14 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
+		Edge e17 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v10);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -1939,8 +1939,8 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e15 = g1.createEdge(LinkBack.class, v6, v11);
-		Edge e16 = g1.createEdge(Link.class, v12, v8);
+		Edge e15 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v11);
+		Edge e16 = g1.createEdge_InMemoryStorage(Link.class, v12, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -2486,18 +2486,18 @@ public class GraphTest extends InstanceTest {
 		 */
 		// TODO faults => assertions
 		createTransaction(g1);
-		Link e1 = g1.createEdge(Link.class, v1, v6);
-		Link e2 = g1.createEdge(Link.class, v11, v5);
-		Link e3 = g1.createEdge(Link.class, v2, v8);
-		SubLink e4 = g1.createEdge(SubLink.class, v11, v6);
-		SubLink e5 = g1.createEdge(SubLink.class, v12, v5);
-		LinkBack e6 = g1.createEdge(LinkBack.class, v6, v11);
-		LinkBack e7 = g1.createEdge(LinkBack.class, v5, v2);
-		LinkBack e8 = g1.createEdge(LinkBack.class, v8, v1);
-		LinkBack e9 = g1.createEdge(LinkBack.class, v5, v10);
-		Link e10 = g1.createEdge(Link.class, v12, v7);
-		SubLink e11 = g1.createEdge(SubLink.class, v10, v6);
-		SubLink e12 = g1.createEdge(SubLink.class, v9, v7);
+		Link e1 = g1.createEdge_InMemoryStorage(Link.class, v1, v6);
+		Link e2 = g1.createEdge_InMemoryStorage(Link.class, v11, v5);
+		Link e3 = g1.createEdge_InMemoryStorage(Link.class, v2, v8);
+		SubLink e4 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
+		SubLink e5 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v5);
+		LinkBack e6 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v11);
+		LinkBack e7 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v2);
+		LinkBack e8 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v1);
+		LinkBack e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v10);
+		Link e10 = g1.createEdge_InMemoryStorage(Link.class, v12, v7);
+		SubLink e11 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		SubLink e12 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
 		commit(g1);
 
 		// SubLink e10 = graph2.createEdge(SubLink.class, v9, v6);
@@ -3861,7 +3861,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3869,7 +3869,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v13);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3877,7 +3877,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v11);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v11);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3901,7 +3901,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3917,7 +3917,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v8, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3925,7 +3925,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v2, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v2, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3941,7 +3941,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(LinkBack.class, v13, v1);
+		Edge e7 = g1.createEdge_InMemoryStorage(LinkBack.class, v13, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -3957,7 +3957,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v9, v6);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4002,7 +4002,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4010,7 +4010,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v13);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4018,7 +4018,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v11);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v11);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4034,7 +4034,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4042,7 +4042,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v8, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4050,7 +4050,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v9, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4058,7 +4058,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v11, v7);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4082,7 +4082,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(Link.class, v1, v13);
+		Edge e8 = g1.createEdge_InMemoryStorage(Link.class, v1, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4098,7 +4098,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(LinkBack.class, v6, v2);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v2);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4161,7 +4161,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4171,7 +4171,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v13);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4181,7 +4181,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v11);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v11);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4201,7 +4201,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4211,7 +4211,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v8, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4231,7 +4231,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v9, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4251,7 +4251,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v11, v7);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4271,7 +4271,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v13);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4281,7 +4281,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(LinkBack.class, v6, v1);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4321,7 +4321,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(Link.class, v2, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4379,7 +4379,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(SubLink.class, v9, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4392,7 +4392,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v8);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4405,7 +4405,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v12);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v12);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4431,7 +4431,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v13);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4470,7 +4470,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v13, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v13, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4483,7 +4483,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v9, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4496,7 +4496,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v12, v7);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4535,7 +4535,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4574,7 +4574,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(LinkBack.class, v6, v1);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4587,7 +4587,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(Link.class, v2, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4660,7 +4660,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(SubLink.class, v9, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4670,7 +4670,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v13);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4680,7 +4680,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v11);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v11);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4700,7 +4700,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4720,7 +4720,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v8, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4740,7 +4740,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v9, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4770,7 +4770,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v11, v7);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4780,7 +4780,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v13);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4800,7 +4800,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(LinkBack.class, v6, v1);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4810,7 +4810,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(Link.class, v2, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4874,7 +4874,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(SubLink.class, v9, v6);
+		Edge e1 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4887,7 +4887,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v3, v13);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v3, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4900,7 +4900,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v7, v11);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v11);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4926,7 +4926,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v10, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4965,7 +4965,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(LinkBack.class, v8, v3);
+		Edge e5 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v3);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4978,7 +4978,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(Link.class, v9, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(Link.class, v9, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -4991,7 +4991,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v11, v7);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5030,7 +5030,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v13);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v13);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5043,7 +5043,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(LinkBack.class, v6, v1);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5082,7 +5082,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(Link.class, v2, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5188,16 +5188,16 @@ public class GraphTest extends InstanceTest {
 	@Test
 	public void testGetEdge() throws CommitFailedException {
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(LinkBack.class, v5, v1);
-		Edge e2 = g1.createEdge(Link.class, v2, v7);
-		Edge e3 = g1.createEdge(LinkBack.class, v8, v4);
-		Edge e4 = g1.createEdge(SubLink.class, v11, v6);
-		Edge e5 = g1.createEdge(Link.class, v2, v5);
-		Edge e6 = g1.createEdge(LinkBack.class, v7, v12);
-		Edge e7 = g1.createEdge(SubLink.class, v9, v8);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e9 = g1.createEdge(Link.class, v3, v7);
-		Edge e10 = g1.createEdge(Link.class, v3, v7);
+		Edge e1 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v4);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
+		Edge e5 = g1.createEdge_InMemoryStorage(Link.class, v2, v5);
+		Edge e6 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v12);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v8);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e9 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
 		commit(g1);
 
 		// border cases
@@ -5299,7 +5299,7 @@ public class GraphTest extends InstanceTest {
 		// normal cases
 		createTransaction(g1);
 		for (int i = 0; i < 1000; i++) {
-			g1.createEdge(SubLink.class, v9, v5);
+			g1.createEdge_InMemoryStorage(SubLink.class, v9, v5);
 		}
 		commit(g1);
 
@@ -5309,7 +5309,7 @@ public class GraphTest extends InstanceTest {
 
 		createTransaction(g1);
 		for (int i = 0; i < 1000; i++) {
-			g1.createEdge(Link.class, v1, v5);
+			g1.createEdge_InMemoryStorage(Link.class, v1, v5);
 		}
 		commit(g1);
 
@@ -5319,7 +5319,7 @@ public class GraphTest extends InstanceTest {
 
 		createTransaction(g1);
 		for (int i = 0; i < 1000; i++) {
-			g1.createEdge(LinkBack.class, v5, v9);
+			g1.createEdge_InMemoryStorage(LinkBack.class, v5, v9);
 		}
 		commit(g1);
 
@@ -5555,7 +5555,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(LinkBack.class, v5, v1);
+		Edge e1 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5583,7 +5583,7 @@ public class GraphTest extends InstanceTest {
 		// normal cases
 		// creating an edge increases the value by 1
 		createTransaction(g1);
-		Edge e2 = g1.createEdge(Link.class, v2, v7);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v2, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5591,7 +5591,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e3 = g1.createEdge(LinkBack.class, v8, v4);
+		Edge e3 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v4);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5599,7 +5599,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e4 = g1.createEdge(SubLink.class, v11, v6);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5607,7 +5607,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e5 = g1.createEdge(Link.class, v2, v5);
+		Edge e5 = g1.createEdge_InMemoryStorage(Link.class, v2, v5);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5615,7 +5615,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e6 = g1.createEdge(LinkBack.class, v7, v12);
+		Edge e6 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v12);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5623,7 +5623,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e7 = g1.createEdge(SubLink.class, v9, v8);
+		Edge e7 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v8);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5631,7 +5631,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e8 = g1.createEdge(SubLink.class, v10, v6);
+		Edge e8 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5639,7 +5639,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e9 = g1.createEdge(Link.class, v3, v7);
+		Edge e9 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5647,7 +5647,7 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(Link.class, v3, v7);
+		Edge e10 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5838,15 +5838,15 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v7);
-		Edge e2 = g1.createEdge(Link.class, v4, v8);
-		Edge e3 = g1.createEdge(Link.class, v1, v8);
-		Edge e4 = g1.createEdge(SubLink.class, v12, v5);
-		Edge e5 = g1.createEdge(SubLink.class, v10, v7);
-		Edge e6 = g1.createEdge(SubLink.class, v11, v5);
-		Edge e7 = g1.createEdge(LinkBack.class, v6, v12);
-		Edge e8 = g1.createEdge(LinkBack.class, v6, v3);
-		Edge e9 = g1.createEdge(LinkBack.class, v8, v9);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v4, v8);
+		Edge e3 = g1.createEdge_InMemoryStorage(Link.class, v1, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v5);
+		Edge e5 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v7);
+		Edge e6 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v5);
+		Edge e7 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v12);
+		Edge e8 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v3);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v9);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5859,12 +5859,12 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(SubLink.class, v11, v6);
-		Edge e11 = g1.createEdge(LinkBack.class, v7, v12);
-		Edge e12 = g1.createEdge(LinkBack.class, v5, v1);
-		Edge e13 = g1.createEdge(Link.class, v12, v5);
-		Edge e14 = g1.createEdge(SubLink.class, v9, v7);
-		Edge e15 = g1.createEdge(SubLink.class, v11, v6);
+		Edge e10 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
+		Edge e11 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v12);
+		Edge e12 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
+		Edge e13 = g1.createEdge_InMemoryStorage(Link.class, v12, v5);
+		Edge e14 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
+		Edge e15 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5878,12 +5878,12 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e16 = g1.createEdge(LinkBack.class, v5, v2);
-		Edge e17 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e18 = g1.createEdge(LinkBack.class, v8, v12);
-		Edge e19 = g1.createEdge(Link.class, v1, v7);
-		Edge e20 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e21 = g1.createEdge(Link.class, v3, v6);
+		Edge e16 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v2);
+		Edge e17 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e18 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v12);
+		Edge e19 = g1.createEdge_InMemoryStorage(Link.class, v1, v7);
+		Edge e20 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e21 = g1.createEdge_InMemoryStorage(Link.class, v3, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5913,15 +5913,15 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v7);
-		Edge e2 = g1.createEdge(Link.class, v4, v8);
-		Edge e3 = g1.createEdge(Link.class, v1, v8);
-		Edge e4 = g1.createEdge(SubLink.class, v12, v5);
-		Edge e5 = g1.createEdge(SubLink.class, v10, v7);
-		Edge e6 = g1.createEdge(SubLink.class, v11, v5);
-		Edge e7 = g1.createEdge(LinkBack.class, v6, v12);
-		Edge e8 = g1.createEdge(LinkBack.class, v6, v2);
-		Edge e9 = g1.createEdge(LinkBack.class, v8, v9);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v4, v8);
+		Edge e3 = g1.createEdge_InMemoryStorage(Link.class, v1, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v5);
+		Edge e5 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v7);
+		Edge e6 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v5);
+		Edge e7 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v12);
+		Edge e8 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v2);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v9);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5948,12 +5948,12 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(SubLink.class, v11, v6);
-		Edge e11 = g1.createEdge(LinkBack.class, v7, v12);
-		Edge e12 = g1.createEdge(LinkBack.class, v5, v1);
-		Edge e13 = g1.createEdge(Link.class, v12, v5);
-		Edge e14 = g1.createEdge(SubLink.class, v9, v7);
-		Edge e15 = g1.createEdge(SubLink.class, v11, v6);
+		Edge e10 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
+		Edge e11 = g1.createEdge_InMemoryStorage(LinkBack.class, v7, v12);
+		Edge e12 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v1);
+		Edge e13 = g1.createEdge_InMemoryStorage(Link.class, v12, v5);
+		Edge e14 = g1.createEdge_InMemoryStorage(SubLink.class, v9, v7);
+		Edge e15 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -5985,15 +5985,15 @@ public class GraphTest extends InstanceTest {
 	@Test
 	public void testEdges3() throws CommitFailedException {
 		createTransaction(g1);
-		Edge e1 = g1.createEdge(Link.class, v3, v7);
-		Edge e2 = g1.createEdge(Link.class, v4, v8);
-		Edge e3 = g1.createEdge(Link.class, v1, v8);
-		Edge e4 = g1.createEdge(SubLink.class, v12, v5);
-		Edge e5 = g1.createEdge(SubLink.class, v10, v7);
-		Edge e6 = g1.createEdge(SubLink.class, v11, v5);
-		Edge e7 = g1.createEdge(LinkBack.class, v6, v12);
-		Edge e8 = g1.createEdge(LinkBack.class, v6, v3);
-		Edge e9 = g1.createEdge(LinkBack.class, v8, v9);
+		Edge e1 = g1.createEdge_InMemoryStorage(Link.class, v3, v7);
+		Edge e2 = g1.createEdge_InMemoryStorage(Link.class, v4, v8);
+		Edge e3 = g1.createEdge_InMemoryStorage(Link.class, v1, v8);
+		Edge e4 = g1.createEdge_InMemoryStorage(SubLink.class, v12, v5);
+		Edge e5 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v7);
+		Edge e6 = g1.createEdge_InMemoryStorage(SubLink.class, v11, v5);
+		Edge e7 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v12);
+		Edge e8 = g1.createEdge_InMemoryStorage(LinkBack.class, v6, v3);
+		Edge e9 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v9);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);
@@ -6020,12 +6020,12 @@ public class GraphTest extends InstanceTest {
 		commit(g1);
 
 		createTransaction(g1);
-		Edge e10 = g1.createEdge(LinkBack.class, v5, v2);
-		Edge e11 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e12 = g1.createEdge(LinkBack.class, v8, v12);
-		Edge e13 = g1.createEdge(Link.class, v1, v7);
-		Edge e14 = g1.createEdge(SubLink.class, v10, v6);
-		Edge e15 = g1.createEdge(Link.class, v3, v6);
+		Edge e10 = g1.createEdge_InMemoryStorage(LinkBack.class, v5, v2);
+		Edge e11 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e12 = g1.createEdge_InMemoryStorage(LinkBack.class, v8, v12);
+		Edge e13 = g1.createEdge_InMemoryStorage(Link.class, v1, v7);
+		Edge e14 = g1.createEdge_InMemoryStorage(SubLink.class, v10, v6);
+		Edge e15 = g1.createEdge_InMemoryStorage(Link.class, v3, v6);
 		commit(g1);
 
 		createReadOnlyTransaction(g1);

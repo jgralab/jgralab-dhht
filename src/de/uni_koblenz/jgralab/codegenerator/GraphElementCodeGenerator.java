@@ -65,8 +65,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
 		code.setVariable("graphOrDatabase", currentCycle.isMembasedImpl() ? "#jgPackage#.Graph" : "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
-		code.setVariable("additionalProxyFormalParams", currentCycle.isMemOrDiskImpl() ? "" : ", #jgDiskImplPackage#.RemoteGraphDatabaseAccess remoteDb");
-		code.setVariable("additionalProxyActualParams", currentCycle.isMemOrDiskImpl() ? "" : ",remoteDb");
+		code.setVariable("additionalProxyFormalParams", currentCycle.isImplementationVariant() ? "" : ", #jgDiskImplPackage#.RemoteGraphDatabaseAccess remoteDb");
+		code.setVariable("additionalProxyActualParams", currentCycle.isImplementationVariant() ? "" : ",remoteDb");
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName##implOrProxy#(long id, #graphOrDatabase# g#additionalProxyFormalParams#) throws java.io.IOException {",
@@ -175,6 +175,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add("public #type# #isOrGet#_#name#();");
 			break;
 		case MEMORYBASED:
+		case DISTRIBUTED:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\treturn _#name#;",
 					 "}");
@@ -211,6 +212,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		case ABSTRACT:
 			code.add("public void set_#name#(#type# _#name#);");
 			break;
+		case DISTRIBUTED:	
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# new_#name#) {",
 					 "\t_#name# = new_#name#;", 
@@ -376,7 +378,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add(" */",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#);");
 		}
-		if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
+		if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
 			code.add("@Override",
 					 "public #mcQualifiedName# getNext#mcCamelName#(#formalParams#) {",
 					 "\treturn (#mcQualifiedName#)getNext#ownElementClass#(#mcQualifiedName#.class#actualParams#);",

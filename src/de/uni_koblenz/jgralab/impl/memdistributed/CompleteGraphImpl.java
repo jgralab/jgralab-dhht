@@ -29,7 +29,7 @@
  * the parts of JGraLab used as well as that of the covered work.
  */
 
-package de.uni_koblenz.jgralab.impl.disk;
+package de.uni_koblenz.jgralab.impl.memdistributed;
 
 import java.rmi.RemoteException;
 import java.util.Collection;

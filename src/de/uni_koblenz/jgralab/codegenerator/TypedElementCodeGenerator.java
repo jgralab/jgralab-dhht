@@ -63,11 +63,11 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 
 	@Override
 	protected CodeList createBody() {
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 		}
 		CodeList code = new CodeList();
-		if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()) {
+		if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
 			code.add(createGetTypeMethod());
 			code.add(createConstructor());
 			code.add(createGetM1ClassMethod());
@@ -78,22 +78,22 @@ public abstract class TypedElementCodeGenerator<ConcreteMetaClass extends TypedE
 	@Override
 	protected CodeBlock createHeader() {
 		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("classOrInterface", currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " class" : " interface");
-		code.setVariable("interfaceOrImplClass", currentCycle.isMemOrDiskImpl() ? rootBlock.getVariable("simpleImplClassName") 
+		code.setVariable("classOrInterface", currentCycle.isImplementationVariant() || currentCycle.isProxies() ? " class" : " interface");
+		code.setVariable("interfaceOrImplClass", currentCycle.isImplementationVariant() ? rootBlock.getVariable("simpleImplClassName") 
 																: (rootBlock.getVariable("simpleClassName") + (currentCycle.isProxies() ? "Proxy" : "")));
-		code.setVariable("abstract", currentCycle.isMemOrDiskImpl()  && aec.isAbstract() ? " abstract" : "");
+		code.setVariable("abstract", currentCycle.isImplementationVariant()  && aec.isAbstract() ? " abstract" : "");
 		code.add("public#abstract##classOrInterface# #interfaceOrImplClass##extends##implements# {");
 		code.setVariable("extends",	" ");
-		if (currentCycle.isMemOrDiskImpl()) {
+		if (currentCycle.isImplementationVariant()) {
 			code.setVariable("extends",	" extends #baseClassName#");
 		} else if (currentCycle.isProxies()) {
 			code.setVariable("extends",	" extends #proxyClassName#");
 		}
 		StringBuffer buf = new StringBuffer();
 		if (interfaces.size() > 0) {
-			String delim = currentCycle.isMemOrDiskImpl() || currentCycle.isProxies() ? " implements " : " extends ";
+			String delim = currentCycle.isImplementationVariant() || currentCycle.isProxies() ? " implements " : " extends ";
 			for (String interfaceName : interfaces) {
-				if (currentCycle.isMemOrDiskImpl() || currentCycle.isProxies()
+				if (currentCycle.isImplementationVariant() || currentCycle.isProxies()
 						|| !interfaceName.equals(aec.getQualifiedName())) {
 					if (interfaceName.equals("Vertex")
 							|| interfaceName.equals("Edge")
