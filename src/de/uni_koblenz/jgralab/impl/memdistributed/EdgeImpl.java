@@ -61,11 +61,6 @@ public abstract class EdgeImpl extends
 
 
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6297447377016245955L;
-
-	/**
 	 * Creates a new {@link Edge} instance.
 	 * 
 	 * @param partialGraphId

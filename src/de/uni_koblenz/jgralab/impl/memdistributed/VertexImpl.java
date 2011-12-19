@@ -154,10 +154,7 @@ public abstract class VertexImpl extends
 		return graphDb.getGraphObject(subOrdinateGraphId);
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3588328684461421331L;
+
 
 	/**
 	 * Creates a new {@link Vertex} instance.

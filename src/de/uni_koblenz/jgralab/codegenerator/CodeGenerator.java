@@ -65,7 +65,7 @@ public abstract class CodeGenerator {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
-			out.add(DISTRIBUTED);
+			//out.add(DISTRIBUTED);
 			out.add(DISKBASED);
 			out.add(PROXIES);
 			out.add(CLASSONLY);
@@ -86,7 +86,7 @@ public abstract class CodeGenerator {
 		 * @return
 		 */
 		protected boolean isDistributedImpl() {
-			return this == DISKBASED;
+			return this == DISTRIBUTED;
 		}
 		
 		/**
@@ -279,6 +279,7 @@ public abstract class CodeGenerator {
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
+			System.out.println("Creating Code for class: " + simpleClassName);
 			createCode();
 			if (currentCycle.isAbstract()) {
 				logger.finer("Creating interface for class: "+ simpleClassName);
