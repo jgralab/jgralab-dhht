@@ -69,11 +69,6 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**
-	 * Generated Serial Version UID
-	 */
-	private static final long serialVersionUID = 1245169302974416890L;
-
-	/**
 	 * The id of this {@link GraphElement}.
 	 */
 	protected long id;

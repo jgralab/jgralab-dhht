@@ -17,8 +17,6 @@ import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
  */
 public final class MemStorageManager implements RemoteStorageAccess {
 
-	private final GraphDatabaseBaseImpl graphDatabase;
-	 
 	/**
 	 * free index list for vertices
 	 */
@@ -54,7 +52,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	
 
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
-		this.graphDatabase = database;
+		//this.graphDatabase = database;
 	}
 
 

@@ -131,6 +131,9 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		if (currentCycle.isDiskbasedImpl()) {
 			addImports("#jgDiskImplPackage#.#baseClassName#");
 		}
+		if (currentCycle.isDistributedImpl()) {
+			addImports("#jgDistributedImplPackage#.#baseClassName#");
+		}
 		rootBlock.setVariable("baseClassName", "ViewGraphImpl");
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
@@ -465,6 +468,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			code.add("public #type# #isOrGet#_#name#() ;");
 			break;
 		case DISKBASED:
+		case DISTRIBUTED:
 		case MEMORYBASED:
 			code.add("public #type# #isOrGet#_#name#()  {", 
 					"\treturn ((#schemaPackageName#.#simpleClassName#)getViewedGraph()).get_#name#();",
@@ -486,6 +490,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 			code.add("public void set_#name#(#type# _#name#) ;");
 			break;
 		case DISKBASED:
+		case DISTRIBUTED:
 		case MEMORYBASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					"\t((#schemaPackageName#.#simpleClassName#)getViewedGraph()).set_#name#(_#name#);","}");
