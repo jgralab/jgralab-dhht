@@ -52,8 +52,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
 
-public interface GraphElement<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
-		extends AttributedElement<OwnTypeClass, OwnType> {
+public interface GraphElement<OwnTypeClass extends GraphElementClass<?,?>, OwnType extends GraphElement<?,?,?>, DualType extends GraphElement<?,?,?>> extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present

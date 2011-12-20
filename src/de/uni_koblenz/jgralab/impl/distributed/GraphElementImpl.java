@@ -65,7 +65,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 // getCompleteGraph returns the complete raph
 // get local graph the complete one or a local partial one
 // getContainingGraph the graph that directly contains the element
-public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
+public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<?,?>, OwnType extends GraphElement<?,?,?>, DualType extends GraphElement<?,?,?>>
 		implements GraphElement<OwnTypeClass, OwnType, DualType> {
 
 	/**

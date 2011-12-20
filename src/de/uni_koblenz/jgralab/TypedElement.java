@@ -4,7 +4,7 @@ import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
-public interface TypedElement<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
+public interface TypedElement<ConcreteMetaClass extends TypedElementClass<?, ?>, ConcreteInterface extends TypedElement<?, ?>>
                  extends Comparable<ConcreteInterface> {
 
 	/**
