@@ -19,7 +19,7 @@ public interface JGraLabServer {
 	 * to the complete graph identified by their common uniqueGraphId
 	 * @param graphDatabase the graph database to be registered
 	 */
-	public void registerLocalGraphDatabase( de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase);
+	public void registerLocalGraphDatabase( de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase);
 	
 	/**
 	 * Retrieves the remote Server instance running on the given host

@@ -46,10 +46,10 @@ import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
-import de.uni_koblenz.jgralab.impl.memdistributed.GraphBaseImpl;
-import de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl;
-import de.uni_koblenz.jgralab.impl.memdistributed.VertexImpl;
-import de.uni_koblenz.jgralab.impl.memdistributed.ViewGraphImpl;
+import de.uni_koblenz.jgralab.impl.distributed.GraphBaseImpl;
+import de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl;
+import de.uni_koblenz.jgralab.impl.distributed.VertexImpl;
+import de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**
@@ -188,7 +188,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public Graph createGraph_DistributedStorage(Class<? extends Graph> graphClass,
 			String uniqueGraphId, long subgraphId,
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase,
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
 			Graph g = graphMap_DiskBasedStorage.get(graphClass).newInstance(
@@ -236,7 +236,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public Edge createEdge_DistributedStorage(Class<? extends Edge> edgeClass,
-			long id, de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase) {
+			long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			Edge e = edgeMap_DistributedStorage.get(edgeClass).newInstance(id,
 					graphDatabase);
@@ -287,7 +287,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	
 	@Override
 	public Edge createEdgeProxy_DistributedStorage(Class<? extends Edge> edgeClass, long id,
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase,
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess remoteDatabase) {
 		try {
 			Edge e = edgeProxyMap_DistributedStorage.get(edgeClass).newInstance(id,
@@ -343,7 +343,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public <T extends Incidence> T createIncidence_DistributedStorage(
 			Class<? extends T> incidenceClass, long incidenceId, long vertexId,
-			long edgeId, de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase) {
+			long edgeId, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMap_DistributedStorage.get(incidenceClass)
@@ -384,7 +384,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public <T extends Incidence> T createIncidenceProxy_DistributedStorage(
 			Class<? extends T> incidenceClass, long id,
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase,
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess remoteDatabase) {
 		try {
 			@SuppressWarnings("unchecked")
@@ -465,7 +465,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public Vertex createVertex_DistributedStorage(
 			Class<? extends Vertex> vertexClass, long id,
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl localGraphDatabase) {
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl localGraphDatabase) {
 		try {
 			Vertex v = vertexMap_DistributedStorage.get(vertexClass).newInstance(
 					id, localGraphDatabase);
@@ -500,7 +500,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	
 	@Override
 	public Vertex createVertexProxy_DistributedStorage(Class<? extends Vertex> vertexClass,
-			long id, de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase,
+			long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
 			Vertex v = vertexProxyMap_DistributedStorage.get(vertexClass).newInstance(id,
@@ -573,7 +573,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setGraphImplementationClass_DistributedStorage(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.memdistributed.GraphBaseImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.GraphBaseImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, long.class,
@@ -743,7 +743,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setVertexImplementationClass_DistributedStorage(
 			Class<? extends Vertex> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.memdistributed.VertexImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.VertexImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
@@ -1046,11 +1046,11 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 
 	@Override
-	public de.uni_koblenz.jgralab.impl.memdistributed.ViewGraphImpl createViewGraph_DistributedStorage(
+	public de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl createViewGraph_DistributedStorage(
 			Graph viewGraph, int level) {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();
-			de.uni_koblenz.jgralab.impl.memdistributed.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.memdistributed.ViewGraphImpl) viewGraphMap_DiskBasedStorage
+			de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl) viewGraphMap_DiskBasedStorage
 					.get(graphClass).newInstance(viewGraph, level);
 			return g;
 		} catch (Exception ex) {
@@ -1094,12 +1094,12 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl createSubordinateGraphInVertex_DistributedStorage(
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase, long vertexId) {
+	public de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl createSubordinateGraphInVertex_DistributedStorage(
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, long vertexId) {
 		try {
 			Vertex vertex = graphDatabase.getVertexObject(vertexId);
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl) subordinateGraphForVertexMap_DistributedStorage
+			de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl) subordinateGraphForVertexMap_DistributedStorage
 					.get(graphClass).newInstance(vertex);
 			return g;
 		} catch (Exception ex) {
@@ -1141,12 +1141,12 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl createSubordinateGraphInEdge_DistributedStorage(
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl graphDatabase, long edgeId) {
+	public de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl createSubordinateGraphInEdge_DistributedStorage(
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, long edgeId) {
 		try {
 			Edge edge = graphDatabase.getEdgeObject(edgeId);
 			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();
-			de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl) subordinateGraphForEdgeMap_DistributedStorage
+			de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl) subordinateGraphForEdgeMap_DistributedStorage
 					.get(graphClass).newInstance(edge);
 			return g;
 		} catch (Exception ex) {
@@ -1193,7 +1193,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setSubordinateGraphImplementationClass_DistributedStorage(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.memdistributed.SubordinateGraphImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
@@ -1271,7 +1271,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public void setViewGraphImplementationClass_DistributedStorage(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.memdistributed.ViewGraphImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { originalClass, int.class };

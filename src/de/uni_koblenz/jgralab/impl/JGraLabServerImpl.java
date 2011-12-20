@@ -120,7 +120,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	
 	@Override
 	public void registerLocalGraphDatabase(
-			de.uni_koblenz.jgralab.impl.memdistributed.GraphDatabaseBaseImpl localDb) {
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl localDb) {
 		String uniqueId = localDb.getUniqueGraphId();
 		if (!localGraphDatabases.containsKey(uniqueId)) {
 			localGraphDatabases.put(uniqueId, localDb);
