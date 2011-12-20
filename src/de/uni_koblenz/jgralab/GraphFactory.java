@@ -274,6 +274,7 @@ public interface GraphFactory {
 	public <T extends Incidence> T createIncidence_InMemoryStorage(Class<T> incidenceClass,	int id, Vertex v, Edge e);
 	
 	public <T extends Incidence> T createIncidence_DistributedStorage(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase);
+
 	
 	/**
 	 * Creates a {@link Incidence}-object for the specified class. The returned

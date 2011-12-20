@@ -1277,8 +1277,8 @@ public abstract class VertexImpl extends
 
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect, int id) {
-		return getSchema().getGraphFactory().createIncidence_InMemoryStorage(incidenceClass,
-				id, this, elemToConnect);
+		return getSchema().getGraphFactory().createIncidence_DistributedStorage(incidenceClass,
+				id, this.getGlobalId(), elemToConnect.getGlobalId(), graphDb);
 	}
 
 	@Override
