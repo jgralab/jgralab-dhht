@@ -1369,7 +1369,7 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// create the explicitly modeled MayBeNestedIn edges
-		for (GraphElement<?, ?, ?> ge : nestedElements.getMarkedElements()) {
+		for (GraphElement<?, ? ,?,?> ge : nestedElements.getMarkedElements()) {
 			GraphElementClass containingGEC = (GraphElementClass) ge;
 			assert nestedElements.getMark(containingGEC) != null;
 			assert !nestedElements.getMark(containingGEC).isEmpty();
@@ -1562,7 +1562,7 @@ public class Rsa2Tg extends XmlProcessor {
 	 * {@link #nestedElements}.
 	 */
 	private void updateNestedElements() {
-		for (GraphElement<?, ?, ?> ge : nestedElements.getMarkedElements()) {
+		for (GraphElement<?, ?, ?,?> ge : nestedElements.getMarkedElements()) {
 			GraphElementClass key = (GraphElementClass) ge;
 
 			Set<GraphElementClass> toDelete = new HashSet<GraphElementClass>();
@@ -1628,7 +1628,7 @@ public class Rsa2Tg extends XmlProcessor {
 		}
 
 		// all edges are candidates
-		for (GraphElement<?, ?, ?> ge : nestedIncidentVertexClasses
+		for (GraphElement<?, ?, ?,?> ge : nestedIncidentVertexClasses
 				.getMarkedElements()) {
 			if (EdgeClass.class.isInstance(ge)) {
 				// ge must nest one incident VertexClasses of containedEC
@@ -2384,7 +2384,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 			// update the information of nestedElements
-			for (GraphElement<?, ?, ?> elem : nestedElements
+			for (GraphElement<?, ?, ?,?> elem : nestedElements
 					.getMarkedElements()) {
 				GraphElementClass gec = (GraphElementClass) elem;
 				Set<GraphElementClass> containedElements = nestedElements
@@ -3495,7 +3495,7 @@ public class Rsa2Tg extends XmlProcessor {
 				oldMBNI = (MayBeNestedIn) currI.getEdge();
 
 				if (newMBNI != null) {
-					for (GraphElement<?, ?, ?> ge : getMayBeNestedInRepresentation
+					for (GraphElement<?, ?, ?,?> ge : getMayBeNestedInRepresentation
 							.getMarkedElements()) {
 						GraphElementClass gec = (GraphElementClass) ge;
 						MayBeNestedIn mbni = getMayBeNestedInRepresentation
@@ -3535,7 +3535,7 @@ public class Rsa2Tg extends XmlProcessor {
 			currI = nextI;
 		}
 
-		for (GraphElement<?, ?, ?> ge : nestedElements.getMarkedElements()) {
+		for (GraphElement<?, ?, ?,?> ge : nestedElements.getMarkedElements()) {
 			Set<GraphElementClass> mark = nestedElements.getMark(ge);
 			if (mark.contains(vc)) {
 				mark.remove(vc);
@@ -3547,7 +3547,7 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 		}
-		for (GraphElement<?, ?, ?> ge : generalizations.getMarkedElements()) {
+		for (GraphElement<?, ?, ?,?> ge : generalizations.getMarkedElements()) {
 			if (ge == vc) {
 				generalizations.mark(ec, generalizations.getMark(vc));
 				generalizations.removeMark(vc);
@@ -5104,12 +5104,12 @@ public class Rsa2Tg extends XmlProcessor {
 										+ ae.getType().getQualifiedName());
 					}
 
-					for (GraphElement<?, ?, ?> ge : nestedElements
+					for (GraphElement<?, ?, ?,?> ge : nestedElements
 							.getMarkedElements()) {
 						Set<GraphElementClass> mark = nestedElements
 								.getMark(ge);
 						if (ge == vc) {
-							nestedElements.mark((GraphElement<?, ?, ?>) ae,
+							nestedElements.mark((GraphElement<?, ?, ?,?>) ae,
 									mark);
 							nestedElements.removeMark(vc);
 						}
@@ -5121,7 +5121,7 @@ public class Rsa2Tg extends XmlProcessor {
 					Set<String> gens = generalizations.getMark(vc);
 					if (gens != null) {
 						generalizations.removeMark(vc);
-						generalizations.mark((GraphElement<?, ?, ?>) ae, gens);
+						generalizations.mark((GraphElement<?, ?, ?,?>) ae, gens);
 					}
 
 					preliminaryVertices.remove(vc);

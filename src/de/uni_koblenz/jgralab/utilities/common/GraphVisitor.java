@@ -75,7 +75,7 @@ public abstract class GraphVisitor {
 		postVisitor();
 	}
 
-	private boolean isMarked(GraphElement<?, ?, ?> e) {
+	private boolean isMarked(GraphElement<?, ?, ?,?> e) {
 		if (marker == null) {
 			return true;
 		}

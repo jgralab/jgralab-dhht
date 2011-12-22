@@ -271,7 +271,7 @@ public abstract class Tg2Whatever {
 	}
 	
 
-	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?> elem) {
+	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?,?> elem) {
 		int num = 1;
 		for (Incidence current : elem.getIncidences()) {
 			if (current == inc) {
