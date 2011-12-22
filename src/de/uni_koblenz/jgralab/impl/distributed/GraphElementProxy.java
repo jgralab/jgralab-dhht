@@ -120,8 +120,8 @@ public abstract class GraphElementProxy
 	}
 
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?> element) {
-		for (GraphElement<?, ?, ?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
+		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;

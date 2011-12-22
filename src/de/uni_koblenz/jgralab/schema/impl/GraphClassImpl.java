@@ -54,7 +54,7 @@ public final class GraphClassImpl extends
 
 	private final Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
 
-	private final Map<String, GraphElementClass<?, ?>> graphElementClasses = new HashMap<String, GraphElementClass<?, ?>>();
+	private final Map<String, GraphElementClass<?, ?,?,?>> graphElementClasses = new HashMap<String, GraphElementClass<?, ?,?,?>>();
 
 	private final Map<String, VertexClass> vertexClasses = new HashMap<String, VertexClass>();
 
@@ -187,7 +187,7 @@ public final class GraphClassImpl extends
 	}
 
 	@Override
-	public boolean knows(GraphElementClass<?, ?> aGraphElementClass) {
+	public boolean knows(GraphElementClass<?, ?,?,?> aGraphElementClass) {
 		if (graphElementClasses.containsKey(aGraphElementClass
 				.getQualifiedName())) {
 			return true;
@@ -204,7 +204,7 @@ public final class GraphClassImpl extends
 	}
 
 	@Override
-	public GraphElementClass<?, ?> getGraphElementClass(String qn) {
+	public GraphElementClass<?, ?,?,?> getGraphElementClass(String qn) {
 		if (graphElementClasses.containsKey(qn)) {
 			return graphElementClasses.get(qn);
 		}
@@ -222,15 +222,15 @@ public final class GraphClassImpl extends
 
 		output.append("\n\nGraphElementClasses of '" + getQualifiedName()
 				+ "':\n\n");
-		for (GraphElementClass<?, ?> gc : graphElementClasses.values()) {
+		for (GraphElementClass<?, ?,?,?> gc : graphElementClasses.values()) {
 			output.append(gc.toString() + "\n");
 		}
 		return output.toString();
 	}
 
 	@Override
-	public List<GraphElementClass<?, ?>> getGraphElementClasses() {
-		return new ArrayList<GraphElementClass<?, ?>>(
+	public List<GraphElementClass<?, ?,?,?>> getGraphElementClasses() {
+		return new ArrayList<GraphElementClass<?, ?,?,?>>(
 				graphElementClasses.values());
 	}
 

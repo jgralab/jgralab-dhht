@@ -37,13 +37,15 @@ import java.util.List;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
-public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge>
+public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge, VertexClass, Vertex>
 		implements EdgeClass {
 
 	static EdgeClass createDefaultEdgeClass(Schema schema) {

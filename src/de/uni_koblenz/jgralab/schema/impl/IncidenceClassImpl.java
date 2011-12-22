@@ -113,8 +113,8 @@ public class IncidenceClassImpl extends
 	 */
 
 	@Override
-	public GraphElementClass<?, ?> getOtherGraphElementClass(
-			GraphElementClass<?, ?> connectedGc) {
+	public GraphElementClass<?, ?,?,?> getOtherGraphElementClass(
+			GraphElementClass<?, ?,?,?> connectedGc) {
 		if (connectedGc == edgeClass) {
 			return vertexClass;
 		} else {
@@ -353,7 +353,7 @@ public class IncidenceClassImpl extends
 	 */
 	private static void checkExistenceOfDirectRolenameForGraphElementClass(
 			HashMap<String, IncidenceClass> rolenames,
-			GraphElementClass<?, ?> geClass) {
+			GraphElementClass<?, ?,?,?> geClass) {
 		for (IncidenceClass ic : geClass.getIncidenceClasses()) {
 			IncidenceClass icWithSameRolename = rolenames.get(ic.getRolename());
 			if (icWithSameRolename != null) {
@@ -404,15 +404,15 @@ public class IncidenceClassImpl extends
 	 */
 	private static void collectDirectRolenamesOfGraphElementClass(
 			HashMap<String, IncidenceClass> rolenames,
-			GraphElementClass<?, ?> geClass) {
+			GraphElementClass<?, ?,?,?> geClass) {
 		for (IncidenceClass ic : geClass.getIncidenceClasses()) {
 			assert rolenames.get(ic.getRolename()) == null;
 			rolenames.put(ic.getRolename(), ic);
 		}
 	}
 
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(
-			GraphElementClass<?, ?> graphElementClass) {
+	public GraphElementClass<?, ?,?,?> getConnectedGraphElementClassOfOwnType(
+			GraphElementClass<?, ?,?,?> graphElementClass) {
 		if (graphElementClass instanceof VertexClass) {
 			return getVertexClass();
 		} else {
@@ -420,8 +420,8 @@ public class IncidenceClassImpl extends
 		}
 	}
 
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(
-			GraphElementClass<?, ?> graphElementClass) {
+	public GraphElementClass<?, ?,?,?> getConnectedGraphElementClassOfDualType(
+			GraphElementClass<?, ?,?,?> graphElementClass) {
 		if (graphElementClass instanceof VertexClass) {
 			return getEdgeClass();
 		} else {

@@ -160,6 +160,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		recordMap_DiskBasedStorage = new HashMap<Class<? extends Record>, Constructor<? extends Record>>();
 	}
 
+	@Override
 	public Graph createGraph_InMemoryStorage(Class<? extends Graph> graphClass,
 			String id, int vMax, int eMax) {
 		try {

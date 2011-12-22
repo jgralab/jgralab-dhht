@@ -121,8 +121,8 @@ public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incide
 	 *         e.g. if graphElementClass is the EdgeClass connected, the method
 	 *         returns the VertexClass and vice versa
 	 */
-	public <OwnTypeClass extends GraphElementClass<?,?,?,?>, OwnType extends GraphElement<?,?,?,?>, DualTypeClass extends GraphElementClass<?,?,?,?>, DualType extends GraphElement<?,?,?,?>> GraphElementClass<? extends DualTypeClass, ? extends DualType, ? extends OwnTypeClass, ? extends OwnType> getOtherGraphElementClass(
-			GraphElementClass<? extends OwnTypeClass, ? extends OwnType, ? extends DualTypeClass, ? extends DualType> graphElementClass);
+	public GraphElementClass<?,?,?,?> getOtherGraphElementClass(
+			GraphElementClass<?,?,?,?> graphElementClass);
 	
 	public GraphElementClass<?,?,?,?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?,?,?,?> graphElementClass);
 	

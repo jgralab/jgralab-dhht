@@ -179,7 +179,7 @@ public abstract class GraphElementClassImpl
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
-			GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType> ogc = ic.getOtherGraphElementClass(this);
+			GraphElementClass<?,?,?,?> ogc = ic.getOtherGraphElementClass(this);
 			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
 				if (ic != ic2) {
 					adjacentIncidenceClasses.add(ic2);

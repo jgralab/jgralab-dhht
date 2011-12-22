@@ -602,7 +602,7 @@ public abstract class VertexProxy extends
 	}
 
 	@Override
-	public GraphElement<?, ?, ?> getSigma() {
+	public GraphElement<?, ?, ?,?> getSigma() {
 		long sigmaId;
 		try {
 			sigmaId = storingGraphDatabase.getSigmaIdOfVertexId(elementId);
@@ -617,7 +617,7 @@ public abstract class VertexProxy extends
 	}
 
 	@Override
-	public void setSigma(GraphElement<?, ?, ?> elem) {
+	public void setSigma(GraphElement<?, ?, ?,?> elem) {
 		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			try {

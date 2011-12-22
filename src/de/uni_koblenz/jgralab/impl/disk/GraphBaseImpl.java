@@ -1167,8 +1167,8 @@ public abstract class GraphBaseImpl implements Graph {
 		attr.setDefaultValue(this);
 	}
 
-	protected void moveToSubordinateGraph(GraphElement<?, ?, ?> parent,
-			GraphElement<?, ?, ?> child) {
+	protected void moveToSubordinateGraph(GraphElement<?, ?, ?,?> parent,
+			GraphElement<?, ?, ?,?> child) {
 		try {
 			parent.addSubordinateElement((Vertex) child);
 		} catch (ClassCastException e) {

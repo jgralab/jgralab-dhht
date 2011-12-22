@@ -179,7 +179,7 @@ public class GraphIO {
 	/**
 	 * Maps GraphElementClasses to their containing GraphClasses
 	 */
-	private final Map<GraphElementClass<?, ?>, GraphClass> GECsearch;
+	private final Map<GraphElementClass<?, ?,?,?>, GraphClass> GECsearch;
 
 	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
 
@@ -247,7 +247,7 @@ public class GraphIO {
 	/**
 	 * The value is the sigma information of the graph element.
 	 */
-	private Map<GraphElement<?, ?, ?>, String> sigmasOfGraphElement;
+	private Map<GraphElement<?, ?, ?,?>, String> sigmasOfGraphElement;
 
 	/**
 	 * Buffers the parsed data of enum domains prior to their creation in
@@ -300,7 +300,7 @@ public class GraphIO {
 
 	private GraphIO() {
 		domains = new TreeMap<String, Domain>();
-		GECsearch = new HashMap<GraphElementClass<?, ?>, GraphClass>();
+		GECsearch = new HashMap<GraphElementClass<?, ?,?,?>, GraphClass>();
 		createMethods = new HashMap<String, Method>();
 		buffer = new byte[BUFFER_SIZE];
 		bufferPos = 0;
@@ -515,7 +515,7 @@ public class GraphIO {
 		}
 	}
 
-	private void writeKappaDefintion(GraphElementClass<?, ?> gec)
+	private void writeKappaDefintion(GraphElementClass<?, ?,?,?> gec)
 			throws IOException {
 		if (gec.getAllowedMinKappa() != 0
 				|| gec.getAllowedMaxKappa() != Integer.MAX_VALUE) {
@@ -533,10 +533,10 @@ public class GraphIO {
 		}
 	}
 
-	private void writeSigmaDefinition(GraphElementClass<?, ?> gec)
+	private void writeSigmaDefinition(GraphElementClass<?, ?,?,?> gec)
 			throws IOException {
 		String delim = " validsigma";
-		for (GraphElementClass<?, ?> sigmaClass : gec.getAllowedSigmaClasses()) {
+		for (GraphElementClass<?, ?,?,?> sigmaClass : gec.getAllowedSigmaClasses()) {
 			space();
 			write(delim);
 			writeIdentifier(sigmaClass.getQualifiedName());
@@ -1017,7 +1017,7 @@ public class GraphIO {
 	}
 
 	private void writeAttributesSigmaKappa(Graph graph,
-			GraphElement<?, ?, ?> next, boolean onlyLocalGraph)
+			GraphElement<?, ?, ?,?> next, boolean onlyLocalGraph)
 			throws IOException, GraphIOException {
 		space();
 		// write attributes
@@ -1027,7 +1027,7 @@ public class GraphIO {
 		}
 
 		// write sigma
-		GraphElement<?, ?, ?> containingElement = next.getSigma();
+		GraphElement<?, ?, ?,?> containingElement = next.getSigma();
 		if (containingElement != null
 				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
 						.getGlobalId()))) {
@@ -2422,20 +2422,20 @@ public class GraphIO {
 	private void buildSigmaHierarchy(
 			Map<String, List<GraphElementClassData>> classBuffer)
 			throws GraphIOException {
-		GraphElementClass<?, ?> gec;
-		GraphElementClass<?, ?> sigma;
+		GraphElementClass<?, ?,?,?> gec;
+		GraphElementClass<?, ?,?,?> sigma;
 
 		for (Entry<String, List<GraphElementClassData>> gcElements : classBuffer
 				.entrySet()) {
 			for (GraphElementClassData vData : gcElements.getValue()) {
-				gec = (GraphElementClass<?, ?>) schema
+				gec = (GraphElementClass<?, ?,?,?>) schema
 						.getAttributedElementClass(vData.getQualifiedName());
 				if (gec == null) {
 					throw new GraphIOException("undefined GraphElementClass '"
 							+ vData.getQualifiedName() + "'");
 				}
 				for (String sigmaQN : vData.validSigmas) {
-					sigma = (GraphElementClass<?, ?>) schema
+					sigma = (GraphElementClass<?, ?,?,?>) schema
 							.getAttributedElementClass(sigmaQN);
 					if (gec == null) {
 						throw new GraphIOException(
@@ -2859,7 +2859,7 @@ public class GraphIO {
 		incidencesAtVertex = new HashMap<Long, ArrayList<Long>>();
 		incidenceTypes = new HashMap<Long, String>();
 		incidenceInformation = new HashMap<Long, Long[]>();
-		sigmasOfGraphElement = new HashMap<GraphElement<?, ?, ?>, String>();
+		sigmasOfGraphElement = new HashMap<GraphElement<?, ?, ?,?>, String>();
 
 		long graphElements = 0, currentCount = 0, interval = 1;
 		if (pf != null) {
@@ -3028,22 +3028,22 @@ public class GraphIO {
 	private void setSigmas(Graph graph, boolean onlyLocalGraph,
 			ImplementationType implementationType)
 			throws NumberFormatException, RemoteException {
-		for (Entry<GraphElement<?, ?, ?>, String> sigma : sigmasOfGraphElement
+		for (Entry<GraphElement<?, ?, ?,?>, String> sigma : sigmasOfGraphElement
 				.entrySet()) {
 			long parentId = Long.parseLong(sigma.getValue().substring(1));
 			if (implementationType == ImplementationType.MEMORY
 					|| !onlyLocalGraph || graph.isLocalElementId(parentId)) {
-				GraphElement<?, ?, ?> parent;
+				GraphElement<?, ?, ?,?> parent;
 				if (sigma.getValue().startsWith("v")) {
 					parent = graph.getVertex(parentId);
 				} else {
 					parent = graph.getEdge(parentId);
 				}
 				if (implementationType == ImplementationType.MEMORY) {
-					((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) sigma
+					((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?,?>) sigma
 							.getKey()).setSigma(parent);
 				} else {
-					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) sigma
+					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?,?>) sigma
 							.getKey()).setSigma(parent);
 				}
 			}
@@ -3159,21 +3159,21 @@ public class GraphIO {
 		match(";");
 	}
 
-	private void parseKappa(GraphElement<?, ?, ?> ge,
+	private void parseKappa(GraphElement<?, ?, ?,?> ge,
 			ImplementationType implementationType) throws GraphIOException,
 			RemoteException {
 		match("kappa");
 		match("=");
 		if (implementationType == ImplementationType.MEMORY) {
-			((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?>) ge)
+			((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl<?, ?, ?,?>) ge)
 					.setKappa(matchInteger());
 		} else {
-			((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?>) ge)
+			((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl<?, ?, ?,?>) ge)
 					.setKappa(matchInteger());
 		}
 	}
 
-	private void parseSigma(GraphElement<?, ?, ?> ge) throws GraphIOException {
+	private void parseSigma(GraphElement<?, ?, ?,?> ge) throws GraphIOException {
 		if (lookAhead.equals("sigma")) {
 			match("sigma");
 			match("=");
