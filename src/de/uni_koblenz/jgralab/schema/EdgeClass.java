@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab.schema;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * Interface for Edge/Aggregation/Composition classes, instances of this class
@@ -41,7 +42,7 @@ import de.uni_koblenz.jgralab.Edge;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface EdgeClass extends GraphElementClass<EdgeClass, Edge> {
+public interface EdgeClass extends GraphElementClass<EdgeClass, Edge, VertexClass, Vertex> {
 
 	public static final String DEFAULTEDGECLASS_NAME = "Edge";
 

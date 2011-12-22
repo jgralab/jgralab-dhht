@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class EdgeImpl extends
-		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
+		GraphElementImpl<EdgeClass, Edge, VertexClass, Vertex> implements Edge {
 
 	protected EdgeContainer container;
 
@@ -1168,7 +1168,7 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public GraphElement<?, ?, ?> getSigma() {
+	public GraphElement<?, ?, ?,?> getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
 		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
@@ -1178,7 +1178,7 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public void setSigma(GraphElement<?, ?, ?> elem) {
+	public void setSigma(GraphElement<?, ?, ?,?> elem) {
 		long sigmaId = 0;
 		if (elem != null) {
 			elem.getGlobalId();

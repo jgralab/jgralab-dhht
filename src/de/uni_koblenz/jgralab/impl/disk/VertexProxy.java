@@ -70,7 +70,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class VertexProxy extends
-		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
+		GraphElementImpl<VertexClass, Vertex, EdgeClass, Edge> implements Vertex {
 
 	/**
 	 * Creates a new {@link Vertex} instance.

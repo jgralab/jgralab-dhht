@@ -44,7 +44,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 
-public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>>
+public abstract class AttributedElementClassImpl<ConcreteMetaClass extends AttributedElementClass<?,?>, ConcreteInterface extends AttributedElement<?,?>>
 		extends TypedElementClassImpl<ConcreteMetaClass, ConcreteInterface>
 		implements AttributedElementClass<ConcreteMetaClass, ConcreteInterface> {
 

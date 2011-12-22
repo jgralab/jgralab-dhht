@@ -5,7 +5,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public interface TypedElementClass<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>> extends NamedElementClass {
+public interface TypedElementClass<ConcreteMetaClass extends TypedElementClass<?,?>, ConcreteInterface extends TypedElement<?,?>> extends NamedElementClass {
 
 	/**
 	 * Adds a {@link Constraint} to this typed element. Constraints are

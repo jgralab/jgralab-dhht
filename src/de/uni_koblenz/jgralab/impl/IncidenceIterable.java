@@ -66,7 +66,7 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		/**
 		 * {@link GraphElement} which {@link Incidence}s are iterated.
 		 */
-		protected GraphElement<?, ?, ?> graphElement = null;
+		protected GraphElement<?, ?, ?,?> graphElement = null;
 
 		/**
 		 * The {@link Class} of the desired {@link Incidence}s.
@@ -104,9 +104,9 @@ public abstract class IncidenceIterable<I extends Incidence> implements
 		 *            {@link Direction} of the desired {@link Incidence}s.
 		 */
 		@SuppressWarnings("unchecked")
-		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>> IncidenceIterator(
+		public <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType>, DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>, DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>> IncidenceIterator(
 				Graph traversalContext,
-				GraphElement<OwnTypeClass, OwnType, DualType> graphElement,
+				GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> graphElement,
 				Class<? extends Incidence> ic, Direction dir) {
 			this.graphElement = graphElement;
 			this.ic = ic;

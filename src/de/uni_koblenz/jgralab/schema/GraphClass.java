@@ -129,7 +129,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 *            the name to search for
 	 * @return the contained graph element class with the name name
 	 */
-	public GraphElementClass<?, ?> getGraphElementClass(String name);
+	public GraphElementClass<?, ?,?,?> getGraphElementClass(String name);
 
 	/**
 	 * @return a list of all EdgeClasses this graphclass knows, including
@@ -141,7 +141,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 * @return a list of all the edge/vertex/aggregation/composition classes of
 	 *         this graph class, including inherited classes
 	 */
-	public List<GraphElementClass<?, ?>> getGraphElementClasses();
+	public List<GraphElementClass<?, ?,?,?>> getGraphElementClasses();
 
 	/**
 	 * @return a list of all the vertex classes of this graph class, including
@@ -191,7 +191,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 *            a vertex/edge/aggregation/composition class name
 	 * @return true, if this graph class aggregates aGraphElementClass
 	 */
-	public boolean knows(GraphElementClass<?, ?> aGraphElementClass);
+	public boolean knows(GraphElementClass<?, ?, ?,?> aGraphElementClass);
 
 	/**
 	 * @param aGraphElementClass

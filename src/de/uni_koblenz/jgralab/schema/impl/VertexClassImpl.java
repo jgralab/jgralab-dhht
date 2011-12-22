@@ -33,7 +33,9 @@ package de.uni_koblenz.jgralab.schema.impl;
 
 
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
@@ -41,7 +43,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class VertexClassImpl extends GraphElementClassImpl<VertexClass, Vertex> implements
+public final class VertexClassImpl extends GraphElementClassImpl<VertexClass, Vertex, EdgeClass, Edge> implements
 		VertexClass {
 
 

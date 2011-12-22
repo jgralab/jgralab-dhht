@@ -61,7 +61,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class EdgeProxy extends
-		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
+		GraphElementImpl<EdgeClass, Edge, VertexClass, Vertex> implements Edge {
 
 	/**
 	 * Creates a new {@link Edge} instance.
@@ -1269,7 +1269,7 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public GraphElement<?, ?, ?> getSigma() {
+	public GraphElement<?, ?, ?,?> getSigma() {
 		long sigmaId;
 		try {
 			sigmaId = storingGraphDatabase.getSigmaIdOfEdgeId(elementId);
@@ -1284,7 +1284,7 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public void setSigma(GraphElement<?, ?, ?> elem) {
+	public void setSigma(GraphElement<?, ?, ?,?> elem) {
 		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			try {

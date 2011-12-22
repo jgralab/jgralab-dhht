@@ -61,7 +61,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class EdgeProxy extends
-		GraphElementProxy<EdgeClass, Edge, Vertex> implements Edge {
+		GraphElementProxy<EdgeClass, Edge, VertexClass, Vertex> implements Edge {
 
 	/**
 	 * Creates a new {@link Edge} instance.

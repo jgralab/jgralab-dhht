@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.schema.impl;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
+public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedElementClass<?,?>, ConcreteInterface extends TypedElement<?,?>>
 		extends NamedElementClassImpl implements TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
@@ -67,7 +68,7 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 		Set<ConcreteMetaClass> returnSet = new HashSet<ConcreteMetaClass>();
 		for (ConcreteMetaClass subclass : directSubClasses) {
 			returnSet.add(subclass);
-			returnSet.addAll(subclass.getAllSubClasses());
+			returnSet.addAll((Collection<? extends ConcreteMetaClass>) subclass.getAllSubClasses());
 		}
 		return returnSet;
 	}
@@ -77,7 +78,7 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 		HashSet<ConcreteMetaClass> allSuperClasses = new HashSet<ConcreteMetaClass>();
 		allSuperClasses.addAll(directSuperClasses);
 		for (ConcreteMetaClass superClass : directSuperClasses) {
-			allSuperClasses.addAll(superClass.getAllSuperClasses());
+			allSuperClasses.addAll((Collection<? extends ConcreteMetaClass>) superClass.getAllSuperClasses());
 		}
 		return allSuperClasses;
 	}
@@ -206,9 +207,9 @@ public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedEleme
 		}
 		directSuperClasses.remove(getDefaultClass());
 
-		if (superClass.isSubClassOf((ConcreteMetaClass) this)) {
-			for (ConcreteMetaClass attr : superClass.getAllSuperClasses()) {
-				System.out.println(attr.getQualifiedName());
+		if (((TypedElementClass<ConcreteMetaClass,?>)superClass).isSubClassOf((ConcreteMetaClass) this)) {
+			for (ConcreteMetaClass mc : ((TypedElementClass<ConcreteMetaClass,?>)superClass).getAllSuperClasses()) {
+				System.out.println(mc.getQualifiedName());
 			}
 			throw new InheritanceException(
 					"Cycle in class hierarchie for classes: "

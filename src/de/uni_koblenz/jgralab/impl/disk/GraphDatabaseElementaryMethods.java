@@ -518,7 +518,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	 * @param elemId
 	 * @return
 	 */
-	public GraphElement<?, ?, ?> getGraphElementObject(long elemId) {
+	public GraphElement<?, ?, ?,?> getGraphElementObject(long elemId) {
 		if (elemId < 0) {
 			return getEdgeObject(-elemId);
 		} else {

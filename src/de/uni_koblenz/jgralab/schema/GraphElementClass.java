@@ -44,7 +44,12 @@ import de.uni_koblenz.jgralab.GraphElement;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface GraphElementClass<T extends GraphElementClass<T, S>, S extends GraphElement<T, S,?>> extends AttributedElementClass<T, S> {
+public interface GraphElementClass
+       <OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, 
+        OwnType extends GraphElement<OwnTypeClass,OwnType,DualTypeClass,DualType>,
+        DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>,
+        DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
+       extends AttributedElementClass<OwnTypeClass, OwnType> {
 
 	/**
 	 * Returns the GraphClass of this AttributedElementClass.
@@ -88,10 +93,10 @@ public interface GraphElementClass<T extends GraphElementClass<T, S>, S extends 
 	public Set<IncidenceClass> getAllIncidenceClasses();
 
 
-	public Set<GraphElementClass<?, ?>> getAllowedSigmaClasses();
+	public Set<GraphElementClass<?, ?, ? ,?>> getAllowedSigmaClasses();
 
 
-	public void addAllowedSigmaClass(GraphElementClass<?,?> gec);
+	public void addAllowedSigmaClass(GraphElementClass<?,?,?,?> gec);
 	
 	public void setAllowedKappaRange(int min, int max);
 	

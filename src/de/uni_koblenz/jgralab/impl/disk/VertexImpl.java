@@ -66,7 +66,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class VertexImpl extends
-		GraphElementImpl<VertexClass, Vertex, Edge> implements Vertex {
+		GraphElementImpl<VertexClass, Vertex, EdgeClass, Edge> implements Vertex {
 
 	protected VertexContainer container;
 

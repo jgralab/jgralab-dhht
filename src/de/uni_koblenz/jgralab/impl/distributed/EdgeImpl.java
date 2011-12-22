@@ -57,7 +57,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  */
 public abstract class EdgeImpl extends
-		GraphElementImpl<EdgeClass, Edge, Vertex> implements Edge {
+		GraphElementImpl<EdgeClass, Edge, VertexClass, Vertex> implements Edge {
 
 
 	/**

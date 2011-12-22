@@ -65,8 +65,13 @@ import de.uni_koblenz.jgralab.schema.Schema;
 // getCompleteGraph returns the complete raph
 // get local graph the complete one or a local partial one
 // getContainingGraph the graph that directly contains the element
-public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualType>, DualType extends GraphElement<?, DualType, OwnType>>
-		implements GraphElement<OwnTypeClass, OwnType, DualType> {
+public abstract class GraphElementImpl
+	<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, 
+	OwnType extends GraphElement<OwnTypeClass,OwnType,DualTypeClass,DualType>,
+	DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>,
+	DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
+
+	implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 
 	/**
 	 * Generated Serial Version UID
@@ -96,7 +101,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	// TODO determine default value
 	private static final int DEFAULT_KAPPA_VALUE = Integer.MAX_VALUE;
 
-	private GraphElementImpl<?, ?, ?> sigma;
+	private GraphElementImpl<?, ?, ?, ?> sigma;
 
 	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
@@ -120,7 +125,7 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	}
 
 	@Override
-	public final GraphElement<?, ?, ?> getSigma() {
+	public final GraphElement<?, ?, ?,?> getSigma() {
 		return sigma;
 	}
 
@@ -145,8 +150,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 			int incidenceId);
 
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?> element) {
-		for (GraphElement<?, ?, ?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
+		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;
@@ -545,8 +550,8 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		} else {
 			addFirstSubordinateEdge(appendix);
 		}
-		((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?>) appendix).setSigma(this);
+		((GraphElementImpl<?, ?, ?,?>) appendix).setAllKappas(getKappa() - 1);
+		((GraphElementImpl<?, ?, ?,?>) appendix).setSigma(this);
 	}
 
 	/**
@@ -564,10 +569,10 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	public final void setSigma(GraphElement<?, ?, ?> newSigma) {
+	public final void setSigma(GraphElement<?, ?, ?,?> newSigma) {
 		assert newSigma != null;
 		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		this.sigma = (GraphElementImpl<?, ?, ?>) newSigma;
+		this.sigma = (GraphElementImpl<?, ?, ?,?>) newSigma;
 	}
 
 	/**
@@ -595,11 +600,11 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 		int kappaDifference = getKappa() - kappa;
 		setKappa(kappa);
 		for (Vertex v : getSubordinateGraph().getVertices()) {
-			((GraphElementImpl<?, ?, ?>) v).setKappa(v.getKappa()
+			((GraphElementImpl<?, ?, ?,?>) v).setKappa(v.getKappa()
 					- kappaDifference);
 		}
 		for (Edge e : getSubordinateGraph().getEdges()) {
-			((GraphElementImpl<?, ?, ?>) e).setKappa(e.getKappa()
+			((GraphElementImpl<?, ?, ?,?>) e).setKappa(e.getKappa()
 					- kappaDifference);
 		}
 	}
@@ -617,13 +622,13 @@ public abstract class GraphElementImpl<OwnTypeClass extends GraphElementClass<Ow
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public final boolean isChildOf(GraphElement<?, ?, ?> parent) {
+	public final boolean isChildOf(GraphElement<?, ?, ?,?> parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?>) getSigma()).isChildOf(parent);
+			return ((GraphElementImpl<?, ?, ?,?>) getSigma()).isChildOf(parent);
 		}
 	}
 

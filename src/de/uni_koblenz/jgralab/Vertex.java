@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface Vertex extends GraphElement<VertexClass, Vertex, Edge> {
+public interface Vertex extends GraphElement<VertexClass, Vertex, EdgeClass, Edge> {
 
 	/**
 	 * Returns the next {@link Vertex} in the sequence of all vertices in the

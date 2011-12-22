@@ -41,12 +41,21 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S extends GraphElement<T,S,?>> extends AttributedElementClassImpl<T, S>
-		implements GraphElementClass<T, S> {
+public abstract class GraphElementClassImpl
+	<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, 
+	OwnType extends GraphElement<OwnTypeClass,OwnType,DualTypeClass,DualType>,
+	DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>,
+	DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
+	
+	extends AttributedElementClassImpl<OwnTypeClass, OwnType>
+	implements GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 
+	
+	
+	
 	protected GraphClass graphClass;
 
-	protected Set<GraphElementClass<?, ?>> allowedSigmaClasses;
+	protected Set<GraphElementClass<?, ?,?,?>> allowedSigmaClasses;
 	
 	protected int minKappa = 0;
 	
@@ -64,16 +73,16 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 			GraphClass graphClass) {
 		super(simpleName, pkg, graphClass.getSchema());
 		this.graphClass = graphClass;
-		allowedSigmaClasses = new HashSet<GraphElementClass<?, ?>>();
+		allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
 	}
 	
 	@Override
-	public void addAllowedSigmaClass(GraphElementClass<?,?> gec) {
+	public void addAllowedSigmaClass(GraphElementClass<?,?,?,?> gec) {
 		allowedSigmaClasses.add(gec);
 	}
 	
 	@Override
-	public Set<GraphElementClass<?,?>> getAllowedSigmaClasses() {
+	public Set<GraphElementClass<?,?,?,?>> getAllowedSigmaClasses() {
 		return allowedSigmaClasses;
 	}
 
@@ -95,15 +104,15 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 
 		output.append("subClasses of '" + getQualifiedName() + "': ");
 
-		for (T aec : getAllSubClasses()) {
+		for (OwnTypeClass aec : getAllSubClasses()) {
 			output.append("'" + aec.getQualifiedName() + "' ");
 		}
 		output.append("\nsuperClasses of '" + getQualifiedName() + "': ");
-		for (T aec : getAllSuperClasses()) {
+		for (OwnTypeClass aec : getAllSuperClasses()) {
 			output.append("'" + aec.getQualifiedName() + "' ");
 		}
 		output.append("\ndirectSuperClasses of '" + getQualifiedName() + "': ");
-		for (T aec : getDirectSuperClasses()) {
+		for (OwnTypeClass aec : getDirectSuperClasses()) {
 			output.append("'" + aec.getQualifiedName() + "' ");
 		}
 
@@ -127,13 +136,13 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	
 	
 	@Override
-	protected void  checkSpecialization(T superclass) {
+	protected void  checkSpecialization(OwnTypeClass superclass) {
 		super.checkSpecialization(superclass);
 		checkDuplicateRolenames(superclass);
 	}
 	
 	
-	private void checkDuplicateRolenames(T other) {
+	private void checkDuplicateRolenames(OwnTypeClass other) {
 		if ((other == null) || (other.equals(""))) {
 			return;
 		}
@@ -159,7 +168,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	public Set<IncidenceClass> getAllIncidenceClasses() {
 		Set<IncidenceClass> incClasses = new HashSet<IncidenceClass>();
 		incClasses.addAll(incidenceClasses);
-		for (T superclass : getAllSuperClasses()) {
+		for (OwnTypeClass superclass : getAllSuperClasses()) {
 			incClasses.addAll(superclass.getIncidenceClasses());
 		}
 		return incClasses;
@@ -170,7 +179,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
-			GraphElementClass<?,?> ogc = ic.getOtherGraphElementClass((GraphElementClass<?,?>)this);
+			GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType> ogc = ic.getOtherGraphElementClass(this);
 			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
 				if (ic != ic2) {
 					adjacentIncidenceClasses.add(ic2);
@@ -183,7 +192,7 @@ public abstract class GraphElementClassImpl<T extends GraphElementClass<T, S>, S
 	protected Set<IncidenceClass> getAllAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : getAllIncidenceClasses()) {
-			GraphElementClass<?,?> ogc = ic.getOtherGraphElementClass(this);
+			GraphElementClass<?,?,?,?> ogc = ic.getOtherGraphElementClass(this);
 			for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
 				if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) && (!ic2.isSuperClassOf(ic))) { 
 					adjacentIncidenceClasses.add(ic2);

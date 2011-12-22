@@ -52,7 +52,12 @@ import de.uni_koblenz.jgralab.schema.IncidenceType;
  *            must be {@link Edge}. Otherwise it has to be {@link Vertex}.
  */
 
-public interface GraphElement<OwnTypeClass extends GraphElementClass<?,?>, OwnType extends GraphElement<?,?,?>, DualType extends GraphElement<?,?,?>> extends AttributedElement<OwnTypeClass, OwnType> {
+public interface GraphElement
+	<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, 
+	OwnType extends GraphElement<OwnTypeClass,OwnType,DualTypeClass,DualType>,
+	DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>,
+	DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
+	extends AttributedElement<OwnTypeClass, OwnType> {
 
 	/**
 	 * Returns <code>true</code> if this {@link GraphElement} is still present
@@ -95,7 +100,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<?,?>, OwnTy
 	 * 
 	 * @return {@link GraphElement}
 	 */
-	public GraphElement<?, ?, ?> getSigma();
+	public GraphElement<?, ?, ?, ?> getSigma();
 
 	/**
 	 * Returns a {@link Graph} which contains all elements which are nested in
@@ -131,7 +136,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<?,?>, OwnTy
 	 * @return boolean <code>true</code> if <code>element</code> is contained in
 	 *         this {@link GraphElement}
 	 */
-	public boolean containsElement(GraphElement<?, ?, ?> element);
+	public boolean containsElement(GraphElement<?, ?, ?, ?> element);
 
 	public long getIncidenceListVersion();
 
@@ -1330,7 +1335,7 @@ public interface GraphElement<OwnTypeClass extends GraphElementClass<?,?>, OwnTy
 	 */
 	public void addSubordinateElement(Edge appendix);
 
-	void setSigma(GraphElement<?, ?, ?> elem);
+	void setSigma(GraphElement<?, ?, ?, ?> elem);
 
 	void setKappa(int kappa);
 

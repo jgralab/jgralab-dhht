@@ -53,7 +53,7 @@ import de.uni_koblenz.jgralab.schema.GraphElementClass;
  * 
  * @author ist@uni-koblenz.de
  */
-public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, ?>>
+public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, ?,?>>
 		implements Iterable<G> {
 
 	/**
@@ -74,12 +74,12 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 * {@link GraphElement} which incident {@link GraphElement}s are
 		 * iterated.
 		 */
-		protected GraphElement<?, ?, ?> graphElement = null;
+		protected GraphElement<?, ?, ?,?> graphElement = null;
 
 		/**
 		 * The {@link Class} of the desired incident {@link GraphElement}s.
 		 */
-		protected Class<? extends GraphElement<?, ?, ?>> gc;
+		protected Class<? extends GraphElement<?, ?, ?,?>> gc;
 
 		/**
 		 * {@link Direction} of the desired incident {@link GraphElement}s.
@@ -112,13 +112,13 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 *            {@link Direction} of the desired {@link Incidence}s. @
 		 */
 		public IncidentGraphElementIterator(Graph traversalContext,
-				GraphElement<?, ?, ?> graphElement,
-				Class<? extends GraphElement<?, ?, ?>> gc, Direction dir) {
+				GraphElement<?, ?, ?,?> graphElement,
+				Class<? extends GraphElement<?, ?, ?,?>> gc, Direction dir) {
 			this.graphElement = graphElement;
 			this.gc = gc;
 			this.dir = dir;
 			this.traversalContext = traversalContext;
-			incidenceListVersion = ((GraphElementImpl<?, ?, ?>) graphElement)
+			incidenceListVersion = ((GraphElementImpl<?, ?, ?,?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
 		}
@@ -136,7 +136,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 * @throws ConcurrentModificationException
 		 */
 		protected void checkConcurrentModification() {
-			if (((GraphElementImpl<?, ?, ?>) graphElement)
+			if (((GraphElementImpl<?, ?, ?,?>) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
 						"The incidence list of the GraphElement has been modified - the iterator is not longer valid");

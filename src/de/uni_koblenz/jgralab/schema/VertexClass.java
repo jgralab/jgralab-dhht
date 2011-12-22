@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab.schema;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -38,7 +39,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface VertexClass extends GraphElementClass<VertexClass, Vertex> {
+public interface VertexClass extends GraphElementClass<VertexClass, Vertex, EdgeClass, Edge> {
 
 	public final static String DEFAULTVERTEXCLASS_NAME = "Vertex";
 

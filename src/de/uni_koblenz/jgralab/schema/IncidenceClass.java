@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.schema;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 
 public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incidence > {
@@ -120,12 +121,12 @@ public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incide
 	 *         e.g. if graphElementClass is the EdgeClass connected, the method
 	 *         returns the VertexClass and vice versa
 	 */
-	public GraphElementClass<?, ?> getOtherGraphElementClass(
-			GraphElementClass<?, ?> graphElementClass);
+	public <OwnTypeClass extends GraphElementClass<?,?,?,?>, OwnType extends GraphElement<?,?,?,?>, DualTypeClass extends GraphElementClass<?,?,?,?>, DualType extends GraphElement<?,?,?,?>> GraphElementClass<? extends DualTypeClass, ? extends DualType, ? extends OwnTypeClass, ? extends OwnType> getOtherGraphElementClass(
+			GraphElementClass<? extends OwnTypeClass, ? extends OwnType, ? extends DualTypeClass, ? extends DualType> graphElementClass);
 	
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?, ?> graphElementClass);
+	public GraphElementClass<?,?,?,?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?,?,?,?> graphElementClass);
 	
-	public GraphElementClass<?, ?> getConnectedGraphElementClassOfDualType(GraphElementClass<?, ?> graphElementClass);
+	public GraphElementClass<?,?,?,?> getConnectedGraphElementClassOfDualType(GraphElementClass<?,?,?,?> graphElementClass);
 
 
 
