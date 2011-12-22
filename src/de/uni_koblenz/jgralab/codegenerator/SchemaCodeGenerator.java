@@ -601,7 +601,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	 * @param typeName the name of the type of the MetaClass, i.e. Vertex or Edge
 	 * @return
 	 */
-	private CodeBlock createGraphElementClass(GraphElementClass<?,?> gec, String typeName ) {
+	private CodeBlock createGraphElementClass(GraphElementClass<?,?,?,?> gec, String typeName ) {
 		CodeList code = new CodeList();
 		code.setVariable("gecName", gec.getQualifiedName());
 		code.setVariable("gecVariable", "gec");
@@ -615,7 +615,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						"\t#gecVariable#.setAbstract(#gecAbstract#);",
 						"\tif (!#gecVariable#.isAbstract())",
 						"\t\tregisterClassId(#gecVariable#);"));
-		for (GraphElementClass<?,?> superClass : gec.getDirectSuperClasses()) {
+		for (GraphElementClass<?,?,?,?> superClass : gec.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
 				continue;
 			}

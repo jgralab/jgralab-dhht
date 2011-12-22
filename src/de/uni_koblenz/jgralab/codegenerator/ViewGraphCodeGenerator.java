@@ -257,9 +257,9 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
-		TreeSet<GraphElementClass<?,?>> sortedClasses = new TreeSet<GraphElementClass<?,?>>();
+		TreeSet<GraphElementClass<?,?,?,?>> sortedClasses = new TreeSet<GraphElementClass<?,?,?,?>>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
-		for (GraphElementClass<?,?> gec : sortedClasses) {
+		for (GraphElementClass<?,?,?,?> gec : sortedClasses) {
 			if (!gec.isInternal()) {
 				CodeList gecCode = new CodeList();
 				code.addNoIndent(gecCode);
@@ -287,7 +287,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 
-	private CodeBlock createGetFirstMethods(GraphElementClass<?,?> gec) {
+	private CodeBlock createGetFirstMethods(GraphElementClass<?,?,?,?> gec) {
 		CodeList code = new CodeList();
 		if (config.hasTypeSpecificMethodsSupport()) {
 			code.addNoIndent(createGetFirstMethod(gec, false));
@@ -300,7 +300,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 
-	private CodeBlock createGetFirstMethod(GraphElementClass<?,?> gec, boolean withTypeFlag) {
+	private CodeBlock createGetFirstMethod(GraphElementClass<?,?,?,?> gec, boolean withTypeFlag) {
 		CodeSnippet code = new CodeSnippet(true);
 		if (currentCycle.isAbstract()) {
 			code.add("/**",
@@ -320,7 +320,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 
-	private CodeBlock createFactoryMethods(GraphElementClass<?,?> gec) {
+	private CodeBlock createFactoryMethods(GraphElementClass<?,?,?,?> gec) {
 		if (gec.isAbstract()) {
 			return null;
 		}
@@ -332,7 +332,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 
-	private CodeBlock createFactoryMethod(GraphElementClass<?,?> gec, boolean withId) {
+	private CodeBlock createFactoryMethod(GraphElementClass<?,?,?,?> gec, boolean withId) {
 		CodeSnippet code = new CodeSnippet(true);
 
 		if (currentCycle.isAbstract()) {
@@ -416,9 +416,9 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		return code;
 	}
 	
-	protected CodeBlock createIteratorMethods(Iterable<? extends GraphElementClass<?,?>> set) {
+	protected CodeBlock createIteratorMethods(Iterable<? extends GraphElementClass<?,?,?,?>> set) {
 		CodeList code = new CodeList();
-		for (GraphElementClass<?,?> gec : set) {
+		for (GraphElementClass<?,?,?,?> gec : set) {
 			if (gec.isInternal()) {
 				continue;
 			}
@@ -429,7 +429,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 	
 	
 	
-	protected CodeBlock createIteratorMethods(GraphElementClass<?,?> gec) {
+	protected CodeBlock createIteratorMethods(GraphElementClass<?,?,?,?> gec) {
 		CodeList code = new CodeList();
 		CodeSnippet s = new CodeSnippet(true);
 		code.addNoIndent(s);

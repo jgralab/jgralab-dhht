@@ -42,7 +42,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public class RolenameCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?>> {
+public class RolenameCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?,?,?>> {
 
 	private MetaClass metaClass;
 

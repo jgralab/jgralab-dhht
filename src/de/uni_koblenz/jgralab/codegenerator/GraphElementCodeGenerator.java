@@ -9,7 +9,7 @@ import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
-public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?>> extends AttributedElementCodeGenerator<MetaClass> {
+public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?,?,?>> extends AttributedElementCodeGenerator<MetaClass> {
 
 
 	protected RolenameCodeGenerator<MetaClass> rolenameGenerator;
