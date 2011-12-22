@@ -11,7 +11,7 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
-public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?>> extends AbstractGraphMarker<T> {
+public abstract class GlobalGraphMarker<T extends GraphElement<?, ?, ?,?>> extends AbstractGraphMarker<T> {
 
 //	enum GraphMarkerImplementationType {
 //		ARRAY,

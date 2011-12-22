@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @param <T>
  */
-public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?>, O>
+public abstract class LocalArrayGraphMarker<T extends GraphElement<?, ?, ?,?>, O>
 		extends AbstractGraphMarker<T> {
 
 	/**

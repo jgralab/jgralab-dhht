@@ -34,7 +34,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 
-public abstract class LocalLongGraphMarker<T extends GraphElement<?, ?, ?>> extends
+public abstract class LocalLongGraphMarker<T extends GraphElement<?, ?, ?,?>> extends
 		AbstractGraphMarker<T> {
 
 	private static final long DEFAULT_UNMARKED_VALUE = Long.MIN_VALUE;

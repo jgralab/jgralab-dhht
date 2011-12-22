@@ -14,7 +14,7 @@ import de.uni_koblenz.jgralab.Vertex;
  *
  * @param <O> The kind of objects that can be attached to the vertices as marks
  */
-public class GlobalGenericGraphMarker<O> extends GlobalGraphMarker<GraphElement<?,?,?>> {
+public class GlobalGenericGraphMarker<O> extends GlobalGraphMarker<GraphElement<?,?,?,?>> {
 
 	public GlobalGenericGraphMarker(Graph globalGraph) {
 		super(globalGraph);
