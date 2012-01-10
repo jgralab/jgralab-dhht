@@ -46,10 +46,6 @@ import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
-import de.uni_koblenz.jgralab.impl.distributed.GraphBaseImpl;
-import de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl;
-import de.uni_koblenz.jgralab.impl.distributed.VertexImpl;
-import de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**

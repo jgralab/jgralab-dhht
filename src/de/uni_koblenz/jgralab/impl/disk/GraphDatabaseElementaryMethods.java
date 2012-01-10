@@ -21,9 +21,9 @@ import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public abstract class GraphDatabaseElementaryMethods implements

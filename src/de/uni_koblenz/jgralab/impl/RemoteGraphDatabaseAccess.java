@@ -6,9 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
 import de.uni_koblenz.jgralab.JGraLabSet;

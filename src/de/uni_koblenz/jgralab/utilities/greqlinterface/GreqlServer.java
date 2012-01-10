@@ -53,12 +53,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueMap;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValuePath;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValuePathSystem;
-import de.uni_koblenz.jgralab.greql2.jvalue.JValueSlice;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 
 public class GreqlServer extends Thread {

@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.schema;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 
 public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incidence > {

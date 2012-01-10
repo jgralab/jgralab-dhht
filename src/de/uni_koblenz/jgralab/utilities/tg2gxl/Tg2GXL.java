@@ -51,7 +51,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;

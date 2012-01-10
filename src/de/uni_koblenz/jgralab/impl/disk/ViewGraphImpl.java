@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;

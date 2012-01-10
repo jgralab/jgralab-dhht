@@ -88,6 +88,7 @@ public final class VertexClassImpl extends GraphElementClassImpl<VertexClass, Ve
 		}
 		super.addIncidenceClass(incClass);
     }
+
 	
 	@Override
 	public VertexClass getDefaultClass() {
