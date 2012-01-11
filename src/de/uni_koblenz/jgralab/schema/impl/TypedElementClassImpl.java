@@ -15,8 +15,10 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
-public abstract class TypedElementClassImpl<ConcreteMetaClass extends TypedElementClass<?,?>, ConcreteInterface extends TypedElement<?,?>>
-		extends NamedElementClassImpl implements TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
+public abstract class TypedElementClassImpl
+	<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>,
+	ConcreteInterface extends TypedElement<ConcreteMetaClass, ConcreteInterface>>
+	extends NamedElementClassImpl implements TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
 	 * A set of {@link Constraint}s which can be used to validate the graph.

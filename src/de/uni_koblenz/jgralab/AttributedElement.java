@@ -45,7 +45,9 @@ import de.uni_koblenz.jgralab.schema.AttributedElementClass;
  * @param ConcreteInterface the non-abstract interface for the instances of this class, e.g. Vertex for a VertexClass
  * 
  */
-public interface AttributedElement<ConcreteAttributedElementClass extends AttributedElementClass<?,?>, ConcreteInterface extends AttributedElement<?,?>> 
+public interface AttributedElement
+	<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass,ConcreteInterface>, 
+	ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass,ConcreteInterface>> 
 extends TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 
 

@@ -56,7 +56,12 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateAttributeException;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface AttributedElementClass<ConcreteMetaClass extends AttributedElementClass<?,?>, ConcreteInterface extends AttributedElement<?,?>> extends NamedElementClass, TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
+public interface AttributedElementClass
+	<ConcreteMetaClass extends AttributedElementClass<ConcreteMetaClass, ConcreteInterface>, 
+	 ConcreteInterface extends AttributedElement<ConcreteMetaClass, ConcreteInterface>> 
+
+
+	extends NamedElementClass, TypedElementClass<ConcreteMetaClass, ConcreteInterface> {
 
 	/**
 	 * Adds a new attribute <code>anAttribute</code> to this element.
