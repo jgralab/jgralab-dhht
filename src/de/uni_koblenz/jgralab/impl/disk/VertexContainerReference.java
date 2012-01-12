@@ -10,10 +10,6 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class VertexContainerReference extends GraphElementContainerReference<VertexContainer> {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6397047815119746241L;
 	
 	
 	public VertexContainerReference(VertexContainer container, ReferenceQueue<VertexContainer> queue) {

@@ -145,7 +145,6 @@ public abstract class IncidenceProxy implements Incidence {
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
 		Incidence currentIncidence;
 		try {
-			long vertexId = storingGraphDatabase.getVertexIdAtIncidenceId(id);
 			long nextIncId = storingGraphDatabase
 					.getNextIncidenceIdAtVertexId(id);
 			currentIncidence = localGraphDatabase.getIncidenceObject(nextIncId);

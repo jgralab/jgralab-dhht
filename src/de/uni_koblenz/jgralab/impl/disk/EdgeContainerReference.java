@@ -10,10 +10,6 @@ import de.uni_koblenz.jgralab.Edge;
 
 public class EdgeContainerReference extends GraphElementContainerReference<EdgeContainer> {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4021980277985504150L;
 
 	long[] incidenceListVersion = null;
 	

@@ -4,10 +4,6 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class VertexContainer extends GraphElementContainer {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2492472176568366922L;
 	
 	transient Vertex[] vertices;
 

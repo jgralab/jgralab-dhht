@@ -130,6 +130,7 @@ public abstract class EdgeImpl extends
 		return (int) (getGlobalId() - e.getGlobalId());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
 			Vertex elemToConnect) {
@@ -142,6 +143,7 @@ public abstract class EdgeImpl extends
 							globalVId, this.getGlobalId()));
 	}
 
+	@SuppressWarnings("unchecked")
 	public final <T extends Incidence> T connect(IncidenceClass incidenceClass,
 			Vertex elemToConnect, long incidenceId) {
 		return (T) getSchema().getGraphFactory().createIncidence_DistributedStorage(incidenceClass.getM1Class(),
@@ -298,6 +300,7 @@ public abstract class EdgeImpl extends
 		return degree;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public final int getDegree(Graph traversalContext,
 			Class<? extends Incidence> ic, Direction direction,
@@ -572,6 +575,7 @@ public abstract class EdgeImpl extends
 				anIncidenceClass.getM1Class());
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public final Iterable<Incidence> getIncidences(
 			IncidenceClass anIncidenceClass, Direction direction) {
