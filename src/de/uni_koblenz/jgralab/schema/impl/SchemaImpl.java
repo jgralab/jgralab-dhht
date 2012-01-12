@@ -78,7 +78,6 @@ import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SubordinateGraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.VertexCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.ViewGraphCodeGenerator;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
@@ -147,7 +146,10 @@ public class SchemaImpl implements Schema {
 			String.class, int.class, int.class };
 
 	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_DISKBASED = {
-			String.class, long.class, GraphDatabaseBaseImpl.class };
+			String.class, long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class };
+	
+	static final Class<?>[] GRAPHCLASS_CREATE_SIGNATURE_DISTRIBUTED = {
+		String.class, long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class };
 
 	/**
 	 * This is the name of the package into which the implementation classes for
@@ -162,6 +164,7 @@ public class SchemaImpl implements Schema {
 	 * Schema.
 	 */
 	public static final String IMPLDISKPACKAGENAME = "impl.disk";
+	public static final String IMPLDISTRIBUTEDPACKAGENAME = "impl.distributed";
 	public static final String IMPLMEMORYPACKAGENAME = "impl.mem";
 
 	static final Class<?>[] VERTEX_CLASS_CREATE_SIGNATURE = { int.class };

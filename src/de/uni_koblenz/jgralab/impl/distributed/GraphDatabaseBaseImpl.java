@@ -1867,7 +1867,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	}
 
 	public Graph createViewGraph(Graph g, int kappa) {
-		return graphFactory.createViewGraph_DiskBasedStorage(g, kappa);
+		return graphFactory.createViewGraph_DistributedStorage(g, kappa);
 	}
 
 	public Graph loadRemotePartialGraph(String hostname, int id) {
