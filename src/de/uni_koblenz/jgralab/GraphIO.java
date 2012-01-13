@@ -67,8 +67,6 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.ParentEntityKind;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -815,7 +813,7 @@ public class GraphIO {
 		}
 
 		space();
-		if (graph.getPartialGraphId() != GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
+		if (graph.getPartialGraphId() != de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods.TOPLEVEL_PARTIAL_GRAPH_ID) {
 			write("PartialGraph ");
 			write(toUtfString(graph.getUniqueGraphId()));
 			write(" " + graph.getPartialGraphId() + " ");
@@ -828,7 +826,7 @@ public class GraphIO {
 			} else {
 				write(" EDGE ");
 			}
-			writeInteger(GraphDatabaseBaseImpl
+			writeInteger(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl
 					.convertToLocalId(e.getGlobalId()));
 		} else {
 			write("Graph ");
@@ -2868,8 +2866,8 @@ public class GraphIO {
 		}
 		Graph graph = null;
 
-		if (implementationType == ImplementationType.MEMORY) {
-			// InMemory Implementation
+		switch (implementationType) {
+		case MEMORY:
 			try {
 				graph = (Graph) schema.getGraphCreateMethod(
 						ImplementationType.MEMORY).invoke(schema,
@@ -2880,13 +2878,13 @@ public class GraphIO {
 			}
 			((de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl) graph)
 					.setLoading(true);
-		} else {
-			// DISK Implementation
+			break;
+		case DISK:	
 			try {
 				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
 
-				GraphDatabaseBaseImpl localGraphDb = (GraphDatabaseBaseImpl) ((JGraLabServerImpl) server)
-						.getGraphDatabase(uniqueGraphId);
+				de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localGraphDb = (de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl) ((JGraLabServerImpl) server)
+						.getGraphDatabase(uniqueGraphId, implementationType);
 				graph = (Graph) schema.getGraphCreateMethod(
 						ImplementationType.DISK).invoke(
 						null,
@@ -2896,6 +2894,25 @@ public class GraphIO {
 				throw new GraphIOException("can't create graph for class '"
 						+ gcName + "'", e);
 			}
+			break;
+		case DISTRIBUTED:	
+			try {
+				JGraLabServer server = JGraLabServerImpl.getLocalInstance();
+
+				de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl localGraphDb = (de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl) ((JGraLabServerImpl) server)
+						.getGraphDatabase(uniqueGraphId, implementationType);
+				graph = (Graph) schema.getGraphCreateMethod(
+						ImplementationType.DISTRIBUTED).invoke(
+						null,
+						new Object[] { uniqueGraphId, partialGraphId,
+								localGraphDb });
+			} catch (Exception e) {
+				throw new GraphIOException("can't create graph for class '"
+						+ gcName + "'", e);
+			}
+			break;
+		default:
+			throw new RuntimeException("Unhandled case");
 			// ((de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl)
 			// graph).setLoading(true);
 			// server = JGraLabServerImpl.getLocalInstance();
@@ -2955,8 +2972,8 @@ public class GraphIO {
 			}
 		}
 
-		if (implementationType == ImplementationType.DISK && !onlyLocalGraph) {
-			createPartialGraphs(uniqueGraphId);
+		if ((implementationType == ImplementationType.DISK || implementationType == ImplementationType.DISTRIBUTED ) && !onlyLocalGraph) {
+			createPartialGraphs(uniqueGraphId, implementationType);
 		}
 		createIncidences(graph, onlyLocalGraph, implementationType);
 		if (onlyLocalGraph) {
@@ -3050,12 +3067,12 @@ public class GraphIO {
 		}
 	}
 
-	private void createPartialGraphs(String uniqueGraphId)
+	private void createPartialGraphs(String uniqueGraphId, ImplementationType implType)
 			throws GraphIOException, RemoteException {
 		for (Entry<Integer, String> pGraph : partialGraphHostnames.entrySet()) {
 			JGraLabServerImpl remoteServer = (JGraLabServerImpl) (server)
 					.getRemoteInstance(pGraph.getValue());
-			remoteServer.getGraphDatabase(uniqueGraphId);
+			remoteServer.getGraphDatabase(uniqueGraphId, implType);
 		}
 	}
 
@@ -3258,7 +3275,7 @@ public class GraphIO {
 					lambdaSeqPosAtEdge,
 					implementationType == ImplementationType.MEMORY ? new Long(
 							incidenceId)
-							: (((long) GraphDatabaseElementaryMethods
+							: (((long) de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods
 									.getPartialGraphId(edge.getGlobalId())) << 32)
 									| incidenceId);
 			incidenceTypes.put(incidenceId, incidenceName);
