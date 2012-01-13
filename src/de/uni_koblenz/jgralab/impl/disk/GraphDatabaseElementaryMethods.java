@@ -16,6 +16,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
@@ -267,7 +268,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		// register graph database at server
 		localJGraLabServer = JGraLabServerImpl.getLocalInstance();
 		localJGraLabServer
-				.registerLocalGraphDatabase((GraphDatabaseBaseImpl) this);
+				.registerLocalDiskGraphDatabase((GraphDatabaseBaseImpl) this);
 		partialGraphDatabases.put(localPartialGraphId, this);
 	}
 
@@ -340,7 +341,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			try {
 				remoteAccess = (RemoteGraphDatabaseAccessWithInternalMethods) localJGraLabServer
 						.getRemoteInstance(getHostname(partialGraphId))
-						.getGraphDatabase(uniqueGraphId);
+						.getGraphDatabase(uniqueGraphId, ImplementationType.DISK);
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

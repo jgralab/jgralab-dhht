@@ -15,6 +15,7 @@ import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLabList;
 import de.uni_koblenz.jgralab.JGraLabMap;
@@ -105,7 +106,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				.getRemoteInstance(hostname);
 		RemoteGraphDatabaseAccess p;
 		try {
-			p = remoteServer.getGraphDatabase(uniqueGraphId);
+			p = remoteServer.getGraphDatabase(uniqueGraphId, ImplementationType.DISTRIBUTED);
 			partialGraphDatabases.put(partialGraphId,
 					(RemoteGraphDatabaseAccessWithInternalMethods) p);
 		} catch (RemoteException e) {

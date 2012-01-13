@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.impl.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
@@ -26,7 +27,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 					.getRemoteInstance(hostnameOfCompleteGraph);
 
 			completeGraphDatabase = remoteInstance
-					.getGraphDatabase(uniqueGraphId);
+					.getGraphDatabase(uniqueGraphId, ImplementationType.DISK);
 			GraphData data = new GraphData();
 			data.globalSubgraphId = GraphDatabaseElementaryMethods
 					.getToplevelGraphForPartialGraphId(localPartialGraphId);
@@ -62,7 +63,7 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 				.getRemoteInstance(remoteHostname);
 		RemoteGraphDatabaseAccess p;
 		try {
-			p = remoteServer.getGraphDatabase(uniqueGraphId);
+			p = remoteServer.getGraphDatabase(uniqueGraphId, ImplementationType.DISK);
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}

@@ -20,17 +20,10 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLabServer;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
-import de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6666943675150922207L;
 
 	private static final String JGRALAB_SERVER_IDENTIFIER = "JGraLabServer";
 
@@ -84,7 +77,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
-	public RemoteGraphDatabaseAccess loadGraph(String uid)
+	public RemoteGraphDatabaseAccess loadGraph(String uid, ImplementationType implType)
 			throws GraphIOException {
 		RemoteGraphDatabaseAccess db = localGraphDatabases
 				.get(uid);
@@ -95,13 +88,41 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			Graph graph = GraphIO.loadGraphFromFile(filename, null,
 					ImplementationType.DISK);
 			db = graph.getGraphDatabase();
-			registerLocalGraphDatabase((GraphDatabaseBaseImpl) db);
+			switch (implType) {
+			case DISK: 
+				registerLocalDiskGraphDatabase((de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl) db);
+				break;
+			case DISTRIBUTED: 
+				registerLocalDistributedGraphDatabase((de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl) db);
+				break;
+			default:
+				throw new RuntimeException("Unhandled case block");
+			}
+			
+
 		}
 		return db;
 	}
 
 	@Override
-	public void registerLocalGraphDatabase(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localDb) {
+	public void registerLocalDiskGraphDatabase(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localDb) {
+		String uniqueId = localDb.getUniqueGraphId();
+		if (!localGraphDatabases.containsKey(uniqueId)) {
+			localGraphDatabases.put(uniqueId, localDb);
+			RemoteGraphDatabaseAccessWithInternalMethods stub;
+			try {
+				stub = (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+						.exportObject(localGraphDatabases.get(uniqueId), 0);
+				localStubs.put(uniqueId, stub);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
+	}
+	
+	@Override
+	public void registerLocalDistributedGraphDatabase(de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl localDb) {
 		String uniqueId = localDb.getUniqueGraphId();
 		if (!localGraphDatabases.containsKey(uniqueId)) {
 			localGraphDatabases.put(uniqueId, localDb);
@@ -117,24 +138,6 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 	}
 
-	
-	@Override
-	public void registerLocalGraphDatabase(
-			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl localDb) {
-		String uniqueId = localDb.getUniqueGraphId();
-		if (!localGraphDatabases.containsKey(uniqueId)) {
-			localGraphDatabases.put(uniqueId, localDb);
-			RemoteGraphDatabaseAccessWithInternalMethods stub;
-			try {
-				stub = (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
-						.exportObject(localGraphDatabases.get(uniqueId), 0);
-				localStubs.put(uniqueId, stub);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-	
 	
 	@Override
 	public void registerFileForUid(String uid, String fileName) {
@@ -145,7 +148,7 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(
 			String schemaName, String uniqueGraphId,
 			String hostnameOfCompleteGraph, long parentGlobalEntityId,
-			ParentEntityKind parent, int localPartialGraphId)
+			ParentEntityKind parent, int localPartialGraphId, ImplementationType implType)
 			throws ClassNotFoundException {
 		Class<?> schemaClass = Class.forName(schemaName);
 		Schema schema = null;
@@ -177,21 +180,32 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 					"Static instance method of class for schema " + schemaName
 							+ " can not be invoked", e);
 		}
-		GraphDatabaseBaseImpl db = new PartialGraphDatabase(schema,
+		switch (implType) {
+		case DISK:
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl db = new de.uni_koblenz.jgralab.impl.disk.PartialGraphDatabase(schema,
 				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
 				parent, localPartialGraphId);
-		System.out.println("Created graph database " + db);
-		registerLocalGraphDatabase(db);
-		System.out.println("Returning " + getGraphDatabase(uniqueGraphId));
-		return getGraphDatabase(uniqueGraphId);
+			registerLocalDiskGraphDatabase(db);
+			break;
+		case DISTRIBUTED:
+//			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl db2 = new de.uni_koblenz.jgralab.impl.distributed.PartialGraphDatabase(schema,
+//				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
+//				parent, localPartialGraphId);
+//			registerLocalDistributedGraphDatabase(db2);
+//			break;
+		default:
+			throw new RuntimeException("Unhandled case");
+		}
+
+
+		return getGraphDatabase(uniqueGraphId, implType);
 	}
 
 	@Override
-	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(
-			String uid) {
+	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(String uid, ImplementationType implType) {
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
-				loadGraph(uid);
+				loadGraph(uid, implType);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
@@ -206,15 +220,15 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	 * @param uid
 	 * @return
 	 */
-	public GraphDatabaseBaseImpl getLocalGraphDatabase(String uid) {
+	public RemoteGraphDatabaseAccess getLocalGraphDatabase(String uid, ImplementationType implType) {
 		if (!localGraphDatabases.containsKey(uid)) {
 			try {
-				loadGraph(uid);
+				loadGraph(uid, implType);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
-		return (GraphDatabaseBaseImpl) localGraphDatabases.get(uid);
+		return localGraphDatabases.get(uid);
 	}
 
 	@Override
@@ -230,8 +244,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
 			String uniqueGraphId, int partialGraphId, de.uni_koblenz.jgralab.algolib.CentralAlgorithm parent)
 			throws RemoteException {
-		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
-				.getGraphObject(GraphDatabaseElementaryMethods
+		Graph g = ((de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId, ImplementationType.DISK))
+				.getGraphObject(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods
 						.getToplevelGraphForPartialGraphId(partialGraphId));
 		return (de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
 				.exportObject(de.uni_koblenz.jgralab.algolib.SatelliteAlgorithmImpl.create(g, parent), 0);
@@ -240,8 +254,8 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 	public de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmRemoteAccess createUniversalSatelliteAlgorithm(
 			String uniqueGraphId, int partialGraphId, de.uni_koblenz.jgralab.algolib.universalsearch.CentralAlgorithm parent)
 			throws RemoteException {
-		Graph g = ((GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId))
-				.getGraphObject(GraphDatabaseElementaryMethods
+		Graph g = ((de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl) getLocalGraphDatabase(uniqueGraphId, ImplementationType.DISK))
+				.getGraphObject(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods
 						.getToplevelGraphForPartialGraphId(partialGraphId));
 		return (de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmRemoteAccess) UnicastRemoteObject
 				.exportObject(de.uni_koblenz.jgralab.algolib.universalsearch.SatelliteAlgorithmImpl.create(g, parent), 0);

@@ -20,7 +20,7 @@ public interface RemoteJGraLabServer extends Remote {
 	 * @param graphDatabase
 	 */
 	public RemoteGraphDatabaseAccessWithInternalMethods getGraphDatabase(
-			String graphUid) throws RemoteException;
+			String graphUid, ImplementationType implType) throws RemoteException;
 
 	/**
 	 * Creates a new GraphDatabase for the partial graph with the givenØ
@@ -43,7 +43,7 @@ public interface RemoteJGraLabServer extends Remote {
 	public RemoteGraphDatabaseAccessWithInternalMethods createPartialGraphDatabase(
 			String schemaName, String uniqueGraphId,
 			String hostnameOfCompleteGraph, long parentGlobalEntityId,
-			ParentEntityKind parent, int localPartialGraphId)
+			ParentEntityKind parent, int localPartialGraphId, ImplementationType implType)
 			throws ClassNotFoundException, RemoteException;
 
 	public SatelliteAlgorithmRemoteAccess createSatelliteAlgorithm(
