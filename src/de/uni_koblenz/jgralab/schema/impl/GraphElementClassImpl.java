@@ -55,7 +55,7 @@ public abstract class GraphElementClassImpl
 	
 	protected GraphClass graphClass;
 
-	protected Set<GraphElementClass<?, ?,?,?>> allowedSigmaClasses;
+//	protected Set<GraphElementClass<?, ?,?,?>> allowedSigmaClasses;
 	
 	protected int minKappa = 0;
 	
@@ -73,17 +73,17 @@ public abstract class GraphElementClassImpl
 			GraphClass graphClass) {
 		super(simpleName, pkg, graphClass.getSchema());
 		this.graphClass = graphClass;
-		allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
+	//	allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
 	}
 	
 	@Override
 	public void addAllowedSigmaClass(GraphElementClass<?,?,?,?> gec) {
-		allowedSigmaClasses.add(gec);
+	//	allowedSigmaClasses.add(gec);
 	}
 	
 	@Override
 	public Set<GraphElementClass<?,?,?,?>> getAllowedSigmaClasses() {
-		return allowedSigmaClasses;
+		return null; // allowedSigmaClasses;
 	}
 
 	@Override

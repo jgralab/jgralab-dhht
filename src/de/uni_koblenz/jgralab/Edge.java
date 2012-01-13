@@ -111,7 +111,7 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            of a subclass of <code>aM1EdgeClass</code> are returned
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass,
+	public <T extends Edge> T getNextEdge(Class<T> aM1EdgeClass,
 			boolean noSubclasses);
 
 	/**
@@ -194,8 +194,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            of a subclass of <code>aM1EdgeClass</code> are returned
 	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Graph traversalContext,
-			Class<? extends Edge> aM1EdgeClass, boolean noSubclasses);
+	public <T extends Edge> T getNextEdge(Graph traversalContext,
+			Class<T> aM1EdgeClass, boolean noSubclasses);
 
 	/**
 	 * Returns a sequence of all start vertices.
@@ -222,8 +222,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getAlphaVertices(
-			Class<? extends Vertex> aVertexClass);
+	public <T extends Vertex> Iterable<T> getAlphaVertices(
+			Class<T> aVertexClass);
 
 	/**
 	 * Returns a sequence of all start vertices.
@@ -286,8 +286,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getOmegaVertices(
-			Class<? extends Vertex> aVertexClass);
+	public <T extends Vertex> Iterable<T> getOmegaVertices(
+			Class<T> aVertexClass);
 
 	/**
 	 * Returns a sequence of all end vertices.
@@ -359,8 +359,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass);
+	public <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass);
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -387,8 +387,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Direction}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass, Direction direction);
+	public <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass, Direction direction);
 
 	/**
 	 * Returns a sequence of all incident vertices.
@@ -435,8 +435,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Class}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass);
+	public <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass);
 
 	/**
 	 * Returns a sequence of all incident vertices which are an instance of
@@ -467,8 +467,8 @@ public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex>
 	 *            {@link Direction}
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass, Direction direction);
+	public <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass, Direction direction);
 
 	/**
 	 * Tests if this edge is a binary one (i.e., its edge class has only two

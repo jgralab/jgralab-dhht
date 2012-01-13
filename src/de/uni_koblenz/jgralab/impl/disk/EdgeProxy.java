@@ -185,7 +185,7 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Edge getNextEdge(Class<? extends Edge> m1EdgeClass,
+	public final <T extends Edge> T getNextEdge(Class<T> m1EdgeClass,
 			boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
@@ -202,19 +202,19 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Edge getNextEdge(Graph traversalContext,
-			Class<? extends Edge> m1EdgeClass, boolean noSubclasses) {
+	public final <T extends Edge> T getNextEdge(Graph traversalContext,
+			Class<T> m1EdgeClass, boolean noSubclasses) {
 		assert m1EdgeClass != null;
 		assert isValid();
 		EdgeProxy e = (EdgeProxy) getNextEdge(traversalContext);
 		while (e != null) {
 			if (noSubclasses) {
 				if (m1EdgeClass == e.getM1Class()) {
-					return e;
+					return (T) e;
 				}
 			} else {
 				if (m1EdgeClass.isInstance(e)) {
-					return e;
+					return (T) e;
 				}
 			}
 			e = (EdgeProxy) e.getNextEdge(traversalContext);
@@ -963,15 +963,15 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass);
+	public final <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass) {
+		return new IncidentVertexIterable<T>(this, aVertexClass);
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(
-			Class<? extends Vertex> aVertexClass, Direction direction) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass, direction);
+	public final <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<T>(this, aVertexClass, direction);
 	}
 
 	@Override
@@ -985,16 +985,16 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+	public final <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass) {
+		return new IncidentVertexIterable<T>(traversalContext, this,
 				aVertexClass);
 	}
 
 	@Override
-	public final Iterable<Vertex> getIncidentVertices(Graph traversalContext,
-			Class<? extends Vertex> aVertexClass, Direction direction) {
-		return new IncidentVertexIterable<Vertex>(traversalContext, this,
+	public final <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass, Direction direction) {
+		return new IncidentVertexIterable<T>(traversalContext, this,
 				aVertexClass, direction);
 	}
 
@@ -1039,9 +1039,9 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Iterable<Vertex> getAlphaVertices(
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
+	public final <T extends Vertex> Iterable<T> getAlphaVertices(
+			Class<T> aVertexClass) {
+		return new IncidentVertexIterable<T>(this, aVertexClass,
 				Direction.VERTEX_TO_EDGE);
 	}
 
@@ -1078,9 +1078,9 @@ public abstract class EdgeProxy extends
 	}
 
 	@Override
-	public final Iterable<Vertex> getOmegaVertices(
-			Class<? extends Vertex> aVertexClass) {
-		return new IncidentVertexIterable<Vertex>(this, aVertexClass,
+	public final <T extends Vertex> Iterable<T> getOmegaVertices(
+			Class<T> aVertexClass) {
+		return new IncidentVertexIterable<T>(this, aVertexClass,
 				Direction.EDGE_TO_VERTEX);
 	}
 
