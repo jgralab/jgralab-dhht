@@ -217,7 +217,7 @@ public interface TypedElementClass
 	 * @throws M1ClassAccessException
 	 *             if reflection exceptions occur.
 	 */
-	public Class<? extends ConcreteInterface> getM1Class();
+	public Class<ConcreteInterface> getM1Class();
 
 	/**
 	 * Returns the M1 implementation class for this typed element.

@@ -102,7 +102,7 @@ public abstract class TypedElementClassImpl
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Class<? extends ConcreteInterface> getM1Class() {
+	public Class<ConcreteInterface> getM1Class() {
 		if (m1Class == null) {
 			String m1ClassName = getSchema().getPackagePrefix() + "."
 					+ getQualifiedName();
@@ -116,7 +116,7 @@ public abstract class TypedElementClassImpl
 								+ getQualifiedName() + "'", e);
 			}
 		}
-		return m1Class;
+		return (Class<ConcreteInterface>) m1Class;
 	}
 
 	@SuppressWarnings("unchecked")
