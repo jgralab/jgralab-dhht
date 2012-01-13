@@ -43,7 +43,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
 import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
@@ -250,7 +249,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	
 	@Override
 	public Edge createEdge_DiskBasedStorage(Class<? extends Edge> edgeClass,
-			long id, GraphDatabaseBaseImpl graphDatabase) {
+			long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			Edge e = edgeMap_DiskBasedStorage.get(edgeClass).newInstance(id,
 					graphDatabase);
@@ -267,7 +266,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id,
-			GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, EdgeContainer container) {
 		try {
 			Edge e = edgeMapForDiskStorageReloading.get(edgeClass).newInstance(
 					id, graphDatabase, container);
@@ -424,7 +423,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	@Override
 	public <T extends Incidence> T reloadLocalIncidence(
 			Class<? extends T> incidenceClass, long id,
-			GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, IncidenceContainer container) {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceMapForDiskStorageReloading.get(incidenceClass)
@@ -534,7 +533,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass,
-			long id, GraphDatabaseBaseImpl graphDatabase,
+			long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase,
 			VertexContainer container) {
 		try {
 			Vertex v = vertexMapForDiskStorageReloading.get(vertexClass)
@@ -574,7 +573,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, long.class,
-						GraphDatabaseBaseImpl.class,
+						de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				graphMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -593,7 +592,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { String.class, long.class,
-						GraphDatabaseBaseImpl.class,
+						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				graphMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -629,11 +628,11 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class };
 				edgeMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 				Class<?>[] paramsDisk = { long.class,
-						GraphDatabaseBaseImpl.class, EdgeContainer.class };
+						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class, EdgeContainer.class };
 				edgeMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 
@@ -651,7 +650,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class };
 				edgeMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 
@@ -669,7 +668,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				edgeProxyMap_DiskBasedStorage.put(edgeM1Class,
 						implementationClass.getConstructor(params));
@@ -687,7 +686,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				edgeProxyMap_DistributedStorage.put(edgeM1Class,
 						implementationClass.getConstructor(params));
@@ -722,11 +721,11 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.VertexImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class };
 				vertexMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 				Class<?>[] paramsDisk = { long.class,
-						GraphDatabaseBaseImpl.class, VertexContainer.class };
+						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class, VertexContainer.class };
 				vertexMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
@@ -743,7 +742,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.distributed.VertexImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class };
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class };
 				vertexMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
@@ -760,7 +759,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				vertexProxyMap_DistributedStorage.put(vertexM1Class,
 						implementationClass.getConstructor(params));
@@ -778,7 +777,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				vertexProxyMap_DiskBasedStorage.put(vertexM1Class,
 						implementationClass.getConstructor(params));
@@ -813,7 +812,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						long.class, long.class };
 				incidenceMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -831,12 +830,12 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						long.class, long.class };
 				incidenceMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 				Class<?>[] paramsDisk = { long.class,
-						GraphDatabaseBaseImpl.class, IncidenceContainer.class };
+						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class, IncidenceContainer.class };
 				incidenceMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
 			} catch (NoSuchMethodException ex) {
@@ -853,7 +852,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				incidenceProxyMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -871,7 +870,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				incidenceProxyMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
@@ -1154,7 +1153,7 @@ public class GraphFactoryImpl implements GraphFactory {
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphInEdge_DiskBasedStorage(
-			GraphDatabaseBaseImpl graphDatabase, long edgeId) {
+			de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, long edgeId) {
 		try {
 			Edge edge = graphDatabase.getEdgeObject(edgeId);
 			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();
@@ -1193,11 +1192,11 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForVertexMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramse = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] paramse = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForEdgeMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(paramse));
@@ -1215,11 +1214,11 @@ public class GraphFactoryImpl implements GraphFactory {
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
-				Class<?>[] params = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForVertexMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
-				Class<?>[] paramse = { long.class, GraphDatabaseBaseImpl.class,
+				Class<?>[] paramse = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				subordinateGraphForEdgeMap_DiskBasedStorage.put(originalClass,
 						implementationClass.getConstructor(paramse));
