@@ -166,8 +166,14 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 
 
 	@Override
-	public final GraphElement<?, ?, ?,?> getSigma() {
-		return (sigmaId > 0) ? graphDb.getVertexObject(sigmaId) : graphDb.getEdgeObject(-sigmaId);
+	public final GraphElement getSigma() {
+		if (sigmaId > 0) {
+			Vertex v = graphDb.getVertexObject(sigmaId);
+			return v;
+		} else {
+			Edge e = graphDb.getEdgeObject(-sigmaId);
+			return e;
+		}
 	}
 	
 	public long getSigmaId() {
@@ -202,8 +208,8 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 
 	
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
-		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement element) {
+		for (GraphElement el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;
@@ -621,9 +627,9 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	public final void setSigma(GraphElement<?, ?, ?,?> newSigma) {
+	public final void setSigma(GraphElement newSigma) {
 		assert newSigma != null;
-		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
+	//	assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
 		this.sigmaId = (newSigma instanceof Vertex) ? newSigma.getGlobalId() : -newSigma.getGlobalId();
 	}
 
@@ -674,13 +680,13 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public final boolean isChildOf(GraphElement<?, ?, ?,?> parent) {
+	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?,?>) getSigma()).isChildOf(parent);
+			return ((GraphElementImpl) getSigma()).isChildOf(parent);
 		}
 	}
 

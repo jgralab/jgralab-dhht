@@ -247,7 +247,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
-		TreeSet<GraphElementClass<?,?,?,?>> sortedClasses = new TreeSet<GraphElementClass<?,?,?,?>>();
+		TreeSet<GraphElementClass> sortedClasses = new TreeSet<GraphElementClass>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
 		for (GraphElementClass<?,?,?,?> gec : sortedClasses) {
 			if (!gec.isInternal()) {

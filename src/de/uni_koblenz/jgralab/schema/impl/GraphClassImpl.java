@@ -54,7 +54,7 @@ public final class GraphClassImpl extends
 
 	private final Map<String, EdgeClass> edgeClasses = new HashMap<String, EdgeClass>();
 
-	private final Map<String, GraphElementClass<?, ?,?,?>> graphElementClasses = new HashMap<String, GraphElementClass<?, ?,?,?>>();
+	private final Map<String, GraphElementClass> graphElementClasses = new HashMap<String, GraphElementClass>();
 
 	private final Map<String, VertexClass> vertexClasses = new HashMap<String, VertexClass>();
 
@@ -229,8 +229,8 @@ public final class GraphClassImpl extends
 	}
 
 	@Override
-	public List<GraphElementClass<?, ?,?,?>> getGraphElementClasses() {
-		return new ArrayList<GraphElementClass<?, ?,?,?>>(
+	public List<GraphElementClass> getGraphElementClasses() {
+		return new ArrayList<GraphElementClass>(
 				graphElementClasses.values());
 	}
 

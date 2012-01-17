@@ -141,7 +141,7 @@ public interface GraphClass extends AttributedElementClass<GraphClass, Graph> {
 	 * @return a list of all the edge/vertex/aggregation/composition classes of
 	 *         this graph class, including inherited classes
 	 */
-	public List<GraphElementClass<?, ?,?,?>> getGraphElementClasses();
+	public List<GraphElementClass> getGraphElementClasses();
 
 	/**
 	 * @return a list of all the vertex classes of this graph class, including

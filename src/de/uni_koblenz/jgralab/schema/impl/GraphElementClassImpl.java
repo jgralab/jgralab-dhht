@@ -76,15 +76,15 @@ public abstract class GraphElementClassImpl
 	//	allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
 	}
 	
-	@Override
-	public void addAllowedSigmaClass(GraphElementClass<?,?,?,?> gec) {
-	//	allowedSigmaClasses.add(gec);
-	}
-	
-	@Override
-	public Set<GraphElementClass<?,?,?,?>> getAllowedSigmaClasses() {
-		return null; // allowedSigmaClasses;
-	}
+//	@Override
+//	public void addAllowedSigmaClass(GraphElementClass gec) {
+//	//	allowedSigmaClasses.add(gec);
+//	}
+//	
+//	@Override
+//	public Set<GraphElementClass> getAllowedSigmaClasses() {
+//		return null; // allowedSigmaClasses;
+//	}
 
 	@Override
 	public GraphClass getGraphClass() {
@@ -179,12 +179,13 @@ public abstract class GraphElementClassImpl
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
-			GraphElementClass<?,?,?,?> ogc = ic.getOtherGraphElementClass(this);
-			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
-				if (ic != ic2) {
-					adjacentIncidenceClasses.add(ic2);
-				}
-			}
+			GraphElementClass ogc = ic.getOtherGraphElementClass(this);
+			//TODO
+//			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
+//				if (ic != ic2) {
+//					adjacentIncidenceClasses.add(ic2);
+//				}
+//			}
 		}
 		return adjacentIncidenceClasses;
 	}
@@ -192,12 +193,13 @@ public abstract class GraphElementClassImpl
 	protected Set<IncidenceClass> getAllAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : getAllIncidenceClasses()) {
-			GraphElementClass<?,?,?,?> ogc = ic.getOtherGraphElementClass(this);
-			for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
-				if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) && (!ic2.isSuperClassOf(ic))) { 
-					adjacentIncidenceClasses.add(ic2);
-				}
-			}
+			GraphElementClass ogc = ic.getOtherGraphElementClass(this);
+			//TODO
+//			for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
+//				if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) && (!ic2.isSuperClassOf(ic))) { 
+//					adjacentIncidenceClasses.add(ic2);
+//				}
+//			}
 		}
 		return adjacentIncidenceClasses;
 	}

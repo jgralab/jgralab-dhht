@@ -69,7 +69,7 @@ public abstract class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
 		GraphStructureChangedListener {
 
-	private GraphElement<?, ?, ?,?> containingElement;
+	private GraphElement  containingElement;
 
 	// TODO: Check if the respective methods are really
 	// needed in the graph interface and how to ensure, that
@@ -142,7 +142,7 @@ public abstract class SubordinateGraphImpl extends
 		Vertex currentV = containingVertex.getNextVertex((Graph) null);
 		//System.out.println("Sigma of next v : " + currentV.getSigma().getLocalId());
 		//System.out.println("Contains: " + ((GraphElementImpl<?, ?, ?>) currentV).isChildOf(containingElement));
-		while (currentV != null && ((GraphElementImpl<?, ?, ?,?>) currentV).isChildOf(containingElement)) {
+		while (currentV != null && ((GraphElementImpl) currentV).isChildOf(containingElement)) {
 		//	System.out.println("Adding vertex: " + currentV);
 			if (firstVertex == null) {
 				firstVertex = (VertexImpl) currentV;
@@ -156,7 +156,7 @@ public abstract class SubordinateGraphImpl extends
 		// initialize edges
 		Edge currentE = containingVertex.getGraph().getFirstEdge();
 		while (currentE != null
-				&& !((GraphElementImpl<?, ?, ?,?>) currentE)
+				&& !((GraphElementImpl) currentE)
 						.isChildOf(containingElement)) {
 			currentE = currentE.getNextEdge();
 		}
@@ -169,7 +169,7 @@ public abstract class SubordinateGraphImpl extends
 				iCount += currentE.getDegree();
 				currentE = currentE.getNextEdge();
 			} while (currentE != null
-					&& ((GraphElementImpl<?, ?, ?,?>) currentE)
+					&& ((GraphElementImpl) currentE)
 							.isChildOf(containingElement));
 		}
 		getCompleteGraph().addGraphStructureChangedListener(this);
@@ -188,7 +188,7 @@ public abstract class SubordinateGraphImpl extends
 
 		// initialize edges
 		for (Edge current = containingEdge.getNextEdge(); current != null
-				&& ((GraphElementImpl<?, ?, ?,?>) current)
+				&& ((GraphElementImpl) current)
 						.isChildOf(containingElement); current.getNextEdge()) {
 			if (getFirstEdge() == null) {
 				setFirstEdge((EdgeImpl) current);
@@ -201,7 +201,7 @@ public abstract class SubordinateGraphImpl extends
 		// initialize vertices
 		Vertex current = containingEdge.getGraph().getFirstVertex();
 		while (current != null
-				&& !((GraphElementImpl<?, ?, ?,?>) current)
+				&& !((GraphElementImpl) current)
 						.isChildOf(containingElement)) {
 			current = current.getNextVertex();
 		}
@@ -212,13 +212,13 @@ public abstract class SubordinateGraphImpl extends
 				vCount++;
 				current = current.getNextVertex();
 			} while (current != null
-					&& ((GraphElementImpl<?, ?, ?,?>) current)
+					&& ((GraphElementImpl) current)
 							.isChildOf(containingElement));
 		}
 		getCompleteGraph().addGraphStructureChangedListener(this);
 	}
 
-	private void initializeCommonFields(GraphElement<?, ?, ?,?> containingElement) {
+	private void initializeCommonFields(GraphElement containingElement) {
 		this.containingElement = containingElement;
 	}
 
@@ -348,14 +348,14 @@ public abstract class SubordinateGraphImpl extends
 
 	@Override
 	public boolean containsVertex(Vertex v) {
-		return ((GraphElementImpl<?, ?, ?,?>) v)
-				.isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement());
+		return ((GraphElementImpl) v)
+				.isChildOf((GraphElement) getParentGraphOrElement());
 	}
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		return ((GraphElementImpl<?, ?, ?,?>) e)
-				.isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement());
+		return ((GraphElementImpl) e)
+				.isChildOf((GraphElement) getParentGraphOrElement());
 	}
 
 	@Override
@@ -383,7 +383,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = containingElement.getGraph().getVertex(id);
-		if (((GraphElementImpl<?, ?, ?,?>) v).isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement())) {
+		if (((GraphElementImpl) v).isChildOf((GraphElement) getParentGraphOrElement())) {
 			return v;
 		} else {
 			return null;
@@ -393,7 +393,7 @@ public abstract class SubordinateGraphImpl extends
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = containingElement.getGraph().getEdge(id);
-		if (((GraphElementImpl<?, ?, ?,?>) e).isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement())) {
+		if (((GraphElementImpl) e).isChildOf((GraphElement) getParentGraphOrElement())) {
 			return e;
 		} else {
 			return null;
@@ -633,7 +633,7 @@ public abstract class SubordinateGraphImpl extends
 			return -1;
 		} else if (arg0.getParentGraphOrElement() != null) {
 			// this is a SubordinateGraphImpl
-			GraphElement<?, ?, ?,?> ce = (GraphElement<?, ?, ?,?>) arg0.getParentGraphOrElement();
+			GraphElement ce = (GraphElement) arg0.getParentGraphOrElement();
 			boolean isArg0Vertex = ce instanceof Vertex;
 			boolean isThisVertex = getParentGraphOrElement() instanceof Vertex;
 			if (isArg0Vertex && isThisVertex) {

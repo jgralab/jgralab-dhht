@@ -599,7 +599,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public GraphElement<?, ?, ?,?> getSigma() {
+	public GraphElement getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
 		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
@@ -609,7 +609,7 @@ public abstract class VertexImpl extends
 	}
 
 	@Override
-	public void setSigma(GraphElement<?, ?, ?,?> elem) {
+	public void setSigma(GraphElement elem) {
 		long sigmaId = elem.getGlobalId();
 		if (elem instanceof Edge) {
 			container.sigmaId[getIdInStorage(elementId)] = -sigmaId;

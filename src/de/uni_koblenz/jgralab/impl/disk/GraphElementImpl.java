@@ -122,8 +122,8 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	}
 
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
-		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement element) {
+		for (GraphElement el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;
@@ -172,11 +172,10 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 				.getPartialGraphId(elementId));
 	}
 
-	// @Override
-	// public final Graph getCompleteGraph() {
-	// return
-	// localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
-	// }
+//	 @Override
+//	 public final Graph getCompleteGraph() {
+//		 return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl.GLOBAL_GRAPH_ID);
+//	 }
 
 	@Override
 	public final Schema getSchema() {
@@ -458,8 +457,8 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 			// subordinate graph
 			addFirstSubordinateVertex(appendix);
 		}
-		((GraphElementImpl<?, ?, ?,?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?,?>) appendix).setSigma(this);
+		((GraphElementImpl) appendix).setAllKappas(getKappa() - 1);
+		((GraphElementImpl) appendix).setSigma(this);
 	}
 
 	/**
@@ -479,8 +478,8 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		} else {
 			addFirstSubordinateEdge(appendix);
 		}
-		((GraphElementImpl<?, ?, ?,?>) appendix).setAllKappas(getKappa() - 1);
-		((GraphElementImpl<?, ?, ?,?>) appendix).setSigma(this);
+		((GraphElementImpl) appendix).setAllKappas(getKappa() - 1);
+		((GraphElementImpl) appendix).setSigma(this);
 	}
 
 	/**
@@ -503,11 +502,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		int kappaDifference = getKappa() - kappa;
 		setKappa(kappa);
 		for (Vertex v : getSubordinateGraph().getVertices()) {
-			((GraphElementImpl<?, ?, ?,?>) v).setKappa(v.getKappa()
+			((GraphElementImpl) v).setKappa(v.getKappa()
 					- kappaDifference);
 		}
 		for (Edge e : getSubordinateGraph().getEdges()) {
-			((GraphElementImpl<?, ?, ?,?>) e).setKappa(e.getKappa()
+			((GraphElementImpl) e).setKappa(e.getKappa()
 					- kappaDifference);
 		}
 	}
@@ -537,13 +536,13 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public final boolean isChildOf(GraphElement<?, ?, ?,?> parent) {
+	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?,?>) getSigma()).isChildOf(parent);
+			return ((GraphElementImpl) getSigma()).isChildOf(parent);
 		}
 	}
 

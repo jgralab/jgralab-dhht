@@ -100,7 +100,7 @@ public interface GraphElement
 	 * 
 	 * @return {@link GraphElement}
 	 */
-	public GraphElement<?, ?, ?, ?> getSigma();
+	public GraphElement getSigma();
 
 	/**
 	 * Returns a {@link Graph} which contains all elements which are nested in
@@ -136,7 +136,7 @@ public interface GraphElement
 	 * @return boolean <code>true</code> if <code>element</code> is contained in
 	 *         this {@link GraphElement}
 	 */
-	public boolean containsElement(GraphElement<?, ?, ?, ?> element);
+	public boolean containsElement(GraphElement element);
 
 	public long getIncidenceListVersion();
 
@@ -1335,7 +1335,7 @@ public interface GraphElement
 	 */
 	public void addSubordinateElement(Edge appendix);
 
-	void setSigma(GraphElement<?, ?, ?, ?> elem);
+	void setSigma(GraphElement elem);
 
 	void setKappa(int kappa);
 

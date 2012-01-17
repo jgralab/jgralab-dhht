@@ -120,8 +120,8 @@ public abstract class GraphElementProxy
 	}
 
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
-		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement element) {
+		for (GraphElement el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;
@@ -477,7 +477,7 @@ public abstract class GraphElementProxy
 		} else {
 			addFirstSubordinateEdge(appendix);
 		}
-		//((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
+	//	((GraphElementImpl) appendix).setAllKappas(getKappa() - 1);
 		appendix.setSigma(this);
 	}
 
@@ -535,13 +535,13 @@ public abstract class GraphElementProxy
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public final boolean isChildOf(GraphElement<?, ?, ?,?> parent) {
+	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?,?>) getSigma()).isChildOf(parent);
+			return ((GraphElementImpl) getSigma()).isChildOf(parent);
 		}
 	}
 

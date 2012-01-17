@@ -1167,7 +1167,7 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public GraphElement<?, ?, ?,?> getSigma() {
+	public GraphElement getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
 		if (sigmaId < 0) {
 			return localGraphDatabase.getEdgeObject(-sigmaId);
@@ -1177,7 +1177,7 @@ public abstract class EdgeImpl extends
 	}
 
 	@Override
-	public void setSigma(GraphElement<?, ?, ?,?> elem) {
+	public void setSigma(GraphElement elem) {
 		long sigmaId = 0;
 		if (elem != null) {
 			elem.getGlobalId();

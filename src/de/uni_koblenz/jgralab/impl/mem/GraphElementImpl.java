@@ -72,12 +72,6 @@ public abstract class GraphElementImpl
 	DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
 
 	implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
-
-	/**
-	 * Generated Serial Version UID
-	 */
-	private static final long serialVersionUID = 1245169302974416890L;
-
 	/**
 	 * The id of this {@link GraphElement}.
 	 */
@@ -101,7 +95,7 @@ public abstract class GraphElementImpl
 	// TODO determine default value
 	private static final int DEFAULT_KAPPA_VALUE = Integer.MAX_VALUE;
 
-	private GraphElementImpl<?, ?, ?, ?> sigma;
+	private GraphElementImpl sigma;
 
 	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
@@ -125,7 +119,7 @@ public abstract class GraphElementImpl
 	}
 
 	@Override
-	public final GraphElement<?, ?, ?,?> getSigma() {
+	public final GraphElement getSigma() {
 		return sigma;
 	}
 
@@ -150,8 +144,8 @@ public abstract class GraphElementImpl
 			int incidenceId);
 
 	@Override
-	public final boolean containsElement(GraphElement<?, ?, ?,?> element) {
-		for (GraphElement<?, ?, ?,?> el = element; el.getSigma() != null
+	public final boolean containsElement(GraphElement element) {
+		for (GraphElement el = element; el.getSigma() != null
 				&& getKappa() > el.getKappa(); el = el.getSigma()) {
 			if (el.getSigma() == this) {
 				return true;
@@ -569,10 +563,10 @@ public abstract class GraphElementImpl
 	 * @param newSigma
 	 *            {@link GraphElementImpl}
 	 */
-	public final void setSigma(GraphElement<?, ?, ?,?> newSigma) {
+	public final void setSigma(GraphElement newSigma) {
 		assert newSigma != null;
-		assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		this.sigma = (GraphElementImpl<?, ?, ?,?>) newSigma;
+	//	assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
+		this.sigma = (GraphElementImpl) newSigma;
 	}
 
 	/**
@@ -622,13 +616,13 @@ public abstract class GraphElementImpl
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
-	public final boolean isChildOf(GraphElement<?, ?, ?,?> parent) {
+	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
 		} else if (getSigma() == parent) {
 			return true;
 		} else {
-			return ((GraphElementImpl<?, ?, ?,?>) getSigma()).isChildOf(parent);
+			return ((GraphElementImpl) getSigma()).isChildOf(parent);
 		}
 	}
 

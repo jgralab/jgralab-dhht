@@ -238,8 +238,8 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	
 	@Override
 	public boolean containsVertex(Vertex v) {
-		return ((GraphElementImpl<?, ?, ?,?>) v)
-				.isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement());
+		return ((GraphElementImpl) v)
+				.isChildOf((GraphElement) getParentGraphOrElement());
 	}
 	
 	@Override
@@ -250,8 +250,8 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 
 	@Override
 	public boolean containsEdge(Edge e) {
-		return ((GraphElementImpl<?, ?, ?,?>) e)
-				.isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement());
+		return ((GraphElementImpl) e)
+				.isChildOf((GraphElement) getParentGraphOrElement());
 	}
 	
 	@Override
@@ -305,7 +305,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = localGraphDatabase.getVertexObject(id);
-		if (((GraphElementImpl<?, ?, ?,?>) v).isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement())) {
+		if (((GraphElementImpl) v).isChildOf((GraphElement) getParentGraphOrElement())) {
 			return v;
 		} else {
 			return null;
@@ -315,7 +315,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = localGraphDatabase.getEdgeObject(id);
-		if (((GraphElementImpl<?, ?, ?,?>) e).isChildOf((GraphElement<?, ?, ?,?>) getParentGraphOrElement())) {
+		if (((GraphElementImpl) e).isChildOf((GraphElement) getParentGraphOrElement())) {
 			return e;
 		} else {
 			return null;
