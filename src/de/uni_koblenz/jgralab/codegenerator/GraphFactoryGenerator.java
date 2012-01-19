@@ -141,7 +141,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
 		code.setVariable("graphInMemImplName", schemaRootPackageName + ".impl.mem."+ graphClass.getQualifiedName());
-		code.setVariable("graphDistributedImplName", schemaRootPackageName + ".impl.memdistributed."+ graphClass.getQualifiedName());
+		code.setVariable("graphDistributedImplName", schemaRootPackageName + ".impl.distributed."+ graphClass.getQualifiedName());
 		code.setVariable("graphOnDiskImplName", schemaRootPackageName + ".impl.disk."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");

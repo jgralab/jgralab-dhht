@@ -350,12 +350,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	 * @param globalSubgraphId
 	 * @return the type of the
 	 */
-	@SuppressWarnings("unchecked")
 	protected Class<? extends Graph> getGraphType(long globalSubgraphId) {
-		return (Class<? extends Graph>) schema
-				.getM1ClassForId(getGraphTypeId(globalSubgraphId));
+		return (Class<? extends Graph>) schema.getGraphClass().getM1Class();
 	}
 
+	
 	/**
 	 * Returns the type of the edge identified by its global id.
 	 * 
@@ -392,19 +391,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 				.getM1ClassForId(getIncidenceTypeId(elementId));
 	}
 
-	public int getGraphTypeId(long globalSubgraphId) {
-		int partialGraphId = getPartialGraphId(globalSubgraphId);
-		if (partialGraphId != localPartialGraphId) {
-			try {
-				return getGraphDatabase(partialGraphId).getGraphTypeId(
-						globalSubgraphId);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		int localSubgraphId = convertToLocalId(globalSubgraphId);
-		return getGraphData(localSubgraphId).typeId;
-	}
+
 
 	public int getVertexTypeId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);

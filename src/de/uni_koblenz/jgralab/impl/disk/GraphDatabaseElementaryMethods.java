@@ -383,9 +383,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	/*
 	 * ==========================================================================
-	 * ======== Methods to access types and type ids
-	 * ============================
-	 * ======================================================
+	 * =============== Methods to access types and type ids =====================
+	 * ==========================================================================
 	 */
 
 	/**
@@ -394,12 +393,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	 * @param globalSubgraphId
 	 * @return the type of the
 	 */
-	@SuppressWarnings("unchecked")
-	protected Class<? extends Graph> getGraphType(long globalSubgraphId) {
-		return (Class<? extends Graph>) schema
-				.getM1ClassForId(getGraphTypeId(globalSubgraphId));
+	protected Class<? extends Graph> getGraphType() {
+		return (Class<? extends Graph>) schema.getGraphClass().getM1Class();
 	}
 
+	
 	/**
 	 * Returns the type of the edge identified by its global id.
 	 * 
@@ -436,19 +434,6 @@ public abstract class GraphDatabaseElementaryMethods implements
 				.getM1ClassForId(getIncidenceTypeId(elementId));
 	}
 
-	public int getGraphTypeId(long globalSubgraphId) {
-		int partialGraphId = getPartialGraphId(globalSubgraphId);
-		if (partialGraphId != localPartialGraphId) {
-			try {
-				return getGraphDatabase(partialGraphId).getGraphTypeId(
-						globalSubgraphId);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		int localSubgraphId = convertToLocalId(globalSubgraphId);
-		return getGraphData(localSubgraphId).typeId;
-	}
 
 	public int getVertexTypeId(long vertexId) {
 		int partialGraphId = getPartialGraphId(vertexId);
@@ -482,10 +467,8 @@ public abstract class GraphDatabaseElementaryMethods implements
 
 	/*
 	 * ==========================================================================
-	 * ======== Methods to access local and proxy objects for graphs and their
-	 * elements
-	 * ==================================================================
-	 * ================
+	 * = Methods to access local and proxy objects for graphs and their elements
+	 * ==========================================================================
 	 */
 
 	/**
@@ -504,8 +487,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
-			g = graphFactory.createGraph_DiskBasedStorage(
-					getGraphType(globalSubgraphId), uniqueGraphId,
+			g = graphFactory.createGraph_DiskBasedStorage(getGraphType(), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);
 			subgraphObjects.put(globalSubgraphId, new SoftReference<Graph>(g));
 		}

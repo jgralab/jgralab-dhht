@@ -199,17 +199,22 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 	@Override
 	protected CodeBlock createConstructor() {
-		if (currentCycle.isMembasedImpl()) {
+		switch (currentCycle) {
+		case MEMORYBASED:
 			return createInMemoryConstructor();
-		} else {
+		case DISKBASED:
 			return createDiskBasedConstructor();
+		case DISTRIBUTED:
+			return createDistributedBasedConstructor();
+		default:
+			throw new RuntimeException("Unhandled case");
 		}
 	}	
 	
 	private CodeBlock createDiskBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
-		addImports("#jgDiskImplPackage#.RemoteGraphDatabaseAccess");
+		addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("",
 				 "public #simpleImplClassName#(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase,	RemoteGraphDatabaseAccess storingGraphDatabase) {",
@@ -218,7 +223,20 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 				 "",
 				 "");	
 		return code;
-		
+	}
+	
+	private CodeBlock createDistributedBasedConstructor() {
+		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+		addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("",
+				 "public #simpleImplClassName#(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase,	RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(globalSubgraphId, localGraphDatabase, storingGraphDatabase);",
+				 "}",
+				 "",
+				 "");	
+		return code;
 	}
 
 
@@ -247,6 +265,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
+		@SuppressWarnings("rawtypes")
 		TreeSet<GraphElementClass> sortedClasses = new TreeSet<GraphElementClass>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
 		for (GraphElementClass<?,?,?,?> gec : sortedClasses) {

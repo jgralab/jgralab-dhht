@@ -41,6 +41,8 @@ import de.uni_koblenz.jgralab.schema.Schema;
 public abstract class GraphDatabaseBaseImpl extends
 		GraphDatabaseElementaryMethods implements RemoteGraphDatabaseAccess {
 
+	Graph localGraph = null;
+	
 	/**
 	 * Creates a new graph database to store all local subgraphs of the complete
 	 * graph identified by the given <code>uniqueGraphId</code>. All those local
@@ -110,7 +112,6 @@ public abstract class GraphDatabaseBaseImpl extends
 			partialGraphDatabases.put(partialGraphId,
 					(RemoteGraphDatabaseAccessWithInternalMethods) p);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return partialGraphId;

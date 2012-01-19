@@ -286,19 +286,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 		graphVersion++;
 	}
 
-	@Override
-	public int getGraphTypeId(long subgraphId) {
-		int partialGraphId = getPartialGraphId(subgraphId);
-		if (partialGraphId != localPartialGraphId) {
-			try {
-				return getGraphDatabase(partialGraphId).getGraphTypeId(
-						subgraphId);
-			} catch (RemoteException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return getGraphData(convertToLocalId(subgraphId)).typeId;
-	}
+
 
 	@Override
 	public long getFirstIncidenceIdAtVertexId(long vertexId) {

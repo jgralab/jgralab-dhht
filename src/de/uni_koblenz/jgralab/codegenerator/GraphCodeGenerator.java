@@ -228,17 +228,37 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	
 	@Override
 	protected CodeBlock createConstructor() {
-		if (currentCycle.isMembasedImpl()) {
+		switch (currentCycle) {
+		case MEMORYBASED:
 			return createInMemoryConstructor();
-		} else {
-			return createDiskBasedConstuctor();
-		} 
-	}
+		case DISKBASED:
+			return createDiskBasedConstructor();
+		case DISTRIBUTED:
+			return createDistributedBasedConstructor();
+		default:
+			throw new RuntimeException("Unhandled case");
+		}
+	}	
 
-	private CodeBlock createDiskBasedConstuctor() {
+	private CodeBlock createDiskBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
 		addImports("#jgImplPackage#.GraphFactoryImpl");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
+				 "",
+				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
+				 "\tinitializeAttributesWithDefaultValues();",
+				 "}");
+	
+		return code;
+	}
+	
+	private CodeBlock createDistributedBasedConstructor() {
+		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgImplPackage#.GraphFactoryImpl");
+		addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
 				 "",
@@ -271,6 +291,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
+		@SuppressWarnings("rawtypes")
 		TreeSet<GraphElementClass> sortedClasses = new TreeSet<GraphElementClass>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
 		for (GraphElementClass<?,?,?,?> gec : sortedClasses) {

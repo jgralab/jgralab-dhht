@@ -257,6 +257,7 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		CodeList code = new CodeList();
 
 		GraphClass gc = (GraphClass) aec;
+		@SuppressWarnings("rawtypes")
 		TreeSet<GraphElementClass> sortedClasses = new TreeSet<GraphElementClass>();
 		sortedClasses.addAll(gc.getGraphElementClasses());
 		for (GraphElementClass<?,?,?,?> gec : sortedClasses) {
