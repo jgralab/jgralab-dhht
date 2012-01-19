@@ -162,7 +162,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("graphName", schemaRootPackageName + "." + graphClass.getQualifiedName());
 		code.setVariable("graphInMemImplName", schemaRootPackageName + ".impl.mem."+ graphClass.getQualifiedName());
-		code.setVariable("graphDistributedImplName", schemaRootPackageName + ".impl.memdistributed."+ graphClass.getQualifiedName());
+		code.setVariable("graphDistributedImplName", schemaRootPackageName + ".impl.distributed."+ graphClass.getQualifiedName());
 		code.setVariable("graphOnDiskImplName", schemaRootPackageName + ".impl.disk."+ graphClass.getQualifiedName());
 		if (!graphClass.isAbstract()) {
 			code.add("/* code for graph #graphName# */");
@@ -183,7 +183,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("vertexName", schemaRootPackageName + "."	+ vertexClass.getQualifiedName());
 		code.setVariable("vertexMemImplName", schemaRootPackageName + ".impl.mem." 	+ vertexClass.getQualifiedName());
-		code.setVariable("vertexDistributedImplName", schemaRootPackageName + ".impl.memdistributed." 	+ vertexClass.getQualifiedName());
+		code.setVariable("vertexDistributedImplName", schemaRootPackageName + ".impl.distributed." 	+ vertexClass.getQualifiedName());
 		code.setVariable("vertexDiskImplName", schemaRootPackageName + ".impl.disk." 	+ vertexClass.getQualifiedName());
 		if (!vertexClass.isAbstract()) {
 			code.add("setVertexImplementationClass_InMemoryStorage(#vertexName#.class, #vertexMemImplName#Impl.class);");
@@ -200,7 +200,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("recordName", schemaRootPackageName + "." + recordDomain.getQualifiedName());
 		code.setVariable("recordMemImplName", schemaRootPackageName + ".impl.mem."	+ recordDomain.getQualifiedName());
-		code.setVariable("recordDistributedImplName", schemaRootPackageName + ".impl.memdistributed."	+ recordDomain.getQualifiedName());
+		code.setVariable("recordDistributedImplName", schemaRootPackageName + ".impl.distributed."	+ recordDomain.getQualifiedName());
 		code.setVariable("recordDiskImplName", schemaRootPackageName + ".impl.disk." + recordDomain.getQualifiedName());
 		code.add("setRecordImplementationClass_InMemoryStorage(#recordName#.class, #recordMemImplName#Impl.class);");
 		code.add("setRecordImplementationClass_DistributedStorage(#recordName#.class, #recordDistributedImplName#Impl.class);");
@@ -212,7 +212,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("edgeName", schemaRootPackageName + "." + edgeClass.getQualifiedName());
 		code.setVariable("edgeMemImplName", schemaRootPackageName + ".impl.mem." + edgeClass.getQualifiedName());
-		code.setVariable("edgeDistributedImplName", schemaRootPackageName + ".impl.memdistributed." + edgeClass.getQualifiedName());
+		code.setVariable("edgeDistributedImplName", schemaRootPackageName + ".impl.distributed." + edgeClass.getQualifiedName());
 		code.setVariable("edgeDiskImplName", schemaRootPackageName + ".impl.disk." + edgeClass.getQualifiedName());
 
 		if (!edgeClass.isAbstract()) {
@@ -229,7 +229,7 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		CodeSnippet code = new CodeSnippet(true);
 		code.setVariable("incName", schemaRootPackageName + "." + incClass.getQualifiedName());
 		code.setVariable("incMemImplName", schemaRootPackageName + ".impl.mem." + incClass.getQualifiedName());
-		code.setVariable("incDistributedImplName", schemaRootPackageName + ".impl.memdistributed." + incClass.getQualifiedName());
+		code.setVariable("incDistributedImplName", schemaRootPackageName + ".impl.distributed." + incClass.getQualifiedName());
 		code.setVariable("incDiskImplName", schemaRootPackageName + ".impl.disk." + incClass.getQualifiedName());
 
 		if (!incClass.isAbstract()) {

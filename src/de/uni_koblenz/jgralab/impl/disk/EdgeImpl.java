@@ -198,6 +198,7 @@ public abstract class EdgeImpl extends
 		return getNextEdge(traversalContext, edgeClass, false);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public final <T extends Edge> T getNextEdge(Graph traversalContext,
 			Class<T> m1EdgeClass, boolean noSubclasses) {
@@ -1166,6 +1167,7 @@ public abstract class EdgeImpl extends
 		return localGraphDatabase.getGraphObject(subordinateGraphId);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public GraphElement getSigma() {
 		long sigmaId = container.sigmaId[getIdInStorage(elementId)];
@@ -1176,6 +1178,7 @@ public abstract class EdgeImpl extends
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setSigma(GraphElement elem) {
 		long sigmaId = 0;

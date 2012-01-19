@@ -65,7 +65,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
 		code.setVariable("graphOrDatabase", currentCycle.isMembasedImpl() ? "#jgPackage#.Graph" : "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
-		code.setVariable("additionalProxyFormalParams", currentCycle.isImplementationVariant() ? "" : ", #jgDiskImplPackage#.RemoteGraphDatabaseAccess remoteDb");
+		code.setVariable("additionalProxyFormalParams", currentCycle.isImplementationVariant() ? "" : ", #jgImplPackage#.RemoteGraphDatabaseAccess remoteDb");
 		code.setVariable("additionalProxyActualParams", currentCycle.isImplementationVariant() ? "" : ",remoteDb");
 		code.addNoIndent(new CodeSnippet(
 						true,

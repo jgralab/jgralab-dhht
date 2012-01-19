@@ -65,7 +65,7 @@ public abstract class CodeGenerator {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
 			out.add(MEMORYBASED);
-			//out.add(DISTRIBUTED);
+			out.add(DISTRIBUTED);
 			out.add(DISKBASED);
 			out.add(PROXIES);
 			out.add(CLASSONLY);
@@ -180,7 +180,7 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
 		rootBlock.setVariable("jgDiskImplPackage", "de.uni_koblenz.jgralab.impl.disk");
-		rootBlock.setVariable("jgDistributedImplPackage", "de.uni_koblenz.jgralab.impl.memdistributed");
+		rootBlock.setVariable("jgDistributedImplPackage", "de.uni_koblenz.jgralab.impl.distributed");
 		rootBlock.setVariable("jgMemImplPackage", "de.uni_koblenz.jgralab.impl.mem");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
 		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
@@ -189,12 +189,12 @@ public abstract class CodeGenerator {
 		if ((packageName != null) && !packageName.equals("")) {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."	+ packageName);
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem." + packageName);
-			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.memdistributed." + packageName);
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed." + packageName);
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem");
-			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.memdistributed");
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed");
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk");
 		}
 		rootBlock.setVariable("isClassOnly", "false");

@@ -74,7 +74,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
-			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+			//addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
 		//	addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
 		//	addImports("java.util.List");
@@ -371,7 +371,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		if (currentCycle.isMembasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_InMemoryStorage(#ecJavaClassName#.class, #newActualParams#, #graphOrGraphDatabase#);",
 					 "\treturn new#ecType#;", 
 					 "}");
 		} else if (currentCycle.isDistributedImpl()) {
@@ -414,32 +414,24 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		if (currentCycle.isMembasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_InMemoryStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
 					 "\talpha.connect(#alphaInc#.class, new#ecType#);",
 					 "\tomega.connect(#omegaInc#.class, new#ecType#);",
 					 "\treturn new#ecType#;",
 				 "}");
 		} else if  (currentCycle.isDistributedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-				//	"\ttry {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#DistributedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DistributedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
 					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
 					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
 					 "\t\treturn new#ecType#;",
-				//	 "\t} catch (java.rmi.RemoteException ex) {",
-				//	 "\t\t throw new RuntimeException(ex);",
-				//	 "\t}",
 				 "}");
 		} else if  (currentCycle.isDiskbasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-				//	"\ttry {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
 					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
 					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
 					 "\t\treturn new#ecType#;",
-				//	 "\t} catch (java.rmi.RemoteException ex) {",
-				//	 "\t\t throw new RuntimeException(ex);",
-				//	 "\t}",
 				 "}");
 		}
 		IncidenceClass alphaInc = null;
