@@ -356,4 +356,5 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 		setTraversalContext(getGraphObject(globalSubgraphId));
 	}
 
+
 }

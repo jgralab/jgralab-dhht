@@ -74,7 +74,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
-			//addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
 		//	addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
 		//	addImports("java.util.List");

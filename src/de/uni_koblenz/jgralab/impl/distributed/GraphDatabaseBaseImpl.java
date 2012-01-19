@@ -389,11 +389,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				inc = v.getFirstIncidence();
 			}
 			for (EdgeImpl edge : edges) {
-				try {
-					incidenceListOfEdgeModified(edge.getGlobalId());
-				} catch (RemoteException e) {
-					throw new RuntimeException(e);
-				}
+				incidenceListOfEdgeModified(edge.getGlobalId());
 			}
 			removeVertexFromVSeq(vertexId);
 		}
@@ -991,6 +987,23 @@ public abstract class GraphDatabaseBaseImpl extends
 			}
 		}
 	}
+	
+	@Override
+	public void incidenceListOfEdgeModified(long edgeId) {
+		int partialGraphId = getPartialGraphId(edgeId);
+		if (partialGraphId == localPartialGraphId) {
+			int localEdgeId = convertToLocalId(edgeId);
+			EdgeImpl v = (EdgeImpl) inMemoryStorage.getEdgeObject(localEdgeId);
+			v.incidenceListModified();
+		} else {
+			try {
+				getGraphDatabase(partialGraphId).incidenceListOfEdgeModified(
+						edgeId);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
 	// TODO: increase/decrease e and v count of parent graphs in necessary?
 
@@ -1413,11 +1426,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			setPreviousIncidenceIdAtEdgeId(incidenceId, lastIncidenceId);
 		}
 		setLastIncidenceIdAtEdgeId(edgeId, incidenceId);
-		try {
-			incidenceListOfEdgeModified(edgeId);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		incidenceListOfEdgeModified(edgeId);
 	}
 
 	@Override
@@ -1576,11 +1585,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setNextIncidenceIdAtEdgeId(movedId, targetId);
 		setPreviousIncidenceIdAtEdgeId(movedId, tgtPreviousId);
 		setPreviousIncidenceIdAtEdgeId(targetId, movedId);
-		try {
-			incidenceListOfEdgeModified(edgeId);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
+		incidenceListOfEdgeModified(edgeId);
 	}
 
 	@Override

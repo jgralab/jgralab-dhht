@@ -58,7 +58,7 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, PROXIES, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, DISTRIBUTEDPROXIES, DISKPROXIES, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
@@ -67,7 +67,8 @@ public abstract class CodeGenerator {
 			out.add(MEMORYBASED);
 			out.add(DISTRIBUTED);
 			out.add(DISKBASED);
-			out.add(PROXIES);
+			out.add(DISTRIBUTEDPROXIES);
+			out.add(DISKPROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -112,7 +113,7 @@ public abstract class CodeGenerator {
 		 * @return
 		 */
 		protected boolean isProxies() {
-			return this == PROXIES;
+			return this == DISKPROXIES || this == DISTRIBUTEDPROXIES;
 		}
 		
 		/**

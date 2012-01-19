@@ -40,14 +40,6 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 
 	public void graphModified() throws RemoteException;
 
-	/**
-	 * Returns the id of the type of the subgraph identified by the given
-	 * <code>subgraphId</code>
-	 * 
-	 * @return
-	 */
-	public int getGraphTypeId(long subgraphId) throws RemoteException;
-
 	public long getIdOfParentDistributedGraph() throws RemoteException;
 
 	public void setLoading(boolean isLoading) throws RemoteException;
