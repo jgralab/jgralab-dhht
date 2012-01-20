@@ -306,11 +306,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 		setTraversalContext(getGraphObject(globalSubgraphId));
 	}
 
-	@Override
-	public RemoteStorageAccess getLocalStorage() throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 
 }

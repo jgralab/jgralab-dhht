@@ -188,11 +188,11 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 			registerLocalDiskGraphDatabase(db);
 			break;
 		case DISTRIBUTED:
-//			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl db2 = new de.uni_koblenz.jgralab.impl.distributed.PartialGraphDatabase(schema,
-//				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
-//				parent, localPartialGraphId);
-//			registerLocalDistributedGraphDatabase(db2);
-//			break;
+			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl db2 = new de.uni_koblenz.jgralab.impl.distributed.PartialGraphDatabase(schema,
+				uniqueGraphId, hostnameOfCompleteGraph, parentGlobalEntityId,
+				parent, localPartialGraphId);
+			registerLocalDistributedGraphDatabase(db2);
+			break;
 		default:
 			throw new RuntimeException("Unhandled case");
 		}
