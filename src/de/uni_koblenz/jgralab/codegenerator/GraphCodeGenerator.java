@@ -70,7 +70,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	@Override
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
-		code.setVariable("graphFactory", currentCycle.isDiskbasedImpl() ? "getGraphFactory()" : "graphFactory");
+		code.setVariable("graphFactory", currentCycle.isMembasedImpl() ? "graphFactory" : "getGraphFactory()");
 		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
@@ -232,8 +232,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		case MEMORYBASED:
 			return createInMemoryConstructor();
 		case DISKBASED:
+		case DISKPROXIES:	
 			return createDiskBasedConstructor();
 		case DISTRIBUTED:
+		case DISTRIBUTEDPROXIES:	
 			return createDistributedBasedConstructor();
 		default:
 			throw new RuntimeException("Unhandled case");
@@ -442,14 +444,16 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "}");
 		} else if  (currentCycle.isDistributedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DistributedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
+					 //"\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DistributedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
 					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
 					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
 					 "\t\treturn new#ecType#;",
 				 "}");
 		} else if  (currentCycle.isDiskbasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
+					 //"\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
 					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
 					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
 					 "\t\treturn new#ecType#;",

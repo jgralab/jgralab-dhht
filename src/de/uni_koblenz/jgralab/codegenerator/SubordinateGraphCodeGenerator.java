@@ -203,8 +203,10 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		case MEMORYBASED:
 			return createInMemoryConstructor();
 		case DISKBASED:
+		case DISKPROXIES:	
 			return createDiskBasedConstructor();
 		case DISTRIBUTED:
+		case DISTRIBUTEDPROXIES:	
 			return createDistributedBasedConstructor();
 		default:
 			throw new RuntimeException("Unhandled case");

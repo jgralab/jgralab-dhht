@@ -287,16 +287,21 @@ public abstract class CodeGenerator {
 				logger.finer("Writing file to: " + pathPrefix + "/"	+ schemaPackage);
 			}
 			if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
-				if (currentCycle.isMembasedImpl()) {
+				switch (currentCycle) {
+				case MEMORYBASED:
 					schemaImplPackage = rootBlock.getVariable("schemaMemImplPackage");
-				} 
-				if (currentCycle.isDistributedImpl()) {
+					break;
+				case DISTRIBUTED:
+				case DISTRIBUTEDPROXIES:
 					schemaImplPackage = rootBlock.getVariable("schemaDistributedImplPackage");
-				} 
-				if (currentCycle.isDiskbasedImpl()) {
+					break;
+				case DISKBASED:	
+				case DISKPROXIES:
 					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
-				} 
-				logger.finer(" - schemaImplPackage="	+ schemaImplPackage);	
+					break;
+				default:
+					throw new RuntimeException("Unhandled case");
+				}
 				if (currentCycle.isImplementationVariant()) {
 					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
 				} else if (hasProxySupport()) {
@@ -347,11 +352,12 @@ public abstract class CodeGenerator {
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
 				break;
 			case DISTRIBUTED:
+			case DISTRIBUTEDPROXIES:
 				code.add("package #schemaDistributedImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDistributedImplPackage"));
 				break;
 			case DISKBASED:
-			case PROXIES:	
+			case DISKPROXIES:	
 				code.add("package #schemaDiskImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskImplPackage"));
 				break;

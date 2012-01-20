@@ -188,7 +188,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 					 "\treturn attributeContainer._#name#;",
 					 "}");
 			break;
-		case PROXIES:
+		case DISTRIBUTEDPROXIES:	
+		case DISKPROXIES:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					"\ttry {",
 					 "\t\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
@@ -226,7 +227,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 					 "\tattributeContainer._#name# = _#name#;", 
 					 "\tgraphModified();", "}");
 			break;
-		case PROXIES:
+		case DISTRIBUTEDPROXIES:	
+		case DISKPROXIES:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					 "\ttry {",
 					 "\t\tstoringGraphDatabase.set#edgeOrVertex#Attribute(elementId, \"#name#\", _#name#);",
