@@ -217,7 +217,7 @@ public class TreeGraphGenerator {
 				DHHTTestGraph partialGraph = getGraph(start.getGlobalId());
 				Vertex target = getVertex(i * 13);
 				Edge e = partialGraph.createSimpleEdge();
-				GraphElement<?, ?, ?> lca = getLeastCommonAncestor(start,
+				GraphElement lca = getLeastCommonAncestor(start,
 						target);
 				if (lca != null)
 					e.setSigma(lca);
@@ -247,7 +247,7 @@ public class TreeGraphGenerator {
 					for (Vertex v : targetVertices) {
 						e.connect(SimpleEdge_target.class, v);
 					}
-					GraphElement<?, ?, ?> lca = getLeastCommonAncestor(
+					GraphElement lca = getLeastCommonAncestor(
 							startVertices, targetVertices);
 					if (lca != null) {
 						// System.out.println("Setting sigma vertex of edge " +
@@ -277,7 +277,7 @@ public class TreeGraphGenerator {
 		return graph;
 	}
 
-	protected GraphElement<?, ?, ?> getLeastCommonAncestor(
+	protected GraphElement getLeastCommonAncestor(
 			List<? extends Vertex> vertices,
 			List<? extends Vertex> otherVertices) {
 		LinkedList<SimpleVertex> newList = new LinkedList<SimpleVertex>();
@@ -290,7 +290,7 @@ public class TreeGraphGenerator {
 		return getLeastCommonAncestor(newList);
 	}
 
-	protected GraphElement<?, ?, ?> getLeastCommonAncestor(
+	protected GraphElement getLeastCommonAncestor(
 			List<? extends Vertex> vertices) {
 		Vertex leastCommonAncestor = vertices.get(0);
 		vertices.remove(0);
@@ -301,12 +301,12 @@ public class TreeGraphGenerator {
 		return leastCommonAncestor;
 	}
 
-	protected GraphElement<?, ?, ?> getLeastCommonAncestor(Vertex v1, Vertex v2) {
-		Set<GraphElement<?, ?, ?>> v1Ancs = new HashSet<GraphElement<?, ?, ?>>();
+	protected GraphElement getLeastCommonAncestor(Vertex v1, Vertex v2) {
+		Set<GraphElement> v1Ancs = new HashSet<GraphElement>();
 		// Set<GraphElement<?,?,?>> v2Ancs = new HashSet<GraphElement<?, ?,
 		// ?>>();
-		GraphElement<?, ?, ?> v1Anc = v1;
-		GraphElement<?, ?, ?> v2Anc = v2;
+		GraphElement v1Anc = v1;
+		GraphElement v2Anc = v2;
 		while (v1Anc != null) {
 			v1Ancs.add(v1Anc);
 			v1Anc = v1Anc.getSigma();

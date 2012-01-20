@@ -3,9 +3,10 @@ package de.uni_koblenz.jgralabtest.dhht;
 import java.util.ArrayList;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
-import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
@@ -46,7 +47,7 @@ public class SubgraphGenerator implements RemoteGraphGenerator {
 	public SubgraphGenerator(String uid, int levels, int[] branchingFactors) {
 		this.branchingFactors = branchingFactors;
 		this.layers = levels;
-		GraphDatabaseBaseImpl db = JGraLabServerImpl.getLocalInstance().getLocalGraphDatabase(uid);
+		GraphDatabaseBaseImpl db = (GraphDatabaseBaseImpl) JGraLabServerImpl.getLocalInstance().getLocalGraphDatabase(uid, ImplementationType.DISTRIBUTED);
 		graph = (DHHTTestGraph) db.getGraphObject(db.getToplevelGraphForPartialGraphId(db.getLocalPartialGraphId()));
 	}
 

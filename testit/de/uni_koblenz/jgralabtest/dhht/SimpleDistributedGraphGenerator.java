@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
+import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseElementaryMethods;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
 import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge;
@@ -74,9 +75,9 @@ public class SimpleDistributedGraphGenerator {
 		
 		for (int i=0; i<20; i++) {
 			SimpleEdge crosslinks = topGraph.createSimpleEdge();
-			long localVId = topGraph.getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			long localVId = ((GraphDatabaseElementaryMethods) topGraph.getGraphDatabase()).convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex local = topGraph.getVertex(localVId);
-			long remoteVId = partialGraphs[2].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			long remoteVId =  ((GraphDatabaseElementaryMethods)partialGraphs[2].getGraphDatabase()).convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex remote = partialGraphs[2].getVertex(localVId);
 			if (i%2 == 0) {
 				e.connect(SimpleEdge_start.class, local);
@@ -90,9 +91,9 @@ public class SimpleDistributedGraphGenerator {
 		for (int i=0; i<additionalEdgeCount-2000; i++) {
 			int pg = i%2 + 1;
 			SimpleEdge crosslinks = topGraph.createSimpleEdge();
-			long localVId = partialGraphs[pg].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			long localVId =  ((GraphDatabaseElementaryMethods)partialGraphs[pg].getGraphDatabase()).convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex local = partialGraphs[pg].getVertex(localVId);
-			long remoteVId = partialGraphs[pg].getGraphDatabase().convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
+			long remoteVId =  ((GraphDatabaseElementaryMethods)partialGraphs[pg].getGraphDatabase()).convertToGlobalId((int) (1 + i%(topGraph.getVCount()-2)));
 			Vertex remote = partialGraphs[pg].getVertex(localVId);
 			if (i%2 == 0) {
 				e.connect(SimpleEdge_start.class, local);
