@@ -1229,13 +1229,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		// remove moved incidence from lambdaSeq
 		if (movedId == getFirstIncidenceIdAtVertexId(vertexId)) {
 			setFirstIncidenceIdAtVertexId(vertexId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, 0);
+			setPreviousIncidenceIdAtVertex(nextId, 0);
 		} else if (movedId == getLastIncidenceIdAtVertexId(vertexId)) {
 			setLastIncidenceIdAtVertexId(vertexId, previousId);
-			setNextIncidenceIdAtVertexId(previousId, 0);
+			setNextIncidenceIdAtVertex(previousId, 0);
 		} else {
-			setNextIncidenceIdAtVertexId(previousId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, previousId);
+			setNextIncidenceIdAtVertex(previousId, nextId);
+			setPreviousIncidenceIdAtVertex(nextId, previousId);
 		}
 
 		long tgtNextId = getNextIncidenceIdAtVertexId(targetId);
@@ -1243,11 +1243,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (targetId == getLastIncidenceIdAtVertexId(vertexId)) {
 			setLastIncidenceIdAtVertexId(vertexId, movedId);
 		} else {
-			setPreviousIncidenceIdAtVertexId(tgtNextId, movedId);
+			setPreviousIncidenceIdAtVertex(tgtNextId, movedId);
 		}
-		setPreviousIncidenceIdAtVertexId(movedId, targetId);
-		setNextIncidenceIdAtVertexId(movedId, tgtNextId);
-		setNextIncidenceIdAtVertexId(targetId, movedId);
+		setPreviousIncidenceIdAtVertex(movedId, targetId);
+		setNextIncidenceIdAtVertex(movedId, tgtNextId);
+		setNextIncidenceIdAtVertex(targetId, movedId);
 		incidenceListOfVertexModified(vertexId);
 	}
 
@@ -1269,13 +1269,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		// remove moved incidence from lambdaSeq
 		if (movedId == getFirstIncidenceIdAtVertexId(vertexId)) {
 			setFirstIncidenceIdAtVertexId(vertexId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, 0);
+			setPreviousIncidenceIdAtVertex(nextId, 0);
 		} else if (movedId == getLastIncidenceIdAtVertexId(vertexId)) {
 			setLastIncidenceIdAtVertexId(vertexId, previousId);
-			setNextIncidenceIdAtVertexId(previousId, 0);
+			setNextIncidenceIdAtVertex(previousId, 0);
 		} else {
-			setNextIncidenceIdAtVertexId(previousId, nextId);
-			setPreviousIncidenceIdAtVertexId(nextId, previousId);
+			setNextIncidenceIdAtVertex(previousId, nextId);
+			setPreviousIncidenceIdAtVertex(nextId, previousId);
 		}
 
 		long tgtPreviousId = getPreviousIncidenceIdAtVertexId(targetId);
@@ -1283,11 +1283,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (targetId == getFirstIncidenceIdAtVertexId(vertexId)) {
 			setFirstIncidenceIdAtVertexId(vertexId, movedId);
 		} else {
-			setNextIncidenceIdAtVertexId(tgtPreviousId, movedId);
+			setNextIncidenceIdAtVertex(tgtPreviousId, movedId);
 		}
-		setNextIncidenceIdAtVertexId(movedId, targetId);
-		setPreviousIncidenceIdAtVertexId(movedId, tgtPreviousId);
-		setPreviousIncidenceIdAtVertexId(targetId, movedId);
+		setNextIncidenceIdAtVertex(movedId, targetId);
+		setPreviousIncidenceIdAtVertex(movedId, tgtPreviousId);
+		setPreviousIncidenceIdAtVertex(targetId, movedId);
 		incidenceListOfVertexModified(vertexId);
 	}
 
@@ -1416,14 +1416,14 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public void appendIncidenceToLambdaSeqOfEdge(long edgeId, long incidenceId) {
 		assert incidenceId != 0;
-		setNextIncidenceIdAtEdgeId(incidenceId, 0);
+		setNextIncidenceIdAtEdge(incidenceId, 0);
 		if (getFirstIncidenceIdAtEdgeId(edgeId) == 0) {
 			setFirstIncidenceIdAtEdgeId(edgeId, incidenceId);
 		}
 		long lastIncidenceId = getLastIncidenceIdAtEdgeId(edgeId);
 		if (lastIncidenceId != 0) {
-			setNextIncidenceIdAtEdgeId(lastIncidenceId, incidenceId);
-			setPreviousIncidenceIdAtEdgeId(incidenceId, lastIncidenceId);
+			setNextIncidenceIdAtEdge(lastIncidenceId, incidenceId);
+			setPreviousIncidenceIdAtEdge(incidenceId, lastIncidenceId);
 		}
 		setLastIncidenceIdAtEdgeId(edgeId, incidenceId);
 		incidenceListOfEdgeModified(edgeId);
@@ -1433,14 +1433,14 @@ public abstract class GraphDatabaseBaseImpl extends
 	public void appendIncidenceToLambdaSeqOfVertex(long vertexId,
 			long incidenceId) {
 		assert incidenceId != 0;
-		setNextIncidenceIdAtVertexId(incidenceId, 0);
+		setNextIncidenceIdAtVertex(incidenceId, 0);
 		if (getFirstIncidenceIdAtVertexId(vertexId) == 0) {
 			setFirstIncidenceIdAtVertexId(vertexId, incidenceId);
 		}
 		long lastIncidenceId = getLastIncidenceIdAtVertexId(vertexId);
 		if (lastIncidenceId != 0) {
-			setNextIncidenceIdAtVertexId(lastIncidenceId, incidenceId);
-			setPreviousIncidenceIdAtVertexId(incidenceId, lastIncidenceId);
+			setNextIncidenceIdAtVertex(lastIncidenceId, incidenceId);
+			setPreviousIncidenceIdAtVertex(incidenceId, lastIncidenceId);
 		}
 		setLastIncidenceIdAtVertexId(vertexId, incidenceId);
 		incidenceListOfVertexModified(vertexId);
@@ -1462,18 +1462,18 @@ public abstract class GraphDatabaseBaseImpl extends
 			long nextId = getNextIncidenceIdAtEdgeId(incidenceId);
 			if (incidenceId == getFirstIncidenceIdAtEdgeId(edgeId)) {
 				setFirstIncidenceIdAtEdgeId(edgeId, nextId);
-				setPreviousIncidenceIdAtEdgeId(nextId, 0);
+				setPreviousIncidenceIdAtEdge(nextId, 0);
 			} else if (incidenceId == getLastIncidenceIdAtEdgeId(edgeId)) {
 				setLastIncidenceIdAtEdgeId(edgeId, previousId);
-				setNextIncidenceIdAtEdgeId(previousId, 0);
+				setNextIncidenceIdAtEdge(previousId, 0);
 			} else {
-				setNextIncidenceIdAtEdgeId(previousId, nextId);
-				setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+				setNextIncidenceIdAtEdge(previousId, nextId);
+				setPreviousIncidenceIdAtEdge(nextId, previousId);
 			}
 		}
 		// delete incidence
-		setNextIncidenceIdAtEdgeId(incidenceId, 0);
-		setPreviousIncidenceIdAtEdgeId(incidenceId, 0);
+		setNextIncidenceIdAtEdge(incidenceId, 0);
+		setPreviousIncidenceIdAtEdge(incidenceId, 0);
 		incidenceListOfVertexModified(edgeId);
 	}
 
@@ -1493,18 +1493,18 @@ public abstract class GraphDatabaseBaseImpl extends
 			long nextId = getNextIncidenceIdAtVertexId(incidenceId);
 			if (incidenceId == getFirstIncidenceIdAtVertexId(vertexId)) {
 				setFirstIncidenceIdAtVertexId(vertexId, nextId);
-				setPreviousIncidenceIdAtEdgeId(nextId, 0);
+				setPreviousIncidenceIdAtEdge(nextId, 0);
 			} else if (incidenceId == getLastIncidenceIdAtVertexId(vertexId)) {
 				setLastIncidenceIdAtVertexId(vertexId, previousId);
-				setNextIncidenceIdAtVertexId(previousId, 0);
+				setNextIncidenceIdAtVertex(previousId, 0);
 			} else {
-				setNextIncidenceIdAtVertexId(previousId, nextId);
-				setPreviousIncidenceIdAtVertexId(nextId, previousId);
+				setNextIncidenceIdAtVertex(previousId, nextId);
+				setPreviousIncidenceIdAtVertex(nextId, previousId);
 			}
 		}
 		// delete incidence
-		setNextIncidenceIdAtVertexId(incidenceId, 0);
-		setPreviousIncidenceIdAtVertexId(incidenceId, 0);
+		setNextIncidenceIdAtVertex(incidenceId, 0);
+		setPreviousIncidenceIdAtVertex(incidenceId, 0);
 		incidenceListOfVertexModified(vertexId);
 	}
 
@@ -1526,13 +1526,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		// remove moved incidence from lambdaSeq
 		if (movedId == getFirstIncidenceIdAtEdgeId(edgeId)) {
 			setFirstIncidenceIdAtEdgeId(edgeId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, 0);
+			setPreviousIncidenceIdAtEdge(nextId, 0);
 		} else if (movedId == getLastIncidenceIdAtEdgeId(edgeId)) {
 			setLastIncidenceIdAtEdgeId(edgeId, previousId);
-			setNextIncidenceIdAtEdgeId(previousId, 0);
+			setNextIncidenceIdAtEdge(previousId, 0);
 		} else {
-			setNextIncidenceIdAtEdgeId(previousId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+			setNextIncidenceIdAtEdge(previousId, nextId);
+			setPreviousIncidenceIdAtEdge(nextId, previousId);
 		}
 
 		long tgtNextId = getNextIncidenceIdAtEdgeId(targetId);
@@ -1540,11 +1540,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (targetId == getLastIncidenceIdAtEdgeId(edgeId)) {
 			setLastIncidenceIdAtEdgeId(edgeId, movedId);
 		} else {
-			setPreviousIncidenceIdAtEdgeId(tgtNextId, movedId);
+			setPreviousIncidenceIdAtEdge(tgtNextId, movedId);
 		}
-		setPreviousIncidenceIdAtEdgeId(movedId, targetId);
-		setNextIncidenceIdAtEdgeId(movedId, tgtNextId);
-		setNextIncidenceIdAtEdgeId(targetId, movedId);
+		setPreviousIncidenceIdAtEdge(movedId, targetId);
+		setNextIncidenceIdAtEdge(movedId, tgtNextId);
+		setNextIncidenceIdAtEdge(targetId, movedId);
 		incidenceListOfVertexModified(edgeId);
 	}
 
@@ -1566,13 +1566,13 @@ public abstract class GraphDatabaseBaseImpl extends
 		// remove moved incidence from lambdaSeq
 		if (movedId == getFirstIncidenceIdAtEdgeId(edgeId)) {
 			setFirstIncidenceIdAtEdgeId(-edgeId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, 0);
+			setPreviousIncidenceIdAtEdge(nextId, 0);
 		} else if (movedId == getLastIncidenceIdAtEdgeId(edgeId)) {
 			setLastIncidenceIdAtEdgeId(edgeId, previousId);
-			setNextIncidenceIdAtEdgeId(previousId, 0);
+			setNextIncidenceIdAtEdge(previousId, 0);
 		} else {
-			setNextIncidenceIdAtEdgeId(previousId, nextId);
-			setPreviousIncidenceIdAtEdgeId(nextId, previousId);
+			setNextIncidenceIdAtEdge(previousId, nextId);
+			setPreviousIncidenceIdAtEdge(nextId, previousId);
 		}
 
 		long tgtPreviousId = getPreviousIncidenceIdAtEdgeId(targetId);
@@ -1580,11 +1580,11 @@ public abstract class GraphDatabaseBaseImpl extends
 		if (targetId == getFirstIncidenceIdAtEdgeId(edgeId)) {
 			setFirstIncidenceIdAtEdgeId(edgeId, movedId);
 		} else {
-			setNextIncidenceIdAtEdgeId(tgtPreviousId, movedId);
+			setNextIncidenceIdAtEdge(tgtPreviousId, movedId);
 		}
-		setNextIncidenceIdAtEdgeId(movedId, targetId);
-		setPreviousIncidenceIdAtEdgeId(movedId, tgtPreviousId);
-		setPreviousIncidenceIdAtEdgeId(targetId, movedId);
+		setNextIncidenceIdAtEdge(movedId, targetId);
+		setPreviousIncidenceIdAtEdge(movedId, tgtPreviousId);
+		setPreviousIncidenceIdAtEdge(targetId, movedId);
 		incidenceListOfEdgeModified(edgeId);
 	}
 

@@ -983,11 +983,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setNextIncidenceIdAtVertexId(long globalIncidenceId, long nextIncidenceId) {
+	public void setNextIncidenceIdAtVertex(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				getGraphDatabase(partialGraphId).setNextIncidenceIdAtVertexId(globalIncidenceId, nextIncidenceId);
+				getGraphDatabase(partialGraphId).setNextIncidenceIdAtVertex(globalIncidenceId, nextIncidenceId);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -998,11 +998,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId,long nextIncidenceId) {		
+	public void setPreviousIncidenceIdAtVertex(long globalIncidenceId,long nextIncidenceId) {		
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				getGraphDatabase(partialGraphId).setPreviousIncidenceIdAtVertexId(globalIncidenceId, nextIncidenceId);
+				getGraphDatabase(partialGraphId).setPreviousIncidenceIdAtVertex(globalIncidenceId, nextIncidenceId);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -1043,11 +1043,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setNextIncidenceIdAtEdgeId(long globalIncidenceId, long nextIncidenceId) {
+	public void setNextIncidenceIdAtEdge(long globalIncidenceId, long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				getGraphDatabase(partialGraphId).setNextIncidenceIdAtEdgeId(globalIncidenceId, nextIncidenceId);
+				getGraphDatabase(partialGraphId).setNextIncidenceIdAtEdge(globalIncidenceId, nextIncidenceId);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}
@@ -1058,11 +1058,11 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setPreviousIncidenceIdAtEdgeId(long globalIncidenceId,long nextIncidenceId) {		
+	public void setPreviousIncidenceIdAtEdge(long globalIncidenceId,long nextIncidenceId) {		
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		if (partialGraphId != localPartialGraphId) {
 			try {
-				getGraphDatabase(partialGraphId).setPreviousIncidenceIdAtEdgeId(globalIncidenceId, nextIncidenceId);
+				getGraphDatabase(partialGraphId).setPreviousIncidenceIdAtEdge(globalIncidenceId, nextIncidenceId);
 			} catch (RemoteException e) {
 				throw new RuntimeException(e);
 			}

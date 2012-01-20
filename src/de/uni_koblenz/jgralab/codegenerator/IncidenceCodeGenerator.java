@@ -62,18 +62,26 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		addImports("#usedJgImplPackage#.EdgeImpl");
 		addImports("#jgPackage#.Edge");
 		addImports("#jgPackage#.Vertex");
-		if (currentCycle.isProxies()) {
+
+		switch (currentCycle) {
+		case MEMORYBASED:
+			return createInMemoryConstructor();
+		case DISKBASED:	
+			return createDiskBasedConstructor();
+		case DISKPROXIES:	
 			addImports("#jgDiskImplPackage#.IncidenceProxy");
 			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
-			
 			return createProxyConstructor();
-		}
-			
-		if (currentCycle.isMembasedImpl()) {
-			return createInMemoryConstructor();
-		} else {
-			return createDiskBasedConstructor();
+		case DISTRIBUTEDPROXIES:	
+			addImports("#jgDistributedImplPackage#.IncidenceProxy");
+			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+			return createProxyConstructor();
+		case DISTRIBUTED:
+			return createDistributedConstructor();
+		default:
+			throw new RuntimeException("Unhandled case");
 		}
 	}
 	
@@ -97,13 +105,22 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 		return code;
 	}
 	
+	
+	private CodeBlock createDistributedConstructor() {
+		CodeList code = new CodeList();
+		addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
+						"\tsuper(globalId,localGraphDatabase, vertexId, edgeId);"));
+		code.addNoIndent(new CodeSnippet("}"));
+		return code;
+	}
+	
+	
 	private CodeBlock createDiskBasedConstructor() {
 		CodeList code = new CodeList();
-		if (currentCycle.isDiskbasedImpl()) {
-			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");	
-		} else {
-			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
-		}
+		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");	
 		code.addNoIndent(new CodeSnippet(
 						true,
 						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",

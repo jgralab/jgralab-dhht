@@ -64,7 +64,21 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 	protected CodeBlock createConstructor() {
 		CodeList code = new CodeList();
 		addImports("#jgPackage#.#ownElementClass#");
-		code.setVariable("graphOrDatabase", currentCycle.isMembasedImpl() ? "#jgPackage#.Graph" : "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+		switch (currentCycle) {
+		case MEMORYBASED:
+			code.setVariable("graphOrDatabase", "#jgPackage#.Graph");
+			break;
+		case DISKBASED:
+		case DISKPROXIES:
+			code.setVariable("graphOrDatabase", "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+			break;
+		case DISTRIBUTED:
+		case DISTRIBUTEDPROXIES:
+			code.setVariable("graphOrDatabase", "#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
+			break;
+		default:
+			throw new RuntimeException("Unhandled case");
+		}
 		code.setVariable("additionalProxyFormalParams", currentCycle.isImplementationVariant() ? "" : ", #jgImplPackage#.RemoteGraphDatabaseAccess remoteDb");
 		code.setVariable("additionalProxyActualParams", currentCycle.isImplementationVariant() ? "" : ",remoteDb");
 		code.addNoIndent(new CodeSnippet(
@@ -107,7 +121,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add(createReadAttributesMethod(aec.getAttributeList(), "attributeContainer."));
 			code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), "attributeContainer."));
 		}	
-		if (currentCycle.isMembasedImpl()) {
+		if (currentCycle.isMembasedImpl() ||currentCycle.isDistributedImpl()) {
 			code.add(createGetIncidenceClassForRolenameMethod());
 			code.add(createWriteAttributesMethod(aec.getAttributeList(), ""));
 			code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), ""));

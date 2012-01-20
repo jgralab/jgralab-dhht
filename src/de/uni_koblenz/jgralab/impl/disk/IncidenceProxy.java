@@ -73,25 +73,25 @@ public abstract class IncidenceProxy implements Incidence {
 
 	void setNextIncidenceAtVertex(Incidence nextIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setNextIncidenceIdAtVertexId(id,
+				.setNextIncidenceIdAtVertex(id,
 						nextIncidenceAtVertex.getGlobalId());
 	}
 
 	void setPreviousIncidenceAtVertex(IncidenceProxy previousIncidenceAtVertex) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setPreviousIncidenceIdAtVertexId(id,
+				.setPreviousIncidenceIdAtVertex(id,
 						previousIncidenceAtVertex.getGlobalId());
 	}
 
 	void setNextIncidenceAtEdge(IncidenceProxy nextIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setNextIncidenceIdAtEdgeId(id,
+				.setNextIncidenceIdAtEdge(id,
 						nextIncidenceAtEdge.getGlobalId());
 	}
 
 	void setPreviousIncidenceAtEdge(IncidenceProxy previousIncidenceAtEdge) {
 		((GraphDatabaseBaseImpl) storingGraphDatabase)
-				.setPreviousIncidenceIdAtEdgeId(id,
+				.setPreviousIncidenceIdAtEdge(id,
 						previousIncidenceAtEdge.getGlobalId());
 	}
 

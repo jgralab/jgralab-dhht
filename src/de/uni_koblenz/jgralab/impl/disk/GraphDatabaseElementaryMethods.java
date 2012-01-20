@@ -959,7 +959,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setNextIncidenceIdAtVertexId(long globalIncidenceId,
+	public void setNextIncidenceIdAtVertex(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		try {
@@ -973,7 +973,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setPreviousIncidenceIdAtVertexId(long globalIncidenceId,
+	public void setPreviousIncidenceIdAtVertex(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		try {
@@ -1012,7 +1012,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setNextIncidenceIdAtEdgeId(long globalIncidenceId,
+	public void setNextIncidenceIdAtEdge(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		try {
@@ -1026,7 +1026,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	}
 
 	@Override
-	public void setPreviousIncidenceIdAtEdgeId(long globalIncidenceId,
+	public void setPreviousIncidenceIdAtEdge(long globalIncidenceId,
 			long nextIncidenceId) {
 		int partialGraphId = getPartialGraphId(globalIncidenceId);
 		try {
