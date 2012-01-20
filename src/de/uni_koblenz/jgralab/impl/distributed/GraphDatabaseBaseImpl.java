@@ -42,6 +42,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		GraphDatabaseElementaryMethods implements RemoteGraphDatabaseAccess {
 
 	Graph localGraph = null;
+
 	
 	/**
 	 * Creates a new graph database to store all local subgraphs of the complete
