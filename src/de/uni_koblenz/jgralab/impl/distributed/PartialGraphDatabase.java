@@ -257,4 +257,4 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 
 }
 
-}
+
