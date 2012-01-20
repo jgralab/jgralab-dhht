@@ -495,6 +495,19 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"\t}",
 					"}");
 			break;
+		case DISTRIBUTED:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					"\ttry {",
+					"\t\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
+					"\t} catch (java.rmi.RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
+					"}");
+			break;
+		case DISKPROXIES:
+		case DISTRIBUTEDPROXIES:
+			break;
+		default: throw new RuntimeException("Unhandled case");	
 		}
 		return code;
 	}
@@ -524,6 +537,19 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"\t}",
 					"}");
 			break;
+		case DISTRIBUTED:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					"\ttry {",
+					"\t\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);",
+					"\t} catch (java.rmi.RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
+					"}");
+			break;
+		case DISKPROXIES:
+		case DISTRIBUTEDPROXIES:
+			break;
+		default: throw new RuntimeException("Unhandled case");	
 		}
 		return code;
 	}

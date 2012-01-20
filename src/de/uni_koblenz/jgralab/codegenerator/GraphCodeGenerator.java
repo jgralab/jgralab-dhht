@@ -244,7 +244,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 	private CodeBlock createDiskBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
-		addImports("#jgImplPackage#.GraphFactoryImpl");
 		addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
@@ -259,7 +258,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	
 	private CodeBlock createDistributedBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
-		addImports("#jgImplPackage#.GraphFactoryImpl");
 		addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
@@ -444,19 +442,25 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "}");
 		} else if  (currentCycle.isDistributedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
-					 //"\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DistributedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
-					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
-					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
-					 "\t\treturn new#ecType#;",
+					 "\t\ttry {",
+					 "\t\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
+					 "\t\t\talpha.connect(#alphaInc#.class, new#ecType#);",
+					 "\t\t\tomega.connect(#omegaInc#.class, new#ecType#);",
+					 "\t\t\treturn new#ecType#;",
+					 "\t\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\t\tthrow new RuntimeException(ex);",
+					 "\t\t}",
 				 "}");
 		} else if  (currentCycle.isDiskbasedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
-					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
-					 //"\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) #graphFactory#.create#ecType#_DiskBasedStorage(#ecJavaClassName#.class, 0, #graphOrGraphDatabase#);",
-					 "\t\talpha.connect(#alphaInc#.class, new#ecType#);",
-					 "\t\tomega.connect(#omegaInc#.class, new#ecType#);",
-					 "\t\treturn new#ecType#;",
+					"\t\ttry {",
+					 "\t\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
+					 "\t\t\talpha.connect(#alphaInc#.class, new#ecType#);",
+					 "\t\t\tomega.connect(#omegaInc#.class, new#ecType#);",
+					 "\t\t\treturn new#ecType#;",
+					 "\t\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\t\tthrow new RuntimeException(ex);",
+					 "\t\t}",
 				 "}");
 		}
 		IncidenceClass alphaInc = null;
