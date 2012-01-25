@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
 
 /**
  * TODO add comment
@@ -400,21 +401,21 @@ public abstract class CodeGenerator {
 	 * 
 	 * @return a Vector of {@code JavaSourceFromString}s from the generated code
 	 */
-	public Vector<JavaSourceFromString> createJavaSources() {
+	public Vector<InMemoryJavaSourceFile> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
 		String proxyClassName = rootBlock.getVariable("proxyClassName");
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
+		Vector<InMemoryJavaSourceFile> javaSources = new Vector<InMemoryJavaSourceFile>(2);
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
 			if (currentCycle.isImplementationVariant()) {
-				javaSources.add(new JavaSourceFromString(implClassName,	rootBlock.getCode()));
+				javaSources.add(new InMemoryJavaSourceFile(implClassName,	rootBlock.getCode()));
 			} else if (currentCycle.isProxies()) {
-				javaSources.add(new JavaSourceFromString(proxyClassName,	rootBlock.getCode()));
+				javaSources.add(new InMemoryJavaSourceFile(proxyClassName,	rootBlock.getCode()));
 			} else {	
-				javaSources.add(new JavaSourceFromString(className, rootBlock.getCode()));
+				javaSources.add(new InMemoryJavaSourceFile(className, rootBlock.getCode()));
 			}
 			currentCycle = getNextCycle();
 		}
