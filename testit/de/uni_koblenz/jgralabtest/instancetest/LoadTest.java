@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,42 +47,23 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
-import de.uni_koblenz.jgralab.impl.FreeIndexList;
-import de.uni_koblenz.jgralab.impl.GraphBaseImpl;
-import de.uni_koblenz.jgralab.impl.InternalGraph;
-import de.uni_koblenz.jgralab.impl.InternalVertex;
+import de.uni_koblenz.jgralab.impl.mem.CompleteGraphImpl;
+import de.uni_koblenz.jgralab.impl.mem.FreeIndexList;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.A;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.B;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.C;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.C2;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.D;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.D2;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.F;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.G;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.H;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.J;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.K;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 @RunWith(Parameterized.class)
 public class LoadTest extends InstanceTest {
 
 	private static final String TESTGRAPH_FILENAME = "testgraph.tg";
-	private static final String TESTGRAPH_PATH = "testit/testdata/";
+	private static final String TESTGRAPH_PATH = "testit/testgraphs/";
 
-	public LoadTest(ImplementationType implementationType, String dbURL) {
-		super(implementationType, dbURL);
+	public LoadTest(ImplementationType implementationType) {
+		super(implementationType);
 	}
 
 	@Parameters
@@ -105,10 +82,9 @@ public class LoadTest extends InstanceTest {
 	@After
 	public void tearDown() {
 		if (implementationType == ImplementationType.DATABASE) {
-			// dbHandler.cleanDatabaseOfTestGraph("VertexTest");
-			// dbHandler.cleanDatabaseOfTestGraph("LoadTest");
+			dbHandler.cleanDatabaseOfTestGraph("VertexTest");
+			dbHandler.cleanDatabaseOfTestGraph("LoadTest");
 			// super.cleanDatabaseOfTestSchema(VertexTestSchema.instance());
-			dbHandler.clearAllTables();
 			dbHandler.closeGraphdatabase();
 		}
 	}
@@ -251,8 +227,12 @@ public class LoadTest extends InstanceTest {
 					.createVertexTestGraphWithTransactionSupport(vMax, eMax);
 			break;
 		case DATABASE:
-			graph = dbHandler.createVertexTestGraphWithDatabaseSupport(
-					"LoadTest", vMax, eMax);
+			graph = dbHandler.createVertexTestGraphWithDatabaseSupport("LoadTest",
+					vMax, eMax);
+			break;
+		case SAVEMEM:
+			graph = VertexTestSchema.instance()
+					.createVertexTestGraphWithSavememSupport(vMax, eMax);
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -328,7 +308,7 @@ public class LoadTest extends InstanceTest {
 			// g1 is always without transaction support
 			g1 = createTestGraph();
 			createReadOnlyTransaction(g1);
-			GraphIO.saveGraphToFile(g1, TESTGRAPH_PATH + TESTGRAPH_FILENAME,
+			GraphIO.saveGraphToFile(TESTGRAPH_PATH + TESTGRAPH_FILENAME, g1,
 					null);
 			commit(g1);
 			switch (implementationType) {
@@ -344,6 +324,11 @@ public class LoadTest extends InstanceTest {
 			case DATABASE:
 				g2 = GraphIO.loadGraphFromFile(TESTGRAPH_PATH
 						+ TESTGRAPH_FILENAME, null);
+				break;
+			case SAVEMEM:
+				g2 = VertexTestSchema.instance()
+						.loadVertexTestGraphWithSavememSupport(
+								TESTGRAPH_PATH + TESTGRAPH_FILENAME);
 				break;
 			default:
 				fail("Implementation " + implementationType
@@ -413,19 +398,17 @@ public class LoadTest extends InstanceTest {
 	}
 
 	private void checkEqualVertexList(Graph g1, Graph g2) {
-		InternalGraph gb1 = (InternalGraph) g1;
-		InternalGraph gb2 = (InternalGraph) g2;
-		InternalVertex v1 = gb1.getFirstVertexInVSeq();
-		InternalVertex v2 = gb2.getFirstVertexInVSeq();
+		Vertex v1 = g1.getFirstVertex();
+		Vertex v2 = g2.getFirstVertex();
 		while (v1 != null) {
 			if (v2 == null) {
 				fail();
 			}
-			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
-			v1 = v1.getNextVertexInVSeq();
-			v2 = v2.getNextVertexInVSeq();
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
+			v1 = v1.getNextVertex();
+			v2 = v2.getNextVertex();
 		}
 		if (v2 != null) {
 			fail();
@@ -439,9 +422,9 @@ public class LoadTest extends InstanceTest {
 			if (v2 == null) {
 				fail();
 			}
-			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
 			v1 = v1.getNextEdge();
 			v2 = v2.getNextEdge();
 		}
@@ -458,13 +441,13 @@ public class LoadTest extends InstanceTest {
 			if (vertexClass.isInternal() || vertexClass.isAbstract()) {
 				continue;
 			}
-			Class<? extends Vertex> vc = vertexClass.getSchemaClass();
+			Class<? extends Vertex> vc = vertexClass.getM1Class();
 			g1.createVertex(vc);
 			// VertexClass vertexClass2 = gc.getVertexClasses().get(i %
 			// gc.getVertexClasses().size());
 			// if (vertexClass.isInternal())
 			// continue;
-			// Class<? extends Vertex> vc2 = vertexClass2.getSchemaClass();
+			// Class<? extends Vertex> vc2 = vertexClass2.getM1Class();
 			g2.createVertex(vc);
 		}
 	}
@@ -473,9 +456,9 @@ public class LoadTest extends InstanceTest {
 		for (int i = 1; i < g1.getVCount(); i += 7) {
 			Vertex v1 = g1.getVertex(i);
 			Vertex v2 = g2.getVertex(i);
-			assertEquals(v1.getId(), v2.getId());
-			assertEquals(v1.getAttributedElementClass().getQualifiedName(), v2
-					.getAttributedElementClass().getQualifiedName());
+			assertEquals(v1.getGlobalId(), v2.getGlobalId());
+			assertEquals(v1.getMetaClass().getQualifiedName(), v2
+					.getMetaClass().getQualifiedName());
 			v1.delete();
 			v2.delete();
 		}
@@ -494,7 +477,7 @@ public class LoadTest extends InstanceTest {
 	private FreeIndexList getFreeIndexListOfVertices(Graph graph,
 			boolean getVertexList) {
 		try {
-			Field f = GraphBaseImpl.class
+			Field f = CompleteGraphImpl.class
 					.getDeclaredField(getVertexList ? "freeVertexList"
 							: "freeEdgeList");
 			f.setAccessible(true);
@@ -638,14 +621,14 @@ public class LoadTest extends InstanceTest {
 		// delete every second vertex
 		for (int i = 1; i < 15; i = i + 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(15).delete();
+		g.getVertexObject(15).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 9, 23, 16, 3, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -680,14 +663,14 @@ public class LoadTest extends InstanceTest {
 		}
 		// delete the vertices
 		createTransaction(g);
-		g.getVertex(1).delete();
+		g.getVertexObject(1).delete();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		for (int i = 4; i <= 17; i = i + 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createReadOnlyTransaction(g);
@@ -727,7 +710,7 @@ public class LoadTest extends InstanceTest {
 		// delete every second vertex
 		createTransaction(g);
 		for (int i = 2; i < 17; i = i + 2) {
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -786,7 +769,7 @@ public class LoadTest extends InstanceTest {
 		// runs[0]==-2
 		createTransaction(g);
 		for (int i = 2; i < 17; i = i + 2) {
-			g.getVertex(i + 1).delete();
+			g.getVertexObject(i + 1).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -795,7 +778,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the first vertex. Runs must be enlarged.
 		createTransaction(g);
-		g.getVertex(1).delete();
+		g.getVertexObject(1).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 9, 32, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -827,7 +810,7 @@ public class LoadTest extends InstanceTest {
 		// delete odd vertices to fill runs
 		createTransaction(g);
 		for (int i = 0; i < 14; i = i + 2) {
-			g.getVertex(i + 1).delete();
+			g.getVertexObject(i + 1).delete();
 		}
 		commit(g);
 		createReadOnlyTransaction(g);
@@ -836,7 +819,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the last vertex. runs[runs.length-1]==0
 		createTransaction(g);
-		g.getVertex(15).delete();
+		g.getVertexObject(15).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 8, 16, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -869,7 +852,7 @@ public class LoadTest extends InstanceTest {
 		createTransaction(g);
 		for (int i = 0; i < 16; i = i + 2) {
 			if (i != 4) {
-				g.getVertex(i + 1).delete();
+				g.getVertexObject(i + 1).delete();
 			}
 		}
 		commit(g);
@@ -879,7 +862,7 @@ public class LoadTest extends InstanceTest {
 		commit(g);
 		// delete the last vertex. runs[runs.length-1]==0
 		createTransaction(g);
-		g.getVertex(5).delete();
+		g.getVertexObject(5).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 8, 16, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,
@@ -911,13 +894,13 @@ public class LoadTest extends InstanceTest {
 		g.createA();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 3, 1, 16, -1, 1, -2);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(3).delete();
+		g.getVertexObject(3).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 2, 2, 16, -1, 2, -1);
@@ -945,13 +928,13 @@ public class LoadTest extends InstanceTest {
 		g.createA();
 		commit(g);
 		createTransaction(g);
-		g.getVertex(2).delete();
+		g.getVertexObject(2).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 2, 1, 16, -1, 1, -1);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(3).delete();
+		g.getVertexObject(3).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 1, 2, 16, -1, 2);
@@ -977,7 +960,7 @@ public class LoadTest extends InstanceTest {
 		}
 		for (int i = 15; i > 0; i = i - 2) {
 			createTransaction(g);
-			g.getVertex(i).delete();
+			g.getVertexObject(i).delete();
 			commit(g);
 		}
 		createReadOnlyTransaction(g);
@@ -985,7 +968,7 @@ public class LoadTest extends InstanceTest {
 				1, -1, 1, -1, 1, -2);
 		commit(g);
 		createTransaction(g);
-		g.getVertex(17).delete();
+		g.getVertexObject(17).delete();
 		commit(g);
 		createReadOnlyTransaction(g);
 		checkFreeIndexList(vList, 8, 9, 32, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1,

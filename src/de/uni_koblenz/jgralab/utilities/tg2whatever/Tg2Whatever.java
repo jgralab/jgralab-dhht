@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,9 +31,10 @@
 
 package de.uni_koblenz.jgralab.utilities.tg2whatever;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
+import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -45,12 +42,15 @@ import org.apache.commons.cli.Option;
 import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -70,7 +70,7 @@ public abstract class Tg2Whatever {
 
 	protected boolean edgeAttributes = false;
 
-	private boolean reversedEdges = false;
+	protected boolean reversedEdges = false;
 
 	private int currentElementSequenceIndex = -1;
 
@@ -93,7 +93,7 @@ public abstract class Tg2Whatever {
 
 	protected boolean shortenStrings = false;
 
-	protected BooleanGraphMarker marker = null;
+	protected LocalBooleanGraphMarker marker = null;
 
 	public Tg2Whatever() {
 		// System.err.println("outputName = '" + outputName + "'");
@@ -108,7 +108,7 @@ public abstract class Tg2Whatever {
 	 * sets the graph marker. If this is not null, only vertices and edges that
 	 * are marked with the marker will be printed to the dot-file
 	 */
-	public void setGraphMarker(BooleanGraphMarker m) {
+	public void setGraphMarker(LocalBooleanGraphMarker m) {
 		marker = m;
 	}
 
@@ -139,8 +139,8 @@ public abstract class Tg2Whatever {
 	public void setGraph(String fileName) throws GraphIOException {
 		graphFileName = fileName;
 		graph = GraphIO.loadSchemaAndGraphFromFile(graphFileName,
-				CodeGeneratorConfiguration.MINIMAL,
-				new ConsoleProgressFunction("Loading"));
+				CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS,
+				new ConsoleProgressFunction(), ImplementationType.MEMORY);
 	}
 
 	/**
@@ -195,27 +195,50 @@ public abstract class Tg2Whatever {
 		domainNames = print;
 	}
 
-	public void convert() throws IOException {
-		if ((outputName == null) || outputName.equals("")) {
-			convert(System.out);
-		} else {
-			PrintStream out = new PrintStream(new FileOutputStream(outputName));
-			convert(out);
-			out.close();
+	public void printGraph() {
+		initializeGraphAndSchema();
+		try {
+			PrintStream out = initializeOutputStream();
+			try {
+				graphStart(out);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+			printBeforeVertices(out);
+			printVertices(out);
+			printBeforeEdges(out);
+			printEdges(out);
+			graphEnd(out);
+		} catch (FileNotFoundException e) {
+			System.err.println("File '" + outputName
+					+ "' could not be created.");
+			System.exit(1);
 		}
 	}
 
-	public void convert(PrintStream out) {
-		initializeGraphAndSchema();
-		graphStart(out);
-		printVertices(out);
-		printEdges(out);
-		graphEnd(out);
+	private void printBeforeEdges(PrintStream out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void printBeforeVertices(PrintStream out) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private PrintStream initializeOutputStream() throws FileNotFoundException {
+		PrintStream out;
+		if (outputName.equals("")) {
+			out = System.out;
+		} else {
+			out = new PrintStream(new FileOutputStream(outputName));
+		}
+		return out;
 	}
 
 	private void printEdges(PrintStream out) {
 		currentElementSequenceIndex = 0;
-		for (Edge e : graph.edges()) {
+		for (Edge e : graph.getEdges()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(e)) {
 				printEdge(out, e);
@@ -225,13 +248,40 @@ public abstract class Tg2Whatever {
 
 	private void printVertices(PrintStream out) {
 		currentElementSequenceIndex = 0;
-		for (Vertex v : graph.vertices()) {
+		for (Vertex v : graph.getVertices()) {
 			currentElementSequenceIndex++;
 			if ((marker == null) || marker.isMarked(v)) {
 				printVertex(out, v);
 			}
 		}
 	}
+	
+
+	
+	protected void printIncidences(PrintStream out) {
+		for (Edge e : graph.getEdges()) {
+			if ((marker == null) || marker.isMarked(e)) {
+				for (Incidence i : e.getIncidences()) {
+					if ((marker == null) || marker.isMarked(i.getVertex())) {
+						printIncidence(out, i);	
+					}	
+				}
+			}
+		}
+	}
+	
+
+	protected int getIncidenceNumber(Incidence inc, GraphElement<?,?,?,?> elem) {
+		int num = 1;
+		for (Incidence current : elem.getIncidences()) {
+			if (current == inc) {
+				return num;
+			}
+			num++;
+		}
+		return -1;
+	}
+
 
 	public int getCurrentElementSequenceIndex() {
 		return currentElementSequenceIndex;
@@ -240,8 +290,8 @@ public abstract class Tg2Whatever {
 	private void loadGraph() {
 		try {
 			System.out.println("Loading graph from file " + graphFileName);
-			graph = GraphIO.loadGraphFromFileWithStandardSupport(graphFileName,
-					schema, new ConsoleProgressFunction("Loading"));
+			graph = GraphIO.loadGraphFromFile(graphFileName,
+					schema, new ConsoleProgressFunction(), ImplementationType.MEMORY);
 			System.out.println("Graph loaded");
 		} catch (GraphIOException ex) {
 			System.err.println("Graph in file '" + graphFileName
@@ -255,7 +305,7 @@ public abstract class Tg2Whatever {
 		try {
 			System.out.println("Loading Schema from Graph");
 			schema = GraphIO.loadSchemaFromFile(graphFileName);
-			schema.compile(CodeGeneratorConfiguration.MINIMAL);
+			schema.compile(CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS);
 			System.out.println("Schema loaded");
 		} catch (GraphIOException ex) {
 			System.err.println("Graph in file '" + graphFileName
@@ -282,8 +332,9 @@ public abstract class Tg2Whatever {
 	 * 
 	 * @param out
 	 *            PrintStream as output stream.
+	 * @throws RemoteException 
 	 */
-	protected abstract void graphStart(PrintStream out);
+	protected abstract void graphStart(PrintStream out) throws RemoteException;
 
 	/**
 	 * Is called, when graph processing ends.
@@ -304,7 +355,7 @@ public abstract class Tg2Whatever {
 	protected abstract void printVertex(PrintStream out, Vertex v);
 
 	/**
-	 * Prints a Edge to the provided output stream.
+	 * Prints an Edge to the provided output stream.
 	 * 
 	 * @param out
 	 *            PrintStream as output stream.
@@ -312,6 +363,16 @@ public abstract class Tg2Whatever {
 	 *            Edge, which should be printed.
 	 */
 	protected abstract void printEdge(PrintStream out, Edge e);
+	
+	/**
+	 * Prints an Incidence to the provided output stream
+	 * @param out
+	 * 			  PrintStream as output stream
+	 * @param i
+	 *            Incidence, which should be printed.
+	 */
+	protected abstract void printIncidence(PrintStream out, Incidence i);
+	
 
 	/**
 	 * Replaces characters in the given string by the escape sequences that are
@@ -343,9 +404,11 @@ public abstract class Tg2Whatever {
 			}
 		}
 		if (comLine.hasOption("o")) {
-			outputName = comLine.getOptionValue("o").trim();
+			outputName = comLine.getOptionValue("o");
 		}
-
+		if (outputName == null) {
+			outputName = "";
+		}
 		if (comLine.hasOption("a")) {
 			schemaName = comLine.getOptionValue("a");
 			setSchema(schemaName);
@@ -377,6 +440,7 @@ public abstract class Tg2Whatever {
 				} else {
 					loadSchemaFromGraph();
 				}
+
 			}
 			loadGraph();
 		}
@@ -434,7 +498,7 @@ public abstract class Tg2Whatever {
 		oh.addOption(rolenames);
 
 		Option output = new Option("o", "output", true,
-				"(required): the output file name, or empty for stdout");
+				"(optional): the output file name, or empty for stdout");
 		output.setRequired(true);
 		output.setArgName("file");
 		oh.addOption(output);
@@ -453,4 +517,6 @@ public abstract class Tg2Whatever {
 		oh.addOption(shortenStrings);
 		return oh;
 	}
+
+
 }

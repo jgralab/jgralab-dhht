@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -44,10 +40,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * @author ist@uni-koblenz.de
@@ -88,10 +80,6 @@ public class DefaultOptimizer extends OptimizerBase {
 	 */
 	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
 			throws OptimizerException {
-		if (syntaxgraph.getVCount() <= 1) {
-			return false;
-		}
-
 		logger.fine(optimizerHeaderString()
 				+ "Starting optimization.  Fasten your seatbelts!");
 
@@ -101,7 +89,7 @@ public class DefaultOptimizer extends OptimizerBase {
 		// optimizers
 		Optimizer cso = new CommonSubgraphOptimizer();
 		Optimizer pe2dpeo = new PathExistenceToDirectedPathExpressionOptimizer();
-		Optimizer eso = new EarlySelectionOptimizer();
+		Optimizer eso = new EarySelectionOptimizer();
 		Optimizer peo = new PathExistenceOptimizer();
 		Optimizer vdoo = new VariableDeclarationOrderOptimizer();
 		Optimizer ceo = new ConditionalExpressionOptimizer();
@@ -158,13 +146,15 @@ public class DefaultOptimizer extends OptimizerBase {
 			noOfRuns++;
 
 			if (noOfRuns > 10) {
-				logger.warning("Optimizer didn't finish after 10 runs. Stopping here.");
+				logger
+						.warning("Optimizer didn't finish after 10 runs. Stopping here.");
 				break;
 			}
 
 			logger.fine(optimizerHeaderString() + "starts a new iteration ("
 					+ noOfRuns + ")...");
 		}
+		;
 
 		// Tg2Dot.printGraphAsDot(syntaxgraph, true,
 		// "/home/horn/after-optimization.tg");
@@ -179,7 +169,7 @@ public class DefaultOptimizer extends OptimizerBase {
 
 	@SuppressWarnings("unused")
 	private void printCosts(GreqlEvaluator eval, Greql2 syntaxgraph) {
-		logger.fine("Optimizer: Optimizing " + syntaxgraph.getId() + ".\n"
+		logger.fine("Optimizer: Optimizing " + syntaxgraph.getUid() + ".\n"
 				+ "This syntaxgraph has " + syntaxgraph.getECount()
 				+ " edges and " + syntaxgraph.getVCount() + " vertexes.");
 		GraphMarker<VertexEvaluator> marker = eval
@@ -196,7 +186,8 @@ public class DefaultOptimizer extends OptimizerBase {
 		rootEval.calculateEstimatedSelectivity(graphSize);
 
 		Greql2Vertex vertex = syntaxgraph.getFirstGreql2Vertex();
-		logger.fine("=========================================================");
+		logger
+				.fine("=========================================================");
 		while (vertex != null) {
 			logger.fine("Current Node: " + vertex);
 			veval = marker.getMark(vertex);
@@ -214,7 +205,8 @@ public class DefaultOptimizer extends OptimizerBase {
 						+ "Defined Vars: " + definedVars + "\n"
 						+ "Variable Combinations: " + varCombs);
 			}
-			logger.fine("=========================================================");
+			logger
+					.fine("=========================================================");
 			vertex = vertex.getNextGreql2Vertex();
 		}
 		VertexEvaluator greql2ExpEval = marker.getMark(syntaxgraph

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,6 +35,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ConcurrentModificationException;
 
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,13 +43,6 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.trans.AttributedElementIterable;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 //import junit.framework.JUnit4TestAdapter;
 
@@ -111,7 +101,7 @@ public class AttributedElementIterableTest {
 			Iterable<Vertex> vertices = motorwayMap.vertices();
 			assertTrue(vertices instanceof AttributedElementIterable<?>);
 			for (Vertex vertex : vertices) {
-				vertex.getId();
+				vertex.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -128,8 +118,8 @@ public class AttributedElementIterableTest {
 			Iterable<Vertex> vertices = motorwayMap.vertices();
 			assertTrue(vertices instanceof AttributedElementIterable<?>);
 			for (Vertex vertex : vertices) {
-				motorwayMap.getVertex(N).delete();
-				vertex.getId();
+				motorwayMap.getVertexObject(N).delete();
+				vertex.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {
@@ -175,7 +165,7 @@ public class AttributedElementIterableTest {
 			Iterable<Edge> edges = motorwayMap.edges();
 			assertTrue(edges instanceof AttributedElementIterable<?>);
 			for (Edge edge : edges) {
-				edge.getId();
+				edge.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -192,8 +182,8 @@ public class AttributedElementIterableTest {
 			Iterable<Edge> edges = motorwayMap.edges();
 			assertTrue(edges instanceof AttributedElementIterable<?>);
 			for (Edge edge : edges) {
-				motorwayMap.getEdge(N).delete();
-				edge.getId();
+				motorwayMap.getEdgeObject(N).delete();
+				edge.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {
@@ -238,10 +228,10 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableNoChange() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Iterable<Edge> incidences = motorwayMap.getVertex(1).incidences();
+			Iterable<Edge> incidences = motorwayMap.getVertexObject(1).incidences();
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
-				edge.getId();
+				edge.getGlobalId();
 			}
 		} catch (Exception e) {
 			fail();
@@ -256,12 +246,12 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableChange() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
+			Vertex v1 = motorwayMap.getVertexObject(1);
 			Iterable<Edge> incidences = v1.incidences();
 			assertTrue(incidences instanceof AttributedElementIterable<?>);
 			for (Edge edge : incidences) {
 				v1.getLastIncidence().delete();
-				edge.getId();
+				edge.getGlobalId();
 			}
 			fail();
 		} catch (ConcurrentModificationException e) {
@@ -282,7 +272,7 @@ public class AttributedElementIterableTest {
 	public void testIncidenceIterableInvalidTransaction() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
+			Vertex v1 = motorwayMap.getVertexObject(1);
 			Iterable<Edge> incidences = v1.incidences();
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
 			assertTrue(incidences instanceof AttributedElementIterable<?>);

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,13 +30,14 @@
  */
 package de.uni_koblenz.jgralab.utilities.tg2gdl;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.utilities.tg2whatever.Tg2Whatever;
 
 /**
@@ -83,21 +80,21 @@ public class Tg2Gdl extends Tg2Whatever {
 		indent(out);
 		out.print("graph: { layout_algorithm: maxdegree finetuning: yes ");
 		indent++;
-		printLabel(graph, out);
+		printLabel((AttributedElement<? extends AttributedElement, ? extends AttributedElementClass>) graph, out);
 		out.println();
 	}
 
-	private void printLabel(AttributedElement ae, PrintStream out) {
+	private void printLabel(AttributedElement<? extends AttributedElement, ? extends AttributedElementClass> ae, PrintStream out) {
 		out.print("label: \"");
 		if (ae instanceof Vertex) {
-			out.print("v" + ((Vertex) ae).getId() + " : "
-					+ ae.getAttributedElementClass().getSimpleName() + "\\n");
+			out.print("v" + ((Vertex) ae).getGlobalId() + " : "
+					+ ae.getType().getSimpleName() + "\\n");
 		} else if (ae instanceof Edge) {
-			out.print("e" + ((Edge) ae).getId() + " : "
-					+ ae.getAttributedElementClass().getSimpleName() + "\\n");
+			out.print("e" + ((Edge) ae).getGlobalId() + " : "
+					+ ae.getType().getSimpleName() + "\\n");
 		}
 		boolean first = true;
-		for (Attribute attr : ae.getAttributedElementClass().getAttributeList()) {
+		for (Attribute attr : ae.getType().getAttributeList()) {
 			if (first) {
 				first = false;
 			} else {
@@ -105,7 +102,8 @@ public class Tg2Gdl extends Tg2Whatever {
 			}
 			out.print(attr.getName()
 					+ " = "
-					+ stringQuote(String.valueOf(ae.getAttribute(attr.getName()))));
+					+ stringQuote(String.valueOf(ae
+							.getAttribute(attr.getName()))));
 		}
 		out.print("\"");
 	}
@@ -120,9 +118,9 @@ public class Tg2Gdl extends Tg2Whatever {
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
 		indent(out);
-		out.print("edge: { source: " + vTitle(e.getAlpha()) + " target: "
-				+ vTitle(e.getOmega()) + " ");
-		printLabel(e, out);
+		//out.print("edge: { source: " + vTitle(e.getAlpha()) + " target: "
+		//		+ vTitle(e.getOmega()) + " ");
+		printLabel((AttributedElement<? extends AttributedElement, ? extends AttributedElementClass>) e, out);
 		out.println(" }");
 	}
 
@@ -137,12 +135,12 @@ public class Tg2Gdl extends Tg2Whatever {
 	protected void printVertex(PrintStream out, Vertex v) {
 		indent(out);
 		out.print("node: { title: " + vTitle(v) + " ");
-		printLabel(v, out);
+		printLabel((AttributedElement<? extends AttributedElement, ? extends AttributedElementClass>) v, out);
 		out.println(" }");
 	}
 
 	private String vTitle(Vertex v) {
-		return "\"v" + v.getId() + "\"";
+		return "\"v" + v.getGlobalId() + "\"";
 	}
 
 	/*
@@ -161,11 +159,12 @@ public class Tg2Gdl extends Tg2Whatever {
 	public static void main(String[] args) {
 		Tg2Gdl converter = new Tg2Gdl();
 		converter.getOptions(args);
-		try {
-			converter.convert();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		converter.printGraph();
+	}
+
+	@Override
+	protected void printIncidence(PrintStream out, Incidence i) {
+		// TODO Auto-generated method stub
+		
 	}
 }

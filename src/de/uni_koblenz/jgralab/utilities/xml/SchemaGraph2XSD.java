@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -93,10 +89,10 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.FactoryConfigurationError;
@@ -110,35 +106,27 @@ import org.apache.commons.cli.OptionGroup;
 
 import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.ist.utilities.xml.IndentingXMLStreamWriter;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.grumlschema.GrumlSchema;
-import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
-import de.uni_koblenz.jgralab.grumlschema.domains.BooleanDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
-import de.uni_koblenz.jgralab.grumlschema.domains.DoubleDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.domains.IntegerDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.ListDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.LongDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.SetDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
-import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.BooleanDomain;
+import de.uni_koblenz.jgralab.schema.Domain;
+import de.uni_koblenz.jgralab.schema.DoubleDomain;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.EnumDomain;
+import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IntegerDomain;
+import de.uni_koblenz.jgralab.schema.ListDomain;
+import de.uni_koblenz.jgralab.schema.LongDomain;
+import de.uni_koblenz.jgralab.schema.MapDomain;
+import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.schema.SetDomain;
+import de.uni_koblenz.jgralab.schema.StringDomain;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.utilities.common.UtilityMethods;
 import de.uni_koblenz.jgralab.utilities.rsa.SchemaFilter;
 import de.uni_koblenz.jgralab.utilities.rsa.SchemaGraph2Tg;
@@ -272,7 +260,7 @@ public class SchemaGraph2XSD {
 	/**
 	 * Marks all included vertex-, edge- and domain-types.
 	 */
-	private BooleanGraphMarker includes;
+	private LocalBooleanGraphMarker includes;
 
 	/**
 	 * Stream output for debug information about include oder excludes types.

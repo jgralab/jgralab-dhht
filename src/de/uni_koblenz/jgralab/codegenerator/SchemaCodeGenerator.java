@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,7 +35,6 @@ import java.util.List;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.CompositeDomain;
@@ -47,14 +42,17 @@ import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.ListDomain;
 import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.SetDomain;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -74,14 +72,13 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	 *            the schema to create the code for
 	 * @param schemaPackageName
 	 *            the package the schema is located in
-	 * @param config
-	 *            a CodeGenaratorConfiguration specifying the required variants
+	 * @param implementationName
+	 *            the special jgralab package name to use
 	 */
 	public SchemaCodeGenerator(Schema schema, String schemaPackageName,
-			CodeGeneratorConfiguration config) {
+			 CodeGeneratorConfiguration config) {
 		super(schemaPackageName, "", config);
 		this.schema = schema;
-
 		rootBlock.setVariable("simpleClassName", schema.getName());
 		rootBlock.setVariable("simpleImplClassName", schema.getName());
 		rootBlock.setVariable("baseClassName", "SchemaImpl");
@@ -94,6 +91,10 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	protected CodeBlock createHeader() {
 		addImports("#jgSchemaImplPackage#.#baseClassName#");
 		addImports("#jgSchemaPackage#.VertexClass");
+		addImports("#jgSchemaPackage#.EdgeClass");
+		addImports("#jgImplPackage#.GraphFactoryImpl");
+		addImports("#jgPackage#.ImplementationType");
+		addImports("java.net.UnknownHostException");
 		addImports("java.lang.ref.WeakReference");
 		CodeSnippet code = new CodeSnippet(
 				true,
@@ -132,12 +133,7 @@ public class SchemaCodeGenerator extends CodeGenerator {
 	private CodeBlock createGraphFactoryMethod() {
 		addImports("#jgPackage#.Graph", "#jgPackage#.ProgressFunction",
 				"#jgPackage#.GraphIO",
-				"#jgImplDbPackage#.GraphDatabaseException",
-				"#jgImplDbPackage#.GraphDatabase",
 				"#jgPackage#.GraphIOException");
-		if (config.hasDatabaseSupport()) {
-			addImports("#jgPackage#.GraphException");
-		}
 		CodeSnippet code = new CodeSnippet(
 				true,
 				"/**",
@@ -146,9 +142,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				"*/",
-				"public #gcName# create#gcCamelName#(int vMax, int eMax) {",
-				((config.hasStandardSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, null, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# create#gcCamelName#_InMemoryStorage(int vMax, int eMax) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_InMemoryStorage(#gcCamelName#.class, GraphFactoryImpl.generateUniqueGraphId(), vMax, eMax);",
 				"}",
 				"",
 				"/**",
@@ -158,17 +153,15 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				" */",
-				"public #gcName# create#gcCamelName#(String id, int vMax, int eMax) {",
-				((config.hasStandardSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, id, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# create#gcCamelName#_InMemoryStorage(String id, int vMax, int eMax) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_InMemoryStorage(#gcCamelName#.class, id, vMax, eMax);",
 				"}",
 				"",
 				"/**",
 				" * Creates a new #gcName# graph.",
 				"*/",
-				"public #gcName# create#gcCamelName#() {",
-				((config.hasStandardSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# create#gcCamelName#_InMemoryStorage() {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_InMemoryStorage(#gcCamelName#.class, GraphFactoryImpl.generateUniqueGraphId());",
 				"}",
 				"",
 				"/**",
@@ -176,76 +169,141 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" *",
 				" * @param id the id name of the new graph",
 				" */",
-				"public #gcName# create#gcCamelName#(String id) {",
-				((config.hasStandardSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraph(#gcCamelName#.class, id);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# create#gcCamelName#_InMemoryStorage(String id) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_InMemoryStorage(#gcCamelName#.class, id);",
 				"}",
 				"",
-				// ---- database support -------
-				"/**",
-				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-				" *",
-				" * @param id Identifier of new graph",
-				" * @param graphDatabase Database which should contain graph",
-				" */",
-				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-				"}",
-				"/**",
-				" * Creates a new #gcName# graph in a database with given <code>id</code>.",
-				" *",
-				" * @param id Identifier of new graph",
-				" * @param vMax Maximum initial count of vertices that can be held in graph.",
-				" * @param eMax Maximum initial count of edges that can be held in graph.",
-				" * @param graphDatabase Database which should contain graph",
-				" */",
-				"public #gcName# create#gcCamelName#WithDatabaseSupport(String id, int vMax, int eMax, GraphDatabase graphDatabase) throws GraphDatabaseException{",
-				((config.hasDatabaseSupport()) ? "\tGraph graph = graphFactory.createGraphWithDatabaseSupport(#gcCamelName#.class, graphDatabase, id, vMax, eMax );\n\t\tif(!graphDatabase.containsGraph(id)){\n\t\t\tgraphDatabase.insert((#jgImplDbPackage#.GraphImpl)graph);\n\t\t\treturn (#gcCamelName#)graph;\n\t\t}\n\t\telse\n\t\t\tthrow new GraphException(\"Graph with identifier \" + id + \" already exists in database.\");"
-						: "\tthrow new UnsupportedOperationException(\"No database support compiled.\");"),
-				"}",
-				// ---- transaction support ----
-				"/**",
-				" * Creates a new #gcName# graph with transaction support with initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
-				" *",
-				" * @param vMax initial vertex count",
-				" * @param eMax initial edge count",
-				"*/",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(int vMax, int eMax) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
+				// ---- disk bases storage support ----
 				"",
 				"/**",
-				" * Creates a new #gcName# graph with transaction support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+				" * Creates a new #gcName# graph with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
 				" *",
 				" * @param id the id name of the new graph",
 				" * @param vMax initial vertex count",
 				" * @param eMax initial edge count",
 				" */",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(String id, int vMax, int eMax) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id, vMax, eMax);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+				"public #gcName# create#gcCamelName#_DiskBasedStorage(String uniqueGraphId, int vMax, int eMax) {",
+				"\tString hostname = null;",
+				"\ttry {",
+				"\t\thostname = InetAddress.getLocalHost().getHostAddress();",
+				"\t} catch (UnknownHostException ex) {",
+				"\t\tthrow new RuntimeException(ex);",
+				"\t}",
+				"\tlong subgraphId = #jgDiskImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDiskImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDiskImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
 				"}",
 				"",
 				"/**",
-				" * Creates a new #gcName# graph.",
+				" * Creates a new #gcName# graph using disk based storage. To be called only by the graph database class!",
+				" *",
 				"*/",
-				"public #gcName# create#gcCamelName#WithTransactionSupport() {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+				"public #gcName# create#gcCamelName#_DiskBasedStorage(String uniqueGraphId, long subgraphId, #jgDiskImplPackage#.GraphDatabaseBaseImpl graphDb) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
 				"}",
 				"",
 				"/**",
-				" * Creates a new #gcName# graph with the ID <code>id</code>.",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user  ",
+				" * to create a new #gcName#-graph instance. The local hostname is detected automatically",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#_DiskBasedStorage() {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tString hostname = null;",
+				"\ttry {",
+				"\t\thostname = InetAddress.getLocalHost().getHostAddress();",
+				"\t} catch (UnknownHostException ex) {",
+				"\t\tthrow new RuntimeException(ex);",
+				"\t}",
+				"\tlong subgraphId = #jgDiskImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDiskImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDiskImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
+				"}",
+				"",
+				"/**",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user ",
+				" * to create a  new #gcName#-graph instance.",
+				" * @param hostAddress the address or resolvable hostname of the local host",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#_DiskBasedStorage(String localHostAddress) {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tlong subgraphId = #jgDiskImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDiskImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDiskImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, localHostAddress);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
+				"}",
+				//distributed storage support
+				"",
+				"/**",
+				" * Creates a new #gcName# graph with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
 				" *",
 				" * @param id the id name of the new graph",
+				" * @param vMax initial vertex count",
+				" * @param eMax initial edge count",
 				" */",
-				"public #gcName# create#gcCamelName#WithTransactionSupport(String id) {",
-				((config.hasTransactionSupport()) ? "\treturn (#gcCamelName#) graphFactory.createGraphWithTransactionSupport(#gcCamelName#.class, id);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
+				"public #gcName# create#gcCamelName#_DistributedStorage(String uniqueGraphId, int vMax, int eMax) {",
+				"\tString hostname = null;",
+				"\ttry {",
+				"\t\thostname = InetAddress.getLocalHost().getHostAddress();",
+				"\t} catch (UnknownHostException ex) {",
+				"\t\tthrow new RuntimeException(ex);",
+				"\t}",
+				"\tlong subgraphId = #jgDistributedImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDistributedImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDistributedImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DistributedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
 				"}",
 				"",
+				"/**",
+				" * Creates a new #gcName# graph using disk based storage. To be called only by the graph database class!",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#_DistributedStorage(String uniqueGraphId, long subgraphId, #jgDistributedImplPackage#.GraphDatabaseBaseImpl graphDb) {",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DistributedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
+				"}",
+				"",
+				"/**",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user  ",
+				" * to create a new #gcName#-graph instance. The local hostname is detected automatically",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#_DistributedStorage() {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tString hostname = null;",
+				"\ttry {",
+				"\t\thostname = InetAddress.getLocalHost().getHostAddress();",
+				"\t} catch (UnknownHostException ex) {",
+				"\t\tthrow new RuntimeException(ex);",
+				"\t}",
+				"\tlong subgraphId = #jgDistributedImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDistributedImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDistributedImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, hostname);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DistributedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
+				"}",
+				"",
+				"/**",
+				" * Creates a new #gcName# graph using disk based storage. This method should be called by a user ",
+				" * to create a  new #gcName#-graph instance.",
+				" * @param hostAddress the address or resolvable hostname of the local host",
+				" *",
+				"*/",
+				"public #gcName# create#gcCamelName#_DistributedStorage(String localHostAddress) {",
+				"\tString uniqueGraphId = GraphFactoryImpl.generateUniqueGraphId();",
+				"\tlong subgraphId = #jgDistributedImplPackage#.GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID;",
+				"\t#jgDistributedImplPackage#.GraphDatabaseBaseImpl graphDb = new #jgDistributedImplPackage#.CompleteGraphDatabaseImpl(this, uniqueGraphId, localHostAddress);",
+				"\treturn (#gcCamelName#) graphFactory.createGraph_DistributedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, graphDb);",
+				"}",
+				
+				"",
+//				"/**",
+//				" * Creates a new #gcName# graph with savemem support with the ID <code>id</code> initial vertex and edge counts <code>vMax</code>, <code>eMax</code>.",
+//				" *",
+//				" * @param id the id name of the new graph",
+//				" * @param vMax initial vertex count",
+//				" * @param eMax initial edge count",
+//				" */",
+//				"public #gcName# create#gcCamelName#Proxy(String uniqueGraphId, long subgraphId, GraphDatabaseBaseImpl graphDb, RemoteGraphDatabase remoteGraphDb) {",
+//				"\treturn (#gcCamelName#) graphFactory.createGraphDiskBasedStorage(#gcCamelName#.class, uniqueGraphId, subgraphId, graphDb, remoteGraphDb);",
+//				"}",
+
 				// ---- file handling methods ----
 				"/**",
 				" * Loads a #gcName# graph from the file <code>filename</code>.",
@@ -254,97 +312,71 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				" * @return the loaded #gcName#",
 				" * @throws GraphIOException if the graph cannot be loaded",
 				" */",
-				"public #gcName# load#gcCamelName#(String filename) throws GraphIOException {",
-				((config.hasStandardSupport()) ? "\treturn load#gcCamelName#(filename, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+				"public #gcName# load#gcCamelName#(String filename, ImplementationType implType) throws GraphIOException {",
+				"\treturn load#gcCamelName#(filename, implType, null);",
 				"}",
 				"",
 				"/**",
-				" * Loads a #gcName# graph from the file <code>filename</code>.",
+				" * Loads a #gcName# graph from the file <code>filename</code> usign the in-memory storage.",
 				" *",
 				" * @param filename the name of the file",
 				" * @param pf a progress function to monitor graph loading",
 				" * @return the loaded #gcName#",
 				" * @throws GraphIOException if the graph cannot be loaded",
 				" */",
-				"public #gcName# load#gcCamelName#(String filename, ProgressFunction pf) throws GraphIOException {",
-				((config.hasStandardSupport()) ? "\tGraph graph = GraphIO.loadGraphFromFileWithStandardSupport(filename, this, pf);\n"
+				"public #gcName# load#gcCamelName#(String filename, ImplementationType implType, ProgressFunction pf) throws GraphIOException {",
+				"\tGraph graph = GraphIO.loadGraphFromFile(filename, this, pf, implType);\n"
 						+ "\tif (!(graph instanceof #gcName#)) {\n"
 						+ "\t\tthrow new GraphIOException(\"Graph in file '\" + filename + \"' is not an instance of GraphClass #gcName#\");\n"
-						+ "\t}" + "\treturn (#gcName#) graph;\n"
-						: "\tthrow new UnsupportedOperationException(\"No Standard support compiled.\");"),
+						+ "\t}" + "\treturn (#gcName#) graph;\n",
 				"}",
-				"",
-				// ---- file handling methods with transaction support ----
-				"/**",
-				" * Loads a #gcName# graph with transaction support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithTransactionSupport(String filename) throws GraphIOException {",
-				((config.hasTransactionSupport()) ? "\treturn load#gcCamelName#WithTransactionSupport(filename, null);"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}",
-				"",
-				"/**",
-				" * Loads a #gcName# graph with transaction support from the file <code>filename</code>.",
-				" *",
-				" * @param filename the name of the file",
-				" * @param pf a progress function to monitor graph loading",
-				" * @return the loaded #gcName#",
-				" * @throws GraphIOException if the graph cannot be loaded",
-				" */",
-				"public #gcName# load#gcCamelName#WithTransactionSupport(String filename, ProgressFunction pf) throws GraphIOException {",
-				((config.hasTransactionSupport()) ? "\tGraph graph = GraphIO.loadGraphFromFileWithTransactionSupport(filename, pf);\n"
-						+ "\tif (!(graph instanceof #gcName#)) {\n"
-						+ "\t\tthrow new GraphIOException(\"Graph in file '\" + filename + \"' is not an instance of GraphClass #gcName#\");\n"
-						+ "\t}" + "\treturn (#gcName#) graph;"
-						: "\tthrow new UnsupportedOperationException(\"No Transaction support compiled.\");"),
-				"}");
+				""
+				);
 		code.setVariable("gcName", schema.getGraphClass().getQualifiedName());
 		code.setVariable("gcCamelName", camelCase(schema.getGraphClass()
 				.getQualifiedName()));
 		code.setVariable("gcImplName", schema.getGraphClass()
-				.getQualifiedName() + "Impl");
+				.getQualifiedName()
+				+ "Impl");
+		addImports("java.net.InetAddress");
 		return code;
 	}
 
 	private CodeBlock createConstructor() {
 		CodeList code = new CodeList();
-		code.addNoIndent(new CodeSnippet(
-				true,
-				"/**",
-				" * the weak reference to the singleton instance",
-				" */",
-				"static WeakReference<#simpleClassName#> theInstance = new WeakReference<#simpleClassName#>(null);",
-				"",
-				"/**",
-				" * @return the singleton instance of #simpleClassName#",
-				" */",
-				"public static #simpleClassName# instance() {",
-				"\t#simpleClassName# s = theInstance.get();",
-				"\tif (s != null) {",
-				"\t\treturn s;",
-				"\t}",
-				"\tsynchronized (#simpleClassName#.class) {",
-				"\t\ts = theInstance.get();",
-				"\t\tif (s != null) {",
-				"\t\t\treturn s;",
-				"\t\t}",
-				"\t\ts = new #simpleClassName#();",
-				"\t\ttheInstance = new WeakReference<#simpleClassName#>(s);",
-				"\t}",
-				"\treturn s;",
-				"}",
-				"",
-				"/**",
-				" * Creates a #simpleClassName# and builds its schema classes.",
-				" * This constructor is private. Use the <code>instance()</code> method",
-				" * to acess the schema.", " */",
-				"private #simpleClassName#() {",
-				"\tsuper(\"#simpleClassName#\", \"#schemaPackage#\");"));
+		code
+				.addNoIndent(new CodeSnippet(
+						true,
+						"/**",
+						" * the weak reference to the singleton instance",
+						" */",
+						"static WeakReference<#simpleClassName#> theInstance = new WeakReference<#simpleClassName#>(null);",
+						"",
+						"/**",
+						" * @return the singleton instance of #simpleClassName#",
+						" */",
+						"public static #simpleClassName# instance() {",
+						"\t#simpleClassName# s = theInstance.get();",
+						"\tif (s != null) {",
+						"\t\treturn s;",
+						"\t}",
+						"\tsynchronized (#simpleClassName#.class) {",
+						"\t\ts = theInstance.get();",
+						"\t\tif (s != null) {",
+						"\t\t\treturn s;",
+						"\t\t}",
+						"\t\ts = new #simpleClassName#();",
+						"\t\ttheInstance = new WeakReference<#simpleClassName#>(s);",
+						"\t}",
+						"\treturn s;",
+						"}",
+						"",
+						"/**",
+						" * Creates a #simpleClassName# and builds its schema classes.",
+						" * This constructor is private. Use the <code>instance()</code> method",
+						" * to acess the schema.", " */",
+						"private #simpleClassName#() {",
+						"\tsuper(\"#simpleClassName#\", \"#schemaPackage#\");"));
 
 		code.add(createEnumDomains());
 		code.add(createCompositeDomains());
@@ -376,10 +408,19 @@ public class SchemaCodeGenerator extends CodeGenerator {
 				code.addNoIndent(new CodeSnippet(true, "{"));
 				hasComment = true;
 			}
-			for (String comment : comments) {
+			if (comments.size() == 1) {
 				code.add(new CodeSnippet("getPackage(\""
 						+ pkg.getQualifiedName() + "\").addComment(\""
-						+ stringQuote(comment) + "\");"));
+						+ stringQuote(comments.get(0)) + "\");"));
+			} else {
+				int n = 0;
+				code.add(new CodeSnippet("getPackage(\""
+						+ pkg.getQualifiedName() + "\").addComment("));
+				for (String comment : comments) {
+					code.add(new CodeSnippet("\t\"" + stringQuote(comment)
+							+ "\"" + (++n == comments.size() ? ");" : ",")));
+				}
+
 			}
 		}
 		if (hasComment) {
@@ -393,34 +434,29 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		CodeList code = new CodeList();
 		addImports("#jgSchemaPackage#.GraphClass");
 		code.setVariable("gcName", gc.getQualifiedName());
+		code.setVariable("gecVariable", "gc");
 		code.setVariable("gcVariable", "gc");
 		code.setVariable("aecVariable", "gc");
 		code.setVariable("schemaVariable", gc.getVariableName());
 		code.setVariable("gcAbstract", gc.isAbstract() ? "true" : "false");
 		code.addNoIndent(new CodeSnippet(
-				true,
-				"{",
-				"\tGraphClass #gcVariable# = #schemaVariable# = createGraphClass(\"#gcName#\");",
-				"\t#gcVariable#.setAbstract(#gcAbstract#);"));
-		for (AttributedElementClass superClass : gc.getDirectSuperClasses()) {
-			if (superClass.isInternal()) {
-				continue;
-			}
-			CodeSnippet s = new CodeSnippet(
-					"#gcVariable#.addSuperClass(getGraphClass(\"#superClassName#\"));");
-			s.setVariable("superClassName", superClass.getQualifiedName());
-			code.add(s);
-		}
+						true,
+						"{",
+						"\tGraphClass #gecVariable# = #schemaVariable# = createGraphClass(\"#gcName#\");",
+						"\t#gecVariable#.setAbstract(#gcAbstract#);",
+						"\tif (!#gecVariable#.isAbstract())",
+						"\t\tregisterClassId(#gecVariable#);"));
 		code.add(createAttributes(gc));
 		code.add(createConstraints(gc));
 		code.add(createComments("gc", gc));
 		code.add(createVertexClasses(gc));
 		code.add(createEdgeClasses(gc));
+		code.add(createIncidenceClasses(gc));
 		code.addNoIndent(new CodeSnippet(false, "}"));
 		return code;
 	}
 
-	private CodeBlock createComments(String variableName, NamedElement ne) {
+	private CodeBlock createComments(String variableName, NamedElementClass ne) {
 		CodeList code = new CodeList();
 		code.setVariable("namedElement", variableName);
 		for (String comment : ne.getComments()) {
@@ -444,158 +480,179 @@ public class SchemaCodeGenerator extends CodeGenerator {
 		}
 		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
 			if (!ec.isInternal()) {
-				code.addNoIndent(new CodeSnippet("public final EdgeClass "
+				if (ec.isBinary()) {
+					addImports("#jgSchemaPackage#.BinaryEdgeClass");
+					code.addNoIndent(new CodeSnippet("public final BinaryEdgeClass "
 						+ ec.getVariableName() + ";"));
+				} else {
+					code.addNoIndent(new CodeSnippet("public final EdgeClass "
+							+ ec.getVariableName() + ";"));
+				}
+			}
+		}
+		for (IncidenceClass ic : schema.getIncidenceClassesInTopologicalOrder()) {
+			if (!ic.isInternal()) {
+				code.addNoIndent(new CodeSnippet("public final IncidenceClass "
+						+ ic.getVariableName() + ";"));
 			}
 		}
 		return code;
 	}
 
-	private CodeBlock createEdgeClasses(GraphClass gc) {
-		CodeList code = new CodeList();
-		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
-			if (!ec.isInternal() && (ec.getGraphClass() == gc)) {
-				code.addNoIndent(createEdgeClass(ec));
-			}
-		}
-		return code;
-	}
 
-	private CodeBlock createEdgeClass(EdgeClass ec) {
+	
+	private CodeBlock createIncidenceClass(IncidenceClass ic) {
 		CodeList code = new CodeList();
-		addImports("#jgSchemaPackage#.EdgeClass");
-		code.setVariable("ecType", "EdgeClass");
-
-		code.setVariable("ecName", ec.getQualifiedName());
-		code.setVariable("schemaVariable", ec.getVariableName());
-		code.setVariable("ecVariable", "ec");
-		code.setVariable("aecVariable", "ec");
-		code.setVariable("ecAbstract", ec.isAbstract() ? "true" : "false");
-		code.setVariable("fromClass", ec.getFrom().getVertexClass()
-				.getVariableName());
-		code.setVariable("fromRole", ec.getFrom().getRolename());
-		code.setVariable("toClass", ec.getTo().getVertexClass()
-				.getVariableName());
-		code.setVariable("toRole", ec.getTo().getRolename());
-		code.setVariable("toAggregation",
-				AggregationKind.class.getCanonicalName() + "."
-						+ ec.getTo().getAggregationKind().toString());
-		code.setVariable("fromAggregation",
-				AggregationKind.class.getCanonicalName() + "."
-						+ ec.getFrom().getAggregationKind().toString());
-		code.setVariable("fromPart", "#fromClass#, " + ec.getFrom().getMin()
-				+ ", " + ec.getFrom().getMax() + ", \"#fromRole#\""
-				+ ", #fromAggregation#");
-		code.setVariable("toPart", "#toClass#, " + ec.getTo().getMin() + ", "
-				+ ec.getTo().getMax() + ", \"#toRole#\"" + ", #toAggregation#");
+		addImports("#jgSchemaPackage#.IncidenceClass");
+		addImports("#jgSchemaPackage#.IncidenceType");
+		addImports("#jgPackage#.Direction");
+		
+		code.setVariable("icName", ic.getQualifiedName());
+		code.setVariable("schemaVariable", ic.getVariableName());
+		code.setVariable("icEdgeClass", ic.getEdgeClass().getQualifiedName());
+		code.setVariable("icVertexClass", ic.getVertexClass().getQualifiedName());
+		code.setVariable("icAbstract", ic.isAbstract() ? "true" : "false");
+		code.setVariable("icRoleName", ic.getRolename());
+		code.setVariable("dir", ic.getDirection().toString());
+		code.setVariable("schemaVariable", ic.getVariableName());
+		code.setVariable("incidenceType", ic.getIncidenceType().toString());
+		code.setVariable("minEdgesAtVertex", Integer.toString(ic.getMinEdgesAtVertex()));
+		code.setVariable("minVerticesAtEdge", Integer.toString(ic.getMinVerticesAtEdge()));
+		code.setVariable("maxEdgesAtVertex", Integer.toString(ic.getMaxEdgesAtVertex()));
+		code.setVariable("maxVerticesAtEdge", Integer.toString(ic.getMaxVerticesAtEdge()));
+		
 		code.addNoIndent(new CodeSnippet(
-				true,
-				"{",
-				"\t#ecType# #ecVariable# = #schemaVariable# = #gcVariable#.create#ecType#(\"#ecName#\",",
-				"\t\t#fromPart#,", "\t\t#toPart#);",
-				"\t#ecVariable#.setAbstract(#ecAbstract#);"));
+						true,
+						"{",
+						/*"\tIncidenceClass #icVariable# =*/ "#schemaVariable# = #gcVariable#.createIncidenceClass(",
+						"\t\t#gcVariable#.getEdgeClass(\"#icEdgeClass#\"),",
+						"\t\t#gcVariable#.getVertexClass(\"#icVertexClass#\"),",
+						"\t\t\"#icRoleName#\",#icAbstract#,#minEdgesAtVertex#,#maxEdgesAtVertex#,",
+						"\t\t#minVerticesAtEdge#,#maxVerticesAtEdge#,Direction.#dir#,IncidenceType.#incidenceType#);",
+						"\tif (!#schemaVariable#.isAbstract())",
+						"\t\tregisterClassId(#schemaVariable#);"));
 
-		for (AttributedElementClass superClass : ec.getDirectSuperClasses()) {
+		for (IncidenceClass superClass : ic.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
 				continue;
 			}
 			CodeSnippet s = new CodeSnippet(
-					"#ecVariable#.addSuperClass(#superClassName#);");
+					"#schemaVariable#.addSuperClass(#superClassName#);");
 			s.setVariable("superClassName", superClass.getVariableName());
 			code.add(s);
 		}
 
-		for (String redefinedFromRole : ec.getFrom().getRedefinedRoles()) {
-			CodeSnippet s = new CodeSnippet(
-					"#ecVariable#.getFrom().addRedefinedRole(\"#redefinedFromRole#\");");
-			s.setVariable("redefinedFromRole", redefinedFromRole);
-			code.add(s);
-		}
 
-		for (String redefinedToRole : ec.getTo().getRedefinedRoles()) {
-			CodeSnippet s = new CodeSnippet(
-					"#ecVariable#.getTo().addRedefinedRole(\"#redefinedToRole#\");");
-			s.setVariable("redefinedToRole", redefinedToRole);
-			code.add(s);
-		}
-
-		code.add(createAttributes(ec));
-		code.add(createConstraints(ec));
-		code.add(createComments("ec", ec));
+		code.add(createConstraints(ic));
+		code.add(createComments("ic", ic));
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
+	
+	
+	private CodeBlock createIncidenceClasses(GraphClass gc) {
+		CodeList code = new CodeList();
+		for (IncidenceClass ic : schema.getIncidenceClassesInTopologicalOrder()) {
+			if (!ic.isInternal()) {
+				code.addNoIndent(createIncidenceClass(ic));
+			}
+		}
+		return code;
+	}
+	
 
 	private CodeBlock createVertexClasses(GraphClass gc) {
 		CodeList code = new CodeList();
 		for (VertexClass vc : schema.getVertexClassesInTopologicalOrder()) {
-			if (vc.isInternal()) {
-				CodeSnippet s = new CodeSnippet();
-				s.setVariable("schemaVariable", vc.getVariableName());
-				s.add("@SuppressWarnings(\"unused\")");
-				s.add("VertexClass #schemaVariable# = getDefaultVertexClass();");
-				code.addNoIndent(s);
-			} else if (vc.getGraphClass() == gc) {
-				code.addNoIndent(createVertexClass(vc));
+//			if (vc.isInternal()) {
+//				CodeSnippet s = new CodeSnippet();
+//				s.setVariable("schemaVariable", vc.getVariableName());
+//				s.add("@SuppressWarnings(\"unused\")");
+//				s.add("VertexClass #schemaVariable# = getDefaultVertexClass();");
+//				code.addNoIndent(s);
+//			} 
+//			else
+				if (!vc.isInternal() && vc.getGraphClass() == gc) {
+				code.addNoIndent(createGraphElementClass(vc, "Vertex"));
 			}
 		}
 		return code;
 	}
-
-	private CodeBlock createVertexClass(VertexClass vc) {
+	
+	private CodeBlock createEdgeClasses(GraphClass gc) {
 		CodeList code = new CodeList();
-		code.setVariable("vcName", vc.getQualifiedName());
-		code.setVariable("vcVariable", "vc");
-		code.setVariable("aecVariable", "vc");
-		code.setVariable("schemaVariable", vc.getVariableName());
-		code.setVariable("vcAbstract", vc.isAbstract() ? "true" : "false");
+		for (EdgeClass ec : schema.getEdgeClassesInTopologicalOrder()) {
+			if (!ec.isInternal() && (ec.getGraphClass() == gc)) {
+				if (ec.isBinary()) {
+					code.addNoIndent(createGraphElementClass(ec, "BinaryEdge"));
+				} else {
+					code.addNoIndent(createGraphElementClass(ec, "Edge"));					
+				}
+			}
+		}
+		return code;
+	}
+	
+
+	/**
+	 * Generates the code snippet to create the metaclass gec in the schema as soon as the 
+	 * schema-impl is loaded. 
+	 * @param gec the MetaClass to be generated
+	 * @param typeName the name of the type of the MetaClass, i.e. Vertex or Edge
+	 * @return
+	 */
+	private CodeBlock createGraphElementClass(GraphElementClass<?,?,?,?> gec, String typeName ) {
+		CodeList code = new CodeList();
+		code.setVariable("gecName", gec.getQualifiedName());
+		code.setVariable("gecVariable", "gec");
+		code.setVariable("gecType", typeName);
+		code.setVariable("schemaVariable", gec.getVariableName());
+		code.setVariable("gecAbstract", gec.isAbstract() ? "true" : "false");
 		code.addNoIndent(new CodeSnippet(
-				true,
-				"{",
-				"\tVertexClass #vcVariable# = #schemaVariable# = #gcVariable#.createVertexClass(\"#vcName#\");",
-				"\t#vcVariable#.setAbstract(#vcAbstract#);"));
-		for (AttributedElementClass superClass : vc.getDirectSuperClasses()) {
+						true,
+						"{",
+						"\t#gecType#Class #gecVariable# = #schemaVariable# = gc.create#gecType#Class(\"#gecName#\");",
+						"\t#gecVariable#.setAbstract(#gecAbstract#);",
+						"\tif (!#gecVariable#.isAbstract())",
+						"\t\tregisterClassId(#gecVariable#);"));
+		for (GraphElementClass<?,?,?,?> superClass : gec.getDirectSuperClasses()) {
 			if (superClass.isInternal()) {
 				continue;
 			}
 			CodeSnippet s = new CodeSnippet(
-					"#vcVariable#.addSuperClass(#superClassName#);");
+					"#gecVariable#.addSuperClass(#superClassName#);");
 			s.setVariable("superClassName", superClass.getVariableName());
 			code.add(s);
 		}
-		code.add(createAttributes(vc));
-		code.add(createConstraints(vc));
-		code.add(createComments("vc", vc));
+		code.add(createAttributes(gec));
+		code.add(createConstraints(gec));
+		code.add(createComments("gec", gec));
 		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
 
-	private CodeBlock createAttributes(AttributedElementClass aec) {
+	private CodeBlock createAttributes(AttributedElementClass<?, ?> aec) {
 		CodeList code = new CodeList();
 		for (Attribute attr : aec.getOwnAttributeList()) {
 			CodeSnippet s = new CodeSnippet(
 					false,
-					"#aecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
+					"#gecVariable#.addAttribute(createAttribute(\"#attrName#\", getDomain(\"#domainName#\"), getAttributedElementClass(\"#aecName#\"), #defaultValue#));");
 			s.setVariable("attrName", attr.getName());
 			s.setVariable("domainName", attr.getDomain().getQualifiedName());
 			s.setVariable("aecName", aec.getQualifiedName());
 			if (attr.getDefaultValueAsString() == null) {
 				s.setVariable("defaultValue", "null");
 			} else {
-				// quote double quotes
-				String defaultValue = attr.getDefaultValueAsString()
-						.replaceAll("([\\\"])", "\\\\$1");
-				// don't confuse code generator with # characters contained in
-				// default values
-				defaultValue = defaultValue.replaceAll("#", "\\u0023");
-				s.setVariable("defaultValue", "\"" + defaultValue + "\"");
+				s.setVariable("defaultValue", "\""
+						+ attr.getDefaultValueAsString().replaceAll("([\\\"])",
+								"\\\\$1") + "\"");
 			}
 			code.addNoIndent(s);
 		}
 		return code;
 	}
 
-	private CodeBlock createConstraints(AttributedElementClass aec) {
+	private CodeBlock createConstraints(TypedElementClass<?, ?> aec) {
 		CodeList code = new CodeList();
 		for (Constraint constraint : aec.getConstraints()) {
 			addImports("#jgSchemaImplPackage#.ConstraintImpl");
@@ -646,7 +703,8 @@ public class SchemaCodeGenerator extends CodeGenerator {
 			if (dom instanceof ListDomain) {
 				s.setVariable("componentDomainName", ((ListDomain) dom)
 						.getBaseDomain().getQualifiedName());
-				s.add("createListDomain(getDomain(\"#componentDomainName#\"));");
+				s
+						.add("createListDomain(getDomain(\"#componentDomainName#\"));");
 			} else if (dom instanceof SetDomain) {
 				s.setVariable("componentDomainName", ((SetDomain) dom)
 						.getBaseDomain().getQualifiedName());
@@ -657,11 +715,13 @@ public class SchemaCodeGenerator extends CodeGenerator {
 						.getQualifiedName());
 				s.setVariable("valueDomainName", mapDom.getValueDomain()
 						.getQualifiedName());
-				s.add("createMapDomain(getDomain(\"#keyDomainName#\"), getDomain(\"#valueDomainName#\"));");
+				s
+						.add("createMapDomain(getDomain(\"#keyDomainName#\"), getDomain(\"#valueDomainName#\"));");
 			} else if (dom instanceof RecordDomain) {
 				addImports("#jgSchemaPackage#.RecordDomain");
-				s.add("{",
-						"\tRecordDomain dom = createRecordDomain(\"#domName#\");");
+				s
+						.add("{",
+								"\tRecordDomain dom = createRecordDomain(\"#domName#\");");
 				RecordDomain rd = (RecordDomain) dom;
 				for (RecordComponent c : rd.getComponents()) {
 					s.add("\tdom.addComponent(\"" + c.getName()

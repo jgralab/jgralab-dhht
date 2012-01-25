@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -58,16 +54,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralab.impl.InternalVertex;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralabtest.tools.RandomBufferGeneric;
 
 @RunWith(Parameterized.class)
@@ -77,8 +66,8 @@ public class IncidenceListTest extends InstanceTest {
 	private static final int RANDOM_TEST_AMOUNT = 2;
 	private static final int NODE_COUNT = 10;
 
-	public IncidenceListTest(ImplementationType implementationType, String dbURL) {
-		super(implementationType, dbURL);
+	public IncidenceListTest(ImplementationType implementationType) {
+		super(implementationType);
 	}
 
 	@Parameters
@@ -106,7 +95,11 @@ public class IncidenceListTest extends InstanceTest {
 					.createMinimalGraphWithTransactionSupport(V, E);
 			break;
 		case DATABASE:
-			g = createMinimalGraphWithDatabaseSupport();
+			g = this.createMinimalGraphWithDatabaseSupport();
+			break;
+		case SAVEMEM:
+			g = MinimalSchema.instance().createMinimalGraphWithSavememSupport(
+					V, E);
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -124,17 +117,24 @@ public class IncidenceListTest extends InstanceTest {
 
 	private MinimalGraph createMinimalGraphWithDatabaseSupport() {
 		dbHandler.connectToDatabase();
-		dbHandler.clearAllTables();
 		dbHandler.loadMinimalSchemaIntoGraphDatabase();
-		return dbHandler.createMinimalGraphWithDatabaseSupport(
-				"IncidenceListTest", V, E);
+		return dbHandler.createMinimalGraphWithDatabaseSupport("IncidenceListTest",
+				V, E);
 	}
 
 	@After
 	public void tearDown() {
 		if (implementationType == ImplementationType.DATABASE) {
-			dbHandler.closeGraphdatabase();
+			this.cleanAndCloseDatabase();
 		}
+	}
+
+	private void cleanAndCloseDatabase() {
+		dbHandler.cleanDatabaseOfTestGraph(g);
+		dbHandler.cleanDatabaseOfTestGraph("IncidenceListTest.testSortIncidences");
+		// TODO, this does not seem to work
+		dbHandler.cleanDatabaseOfTestSchema(MinimalSchema.instance());
+		dbHandler.closeGraphdatabase();
 	}
 
 	@Test
@@ -155,7 +155,7 @@ public class IncidenceListTest extends InstanceTest {
 		assertEquals(e1, nodes[0].getFirstIncidence());
 		assertEquals(e1, nodes[0].getLastIncidence());
 		assertEquals(e1.getReversedEdge(), nodes[1].getFirstIncidence());
-		assertEquals(e1.getReversedEdge(), nodes[1].getLastIncidence());
+		assertEquals(e1.getReversedEdge(), nodes[1].getFirstIncidence());
 		assertEquals(1, nodes[0].getDegree());
 		assertEquals(1, nodes[0].getDegree(EdgeDirection.INOUT));
 		assertEquals(1, nodes[0].getDegree(EdgeDirection.OUT));
@@ -177,7 +177,7 @@ public class IncidenceListTest extends InstanceTest {
 		assertEquals(e1, nodes[0].getFirstIncidence());
 		assertEquals(e2.getReversedEdge(), nodes[0].getLastIncidence());
 		assertEquals(e1.getReversedEdge(), nodes[1].getFirstIncidence());
-		assertEquals(e1.getReversedEdge(), nodes[1].getLastIncidence());
+		assertEquals(e1.getReversedEdge(), nodes[1].getFirstIncidence());
 		assertEquals(3, nodes[0].getDegree());
 		assertEquals(3, nodes[0].getDegree(EdgeDirection.INOUT));
 		assertEquals(2, nodes[0].getDegree(EdgeDirection.OUT));
@@ -232,13 +232,17 @@ public class IncidenceListTest extends InstanceTest {
 	private String getISeq(Vertex v) {
 		StringBuilder sb = new StringBuilder();
 		for (Edge e : v.incidences()) {
-			sb.append('e').append(e.getId()).append(' ');
+			sb.append('e').append(e.getGlobalId()).append(' ');
 		}
 		return sb.toString().trim();
 	}
 
 	@Test
 	public void putEdgeBeforeTest() throws Exception {
+		// TODO remove when problem is resolved
+		// if(implementationType == ImplementationType.SAVEMEM){
+		// fail("testcase creates an infinite loop.");
+		// }
 		createTransaction(g);
 		createRandomEdges();
 		commit(g);
@@ -446,13 +450,35 @@ public class IncidenceListTest extends InstanceTest {
 
 	@Test
 	public void testSortIncidences() throws CommitFailedException {
+		MinimalGraph g = null;
+		switch (implementationType) {
+		case STANDARD:
+			g = MinimalSchema.instance().createMinimalGraph(V, E);
+			break;
+		case TRANSACTION:
+			g = MinimalSchema.instance()
+					.createMinimalGraphWithTransactionSupport(V, E);
+			break;
+		case DATABASE:
+			g = dbHandler.createMinimalGraphWithDatabaseSupport(
+					"IncidenceListTest.testSortIncidences", V, E);
+			break;
+		case SAVEMEM:
+			g = MinimalSchema.instance().createMinimalGraphWithSavememSupport(
+					V, E);
+			break;
+		default:
+			fail("Implementation " + implementationType
+					+ " not yet supported by this test.");
+		}
+
 		Node[] nodes = new Node[NODE_COUNT];
 
 		createTransaction(g);
 		Node isolated = g.createNode();
 		commit(g);
 
-		final GraphMarker<Integer> marker = new GraphMarker<Integer>(g);
+		final LocalGenericGraphMarker<Integer> marker = new LocalGenericGraphMarker<Integer>(g);
 		Comparator<Edge> comp = new Comparator<Edge>() {
 
 			@Override
@@ -505,13 +531,12 @@ public class IncidenceListTest extends InstanceTest {
 			markInOrder(links, marker);
 
 			createTransaction(g);
-			long version = ((InternalVertex) nodes[0]).getIncidenceListVersion();
+			long version = nodes[0].getIncidenceListVersion();
 			nodes[0].sortIncidences(comp);
 			commit(g);
 
 			createReadOnlyTransaction(g);
-			assertEquals(version, ((InternalVertex) nodes[0])
-					.getIncidenceListVersion());
+			assertEquals(version, nodes[0].getIncidenceListVersion());
 			checkInOrder(nodes, links);
 			commit(g);
 
@@ -529,13 +554,12 @@ public class IncidenceListTest extends InstanceTest {
 			// reset state and check if it is correct
 			markInOrder(links, marker);
 			createTransaction(g);
-			version = ((InternalVertex) nodes[0]).getIncidenceListVersion();
+			version = nodes[0].getIncidenceListVersion();
 			nodes[0].sortIncidences(comp);
 			commit(g);
 
 			createReadOnlyTransaction(g);
-			assertTrue(version < ((InternalVertex) nodes[0])
-					.getIncidenceListVersion());
+			assertTrue(version < nodes[0].getIncidenceListVersion());
 			checkInOrder(nodes, links);
 			commit(g);
 
@@ -587,13 +611,13 @@ public class IncidenceListTest extends InstanceTest {
 		}
 	}
 
-	private void markInOrder(List<Link> links, final GraphMarker<Integer> marker) {
+	private void markInOrder(List<Link> links, final LocalGenericGraphMarker<Integer> marker) {
 		for (int i = 0; i < links.size(); i++) {
 			marker.mark(links.get(i), i);
 		}
 	}
 
-	private void markInverse(List<Link> links, final GraphMarker<Integer> marker) {
+	private void markInverse(List<Link> links, final LocalGenericGraphMarker<Integer> marker) {
 		for (int i = 0; i < links.size(); i++) {
 			marker.mark(links.get(i), links.size() - i);
 		}

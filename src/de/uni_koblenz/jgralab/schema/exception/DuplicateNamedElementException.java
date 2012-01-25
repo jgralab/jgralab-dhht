@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,10 +30,10 @@
  */
 package de.uni_koblenz.jgralab.schema.exception;
 
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 
 /**
- * Thrown when trying to create a {@link NamedElement} which has a qualified
+ * Thrown when trying to create a {@link NamedElementClass} which has a qualified
  * name that equals the qualified name of another schema element.
  * 
  * @author ist@uni-koblenz.de

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,8 +31,7 @@
 
 package de.uni_koblenz.jgralab.schema;
 
-import java.util.Set;
-
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -44,47 +39,10 @@ import de.uni_koblenz.jgralab.Vertex;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface VertexClass extends GraphElementClass {
+public interface VertexClass extends GraphElementClass<VertexClass, Vertex, EdgeClass, Edge> {
 
 	public final static String DEFAULTVERTEXCLASS_NAME = "Vertex";
 
-	/**
-	 * adds a superclass to the list of superclasses, all attributes get
-	 * inherited from those classes
-	 * 
-	 * @param superClass
-	 *            the vertex class to be added to the list of superclasses
-	 * 
-	 */
-	public void addSuperClass(VertexClass superClass);
 
-	// public Set<IncidenceClass> getOwnInIncidenceClasses();
-
-	// public Set<IncidenceClass> getOwnOutIncidenceClasses();
-
-	public Set<IncidenceClass> getAllInIncidenceClasses();
-
-	public Set<IncidenceClass> getAllOutIncidenceClasses();
-
-	public Set<IncidenceClass> getValidFromFarIncidenceClasses();
-
-	public Set<IncidenceClass> getValidToFarIncidenceClasses();
-
-	// public Set<IncidenceClass> getOwnAndInheritedFarIncidenceClasses();
-
-	public void addInIncidenceClass(IncidenceClass ic);
-
-	public void addOutIncidenceClass(IncidenceClass ic);
-
-	@Override
-	public Class<? extends Vertex> getSchemaClass();
-
-	public Set<EdgeClass> getValidToEdgeClasses();
-
-	public Set<EdgeClass> getValidFromEdgeClasses();
-
-	public Set<EdgeClass> getConnectedEdgeClasses();
-
-	public Set<EdgeClass> getOwnConnectedEdgeClasses();
 
 }

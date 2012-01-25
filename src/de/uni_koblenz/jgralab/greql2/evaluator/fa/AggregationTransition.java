@@ -42,9 +42,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
@@ -280,18 +277,11 @@ public class AggregationTransition extends Transition {
 				}
 			}
 		}
-		if (rolesOnly) {
-			if (!acceptedByRole) {
-				return false;
-			}
-		} else {
-			if (!acceptedByRole) {
-				AttributedElementClass edgeClass = e
-						.getAttributedElementClass();
-				if (!typeCollection.acceptsType(edgeClass)) {
-					return false;
-				}
-			}
+
+		// checks if a edgeTypeRestriction is set and if e has the right type
+		AttributedElementClass edgeClass = e.getMetaClass();
+		if (!typeCollection.acceptsType(edgeClass)) {
+			return false;
 		}
 
 		// checks if a boolean expression exists and if it evaluates to true

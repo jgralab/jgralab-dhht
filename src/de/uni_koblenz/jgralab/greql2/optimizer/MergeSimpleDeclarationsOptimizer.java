@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,18 +35,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTargetExprOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.impl.InternalEdge;
 
 /**
  * This {@link MergeSimpleDeclarationsOptimizer} finds and merges all
@@ -120,11 +108,12 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 			IsSimpleDeclOf isSimpleDeclOf = decl
 					.getFirstIsSimpleDeclOfIncidence(EdgeDirection.IN);
 			while (isSimpleDeclOf != null) {
-				SimpleDeclaration sDecl = isSimpleDeclOf.getAlpha();
-				String key = decl.getId()
+				SimpleDeclaration sDecl = (SimpleDeclaration) isSimpleDeclOf
+						.getAlpha();
+				String key = decl.getUid()
 						+ "-"
 						+ sDecl.getFirstIsTypeExprOfIncidence(EdgeDirection.IN)
-								.getAlpha().getId();
+								.getAlpha().getUid();
 				if (mergableSDMap.containsKey(key)) {
 					// We've found another SimpleDeclaration with the same type
 					// expression under the current Declaration, thus we add it
@@ -136,8 +125,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 					simpleDecls.add(sDecl);
 					mergableSDMap.put(key, simpleDecls);
 				}
-				isSimpleDeclOf = isSimpleDeclOf
-						.getNextIsSimpleDeclOfIncidence();
+				isSimpleDeclOf = isSimpleDeclOf.getNextIsSimpleDeclOf();
 			}
 			decl = decl.getNextDeclaration();
 		}
@@ -156,7 +144,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 		for (Entry<String, ArrayList<SimpleDeclaration>> e : mergableSDMap
 				.entrySet()) {
 			SimpleDeclaration survivor = e.getValue().get(0);
-			Declaration decl = survivor.getFirstIsSimpleDeclOfIncidence()
+			Declaration decl = (Declaration) survivor.getFirstIsSimpleDeclOfIncidence()
 					.getOmega();
 			IsSimpleDeclOf isSDOfSurvivor = survivor
 					.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT);
@@ -174,8 +162,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 							+ survivor + ".");
 
 					while (s.getFirstIsDeclaredVarOfIncidence() != null) {
-						((InternalEdge) s.getFirstIsDeclaredVarOfIncidence())
-								.setOmega(survivor);
+						s.getFirstIsDeclaredVarOfIncidence().setOmega(survivor);
 					}
 
 					// merge the sourcePositions
@@ -212,10 +199,10 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 		IsSimpleDeclOf edge = decl.getFirstIsSimpleDeclOfIncidence();
 		while (edge != null) {
 			if (edge.getNormalEdge() != isSDOfSurvivor) {
-				edge = edge.getNextIsSimpleDeclOfIncidence();
+				edge = edge.getNextIsSimpleDeclOf();
 				continue;
 			}
-			IsSimpleDeclOf nextEdge = edge.getNextIsSimpleDeclOfIncidence();
+			IsSimpleDeclOf nextEdge = edge.getNextIsSimpleDeclOf();
 			if ((nextEdge != null) && (nextEdge.getNormalEdge() == isSDOfS)) {
 				return true;
 			} else {

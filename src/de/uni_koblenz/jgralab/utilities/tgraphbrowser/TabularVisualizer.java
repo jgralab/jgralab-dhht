@@ -40,12 +40,12 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.pcollections.PSet;
-
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.GraphIOException;
+iimport org.pcollections.PSet;
+
+mport de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -66,27 +66,23 @@ public class TabularVisualizer {
 	 *            if elements is null, the currently selected elements are
 	 *            filtered.
 	 */
-	public void calculateVertexListAndEdgeList(State state,
-			PSet<GraphElement> elements) {
+	public void calculateVertexListAndEdgeList(State state, JValueSet elements) {
 		ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-		ArrayList<Edge> edges = new ArrayList<Edge>();
-		for (GraphElement jv : elements) {
+		ArrayList<Edge> edges = 	public void calculateVertexListAndEdgeList(State state,
+			PSet<GraphElement> elements) {
+			Vertex v = jv.toVertex();
+				if (state.selectedVertexClasses.get(v
+						.getMetaClass())) {
+					vertices.add(v)		for (GraphElement jv : elements) {
 			if (jv instanceof Vertex) {
 				Vertex v = (Vertex) jv;
-				if (state.selectedVertexClasses.get(v
-						.getAttributedElementClass())) {
-					vertices.add(v);
-				}
-			} else {
-				Edge e = (Edge) jv;
-				if (state.selectedEdgeClasses
-						.get(e.getAttributedElementClass())) {
+	.get(e.getMetaClass())) {
 					edges.add(e);
 				}
 			}
 		}
-		state.verticesOfTableView = vertices.isEmpty() ? null : vertices
-				.toArray(new Vertex[0]);
+		state.verticesOfTableView = vertices.isEmpty() ? null : 				Edge e = (Edge) jv;
+Vertex[0]);
 		state.edgesOfTableView = edges.isEmpty() ? null : edges
 				.toArray(new Edge[0]);
 	}
@@ -101,25 +97,30 @@ public class TabularVisualizer {
 	public void calculateVertexListAndEdgeList(State state) {
 		StringBuilder query = new StringBuilder();
 		// calculate the list of vertices
-		query.append("V").append(state.getVertexTypeSet());
+		query.append("V{");
+		boolean first = true;
+		for (VertexClass type : state.selectedVertexClasses.keySet()) {
+			query.append(!first ? ", " : "").append(
+					state.selectedVertexC		query.append("V").append(state.getVertexTypeSet());
 		@SuppressWarnings("unchecked")
 		PSet<Vertex> vertices = (PSet<Vertex>) StateRepository.evaluateGReQL(
 				query.toString(), state.getGraph(), null);
 		state.verticesOfTableView = new Vertex[vertices.size()];
-		int i = 0;
 		for (Vertex v : vertices) {
 			state.verticesOfTableView[i++] = v;
-		}
-		// calculate the list of edges
-		query = new StringBuilder("E");
+der("E{");
+		first = true;
+		for (EdgeClass type : state.selectedEdge		query = new StringBuilder("E");
 		query.append(state.getEdgeTypeSet());
 		@SuppressWarnings("unchecked")
 		PSet<Edge> edges = (PSet<Edge>) StateRepository.evaluateGReQL(
 				query.toString(), state.getGraph(), null);
 		state.edgesOfTableView = new Edge[edges.size()];
-		i = 0;
 		for (Edge e : edges) {
 			state.edgesOfTableView[i++] = e;
+jv.isEdge()) {
+				state.edgesOfTableView[i++] = jv.toEdge();
+			}
 		}
 	}
 
@@ -148,14 +149,13 @@ public class TabularVisualizer {
 			int numberPerPage, boolean showAttributes, String elementId,
 			boolean jumpToElement, boolean createLinks) {
 		boolean isVertex = elementId.startsWith("v");
-		// set currentVertex or currentEdge to the current element
-		code.append("current")
+		// set currentVertex or curr		code.append("current")
 				.append(elementId.charAt(0) == 'v' ? "Vertex" : "Edge")
 				.append(" = \"").append(elementId).append("\";\n");
-		// delete old content
-		code.append("var parent = document.getElementById(\"divText")
+nd(elementId).append("\"		code.append("var parent = document.getElementById(\"divText")
 				.append(elementId.charAt(0) == 'v' ? "Vertex" : "Edge")
 				.append("\");\nparent.innerHTML = \"\";\n");
+nparent.innerHTML = \"\";\n");
 		// check if there are elements
 		if ((isVertex ? state.getGraph().getVCount() : state.getGraph()
 				.getECount()) == 0) {
@@ -166,23 +166,22 @@ public class TabularVisualizer {
 					.append(isVertex ? "vertices" : "edges").append(".\";\n");
 			code.append("divText.appendChild(h1);\n");
 			return;
-		}
-		// print number of elements
-		code.append("document.getElementById(\"h3HowManyElements\").style.display = \"none\";\n");
+		}		code.append("document.getElementById(\"h3HowManyElements\").style.display = \"none\";\n");
 		code.append("document.getElementById(\"h3HowManyVertices\").style.display = areVerticesShown() ? \"block\" : \"none\";\n");
 		code.append("document.getElementById(\"h3HowManyEdges\").style.display = areVerticesShown() ? \"none\" : \"block\";\n");
 		code.append("document.getElementById(\"h3")
 				.append(isVertex ? "HowManyVertices" : "HowManyEdges")
 				.append("\").innerHTML = \"")
 				.append(isVertex ? (state.verticesOfTableView == null ? 0
-						: state.verticesOfTableView.length)
-						+ " of "
+erticesOfTableView == null ? 0
+						: state.verticesOfTableView.l						+ " of "
 						+ state.getGraph().getVCount() + " vertices"
+tices"
 						: (state.edgesOfTableView == null ? 0
 								: state.edgesOfTableView.length)
-								+ " of "
-								+ state.getGraph().getECount() + " edges")
+								+ " of "								+ state.getGraph().getECount() + " edges")
 				.append(" visible.\";\n");
+
 		if ((elementId.length() == 0)
 				|| (elementId.length() == 1)
 				|| (isVertex && ((state.verticesOfTableView == null) || (state.verticesOfTableView.length == 0)))
@@ -195,12 +194,12 @@ public class TabularVisualizer {
 		if ((isVertex ? state.selectedVertexClasses : state.selectedEdgeClasses)
 				.get((isVertex ? state.getGraph().getVertex(idOfElement)
 						: state.getGraph().getEdge(idOfElement))
-						.getAttributedElementClass())) {
+						.getMetaClass())) {
 			// try to find element if it's type wasn't deselected
 			for (int i = 0; i < (isVertex ? state.verticesOfTableView
 					: state.edgesOfTableView).length; i++) {
 				if ((isVertex ? state.verticesOfTableView
-						: state.edgesOfTableView)[i].getId() == idOfElement) {
+						: state.edgesOfTableView)[i].getGlobalId() == idOfElement) {
 					positionOfElementInArray = i;
 					break;
 				}
@@ -230,8 +229,8 @@ public class TabularVisualizer {
 			// create the navigation bar through the table pages
 			createNavigationThroughPages(code, isVertex ? "Vertex" : "Edge",
 					numberOfPages, numberOfPageWithElementOfId, true);
-		} else {
-			code.append("parent.appendChild(document.createElement(\"br\"));\n");
+		} els			code.append("parent.appendChild(document.createElement(\"br\"));\n");
+");
 			code.append("var divText").append(isVertex ? "Vertex" : "Edge")
 					.append(" = parent;\n");
 		}
@@ -242,13 +241,13 @@ public class TabularVisualizer {
 				isVertex ? state.verticesOfTableView : state.edgesOfTableView,
 				state.selectedVertexClasses, state.selectedEdgeClasses,
 				createLinks);
-		// color the element
-		Object elem = state.navigationHistory.get(state.insertPosition - 1);
+		// color th		Object elem = state.navigationHistory.get(state.insertPosition - 1);
+ion - 1);
 		String coloredElementId = "";
-		if (elem instanceof Vertex) {
-			coloredElementId = "v" + ((Vertex) elem).getId();
-		} else if (elem instanceof Edge) {
-			coloredElementId = "e" + ((Edge) elem).getId();
+		if (elem.isVertex()) {
+			coloredElementId = "v" + elem.toVertex().getPartialGraphId();
+		} else if (elem.isEdge()) {
+			coloredElementId = "e" + elem.toEdge().getPartialGraphId();
 		}
 		code.append("changeBackgroundColor(\"").append(coloredElementId)
 				.append("\");\n");
@@ -259,23 +258,25 @@ public class TabularVisualizer {
 		}
 
 		if (elementWasNotFound) {
-			// show message, that the graphelement could not be found.
-			code.append("if((").append(isVertex)
+			// show message, that the graphelement could not 			code.append("if((").append(isVertex)
 					.append(" && areVerticesShown()) || (").append(!isVertex)
 					.append(" && !areVerticesShown())){\n");
+))){\n");
 			code.append("alert(\"The ").append(isVertex ? "vertex " : "edge ")
 					.append(elementId).append(" could not be found");
 			if (!(isVertex ? state.selectedVertexClasses
 					: state.selectedEdgeClasses).get((isVertex ? state
 					.getGraph().getVertex(idOfElement) : state.getGraph()
-					.getEdge(idOfElement)).getAttributedElementClass())) {
+					.getEdge(idOfElement)).getMetaClass())) {
 				code.append(" because the type ")
-						.append((isVertex ? state.getGraph().getVertex(
-								idOfElement) : state.getGraph().getEdge(
-								idOfElement)).getAttributedElementClass()
-								.getQualifiedName()).append(" is deselected");
-			}
-			code.append(". \\nThat's why the first page of the current table is shown.\");\n");
+						.append(
+								(isVertex ? state.getGraph().getVertex(
+										idOfElement) : state.getGraph()
+										.getEdge(idOfElement))
+										.getMetaClass()
+										.getQualifiedName()).append(
+								" is deselecte			code.append(". \\nThat's why the first page of the current table is shown.\");\n");
+\");\n");
 			code.append("}\n");
 		}
 	}
@@ -310,27 +311,27 @@ public class TabularVisualizer {
 			GraphElement[] graphElements,
 			HashMap<VertexClass, Boolean> selectedVertexClasses,
 			HashMap<EdgeClass, Boolean> selectedEdgeClasses, boolean createLinks) {
-		// create table
-		code.append("var mainTable").append(typeInfix)
+				code.append("var mainTable").append(typeInfix)
 				.append(" = document.createElement(\"table\");\n");
-		// create tablehead
-		code.append("var table").append(typeInfix)
+"table\");\n");
+		// c		code.append("var table").append(typeInfix)
 				.append(" = document.createElement(\"thead\");\n");
+"thead\");\n");
 		code.append("mainTable").append(typeInfix).append(".appendChild(table")
 				.append(typeInfix).append(");\n");
 		// create head
-		code.append("var currentTr = document.createElement(\"tr\");\n");
-		code.append("table").append(typeInfix)
+		code.append("var currentTr = document.createElemen		code.append("table").append(typeInfix)
 				.append(".appendChild(currentTr);\n");
+urrentTr);\n");
 		createCell(code, true, typeInfix, false);
 		if (showAttributes) {
 			createCell(code, true, "Attributes", false);
 		}
 		createCell(code, true, "Incident "
 				+ (typeInfix.startsWith("E") ? "vertices" : "edges"), false);
-		// create tablebody
-		code.append("var table").append(typeInfix)
+		// c		code.append("var table").append(typeInfix)
 				.append(" = document.createElement(\"tbody\");\n");
+"tbody\");\n");
 		code.append("mainTable").append(typeInfix).append(".appendChild(table")
 				.append(typeInfix).append(");\n");
 		// create elements
@@ -340,22 +341,22 @@ public class TabularVisualizer {
 						: numberOfPageWithElementOfId * numberPerPage)); currentElementIndex++) {
 			GraphElement currentElement = graphElements[currentElementIndex];
 			code.append("var currentTr = document.createElement(\"tr\");\n");
-			code.append("currentTr.id = \"tr")
-					.append(currentElement instanceof Vertex ? "v" : "e")
-					.append(currentElement.getId()).append("\";\n");
-			code.append("table").append(typeInfix)
-					.append(".appendChild(currentTr);\n");
+			code.append("currentTr.id = \"tr").append(
+					currentElement instanceof Vertex ? "v" : "e").append(
+					currentElement.getGlobalId()).append("\";\n");
+			code.append("table").append(typeInfix).append(
+					".appendChild(currentTr);\n");
 			// create identifier td
 			createCell(code, false, createElement(currentElement), false);
 			code.append("currentTd.onclick = function(){\nclickOnElement(\"")
 					.append(currentElement instanceof Vertex ? "v" : "e")
-					.append(currentElement.getId()).append("\");\n}\n");
+					.append(currentElement.getGlobalId()).append("\");\n}\n");
 			// create jumpTo
 			if (createLinks) {
 				code.append("var anker = document.createElement(\"a\");\n");
-				code.append("anker.id = \"")
-						.append(currentElement instanceof Vertex ? "v" : "e")
-						.append(currentElement.getId()).append("\";\n");
+				code.append("anker.id = \"").append(
+						currentElement instanceof Vertex ? "v" : "e").append(
+						currentElement.getGlobalId()).append("\";\n");
 				code.append("currentTd.appendChild(anker);\n");
 			}
 			if (!showAttributes) {
@@ -371,8 +372,8 @@ public class TabularVisualizer {
 			// create incidence td
 			createCell(code, false, "", true);
 			if (currentElement instanceof Vertex) {
-				code.append("currentTd.id = \"td").append("v")
-						.append(currentElement.getId()).append("\";\n");
+				code.append("currentTd.id = \"td").append("v").append(
+						currentElement.getGlobalId()).append("\";\n");
 				createIncidentEdges(code, (Vertex) currentElement,
 						selectedEdgeClasses, selectedVertexClasses, 1, null);
 			} else {
@@ -381,10 +382,10 @@ public class TabularVisualizer {
 			}
 			code.append("currentTd.style.textAlign = \"left\";\n");
 		}
-		// append table
-		code.append("div").append(typeInfix)
+				code.append("div").append(typeInfix)
 				.append("Table.appendChild(mainTable").append(typeInfix)
 				.append(");\n");
+append(");\n");
 	}
 
 	/**
@@ -394,8 +395,8 @@ public class TabularVisualizer {
 	 * @return
 	 */
 	private String createElement(GraphElement currentElement) {
-		return currentElement.getAttributedElementClass().getUniqueName()
-				+ "<sub>" + Math.abs(currentElement.getId()) + "</sub>";
+		return currentElement.getMetaClass().getUniqueName()
+				+ "<sub>" + Math.abs(currentElement.getGlobalId()) + "</sub>";
 	}
 
 	/**
@@ -430,12 +431,12 @@ public class TabularVisualizer {
 		code.append(inToolTip ? (var == null ? "currentTd" : var)
 				+ ".title = \"" : "");
 		boolean first = true;
-		for (Attribute attr : currentElement.getAttributedElementClass()
+		for (Attribute attr : currentElement.getMetaClass()
 				.getAttributeList()) {
-			if (!first) {
-				code.append(inToolTip ? "\t"
+			if 				code.append(inToolTip ? "\t"
 						: (var == null ? "currentTd" : var)
 								+ ".appendChild(document.createElement(\"br\"));\n");
+\"));\n");
 			}
 			code.append(inToolTip ? "" : (var == null ? "currentTd" : var)
 					+ ".appendChild(document.createTextNode(\"");
@@ -443,12 +444,12 @@ public class TabularVisualizer {
 			try {
 				String content = currentElement
 						.writeAttributeValueToString(attr.getName());
-				content = Pattern.compile(Matcher.quoteReplacement("\\"))
-						.matcher(content)
+				content = Pattern.compile(Matcher.qu						.matcher(content)
 						.replaceAll(Matcher.quoteReplacement("\\\\"));
-				content = Pattern.compile(Matcher.quoteReplacement("\""))
-						.matcher(content)
+Replacement("\\\\"));
+				content = Pattern.compile(Matcher.						.matcher(content)
 						.replaceAll(Matcher.quoteReplacement("\\\""));
+teReplacement("\\\""));
 				code.append(content.equals("n") ? "null"
 						: content.equals("t") ? "true"
 								: content.equals("f") ? "false" : content);
@@ -484,32 +485,32 @@ public class TabularVisualizer {
 			HashMap<EdgeClass, Boolean> selectedEdgeClasses,
 			HashMap<VertexClass, Boolean> selectedVertexClasses,
 			int displayedPage, String vertexTdId) {
-		if (vertexTdId != null) {
-			code.append("var currentTd = document.getElementById(\"")
+					code.append("var currentTd = document.getElementById(\"")
 					.append(vertexTdId)
 					.append("\");\ncurrentTd.innerHTML = \"\";\n");
+Td.innerHTML = \"\";\n");
 		}
 		int numberOfEdges = 1;
 		boolean hasNoLeadingBr = false;
 		for (Edge e : currentVertex.incidences()) {
-			if (selectedEdgeClasses.get(e.getAttributedElementClass())) {
+			if (selectedEdgeClasses.get(e.getMetaClass())) {
 				// show all incidences whose type is selected
 				if ((numberOfEdges > (displayedPage - 1)
 						* NUMBER_OF_INCIDENCES_PER_PAGE)
 						&& (numberOfEdges <= displayedPage
 								* NUMBER_OF_INCIDENCES_PER_PAGE)) {
 					if (numberOfEdges > 1) {
-						// create <br />
-						code.append("currentTd.appendChild(document.createElement(\"br\"));\n");
+									code.append("currentTd.appendChild(document.createElement(\"br\"));\n");
+ment(\"br\"));\n");
 					} else {
 						hasNoLeadingBr = true;
 					}
 					// create entries for the first
 					// NUMBER_OF_INCIDENCES_PER_PAGE incident edges
-					code.append("var text = document.createElement(\"b\");\n");
-					code.append("text.appendChild(document.createTextNode(")
+					code.append("var text = documen					code.append("text.appendChild(document.createTextNode(")
 							.append(isOutgoingEdge(currentVertex, e) ? "String.fromCharCode(8594)"
 									: "String.fromCharCode(8592)")
+"String.fromCharCode(8592)")
 							.append("));\n");
 					code.append("text.style.fontSize = \"large\";\n");
 					code.append("currentTd.appendChild(text);\n");
@@ -517,24 +518,23 @@ public class TabularVisualizer {
 					code.append("currentTd.appendChild(text);\n");
 					code.append("var aE = document.createElement(\"a\");\n");
 					code.append("aE.href = \"javascript:showElement('e")
-							.append(Math.abs(e.getId())).append("');\";\n");
+							.append(Math.abs(e.getGlobalId())).append("');\";\n");
 					code.append("aE.innerHTML = \"").append(createElement(e))
 							.append("\";\n");
 					createAttributes(code, e.getNormalEdge(), true, "aE");
-					code.append("currentTd.appendChild(aE);\n");
-					code.append("currentTd.appendChild(document.createTextNode(\"}\"+String.fromCharCode(160)));\n");
+									code.append("currentTd.appendChild(document.createTextNode(\"}\"+String.fromCharCode(160)));\n");
+xtNode(\"}\"+String.fromCharCode(160)));\n");
 					AttributedElementClass qualName = e.getThat()
-							.getAttributedElementClass();
+							.getMetaClass();
 					if (selectedVertexClasses.get(qualName)) {
-						// if the type of that is selected, show it as link
-						code.append("var aThat = document.createElement(\"a\");\n");
+										code.append("var aThat = document.createElement(\"a\");\n");
+pend("var aThat = document.createElement(\"a\");\n");
 						code.append("aThat.href = \"javascript:showElement('v")
-								.append(e.getThat().getId()).append("');\";\n");
-					} else {
-						code.append("var aThat = document.createElement(\"span\");\n");
-					}
+								.append(e.getT						code.append("var aThat = document.createElement(\"span\");\n");
 					code.append("aThat.innerHTML= \"")
 							.append(createElement(e.getThat())).append("\";\n");
+rHTML= \"").append(
+							createElement(e.getThat())).append("\";\n");
 					code.append("currentTd.appendChild(aThat);\n");
 					createAttributes(code, e.getThat(), true, "aThat");
 				}
@@ -544,27 +544,26 @@ public class TabularVisualizer {
 		if (numberOfEdges - 1 > NUMBER_OF_INCIDENCES_PER_PAGE) {
 			// if there are more than NUMBER_OF_INCIDENCES_PER_PAGE
 			// incidences create a header to switch through the pages
-			if (hasNoLeadingBr) {
-				// crate leading br after the header if it doesn't exist yet
-				code.append("currentTd.insertBefore(document.createElement(\"br\"),currentTd.firstChild);\n");
+			if (hasNoLeadingB				code.append("currentTd.insertBefore(document.createElement(\"br\"),currentTd.firstChild);\n");
+sertBefore(document.createElement(\"br\"),currentTd.firstChild);\n");
 			}
 			numberOfEdges--;
 			int numberOfPages = numberOfEdges
 					/ NUMBER_OF_INCIDENCES_PER_PAGE
 					+ (numberOfEdges % NUMBER_OF_INCIDENCES_PER_PAGE == 0 ? 0
 							: 1);
-			createNavigationThroughPages(code, "v" + currentVertex.getId(),
-					numberOfPages, displayedPage, false);
-		}
-	}
-
-	/**
-	 * @param currentVertex
+			createNavigationThroughPages(code, "v" + currentV	 * @param currentVertex
 	 * @param e
 	 * @return
 	 */
 	private boolean isOutgoingEdge(Vertex currentVertex, Edge e) {
 		return e.isNormal() && e.getAlpha() == currentVertex;
+	}
+
+	/**
+ertex.getGlobalId(),
+					numberOfPages, displayedPage, false);
+		}
 	}
 
 	/**
@@ -580,44 +579,46 @@ public class TabularVisualizer {
 	private void createIncidentVertices(StringBuilder code, Edge currentEdge,
 			HashMap<VertexClass, Boolean> selectedVertexClasses) {
 		AttributedElementClass qualName = currentEdge.getAlpha()
-				.getAttributedElementClass();
+				.getMetaClass();
 		// create alpha-vertex
 		if (selectedVertexClasses.get(qualName)) {
 			// if the type of alpha is selected, show it as link
 			code.append("var aAlpha = document.createElement(\"a\");\n");
-			code.append("aAlpha.href = \"javascript:showElement('v")
-					.append(currentEdge.getAlpha().getId()).append("');\";\n");
+			code.append("aAlpha.href = \"javascript:showElement('v").append(
+					currentEdge.getAlpha().getCompleteGraphUid()).append("');\";\n");
 		} else {
 			code.append("var aAlpha = document.createElement(\"span\");\n");
 		}
-		code.append("aAlpha.innerHTML= \"")
+		code.append("aAlpha.innerHTML= \"").append(
+				createElement(currentEdge.getAlpha())).append("\";\n");
+			code.append("aAlpha.innerHTML= \"")
 				.append(createElement(currentEdge.getAlpha())).append("\";\n");
-		code.append("currentTd.appendChild(aAlpha);\n");
-		createAttributes(code, currentEdge.getAlpha(), true, "aAlpha");
+aAlpha");
 		// create -->
-		code.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
-		code.append("currentTd.appendChild(textNode);\n");
-		code.append("var textNode = document.createElement(\"b\");\n");
+		code
+				.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
+		code.append("c		code.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
+"b\");\n");
 		code.append("textNode.appendChild(document.createTextNode("
 				+ "String.fromCharCode(8594)));\n");
 		code.append("textNode.style.fontSize = \"large\";\n");
 		code.append("currentTd.appendChild(textNode);\n");
-		code.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
-		code.append("currentTd.appendChild(textNode);\n");
-		// create omega-vertex
-		qualName = currentEdge.getOmega().getAttributedElementClass();
+		code
+				.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
+		code.appe		code.append("var textNode = document.createTextNode(String.fromCharCode(160));\n");
+.getOmega().getMetaClass();
 		if (selectedVertexClasses.get(qualName)) {
 			// if the type of alpha is selected, show it as link
 			code.append("var aOmega = document.createElement(\"a\");\n");
-			code.append("aOmega.href = \"javascript:showElement('v")
-					.append(currentEdge.getOmega().getId()).append("');\";\n");
+			code.append("aOmega.href = \"javascript:showElement('v").append(
+					currentEdge.getOmega().getCompleteGraphUid()).append("');\";\n");
 		} else {
 			code.append("var aOmega = document.createElement(\"span\");\n");
 		}
-		code.append("aOmega.innerHTML= \"")
+		code.append("aOmega.innerHTML= \"").append(
+				createElement(currentEdge.getOmega())).append("		code.append("aOmega.innerHTML= \"")
 				.append(createElement(currentEdge.getOmega())).append("\";\n");
-		code.append("currentTd.appendChild(aOmega);\n");
-		createAttributes(code, currentEdge.getOmega(), true, "aOmega");
+), true, "aOmega");
 	}
 
 	/**
@@ -643,14 +644,13 @@ public class TabularVisualizer {
 			boolean isJavaScript) {
 		String infix = isHead ? "h" : "d";
 		// create th or td
-		code.append("var currentT").append(infix)
+		code.append("var currentT").append(infix).append(
+				" = document.createElement(\"t").append(i		code.append("var currentT").append(infix)
 				.append(" = document.createElement(\"t").append(infix)
 				.append("\");\n");
 		code.append("currentTr.appendChild(currentT").append(infix)
 				.append(");\n");
-		if (!isJavaScript) {
-			code.append("currentT").append(infix).append(".innerHTML=\"")
-					.append(content).append("\";\n");
+end(content).append("\";\n");
 		} else {
 			code.append(content);
 		}
@@ -676,80 +676,73 @@ public class TabularVisualizer {
 			String typeInfix, int numberOfPages, int displayedPage,
 			boolean isMainNavigation) {
 		if (isMainNavigation) {
-			code.append("var divText").append(typeInfix)
+			code.append("var divText").append(typeInfix).append(
+					" = document.getElementById(\"divText").a			code.append("var divText").append(typeInfix)
 					.append(" = document.getElementById(\"divText")
 					.append(typeInfix).append("\");\n");
-		}
-		// create div of headline
-		code.append("var div").append(typeInfix)
+ument.createElement(\"div\");\n"		code.append("var div").append(typeInfix)
 				.append("Headline = document.createElement(\"div\");\n");
-		code.append("div").append(typeInfix).append("Headline.id = \"div")
-				.append(typeInfix).append("Headline\";\n");
-		code.append("if(div").append(typeInfix)
+adline\";\n");
+		code.append("if(div").append(typeInfix).append(
+				"Headline.hasAttribute){\n");
+		code.append("div		code.append("if(div").append(typeInfix)
 				.append("Headline.hasAttribute){\n");
 		code.append("div").append(typeInfix)
 				.append("Headline.setAttribute(\"class\",\"divHeadline\");\n");
-		code.append("}else{\n");
-		code.append("div")
+"className\",\"divHeadline\		code.append("div")
 				.append(typeInfix)
 				.append("Headline.setAttribute(\"className\",\"divHeadline\");\n");
-		code.append("}\n");
-		if (isMainNavigation) {
-			code.append("divText").append(typeInfix).append(".appendChild(div")
+ppendChild(div")
 					.append(typeInfix).append("Headline);\n");
 		} else {
-			code.append("currentTd.insertBefore(div").append(typeInfix)
+			code.append("currentTd.insertBefore(div").append(typeInfix).append(
+					"Headline,currentTd.firstChild)			code.append("currentTd.insertBefore(div").append(typeInfix)
 					.append("Headline,currentTd.firstChild);\n");
+");\n");
+			code.append("div").append(typeInfix).append(
+					"Headline.appendChild(brheadline);\n");
 		}
-		if (isMainNavigation) {
-			// create br
-			code.append("var brheadline = document.createElement(\"br\");\n");
-			code.append("div").append(typeInfix)
+		// creat			code.append("div").append(typeInfix)
 					.append("Headline.appendChild(brheadline);\n");
-		}
-		// create a to beginning
-		code.append("var aToBeginning = document.createElement(\"a\");\n");
-		code.append("aToBeginning.href = \"javascript:")
+.append("aToBeginning.href = \"javascript:").append(
+				isMainNavigation ? "goToPage" : "goToInciden		code.append("aToBeginning.href = \"javascript:")
 				.append(isMainNavigation ? "goToPage" : "goToIncidentPage")
 				.append("(1")
 				.append(isMainNavigation ? "" : ",'\"+currentTd.id+\"'")
-				.append(");\";\n");
-		code.append("aToBeginning.innerHTML = \"&lt;&lt;\";\n");
-		code.append("div").append(typeInfix)
+end(typeInfix).append(
+				"Headline.appendChild(aToBeginning);\n");
+		// create 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(aToBeginning);\n");
-		// create a to previous
-		code.append("var aToPrevious = document.createElement(\"a\");\n");
-		code.append("aToPrevious.href = \"javascript:")
-				.append(isMainNavigation ? "goToPage" : "goToIncidentPage")
-				.append("(document.getElementById('inputPageNumber")
+	.append("aToPrevious.href = \"javascript:")
+				.append(isMainNavigation ? "goToPage" : "goToI		code.append("aToPrevious.href = \"javascript:")
+putPageNumber")
 				.append(typeInfix)
-				.append("').value==1?1:document.getElementById('inputPageNumber")
+				.append(
+						"').value==1?1:document.getElementById('inputPageNumber")
+				.append(typeInfix).				.append("').value==1?1:document.getElementById('inputPageNumber")
 				.append(typeInfix).append("').value-1")
 				.append(isMainNavigation ? "" : ",'\"+currentTd.id+\"'")
-				.append(");\";\n");
-		code.append("aToPrevious.innerHTML = String.fromCharCode(160)+String.fromCharCode(60)+String.fromCharCode(160);\n");
+fromCharCode(60		code.append("aToPrevious.innerHTML = String.fromCharCode(160)+String.fromCharCode(60)+String.fromCharCode(160);\n");
 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(aToPrevious);\n");
-		// create text " Page "
-		code.append("var textPage = document.createTextNode(String.fromCharCode(160)+\"Page\"+String.fromCharCode(160));\n");
+.fromCharCode(160)+\"		code.append("var textPage = document.createTextNode(String.fromCharCode(160)+\"Page\"+String.fromCharCode(160));\n");
 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(textPage);\n");
-		// create input-field
-		code.append("var inputPageNumber").append(typeInfix)
+
+				" = document.c		code.append("var inputPageNumber").append(typeInfix)
 				.append(" = document.createElement(\"input\");\n");
 		code.append("inputPageNumber").append(typeInfix)
 				.append(".id = \"inputPageNumber").append(typeInfix)
 				.append("\";\n");
 		code.append("inputPageNumber").append(typeInfix)
 				.append(".type = \"text\";\n");
-		code.append("inputPageNumber").append(typeInfix).append(".size = 6;\n");
-		code.append("inputPageNumber").append(typeInfix).append(".value = ")
+.append("inputPageNumber").append(typeInfix).append(".value = ")
 				.append(displayedPage).append(";\n");
-		code.append("inputPageNumber").append(typeInfix)
+		code.append("inputPageNumber").append(typeInfix).append(
+				".style.textAlign = \"r		code.append("inputPageNumber").append(typeInfix)
 				.append(".style.textAlign = \"right\";\n");
 		code.append("inputPageNumber")
-				.append(typeInfix)
-				.append(".onchange = function(){\nif(this.value<1){\nthis.value = 1;\n}else if(this.value>")
+nthis.value = 1;\n				.append(".onchange = function(){\nif(this.value<1){\nthis.value = 1;\n}else if(this.value>")
 				.append(numberOfPages)
 				.append("){\nthis.value = ")
 				.append(numberOfPages)
@@ -761,16 +754,15 @@ public class TabularVisualizer {
 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(inputPageNumber")
 				.append(typeInfix).append(");\n");
-		// create text "/xxx "
-		code.append(
+TextNode(Stri		code.append(
 				"var textMax = document.createTextNode(String.fromCharCode(160)+\"/")
-				.append(numberOfPages)
-				.append("\"+String.fromCharCode(160));\n");
-		code.append("div").append(typeInfix)
+\n");
+		code.append("div").append(typeInfix).append(
+				"Headline.a		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(textMax);\n");
-		// create a to next page
-		code.append("var aToNext = document.createElement(\"a\");\n");
-		code.append("aToNext.href = \"javascript:")
+nt.createElement(\"a\");\n");
+		code.append("aToNext.href = \"javascript:").append(
+				isMa		code.append("aToNext.href = \"javascript:")
 				.append(isMainNavigation ? "goToPage" : "goToIncidentPage")
 				.append("(document.getElementById('inputPageNumber")
 				.append(typeInfix).append("').value==").append(numberOfPages)
@@ -778,32 +770,25 @@ public class TabularVisualizer {
 				.append(":document.getElementById('inputPageNumber")
 				.append(typeInfix).append("').value*1+1")
 				.append(isMainNavigation ? "" : ",'\"+currentTd.id+\"'")
-				.append(");\";\n");
-		code.append("aToNext.innerHTML = String.fromCharCode(160)+String.fromCharCode(62)+String.fromCharCode(160);\n");
+= String.fromCha		code.append("aToNext.innerHTML = String.fromCharCode(160)+String.fromCharCode(62)+String.fromCharCode(160);\n");
 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(aToNext);\n");
-		// create a to end
-		code.append("var aToEnd = document.createElement(\"a\");\n");
-		code.append("aToEnd.href = \"javascript:")
+ent.createElement(\"a\");\n");
+		code.append("aToEnd.href = \"javascript:").appe		code.append("aToEnd.href = \"javascript:")
 				.append(isMainNavigation ? "goToPage" : "goToIncidentPage")
 				.append("(").append(numberOfPages)
 				.append(isMainNavigation ? "" : ",'\"+currentTd.id+\"'")
-				.append(");\";\n");
-		code.append("aToEnd.innerHTML = \"&gt;&gt;\";\n");
+erHTML = \"&gt;&gt;\";\n");
+		code.append("div").append(typeInfix).append(
 		code.append("div").append(typeInfix)
 				.append("Headline.appendChild(aToEnd);\n");
-		// create br
-		if (isMainNavigation) {
-			code.append("var brafterheadline = document.createElement(\"br\");\n");
-			code.append("brafterheadline.id = \"brToDelete").append(typeInfix)
+e
+					.append("var brafterheadline = doc			code.append("var brafterheadline = document.createElement(\"br\");\n");
+te").append(typeInfix)
 					.append("\";\n");
-			code.append("divText").append(typeInfix)
+			code.append("divText").append(typeInfi			code.append("divText").append(typeInfix)
 					.append(".appendChild(brafterheadline);\n");
-		}
-	}
-
-	/**
-	 * Creates the div for the table of the vertices or edges.
+table of the vertices or edges.
 	 * 
 	 * @param code
 	 * 
@@ -811,11 +796,11 @@ public class TabularVisualizer {
 	 */
 	private void createTableDiv(StringBuilder code, String typeInfix) {
 		// create div for table
-		code.append("var div").append(typeInfix)
+		code.append("var div").append(typeInfix		code.append("var div").append(typeInfix)
 				.append("Table = document.createElement(\"div\");\n");
 		code.append("div").append(typeInfix).append("Table.id = \"div")
 				.append(typeInfix).append("Table\";\n");
-		code.append("divText").append(typeInfix).append(".appendChild(div")
+).append(".appendChild(div")
 				.append(typeInfix).append("Table);\n");
 	}
 }

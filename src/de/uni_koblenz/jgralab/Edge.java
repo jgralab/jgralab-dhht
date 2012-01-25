@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,8 +31,10 @@
 
 package de.uni_koblenz.jgralab;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * represents a signed edge, has an orientation
@@ -44,329 +42,441 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface Edge extends GraphElement {
+public interface Edge extends GraphElement<EdgeClass, Edge, VertexClass, Vertex> {
 
 	/**
-	 * @return the next incidence object in iSeq of current vertex
-	 */
-	public Edge getNextIncidence();
-
-	/**
-	 * @return the previous incidence object in iSeq of current vertex
-	 */
-	public Edge getPrevIncidence();
-
-	/**
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence object in iSeq of current vertex
-	 */
-	public Edge getNextIncidence(EdgeDirection orientation);
-
-	/**
-	 * Gets the next incident edge at the current vertex, which has one of
-	 * <code>kinds</code> aggregation semantics at this (
-	 * <code>thisIncidence == true</code>) or that (
-	 * <code>thisIncidence == false</code>) side.
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
 	 * 
-	 * If no <code>kind</code> is given, it simply returns the first incident
-	 * edge.
-	 * 
-	 * @see Vertex#getFirstIncidence(boolean, AggregationKind...)
-	 * 
-	 * @param thisIncidence
-	 *            if true, <code>kinds</code> has to match the incidence at the
-	 *            current vertex, else it has to matche the incedence at the
-	 *            opposite vertex
-	 * @param kinds
-	 *            the acceptable aggregation kinds
-	 * @return the next incident edge at the current vertex, which has one of
-	 *         <code>kinds</code> aggregation semantics at this (
-	 *         <code>thisIncidence == true</code>) or that (
-	 *         <code>thisIncidence == false</code>) side.
-	 */
-	public Edge getNextIncidence(boolean thisIncidence,
-			AggregationKind... kinds);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass, boolean noSubclasses);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			boolean noSubclasses);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(EdgeClass anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
-
-	/**
-	 * @param anEdgeClass
-	 *            the edge class to search for
-	 * @param orientation
-	 *            the orientation the next incidence should have
-	 * @param noSubclasses
-	 *            if true, no subclasses are returned
-	 * @return the next incidence in iSeq where the corresponding edge is of
-	 *         explicit class anEdgeClass
-	 */
-	public Edge getNextIncidence(Class<? extends Edge> anEdgeClass,
-			EdgeDirection orientation, boolean noSubclasses);
-
-	/**
-	 * @return the "this" vertex object, that is the object this directed edge
-	 *         starts at
-	 */
-	public Vertex getThis();
-
-	/**
-	 * @return the "that" vertex object, that is the object this directed edge
-	 *         ends at
-	 */
-	public Vertex getThat();
-
-	/**
-	 * sets the alpha vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setAlpha(Vertex v);
-
-	/**
-	 * sets the omega vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setOmega(Vertex v);
-
-	/**
-	 * sets the this vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setThis(Vertex v);
-
-	/**
-	 * sets the that vertex to v
-	 * 
-	 * @param v
-	 *            a vertex
-	 */
-	void setThat(Vertex v);
-
-	/**
-	 * @return the rolename of the edge at the this-vertex
-	 */
-	public String getThisRole();
-
-	/**
-	 * @return the rolename of the edge at the that-vertex
-	 */
-	public String getThatRole();
-
-	/**
-	 * @return next edge in eSeq
+	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge();
 
-	/**
-	 * @return previous edge in eSeq
-	 */
-	public Edge getPrevEdge();
 
 	/**
+	 * Returns the previous {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
+	 * the sequence <code>null</code> is returned.
+	 * 
+	 * @return {@link Edge}
+	 */
+	public Edge getPreviousEdge();
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param anEdgeClass
-	 * @return next edge of anEdgeClass or its superclasses in eSeq
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @return {@link Edge}
 	 */
 	public Edge getNextEdge(EdgeClass anEdgeClass);
 
 	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @return {@link Edge}
+	 */
+	public Edge getNextEdge(Class<? extends Edge> aM1EdgeClass);
+
+	/**
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
 	 * @param anEdgeClass
-	 * @return next edge of anEdgeClass or its superclasses in eSeq
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>anEdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public Edge getNextEdge(Class<? extends Edge> anEdgeClass);
+	public Edge getNextEdge(EdgeClass anEdgeClass, boolean noSubclasses);
 
 	/**
-	 * @return the alpha vertex of this edge
-	 */
-	public Vertex getAlpha();
-
-	/**
-	 * @return the omega vertex of this edge
-	 */
-	public Vertex getOmega();
-
-	/**
-	 * @param e
-	 * @return true if this edge is somewhere before e in the lambda sequence of
-	 *         the this-vertex
-	 */
-	public boolean isBeforeIncidence(Edge e);
-
-	/**
-	 * @param e
-	 * @return true if this edge is somewhere after e in the lambda sequence of
-	 *         the this-vertex
-	 */
-	public boolean isAfterIncidence(Edge e);
-
-	/**
-	 * @param e
-	 * @return true if this edge is somewhere before e in eSeq
-	 */
-	public boolean isBeforeEdge(Edge e);
-
-	/**
-	 * puts this edge immediately before e in eSeq
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
 	 * 
-	 * @param e
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>aM1EdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public void putBeforeEdge(Edge e);
+	public <T extends Edge> T getNextEdge(Class<T> aM1EdgeClass,
+			boolean noSubclasses);
 
 	/**
-	 * @param e
-	 * @return true if this edge is somewhere after e in eSeq
-	 */
-	public boolean isAfterEdge(Edge e);
-
-	/**
-	 * puts this edge immediately after anEdge in eSeq
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
 	 * 
-	 * @param e
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Edge}
 	 */
-	public void putAfterEdge(Edge e);
+	public Edge getNextEdge(Graph traversalContext);
 
 	/**
-	 * removes this edge from eSeq and erases its attributes @ if used on an
-	 * incidence
+	 * Returns the previous {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph}(eSeq). If this {@link Edge} is the beginning of
+	 * the sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Edge}
 	 */
-	public void delete();
+	public Edge getPreviousEdge(Graph traversalContext);
 
 	/**
-	 * puts this edge immediately before the given edge <code>e</code> in the
-	 * incidence list of the <code>this-vertex</code> of this edge. This does
-	 * neither affect the global edge sequence eSeq nor the alpha or omega
-	 * vertices, only the order of the edges at the <code>this-vertex</code> of
-	 * this edge is changed.
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anEdgeClass
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @return {@link Edge}
 	 */
-	public void putIncidenceBefore(Edge e);
+	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass);
 
 	/**
-	 * puts this edge after the after given edge <code>previousEdge</code> in
-	 * the incidence list of the <code>this-vertex</code> of this edge. This
-	 * does neither affect the global edge sequence eSeq nor the alpha or omega
-	 * vertices, only the order of the edges at the <code>this-vertex</code> of
-	 * this edge is changed.
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @return {@link Edge}
 	 */
-	public void putIncidenceAfter(Edge e);
+	public Edge getNextEdge(Graph traversalContext,
+			Class<? extends Edge> aM1EdgeClass);
 
 	/**
-	 * returns the normal edge of this edge
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param anEdgeClass
+	 *            {@link EdgeClass} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>anEdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public Edge getNormalEdge();
+	public Edge getNextEdge(Graph traversalContext, EdgeClass anEdgeClass,
+			boolean noSubclasses);
 
 	/**
-	 * returns the reversed edge of this edge, e.g. for the edge -1 the reversed
-	 * edge is 1, for the edge 1 the reversed edge is -1.
+	 * Returns the next {@link Edge} in the sequence of all edges in the
+	 * complete {@link Graph} (eSeq). If this {@link Edge} is the end of the
+	 * sequence <code>null</code> is returned.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aM1EdgeClass
+	 *            {@link Class} the next {@link Edge} should have
+	 * @param noSubclasses
+	 *            boolean if <code>true</code>, no edges which are an instance
+	 *            of a subclass of <code>aM1EdgeClass</code> are returned
+	 * @return {@link Edge}
 	 */
-	public Edge getReversedEdge();
+	public <T extends Edge> T getNextEdge(Graph traversalContext,
+			Class<T> aM1EdgeClass, boolean noSubclasses);
 
 	/**
-	 * returns true if this edge is the "normal" edge, false otherwise
+	 * Returns a sequence of all start vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public boolean isNormal();
+	public Iterable<Vertex> getAlphaVertices();
 
 	/**
-	 * @return the semantics of this edge, e.g. AggregationKind.NONE, SHARED or
-	 *         COMPOSITE
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public AggregationKind getAggregationKind();
+	public Iterable<Vertex> getAlphaVertices(VertexClass aVertexClass);
 
 	/**
-	 * @return the semantics of the alpha end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public AggregationKind getAlphaAggregationKind();
+	public <T extends Vertex> Iterable<T> getAlphaVertices(
+			Class<T> aVertexClass);
 
 	/**
-	 * @return the semantics of the omega end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * Returns a sequence of all start vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public AggregationKind getOmegaAggregationKind();
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext);
 
 	/**
-	 * @return the semantics of the this end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
-	public AggregationKind getThisAggregationKind();
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			VertexClass aVertexClass);
 
 	/**
-	 * @return the semantics of the that end of this edge, e.g.
-	 *         AggregationKind.NONE, SHARED or COMPOSITE
+	 * Returns a sequence of all start vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 * @throws RemoteException 
 	 */
-	public AggregationKind getThatAggregationKind();
+	public Iterable<Vertex> getAlphaVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices();
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public <T extends Vertex> Iterable<T> getOmegaVertices(
+			Class<T> aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
+			VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all end vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getOmegaVertices(Graph traversalContext,
+			Class<? extends Vertex> aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices.
+	 * 
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices();
+
+	/**
+	 * Returns a sequence of all incident vertices which are connected via an
+	 * {@link Incidence} of direction <code>dir</code>.
+	 * 
+	 * @param dir
+	 *            {Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Direction dir);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(VertexClass aVertexClass,
+			Direction direction);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public <T extends Vertex> Iterable<T> getIncidentVertices(
+			Class<T> aVertexClass, Direction direction);
+
+	/**
+	 * Returns a sequence of all incident vertices.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext);
+
+	/**
+	 * Returns a sequence of all incident vertices which are connected via an
+	 * {@link Incidence} of direction <code>dir</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param dir
+	 *            {Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			Direction dir);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link VertexClass}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public Iterable<Vertex> getIncidentVertices(Graph traversalContext,
+			VertexClass aVertexClass, Direction direction);
+
+	/**
+	 * Returns a sequence of all incident vertices which are an instance of
+	 * <code>aVertexClass</code> and are reachable via an {@link Incidence} of
+	 * direction <code>direction</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param aVertexClass
+	 *            {@link Class}
+	 * @param direction
+	 *            {@link Direction}
+	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
+	 */
+	public <T extends Vertex> Iterable<T> getIncidentVertices(Graph traversalContext,
+			Class<T> aVertexClass, Direction direction);
+
+	/**
+	 * Tests if this edge is a binary one (i.e., its edge class has only two
+	 * incidences both with multiplicity 1 for the number of vertices at the
+	 * edge)
+	 * 
+	 * @return true for binary edges, false otherwise
+	 */
+	public boolean isBinary();
 
 }

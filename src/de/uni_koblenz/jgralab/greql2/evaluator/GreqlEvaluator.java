@@ -82,9 +82,6 @@ import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
 import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
@@ -250,7 +247,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized PSet<Vertex> getVertexIndex(Graph graph,
 			String queryPart) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getId());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
 		if (ref == null) {
 			return null;
 		}
@@ -272,7 +269,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized void addVertexIndex(Graph graph,
 			String queryPart, PSet<Vertex> vertexSet) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getId());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
 		GraphIndex index = null;
 
 		if (ref != null) {
@@ -285,7 +282,7 @@ public class GreqlEvaluator {
 
 		if (index == null) {
 			index = new GraphIndex(graph);
-			graphIndizes.put(graph.getId(),
+			graphIndizes.put(graph.getUid(),
 					new SoftReference<GraphIndex>(index));
 		}
 		index.addVertexSet(queryPart, vertexSet);

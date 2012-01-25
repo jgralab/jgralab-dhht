@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,30 +31,33 @@
 
 package de.uni_koblenz.jgralab.schema.impl;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceDirection;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
-import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
-
-	private IncidenceClass from, to;
+public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge, VertexClass, Vertex>
+		implements EdgeClass {
 
 	static EdgeClass createDefaultEdgeClass(Schema schema) {
 		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
 		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
 		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
 		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
-				DEFAULTEDGECLASS_NAME, schema.getDefaultVertexClass(), 0,
-				Integer.MAX_VALUE, "", AggregationKind.NONE,
-				schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
-				AggregationKind.NONE);
+				DEFAULTEDGECLASS_NAME);
+		// , 0,
+		// Integer.MAX_VALUE, "", AggregationKind.NONE,
+		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
+		// AggregationKind.NONE);
 		ec.setAbstract(true);
 		return ec;
 	}
@@ -96,19 +95,8 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 	 *            unique way
 	 */
 	protected EdgeClassImpl(String simpleName, Package pkg,
-			GraphClass aGraphClass, VertexClass from, int fromMin, int fromMax,
-			String fromRoleName, AggregationKind aggrFrom, VertexClass to,
-			int toMin, int toMax, String toRoleName, AggregationKind aggrTo) {
+			GraphClass aGraphClass) {
 		super(simpleName, pkg, aGraphClass);
-		IncidenceClass fromInc = new IncidenceClassImpl(this, from,
-				fromRoleName, fromMin, fromMax, IncidenceDirection.OUT,
-				aggrFrom);
-		IncidenceClass toInc = new IncidenceClassImpl(this, to, toRoleName,
-				toMin, toMax, IncidenceDirection.IN, aggrTo);
-		this.from = fromInc;
-		this.to = toInc;
-		from.addOutIncidenceClass(fromInc);
-		to.addInIncidenceClass(toInc);
 		register();
 	}
 
@@ -124,100 +112,59 @@ public class EdgeClassImpl extends GraphElementClassImpl implements EdgeClass {
 	}
 
 	@Override
-	public void addSuperClass(EdgeClass superClass) {
-		checkIncidenceClassSpecialization(getFrom(), superClass.getFrom());
-		checkIncidenceClassSpecialization(getTo(), superClass.getTo());
-		super.addSuperClass(superClass);
-		((IncidenceClassImpl) getFrom()).addSubsettedIncidenceClass(superClass
-				.getFrom());
-		((IncidenceClassImpl) getTo()).addSubsettedIncidenceClass(superClass
-				.getTo());
+	public boolean isBinary() {
+		return false;
 	}
 
 	@Override
-	public IncidenceClass getFrom() {
-		return from;
+	public EdgeClass getDefaultClass() {
+		return graphClass.getSchema().getDefaultEdgeClass();
 	}
 
 	@Override
-	public IncidenceClass getTo() {
-		return to;
-	}
+	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder() {
+		ArrayList<IncidenceClass> topologicalOrderList = new ArrayList<IncidenceClass>();
+		HashSet<IncidenceClass> incidenceClassSet = new HashSet<IncidenceClass>();
 
-	/**
-	 * checks if the incidence classes own and inherited are compatible, i.e. if
-	 * the upper multiplicity of own is lower or equal than the one of inherited
-	 * and so on
-	 * 
-	 * @param special
-	 * @param general
-	 * @throws SchemaException
-	 *             upon illegal combinations
-	 */
-	public static void checkIncidenceClassSpecialization(
-			IncidenceClass special, IncidenceClass general) {
-		// Vertex same
-		if ((!general.getVertexClass().isSuperClassOfOrEquals(
-				special.getVertexClass()))) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class "
-							+ "is identical or a superclass of the own one. Offending EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " which wants to specialize "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
-		// Multiplicities
-		if (special.getMax() > general.getMax()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"The multiplicity of an edge class may not be larger than "
-							+ "the multiplicities of its superclass. Offending EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " and "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
+		incidenceClassSet.addAll(getIncidenceClasses());
 
-		// name clashes
-		if (general.getRolename().equals(special.getRolename())
-				&& !general.getRolename().isEmpty()
-				&& !special.getRolename().isEmpty()) {
-			String dir = special.getDirection() == IncidenceDirection.OUT ? "Alpha"
-					: "Omega";
-			throw new SchemaException(
-					"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
-							+ "EdgeClasses are "
-							+ special.getEdgeClass().getQualifiedName()
-							+ " and "
-							+ general.getEdgeClass().getQualifiedName()
-							+ " at end " + dir);
-		}
-		for (IncidenceClass ic : general.getSubsettedIncidenceClasses()) {
-			if (ic.getRolename().equals(special.getRolename())
-					&& !general.getRolename().isEmpty()
-					&& !ic.getRolename().isEmpty()) {
-				String dir = ic.getDirection() == IncidenceDirection.OUT ? "Alpha"
-						: "Omega";
-				throw new SchemaException(
-						"An IncidenceClass may only redefine (or subset) an IncidenceClass with a different name. Offending"
-								+ "EdgeClasses are "
-								+ special.getEdgeClass().getQualifiedName()
-								+ " and "
-								+ ic.getEdgeClass().getQualifiedName()
-								+ " at end " + dir);
+		// first only the incidence classes without a superclass at this edge
+		// class are in the topo list
+		for (IncidenceClass ic : getIncidenceClasses()) {
+			boolean specializedOwnIncClass = false;
+			for (IncidenceClass sc : ic.getAllSuperClasses()) {
+				if (sc.getEdgeClass() == this) {
+					specializedOwnIncClass = true;
+				}
+			}
+			if (!specializedOwnIncClass) {
+				topologicalOrderList.add(ic);
 			}
 		}
 
-	}
+		incidenceClassSet.removeAll(topologicalOrderList);
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Class<? extends Edge> getSchemaClass() {
-		return (Class<? extends Edge>) super.getSchemaClass();
+		// iteratively add classes from vertexClassSet,
+		// whose superclasses already are in topologicalOrderList,
+		// to topologicalOrderList
+		// the added classes are removed from vertexClassSet
+		while (!incidenceClassSet.isEmpty()) {
+			for (IncidenceClass ic : incidenceClassSet) {
+				Set<IncidenceClass> superclassesAtThisEdgeClass = new HashSet<IncidenceClass>();
+				for (IncidenceClass sc : ic.getDirectSuperClasses()) {
+					if (sc.getEdgeClass() == this) {
+						superclassesAtThisEdgeClass.add(sc);
+					}
+				}
+				//only superclasses at the same edge class
+				if (topologicalOrderList
+						.containsAll(superclassesAtThisEdgeClass)) {
+					topologicalOrderList.add(ic);
+				}
+			}
+			incidenceClassSet.removeAll(topologicalOrderList);
+		}
+		return topologicalOrderList;
 	}
 
 }

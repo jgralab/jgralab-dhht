@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,7 +34,6 @@ package de.uni_koblenz.jgralab.utilities.tg2gxl;
 //import gnu.getopt.Getopt;
 //import gnu.getopt.LongOpt;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,11 +47,10 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;
@@ -69,7 +63,6 @@ import de.uni_koblenz.jgralab.schema.LongDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.SetDomain;
-import de.uni_koblenz.jgralab.schema.StringDomain;
 import de.uni_koblenz.jgralab.utilities.tg2schemagraph.Schema2SchemaGraph;
 import de.uni_koblenz.jgralab.utilities.tg2whatever.Tg2Whatever;
 
@@ -144,7 +137,10 @@ public class Tg2GXL extends Tg2Whatever {
 	}
 
 	/**
-	 * starts the graph.
+	 * starts the graph. The M1 graph refers to its corresponding M2-graph
+	 * graphclass object. The M2 graph refers to the GXL-Metaschema. The name of
+	 * the M2-graph id does not matter anything, the name schemaName+"Graph" was
+	 * chosen for comprehensibility only.
 	 * 
 	 * @param out
 	 *            the output stream
@@ -157,24 +153,31 @@ public class Tg2GXL extends Tg2Whatever {
 		out.println("<gxl xmlns:xlink=\"" + xlink + "\">");
 
 		if (printSchema) {
-
 			out.println("<graph id=\""
-					+ uniqueGraphClassName
-					+ "Graph\" edgeids=\"true\" edgemode=\"directed\" hypergraph=\"false\">");
+							+ uniqueGraphClassName
+							+ "Graph\" edgeids=\" true\" edgemode=\" directed\" hypergraph=\" false\">");
 			out.println("<type xlink:href=\"" + gxlMetaSchema
-					+ "#gxl-1.0\" xlink:type=\"simple\"/>");
+					+ "#gxl-1.0\" xlink:type=\" simple\"/>");
 		} else {
 			out.println("<graph id=\""
-					+ graph.getId()
-					+ "\" edgeids=\"true\" edgemode=\"directed\" hypergraph=\"false\">");
+							+ graph.getCompleteGraphUid()
+							+ "\" edgeids=\" true\" edgemode=\" directed\" hypergraph=\" false\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ graph.getGraphClass().getQualifiedName()
-					+ "\" xlink:type=\"simple\"/>");
+					+ "\" xlink:type=\" simple\"/>");
 		}
 	}
 
 	/**
-	 * prints a vertex.
+	 * prints a vertex. All M1 vertices are identified by there Id and refer to
+	 * the <code>AttributedElementClassM2</code> object, identified by its
+	 * (unique) name. That is why M2 vertices are divided in two groups: 1.
+	 * <code>v instanceof AttributedElementClassM2</code> 2.
+	 * <code>!(v instanceof AttributedElementClassM2)</code> For 1. the vertex
+	 * name identifies id and for 2. the vertex Id identifies it. Anyway, the
+	 * <code>SchemaM2</code> vertex is ignored, as it has no correspondence in
+	 * the GXL-Metaschema.
+	 * 
 	 * 
 	 * @param out
 	 *            the output stream
@@ -183,28 +186,35 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	@Override
 	protected void printVertex(PrintStream out, Vertex v) {
-		AttributedElementClass elemClass = v.getAttributedElementClass();
-		if (printSchema && !(v instanceof Schema)) {
+		AttributedElementClass<?,?> elemClass = v.getMetaClass();
+		if (printSchema && !(v instanceof  de.uni_koblenz.jgralab.grumlschema.structure.Schema)) {
 
 			if (v instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
 				out.println("<node id=\"" + v.getAttribute("qualifiedName")
 						+ "\">");
 			} else {
-				out.println("<node id=\"v:" + v.getId() + "\">");
+				out.println("<node id=\"v:" + v.getGlobalId() + "\">");
 			}
 			out.println("<type xlink:href=\"" + gxlMetaSchema + "#"
 					+ grUML2GXL.get(elemClass.getQualifiedName())
-					+ "\" xlink:type=\"simple\"/>");
-			printAttributes(out, v);
+					+ "\" xlink:type=\" simple\"/>");
+			// print attributes
+			if (elemClass.getAttributeCount() > 0) {
+				printAttributes(out, v);
+			}
 			out.println("</node>");
 		}
 
 		else if (!printSchema) {
-			out.println("<node id=\"v:" + v.getId() + "\">");
+			out.println("<node id=\"v:" + v.getGlobalId() + "\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ elemClass.getQualifiedName()
-					+ "\" xlink:type=\"simple\"/>");
-			printAttributes(out, v);
+					+ "\" xlink:type=\" simple\"/>");
+
+			// print attributes
+			if (elemClass.getAttributeCount() > 0) {
+				printAttributes(out, v);
+			}
 			out.println("</node>");
 		}
 	}
@@ -219,7 +229,7 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	protected int getEdgeIncidence(Edge e, Vertex v) {
 		int i = 0;
-		for (Edge e0 : v.incidences()) {
+		for (Edge e0 : v.getIncidences()) {
 			if ((e0 == e) && (e0.isNormal() == e.isNormal())) {
 				return i;
 			}
@@ -229,7 +239,10 @@ public class Tg2GXL extends Tg2Whatever {
 	}
 
 	/**
-	 * prints an edge object.
+	 * prints an edge object. For the M1 graph, the incidence numbers of the
+	 * edge get printed, too. For the M2 graph, the (in GXL) undefined edges
+	 * <code>ContainsGraphClassM2</code> and
+	 * <code>HasRecordDomainComponentM2</code> are ignored anyway.
 	 * 
 	 * @param out
 	 *            the output stream
@@ -238,13 +251,13 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 	@Override
 	protected void printEdge(PrintStream out, Edge e) {
-		AttributedElementClass elemClass = e.getAttributedElementClass();
+		AttributedElementClass elemClass = e.getMetaClass();
 
 		if (printSchema
 				&& !(e instanceof de.uni_koblenz.jgralab.grumlschema.structure.DefinesGraphClass)
 				&& !(e instanceof HasRecordDomainComponent)) {
-			String thisVertex = "v:" + e.getThis().getId();
-			String thatVertex = "v:" + e.getThat().getId();
+			String thisVertex = "v:" + e.getThis().getCompleteGraphUid();
+			String thatVertex = "v:" + e.getThat().getCompleteGraphUid();
 
 			if (e.getThis() instanceof de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) {
 				thisVertex = ((de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass) e
@@ -255,27 +268,31 @@ public class Tg2GXL extends Tg2Whatever {
 						.getThat()).get_qualifiedName();
 			}
 
-			out.println("<edge id=\"e:" + e.getId() + "\" to=\"" + thatVertex
+			out.println("<edge id=\"e:" + e.getGlobalId() + "\" to=\"" + thatVertex
 					+ "\" from=\"" + thisVertex + "\">");
 			out.println("<type xlink:href=\"" + gxlMetaSchema + "#"
 					+ grUML2GXL.get(elemClass.getQualifiedName())
-					+ "\" xlink:type=\"simple\"/>");
+					+ "\" xlink:type=\" simple\"/>");
 
-			printAttributes(out, e);
+			// printAttributes
+			if (elemClass.getAttributeCount() > 0) {
+				printAttributes(out, e);
+			}
 			out.println("</edge>");
 		} else if (!printSchema) {
 			int toOrder = getEdgeIncidence(e.getReversedEdge(), e.getThat());
 			int fromOrder = getEdgeIncidence(e, e.getThis());
-			out.println("<edge id=\"e:" + e.getId() + "\" to=\"v:"
-					+ e.getThat().getId() + "\" from=\"v:"
-					+ e.getThis().getId() + "\" toorder=\" " + toOrder
+			out.println("<edge id=\"e:" + e.getGlobalId() + "\" to=\"v:"
+					+ e.getThat().getCompleteGraphUid() + "\" from=\"v:"
+					+ e.getThis().getCompleteGraphUid() + "\" toorder=\" " + toOrder
 					+ "\" fromorder=\" " + fromOrder + "\">");
 			out.println("<type xlink:href=\"" + schemaGraphOutputName + "#"
 					+ elemClass.getQualifiedName()
-					+ "\" xlink:type=\"simple\"/>");
-
-			printAttributes(out, e);
-
+					+ "\" xlink:type=\" simple\"/>");
+			// printAttributes
+			if (elemClass.getAttributeCount() > 0) {
+				printAttributes(out, e);
+			}
 			out.println("</edge>");
 		}
 	}
@@ -305,7 +322,8 @@ public class Tg2GXL extends Tg2Whatever {
 	 */
 
 	private void printAttributes(PrintStream out, AttributedElement elem) {
-		for (Attribute attr : elem.getAttributedElementClass()
+
+		for (Attribute attr : elem.getMetaClass()
 				.getAttributeList()) {
 
 			out.println("<attr name=\"" + attr.getName() + "\">");
@@ -336,44 +354,44 @@ public class Tg2GXL extends Tg2Whatever {
 			printValue(out, dom, val);
 		} else {
 			if (dom instanceof SetDomain) {
-				out.println("<set>");
+				out.println("<Set>");
 				if (val != null) {
 					for (Object o : (Set<?>) val) {
 						printComposite(out, ((SetDomain) dom).getBaseDomain(),
 								o);
 					}
 				}
-				out.println("</set>");
+				out.println("</Set>");
 			}
 			if (dom instanceof ListDomain) {
-				out.println("<list>");
+				out.println("<List>");
 				for (Object o : (List<?>) val) {
 					printComposite(out, ((ListDomain) dom).getBaseDomain(), o);
 				}
-				out.println("</list>");
+				out.println("</List>");
 			}
 			if (dom instanceof RecordDomain) {
-				out.println("<tup>");
-				out.println("<string>");
+				out.println("<Tup>");
+				out.println("<String>");
 				out.println("" + ((RecordDomain) dom).getQualifiedName());
-				out.println("</string>");
+				out.println("</String>");
 				Collection<RecordComponent> components = ((RecordDomain) dom)
 						.getComponents();
 				for (RecordComponent component : components) {
-					out.println("<tup>");
-					out.println("<string>");
+					out.println("<Tup>");
+					out.println("<String>");
 					out.println("" + stringQuote(component.getName()));
-					out.println("</string>");
+					out.println("</String>");
 					try {
-						printComposite(out, component.getDomain(),
-								val.getClass().getField(component.getName())
-										.get(val));
+						printComposite(out, component.getDomain(), val
+								.getClass().getField(component.getName()).get(
+										val));
 					} catch (Exception e) {
 
 					}
-					out.println("</tup>");
+					out.println("</Tup>");
 				}
-				out.println("</tup>");
+				out.println("</Tup>");
 			}
 		}
 	}
@@ -395,34 +413,34 @@ public class Tg2GXL extends Tg2Whatever {
 		String attrValue = "null";
 
 		if (val != null) {
-			if (val instanceof Float) {
-				val = ((Float) val).doubleValue();
+			if ((val instanceof Double) || (val instanceof Float)) {
+				val = Double.parseDouble(val.toString());
 			}
-			if (val instanceof Integer) {
-				val = ((Integer) val).longValue();
+			if ((val instanceof Long) || (val instanceof Integer)) {
+				val = Long.parseLong(val.toString());
 			}
 			attrValue = stringQuote(val.toString());
 		}
 
 		if (dom instanceof BooleanDomain) {
-			out.print("<bool>");
-			out.print("" + attrValue);
-			out.println("</bool>");
+			out.println("<Bool>");
+			out.println("" + attrValue);
+			out.println("</Bool>");
 		}
 		if (dom instanceof DoubleDomain) {
-			out.print("<float>");
-			out.print("" + attrValue);
-			out.println("<float>");
+			out.println("<Float>");
+			out.println("" + attrValue);
+			out.println("</Float>");
 		}
-		if ((dom instanceof EnumDomain) || (dom instanceof StringDomain)) {
-			out.print("<string>");
-			out.print("" + attrValue);
-			out.println("</string>");
+		if (dom instanceof EnumDomain) {
+			out.println("<String>");
+			out.println("" + attrValue);
+			out.println("</String>");
 		}
 		if ((dom instanceof IntegerDomain) || (dom instanceof LongDomain)) {
-			out.print("<int>");
-			out.print("" + attrValue);
-			out.println("</int>");
+			out.println("<Int>");
+			out.println("" + attrValue);
+			out.println("</Int>");
 		}
 	}
 
@@ -439,29 +457,27 @@ public class Tg2GXL extends Tg2Whatever {
 		Tg2GXL converter = new Tg2GXL();
 		converter.getOptions(args);
 		converter.initgrUML2GXLMap();
-		try {
-			converter.convert();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		converter.printGraph();
 	}
 
 	/**
-	 * overrides the <code>printGraph()</code> method in Tg2Whatever.
+	 * overrides the <code>printGraph()</code> method in Tg2Whatever. The
+	 * <code>boolean printSchema</code> variable is used in every method,
+	 * invoked by <code>super.printGraph()</code> to decide, if either the M1 or
+	 * the M2 graph is printed.
 	 */
 	@Override
-	public void convert() throws IOException {
+	public void printGraph() {
 		printSchema = false;
 		setOutputFile(graphOutputName);
 		uniqueGraphClassName = graph.getSchema().getGraphClass()
 				.getQualifiedName();
-		super.convert();
+		super.printGraph();
 		setOutputFile(schemaGraphOutputName);
 		setGraph(new Schema2SchemaGraph()
 				.convert2SchemaGraph(graph.getSchema()));
 		printSchema = true;
-		super.convert();
+		super.printGraph();
 
 	}
 
@@ -494,7 +510,11 @@ public class Tg2GXL extends Tg2Whatever {
 		if (comLine.hasOption("o")) {
 			graphOutputName = comLine.getOptionValue("o");
 			schemaGraphOutputName = graphOutputName.substring(0,
-					graphOutputName.length() - 4) + "Schema.gxl";
+					graphOutputName.length() - 4)
+					+ "Schema.gxl";
+		}
+		if (outputName == null) {
+			outputName = "";
 		}
 	}
 
@@ -569,5 +589,11 @@ public class Tg2GXL extends Tg2Whatever {
 			}
 		}
 		return sb.toString();
+	}
+
+	@Override
+	protected void printIncidence(PrintStream out, Incidence i) {
+		// TODO Auto-generated method stub
+		
 	}
 }

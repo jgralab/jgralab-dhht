@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,15 +31,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
-import de.uni_koblenz.jgralab.greql2.schema.ExponentiatedPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 
 /**
  * Evaluates an exponentiated path description. Creates a NFA that accepts the
@@ -83,23 +78,27 @@ public class ExponentiatedPathDescriptionEvaluator extends
 	}
 
 	@Override
-	public NFA evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		PathDescription p = (PathDescription) vertex
 				.getFirstIsExponentiatedPathOfIncidence().getAlpha();
 		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		VertexEvaluator exponentEvaluator = vertexEvalMarker.getMark(vertex
 				.getFirstIsExponentOfIncidence(EdgeDirection.IN).getAlpha());
-		Object exponentValue = exponentEvaluator.getResult();
+		JValue exponentValue = exponentEvaluator.getResult(subgraph);
 		int exponent = 0;
-		if (exponentValue instanceof Integer) {
-			exponent = (Integer) exponentValue;
+		if (exponentValue.isInteger()) {
+			try {
+				exponent = exponentValue.toInteger();
+			} catch (JValueInvalidTypeException ex) {
+				// cannot happen
+			}
 		} else {
-			throw new GreqlException(
+			throw new EvaluateException(
 					"Exponent of ExponentiatedPathDescription is not convertable to integer value");
 		}
-		return NFA.createExponentiatedPathDescriptionNFA(pathEval.getNFA(),
-				exponent);
+		return new JValueImpl(NFA.createExponentiatedPathDescriptionNFA(
+				pathEval.getNFA(), exponent));
 	}
 
 	@Override

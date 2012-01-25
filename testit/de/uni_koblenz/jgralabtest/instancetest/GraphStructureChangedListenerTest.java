@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,7 +37,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Collection;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,17 +45,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphStructureChangedAdapter;
-import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRemove;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.InternalGraph;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class GraphStructureChangedListenerTest extends InstanceTest {
@@ -68,8 +56,8 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 	private static final int LISTENERS = 10;
 
 	public GraphStructureChangedListenerTest(
-			ImplementationType implementationType, String dbURL) {
-		super(implementationType, dbURL);
+			ImplementationType implementationType) {
+		super(implementationType);
 	}
 
 	@Parameters
@@ -123,7 +111,7 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 			trigger();
 			assertTrue(
 					"The vertex count of the graph does not match the new vertex count",
-					newValue == ((InternalGraph) g).getMaxVCount());
+					newValue == g.getMaxVCount());
 		}
 
 		@Override
@@ -131,7 +119,7 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 			trigger();
 			assertTrue(
 					"The edge count of the graph does not match the new vertex count",
-					newValue == ((InternalGraph) g).getMaxECount());
+					newValue == g.getMaxECount());
 		}
 
 	}
@@ -156,11 +144,9 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 			g = MinimalSchema.instance()
 					.createMinimalGraphWithTransactionSupport(V, E);
 			break;
-		case DATABASE:
-			dbHandler.connectToDatabase();
-			dbHandler.loadMinimalSchemaIntoGraphDatabase();
-			g = dbHandler.createMinimalGraphWithDatabaseSupport(
-					"GraphStructureChangedListenerTest", V, E);
+		case SAVEMEM:
+			g = MinimalSchema.instance().createMinimalGraphWithSavememSupport(
+					V, E);
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -168,14 +154,6 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 		}
 		trigger1 = false;
 		trigger2 = false;
-	}
-
-	@After
-	public void tearDown() {
-		if (implementationType == ImplementationType.DATABASE) {
-			dbHandler.clearAllTables();
-			dbHandler.closeGraphdatabase();
-		}
 	}
 
 	private boolean trigger1;
@@ -332,7 +310,7 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 		GraphStructureChangedListener[] listenersWithAutoRemove = new GraphStructureChangedListener[LISTENERS];
 		GraphStructureChangedListener[] normalListeners = new GraphStructureChangedListener[LISTENERS];
 		for (int i = 0; i < listenersWithAutoRemove.length; i++) {
-			listenersWithAutoRemove[i] = new GraphStructureChangedAdapterWithAutoRemove() {
+			listenersWithAutoRemove[i] = new GraphStructureChangedAdapterWithAutoRevome() {
 			};
 			normalListeners[i] = new GraphStructureChangedAdapter() {
 			};

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,20 +31,16 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import org.pcollections.PSet;
-
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices;
-import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
+import de.uni_koblenz.jgralab.greql2.funlib.ReachableVertices;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 
 /**
  * evaluates a BackwardVertexSet
@@ -90,18 +82,30 @@ public class BackwardVertexSetEvaluator extends PathSearchEvaluator {
 		NFA revertedNFA = NFA.revertNFA(pathDescEval.getNFA());
 		searchAutomaton = new DFA(revertedNFA);
 
+		// We log the number of states as the result size of the underlying
+		// PathDescription.
+		if (evaluationLogger != null) {
+			evaluationLogger.logResultSize("PathDescription",
+					searchAutomaton.stateList.size());
+		}
 		initialized = true;
 	}
 
 	@Override
-	public PSet<Vertex> evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		if (!initialized) {
 			initialize();
 		}
 		Vertex targetVertex = null;
-		targetVertex = (Vertex) targetEval.getResult();
-
-		return ReachableVertices.search(targetVertex, searchAutomaton);
+		try {
+			targetVertex = targetEval.getResult(subgraph).toVertex();
+		} catch (JValueInvalidTypeException exception) {
+			throw new EvaluateException(
+					"Error evaluation BackwardVertexSet, TargetExpression doesn't evaluate to a vertex",
+					exception);
+		}
+		return ReachableVertices
+				.search(targetVertex, searchAutomaton, subgraph);
 	}
 
 	@Override

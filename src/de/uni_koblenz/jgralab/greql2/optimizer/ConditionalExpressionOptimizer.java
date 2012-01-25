@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -44,18 +40,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
 import de.uni_koblenz.jgralab.greql2.optimizer.condexp.Formula;
-import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
 
 /**
  * TODO: (heimdall) Comment class!
@@ -106,8 +95,6 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
 			throws OptimizerException {
 		boolean simplifiedOrOptimized = false;
-		// System.out.println("Before CEO: "
-		// + GreqlSerializer.serializeGraph(syntaxgraph));
 
 		FunctionApplication top = findAndOrNotFunApp(syntaxgraph
 				.getFirstGreql2Expression());
@@ -150,9 +137,9 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 		recreateVertexEvaluators(eval);
 		OptimizerUtility.createMissingSourcePositions(syntaxgraph);
 
-		// System.out.println("After CEO: "
-		// + GreqlSerializer.serializeGraph(syntaxgraph));
 		// Tg2Dot.printGraphAsDot(syntaxgraph, true, "/home/horn/ceo.dot");
+		// System.out.println("Afted CEO:");
+		// System.out.println(((SerializableGreql2) syntaxgraph).serialize());
 
 		return simplifiedOrOptimized;
 	}
@@ -164,7 +151,7 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 		assert top.isValid();
 		for (Edge e : top.incidences(EdgeDirection.OUT)) {
 			list.add(new VertexEdgeClassTuple((Greql2Vertex) e.getOmega(),
-					(Class<? extends Edge>) e.getSchemaClass()));
+					(Class<? extends Edge>) e.getM1Class()));
 		}
 		return list;
 	}

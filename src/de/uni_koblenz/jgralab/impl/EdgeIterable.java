@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -46,7 +42,7 @@ import de.uni_koblenz.jgralab.Graph;
  * This class provides an Iterable to iterate over edges in a graph. One may use
  * this class to use the advanced for-loop of Java 5. Instances of this class
  * should never, and this means <b>never</b> created manually but only using the
- * methods <code>edges(params)</code> of th graph. Every special graphclass
+ * methods <code>edges(params)</code> of the graph. Every special graphclass
  * contains generated methods similar to <code>edges(params)</code> for every
  * EdgeClass that is part of the GraphClass.
  * 
@@ -62,7 +58,7 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 
 		protected E current = null;
 
-		protected InternalGraph graph = null;
+		protected Graph graph = null;
 
 		protected Class<? extends Edge> ec;
 
@@ -74,10 +70,13 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 		 */
 		protected long edgeListVersion;
 
+		protected Graph traversalContext;
+
 		@SuppressWarnings("unchecked")
-		EdgeIterator(InternalGraph g, Class<? extends Edge> ec) {
+		EdgeIterator(Graph traversalContext, Graph g, Class<? extends Edge> ec)  {
 			graph = g;
 			this.ec = ec;
+			this.traversalContext = traversalContext;
 			edgeListVersion = g.getEdgeListVersion();
 			current = (E) (ec == null ? graph.getFirstEdge() : graph
 					.getFirstEdge(ec));
@@ -85,17 +84,17 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 
 		@SuppressWarnings("unchecked")
 		public E next() {
-			if (graph.isEdgeListModified(edgeListVersion)) {
-				throw new ConcurrentModificationException(
-						"The edge list of the graph has been modified - the iterator is not longer valid");
-			}
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			E result = current;
-			current = (E) (ec == null ? current.getNextEdge() : current
-					.getNextEdge(ec));
-			return result;
+				if (graph.isEdgeListModified(edgeListVersion)) {
+					throw new ConcurrentModificationException(
+							"The edge list of the graph has been modified - the iterator is not longer valid");
+				}
+				if (current == null) {
+					throw new NoSuchElementException();
+				}
+				E result = current;
+				current = (E) (ec == null ? current.getNextEdge(traversalContext)
+						: current.getNextEdge(traversalContext, ec));
+				return result;
 		}
 
 		public boolean hasNext() {
@@ -111,13 +110,23 @@ public class EdgeIterable<E extends Edge> implements Iterable<E> {
 
 	private EdgeIterator iter;
 
-	public EdgeIterable(Graph g) {
-		this(g, null);
+	public EdgeIterable(Graph g)  {
+		this(g.getTraversalContext(), g, null);
 	}
 
-	public EdgeIterable(Graph g, Class<? extends Edge> ec) {
+	public EdgeIterable(Graph g, Class<? extends Edge> ec)  {
 		assert g != null;
-		iter = new EdgeIterator((InternalGraph) g, ec);
+		iter = new EdgeIterator(g.getTraversalContext(), g, ec);
+	}
+
+	public EdgeIterable(Graph traversalContext, Graph g)  {
+		this(traversalContext, g, null);
+	}
+
+	public EdgeIterable(Graph traversalContext, Graph g,
+			Class<? extends Edge> ec)  {
+		assert g != null;
+		iter = new EdgeIterator(traversalContext, g, ec);
 	}
 
 	public Iterator<E> iterator() {

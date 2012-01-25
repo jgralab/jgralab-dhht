@@ -5,10 +5,6 @@
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
  * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
- * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
@@ -51,19 +47,14 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayVertexMarker;
 import de.uni_koblenz.jgralabtest.instancetest.InstanceTest;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class ArrayGraphmarkerTest extends InstanceTest {
 
-	public ArrayGraphmarkerTest(ImplementationType implementationType,
-			String dbURL) {
-		super(implementationType, dbURL);
+	public ArrayGraphmarkerTest(ImplementationType implementationType) {
+		super(implementationType);
 	}
 
 	@Parameters
@@ -128,7 +119,7 @@ public class ArrayGraphmarkerTest extends InstanceTest {
 	protected final int E = 4; // initial max edge count
 
 	private MinimalGraph g;
-	private ArrayVertexMarker<TestMarkerObject> marker;
+	private LocalArrayVertexMarker<TestMarkerObject> marker;
 
 	private Node v1;
 	private Node v2;
@@ -143,11 +134,9 @@ public class ArrayGraphmarkerTest extends InstanceTest {
 			g = MinimalSchema.instance()
 					.createMinimalGraphWithTransactionSupport(V, E);
 			break;
-		case DATABASE:
-			dbHandler.connectToDatabase();
-			dbHandler.loadMinimalSchemaIntoGraphDatabase();
-			g = dbHandler.createMinimalGraphWithDatabaseSupport(
-					"GraphMarkerTest", V, E);
+		case SAVEMEM:
+			g = MinimalSchema.instance().createMinimalGraphWithSavememSupport(
+					V, E);
 			break;
 		default:
 			fail("Implementation " + implementationType
@@ -159,17 +148,13 @@ public class ArrayGraphmarkerTest extends InstanceTest {
 		g.createLink(v1, v2);
 		commit(g);
 
-		marker = new ArrayVertexMarker<TestMarkerObject>(g);
+		marker = new LocalArrayVertexMarker<TestMarkerObject>(g);
 		createTransaction(g);
 	}
 
 	@After
 	public void tearDown() throws CommitFailedException, InterruptedException {
 		commit(g);
-		if (implementationType == ImplementationType.DATABASE) {
-			dbHandler.clearAllTables();
-			dbHandler.closeGraphdatabase();
-		}
 		g = null;
 		marker = null;
 		System.gc();

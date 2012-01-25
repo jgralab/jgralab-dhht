@@ -50,53 +50,43 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
 import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
-import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
-import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasBaseDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasKeyDomain;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
 import de.uni_koblenz.jgralab.grumlschema.domains.HasValueDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
-import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.ComesFrom;
-import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
-import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDefaultPackage;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
 import de.uni_koblenz.jgralab.grumlschema.structure.DefinesGraphClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.EndsAt;
-import de.uni_koblenz.jgralab.grumlschema.structure.GoesTo;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
 import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
-import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceDirection;
-import de.uni_koblenz.jgralab.grumlschema.structure.NamedElement;
-import de.uni_koblenz.jgralab.grumlschema.structure.Package;
-import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
 import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.Subsets;
-import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BooleanDomain;
+import de.uni_koblenz.jgralab.schema.CollectionDomain;
+import de.uni_koblenz.jgralab.schema.Constraint;
+import de.uni_koblenz.jgralab.schema.Domain;
 import de.uni_koblenz.jgralab.schema.DoubleDomain;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.EnumDomain;
+import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IntegerDomain;
 import de.uni_koblenz.jgralab.schema.LongDomain;
+import de.uni_koblenz.jgralab.schema.MapDomain;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
+import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.StringDomain;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * Compares a given Schema and SchemaGraph with each other.
@@ -285,8 +275,8 @@ public class CompareSchemaWithSchemaGraph {
 	}
 
 	private void compareNamedElement(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 
 		compareQualifiedName(element, gElement);
 
@@ -294,16 +284,16 @@ public class CompareSchemaWithSchemaGraph {
 	}
 
 	private void compareQualifiedName(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 		// Comparison of the QualifiedName
 		assertEquals("Both Package objects have a different name.",
 				element.getQualifiedName(), gElement.get_qualifiedName());
 	}
 
 	private void compareComments(
-			de.uni_koblenz.jgralab.schema.NamedElement element,
-			NamedElement gElement) {
+			de.uni_koblenz.jgralab.schema.NamedElementClass element,
+			NamedElementClass gElement) {
 
 		List<String> comments = element.getComments();
 		List<String> gComments = retrieveComments(gElement);
@@ -312,7 +302,7 @@ public class CompareSchemaWithSchemaGraph {
 		gComments.containsAll(comments);
 	}
 
-	private List<String> retrieveComments(NamedElement gElement) {
+	private List<String> retrieveComments(NamedElementClass gElement) {
 		List<String> gComments = new ArrayList<String>();
 
 		Annotates annotates = gElement.getFirstAnnotatesIncidence();

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,13 +39,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMap;
-import de.uni_koblenz.jgralabtest.schemas.citymap.CityMapSchema;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Intersection;
-import de.uni_koblenz.jgralabtest.schemas.citymap.Street;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 
 public class TempAttributeTest extends TestCase {
 
@@ -63,7 +54,7 @@ public class TempAttributeTest extends TestCase {
 
 	@Test
 	public void testTempAttribute() {
-		GraphMarker<String> marker = new GraphMarker<String>(graph);
+		LocalGenericGraphMarker<String> marker = new LocalGenericGraphMarker<String>(graph);
 		System.out
 				.println("Setting and getting temporary attribute belonging to the graph itself");
 		marker.mark(graph, "successful");

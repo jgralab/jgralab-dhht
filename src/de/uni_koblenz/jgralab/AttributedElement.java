@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -36,30 +32,24 @@
 package de.uni_koblenz.jgralab;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
- * aggregates graphs, edges and vertices
+ * Aggregates graphs, edges and vertices.
  * 
  * @author ist@uni-koblenz.de
  * 
+ * @param ConcreteAttributeElementClass the non-abstract metaclass of this class, e.g. VertexClass or EdgeClass, used for generic implementations of methods such as addSuperclass
+ * @param ConcreteInterface the non-abstract interface for the instances of this class, e.g. Vertex for a VertexClass
+ * 
  */
-public interface AttributedElement extends Comparable<AttributedElement> {
-	/**
-	 * @return the {@link AttributedElementClass} of this
-	 *         {@link AttributedElement}
-	 */
-	public AttributedElementClass getAttributedElementClass();
+public interface AttributedElement
+	<ConcreteAttributedElementClass extends AttributedElementClass<ConcreteAttributedElementClass,ConcreteInterface>, 
+	ConcreteInterface extends AttributedElement<ConcreteAttributedElementClass,ConcreteInterface>> 
+extends TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 
-	/**
-	 * @return the schema class of this attributedelement
-	 */
-	public Class<? extends AttributedElement> getSchemaClass();
-
-	public GraphClass getGraphClass();
 
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException;
@@ -72,15 +62,22 @@ public interface AttributedElement extends Comparable<AttributedElement> {
 
 	public void readAttributeValues(GraphIO io) throws GraphIOException;
 
-	public <T> T getAttribute(String name) throws NoSuchAttributeException;
-
-	public <T> void setAttribute(String name, T data)
-			throws NoSuchAttributeException;
-
 	/**
-	 * @return the schema this AttributedElement belongs to
+	 * Returns the value of the attribute <code>name</code> of this
+	 * {@link AttributedElement}.
+	 * 
+	 * @param name
+	 *            {@link String} the name of the requested attribute
+	 * @return {@link Object} value of attribute <code>name</code>
+	 * @throws NoSuchAttributeException
+	 *             if the attribute <code>name</code> does not exist at this
+	 *             {@link AttributedElement}
+	 * @throws RemoteException 
 	 */
-	public Schema getSchema();
+	public Object getAttribute(String name) throws NoSuchAttributeException;
+
+	public void setAttribute(String name, Object data)
+			throws NoSuchAttributeException;
 
 	void initializeAttributesWithDefaultValues();
 }

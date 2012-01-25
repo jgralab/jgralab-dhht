@@ -5,10 +5,6 @@
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
  * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
- * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
@@ -64,7 +60,7 @@ import de.uni_koblenz.jgralab.utilities.tgschema2java.TgSchema2Java;
  * <li><code>implementationMode</code> takes a comma separated list of possible
  * implementation modes. If unset, all implementations will be generated.
  * Possible implementation modes are currently "standard", "transaction" and
- * "db".</li>
+ * "savemem".</li>
  * <li><code>subtypeFlag</code> corresponds to the cli option -f . If set,
  * separate methods with subtype flag will be created.</li>
  * <li><code>withoutTypes</code> corresponds to the cli option -w . If set, no
@@ -83,6 +79,7 @@ public class TgSchema2JavaTask extends Task {
 	public TgSchema2JavaTask() {
 		executeObject = new TgSchema2Java();
 		executeObject.setTypeSpecificMethodSupport(true);
+		executeObject.setMethodsForSubclassesSupport(true);
 		schemaLocation = new HashSet<String>();
 	}
 
@@ -104,13 +101,16 @@ public class TgSchema2JavaTask extends Task {
 		}
 	}
 
-	public void setImplementationMode(String value) {
-		try {
-			executeObject.setImplementationMode(value);
-		} catch (Exception e) {
-			throw new BuildException(e);
+	public void setSubtypeFlag(String value) {
+		String v = value.toLowerCase();
+		if (v.equals("true") || v.equals("yes")) {
+			executeObject.setMethodsForSubclassesSupport(true);
+		} else if (!(v.equals("false") || v.equals("no"))) {
+			throw new BuildException("Invalid value for boolean field: "
+					+ value);
 		}
 	}
+
 
 	public void addConfiguredFileset(FileSet files) {
 		Iterator<?> fileIterator = files.iterator();

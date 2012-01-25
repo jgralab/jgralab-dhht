@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -58,10 +54,6 @@ public class TG2SchemaGraphTest {
 			System.out.print("Converting Schema to SchemaGraph ...");
 			SchemaGraph schemaGraph = new Schema2SchemaGraph()
 					.convert2SchemaGraph(schema);
-			String sgFile = tgFile.substring(tgFile.lastIndexOf("/") + 1);
-			sgFile = "testit/testdata/"
-					+ sgFile.substring(0, sgFile.length() - 3) + ".schema.tg";
-			schemaGraph.save(sgFile);
 			System.out.println("\tdone");
 
 			// Compares the Schema with the created SchemaGraph

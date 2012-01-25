@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -61,9 +57,9 @@ public class EnumCodeGenerator extends CodeGenerator {
 
 	@Override
 	protected CodeBlock createBody() {
+		CodeSnippet constCode = new CodeSnippet(true);
 		CodeList result = new CodeList();
 		if (currentCycle.isClassOnly()) {
-			CodeSnippet constCode = new CodeSnippet(true);
 			String delim = "";
 			StringBuilder constants = new StringBuilder();
 			for (String s : enumDomain.getConsts()) {
@@ -76,7 +72,8 @@ public class EnumCodeGenerator extends CodeGenerator {
 
 			CodeSnippet valueOfCode = new CodeSnippet(true);
 			valueOfCode
-					.add("public static #simpleClassName# valueOfPermitNull(String val) {",
+					.add(
+							"public static #simpleClassName# valueOfPermitNull(String val) {",
 							"\tif (val.equals(de.uni_koblenz.jgralab.GraphIO.NULL_LITERAL)) {",
 							"\t\treturn null;", "\t}",
 							"\treturn valueOf(val);", "}");

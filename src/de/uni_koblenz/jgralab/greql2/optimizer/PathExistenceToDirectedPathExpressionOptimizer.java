@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -44,29 +40,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.funlib.collections.Intersection;
-import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsPathDescriptionOf;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
-import de.uni_koblenz.jgralab.greql2.schema.PathExpression;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.TypeId;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
-import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
+import de.uni_koblenz.jgralab.greql2.funlib.Intersection;
 
 /**
  * @author Tassilo Horn &lt;horn@uni-koblenz.de&gt;
@@ -111,11 +92,6 @@ public class PathExistenceToDirectedPathExpressionOptimizer extends
 
 		List<PathExistence> pes = new LinkedList<PathExistence>();
 		for (PathExistence pe : syntaxgraph.getPathExistenceVertices()) {
-			// PathExistences that are inside a not() must not be optimized,
-			// because that would filter out exactly the right elements.
-			if (isInNot(pe)) {
-				continue;
-			}
 			pes.add(pe);
 		}
 
@@ -145,22 +121,6 @@ public class PathExistenceToDirectedPathExpressionOptimizer extends
 		recreateVertexEvaluators(eval);
 		OptimizerUtility.createMissingSourcePositions(syntaxgraph);
 		return !pes.isEmpty();
-	}
-
-	private boolean isInNot(Vertex v) {
-		if (v instanceof FunctionApplication) {
-			FunctionApplication fa = (FunctionApplication) v;
-			if (fa.get_functionId().get_name().equals("not")) {
-				return true;
-			}
-		}
-		for (Edge e : v.incidences(EdgeDirection.OUT)) {
-			boolean result = isInNot(e.getThat());
-			if (result) {
-				return result;
-			}
-		}
-		return false;
 	}
 
 	private boolean tryOptimizePathExistence(PathExistence pe) {

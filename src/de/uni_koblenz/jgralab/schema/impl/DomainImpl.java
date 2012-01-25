@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,7 +34,7 @@ package de.uni_koblenz.jgralab.schema.impl;
 import de.uni_koblenz.jgralab.schema.Domain;
 import de.uni_koblenz.jgralab.schema.Package;
 
-public abstract class DomainImpl extends NamedElementImpl implements Domain {
+public abstract class DomainImpl extends NamedElementClassImpl implements Domain {
 
 	protected DomainImpl(String simpleName, Package pkg) {
 		super(simpleName, pkg, pkg.getSchema());
@@ -54,15 +50,5 @@ public abstract class DomainImpl extends NamedElementImpl implements Domain {
 	@Override
 	public String toString() {
 		return "domain " + qualifiedName;
-	}
-
-	@Override
-	public String getUniqueName() {
-		return qualifiedName;
-	}
-
-	@Override
-	public boolean isBoolean() {
-		return false;
 	}
 }

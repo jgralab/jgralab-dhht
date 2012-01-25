@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,28 +33,20 @@ package de.uni_koblenz.jgralabtest.greql2;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.io.File;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.serialising.XMLLoader;
-import de.uni_koblenz.jgralab.greql2.serialising.XMLOutputWriter;
-
-public class StoreJValueTest extends GenericTest {
+public class StoreJValueTest extends GenericTests {
 
 	@Test
 	public void testStoreJValue1() throws Exception {
-		fail(); // JValueVisitorException
-		String queryString = "list(tup(\"Nodes:\", count(from v:V{} report v end)), tup(\"Edges:\", count(from e:E{} report e end)))";
-		Object result = evalTestQuery("StoreJValue1", queryString);
-		XMLOutputWriter writer = new XMLOutputWriter(
-				getTestGraph(TestVersion.GREQL_GRAPH));
-		writer.writeValue(result, new File(
-				"testit/testdata/storejvaluetest1.xml"));
-		XMLLoader loader = new XMLLoader(getTestGraph(TestVersion.GREQL_GRAPH));
-		Object loadedValue = loader
+		String queryString = "bag(tup(\"Nodes:\", count(from v:V{} report v end)), tup(\"Edges:\", count(from e:E{} report e end)))";
+		JValue result = evalTestQuery("StoreJValue1", queryString);
+		JValueXMLOutputVisitor outputVisitor = new JValueXMLOutputVisitor(
+				result, "testit/testdata/storejvaluetest1.xml", getTestGraph());
+		outputVisitor.toString();
+		JValueXMLLoader loader = new JValueXMLLoader(getTestGraph());
+		JValue loadedValue = loader
 				.load("testit/testdata/storejvaluetest1.xml");
 		assertNotNull(loadedValue);
 		assertEquals(result, loadedValue);
@@ -66,15 +54,12 @@ public class StoreJValueTest extends GenericTest {
 
 	@Test
 	public void testStoreJValue2a() throws Exception {
-		fail(); // JValueVisitorException
 		String queryString = "V{}";
-		Object result = evalTestQuery("StoreJValue2a", queryString);
-		XMLOutputWriter writer = new XMLOutputWriter(
-				getTestGraph(TestVersion.GREQL_GRAPH));
-		writer.writeValue(result, new File(
-				"testit/testdata/storejvaluetest2a.xml"));
-		XMLLoader loader = new XMLLoader(getTestGraph(TestVersion.GREQL_GRAPH));
-		Object loadedValue = loader
+		JValue result = evalTestQuery("StoreJValue2a", queryString);
+		new JValueXMLOutputVisitor(result,
+				"testit/testdata/storejvaluetest2a.xml", getTestGraph());
+		JValueXMLLoader loader = new JValueXMLLoader(getTestGraph());
+		JValue loadedValue = loader
 				.load("testit/testdata/storejvaluetest2a.xml");
 		assertNotNull(loadedValue);
 		assertEquals(result, loadedValue);
@@ -82,15 +67,12 @@ public class StoreJValueTest extends GenericTest {
 
 	@Test
 	public void testStoreJValue2() throws Exception {
-		fail(); // JValueVisitorException
 		String queryString = "from v:V{} report v as \"Nodes\" end";
-		Object result = evalTestQuery("StoreJValue2", queryString);
-		XMLOutputWriter writer = new XMLOutputWriter(
-				getTestGraph(TestVersion.GREQL_GRAPH));
-		writer.writeValue(result, new File(
-				"testit/testdata/storejvaluetest2.xml"));
-		XMLLoader loader = new XMLLoader(getTestGraph(TestVersion.GREQL_GRAPH));
-		Object loadedValue = loader
+		JValue result = evalTestQuery("StoreJValue2", queryString);
+		new JValueXMLOutputVisitor(result,
+				"testit/testdata/storejvaluetest2.xml", getTestGraph());
+		JValueXMLLoader loader = new JValueXMLLoader(getTestGraph());
+		JValue loadedValue = loader
 				.load("testit/testdata/storejvaluetest2.xml");
 		assertNotNull(loadedValue);
 		assertEquals(result, loadedValue);
@@ -98,15 +80,12 @@ public class StoreJValueTest extends GenericTest {
 
 	@Test
 	public void testStoreJValue3() throws Exception {
-		fail(); // JValueVisitorException
 		String queryString = "from x,y:list(1..100) reportTable x, y, x*y end";
-		Object result = evalTestQuery("StoreJValue3", queryString);
-		XMLOutputWriter writer = new XMLOutputWriter(
-				getTestGraph(TestVersion.GREQL_GRAPH));
-		writer.writeValue(result, new File(
-				"testit/testdata/storejvaluetest3.xml"));
-		XMLLoader loader = new XMLLoader(getTestGraph(TestVersion.GREQL_GRAPH));
-		Object loadedValue = loader
+		JValue result = evalTestQuery("StoreJValue3", queryString);
+		new JValueXMLOutputVisitor(result,
+				"testit/testdata/storejvaluetest3.xml", getTestGraph());
+		JValueXMLLoader loader = new JValueXMLLoader(getTestGraph());
+		JValue loadedValue = loader
 				.load("testit/testdata/storejvaluetest3.xml");
 		assertNotNull(loadedValue);
 		assertEquals(result, loadedValue);

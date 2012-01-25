@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,31 +34,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.pcollections.PMap;
-import org.pcollections.PSet;
-import org.pcollections.PVector;
-
-import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
-import de.uni_koblenz.jgralab.trans.Savepoint;
-import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.record.BooleanType;
-import de.uni_koblenz.jgralabtest.schemas.record.Hugo;
-import de.uni_koblenz.jgralabtest.schemas.record.Link;
-import de.uni_koblenz.jgralabtest.schemas.record.Node;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestSchema;
 
 public class UndoTest {
 
 	private RecordTestGraph graph;
 	Node node1;
 	Node node2;
-	String filename = "testit/testdata/record_testgraph.tg";
+	String filename = "record_testgraph.tg";
 
 	@Before
 	public void setUp() throws CommitFailedException {
@@ -87,18 +73,22 @@ public class UndoTest {
 		assertNull(graph.getFirstNode());
 
 		node2 = graph.createNode();
-		PMap<Integer, String> map = JGraLab.map();
-		map = map.plus(1, "Hugo").plus(100, "Volker");
+		Map<Integer, String> map = graph.createMap();
+		map.put(1, "Hugo");
+		map.put(100, "Volker");
 		node2.set_nodeMap(map);
 		node2.set_testEnum(Hugo.A);
-		PVector<String> list = JGraLab.vector();
-		list = list.plus("Hugo").plus("Lalala");
+		List<String> list = graph.createList();
+		list.add("Hugo");
+		list.add("Lalala");
 		node2.set_testList(list);
-		PSet<Integer> set = JGraLab.set();
-		set = set.plus(1).plus(3).plus(8);
+		Set<Integer> set = graph.createSet();
+		set.add(1);
+		set.add(3);
+		set.add(8);
 		node2.set_testSet(set);
 		node2.set_testString("Hugo");
-		node2.set_testRecord(new BooleanType(true, true));
+		node2.set_testRecord(graph.createBooleanType(true, true));
 
 		assertTrue(graph.getFirstNode() != null);
 		assertTrue(graph.getFirstNode() == node2);

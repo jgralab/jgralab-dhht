@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -50,16 +46,11 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class ImplementationModeTest extends InstanceTest {
-	public ImplementationModeTest(ImplementationType implementationType,
-			String dbURL) {
-		super(implementationType, dbURL);
+	public ImplementationModeTest(ImplementationType implementationType) {
+		super(implementationType);
 	}
 
 	@Parameters
@@ -83,9 +74,9 @@ public class ImplementationModeTest extends InstanceTest {
 			g = MinimalSchema.instance()
 					.createMinimalGraphWithTransactionSupport(V, E);
 			break;
-		case DATABASE:
-			// load graph from file not (yet) implemented in DATABASE
-			return;
+		case SAVEMEM:
+			g = MinimalSchema.instance().createMinimalGraph(V, E);
+			break;
 		default:
 			fail("Implementation " + implementationType
 					+ " not yet supported by this test.");
@@ -95,11 +86,11 @@ public class ImplementationModeTest extends InstanceTest {
 			g.createNode();
 		}
 		for (int i = 0; i < N; ++i) {
-			g.createLink(g.getFirstNode(), (Node) g.getVertex(i + 1));
+			g.createLink(g.getFirstNode(), (Node) g.getVertexObject(i + 1));
 		}
 		commit(g);
 		createTransaction(g);
-		g.save(filename);
+		MinimalSchema.instance().saveMinimalGraph(filename, g);
 		commit(g);
 	}
 
@@ -115,19 +106,26 @@ public class ImplementationModeTest extends InstanceTest {
 		switch (implementationType) {
 		case STANDARD:
 			g2 = MinimalSchema.instance().loadMinimalGraph(filename);
+			assertTrue(g2.hasStandardSupport());
 			assertFalse(g2.hasTransactionSupport());
+			assertFalse(g2.hasSavememSupport());
 			break;
 		case TRANSACTION:
 			g2 = MinimalSchema.instance()
 					.loadMinimalGraphWithTransactionSupport(filename);
 			createReadOnlyTransaction(g2);
+			assertFalse(g2.hasStandardSupport());
 			assertTrue(g2.hasTransactionSupport());
+			assertFalse(g2.hasSavememSupport());
 			commit(g2);
 			break;
-		case DATABASE:
-			// load graph from file not (yet) implemented in DATABASE
-			return;
-
+		case SAVEMEM:
+			g2 = MinimalSchema.instance().loadMinimalGraphWithSavememSupport(
+					filename);
+			assertFalse(g2.hasStandardSupport());
+			assertFalse(g2.hasTransactionSupport());
+			assertTrue(g2.hasSavememSupport());
+			break;
 		default:
 			fail("Implementation " + implementationType
 					+ " not yet supported by this test.");

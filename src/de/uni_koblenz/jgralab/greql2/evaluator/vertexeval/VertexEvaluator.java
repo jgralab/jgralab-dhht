@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -43,26 +39,33 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclaration;
+import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.evaluator.logging.EvaluationLogger;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
+import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This is the base class for all VertexEvaluators which evaluate the vertices
  * in the GReQL Syntaxgraph
- *
+ * 
  * @author ist@uni-koblenz.de
- *
+ * 
  */
 public abstract class VertexEvaluator {
 	/**
@@ -89,9 +92,20 @@ public abstract class VertexEvaluator {
 	protected Graph graph = null;
 
 	/**
+	 * used only for debugging, the indentation of the debug-messages on stdout
+	 * for this vertexeval
+	 */
+	protected static int currentIndentation = 0;
+
+	/**
 	 * The GreqlEvaluator this VertexEvaluator belongs to
 	 */
 	protected GreqlEvaluator greqlEvaluator = null;
+
+	/**
+	 * The evaluation logger that should be used for logging
+	 */
+	protected EvaluationLogger evaluationLogger;
 
 	/**
 	 * The costs for the current evaluation of the whole subtree in the abstract
@@ -135,7 +149,13 @@ public abstract class VertexEvaluator {
 	/**
 	 * The evaluation result
 	 */
-	protected Object result = null;
+	protected JValue result = null;
+
+	/**
+	 * The subgraph which was uses for the last evaluation and should be used
+	 * for the next evaluation
+	 */
+	protected AbstractGraphMarker<AttributedElement> subgraph = null;
 
 	/**
 	 * The set of variables this vertex depends on
@@ -157,6 +177,7 @@ public abstract class VertexEvaluator {
 	protected VertexEvaluator(GreqlEvaluator eval) {
 		greqlEvaluator = eval;
 		graph = eval.getDatagraph();
+		evaluationLogger = eval.getEvaluationLogger();
 		vertexEvalMarker = eval.getVertexEvaluatorGraphMarker();
 	}
 
@@ -175,26 +196,33 @@ public abstract class VertexEvaluator {
 
 	/**
 	 * @return the name of the associated {@link Greql2Vertex} used for logging.
-	 *         By default this is the type name, i.e. ListComprehension, but
+	 *         By default this is the type name, i.e. BagComprehension, but
 	 *         subclasses may override this method to get a more finegrained
 	 *         control. For example {@link FunctionApplicationEvaluator}s use
 	 *         the function name of the corresponding function for logging.
 	 */
 	public String getLoggingName() {
-		return this.getVertex().getAttributedElementClass().getSimpleName();
+		return this.getVertex().getMetaClass().getSimpleName();
 	}
 
 	/**
 	 * Gets the result of the evaluation of this vertex on the given subgraph
-	 *
+	 * 
+	 * @param newSubgraph
+	 *            the subgraph to evaluate the vertex on or null if it should be
+	 *            evaluated on the whole datagraph
 	 * @return the evaluation result
 	 */
-	public Object getResult() {
-		if (result != null) {
+	public JValue getResult(AbstractGraphMarker<AttributedElement> newSubgraph)
+			throws EvaluateException {
+		if ((result != null) && (this.subgraph == newSubgraph)) {
 			return result;
 		}
 
-		// System.out.println("Evaluating : " + this);
+		// currentIndentation++;
+		// printIndentation();
+		// GreqlEvaluator.println("Evaluating : " + this);
+		this.subgraph = newSubgraph;
 		try {
 			result = evaluate();
 			// System.out.println("VertexEvaluator.getResult() " + result
@@ -204,8 +232,72 @@ public abstract class VertexEvaluator {
 			throw ex;
 		}
 
-		// System.out.println("Evaluating : " + this + " finished");
-		// System.out.println("Result is: " + result);
+		// Logging...
+		if ((evaluationLogger != null) && (result != null)) {
+			if (result.isBoolean()) {
+				// Log the selectivity for vertices that return a boolean
+				Boolean bool = result.toBoolean();
+				evaluationLogger.logSelectivity(getLoggingName(),
+						(bool != null) && bool.booleanValue());
+			} else if (result.isJValueTypeCollection()) {
+				// Log the selectivity for TypeId vertices
+				JValueTypeCollection col = result.toJValueTypeCollection();
+				AttributedElementClass aec = null;
+				if (col.getAllowedTypes().iterator().hasNext()) {
+					aec = col.getAllowedTypes().iterator().next();
+				} else {
+					aec = col.getForbiddenTypes().iterator().next();
+				}
+				if (aec.isSubClassOf(aec.getSchema().getAttributedElementClass(
+						"Vertex"))) {
+					// The typeId restricts vertex classes
+					for (VertexClass vc : greqlEvaluator.getDatagraph()
+							.getSchema().getVertexClassesInTopologicalOrder()) {
+						evaluationLogger.logSelectivity(getLoggingName(),
+								col.acceptsType(vc));
+					}
+				} else {
+					// The typeId restricts edge classes
+					for (EdgeClass ec : greqlEvaluator.getDatagraph()
+							.getSchema().getEdgeClassesInTopologicalOrder()) {
+						evaluationLogger.logSelectivity(getLoggingName(),
+								col.acceptsType(ec));
+					}
+				}
+			}
+
+			// Log the size of the result
+			if (result.isCollection()) {
+				if (this instanceof SimpleDeclarationEvaluator) {
+					int size = 1;
+					for (JValue val : result.toJValueList()) {
+						VariableDeclaration d = (VariableDeclaration) val
+								.toObject();
+						size *= d.getDefinitionCardinality();
+					}
+					evaluationLogger.logResultSize(getLoggingName(), size);
+				} else {
+					evaluationLogger.logResultSize(getLoggingName(), result
+							.toCollection().size());
+				}
+			} else if (result.toObject() instanceof VariableDeclarationLayer) {
+				// Declarations return a VariableDeclarationLayer object as
+				// result. The real result size is the number of possible
+				// variable combinations. This cannot be logged here, but it
+				// is done in DeclarationLayer itself.
+			} else if (result.isAutomaton()) {
+				// Result sizes for PathDescriptions are logged as the
+				// number of states the DFA has. That is done in
+				// Forward-/BackwardVertexSet and PathExistance.
+			} else {
+				evaluationLogger.logResultSize(getLoggingName(), 1);
+			}
+		}
+
+		// printIndentation();
+		// GreqlEvaluator.println("Evaluating : " + this + " finished");
+		// currentIndentation--;
+		// GreqlEvaluator.println("Result is: " + result);
 
 		greqlEvaluator.progress(ownEvaluationCosts);
 
@@ -224,7 +316,7 @@ public abstract class VertexEvaluator {
 	 * this method does the evaluation. It must be implemented by concrete
 	 * evaluators
 	 */
-	public abstract Object evaluate();
+	public abstract JValue evaluate() throws EvaluateException;
 
 	/**
 	 * clears the evaluation result
@@ -248,6 +340,7 @@ public abstract class VertexEvaluator {
 		estimatedCardinality = Long.MIN_VALUE;
 		estimatedSelectivity = Double.NaN;
 		costsGraphSize = null;
+		subgraph = null;
 	}
 
 	public void resetSubtreeToInitialState() {
@@ -264,7 +357,7 @@ public abstract class VertexEvaluator {
 	/**
 	 * This method must be overwritten by every subclass. It should call the
 	 * right method of the GreqlEvaluators costmodel.
-	 *
+	 * 
 	 * @return a 3-Tupel (ownCosts, iteratedCosts, subtreeCosts) of costs the
 	 *         evaluation of the subtree with this vertex as root causes
 	 */
@@ -276,7 +369,7 @@ public abstract class VertexEvaluator {
 	 * cost differ from the initialEvaluationCosts, because only for the first
 	 * evaluation, the result really gets evaluated, for all other evaluations,
 	 * the evaluated result only gets copied, these costs are 1
-	 *
+	 * 
 	 * @return the costs of this evaluation of the subtree the vertex this
 	 *         evaluator evaluates is root of
 	 */
@@ -292,7 +385,7 @@ public abstract class VertexEvaluator {
 	 * Calculates the costs the first evaluation of the subtree causes. These
 	 * cost differ from the second "evaluation", because for the second one, the
 	 * already evaluated result only gets copied, these costs are 1
-	 *
+	 * 
 	 * @return the costs of the first evaluation of the subgraph the vertex this
 	 *         evaluator evaluates is root of
 	 */
@@ -314,7 +407,7 @@ public abstract class VertexEvaluator {
 	/**
 	 * Get the costs for evaluating the associated vertex one time. No subtree
 	 * or iteration costs are taken into account.
-	 *
+	 * 
 	 * @param graphSize
 	 *            a {@link GraphSize} object indicating the size of the data-
 	 *            {@link Graph}
@@ -352,7 +445,7 @@ public abstract class VertexEvaluator {
 
 	/**
 	 * Calculates the set of variables this vertex depends on
-	 *
+	 * 
 	 * @return the set of variables this vertex depends on
 	 */
 	public Set<Variable> getNeededVariables() {
@@ -366,7 +459,7 @@ public abstract class VertexEvaluator {
 	 * Calculates the set of variables this vertex (or even a vertex in a
 	 * subgraph) defines and that is valid in the whole subtree with this vertex
 	 * as head.
-	 *
+	 * 
 	 * @return the set of variables this vertex defines and that are valid
 	 */
 	public Set<Variable> getDefinedVariables() {
@@ -440,7 +533,7 @@ public abstract class VertexEvaluator {
 		while (inc != null) {
 			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
+			inc = inc.getNextGreql2Aggregation(EdgeDirection.OUT);
 		}
 		return possibleSourcePositions;
 	}
@@ -467,7 +560,7 @@ public abstract class VertexEvaluator {
 		while (inc != null) {
 			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
+			inc = inc.getNextGreql2Aggregation(EdgeDirection.OUT);
 		}
 		if (possibleSourcePositions.size() == 0) {
 			return; // maybe the vertex is the root vertex, than it has no
@@ -482,9 +575,9 @@ public abstract class VertexEvaluator {
 				SourcePosition availablePosition = availableIter.next();
 				if ((availablePosition.get_offset() <= currentPosition
 						.get_offset())
-						&& ((availablePosition.get_offset()
-								+ availablePosition.get_length()) >= (currentPosition
-								.get_offset() + currentPosition.get_length()))) {
+						&& (availablePosition.get_offset()
+								+ availablePosition.get_length() >= currentPosition
+								.get_offset() + currentPosition.get_length())) {
 					accepted = true;
 					break;
 				}
@@ -503,7 +596,7 @@ public abstract class VertexEvaluator {
 	 * creates a vertex evaluator for the given vertex
 	 */
 	public static VertexEvaluator createVertexEvaluator(Vertex vertex,
-			GreqlEvaluator eval) {
+			GreqlEvaluator eval) throws EvaluateException {
 		Class<?> vertexClass = vertex.getClass();
 		String fullClassName = vertexClass.getName();
 		// remove the "Impl" ...
@@ -516,7 +609,15 @@ public abstract class VertexEvaluator {
 		if (unevaluatedVertices.contains(className)) {
 			return null;
 		}
-		String evalName = className + "Evaluator";
+		String evalName;
+		if ((vertex.getM1Class() == FunctionApplication.class)
+				&& !Greql2FunctionLibrary.instance().isGreqlFunction(
+						((FunctionApplication) vertex).get_functionId()
+								.get_name())) {
+			evalName = "SubQueryEvaluator";
+		} else {
+			evalName = className + "Evaluator";
+		}
 		evalName = evalName.substring(className.lastIndexOf(".") + 1);
 		evalName = VertexEvaluator.class.getPackage().getName() + "."
 				+ evalName;
@@ -529,15 +630,15 @@ public abstract class VertexEvaluator {
 					.newInstance(vertex, eval);
 			return vertexEval;
 		} catch (ClassNotFoundException ex) {
-			throw new RuntimeException(className, ex);
+			throw new EvaluateException(className, ex);
 		} catch (NoSuchMethodException ex) {
-			throw new RuntimeException(className, ex);
+			throw new EvaluateException(className, ex);
 		} catch (IllegalAccessException ex) {
-			throw new RuntimeException(className, ex);
+			throw new EvaluateException(className, ex);
 		} catch (InstantiationException ex) {
-			throw new RuntimeException(className, ex);
+			throw new EvaluateException(className, ex);
 		} catch (InvocationTargetException ex) {
-			throw new RuntimeException(className, ex);
+			throw new EvaluateException(className, ex);
 		}
 	}
 

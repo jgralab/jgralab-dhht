@@ -127,8 +127,9 @@
 	<property name="common-tools.includes" value="common/**" />
 
 	<property name="utilities.src" value="${src.dir}/de/uni_koblenz/jgralab/utilities" />
-	<property name="utilities.includes" value="ant/** common/** converter/** csv2tg/** greqlinterface/** jgralab2owl/** schemacompare/** tg2gdl/** tg2gxl/** tg2sidiff/** tgraphbrowser/** tgtree/** xmi2tgschema/** xml/**" />
-
+	<property name="utilities.includes" value="ant/** common/** converter/** schemacompare/**" />       
+<!--	<property name="utilities.includes" value="ant/** common/** converter/** csv2tg/** greqlinterface/** jgralab2owl/** schemacompare/** tg2gdl/** tg2gxl/** tg2sidiff/** tgraphbrowser/** tgtree/** xmi2tgschema/** xml/**" />
+-->
 	<!-- The targets -->
 	<target name="build" depends="ist_utilities,clean,compile,modify_manifest,jar" />
 
@@ -306,6 +307,12 @@
 
 	<target name="bumpminor" depends="versiontasks">
 		<bump_minor />
+	</target>
+
+	<target name="compiletest" depends="generatetestschemas">
+		<javac fork="true" srcdir="${testcases.dir}/de/uni_koblenz/jgralabtest/dhht" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" target="${javac.targetVM}" >
+			<compilerarg line="-Xlint:unchecked"/>
+		</javac>
 	</target>
 
 	<target name="testcompile" depends="generatetestschemas,common.testcompile" />

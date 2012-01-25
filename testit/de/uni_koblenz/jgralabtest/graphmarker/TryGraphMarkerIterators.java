@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,34 +35,30 @@ import java.util.Iterator;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.ArrayEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.BitSetEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.BitSetVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.DoubleEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.DoubleVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.LongEdgeMarker;
-import de.uni_koblenz.jgralab.graphmarker.LongVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalArrayVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBitSetEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBitSetVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalDoubleEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalDoubleVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalIntegerVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalLongEdgeMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalLongVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSubGraphMarker;
 
 public class TryGraphMarkerIterators {
-	private static ArrayVertexMarker<String> arrayVertexMarker;
-	private static ArrayEdgeMarker<String> arrayEdgeMarker;
-	private static IntegerVertexMarker integerVertexMarker;
-	private static IntegerEdgeMarker integerEdgeMarker;
-	private static DoubleVertexMarker doubleVertexMarker;
-	private static DoubleEdgeMarker doubleEdgeMarker;
-	private static LongVertexMarker longVertexMarker;
-	private static LongEdgeMarker longEdgeMarker;
-	private static BitSetVertexMarker bitSetVertexMarker;
-	private static BitSetEdgeMarker bitSetEdgeMarker;
-	private static SubGraphMarker subGraphMarker;
+	private static LocalArrayVertexMarker<String> arrayVertexMarker;
+	private static LocalArrayEdgeMarker<String> arrayEdgeMarker;
+	private static LocalIntegerVertexMarker integerVertexMarker;
+	private static LocalIntegerEdgeMarker integerEdgeMarker;
+	private static LocalDoubleVertexMarker doubleVertexMarker;
+	private static LocalDoubleEdgeMarker doubleEdgeMarker;
+	private static LocalLongVertexMarker longVertexMarker;
+	private static LocalLongEdgeMarker longEdgeMarker;
+	private static LocalBitSetVertexMarker bitSetVertexMarker;
+	private static LocalBitSetEdgeMarker bitSetEdgeMarker;
+	private static LocalSubGraphMarker subGraphMarker;
 
 	public static void main(String[] args) {
 		MinimalGraph graph = MinimalSchema.instance().createMinimalGraph();
@@ -78,33 +70,33 @@ public class TryGraphMarkerIterators {
 		for (int i = 0; i < links.length; i++) {
 			links[i] = graph.createLink(nodes[i], nodes[10 - i - 1]);
 		}
-		arrayVertexMarker = new ArrayVertexMarker<String>(graph);
-		arrayEdgeMarker = new ArrayEdgeMarker<String>(graph);
-		integerVertexMarker = new IntegerVertexMarker(graph);
-		integerEdgeMarker = new IntegerEdgeMarker(graph);
-		doubleVertexMarker = new DoubleVertexMarker(graph);
-		doubleEdgeMarker = new DoubleEdgeMarker(graph);
-		longVertexMarker = new LongVertexMarker(graph);
-		longEdgeMarker = new LongEdgeMarker(graph);
-		bitSetVertexMarker = new BitSetVertexMarker(graph);
-		bitSetEdgeMarker = new BitSetEdgeMarker(graph);
-		subGraphMarker = new SubGraphMarker(graph);
+		arrayVertexMarker = new LocalArrayVertexMarker<String>(graph);
+		arrayEdgeMarker = new LocalArrayEdgeMarker<String>(graph);
+		integerVertexMarker = new LocalIntegerVertexMarker(graph);
+		integerEdgeMarker = new LocalIntegerEdgeMarker(graph);
+		doubleVertexMarker = new LocalDoubleVertexMarker(graph);
+		doubleEdgeMarker = new LocalDoubleEdgeMarker(graph);
+		longVertexMarker = new LocalLongVertexMarker(graph);
+		longEdgeMarker = new LocalLongEdgeMarker(graph);
+		bitSetVertexMarker = new LocalBitSetVertexMarker(graph);
+		bitSetEdgeMarker = new LocalBitSetEdgeMarker(graph);
+		subGraphMarker = new LocalSubGraphMarker(graph);
 
 		applyIterators("No marks:");
 
 		for (int i = 0; i < nodes.length; i++) {
 			arrayVertexMarker.mark(nodes[i], "StringMark: " + nodes[i]);
-			integerVertexMarker.mark(nodes[i], nodes[i].getId());
-			doubleVertexMarker.mark(nodes[i], nodes[i].getId() + 0.5);
-			longVertexMarker.mark(nodes[i], 1000l + nodes[i].getId());
+			integerVertexMarker.mark(nodes[i], nodes[i].getCompleteGraphUid());
+			doubleVertexMarker.mark(nodes[i], nodes[i].getCompleteGraphUid() + 0.5);
+			longVertexMarker.mark(nodes[i], 1000l + nodes[i].getCompleteGraphUid());
 			bitSetVertexMarker.mark(nodes[i]);
 			subGraphMarker.mark(nodes[i]);
 		}
 		for (int i = 0; i < links.length; i++) {
 			arrayEdgeMarker.mark(links[i], "StringMark: " + links[i]);
-			integerEdgeMarker.mark(links[i], links[i].getId());
-			doubleEdgeMarker.mark(links[i], links[i].getId() + 0.5);
-			longEdgeMarker.mark(links[i], 1000l + links[i].getId());
+			integerEdgeMarker.mark(links[i], links[i].getCompleteGraphUid());
+			doubleEdgeMarker.mark(links[i], links[i].getCompleteGraphUid() + 0.5);
+			longEdgeMarker.mark(links[i], 1000l + links[i].getCompleteGraphUid());
 			bitSetEdgeMarker.mark(links[i]);
 			subGraphMarker.mark(links[i]);
 		}

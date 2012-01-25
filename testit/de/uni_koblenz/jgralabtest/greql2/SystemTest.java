@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,25 +32,15 @@
 package de.uni_koblenz.jgralabtest.greql2;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.pcollections.PCollection;
-import org.pcollections.PVector;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
-import de.uni_koblenz.jgralab.greql2.types.Table;
-import de.uni_koblenz.jgralab.greql2.types.Tuple;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.connections.Way;
 
-public class SystemTest extends GenericTest {
+public class SystemTest extends GenericTests {
 
 	@Override
-	protected Graph createGreqlTestGraph() {
+	protected Graph createTestGraph() throws Exception {
 		int count = 1;
 		String part1 = "from i:a report ";
 		String part2 = " end where q:=a, l:=a, m:=a, n:=a, o:=a, p:=a, k:= a, j:=a, h := a, g := a, f:= a, e := a, d:=a, c:=a, b:=a, a:=4";
@@ -73,94 +59,54 @@ public class SystemTest extends GenericTest {
 	@Test
 	public void testFunctionArgumentsEvaluation() throws Exception {
 		String queryString = "from x:V{FunctionApplication}, y:V{Expression} with x <--{IsArgumentOf} y report tup( tup(\"Function: \", x ), tup(\"Argument: \", y )) end";
-		Object result = evalTestQuery("FunctionArgumentsEvaluation",
+		JValue result = evalTestQuery("FunctionArgumentsEvaluation",
 				queryString);
-		assertEquals(11, ((PCollection<?>) result).size());
+		assertEquals(11, result.toCollection().size());
 	}
 
 	@Test
 	public void testFunctionAsFunctionArgumentEvaluation() throws Exception {
 		String queryString = "from x:V{FunctionApplication}, y:V{FunctionApplication} with x <--{IsArgumentOf} y report tup( tup(\"Function: \", x ), tup(\"Argument: \", y )) end";
-		Object result = evalTestQuery("FunctionAsFunctionArgumentEvaluation",
+		JValue result = evalTestQuery("FunctionAsFunctionArgumentEvaluation",
 				queryString);
-		assertEquals(5, ((PCollection<?>) result).size());
+		assertEquals(5, result.toCollection().size());
 	}
 
 	@Test
 	public void testFunctionAsFunctionArgumentAsFuntionArgumentEvaluation()
 			throws Exception {
 		String queryString = "from x:V{FunctionApplication}, y:V{FunctionApplication} with x <--{IsArgumentOf} <--{IsArgumentOf} y report tup( tup(\"Function: \", x ), tup(\"Argument: \", y )) end";
-		Object result = evalTestQuery(
+		JValue result = evalTestQuery(
 				"FunctionAsFunctionAsFunctionArgumentEvaluation", queryString);
-		assertEquals(4, ((PCollection<?>) result).size());
+		assertEquals(4, result.toCollection().size());
 	}
 
 	@Test
-	public void testFunctionAsArgumentInListComprehensionEvaluation()
+	public void testFunctionAsArgumentInBagComprehensionEvaluation()
 			throws Exception {
-		String queryString = "from x:V{FunctionApplication}, y:V{ListComprehension} with x -->{IsArgumentOf}+ -->{IsCompResultDefOf} y report tup(tup(\"Function: \", x ), tup(\"ListComprehension: \", y )) end";
-		Object result = evalTestQuery("FunctionAsArgumentInListComprehension",
+		String queryString = "from x:V{FunctionApplication}, y:V{BagComprehension} with x -->{IsArgumentOf}+ -->{IsCompResultDefOf} y report tup(tup(\"Function: \", x ), tup(\"BagComprehension: \", y )) end";
+		JValue result = evalTestQuery("FunctionAsArgumentInBagComprehension",
 				queryString);
-		assertEquals(5, ((PCollection<?>) result).size());
+		assertEquals(5, result.toCollection().size());
 	}
 
 	@Test
-	public void test() throws Exception {
-		String X1 = "X1";
-		String X2 = "X2";
-
-		String queryString = "from x:V{junctions.Crossroad}, y:V{junctions.Crossroad} "
-				+ "with x -->{connections.Street} <--{connections.Footpath} y report id(x) as '"
-				+ X1 + "', id(y) as '" + X2 + "' end";
-		Table<?> result = ((Table<?>) evalTestQuery(queryString));
-		checkHeader(result, X1, X2);
-
-		assertEquals(12, result.size());
-	}
-
-	private void checkHeader(Table<?> table, String... headerStrings) {
-		PVector<?> header = table.getTitles();
-		assertTrue(header.size() == headerStrings.length);
-		for (String headerString : headerStrings) {
-			assertTrue(header.contains(headerString));
-		}
+	public void testVariableAsVariableDefinition() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from x:V{Variable}, y:V{Variable} with x -->{IsVarOf} <--{IsExprOf} y report x.name as \"DefinedVariable\", y.name as \"Definition\" end";
+		JValue result = evalTestQuery("VariableAsVariableDefinition",
+				queryString);
+		assertEquals(15, result.toCollection().size());
 	}
 
 	@Test
-	public void testCrossroadWithUsage() throws Exception {
-		String VERTEX = "Vertex";
-		String IDENTIFIER = "Identifier";
-		String USAGE_COUNT = "UsageCount";
-		String USAGES = "Usages";
-
-		String queryString = "from c:V{junctions.Crossroad} report c as '"
-				+ VERTEX + "', id(c) as '" + IDENTIFIER + "', "
-				+ "outDegree{connections.Way}(c) as '" + USAGE_COUNT + "', "
-				+ "edgesFrom(c) as '" + USAGES + "' end";
-		Table<?> result = (Table<?>) evalTestQuery(queryString);
-		@SuppressWarnings("unchecked")
-		PVector<Tuple> data = (PVector<Tuple>) result.toPVector();
-
-		checkHeader(result, VERTEX, IDENTIFIER, USAGE_COUNT, USAGES);
-
-		for (Tuple tuple : data) {
-			Vertex vertex = (Vertex) tuple.get(0);
-			int identifier = ((Integer) tuple.get(1)).intValue();
-			int usage_count = ((Integer) tuple.get(2)).intValue();
-			PCollection<?> usages = (PCollection<?>) tuple.get(3);
-
-			assertEquals(vertex.getId(), identifier);
-			assertEquals(vertex.getDegree(Way.class, EdgeDirection.OUT),
-					usage_count);
-
-			int n = 0;
-			for (Edge edge : vertex.incidences(Way.class, EdgeDirection.OUT)) {
-				++n;
-				assertTrue(usages.contains(edge));
-			}
-			assertEquals(n, usages.size());
-		}
-
-		assertEquals(crossroadCount, result.size());
+	public void testIdentifierWithUsage() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from x:V{Identifier} report x.name as \"Identifier\", outDegree{IsArgumentOf}(x) as \"UsageCount\", edgesFrom(x) as \"Usages\" end";
+		JValue result = evalTestQuery("IdentifierWithUsage", queryString);
+		assertEquals(21, result.toCollection().size());
 	}
+
 }

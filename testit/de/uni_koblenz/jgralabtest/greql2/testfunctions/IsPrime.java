@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -35,7 +31,13 @@
 
 package de.uni_koblenz.jgralabtest.greql2.testfunctions;
 
-import de.uni_koblenz.jgralab.greql2.funlib.Function;
+import java.util.ArrayList;
+
+import org.junit.experimental.categories.Category;
+
+import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 
 /**
  * Checks if the given number is a prime number.
@@ -61,21 +63,43 @@ import de.uni_koblenz.jgralab.greql2.funlib.Function;
  * </dl>
  * </dd>
  * </dl>
- *
+ * 
  * @author ist@uni-koblenz.de
  */
-public class IsPrime extends Function {
+public class IsPrime extends Greql2Function {
+	{
+		JValueType[][] x = { { JValueType.LONG, JValueType.BOOL },
+				{ JValueType.LONG, JValueType.INT, JValueType.BOOL } };
+		signatures = x;
 
-	public IsPrime() {
-		super(
-				"Return true, if the given number is a prime number.\n"
-						+ "This function performs the Miller-Rabin pseudo primality\n"
-						+ "test. The optional second parameter $k$ is an integer that\n"
-						+ "specifies influences the probability of being a prime.\n"
-						+ "The chances of being prime is $1- (\\frac{1}{4})^k$.  The default\n"
-						+ "value of $k$ is 10.", 50, 1, 1.0 / Math.log(5000),
-				Category.ARITHMETICS);
+		description = "Return true, if the given number is a prime number.\n"
+				+ "This function performs the Miller-Rabin pseudo primality\n"
+				+ "test. The optional second parameter $k$ is an integer that\n"
+				+ "specifies influences the probability of being a prime.\n"
+				+ "The chances of being prime is $1- (\\frac{1}{4})^k$.  The default\n"
+				+ "value of $k$ is 10.";
+
+		Category[] c = { Category.ARITHMETICS };
+		categories = c;
 	}
+
+	/**
+	 * The costs for an isPrime function application.
+	 * 
+	 * Since those depend heavily on the parameter(s) of isPrime, but those
+	 * aren't available before evaluation, it's hard to set it to a "good"
+	 * value...
+	 */
+	private static final int ESTIMATED_COSTS_PER_RUN = 5;
+
+	/**
+	 * The selectivity for isPrime. The number of prime numbers < x can be
+	 * estimated with x / ln(x). So the selectivity is (x / ln(x))/x = 1/ln(x).
+	 * 
+	 * Since we assume that isPrime is most often called with smaller values, we
+	 * use 500 for x.
+	 */
+	private static final double SELECTIVITY = 1.0 / Math.log(5000);
 
 	/**
 	 * @param a
@@ -97,13 +121,13 @@ public class IsPrime extends Function {
 			return 0;
 		}
 
-		y = (x * x) % n;
-		if ((y == 1) && (x != 1) && (x != (n - 1))) {
+		y = x * x % n;
+		if ((y == 1) && (x != 1) && (x != n - 1)) {
 			return 0;
 		}
 
-		if ((i % 2) != 0) {
-			y = (a * y) % n;
+		if (i % 2 != 0) {
+			y = a * y % n;
 		}
 		return y;
 	}
@@ -116,7 +140,7 @@ public class IsPrime extends Function {
 	 * @return a random number between <code>x</code> and <code>y</code>
 	 */
 	private static long random(long x, long y) {
-		return Math.round((Math.random() * (y - x)) + x);
+		return Math.round(Math.random() * (y - x) + x);
 	}
 
 	/**
@@ -141,29 +165,50 @@ public class IsPrime extends Function {
 		return true;
 	}
 
-	public Boolean evaluate(Long number) {
+	@Override
+	public JValue evaluate(Graph graph,
+			AbstractGraphMarker<AttributedElement> subgraph, JValue[] arguments)
+			throws EvaluateException {
+		int noOfTestRuns = 10;
+		switch (checkArguments(arguments)) {
+		case 0:
+			break;
+		case 1:
+			noOfTestRuns = arguments[1].toInteger();
+			if (noOfTestRuns <= 0) {
+				throw new EvaluateException(
+						"isPrime's second argument must be positive!");
+			}
+			break;
+		default:
+			throw new WrongFunctionParameterException(this, arguments);
+		}
+		long number = arguments[0].toLong();
+
 		if (number < 2) {
-			return false;
+			return new JValueImpl(JValueBoolean.getFalseValue());
 		}
-		return isPrime(number, 10);
+
+		return new JValueImpl(isPrime(number, noOfTestRuns));
 	}
 
-	public Boolean evaluate(Integer number) {
-		return evaluate(Long.valueOf(number));
+	@Override
+	public long getEstimatedCardinality(int inElements) {
+		return 1;
 	}
 
-	public Boolean evaluate(Long number, Integer noOfTestRuns) {
-		if (noOfTestRuns <= 0) {
-			throw new IllegalArgumentException(
-					"isPrime's second argument must be positive!");
-		}
-		if (number < 2) {
-			return false;
-		}
-		return isPrime(number, noOfTestRuns);
+	@Override
+	public long getEstimatedCosts(ArrayList<Long> inElements) {
+		return 10 * ESTIMATED_COSTS_PER_RUN;
 	}
 
-	public Boolean evaluate(Integer number, Integer noOfTestRuns) {
-		return evaluate(Long.valueOf(number), noOfTestRuns);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uni_koblenz.jgralab.greql2.funlib.Greql2Function#getSelectivity()
+	 */
+	@Override
+	public double getSelectivity() {
+		return SELECTIVITY;
 	}
 }

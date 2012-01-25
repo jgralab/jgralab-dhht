@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,13 +33,12 @@ package de.uni_koblenz.jgralab.greql2.exception;
 
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
-
 public class DuplicateVariableException extends QuerySourceException {
-	private static final long serialVersionUID = 5730584909369802057L;
+
+	static final long serialVersionUID = -1234561;
 
 	/**
+	 * 
 	 * @param variable
 	 * @param sourcePositions
 	 */

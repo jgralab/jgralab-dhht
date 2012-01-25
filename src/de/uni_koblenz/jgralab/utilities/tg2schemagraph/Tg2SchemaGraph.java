@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,7 +39,6 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 public class Tg2SchemaGraph {
@@ -66,10 +61,10 @@ public class Tg2SchemaGraph {
 	public static void main(String[] args) {
 		CommandLine comLine = processCommandLineOptions(args);
 		assert comLine != null;
-		Tg2SchemaGraph tg2sg = new Tg2SchemaGraph();
+		Tg2SchemaGraph graph = new Tg2SchemaGraph();
 		try {
-			SchemaGraph sg = tg2sg.process(comLine.getOptionValue("s"));
-			sg.save(comLine.getOptionValue("o"));
+			GraphIO.saveGraphToFile(comLine.getOptionValue("o"),
+					graph.process(comLine.getOptionValue("s")), null);
 		} catch (GraphIOException e) {
 			e.printStackTrace();
 			System.out

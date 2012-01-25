@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,34 +36,19 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
-import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
-import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
-import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
-import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
-import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
-import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
-import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
-import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
-import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
-import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
-import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
-import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.NamedElement;
-import de.uni_koblenz.jgralab.grumlschema.structure.Package;
-import de.uni_koblenz.jgralab.grumlschema.structure.Redefines;
-import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
-import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
+import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
+import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.Constraint;
+import de.uni_koblenz.jgralab.schema.Domain;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.EnumDomain;
+import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
+import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class SchemaGraph2Tg {
 
@@ -264,7 +245,7 @@ public class SchemaGraph2Tg {
 		currentPackageName = pkg.get_qualifiedName();
 	}
 
-	private void printComments(NamedElement ne) {
+	private void printComments(NamedElementClass ne) {
 		for (Annotates ann : ne.getAnnotatesIncidences(EdgeDirection.IN)) {
 			Comment com = (Comment) ann.getThat();
 			println(COMMENT, SPACE, ne.get_qualifiedName(), SPACE,

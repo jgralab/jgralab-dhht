@@ -47,13 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import java.rmi.RemoteException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -89,30 +83,6 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
-import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
-import de.uni_koblenz.jgralab.greql2.exception.SerialisingException;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.serialising.HTMLOutputWriter;
-import de.uni_koblenz.jgralab.greql2.serialising.XMLOutputWriter;
-
-@SuppressWarnings("serial")
-public class GreqlGui extends SwingApplication {
-	// keys for preferences
-	private static final String PREFS_KEY_LAST_QUERY_DIRECTORY = "LAST_QUERY_DIRECTORY"; //$NON-NLS-1$
-	private static final String PREFS_KEY_LAST_GRAPH_DIRECTORY = "LAST_GRAPH_DIRECTORY"; //$NON-NLS-1$
-	private static final String PREFS_KEY_RECENT_GRAPH = "RECENT_GRAPH"; //$NON-NLS-1$
-	private static final String PREFS_KEY_RECENT_QUERY = "RECENT_QUERY"; //$NON-NLS-1$
-	private static final String PREFS_KEY_RESULT_FONT = "RESULT_FONT"; //$NON-NLS-1$
-	private static final String PREFS_KEY_QUERY_FONT = "QUERY_FONT"; //$NON-NLS-1$
-
-	private static final String VERSION = "0.0"; //$NON-NLS-1$
-
-	private static final String BUNDLE_NAME = GreqlGui.class.getPackage()
-			.getName() + ".resources.messages"; //$NON-NLS-1$
-
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-			.getBundle(BUNDLE_NAME);
 
 	private static final String DOCUMENT_EXTENSION = ".greql"; //$NON-NLS-1$
 	private static final String GRAPH_EXTENSION = ".tg"; //$NON-NLS-1$
@@ -232,21 +202,23 @@ public class GreqlGui extends SwingApplication {
 			} finally {
 				graphLoading = false;
 			}
-			invokeAndWait(new Runnable() {
-				@Override
-				public void run() {
-					if (graph == null) {
-						// TODO externalize string
-						String msg = "Can't load "; //$NON-NLS-1$
-						try {
-							msg += file.getCanonicalPath() + "\n" //$NON-NLS-1$
-									+ ex.getMessage();
-						} catch (IOException e) {
-							msg += "graph\n"; //$NON-NLS-1$
-						}
-						Throwable cause = ex.getCause();
-						if (cause != null) {
-							msg += "\ncaused by " + cause; //$NON-NLS-1$
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
+					public void run() {
+						if (graph == null) {
+							JOptionPane.showMessageDialog(null,
+									ex.getMessage(), ex.getClass()
+											.getSimpleName(),
+									JOptionPane.ERROR_MESSAGE);
+							statusLabel.setText("Couldn't load graph :-(");
+						} else {
+							try {
+								statusLabel.setText("Graph '" + graph.getCompleteGraphUid()
+										+ "' loaded.");
+							} catch (RemoteException e) {
+								throw new RuntimeException(e);
+							}
 						}
 						JOptionPane.showMessageDialog(GreqlGui.this, msg, ex
 								.getClass().getSimpleName(),

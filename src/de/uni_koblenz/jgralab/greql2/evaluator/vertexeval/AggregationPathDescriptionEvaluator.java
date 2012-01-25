@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,14 +31,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.AggregationPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
 
 /**
  * Evaluates an AggregationPathDescription, that is something link v
@@ -61,8 +57,8 @@ public class AggregationPathDescriptionEvaluator extends
 	}
 
 	@Override
-	public NFA evaluate() {
-		TypeCollection typeCollection = new TypeCollection();
+	public JValue evaluate() throws EvaluateException {
+		JValueTypeCollection typeCollection = new JValueTypeCollection();
 		IsEdgeRestrOf inc = vertex
 				.getFirstIsEdgeRestrOfIncidence(EdgeDirection.IN);
 		EdgeRestrictionEvaluator edgeRestEval = null;
@@ -78,7 +74,7 @@ public class AggregationPathDescriptionEvaluator extends
 				((AggregationPathDescription) vertex).is_outAggregation(),
 				typeCollection, getEdgeRoles(edgeRestEval), predicateEvaluator,
 				vertexEvalMarker);
-		return createdNFA;
+		return new JValueImpl(createdNFA);
 	}
 
 	@Override

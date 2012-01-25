@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -47,32 +43,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Identifier;
-import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.RecordConstruction;
-import de.uni_koblenz.jgralab.greql2.schema.RecordElement;
-import de.uni_koblenz.jgralab.greql2.schema.RecordId;
-import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 
 /**
@@ -82,10 +61,10 @@ import de.uni_koblenz.jgralab.schema.Attribute;
  * @author ist@uni-koblenz.de
  * 
  */
-public class EarlySelectionOptimizer extends OptimizerBase {
+public class EarySelectionOptimizer extends OptimizerBase {
 
 	private static Logger logger = JGraLab
-			.getLogger(EarlySelectionOptimizer.class.getPackage().getName());
+			.getLogger(EarySelectionOptimizer.class.getPackage().getName());
 
 	private Greql2 syntaxgraph;
 
@@ -98,7 +77,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 	 */
 	@Override
 	public boolean isEquivalent(Optimizer optimizer) {
-		if (optimizer instanceof EarlySelectionOptimizer) {
+		if (optimizer instanceof EarySelectionOptimizer) {
 			return true;
 		}
 		return false;
@@ -155,7 +134,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 			IsConstraintOf isConst = decl
 					.getFirstIsConstraintOfIncidence(EdgeDirection.IN);
 			while (isConst != null) {
-				Expression exp = isConst.getAlpha();
+				Expression exp = (Expression) isConst.getAlpha();
 				for (Entry<SimpleDeclaration, Set<Expression>> e : collectMovableExpressions(
 						exp).entrySet()) {
 					if (movableExpressions.containsKey(e.getKey())) {
@@ -164,8 +143,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 						movableExpressions.put(e.getKey(), e.getValue());
 					}
 				}
-				isConst = isConst
-						.getNextIsConstraintOfIncidence(EdgeDirection.IN);
+				isConst = isConst.getNextIsConstraintOf(EdgeDirection.IN);
 			}
 		}
 
@@ -187,9 +165,9 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 					@Override
 					public int compare(SimpleDeclaration sd1,
 							SimpleDeclaration sd2) {
-						Declaration decl1 = sd1
+						Declaration decl1 = (Declaration) sd1
 								.getFirstIsSimpleDeclOfIncidence().getOmega();
-						Declaration decl2 = sd2
+						Declaration decl2 = (Declaration) sd2
 								.getFirstIsSimpleDeclOfIncidence().getOmega();
 						if (OptimizerUtility.isAbove(decl1, decl2)) {
 							return 1;
@@ -202,7 +180,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 				});
 
 		for (SimpleDeclaration sd : simpleDeclsWithMovableExpressions) {
-			Declaration parentDecl = sd.getFirstIsSimpleDeclOfIncidence()
+			Declaration parentDecl = (Declaration) sd.getFirstIsSimpleDeclOfIncidence()
 					.getOmega();
 			Set<Variable> varsDeclaredBySd = OptimizerUtility
 					.collectVariablesDeclaredBy(sd);
@@ -280,7 +258,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		}
 		logger.finer(sb.toString() + " with predicates " + predicates + ".");
 
-		Declaration parentDeclOfOrigSD = origSD
+		Declaration parentDeclOfOrigSD = (Declaration) origSD
 				.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).getOmega();
 		assert parentDeclOfOrigSD.getDegree(EdgeDirection.OUT) == 1;
 
@@ -327,8 +305,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		Declaration newInnerDecl = syntaxgraph.createDeclaration();
 		syntaxgraph.createIsCompDeclOf(newInnerDecl, newInnerCompr);
 		syntaxgraph.createIsCompResultDefOf(newOuterRecord, newInnerCompr);
-		origSD.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).setOmega(
-				newInnerDecl);
+		origSD.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).setOmega(newInnerDecl);
 
 		Expression newCombinedConstraint = createConjunction(
 				new ArrayList<Expression>(predicates), new HashSet<Variable>());
@@ -369,8 +346,8 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		Variable var = varsDeclaredByOrigSD.iterator().next();
 
 		logger.finer(optimizerHeaderString()
-				+ "Performing early selection transformation for " + origSD
-				+ " declaring variable " + var + " (" + var.get_name()
+				+ "(M1) Performing early selection transformation for "
+				+ origSD + " declaring variable " + var + " (" + var.get_name()
 				+ ") with predicates " + predicates);
 
 		// Create the new vertices
@@ -390,8 +367,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		Variable newInnerVar = undeclaredVars.iterator().next();
 
 		// Connect the edges
-		origSD.getFirstIsTypeExprOfIncidence(EdgeDirection.IN).setOmega(
-				newInnerSD);
+		origSD.getFirstIsTypeExprOfIncidence(EdgeDirection.IN).setOmega(newInnerSD);
 		syntaxgraph.createIsTypeExprOfDeclaration(newSetComp, origSD);
 		syntaxgraph.createIsCompDeclOf(newDecl, newSetComp);
 		syntaxgraph.createIsSimpleDeclOf(newInnerSD, newDecl);
@@ -400,7 +376,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		syntaxgraph.createIsCompResultDefOf(newInnerVar, newSetComp);
 
 		for (Expression exp : predicates) {
-			removeExpressionFromOriginalConstraint(exp, origSD
+			removeExpressionFromOriginalConstraint(exp, (Declaration) origSD
 					.getFirstIsSimpleDeclOfIncidence().getOmega());
 		}
 	}
@@ -444,7 +420,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 			for (IsArgumentOf inc : funApp
 					.getIsArgumentOfIncidences(EdgeDirection.IN)) {
 				if (inc.getNormalEdge() != upEdge.getNormalEdge()) {
-					otherArg = inc.getAlpha();
+					otherArg = (Expression) inc.getAlpha();
 				}
 			}
 			ArrayList<Edge> funAppEdges = new ArrayList<Edge>();
@@ -494,12 +470,10 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		FunctionId funId = OptimizerUtility.findOrCreateFunctionId("and",
 				syntaxgraph);
 		syntaxgraph.createIsFunctionIdOf(funId, funApp);
-		syntaxgraph.createIsArgumentOf(
-				(Expression) copySubgraph(predicates.get(0), syntaxgraph,
-						varsToBeCopied, copiedVars), funApp);
-		syntaxgraph.createIsArgumentOf(
-				createConjunction(predicates.subList(1, predicates.size()),
-						varsToBeCopied, copiedVars), funApp);
+		syntaxgraph.createIsArgumentOf((Expression) copySubgraph(predicates
+				.get(0), syntaxgraph, varsToBeCopied, copiedVars), funApp);
+		syntaxgraph.createIsArgumentOf(createConjunction(predicates.subList(1,
+				predicates.size()), varsToBeCopied, copiedVars), funApp);
 		return funApp;
 	}
 
@@ -549,11 +523,10 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 				&& OptimizerUtility.isAnd((FunctionApplication) exp)) {
 			// For AND expressions we dive deeper into the arguments.
 			FunctionApplication funApp = (FunctionApplication) exp;
-			IsArgumentOf isArg = funApp
-					.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
+			IsArgumentOf isArg = funApp.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
 			while (isArg != null) {
 				for (Entry<SimpleDeclaration, Set<Expression>> entry : collectMovableExpressions(
-						isArg.getAlpha()).entrySet()) {
+						(Expression) isArg.getAlpha()).entrySet()) {
 					if (movableExpressions.containsKey(entry.getKey())) {
 						movableExpressions.get(entry.getKey()).addAll(
 								entry.getValue());
@@ -562,7 +535,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 								.put(entry.getKey(), entry.getValue());
 					}
 				}
-				isArg = isArg.getNextIsArgumentOfIncidence(EdgeDirection.IN);
+				isArg = isArg.getNextIsArgumentOf(EdgeDirection.IN);
 			}
 			return movableExpressions;
 		}
@@ -572,7 +545,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 			// Only collect those SimpleDeclarations whose parent Declaration
 			// has more than one SimpleDeclaration or which declare more than
 			// one variable.
-			Declaration parent = sd.getFirstIsSimpleDeclOfIncidence(
+			Declaration parent = (Declaration) sd.getFirstIsSimpleDeclOfIncidence(
 					EdgeDirection.OUT).getOmega();
 			if ((collectSimpleDeclarationsOf(parent).size() > 1)
 					|| (OptimizerUtility.collectVariablesDeclaredBy(sd).size() > 1)) {
@@ -607,7 +580,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 
 		SimpleDeclaration sd = null, oldSd = null;
 		for (Variable var : neededVars) {
-			sd = var.getFirstIsDeclaredVarOfIncidence().getOmega();
+			sd = (SimpleDeclaration) var.getFirstIsDeclaredVarOfIncidence().getOmega();
 			if ((oldSd != null) && (sd != oldSd)) {
 				// the last variable was declared in another
 				// SimpleDeclaration
@@ -640,7 +613,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 					if (inc.getAlpha() == var) {
 						neededLocalVars.add(var);
 					}
-					inc = inc.getNextIsDeclaredVarOfIncidence();
+					inc = inc.getNextIsDeclaredVarOf();
 				}
 			}
 		}
@@ -665,8 +638,8 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 			return true;
 		}
 
-		if (omega.getAttributedElementClass().getSchemaClass() == target
-				.getAttributedElementClass().getSchemaClass()) {
+		if (omega.getMetaClass().getM1Class() == target
+				.getMetaClass().getM1Class()) {
 			return false;
 		}
 
@@ -691,7 +664,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		ArrayList<SimpleDeclaration> sds = new ArrayList<SimpleDeclaration>();
 		for (IsSimpleDeclOf inc : decl
 				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
-			sds.add(inc.getAlpha());
+			sds.add((SimpleDeclaration) inc.getAlpha());
 		}
 		return sds;
 	}
@@ -760,7 +733,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		}
 
 		Class<? extends Vertex> vertexClass = (Class<? extends Vertex>) origVertex
-				.getAttributedElementClass().getSchemaClass();
+				.getMetaClass().getM1Class();
 		Vertex topVertex = graph.createVertex(vertexClass);
 		copyAttributes(origVertex, topVertex);
 
@@ -777,7 +750,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 			subVertex = copySubgraph(origEdge.getAlpha(), graph,
 					variablesToBeCopied, copiedVarMap);
 			Class<? extends Edge> edgeClass = (Class<? extends Edge>) origEdge
-					.getAttributedElementClass().getSchemaClass();
+					.getMetaClass().getM1Class();
 			graph.createEdge(edgeClass, subVertex, topVertex);
 			origEdge = origEdge.getNextIncidence(EdgeDirection.IN);
 		}
@@ -796,7 +769,7 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 	 *            <code>from</code>'s type.
 	 */
 	private void copyAttributes(AttributedElement from, AttributedElement to) {
-		for (Attribute attr : from.getAttributedElementClass()
+		for (Attribute attr : from.getMetaClass()
 				.getAttributeList()) {
 			to.setAttribute(attr.getName(), from.getAttribute(attr.getName()));
 		}

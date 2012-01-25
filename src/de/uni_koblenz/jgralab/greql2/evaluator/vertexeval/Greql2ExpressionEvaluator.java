@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -38,19 +34,13 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 import java.util.ArrayList;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.exception.UndefinedVariableException;
 import de.uni_koblenz.jgralab.greql2.exception.UnknownTypeException;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsIdOf;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.Package;
@@ -85,10 +75,10 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 	 * The varibles that are defined via the <code>using</code> clause. They are
 	 * called bound or also free variables
 	 */
-	private Map<String, Object> boundVariables;
+	private Map<String, JValue> boundVariables;
 	boolean boundVariablesChanged = true;
 
-	protected void setBoundVariables(Map<String, Object> boundVariables) {
+	protected void setBoundVariables(Map<String, JValue> boundVariables) {
 		this.boundVariables = boundVariables;
 		result = null;
 		boundVariablesChanged = true;
@@ -98,8 +88,8 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 		IsBoundVarOf inc = vertex
 				.getFirstIsBoundVarOfIncidence(EdgeDirection.IN);
 		while (inc != null) {
-			Variable currentBoundVariable = inc.getAlpha();
-			Object variableValue = boundVariables.get(currentBoundVariable
+			Variable currentBoundVariable = (Variable) inc.getAlpha();
+			JValue variableValue = boundVariables.get(currentBoundVariable
 					.get_name());
 			if (variableValue == null) {
 				throw new UndefinedVariableException(currentBoundVariable,
@@ -108,7 +98,7 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 			VariableEvaluator variableEval = (VariableEvaluator) vertexEvalMarker
 					.getMark(currentBoundVariable);
 			variableEval.setValue(variableValue);
-			inc = inc.getNextIsBoundVarOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsBoundVarOf(EdgeDirection.IN);
 		}
 	}
 
@@ -130,13 +120,13 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 	 * sets the values of all bound variables and evaluates the queryexpression
 	 */
 	@Override
-	public Object evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		if (boundVariablesChanged) {
 			initializeBoundVariables();
 			boundVariablesChanged = false;
 		}
 
-		if (vertex.get_importedTypes() != null && graph != null) {
+		if (vertex.get_importedTypes() != null) {
 			Schema graphSchema = graph.getSchema();
 			for (String importedType : vertex.get_importedTypes()) {
 				if (importedType.endsWith(".*")) {
@@ -168,17 +158,17 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 			}
 		}
 
-		Expression boundExpression = vertex.getFirstIsQueryExprOfIncidence(
-				EdgeDirection.IN).getAlpha();
+		Expression boundExpression = (Expression) vertex
+				.getFirstIsQueryExprOfIncidence(EdgeDirection.IN).getAlpha();
 		VertexEvaluator eval = vertexEvalMarker.getMark(boundExpression);
-		Object result = eval.getResult();
+		JValue result = eval.getResult(subgraph);
 		// if the query contains a "store as " - clause, there is a
 		// "isIdOfInc"-Incidence connected with the Greql2Expression
 		IsIdOf storeInc = vertex.getFirstIsIdOfIncidence(EdgeDirection.IN);
 		if (storeInc != null) {
 			VertexEvaluator storeEval = vertexEvalMarker.getMark(storeInc
 					.getAlpha());
-			String varName = storeEval.getResult().toString();
+			String varName = storeEval.getResult(null).toString();
 			boundVariables.put(varName, result);
 		}
 		return result;
@@ -186,8 +176,8 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsGreql2Expression(
-				this, graphSize);
+		return this.greqlEvaluator.getCostModel()
+				.calculateCostsGreql2Expression(this, graphSize);
 	}
 
 }

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,14 +32,14 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
 
 /**
  * Creates a NFA wich accepts a single edge out of the --edge-> - clause
@@ -60,15 +56,15 @@ public class EdgePathDescriptionEvaluator extends
 	}
 
 	@Override
-	public NFA evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		Edge evalEdge = vertex.getFirstIsEdgeExprOfIncidence();
 		VertexEvaluator edgeEval = null;
 		if (evalEdge != null) {
 			edgeEval = vertexEvalMarker.getMark(evalEdge.getAlpha());
 		}
-		TypeCollection typeCollection = new TypeCollection();
-		IsTypeRestrOfExpression inc = vertex
-				.getFirstIsTypeRestrOfExpressionIncidence(EdgeDirection.IN);
+		JValueTypeCollection typeCollection = new JValueTypeCollection();
+		IsTypeRestrOf inc = vertex
+				.getFirstIsTypeRestrOfIncidence(EdgeDirection.IN);
 		EdgeRestrictionEvaluator edgeRestEval = null;
 		VertexEvaluator predicateEvaluator = null;
 		if (inc != null) {
@@ -80,7 +76,7 @@ public class EdgePathDescriptionEvaluator extends
 		createdNFA = NFA.createEdgePathDescriptionNFA(getEdgeDirection(vertex),
 				typeCollection, getEdgeRoles(edgeRestEval), edgeEval,
 				predicateEvaluator, vertexEvalMarker);
-		return createdNFA;
+		return new JValueImpl(createdNFA);
 	}
 
 	@Override

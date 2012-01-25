@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,8 +33,6 @@ package de.uni_koblenz.jgralab.greql2.exception;
 
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-
 /**
  * This exception should be thrown if a query accesses a type that doesn't exist
  * in the datagraph schema
@@ -52,14 +46,14 @@ public class UnknownTypeException extends QuerySourceException {
 
 	public UnknownTypeException(String typeName,
 			List<SourcePosition> sourcePositions, Exception cause) {
-		super("Schema doesn't contain a type '" + typeName + "'", null,
-				sourcePositions, cause);
+		super("The Datagraph schema doesn't contain a type '" + typeName + "'",
+				null, sourcePositions, cause);
 	}
 
 	public UnknownTypeException(String typeName,
 			List<SourcePosition> sourcePositions) {
-		super("Schema doesn't contain a type '" + typeName + "'", null,
-				sourcePositions);
+		super("The Datagraph schema doesn't contain a type '" + typeName + "'",
+				null, sourcePositions);
 	}
 
 }

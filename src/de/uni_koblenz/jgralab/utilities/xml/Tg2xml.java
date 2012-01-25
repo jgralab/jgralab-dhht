@@ -66,8 +66,8 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -81,7 +81,7 @@ public class Tg2xml extends GraphVisitor {
 	private final String schemaLocation;
 	private final OutputStream outputStream;
 	private final IndentingXMLStreamWriter writer;
-	private final GraphMarker<IncidencePositionMark> incidencePositionMarker;
+	private final LocalGenericGraphMarker<IncidencePositionMark> incidencePositionMarker;
 
 	private static class IncidencePositionMark {
 		public int fseq, tseq;
@@ -93,7 +93,7 @@ public class Tg2xml extends GraphVisitor {
 			String nameSpacePrefix, String schemaLocation) throws IOException,
 			XMLStreamException {
 		super(graph);
-		incidencePositionMarker = new GraphMarker<IncidencePositionMark>(graph);
+		incidencePositionMarker = new LocalGenericGraphMarker<IncidencePositionMark>(graph);
 
 		Schema schema = graph.getSchema();
 		String qualifiedName = schema.getQualifiedName();
@@ -113,7 +113,7 @@ public class Tg2xml extends GraphVisitor {
 				outputStream, "UTF-8"));
 	}
 
-	public Tg2xml(BufferedOutputStream outputStream, BooleanGraphMarker marker,
+	public Tg2xml(BufferedOutputStream outputStream, LocalBooleanGraphMarker marker,
 			String nameSpacePrefix, String schemaLocation) throws IOException,
 			XMLStreamException {
 		this(outputStream, marker.getGraph(), nameSpacePrefix, schemaLocation);
@@ -125,7 +125,7 @@ public class Tg2xml extends GraphVisitor {
 		try {
 			writer.writeStartDocument("UTF-8", "1.0");
 
-			writer.writeStartElement(prefix, graph.getAttributedElementClass()
+			writer.writeStartElement(prefix, graph.getMetaClass()
 					.getQualifiedName(), namespaceURI);
 			writer.writeNamespace(prefix, namespaceURI);
 			writer.writeNamespace("xsi",
@@ -133,7 +133,7 @@ public class Tg2xml extends GraphVisitor {
 			writer.writeAttribute("xsi:schemaLocation", namespaceURI + " "
 					+ schemaLocation);
 			writer.writeAttribute(GRUML_ATTRIBUTE_ID, GRUML_ID_PREFIX_GRAPH
-					+ graph.getId());
+					+ graph.getCompleteGraphUid());
 			writeAttributes(graph);
 
 		} catch (XMLStreamException e) {
@@ -144,10 +144,10 @@ public class Tg2xml extends GraphVisitor {
 	@Override
 	protected void visitVertex(Vertex v) throws XMLStreamException {
 		// write vertex
-		writer.writeEmptyElement(v.getAttributedElementClass()
+		writer.writeEmptyElement(v.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_ID, GRUML_ID_PREFIX_VERTEX
-				+ v.getId());
+				+ v.getGlobalId());
 		writeAttributes(v);
 		// iterate over incidences and mark these edges
 		int i = 1;
@@ -170,14 +170,14 @@ public class Tg2xml extends GraphVisitor {
 	@Override
 	protected void visitEdge(Edge e) throws XMLStreamException {
 		IncidencePositionMark currentMark = incidencePositionMarker.getMark(e);
-		writer.writeEmptyElement(e.getAttributedElementClass()
+		writer.writeEmptyElement(e.getMetaClass()
 				.getQualifiedName());
 		writer.writeAttribute(GRUML_ATTRIBUTE_FROM, GRUML_ID_PREFIX_VERTEX
-				+ e.getAlpha().getId());
+				+ e.getAlpha().getCompleteGraphUid());
 		writer.writeAttribute(GRUML_ATTRIBUTE_FSEQ, Integer
 				.toString(currentMark.fseq));
 		writer.writeAttribute(GRUML_ATTRIBUTE_TO, GRUML_ID_PREFIX_VERTEX
-				+ e.getOmega().getId());
+				+ e.getOmega().getCompleteGraphUid());
 		writer.writeAttribute(GRUML_ATTRIBUTE_TSEQ, Integer
 				.toString(currentMark.tseq));
 		writeAttributes(e);
@@ -216,7 +216,7 @@ public class Tg2xml extends GraphVisitor {
 	private void writeAttributes(AttributedElement element)
 			throws XMLStreamException {
 
-		for (Attribute currentAttribute : element.getAttributedElementClass()
+		for (Attribute currentAttribute : element.getMetaClass()
 				.getAttributeList()) {
 			String currentName = currentAttribute.getName();
 			try {

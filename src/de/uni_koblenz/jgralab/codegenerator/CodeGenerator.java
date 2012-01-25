@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -46,7 +42,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
 
 /**
  * TODO add comment
@@ -63,21 +58,17 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, STDIMPL, DBIMPL, TRANSIMPL, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, DISTRIBUTEDPROXIES, DISKPROXIES, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
 			List<GenerationCycle> out = new ArrayList<GenerationCycle>();
 			out.add(ABSTRACT);
-			if (config.hasStandardSupport()) {
-				out.add(STDIMPL);
-			}
-			if (config.hasTransactionSupport()) {
-				out.add(TRANSIMPL);
-			}
-			if (config.hasDatabaseSupport()) {
-				out.add(DBIMPL);
-			}
+			out.add(MEMORYBASED);
+			out.add(DISTRIBUTED);
+			out.add(DISKBASED);
+			out.add(DISTRIBUTEDPROXIES);
+			out.add(DISKPROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -86,28 +77,45 @@ public abstract class CodeGenerator {
 		 * 
 		 * @return
 		 */
-		protected boolean isStdImpl() {
-			return this == STDIMPL;
+		protected boolean isMembasedImpl() {
+			return this == MEMORYBASED;
 		}
-
-
+		
+		
 		/**
 		 * 
-		 * @return Returns true if support for database impl classes is enabled,
-		 *         otherwise false.
+		 * @return
 		 */
-		protected boolean isDbImpl() {
-			return this == DBIMPL;
+		protected boolean isDistributedImpl() {
+			return this == DISTRIBUTED;
 		}
+		
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isDiskbasedImpl() {
+			return this == DISKBASED;
+		}
+		
+		
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isImplementationVariant() {
+			return this == DISKBASED || this == MEMORYBASED || this == DISTRIBUTED;
+		}
+
 
 		/**
 		 * 
 		 * @return
 		 */
-		protected boolean isTransImpl() {
-			return this == TRANSIMPL;
+		protected boolean isProxies() {
+			return this == DISKPROXIES || this == DISTRIBUTEDPROXIES;
 		}
-
+		
 		/**
 		 * 
 		 * @return
@@ -124,13 +132,6 @@ public abstract class CodeGenerator {
 			return this == CLASSONLY;
 		}
 
-		/**
-		 * 
-		 * @return
-		 */
-		protected boolean isStdOrDbImplOrTransImpl() {
-			return (this == STDIMPL) || (this == TRANSIMPL) || (this == DBIMPL);
-		}
 	}
 
 	private final List<GenerationCycle> cycles;
@@ -162,11 +163,11 @@ public abstract class CodeGenerator {
 	 *            calculates the name
 	 *            schemaRootPackageName.packageName.implementationName, in the
 	 *            example
-	 *            "de.uni_koblenz.jgralab.greql2.comprehension.Listcomprehension"
+	 *            "de.uni_koblenz.jgralab.greql2.comprehension.Bagcomprehension"
 	 *            for the interface and possibly
 	 *            schemaRootPackageName.impl.packageName.implementationName, in
 	 *            the example
-	 *            "de.uni_koblenz.jgralab.greql2.impl.comprehension.Listcomprehension"
+	 *            "de.uni_koblenz.jgralab.greql2.impl.comprehension.Bagcomprehension"
 	 *            for the default implementation class
 	 * @param config
 	 *            The {@link CodeGeneratorConfiguration} to be used when
@@ -176,41 +177,26 @@ public abstract class CodeGenerator {
 			CodeGeneratorConfiguration config) {
 		this.schemaRootPackageName = schemaRootPackageName;
 		this.config = config;
-
 		rootBlock = new CodeList(null);
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
-		rootBlock.setVariable("jgTransPackage", "de.uni_koblenz.jgralab.trans");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
-		rootBlock.setVariable("jgImplStdPackage",
-				"de.uni_koblenz.jgralab.impl.std");
-		rootBlock.setVariable("jgImplTransPackage",
-				"de.uni_koblenz.jgralab.impl.trans");
-		rootBlock.setVariable("jgImplDbPackage",
-				"de.uni_koblenz.jgralab.impl.db");
-		rootBlock.setVariable("jgSchemaPackage",
-				"de.uni_koblenz.jgralab.schema");
-		rootBlock.setVariable("jgSchemaImplPackage",
-				"de.uni_koblenz.jgralab.schema.impl");
+		rootBlock.setVariable("jgDiskImplPackage", "de.uni_koblenz.jgralab.impl.disk");
+		rootBlock.setVariable("jgDistributedImplPackage", "de.uni_koblenz.jgralab.impl.distributed");
+		rootBlock.setVariable("jgMemImplPackage", "de.uni_koblenz.jgralab.impl.mem");
+		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
+		rootBlock.setVariable("jgSchemaImplPackage", "de.uni_koblenz.jgralab.schema.impl");
+		
 
 		if ((packageName != null) && !packageName.equals("")) {
-			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."
-					+ packageName);
-			// schema implementation packages (standard, db and for
-			// transaction)
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std." + packageName);
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans." + packageName);
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db." + packageName);
+			rootBlock.setVariable("schemaPackage", schemaRootPackageName + "."	+ packageName);
+			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem." + packageName);
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed." + packageName);
+			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
-			rootBlock.setVariable("schemaImplStdPackage", schemaRootPackageName
-					+ ".impl.std");
-			rootBlock.setVariable("schemaImplTransPackage",
-					schemaRootPackageName + ".impl.trans");
-			rootBlock.setVariable("schemaImplDbPackage", schemaRootPackageName
-					+ ".impl.db");
+			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem");
+			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed");
+			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
 		rootBlock.setVariable("isImplementationClassOnly", "false");
@@ -275,13 +261,16 @@ public abstract class CodeGenerator {
 					+ outputFile.getAbsolutePath(), e);
 		}
 	}
+	
+	
+
 
 	public void createFiles(String pathPrefix) throws GraphIOException {
 		// String className = rootBlock.getVariable("className");
 		String simpleClassName = rootBlock.getVariable("simpleClassName");
 		String schemaPackage = rootBlock.getVariable("schemaPackage");
-		String simpleImplClassName = rootBlock
-				.getVariable("simpleImplClassName");
+		String simpleImplClassName = rootBlock.getVariable("simpleImplClassName");
+		String simpleProxyClassName =  simpleClassName + "Proxy";
 		String schemaImplPackage = "";
 
 		logger.finer("createFiles(\"" + pathPrefix + "\")");
@@ -291,43 +280,46 @@ public abstract class CodeGenerator {
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
+			System.out.println("Creating Code for class: " + simpleClassName);
 			createCode();
 			if (currentCycle.isAbstract()) {
-				logger
-						.finer("Creating interface for class: "
-								+ simpleClassName);
-				logger.finer("Writing file to: " + pathPrefix + "/"
-						+ schemaPackage);
+				logger.finer("Creating interface for class: "+ simpleClassName);
+				logger.finer("Writing file to: " + pathPrefix + "/"	+ schemaPackage);
 			}
-			if (currentCycle.isStdOrDbImplOrTransImpl()) {
-				if (currentCycle.isStdImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplStdPackage");
-					logger
-							.finer(" - schemaImplStdPackage="
-									+ schemaImplPackage);
+			if (currentCycle.isImplementationVariant() || currentCycle.isProxies()) {
+				switch (currentCycle) {
+				case MEMORYBASED:
+					schemaImplPackage = rootBlock.getVariable("schemaMemImplPackage");
+					break;
+				case DISTRIBUTED:
+				case DISTRIBUTEDPROXIES:
+					schemaImplPackage = rootBlock.getVariable("schemaDistributedImplPackage");
+					break;
+				case DISKBASED:	
+				case DISKPROXIES:
+					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
+					break;
+				default:
+					throw new RuntimeException("Unhandled case");
 				}
-				if (currentCycle.isTransImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplTransPackage");
-					logger.finer(" - schemaImplTransPackage="
-							+ schemaImplPackage);
+				if (currentCycle.isImplementationVariant()) {
+					writeCodeToFile(pathPrefix, simpleImplClassName + ".java",	schemaImplPackage);
+				} else if (hasProxySupport()) {
+					writeCodeToFile(pathPrefix, simpleProxyClassName + ".java",	schemaImplPackage);
 				}
-				if (currentCycle.isDbImpl()) {
-					schemaImplPackage = rootBlock
-							.getVariable("schemaImplDbPackage");
-					logger.finer(" - schemaImplDbPackage=" + schemaImplPackage);
-				}
-				writeCodeToFile(pathPrefix, simpleImplClassName + ".java",
-						schemaImplPackage);
 			} else {
-				writeCodeToFile(pathPrefix, simpleClassName + ".java",
-						schemaPackage);
+				writeCodeToFile(pathPrefix, simpleClassName + ".java", schemaPackage);
 			}
 			currentCycle = getNextCycle();
 		}
 	}
 
+	
+	
+	protected boolean hasProxySupport() {
+		return false;
+	}
+	
 	/**
 	 * creates the generated code string for a class
 	 */
@@ -355,14 +347,19 @@ public abstract class CodeGenerator {
 			case ABSTRACT:
 				code.add("package #schemaPackage#;");
 				break;
-			case STDIMPL:
-				code.add("package #schemaImplStdPackage#;");
+			case MEMORYBASED:
+				code.add("package #schemaMemImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgMemImplPackage"));
 				break;
-			case TRANSIMPL:
-				code.add("package #schemaImplTransPackage#;");
+			case DISTRIBUTED:
+			case DISTRIBUTEDPROXIES:
+				code.add("package #schemaDistributedImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDistributedImplPackage"));
 				break;
-			case DBIMPL:
-				code.add("package #schemaImplDbPackage#;");
+			case DISKBASED:
+			case DISKPROXIES:	
+				code.add("package #schemaDiskImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskImplPackage"));
 				break;
 			case CLASSONLY:
 				code.add("package #schemaPackage#;");
@@ -403,21 +400,21 @@ public abstract class CodeGenerator {
 	 * 
 	 * @return a Vector of {@code JavaSourceFromString}s from the generated code
 	 */
-	public Vector<InMemoryJavaSourceFile> createJavaSources() {
+	public Vector<JavaSourceFromString> createJavaSources() {
 		String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
-		Vector<InMemoryJavaSourceFile> javaSources = new Vector<InMemoryJavaSourceFile>(
-				2);
+		String proxyClassName = rootBlock.getVariable("proxyClassName");
+		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
-			if (currentCycle.isStdOrDbImplOrTransImpl()) {
-				javaSources.add(new InMemoryJavaSourceFile(implClassName,
-						rootBlock.getCode()));
-			} else {
-				javaSources.add(new InMemoryJavaSourceFile(className, rootBlock
-						.getCode()));
+			if (currentCycle.isImplementationVariant()) {
+				javaSources.add(new JavaSourceFromString(implClassName,	rootBlock.getCode()));
+			} else if (currentCycle.isProxies()) {
+				javaSources.add(new JavaSourceFromString(proxyClassName,	rootBlock.getCode()));
+			} else {	
+				javaSources.add(new JavaSourceFromString(className, rootBlock.getCode()));
 			}
 			currentCycle = getNextCycle();
 		}
@@ -430,7 +427,7 @@ public abstract class CodeGenerator {
 	 * 
 	 * @return The next matching {@link GenerationCycle}.
 	 */
-	private GenerationCycle getNextCycle() {
+	protected GenerationCycle getNextCycle() {
 		// end of generation cycle
 		if (cycleCount >= cycles.size()) {
 			// cycleCount = 0;

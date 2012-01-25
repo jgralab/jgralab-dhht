@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,16 +30,11 @@
  */
 package de.uni_koblenz.jgralabtest.impl.trans;
 
-import org.pcollections.PMap;
+import java.util.HashMap;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralabtest.schemas.record.BooleanType;
-import de.uni_koblenz.jgralabtest.schemas.record.Node;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.record.RecordTestSchema;
 
 public class TryRecordLoading {
 
@@ -56,15 +47,14 @@ public class TryRecordLoading {
 		RecordTestGraph graph = RecordTestSchema.instance()
 				.createRecordTestGraph();
 		Node node = graph.createNode();
-		PMap<Integer, String> map = JGraLab.map();
-		node.set_nodeMap(map);
-		node.set_testRecord(new BooleanType(true, false));
+		node.set_nodeMap(new HashMap<Integer, String>());
+		node.set_testRecord(graph.createBooleanType(true, false));
 		graph.createLink(node, node);
 
 		// save graph to file
 		String filename = "./testit/testgraphs/record.tg";
 
-		GraphIO.saveGraphToFile(graph, filename, new ConsoleProgressFunction());
+		GraphIO.saveGraphToFile(filename, graph, new ConsoleProgressFunction());
 
 		// load graph with transaction support
 
@@ -74,4 +64,5 @@ public class TryRecordLoading {
 		System.out.println("Success!");
 
 	}
+
 }

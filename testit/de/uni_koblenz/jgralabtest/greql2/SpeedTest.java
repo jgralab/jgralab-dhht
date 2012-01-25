@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,12 +34,13 @@ package de.uni_koblenz.jgralabtest.greql2;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 
-public class SpeedTest extends GenericTest {
+public class SpeedTest extends GenericTests {
 
+	@Override
 	protected Graph getTestGraph() throws Exception {
+		printTestFunctionHeader("GenerateTestGraph");
+
 		int count = 10;
 		String part1 = "from i:a report ";
 		String part2 = " end where q:=a, l:=a, m:=a, n:=a, o:=a, p:=a, k:= a, j:=a, h := a, g := a, f:= a, e := a, d:=a, c:=a, b:=a, a:=4";
@@ -56,7 +53,9 @@ public class SpeedTest extends GenericTest {
 			queryString.append(part2);
 		}
 		String query = queryString.toString();
+		System.out.println("QueryString is : " + query);
 		Graph g = GreqlParser.parse(query);
+		printTestFunctionFooter("GenerateTestGraph");
 		return g;
 	}
 
@@ -64,19 +63,20 @@ public class SpeedTest extends GenericTest {
 	// need more than 10 seconds. But currently it needs infinite time...
 	@Test(timeout = 10000)
 	public void testCountFunctionEvaluation() throws Exception {
-		String queryString = "list(tup(\"Nodes:\", count(from  v:V{} report v end)), tup(\"Edges:\", count(from  e:E{} report e end)))";
+		printTestFunctionHeader("GraphSize");
+		String queryString = "bag(tup(\"Nodes:\", count(from  v:V{} report v end)), tup(\"Edges:\", count(from  e:E{} report e end)))";
 		Graph datagraph = getTestGraph();
 
-		// System.out.println("Creating evaluator");
+		System.out.println("Creating evaluator");
 		GreqlEvaluator eval = new GreqlEvaluator(queryString, datagraph, null);
-		// System.out.println("Starting evaluation");
+		System.out.println("Starting evaluation");
 		eval.startEvaluation();
 
-		// TODO test seriously
-		// System.out.println("Result of the evaluation was: "
-		// + eval.getEvaluationResult().toString());
-		// System.out.println("Overall evaluation took "
-		// + eval.getOverallEvaluationTime() + " Milliseconds");
+		System.out.println("Result of the evaluation was: "
+				+ eval.getEvaluationResult().toString());
+		System.out.println("Overall evaluation took "
+				+ eval.getOverallEvaluationTime() + " Milliseconds");
+		printTestFunctionFooter("GraphSize");
 	}
 
 }

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,15 +37,17 @@ import java.util.NoSuchElementException;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.GraphClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
- * This class provides an Iterable to iterate over vertices in a graph. One may
- * use this class to use the advanced for-loop of Java 5. Instances of this
- * class should never, and this means <b>never</b> created manually but only
- * using the methods <code>vertices(params)</code> of th graph. Every special
- * graphclass contains generated methods similar to
- * <code>vertices(params)</code> for every VertexClass that is part of the
- * GraphClass.
+ * This class provides an {@link Iterable} to iterate over vertices in a
+ * {@link Graph}. One may use this class to use the advanced for-loop of Java 5.
+ * Instances of this class should never, and this means <b>never</b> created
+ * manually but only using the method {@link Graph#getVertices()} or its
+ * variants. Every special {@link GraphClass} contains generated methods similar
+ * to {@link Graph#getVertices()} for every {@link VertexClass} that is part of
+ * the {@link GraphClass}.
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -60,7 +58,7 @@ import de.uni_koblenz.jgralab.Vertex;
 public class VertexIterable<V extends Vertex> implements Iterable<V> {
 
 	/**
-	 * This Iterator iterates over all vertices in a graph
+	 * This {@link Iterator} iterates over all vertices in a {@link Graph}.
 	 * 
 	 * @author ist@uni-koblenz.de
 	 * 
@@ -68,91 +66,149 @@ public class VertexIterable<V extends Vertex> implements Iterable<V> {
 	class VertexIterator implements Iterator<V> {
 
 		/**
-		 * the vertex that hasNext() retrieved and that a call of next() will
-		 * return
+		 * The {@link Vertex} that a call of next() will return
 		 */
 		protected V current = null;
 
 		/**
-		 * the graph this iterator works on
+		 * The {@link Graph} this {@link Iterator} works on.
 		 */
-		protected InternalGraph graph = null;
+		protected Graph graph = null;
 
 		protected Class<? extends Vertex> vc;
 
 		/**
-		 * the version of the vertex list of the graph at the beginning of the
-		 * iteration. This information is used to check if the vertex list has
-		 * changed, the failfast-iterator will then throw an exception the next
-		 * time "next()" is called
+		 * The version of the vertex list of the {@link Graph} at the beginning
+		 * of the iteration. This information is used to check if the vertex
+		 * list has changed, the failfast-iterator will then throw an exception
+		 * the next time {@link #next()} is called
 		 */
 		protected long vertexListVersion;
 
+		protected Graph traversalContext;
+
 		/**
-		 * creates a new VertexIterator for the given graph
+		 * Creates a new {@link VertexIterator} for the given {@link Graph}
+		 * <code>graph</code>.
 		 * 
-		 * @param g
-		 *            the graph to work on
+		 * @param traversalContext
+		 *            {@link Graph}
+		 * @param graph
+		 *            {@link Graph}
 		 */
 		@SuppressWarnings("unchecked")
-		VertexIterator(InternalGraph g, Class<? extends Vertex> vc) {
-			graph = g;
+		VertexIterator(Graph traversalContext, Graph graph,
+				Class<? extends Vertex> vc)  {
+			this.graph = graph;
 			this.vc = vc;
-			vertexListVersion = g.getVertexListVersion();
+			vertexListVersion = graph.getVertexListVersion();
+			this.traversalContext = traversalContext;
 			current = (V) (vc == null ? graph.getFirstVertex() : graph
 					.getFirstVertex(vc));
 		}
 
-		/**
-		 * @return the next vertex in the graph which mathes the conditions of
-		 *         this iterator
-		 */
 		@SuppressWarnings("unchecked")
+		@Override
 		public V next() {
-			if (graph.isVertexListModified(vertexListVersion)) {
-				throw new ConcurrentModificationException(
-						"The vertex list of the graph has been modified - the iterator is not longer valid");
-			}
-			if (current == null) {
-				throw new NoSuchElementException();
-			}
-			V result = current;
-			current = (V) (vc == null ? current.getNextVertex() : current
-					.getNextVertex(vc));
-			return result;
+				if (graph.isVertexListModified(vertexListVersion)) {
+					throw new ConcurrentModificationException(
+							"The vertex list of the graph has been modified - the iterator is not longer valid");
+				}
+				if (current == null) {
+					throw new NoSuchElementException();
+				}
+				V result = current;
+				current = (V) (vc == null ? current.getNextVertex(traversalContext)
+						: current.getNextVertex(traversalContext, vc));
+				return result;
 		}
 
-		/**
-		 * @return true iff there is at least one next vertex to retrieve
-		 */
+		@Override
 		public boolean hasNext() {
 			return current != null;
 		}
 
 		/**
-		 * Using the VertexIterator, it is <b>not</b> possible to remove
-		 * vertices from a graph neither the iterator will recognize such a
-		 * removal.
+		 * Checks if the sequence of {@link Vertex} was modified. In this case a
+		 * {@link ConcurrentModificationException} is thrown
 		 * 
-		 * @throw UnsupportedOperationException every time the method is called
+		 * @throws ConcurrentModificationException
 		 */
+		protected void checkConcurrentModification()  {
+			if (graph.isVertexListModified(vertexListVersion)) {
+				throw new ConcurrentModificationException(
+						"The vertex list of the graph has been modified - the iterator is not longer valid");
+			}
+		}
+
+		@Override
 		public void remove() {
 			throw new UnsupportedOperationException(
 					"It is not allowed to remove vertices during iteration.");
 		}
 	}
 
+	/**
+	 * The current {@link Iterator}.
+	 */
 	private VertexIterator iter;
 
-	public VertexIterable(Graph g) {
-		this(g, null);
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code>.
+	 * 
+	 * @param graph
+	 *            {@link Graph}
+	 */
+	public VertexIterable(Graph graph)  {
+		this(graph.getTraversalContext(), graph, null);
 	}
 
-	public VertexIterable(Graph g, Class<? extends Vertex> vc) {
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code> which are an instance of <code>vc</code>.
+	 * 
+	 * @param graph
+	 *            {@link Graph}
+	 * @param vc
+	 *            {@link Class}
+	 */
+	public VertexIterable(Graph g, Class<? extends Vertex> vc)  {
 		assert g != null;
-		iter = new VertexIterator((InternalGraph) g, vc);
+		iter = new VertexIterator(g.getTraversalContext(), g, vc);
 	}
 
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param graph
+	 *            {@link Graph}
+	 */
+	public VertexIterable(Graph traversalContext, Graph graph)  {
+		this(traversalContext, graph, null);
+	}
+
+	/**
+	 * Creates a {@link VertexIterable} to iterate over all vertices of
+	 * <code>graph</code> which are an instance of <code>vc</code>.
+	 * 
+	 * @param traversalContext
+	 *            {@link Graph}
+	 * @param graph
+	 *            {@link Graph}
+	 * @param vc
+	 *            {@link Class}
+	 */
+	public VertexIterable(Graph traversalContext, Graph g,
+			Class<? extends Vertex> vc)  {
+		assert g != null;
+		iter = new VertexIterator(traversalContext, g, vc);
+	}
+
+	@Override
 	public Iterator<V> iterator() {
 		return iter;
 	}

@@ -76,7 +76,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.WorkInProgress;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -106,7 +106,7 @@ public class Xml2tg {
 
 	private Queue<AttributedElementInfo> edgesToCreate;
 
-	private GraphMarker<IncidencePositionMark> incidencePositionMarker;
+	private LocalGenericGraphMarker<IncidencePositionMark> incidencePositionMarker;
 
 	private boolean assumeVerticesBeforeEdges;
 
@@ -346,7 +346,7 @@ public class Xml2tg {
 											+ graphClassName, e);
 						}
 						// inicialize markers
-						incidencePositionMarker = new GraphMarker<IncidencePositionMark>(
+						incidencePositionMarker = new LocalGenericGraphMarker<IncidencePositionMark>(
 								graph);
 
 					}

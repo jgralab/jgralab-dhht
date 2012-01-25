@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -35,13 +31,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
 
 /**
  * This is the base class for all path descriptions. It provides methods to add
@@ -50,9 +47,9 @@ import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
  * because the method PathDescriptionEvaluator.getResult(...) automaticly adds
  * start- and goalrestrictions to the pathdescription, if a start or
  * goalrestriction exists.
- *
+ * 
  * @author ist@uni-koblenz.de
- *
+ * 
  */
 public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 
@@ -63,7 +60,7 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 
 	/**
 	 * Creates a new PathDescriptionEvaluator
-	 *
+	 * 
 	 * @param eval
 	 */
 	public PathDescriptionEvaluator(GreqlEvaluator eval) {
@@ -73,9 +70,9 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	/**
 	 * returns the nfa
 	 */
-	public NFA getNFA() {
+	public NFA getNFA() throws EvaluateException {
 		if (createdNFA == null) {
-			getResult();
+			getResult(null);
 		}
 		return createdNFA;
 	}
@@ -84,16 +81,21 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	 * Returns the created NFA, encapsulated in a JValue The NFA for the path
 	 * description doesn't depend on the subgraph, so the getResult-Methode is
 	 * overwritten
-	 *
+	 * 
 	 * @return the result as jvalue
 	 */
 	@Override
-	public Object getResult() {
+	public JValue getResult(AbstractGraphMarker<AttributedElement> subgraph)
+			throws EvaluateException {
 		if (createdNFA == null) {
 			result = evaluate();
-			createdNFA = (NFA) result;
-			addGoalRestrictions();
-			addStartRestrictions();
+			try {
+				createdNFA = (NFA) result.toAutomaton();
+				addGoalRestrictions();
+				addStartRestrictions();
+			} catch (JValueInvalidTypeException ex) {
+				throw new EvaluateException("Error creating a Path NFA", ex);
+			}
 		}
 		return result;
 	}
@@ -103,7 +105,7 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	 * belong to this path descritpion and adds the transitions that accepts
 	 * them to the nfa
 	 */
-	protected void addGoalRestrictions() {
+	protected void addGoalRestrictions() throws EvaluateException {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator goalRestEval = null;
 		IsGoalRestrOf inc = pathDesc
@@ -111,17 +113,23 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 		if (inc == null) {
 			return;
 		}
-		TypeCollection typeCollection = new TypeCollection();
+		JValueTypeCollection typeCollection = new JValueTypeCollection();
 		while (inc != null) {
 			VertexEvaluator vertexEval = vertexEvalMarker.getMark(inc
 					.getAlpha());
 			if (vertexEval instanceof TypeIdEvaluator) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEval;
-				typeCollection.addTypes((TypeCollection) typeEval.getResult());
+				try {
+					typeCollection.addTypes(typeEval.getResult(null)
+							.toJValueTypeCollection());
+				} catch (JValueInvalidTypeException ex) {
+					throw new EvaluateException(
+							"Result of TypeId is not JValueTypeCollection", ex);
+				}
 			} else {
 				goalRestEval = vertexEval;
 			}
-			inc = inc.getNextIsGoalRestrOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsGoalRestrOf(EdgeDirection.IN);
 		}
 		NFA.addGoalTypeRestriction(getNFA(), typeCollection);
 		if (goalRestEval != null) {
@@ -133,10 +141,10 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	/**
 	 * creates the lists of start and goal type restrictions from all
 	 * TypeId-Vertices that belong to this path descritpion
-	 *
+	 * 
 	 * @return the generated list of types
 	 */
-	protected void addStartRestrictions() {
+	protected void addStartRestrictions() throws EvaluateException {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator startRestEval = null;
 		IsStartRestrOf inc = pathDesc
@@ -144,17 +152,23 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 		if (inc == null) {
 			return;
 		}
-		TypeCollection typeCollection = new TypeCollection();
+		JValueTypeCollection typeCollection = new JValueTypeCollection();
 		while (inc != null) {
 			VertexEvaluator vertexEval = vertexEvalMarker.getMark(inc
 					.getAlpha());
 			if (vertexEval instanceof TypeIdEvaluator) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEval;
-				typeCollection.addTypes((TypeCollection) typeEval.getResult());
+				try {
+					typeCollection.addTypes(typeEval.getResult(null)
+							.toJValueTypeCollection());
+				} catch (JValueInvalidTypeException ex) {
+					throw new EvaluateException(
+							"Result of TypeId is not JValueTypeCollection", ex);
+				}
 			} else {
 				startRestEval = vertexEval;
 			}
-			inc = inc.getNextIsStartRestrOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsStartRestrOf(EdgeDirection.IN);
 		}
 		NFA.addStartTypeRestriction(getNFA(), typeCollection);
 		if (startRestEval != null) {

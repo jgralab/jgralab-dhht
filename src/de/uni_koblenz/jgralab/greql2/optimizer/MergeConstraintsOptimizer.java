@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -41,16 +37,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
 
 /**
  * Merges all constraint {@link Expression}s that are connected to a
@@ -102,7 +93,7 @@ public class MergeConstraintsOptimizer extends OptimizerBase {
 			for (IsConstraintOf constraint : decl
 					.getIsConstraintOfIncidences(EdgeDirection.IN)) {
 				constraintEdges.add(constraint);
-				constraint = constraint.getNextIsConstraintOfIncidence();
+				constraint = constraint.getNextIsConstraintOf();
 			}
 			if (constraintEdges.size() > 1) {
 				constraintsGotMerged = true;
@@ -137,18 +128,16 @@ public class MergeConstraintsOptimizer extends OptimizerBase {
 	public Expression createConjunction(List<IsConstraintOf> constraintEdges,
 			Greql2 syntaxgraph) {
 		if (constraintEdges.size() == 1) {
-			return constraintEdges.get(0).getAlpha();
+			return (Expression) constraintEdges.get(0).getAlpha();
 		}
 		FunctionApplication funApp = syntaxgraph.createFunctionApplication();
 		FunctionId funId = OptimizerUtility.findOrCreateFunctionId("and",
 				syntaxgraph);
 		syntaxgraph.createIsFunctionIdOf(funId, funApp);
-		syntaxgraph.createIsArgumentOf(constraintEdges.get(0).getAlpha(),
-				funApp);
-		syntaxgraph.createIsArgumentOf(
-				createConjunction(
-						constraintEdges.subList(1, constraintEdges.size()),
-						syntaxgraph), funApp);
+		syntaxgraph.createIsArgumentOf((Expression) constraintEdges.get(0)
+				.getAlpha(), funApp);
+		syntaxgraph.createIsArgumentOf(createConjunction(constraintEdges
+				.subList(1, constraintEdges.size()), syntaxgraph), funApp);
 		return funApp;
 	}
 }

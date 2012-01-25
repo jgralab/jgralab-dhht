@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,14 +31,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf;
-import de.uni_koblenz.jgralab.greql2.schema.SimplePathDescription;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTypeCollection;
 
 /**
  * Evaluates a SimplePathDescription, that is something link v -->{isExprOf} w.
@@ -60,8 +56,8 @@ public class SimplePathDescriptionEvaluator extends
 	}
 
 	@Override
-	public NFA evaluate() {
-		TypeCollection typeCollection = new TypeCollection();
+	public JValue evaluate() throws EvaluateException {
+		JValueTypeCollection typeCollection = new JValueTypeCollection();
 		EdgeRestrictionEvaluator edgeRestEval = null;
 		VertexEvaluator predicateEvaluator = null;
 		for (IsEdgeRestrOf inc : vertex
@@ -75,7 +71,7 @@ public class SimplePathDescriptionEvaluator extends
 				getEdgeDirection(vertex), typeCollection,
 				getEdgeRoles(edgeRestEval), predicateEvaluator,
 				vertexEvalMarker);
-		return createdNFA;
+		return new JValueImpl(createdNFA);
 	}
 
 	@Override

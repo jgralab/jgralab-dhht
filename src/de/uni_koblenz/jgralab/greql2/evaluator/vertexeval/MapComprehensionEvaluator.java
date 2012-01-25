@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,18 +33,15 @@
  */
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import org.pcollections.PCollection;
-import org.pcollections.PMap;
-
-import de.uni_koblenz.jgralab.EdgeDirection;
-import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
-import de.uni_koblenz.jgralab.greql2.schema.MapComprehension;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueMap;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>
@@ -84,10 +77,10 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 	 * ()
 	 */
 	@Override
-	public Object evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		VariableDeclarationLayer declLayer = getVariableDeclationLayer();
 
-		PMap<Object, Object> resultMap = JGraLab.map();
+		JValueMap resultMap = new JValueMap();
 
 		Vertex key = vertex.getFirstIsKeyExprOfComprehensionIncidence(
 				EdgeDirection.IN).getAlpha();
@@ -96,10 +89,10 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 				EdgeDirection.IN).getAlpha();
 		VertexEvaluator valEval = vertexEvalMarker.getMark(val);
 		declLayer.reset();
-		while (declLayer.iterate()) {
-			Object jkey = keyEval.getResult();
-			Object jval = valEval.getResult();
-			resultMap = resultMap.plus(jkey, jval);
+		while (declLayer.iterate(subgraph)) {
+			JValue jkey = keyEval.getResult(subgraph);
+			JValue jval = valEval.getResult(subgraph);
+			resultMap.put(jkey, jval);
 		}
 		return resultMap;
 	}
@@ -123,7 +116,7 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 	}
 
 	@Override
-	protected PCollection<Object> getResultDatastructure() {
+	protected JValueCollection getResultDatastructure() {
 		return null;
 	}
 

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -81,19 +77,17 @@ public class GraphIOTest {
 	public static void main(String[] args) throws GraphIOException {
 		Schema ioTest = GraphIO.loadSchemaFromFile("GraphIOTestInput.tg");
 
-		GraphIO.saveSchemaToFile(ioTest, "GraphIOTestOutput.tg");
+		GraphIO.saveSchemaToFile("GraphIOTestOutput.tg", ioTest);
 		System.out.println("Fini.");
 	}
-
+	
 	@Test
 	public void testLoadCityMap() {
 		try {
 			File dir = new File(".");
 			dir.getAbsolutePath();
 			System.out.println(dir.getAbsolutePath());
-			GraphIO.loadSchemaAndGraphFromFile(dir.getAbsolutePath()
-					+ "/testit/testgraphs/citymapgraph.tg",
-					CodeGeneratorConfiguration.MINIMAL, null);
+			GraphIO.loadSchemaAndGraphFromFile(dir.getAbsolutePath() + "/testit/testgraphs/citymapgraph.tg", CodeGeneratorConfiguration.MINIMAL, null);
 		} catch (GraphIOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

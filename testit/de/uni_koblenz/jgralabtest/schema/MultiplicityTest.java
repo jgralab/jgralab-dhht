@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -53,10 +49,6 @@ import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
 import de.uni_koblenz.jgralab.graphvalidator.MultiplicityConstraintViolation;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.A;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.B;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public class MultiplicityTest {
 	private VertexTestGraph graph;
@@ -79,12 +71,12 @@ public class MultiplicityTest {
 	 * @throws GraphIOException
 	 */
 	private Schema compileSchema(String schemaString) throws GraphIOException {
-		ByteArrayInputStream input = new ByteArrayInputStream(
-				schemaString.getBytes());
+		ByteArrayInputStream input = new ByteArrayInputStream(schemaString
+				.getBytes());
 		Schema s = null;
 		s = GraphIO.loadSchemaFromStream(input);
 		try {
-			s.compile(CodeGeneratorConfiguration.FULL);
+			s.compile(CodeGeneratorConfiguration.FULL_WITHOUT_SUBCLASS_FLAGS);
 		} catch (Exception e) {
 			throw new GraphIOException("", e);
 		}

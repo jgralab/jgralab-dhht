@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -38,10 +34,7 @@ package de.uni_koblenz.jgralab.greql2.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
+import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
 
 /**
  * This is the base class for all exceptions that refeer to the querysource with
@@ -50,8 +43,9 @@ import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
  * @author ist@uni-koblenz.de
  * 
  */
-public class QuerySourceException extends GreqlException {
-	private static final long serialVersionUID = 8525494291742693931L;
+public class QuerySourceException extends EvaluateException {
+
+	static final long serialVersionUID = -1234561;
 
 	/**
 	 * the position in the query where exception occured
@@ -64,6 +58,11 @@ public class QuerySourceException extends GreqlException {
 	private Greql2Vertex element;
 
 	/**
+	 * the error message
+	 */
+	private String errorMessage;
+
+	/**
 	 * 
 	 * @param element
 	 *            the element that caused the error
@@ -71,9 +70,10 @@ public class QuerySourceException extends GreqlException {
 	 *            a list of sourceposition where the error possible occurs
 	 */
 	public QuerySourceException(String errorMessage, Greql2Vertex element,
-			List<SourcePosition> sourcePositions, Throwable cause) {
+			List<SourcePosition> sourcePositions, Exception cause) {
 		super(errorMessage, cause);
 		this.element = element;
+		this.errorMessage = errorMessage;
 		if (sourcePositions != null) {
 			positions = sourcePositions;
 		} else {
@@ -91,6 +91,7 @@ public class QuerySourceException extends GreqlException {
 	public QuerySourceException(String errorMessage, Greql2Vertex element,
 			SourcePosition sourcePosition, Exception cause) {
 		super(errorMessage, cause);
+		this.errorMessage = errorMessage;
 		this.element = element;
 		positions = new ArrayList<SourcePosition>();
 		positions.add(sourcePosition);
@@ -127,27 +128,26 @@ public class QuerySourceException extends GreqlException {
 	public String getMessage() {
 		StringBuilder sb = new StringBuilder();
 		if (positions.size() > 0) {
-			sb.append(super.getMessage());
+			sb.append(errorMessage);
 			sb.append(": query part '");
-			sb.append(element != null ? GreqlSerializer
-					.serializeVertex(element) : "<unknown element>");
+			sb.append((element != null) ? ((SerializableGreql2) element
+					.getGraph()).serialize(element) : "<unknown element>");
 			sb.append("' at position (");
 			sb.append(positions.get(0).get_offset());
 			sb.append(", ");
 			sb.append(positions.get(0).get_length());
 			sb.append(")");
 		} else {
-			sb.append(super.getMessage());
+			sb.append(errorMessage);
 			sb.append(": query part '");
-			sb.append(element != null ? GreqlSerializer
-					.serializeVertex(element) : "<unknown element>");
+			sb.append((element != null) ? ((SerializableGreql2) element
+					.getGraph()).serialize(element) : "<unknown element>");
 			sb.append("' at unknown position in query");
 		}
 
 		if (element != null) {
 			sb.append("\nComplete (optimized) Query: ");
-			sb.append(GreqlSerializer.serializeGraph((Greql2) element
-					.getGraph()));
+			sb.append(((SerializableGreql2) element.getGraph()).serialize());
 		}
 
 		return sb.toString();

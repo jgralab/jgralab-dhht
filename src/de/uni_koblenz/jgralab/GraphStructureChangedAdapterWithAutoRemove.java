@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,7 +30,51 @@
  */
 package de.uni_koblenz.jgralab;
 
-public class GraphStructureChangedAdapterWithAutoRemove extends
-		GraphStructureChangedAdapter implements
+
+/**
+ * This class provides an adapter for the
+ * <code>GraphStructureChangedListener</code>.
+ * 
+ * @author ist@uni-koblenz.de
+ * 
+ */
+public abstract class GraphStructureChangedAdapterWithAutoRemove implements
 		GraphStructureChangedListenerWithAutoRemove {
+
+	@Override
+	public void edgeAdded(Edge e) {
+	}
+
+	@Override
+	public void edgeDeleted(Edge e) {
+	}
+
+	@Override
+	public void maxEdgeCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void maxVertexCountIncreased(int newValue) {
+	}
+
+	@Override
+	public void vertexAdded(Vertex v) {
+	}
+
+	@Override
+	public void vertexDeleted(Vertex v) {
+	}
+
+	@Override
+	public void incidenceAdded(Incidence i) {
+	}
+
+	@Override
+	public void incidenceDeleted(Incidence i) {
+	}
+
+	@Override
+	public void maxIncidenceCountIncreased(int newValue) {
+	}
+
 }

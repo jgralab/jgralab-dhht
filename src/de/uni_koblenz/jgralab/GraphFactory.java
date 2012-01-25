@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,7 +31,9 @@
 
 package de.uni_koblenz.jgralab;
 
-import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
+import java.rmi.RemoteException;
+
+import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 
 /**
  * Creates instances of graphs, edges and vertices. By changing factory it is
@@ -45,213 +43,418 @@ import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
  */
 public interface GraphFactory {
 
-	// --- Methods for option STDIMPL
-	// ---------------------------------------------------
-
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraph(Class<? extends Graph> graphClass, String id,
-			int vMax, int eMax);
-
+	public Graph createGraph_InMemoryStorage(Class<? extends Graph> graphClass, String id, int vMax, int eMax);
+	
 	/**
 	 * creates a Graph-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified graphClass.
 	 */
-	public Graph createGraph(Class<? extends Graph> graphClass, String id);
+	public Graph createGraph_InMemoryStorage(Class<? extends Graph> graphClass, String id);
+	
+	
+	/**
+	 * creates a Graph-object for the specified class. The returned object may
+	 * be an instance of a subclass of the specified graphClass.
+	 */
+	public Graph createGraph_DistributedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+		
+	/**
+	 * creates a Graph-object for the specified class. The returned object may
+	 * be an instance of a subclass of the specified graphClass.
+	 * @param graphDatabase 
+	 */
+	public Graph createGraph_DiskBasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	
+	/**
+	 * creates a View-Graph object for the specified class. The returned object
+	 * may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param viewGraph
+	 * @param level
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl createViewGraph_InMemoryStorage(Graph viewGraph, int level);
+	
+	/**
+	 * creates a View-Graph object for the specified class. The returned object
+	 * may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param viewGraph
+	 * @param level
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl createViewGraph_DistributedStorage(Graph viewGraph, int level);
+	
+	/**
+	 * creates a View-Graph object for the specified class. The returned object
+	 * may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param viewGraph
+	 * @param level
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl createViewGraph_DiskBasedStorage(Graph viewGraph, int level);
 
+
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraphInVertex_InMemoryStorage(Vertex vertex);
+	
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraphInEdge_InMemoryStorage(Edge edge);
+	
+	
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl createSubordinateGraphInVertex_DistributedStorage(de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, long vertexId);
+	
+
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl createSubordinateGraphInEdge_DistributedStorage(de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, long edgeId);
+
+	
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphInVertex_DiskBasedStorage(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, long vertexId);
+	
+
+	/**
+	 * creates a Subordinate-Graph object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified graphClass.
+	 * 
+	 * @param elem
+	 * @return
+	 * @throws RemoteException 
+	 */
+	public de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl createSubordinateGraphInEdge_DiskBasedStorage(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, long edgeId);
+
+	
+	
+	
 	/**
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertex(Class<? extends Vertex> vertexClass, int id,
-			Graph g);
+	public Vertex createVertex_InMemoryStorage(Class<? extends Vertex> vertexClass, int id,	Graph g);
+	
+	/**
+	 * creates a Vertex-object for the specified class. The returned object may
+	 * be an instance of a subclass of the specified vertexClass.
+	 */
+	public Vertex createVertex_DistributedStorage(Class<? extends Vertex> vertexClass, long id,	de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase);
+	
+	/**
+	 * creates a Vertex-object for the specified class. The returned object may
+	 * be an instance of a subclass of the specified vertexClass.
+	 */
+	public Vertex createVertex_DiskBasedStorage(Class<? extends Vertex> vc, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localGraphDatabase);
+
+	/**
+	 * creates a Vertex-proxy for the specified class, acting as local API for the 
+	 * respective remote vertex identified by its global id. The returned object may
+	 * be an instance of a subclass of the specified vertexClass.
+	 */
+	public Vertex createVertexProxy_DistributedStorage(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	
+	/**
+	 * creates a Vertex-proxy for the specified class, acting as local API for the 
+	 * respective remote vertex identified by its global id. The returned object may
+	 * be an instance of a subclass of the specified vertexClass.
+	 */
+	public Vertex createVertexProxy_DiskBasedStorage(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	
+	
+	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localGraphDatabase, de.uni_koblenz.jgralab.impl.disk.VertexContainer container);
+	
+	
+	
+	/**
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
+	 */
+	public Edge createEdge_InMemoryStorage(Class<? extends Edge> edgeClass, int id, Graph g);
 
 	/**
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Edge createEdge(Class<? extends Edge> edgeClass, int id, Graph g,
-			Vertex alpha, Vertex omega);
-
-	public void setGraphImplementationClass(
-			Class<? extends Graph> graphSchemaClass,
-			Class<? extends Graph> graphImplementationClass);
-
-	public void setVertexImplementationClass(
-			Class<? extends Vertex> vertexSchemaClass,
-			Class<? extends Vertex> vertexImplementationClass);
-
-	public void setEdgeImplementationClass(
-			Class<? extends Edge> edgeSchemaClass,
-			Class<? extends Edge> edgeImplementationClass);
-
+	public Edge createEdge_DistributedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase);
+	
+	
 	/**
-	 * Creates a graph with database support.
-	 * 
-	 * @param graphClass
-	 *            The graph class.
-	 * @param graphDatabase
-	 *            Database graph should be contained in.
-	 * @param id
-	 *            Id of graph.
+	 * creates a Edge-object for the specified class. The returned object may be
+	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Graph createGraphWithDatabaseSupport(
-			Class<? extends Graph> graphClass, GraphDatabase graphDatabase,
-			String id);
+	public Edge createEdge_DiskBasedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase);
 
+	
 	/**
-	 * Creates a graph with database support.
-	 * 
-	 * @param graphClass
-	 *            The graph class.
-	 * @param graphDatabase
-	 *            Database graph should be contained in.
-	 * @param id
-	 *            Id of graph.
-	 * @param vMax
-	 *            Maximum initial count of vertices that can be held in graph.
-	 * @param eMax
-	 *            Maximum initial count of edges that can be held in graph.
+	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 
+	 * an instance of the class defined by <code>setEdgeImplementationClass</code> for the interface defined by <code>edgeClass</code>
 	 */
-	public Graph createGraphWithDatabaseSupport(
-			Class<? extends Graph> graphClass, GraphDatabase graphDatabase,
-			String id, int vMax, int eMax);
-
+	public Edge createEdgeProxy_DistributedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	
+	
 	/**
-	 * Creates a vertex instance of a specified class with database support.
-	 * Returned object may be an instance of a subclass of specified vertex
-	 * class.
-	 * 
-	 * @param vertexClass
-	 *            Class of vertex to instance.
-	 * @param id
-	 *            Identifier of vertex.
-	 * @param graph
-	 *            Graph which should contain created vertex.
+	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 
+	 * an instance of the class defined by <code>setEdgeImplementationClass</code> for the interface defined by <code>edgeClass</code>
 	 */
-	public Vertex createVertexWithDatabaseSupport(
-			Class<? extends Vertex> vertexClass, int id, Graph graph);
+	public Edge createEdgeProxy_DiskBasedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
+	
+	
 	/**
-	 * Creates an edge instance of specified class with database support.
-	 * Returned object may be an instance of a subclass of specified edge class.
-	 * 
+	 * reloads an local edge from disk storage and initializes the implementation class specified for
+	 * that edge class 
 	 * @param edgeClass
-	 *            Class of edge to instance.
 	 * @param id
-	 *            Identifier of edge.
-	 * @param graph
-	 *            Graph which should contain created edge.
-	 * @param alpha
-	 *            Start vertex of edge.
-	 * @param omega
-	 *            End vertex of edge.
+	 * @param graphDatabase
+	 * @return
 	 */
-	public Edge createEdgeWithDatabaseSupport(Class<? extends Edge> edgeClass,
-			int id, Graph graph, Vertex alpha, Vertex omega);
+	public Edge reloadLocalEdge(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, de.uni_koblenz.jgralab.impl.disk.EdgeContainer container);
 
+
+	
 	/**
-	 * Assigns an implementation class with database support for a
-	 * <code>Graph</code>.
+	 * Creates a {@link Incidence}-object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified
+	 * <code>incidenceClass</code>.
 	 * 
-	 * @param graphSchemaClass
-	 * @param graphImplementationClass
+	 * @param incidenceClass
+	 *            {@link Class}
+	 * @param id
+	 *            the id of this incidence
+	 * @param v
+	 *            {@link Vertex} to which the created {@link Incidence} is
+	 *            connected
+	 * @param e
+	 *            {@link Edge} to which the created {@link Incidence} is
+	 *            connected
+	 * @return {@link Incidence}
 	 */
-	public void setGraphDatabaseImplementationClass(
-			Class<? extends Graph> graphSchemaClass,
-			Class<? extends Graph> graphImplementationClass);
+	public <T extends Incidence> T createIncidence_InMemoryStorage(Class<T> incidenceClass,	int id, Vertex v, Edge e);
+	
+	public <T extends Incidence> T createIncidence_DistributedStorage(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase);
 
+	
 	/**
-	 * Assigns an implementation class with database support for a
-	 * <code>Vertex</code>.
+	 * Creates a {@link Incidence}-object for the specified class. The returned
+	 * object may be an instance of a subclass of the specified
+	 * <code>incidenceClass</code>.
 	 * 
-	 * @param vertexSchemaClass
-	 * @param vertexImplementationClass
+	 * @param incidenceClass
+	 *            {@link Class}
+	 * @param id
+	 *            the id of this incidence
+	 * @param v
+	 *            {@link Vertex} to which the created {@link Incidence} is
+	 *            connected
+	 * @param e
+	 *            {@link Edge} to which the created {@link Incidence} is
+	 *            connected
+	 * @return {@link Incidence}
 	 */
-	public void setVertexDatabaseImplementationClass(
-			Class<? extends Vertex> vertexSchemaClass,
-			Class<? extends Vertex> vertexImplementationClass);
+	public <T extends Incidence> T createIncidence_DiskBasedStorage(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase);
+	
+	
+	public <T extends Incidence> T createIncidenceProxy_DistributedStorage(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
+
+	public <T extends Incidence> T createIncidenceProxy_DiskBasedStorage(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	
+
+
+	public <T extends Incidence> T reloadLocalIncidence(Class<? extends T> incidenceClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, de.uni_koblenz.jgralab.impl.disk.IncidenceContainer container);
+	
+	
+	
+	
+	
+	
+	public void setGraphImplementationClass_InMemoryStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl> implementationClass);
+	
+	
+	public void setGraphImplementationClass_DistributedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.GraphBaseImpl> implementationClass);
+	
+	
+	public void setGraphImplementationClass_DiskBasedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl> implementationClass);
+	
+
+	public void setSubordinateGraphImplementationClass_InMemoryStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl> implementationClass);
+	
+	public void setSubordinateGraphImplementationClass_DistributedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.SubordinateGraphImpl> implementationClass);
+	
+	public void setSubordinateGraphImplementationClass_DiskBasedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass);
+
+	public void setViewGraphImplementationClass_InMemoryStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.ViewGraphImpl> implementationClass);
+	
+	public void setViewGraphImplementationClass_DistributedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl> implementationClass);
+	
+	public void setViewGraphImplementationClass_DiskBasedStorage(
+			Class<? extends Graph> graphM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass);
+		
+	
+	
 	/**
-	 * Assigns an implementation class with database support for an
-	 * <code>Edge</code>.
-	 * 
-	 * @param edgeSchemaClass
-	 * @param edgeImplementationClass
+	 * Sets the implementation class to be used for all vertices of the given M1 Class vertexM1Class if a graph
+	 * is created using the in-memory storage facility
+	 * @param vertexM1Class
+	 * @param implementationClass
 	 */
-	public void setEdgeDatabaseImplementationClass(
-			Class<? extends Edge> edgeSchemaClass,
-			Class<? extends Edge> edgeImplementationClass);
+	public void setVertexImplementationClass_InMemoryStorage(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.mem.VertexImpl> implementationClass);
+	
+	public void setVertexImplementationClass_DistributedStorage(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.VertexImpl> implementationClass);
+	
+	public void setVertexImplementationClass_DiskBasedStorage(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends  de.uni_koblenz.jgralab.impl.disk.VertexImpl> implementationClass);
+	
 
-	// --- Methods for option TRANSIMPL
-	// ------------------------------------------------
+	public void setVertexProxyImplementationClass_DistributedStorage(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends de.uni_koblenz.jgralab.Vertex> implementationClass);
+	
+	public void setVertexProxyImplementationClass_DiskBasedStorage(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends  de.uni_koblenz.jgralab.Vertex> implementationClass);
+	
+	
+	
+	public void setEdgeImplementationClass_InMemoryStorage(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
+	
+	public void setEdgeImplementationClass_DistributedStorage(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
 
+	public void setEdgeImplementationClass_DiskBasedStorage(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
+	
+	public void setEdgeProxyImplementationClass_DistributedStorage(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
+	
+	public void setEdgeProxyImplementationClass_DiskBasedStorage(Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass);
+	
+	
+	
+	
+	
+	public void setIncidenceImplementationClass_InMemoryStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+	
+	public void setIncidenceImplementationClass_DistributedStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+	
+	public void setIncidenceImplementationClass_DiskBasedStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+
+	public void setIncidenceProxyImplementationClass_DistributedStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+	
+	public void setIncidenceProxyImplementationClass_DiskBasedStorage(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass);
+
+	
+	
 	/**
-	 * creates a Graph-object for the specified class with transaction support.
-	 * The returned object may be an instance of a subclass of the specified
-	 * graphClass.
+	 * Creates an record of class <code>recordDomain</code> in the graph g
 	 */
-	public Graph createGraphWithTransactionSupport(
-			Class<? extends Graph> graphClass, String id, int vMax, int eMax);
-
+	public <T extends Record> T createRecord_InMemoryStorage(Class<T> recordDomain, Graph g);
+	
 	/**
-	 * creates a Graph-object for the specified class with transaction support.
-	 * The returned object may be an instance of a subclass of the specified
-	 * graphClass.
+	 * Creates an record of class <code>recordDomain</code> in the graph g
 	 */
-	public Graph createGraphWithTransactionSupport(
-			Class<? extends Graph> graphClass, String id);
-
+	public <T extends Record> T createRecord_DistributedStorage(Class<T> recordDomain, Graph g);
+	
 	/**
-	 * creates a Vertex-object for the specified class with transaction support.
-	 * The returned object may be an instance of a subclass of the specified
-	 * vertexClass.
+	 * Creates an record of class <code>recordDomain</code> in the graph g
 	 */
-	public Vertex createVertexWithTransactionSupport(
-			Class<? extends Vertex> vertexClass, int id, Graph g);
-
-	/**
-	 * creates a Edge-object for the specified class with transaction support.
-	 * The returned object may be an instance of a subclass of the specified
-	 * edgeClass.
-	 */
-	public Edge createEdgeWithTransactionSupport(
-			Class<? extends Edge> edgeClass, int id, Graph g, Vertex alpha,
-			Vertex omega);
+	public <T extends Record> T createRecord_DiskBasedStorage(Class<T> recordDomain, Graph g);
 
 	/**
 	 * Assigns an implementation class with transaction support for a
-	 * <code>Graph</code>.
+	 * <code>Record</code>.
 	 * 
-	 * @param graphSchemaClass
-	 * @param grapgImplementationClass
+	 * @param record
+	 * @param implementationClass
 	 */
-	public void setGraphTransactionImplementationClass(
-			Class<? extends Graph> graphSchemaClass,
-			Class<? extends Graph> grapgImplementationClass);
+	public void setRecordImplementationClass_InMemoryStorage(Class<? extends Record> record,
+			Class<? extends Record> implementationClass);
+	
+	public void setRecordImplementationClass_DistributedStorage(Class<? extends Record> record,
+			Class<? extends Record> implementationClass);
+	
+	public void setRecordImplementationClass_DiskBasedStorage(Class<? extends Record> record,
+			Class<? extends Record> implementationClass);
 
-	/**
-	 * Assigns an implementation class with transaction support for a
-	 * <code>Vertex</code>.
-	 * 
-	 * @param vertexSchemaClass
-	 * @param vertexImplementationClass
-	 */
-	public void setVertexTransactionImplementationClass(
-			Class<? extends Vertex> vertexSchemaClass,
-			Class<? extends Vertex> vertexImplementationClass);
 
-	/**
-	 * Assigns an implementation class with transaction support for an
-	 * <code>Edge</code>.
-	 * 
-	 * @param edgeSchemaClass
-	 * @param edgeImplementationClass
-	 */
-	public void setEdgeTransactionImplementationClass(
-			Class<? extends Edge> edgeSchemaClass,
-			Class<? extends Edge> edgeImplementationClass);
+
+
+
 
 }

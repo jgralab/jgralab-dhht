@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,7 +35,6 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -198,9 +193,9 @@ public class EdgeClassImplTest extends GraphElementClassImplTest {
 				.createVertexClass("EdgeClassFromVertexClass");
 		VertexClass edgeClassToVertexClass2 = graphClass2
 				.createVertexClass("EdgeClassToVertexClass");
-		EdgeClass other = createEdgeClass(graphClass2,
-				edgeClass.getQualifiedName(), edgeClass,
-				edgeClassFromVertexClass2, edgeClassToVertexClass2);
+		EdgeClass other = createEdgeClass(graphClass2, edgeClass
+				.getQualifiedName(), edgeClass, edgeClassFromVertexClass2,
+				edgeClassToVertexClass2);
 
 		testCompareTo3(other);
 	}
@@ -759,7 +754,7 @@ public class EdgeClassImplTest extends GraphElementClassImplTest {
 
 	@Override
 	@Test
-	public void testGetSchemaClass() {
+	public void testGetM1Class() {
 		// TODO Auto-generated method stub
 	}
 

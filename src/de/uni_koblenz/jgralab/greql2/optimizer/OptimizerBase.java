@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -40,19 +36,13 @@ package de.uni_koblenz.jgralab.greql2.optimizer;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * Base class for all {@link Optimizer}s which defines some useful methods that
@@ -68,7 +58,13 @@ public abstract class OptimizerBase implements Optimizer {
 	}
 
 	protected void recreateVertexEvaluators(GreqlEvaluator eval) {
-		eval.createVertexEvaluators();
+		try {
+			eval.createVertexEvaluators();
+		} catch (EvaluateException e) {
+			e.printStackTrace();
+			throw new OptimizerException(
+					"Exception while re-creating VertexEvaluators.", e);
+		}
 	}
 
 	/**
@@ -86,7 +82,7 @@ public abstract class OptimizerBase implements Optimizer {
 	protected void relink(Vertex from, Vertex to) {
 		assert (from != null) && (to != null) : "Relinking null!";
 		assert from != to : "Relinking from itself!";
-		assert from.getSchemaClass() == to.getSchemaClass() : "Relinking different classes! from is "
+		assert from.getM1Class() == to.getM1Class() : "Relinking different classes! from is "
 				+ from + ", to is " + to;
 		assert from.isValid() && to.isValid() : "Relinking invalid vertices!";
 
@@ -138,7 +134,7 @@ public abstract class OptimizerBase implements Optimizer {
 				// Externally bound vars are always before locally declared vars
 				return true;
 			}
-			Greql2Expression root = ibvo1.getOmega();
+			Greql2Expression root = (Greql2Expression) ibvo1.getOmega();
 			for (IsBoundVarOf ibvo : root.getIsBoundVarOfIncidences()) {
 				ibvo = (IsBoundVarOf) ibvo.getNormalEdge();
 				if (ibvo == ibvo1) {
@@ -153,13 +149,13 @@ public abstract class OptimizerBase implements Optimizer {
 			return false;
 		}
 
-		SimpleDeclaration sd1 = var1.getFirstIsDeclaredVarOfIncidence(
+		SimpleDeclaration sd1 = (SimpleDeclaration) var1
+				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT).getOmega();
+		Declaration decl1 = (Declaration) sd1.getFirstIsSimpleDeclOfIncidence(
 				EdgeDirection.OUT).getOmega();
-		Declaration decl1 = sd1.getFirstIsSimpleDeclOfIncidence(
-				EdgeDirection.OUT).getOmega();
-		SimpleDeclaration sd2 = var2.getFirstIsDeclaredVarOfIncidence(
-				EdgeDirection.OUT).getOmega();
-		Declaration decl2 = sd2.getFirstIsSimpleDeclOfIncidence(
+		SimpleDeclaration sd2 = (SimpleDeclaration) var2
+				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT).getOmega();
+		Declaration decl2 = (Declaration) sd2.getFirstIsSimpleDeclOfIncidence(
 				EdgeDirection.OUT).getOmega();
 
 		if (decl1 == decl2) {
@@ -175,7 +171,7 @@ public abstract class OptimizerBase implements Optimizer {
 					if (inc.getAlpha() == var2) {
 						return false;
 					}
-					inc = inc.getNextIsDeclaredVarOfIncidence(EdgeDirection.IN);
+					inc = inc.getNextIsDeclaredVarOf(EdgeDirection.IN);
 				}
 			} else {
 				// var1 and var2 are declared in the same Declaration but
@@ -190,7 +186,7 @@ public abstract class OptimizerBase implements Optimizer {
 					if (inc.getAlpha() == sd2) {
 						return false;
 					}
-					inc = inc.getNextIsSimpleDeclOfIncidence(EdgeDirection.IN);
+					inc = inc.getNextIsSimpleDeclOf(EdgeDirection.IN);
 				}
 			}
 		} else {
@@ -257,13 +253,13 @@ public abstract class OptimizerBase implements Optimizer {
 			// there's nothing to split out anymore
 			return sd;
 		}
-		Declaration parentDecl = sd.getFirstIsSimpleDeclOfIncidence(
-				EdgeDirection.OUT).getOmega();
+		Declaration parentDecl = (Declaration) sd
+				.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).getOmega();
 		IsSimpleDeclOf oldEdge = sd.getFirstIsSimpleDeclOfIncidence();
 		SimpleDeclaration newSD = syntaxgraph.createSimpleDeclaration();
 		IsSimpleDeclOf newEdge = syntaxgraph.createIsSimpleDeclOf(newSD,
 				parentDecl);
-		syntaxgraph.createIsTypeExprOfDeclaration(sd
+		syntaxgraph.createIsTypeExprOfDeclaration((Expression) sd
 				.getFirstIsTypeExprOfDeclarationIncidence(EdgeDirection.IN)
 				.getAlpha(), newSD);
 		newEdge.getReversedEdge().putIncidenceAfter(oldEdge.getReversedEdge());
@@ -278,7 +274,7 @@ public abstract class OptimizerBase implements Optimizer {
 					// the edge.
 					relinkIncs.add(inc);
 				}
-				inc = inc.getNextIsDeclaredVarOfIncidence(EdgeDirection.IN);
+				inc = inc.getNextIsDeclaredVarOf(EdgeDirection.IN);
 			}
 			for (IsDeclaredVarOf relinkEdge : relinkIncs) {
 				relinkEdge.setOmega(newSD);

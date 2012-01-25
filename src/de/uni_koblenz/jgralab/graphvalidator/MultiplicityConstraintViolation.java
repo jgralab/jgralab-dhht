@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,8 +32,9 @@ package de.uni_koblenz.jgralab.graphvalidator;
 
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.TypedElement;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>
@@ -46,9 +43,9 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 public class MultiplicityConstraintViolation extends ConstraintViolation {
 	private String message;
 
-	public MultiplicityConstraintViolation(EdgeClass ec, String message,
-			Set<AttributedElement> offendingElems) {
-		super(ec);
+	public MultiplicityConstraintViolation(IncidenceClass ic, String message,
+			Set<? extends GraphElement<?,?,?>> offendingElems) {
+		super(ic);
 		this.message = message;
 		offendingElements = offendingElems;
 	}
@@ -82,20 +79,20 @@ public class MultiplicityConstraintViolation extends ConstraintViolation {
 	 * @return the offendingElements
 	 */
 	@Override
-	public Set<AttributedElement> getOffendingElements() {
+	public Set<? extends TypedElement<?,?>> getOffendingElements() {
 		return offendingElements;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Broken multiplicity constraint at EdgeClass ");
-		sb.append(attributedElementClass.getQualifiedName());
+		sb.append("Broken multiplicity constraint at IncidenceClass ");
+		sb.append(affectedTypedElementClass.getQualifiedName());
 		sb.append("! ");
 		sb.append(message);
 		sb.append(" Offending vertices: ");
 		boolean first = true;
-		for (AttributedElement v : offendingElements) {
+		for (TypedElement<?,?> v : offendingElements) {
 			if (first) {
 				first = false;
 			} else {

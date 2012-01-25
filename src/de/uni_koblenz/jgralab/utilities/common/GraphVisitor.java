@@ -35,25 +35,25 @@
 
 package de.uni_koblenz.jgralab.utilities.common;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 
 /**
  * An abstract visitor class visiting all (marked) vertices and edges.
  */
 public abstract class GraphVisitor {
 	protected Graph graph;
-	protected BooleanGraphMarker marker;
+	protected LocalBooleanGraphMarker marker;
 
 	public GraphVisitor(Graph graph) {
 		super();
 		this.graph = graph;
 	}
 
-	public GraphVisitor(BooleanGraphMarker marker) {
+	public GraphVisitor(LocalBooleanGraphMarker marker) {
 		this(marker.getGraph());
 		this.marker = marker;
 	}
@@ -63,14 +63,14 @@ public abstract class GraphVisitor {
 		preVisitor();
 
 		// visit all (marked) vertices
-		for (Vertex currentVertex : graph.vertices()) {
+		for (Vertex currentVertex : graph.getVertices()) {
 			if (isMarked(currentVertex)) {
 				visitVertex(currentVertex);
 			}
 		}
 
 		// visit all (marked) edges
-		for (Edge currentEdge : graph.edges()) {
+		for (Edge currentEdge : graph.getEdges()) {
 			if (isMarked(currentEdge)) {
 				visitEdge(currentEdge);
 			}
@@ -79,7 +79,7 @@ public abstract class GraphVisitor {
 		postVisitor();
 	}
 
-	private boolean isMarked(AttributedElement e) {
+	private boolean isMarked(GraphElement<?, ?, ?,?> e) {
 		if (marker == null) {
 			return true;
 		}

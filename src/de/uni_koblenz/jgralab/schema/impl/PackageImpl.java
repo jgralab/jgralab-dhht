@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -46,7 +42,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public final class PackageImpl extends NamedElementImpl implements Package {
+public final class PackageImpl extends NamedElementClassImpl implements Package {
 
 	private final Map<String, Domain> domains = new TreeMap<String, Domain>();
 
@@ -254,7 +250,15 @@ public final class PackageImpl extends NamedElementImpl implements Package {
 	}
 
 	@Override
-	public String getUniqueName() {
-		return qualifiedName;
+	public boolean equals(Object o) {
+		if (o instanceof Package) {
+			Package other = (Package) o;
+			return qualifiedName.equals(other.getQualifiedName())
+					&& getSchema().getQualifiedName().equals(
+							other.getSchema().getQualifiedName());
+		}
+		return false;
 	}
+
+
 }

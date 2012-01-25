@@ -52,13 +52,9 @@ import org.junit.runners.Parameterized.Parameters;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
+import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalSubGraphMarker;
 import de.uni_koblenz.jgralabtest.instancetest.InstanceTest;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Link;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.Node;
 
 @RunWith(Parameterized.class)
 public class SubGraphMarkerTest extends InstanceTest {
@@ -75,8 +71,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 	private MinimalGraph g;
 	private Node[] nodes;
 	private Link[] links;
-	private SubGraphMarker oldMarker;
-	private SubGraphMarker newMarker;
+	private LocalBooleanGraphMarker oldMarker;
+	private LocalSubGraphMarker newMarker;
 
 	public SubGraphMarkerTest(ImplementationType implementationType,
 			String dbURL) {
@@ -106,8 +102,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 		createTransaction(g);
 
 		Random rng = new Random(16L);
-		oldMarker = new SubGraphMarker(g);
-		newMarker = new SubGraphMarker(g);
+		oldMarker = new LocalBooleanGraphMarker(g);
+		newMarker = new LocalSubGraphMarker(g);
 		nodes = new Node[VERTEX_COUNT];
 		for (int i = 1; i <= VERTEX_COUNT; i++) {
 			nodes[i - 1] = g.createNode();
@@ -118,8 +114,8 @@ public class SubGraphMarkerTest extends InstanceTest {
 		for (int i = 1; i <= EDGE_COUNT; i++) {
 			int alphaID = rng.nextInt(VERTEX_COUNT) + 1;
 			int omegaID = rng.nextInt(VERTEX_COUNT) + 1;
-			links[i - 1] = g.createLink((Node) g.getVertex(alphaID),
-					(Node) g.getVertex(omegaID));
+			links[i - 1] = g.createLink((Node) g.getVertexObject(alphaID), (Node) g
+					.getVertexObject(omegaID));
 		}
 
 		commit(g);

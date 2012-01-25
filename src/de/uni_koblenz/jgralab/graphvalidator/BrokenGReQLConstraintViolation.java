@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,9 +32,9 @@ package de.uni_koblenz.jgralab.graphvalidator;
 
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.Constraint;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>
@@ -49,7 +45,7 @@ public class BrokenGReQLConstraintViolation extends ConstraintViolation {
 	private Constraint constraint;
 	private String brokenPart;
 
-	public BrokenGReQLConstraintViolation(AttributedElementClass aec,
+	public BrokenGReQLConstraintViolation(TypedElementClass<?, ?> aec,
 			Constraint constraint, String brokenPart) {
 		super(aec);
 		this.constraint = constraint;
@@ -95,7 +91,7 @@ public class BrokenGReQLConstraintViolation extends ConstraintViolation {
 		sb.append("\" in ");
 		sb.append(constraint);
 		sb.append(" attached to ");
-		sb.append(attributedElementClass.getQualifiedName());
+		sb.append(affectedTypedElementClass.getQualifiedName());
 		sb.append(" is no valid GReQL expression..");
 		return sb.toString();
 	}
@@ -110,7 +106,7 @@ public class BrokenGReQLConstraintViolation extends ConstraintViolation {
 	}
 
 	@Override
-	public Set<AttributedElement> getOffendingElements() {
+	public Set<? extends TypedElement<?, ?>> getOffendingElements() {
 		return null;
 	}
 }

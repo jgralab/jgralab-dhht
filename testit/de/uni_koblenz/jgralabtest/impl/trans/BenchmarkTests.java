@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,11 +36,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 public class BenchmarkTests {
 	private MotorwayMap motorwayMap;
@@ -190,7 +181,7 @@ public class BenchmarkTests {
 		if (transactionSupport) {
 			motorwayMap = MotorwayMapSchema.instance()
 					.loadMotorwayMapWithTransactionSupport(FILENAME,
-							new ConsoleProgressFunction("Loading"));
+							new ConsoleProgressFunction());
 		} else {
 			motorwayMap = MotorwayMapSchema.instance().loadMotorwayMap(
 					FILENAME, new ConsoleProgressFunction());
@@ -202,7 +193,7 @@ public class BenchmarkTests {
 		if (transactionSupport) {
 			motorwayMap.newReadOnlyTransaction();
 		}
-		GraphIO.saveGraphToFile(motorwayMap, FILENAME,
+		GraphIO.saveGraphToFile(FILENAME, motorwayMap,
 				new ConsoleProgressFunction());
 	}
 
@@ -224,7 +215,7 @@ public class BenchmarkTests {
 	private void internalIterateVertices() {
 		progressFunction.init(1000);
 		for (Vertex v : motorwayMap.vertices()) {
-			v.getId();
+			v.getGlobalId();
 			for (Edge edge : v.incidences()) {
 				edge.getAlpha();
 				edge.getOmega();

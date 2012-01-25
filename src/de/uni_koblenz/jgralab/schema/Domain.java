@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -42,11 +38,10 @@ import de.uni_koblenz.jgralab.codegenerator.CodeBlock;
  * 
  * @author ist@uni-koblenz.de
  */
-public interface Domain extends NamedElement {
+public interface Domain extends NamedElementClass {
 
 	/**
-	 * example: int for Integer, List<Boolean> for a list with basedomain
-	 * boolean
+	 * example: int for integer List<Boolean> for a list with basedomain boolean
 	 * 
 	 * @return java representation of this attribute
 	 */
@@ -66,7 +61,7 @@ public interface Domain extends NamedElement {
 	 *         object named graphIoVariablename into the variableName
 	 */
 	public CodeBlock getReadMethod(String schemaPrefix, String variableName,
-			String graphIoVariableName);
+			String graphIoVariableName, String attributeContainer);
 
 	/**
 	 * example: List<String>
@@ -80,64 +75,18 @@ public interface Domain extends NamedElement {
 	 *         oject named graphIoVariablename into the variableName
 	 */
 	public CodeBlock getWriteMethod(String schemaRootPackagePrefix,
-			String variableName, String graphIoVariableName);
+			String variableName, String graphIoVariableName, String attributeContainer);
 
 	/**
 	 * @return true if this domain is a composite domain
 	 */
 	public boolean isComposite();
 
+	
 	/**
-	 * @return true if this domain is a primitive type
-	 */
-	public boolean isPrimitive();
-
-	/**
-	 * @return true if this domain is a primitive type
-	 */
-	public boolean isBoolean();
-
-	/**
-	 * example: Integer for integer List<Boolean> for a list with basedomain
-	 * boolean
+	 * Initial value.
 	 * 
-	 * @return java representation of this attribute
-	 */
-	public String getTransactionJavaAttributeImplementationTypeName(
-			String schemaRootPackagePrefix);
-
-	/**
-	 * example: Integer for integer
-	 * 
-	 * @return the non primitive representation of this attribute, only affects
-	 *         int, boolean, double
-	 */
-	public String getTransactionJavaClassName(String schemaRootPackagePrefix);
-
-	/**
-	 * @return a code fragment to read a value of this domain from the GraphIO
-	 *         object named graphIoVariablename into the variableName for
-	 *         transaction support
-	 */
-	public CodeBlock getTransactionReadMethod(String schemaPrefix,
-			String variableName, String graphIoVariableName);
-
-	/**
-	 * @return a code fragment to write a value of this domain to the GraphIO
-	 *         object named graphIoVariablename into the variableName for
-	 *         transaction support
-	 */
-	public CodeBlock getTransactionWriteMethod(String schemaRootPackagePrefix,
-			String variableName, String graphIoVariableName);
-
-	/**
-	 * @param schemaRootPackagePrefix
-	 * @return the name of the versioned class implementation for this domain.
-	 */
-	public String getVersionedClass(String schemaRootPackagePrefix);
-
-	/**
-	 * @return the initial value for this Domain
+	 * @return
 	 */
 	public String getInitialValue();
 }

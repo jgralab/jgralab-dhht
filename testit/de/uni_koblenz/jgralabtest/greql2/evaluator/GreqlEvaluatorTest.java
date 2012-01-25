@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,77 +33,69 @@ package de.uni_koblenz.jgralabtest.greql2.evaluator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.junit.Test;
-import org.pcollections.PSet;
-import org.pcollections.PVector;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
-import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.VariableDeclarationOrderOptimizer;
-import de.uni_koblenz.jgralab.greql2.schema.impl.std.Greql2Impl;
-import de.uni_koblenz.jgralab.greql2.types.Tuple;
-import de.uni_koblenz.jgralabtest.greql2.GenericTest;
+import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.RouteMap;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.connections.AirRoute;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.junctions.Airport;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.County;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.Locality;
 
-public class GreqlEvaluatorTest extends GenericTest {
+public class GreqlEvaluatorTest extends GenericTests {
 	static {
-		FunLib.register(IsPrime.class);
+		Greql2FunctionLibrary.instance().registerUserDefinedFunction(
+				IsPrime.class);
 	}
 
-	private static final String[] COUNTIES = { "Berlin", "Hessen",
-			"Rheinland-Pfalz" };
-	private static final String[] LOCALITIES_WITHOUT_CITIES = { "Kammerforst",
-			"Frankfurt-Flughafen", "Höhr-Grenzhausen",
-			"Flugplatz Koblenz-Winningen", "Winningen", "Lautzenhausen",
-			"Montabaur", "Flughafen Frankfurt-Hahn" };
-
-	
+	private JValueBag createBagWithMeat(List<JValueImpl> list) {
+		JValueBag bag = new JValueBag();
+		list.add(new JValueImpl("Currywurst"));
+		list.add(new JValueImpl("Bratwurst"));
+		list.add(new JValueImpl("Käsewurst"));
+		list.add(new JValueImpl("Steak"));
+		list.add(new JValueImpl("Pommes"));
+		list.add(new JValueImpl("Mayo"));
+		list.add(new JValueImpl("Ketchup"));
+		list.add(new JValueImpl("Zwiebeln"));
+		for (JValueImpl v : list) {
+			bag.add(v, 3);
+		}
+		return bag;
+	}
 
 	@Test
 	public void testCombinations() {
 		String query = "from a:list(1..10), b:list(1..10), c:list(1..10), d:list(1..10) report d end";
 		GreqlEvaluator eval = new GreqlEvaluator(query, new Greql2Impl(),
-				new HashMap<String, Object>());
+				new HashMap<String, JValue>());
 		eval.startEvaluation();
-		// TODO test seriously
-		@SuppressWarnings("unused")
-		Object result = eval.getResult();
-		// for (JValue v : result.toCollection()) {
-		// System.out.println(v);
-		// }
+		JValue result = eval.getEvaluationResult();
+		for (JValue v : result.toCollection()) {
+			System.out.println(v);
+		}
 	}
 
 	@Test
 	public void testCombinations2() {
-		HashMap<String, Object> boundVars = new HashMap<String, Object>();
+		HashMap<String, JValue> boundVars = new HashMap<String, JValue>();
 		GreqlEvaluator eval = null;
 		String createboundVars = "set(1,2,3) store as s123";
 		String createboundVars2 = "set(4,5,6) store as s456 ";
 		eval = new GreqlEvaluator(createboundVars, new Greql2Impl(), boundVars);
 		eval.startEvaluation();
-		// TODO test seriously
-		// System.out.println("HashMap: " + boundVars.size());
-		// for (java.util.Map.Entry<String, JValue> entry :
-		// boundVars.entrySet()) {
-		// System.out.println("<" + entry.getKey() + "," + entry.getValue()
-		// + ">");
-		// }
+		System.out.println("HashMap: " + boundVars.size());
+		for (java.util.Map.Entry<String, JValue> entry : boundVars.entrySet()) {
+			System.out.println("<" + entry.getKey() + "," + entry.getValue()
+					+ ">");
+		}
 		eval = new GreqlEvaluator(createboundVars2, new Greql2Impl(), boundVars);
 		eval.startEvaluation();
 		String query = "using s123, s456: "
@@ -122,12 +110,35 @@ public class GreqlEvaluatorTest extends GenericTest {
 		eval.setOptimize(false);
 		eval.startEvaluation();
 
-		// TODO test seriously
-		@SuppressWarnings("unused")
-		Object result = eval.getResult();
-		// for (JValue v : result.toCollection()) {
-		// System.out.println(v);
-		// }
+		JValue result = eval.getEvaluationResult();
+		for (JValue v : result.toCollection()) {
+			System.out.println(v);
+		}
+	}
+
+	@Test
+	public void testVertexSeq() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		Graph graph = getTestGraph();
+		Vertex first = graph.getFirstVertex().getNextVertex();
+		Vertex last = graph.getLastVertex().getPrevVertex().getPrevVertex();
+		JValueImpl firstV = new JValueImpl(first);
+		JValueImpl lastV = new JValueImpl(last);
+		setBoundVariable("firstV", firstV);
+		setBoundVariable("lastV", lastV);
+		String queryString = "using firstV, lastV: vertexSeq{Definition}(firstV, lastV)";
+		JValue result = evalTestQuery("vertexSeq", queryString);
+		JValueSet set = result.toJValueSet();
+		if (!(first instanceof Definition)) {
+			first = first.getNextVertex(Definition.class);
+		}
+		Definition current = (Definition) first;
+		for (JValue cv : set) {
+			assertEquals(current, cv.toVertex());
+			current = current.getNextDefinition();
+		}
+		assertNull(current.getNextDefinition());
 	}
 
 	/*
@@ -137,43 +148,42 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateAlternativePathDescription() throws Exception {
-		String queryString = "from airport: V{junctions.Airport}, x: V with x "
-				+ "(-->{localities.ContainsLocality} | -->{connections.AirRoute}) airport "
-				+ "report x end";
-		PVector<Vertex> result = (PVector<Vertex>) evalTestQuery(queryString);
-
-		assertFalse(result.isEmpty());
-		for (Vertex vertex : result) {
-			if (!(vertex instanceof Airport || vertex instanceof County)) {
-				fail();
-			}
-		}
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var  -->{IsDefinitionOf} | -->{IsVarOf}  def report var end";
+		JValue result = evalTestQuery("AlternativePathDescription", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("AlternativePathDescription (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateAlternativePathDescription2() throws Exception {
-		String queryString = "from v:V{NamedElement} reportSet v, v.name, v (-->{^connections.Way, ^connections.AirRoute} | (-->{localities.ContainsLocality} -->{connections.AirRoute}))* end";
-		PSet<Tuple> result = (PSet<Tuple>) evalTestQuery(queryString);
-
-		for (Tuple tuple : result) {
-			Vertex vertex = (Vertex) tuple.get(0);
-			if (!(vertex instanceof Airport || vertex instanceof County || vertex instanceof Locality)) {
-				fail();
-			}
-		}
-		Object resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from v: V{Variable} "
+				+ "           reportSet v, v.name, v (-->{^IsVarOf, ^IsDefinitionOf, ^IsBoundExprOfDefinition} | (-->{IsVarOf} -->{IsDefinitionOf}))* end";
+		JValue result = evalTestQuery("AlternativePathDescription2",
+				queryString);
+		assertEquals(5, result.toCollection().size());
+		JValue resultWO = evalTestQuery("AlternativePathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 
-		// TODO test seriously
-		// System.out.println(result);
+		System.out.println(result);
 	}
 
 	@Test
 	public void testEvaluateExponentiatedPathDescription() throws Exception {
-		String queryString = "from airport: V{junctions.Airport} with airport  <->^2 airport report airport end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition} with var  <->^2 var report var end";
+		JValue result = evalTestQuery("ExponentiatedPathDescription",
+				queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("ExponentiatedPathDescription (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -184,23 +194,16 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateBackwardVertexSet() throws Exception {
-		String queryString = "from airport: V{junctions.Airport} "
-				+ "report airport <--{connections.AirRoute} <--{localities.ContainsLocality} end";
-		JValue result = evalTestQuery(queryString);
-
-		assertEquals(airportCount, result.toCollection().size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from w: V{WhereExpression} report w <--{IsDefinitionOf} <--{IsVarOf} end";
+		JValue result = evalTestQuery("BackwardVertexSet1", queryString);
+		assertEquals(1, result.toCollection().size());
 		for (JValue j : result.toCollection()) {
-			JValueCollection collection = j.toCollection();
-			if (!collection.isEmpty()) {
-				for (JValue vertex : collection) {
-					setBoundVariable("x", vertex);
-					assertQueryEquals(
-							"using x: exists airport:V{junctions.Airport} "
-									+ "@ isReachable(x, airport, <->^2)", true);
-				}
-			}
+			assertEquals(4, j.toCollection().size());
 		}
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("BackwardVertexSet1 (wo)", queryString,
+				new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -209,7 +212,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 		String queryString = "forall e: E{IsDefinitionOf}"
 				+ "  @ startVertex(e) -->{IsDefinitionOf} endVertex(e)";
 		JValue result = evalTestQuery("Reachability", queryString);
-		assertTrue(result.toBoolean());
+		assertEquals(true, result.toBoolean());
 		JValue resultWO = evalTestQuery("BackwardVertexSet1 (wo)", queryString,
 				new DefaultOptimizer());
 		assertEquals(result, resultWO);
@@ -222,26 +225,42 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateBackwardVertexSet2() throws Exception {
-		String queryString = "from w: V{junctions.Junction} report w <--{localities.ContainsCrossroad} [<--{localities.ContainsLocality}] end";
-		JValue result = evalTestQuery(queryString);
-
-		assertEquals(crossroadCount + airportCount, result.toCollection()
-				.size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from w: V{WhereExpression} report w <--{IsDefinitionOf} [<--{IsVarOf}] end";
+		JValue result = evalTestQuery("BackwardVertexSet2", queryString);
+		assertEquals(1, result.toCollection().size());
 		for (JValue j : result.toCollection()) {
-			for (JValue value : j.toCollection()) {
-				Vertex vertex = value.toVertex();
-				if (!(vertex instanceof Locality || vertex instanceof County)) {
-					fail();
-				}
-			}
+			assertEquals(8, j.toCollection().size());
 		}
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("BackwardVertexSet2 (wo)", queryString,
+				new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	/*
 	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateListComprehension(ListComprehension,
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluateBagComprehension() throws Exception {
+		ArrayList<JValueImpl> list = new ArrayList<JValueImpl>();
+		setBoundVariable("FOO", createBagWithMeat(list));
+		String queryString = "using FOO: from i: toSet(FOO) report i end";
+		JValue result = evalTestQuery("BagComprehension", queryString);
+		assertEquals(8, result.toCollection().size());
+		for (JValue v : list) {
+			assertEquals(1, result.toCollection().toJValueBag().getQuantity(v));
+		}
+		JValue resultWO = evalTestQuery("BagComprehension (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
 	 * Graph)'
 	 */
 	@Test
@@ -257,7 +276,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateListComprehension(ListComprehension,
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
 	 * Graph)'
 	 */
 	@Test
@@ -273,7 +292,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateListComprehension(ListComprehension,
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
 	 * Graph)'
 	 */
 	@Test
@@ -289,7 +308,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateListComprehension(ListComprehension,
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
 	 * Graph)'
 	 */
 	@Test
@@ -305,18 +324,52 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagConstruction(BagConstruction,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluateBagConstruction() throws Exception {
+		String queryString = "bag ( 1 , 2 , 3 , 7 , 34, 456, 7, 5, 455, 456, 457, 1, 2, 3, 3, 3, 3 )";
+		JValue result = evalTestQuery("BagConstruction", queryString);
+		assertEquals(17, result.toCollection().size());
+		assertEquals(2, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(1)));
+		assertEquals(2, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(2)));
+		assertEquals(5, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(3)));
+		assertEquals(1, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(5)));
+		assertEquals(2, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(7)));
+		assertEquals(1, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(34)));
+		assertEquals(1, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(455)));
+		assertEquals(2, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(456)));
+		assertEquals(1, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl(457)));
+
+		JValue resultWO = evalTestQuery("BagConstruction (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
 	 * 'greql2.evaluator.GreqlEvaluator.evaluateAlternativePathDescription(AlternativePathDescription,
 	 * Graph)'
 	 */
 	@Test
-	public void testEvaluateComplexPathDescription() throws Exception {
-		String queryString = "from county: V{localities.County}, locality: V{localities.Locality} "
-				+ "with county (-->{localities.ContainsLocality}) | "
-				+ "(-->{localities.HasCapital}) locality "
-				+ "reportSet locality end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(localityCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+	public void testEvaluateComplexePathDescription() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var  (-->{IsVarOf} -->{IsDefinitionOf}) | (-->{IsVarOf} -->{IsArgumentOf} -->{IsExprOf}+)  def report var end";
+		JValue result = evalTestQuery("ComplexDescription", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("ComplexDescription (wo)", queryString,
+				new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -330,7 +383,8 @@ public class GreqlEvaluatorTest extends GenericTest {
 		String queryString = "1=1?1:2";
 		JValue result = evalTestQuery("ConditionalExpression", queryString);
 		assertEquals(1, (int) result.toInteger());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("ConditionalExpression (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -339,16 +393,18 @@ public class GreqlEvaluatorTest extends GenericTest {
 		String queryString = "1=2?1:2";
 		JValue result = evalTestQuery("ConditionalExpression2", queryString);
 		assertEquals(2, (int) result.toInteger());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("ConditionalExpression2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateConditionalExpression3() throws Exception {
-		String queryString = "false ? 1 : 2";
+		String queryString = "1?1:2";
 		JValue result = evalTestQuery("ConditionalExpression3", queryString);
-		assertEquals(2, (int) result.toInteger());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		assertEquals(3, (int) result.toInteger());
+		JValue resultWO = evalTestQuery("ConditionalExpression3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -359,12 +415,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateEdgePathDescription() throws Exception {
-		String queryString = "from edge: E, origin: V{junctions.Plaza}, target: V{junctions.Crossroad} "
-				+ "in eSubgraph{connections.Footpath!} with origin <-edge-> target "
-				+ "report target end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(1, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from edge: E, var: V{Definition}, def: V{WhereExpression} in eSubgraph{IsDefinitionOf!} with var --edge-> def report var end";
+		JValue result = evalTestQuery("EdgePathDescription", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgePathDescription (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -375,12 +432,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateEdgePathDescription2() throws Exception {
-		String queryString = "flatten(from edge: E in eSubgraph{connections.Footpath!} report "
-				+ "from origin: V{junctions.Plaza}, target: V{junctions.Crossroad} "
-				+ "with origin <-edge-> target report target end end)";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(1, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from edge: E in eSubgraph{IsDefinitionOf!} report from var: V{Definition}, def: V{WhereExpression} with var --edge-> def report var end end";
+		JValue result = evalTestQuery("EdgePathDescription2", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgePathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -391,15 +449,14 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateEdgePathDescription3() throws Exception {
-		String queryString = "flatten(from edge: E in eSubgraph{connections.Footpath!} report "
-				+ "from origin: V{junctions.Plaza}, target: V{junctions.Crossroad} "
-				+ "with origin <-edge-> target report target end end)";
-		String queryString2 = "flatten(from edge: E in eSubgraph{connections.Footpath!} report "
-				+ "from origin: V{junctions.Plaza}, target: V{junctions.Crossroad} "
-				+ "with contains(<-edge-> target, origin) report target end end)";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(1, result.toCollection().size());
-		JValue resultWO = evalTestQuery(queryString2);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from edge: E in eSubgraph{IsVarOf} report from var: V{Variable}, def: V{Definition} with var --edge-> def report var end end";
+		String queryString2 = "from edge: E in eSubgraph{IsVarOf} report from var: V{Variable}, def: V{Definition} with contains(--edge-> def, var) = true report var end end";
+		JValue result = evalTestQuery("EdgePathDescription3", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgePathDescription3 (wo)",
+				queryString2/* , new DefaultOptimizer() */);
 		assertEquals(result, resultWO);
 	}
 
@@ -410,14 +467,33 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateEdgePathDescription4() throws Exception {
-		String queryString = "from edge: E in eSubgraph{connections.Footpath} report from plaza: V{junctions.Plaza} report plaza end end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(16, result.toCollection().size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from edge: E in eSubgraph{IsVarOf} report from var: V{Definition} report var end end";
+		JValue result = evalTestQuery("EdgePathDescription4", queryString);
+		assertEquals(4, result.toCollection().size());
 		for (JValue j : result.toCollection()) {
-			assertEquals(6, j.toCollection().size());
+			assertEquals(4, j.toCollection().size());
 		}
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("EdgePathDescription4 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateEdgePathDescription(EdgePathDescription,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluateEdgePathDescription5() throws Exception {
+		String queryString = "from edge: E in eSubgraph{IsDefinitionOf!} report from var: V{Definition}, def: V{WhereExpression} with contains(--edge-> def, var) report var end end";
+		JValue result = evalTestQuery("EdgePathDescription5", queryString);
+		System.out.println(result);
+		// assertEquals(4, result.toCollection().size());
+		// JValue resultWO = evalTestQuery("EdgePathDescription3 (wo)",
+		// queryString, new DefaultOptimizer());
+		// assertEquals(result, resultWO);
 	}
 
 	/*
@@ -427,70 +503,87 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateEdgeSetExpression() throws Exception {
-		String queryString = "from footpath:E{connections.Footpath} report footpath end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(footpathCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i:E{IsDefinitionOf} report i end";
+		JValue result = evalTestQuery("EdgeSetExpression", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgeSetExpression (wo)", queryString,
+				new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateEdgeSubgraphExpression1() throws Exception {
-		String queryString = "from footpath: E in eSubgraph{connections.Footpath} report footpath end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(footpathCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i: E in eSubgraph{IsDefinitionOf} report i end";
+		JValue result = evalTestQuery("EdgeSubgraphExpression1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgeSubgraphExpression1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
-	}
-
-	protected Object evalQueryWithOptimizer(String queryString)
-			throws Exception {
-		return evalTestQuery("", queryString, new DefaultOptimizer(),
-				TestVersion.ROUTE_MAP_GRAPH);
 	}
 
 	@Test
 	public void testEvaluateEdgeSubgraphExpression2() throws Exception {
-		String queryString = "from i: V in eSubgraph{connections.Footpath} report i end";
-		PVector<Vertex> result = (PVector<Vertex>) evalTestQuery(queryString);
-		assertEquals(24, result.size());
-		Object resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i: V in eSubgraph{IsDefinitionOf} report i end";
+		JValue result = evalTestQuery("EdgeSubgraphExpression2", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValue resultWO = evalTestQuery("EdgeSubgraphExpression2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateEdgeSubgraphExpression3() throws Exception {
-		String queryString = "from i: V in eSubgraph{^connections.Footpath} report i end";
-		PVector<Vertex> result = (PVector<Vertex>) evalTestQuery(queryString);
-		assertEquals(156, result.size());
-		Object resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i: V in eSubgraph{^IsDefinitionOf} report i end";
+		JValue result = evalTestQuery("EdgeSubgraphExpression3", queryString);
+		assertEquals(16, result.toCollection().size()); /*
+														 * with new parser only
+														 * 16
+														 */
+		JValue resultWO = evalTestQuery("EdgeSubgraphExpression3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateExponentiatedPathDescription1() throws Exception {
-		String queryString = "from origin: V{junctions.Airport}, target: V{junctions.Airport} with origin <--{connections.AirRoute}^1 target report origin end";
-		PVector<Vertex> result = (PVector<Vertex>) evalTestQuery(queryString);
-		assertEquals(3, result.size());
-		Object resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from def: V{Definition}, whe: V{WhereExpression} with def -->{IsDefinitionOf}^1 whe report def end";
+		JValue result = evalTestQuery("ExponentiatedPathDescription1",
+				queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("ExponentiatedPathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateExponentiatedPathDescription2() throws Exception {
-		String queryString = "from origin: V{junctions.Airport}, target: V{junctions.Airport} with origin <--{connections.AirRoute}^2 target report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(1, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		String queryString = "from def: V{Definition}, whe: V{WhereExpression} with def -->{IsDefinitionOf}^2 whe report def end";
+		JValue result = evalTestQuery("ExponentiatedPathDescription2",
+				queryString);
+		assertEquals(0, result.toCollection().size());
+		JValue resultWO = evalTestQuery("ExponentiatedPathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateExponentiatedPathDescription3() throws Exception {
-		String queryString = "from origin: V{junctions.Airport}, target: V{junctions.Airport} with origin <--{connections.AirRoute}^3 target report origin end";
-		JValue result = evalTestQuery(queryString);
+		String queryString = "from def: V{Definition}, whe: V{WhereExpression} with def -->{IsDefinitionOf}^3 whe report def end";
+		JValue result = evalTestQuery("ExponentiatedPathDescription3",
+				queryString);
 		assertEquals(0, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("ExponentiatedPathDescription3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -501,10 +594,30 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateForwardVertexSet() throws Exception {
-		String queryString = "from airport: V{junctions.Airport} report airport --> end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable} report var --> end";
+		JValue result = evalTestQuery("ForwardVertexSet", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValue resultWO = evalTestQuery("ForwardVertexSet (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateFunctionApplication(FunctionApplication,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluateFunctionApplication() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "using FOO: from i: V{Identifier} report i.name end";
+		JValue result = evalTestQuery("FunctionApplication", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValue resultWO = evalTestQuery("FunctionApplication (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -515,11 +628,14 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateGoalRestriction1() throws Exception {
-		String queryString = "from county: V{localities.County}, junction: V{junctions.Junction} with county -->{localities.ContainsLocality} & {localities.Town!} -->{localities.ContainsCrossroad} junction report junction end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(3, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
-		assertEquals(result.toJValueSet(), resultWO.toJValueSet());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var  -->{IsVarOf} & {Definition} -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("GoalRestriction1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("GoalRestriction1 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
 	}
 
 	/*
@@ -570,6 +686,24 @@ public class GreqlEvaluatorTest extends GenericTest {
 		assertEquals(result, resultWO);
 	}
 
+	@Test
+	public void testEvaluateIntermediateVertexDescription() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def:V{Definition}, whr: V{WhereExpression} with isReachable(var, whr, -->{IsVarOf} def -->{IsDefinitionOf}) report var end";
+		JValue result = evalTestQuery("IntermediateVertexDescription",
+				queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("IntermediateVertexDescription (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	@Test
+	public void testEvaluateIntermediateVertexPathDescription()
+			throws Exception {
+	}
+
 	/*
 	 * Test method for
 	 * 'greql2.evaluator.GreqlEvaluator.evaluateIteratedPathDescription(IteratedPathDescription,
@@ -577,32 +711,33 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateIteratedPathDescription1() throws Exception {
-		String queryString = "from origin: V{junctions.Crossroad}, target: V{junctions.Airport} "
-				+ "with origin  -->{connections.Street}* <--{localities.ContainsCrossroad} target "
-				+ "report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(180, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var  -->{IsDefinitionOf}* def report var end";
+		JValue result = evalTestQuery("IteratedPathDescription1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("IteratedPathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateIteratedPathDescription12() throws Exception {
-		String queryString = "from origin: V{junctions.Crossroad}, target: V{junctions.Airport} "
-				+ "with origin  -->{connections.Street}* <--{localities.ContainsCrossroad} target "
-				+ "report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(180, result.toCollection().size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var  -->{IsDefinitionOf}* def report var end";
+		JValue result = evalTestQuery("IteratedPathDescription12", queryString);
+		assertEquals(4, result.toCollection().size());
 
-		String queryString2 = "from origin: V{junctions.Crossroad}, "
-				+ " target: origin  -->{connections.Street}* <--{localities.ContainsCrossroad} &{junctions.Airport} "
-				+ "report origin end";
-		assertQueryEquals(queryString2, result);
+		String queryString2 = "from var: V{Definition}, def: var -->{IsDefinitionOf}* &{WhereExpression} report var end";
+		JValue result2 = evalTestQuery("IteratedPathDescription12 (2)",
+				queryString2);
+		assertEquals(result, result2);
 
-		String queryString3 = "from origin: V{junctions.Crossroad}, "
-				+ " target: origin  (-->{connections.Street}* <--{localities.ContainsCrossroad}) &{junctions.Airport} "
-				+ "report origin end";
-		assertQueryEquals(queryString3, result);
+		String queryString3 = "from var: V{Definition}, def: var (-->{IsDefinitionOf}*) &{WhereExpression} report var end";
+		JValue result3 = evalTestQuery("IteratedPathDescription12 (2)",
+				queryString3);
+		assertEquals(result, result3);
 	}
 
 	/*
@@ -622,23 +757,25 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testEvaluateIteratedPathDescription3() throws Exception {
-		String queryString = "from origin: V{junctions.Crossroad}, target: V{junctions.Airport} "
-				+ "with origin  -->{connections.Street}+ <--{localities.ContainsCrossroad} target "
-				+ "report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(177, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var  -->{IsDefinitionOf}+ def report var end";
+		JValue result = evalTestQuery("IteratedPathDescription3", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("IteratedPathDescription3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateIteratedPathDescription4() throws Exception {
-		String queryString = "from origin: V{junctions.Crossroad}, target: V{junctions.Airport} "
-				+ "with origin  -->{connections.Street}* <--{localities.ContainsCrossroad} -->{connections.AirRoute} target "
-				+ "report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(127, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var -->{IsVarOf}* -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("IteratedPathDescription4", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("IteratedPathDescription4 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -802,33 +939,34 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testEvaluateDependentDeclarations2() throws Exception {
-		String queryString = "from airport: V{junctions.Airport}, destination: -->{connections.AirRoute} airport reportSet destination end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount - 1, result.toCollection().size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from whe: V{WhereExpression}, def: -->{IsDefinitionOf} whe reportSet def end";
+		JValue result = evalTestQuery("DependentDeclarations2", queryString);
+		assertEquals(4, result.toCollection().size());
 		JValueSet set = result.toCollection().toJValueSet();
-		for (Airport airport : ((RouteMap) getTestGraph(TestVersion.ROUTE_MAP_GRAPH))
-				.getAirportVertices()) {
-			if (airport.getDegree(AirRoute.class, EdgeDirection.OUT) != 0) {
-				assertTrue(set.contains(new JValueImpl(airport)));
-			}
+		for (Definition def : ((Greql2) getTestGraph()).getDefinitionVertices()) {
+			assertTrue(set.contains(new JValueImpl(def)));
 		}
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("DependentDeclarations2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateDependentDeclarations3() throws Exception {
-		String queryString = "from airport: V{junctions.Airport}, destination: <--{connections.AirRoute} airport reportSet airport end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount - 1, result.toCollection().size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from def: V{Definition}, whe: <--{IsDefinitionOf} def report def end";
+		JValue result = evalTestQuery("DependentDeclarations3", queryString);
+		assertEquals(4, result.toCollection().size());
 		JValueSet set = result.toCollection().toJValueSet();
-		for (Airport airport : ((RouteMap) getTestGraph(TestVersion.ROUTE_MAP_GRAPH))
-				.getAirportVertices()) {
-			if (airport.getDegree(AirRoute.class, EdgeDirection.OUT) != 0) {
-				assertTrue(set.contains(new JValueImpl(airport)));
-			}
+		for (Definition def : ((Greql2) getTestGraph()).getDefinitionVertices()) {
+			assertNotNull(def.getFirstIsDefinitionOfIncidence());
+			assertTrue(set.contains(new JValueImpl(def)));
 		}
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("DependentDeclarations3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -839,19 +977,23 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateOptionalPathDescription() throws Exception {
-		String queryString = "from junction: V{junctions.Junction}, airport: V{junctions.Airport} with junction [ -->{connections.Street} ] -->{connections.AirRoute} airport report junction end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(3, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var [ -->{IsVarOf} ] -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("OptionalPathDescription1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("OptionalPathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateOptionalPathDescription2() throws Exception {
-		String queryString = "from junction: V{junctions.Junction}, airport: V{junctions.Airport} with junction  -->{connections.Street}  [-->{connections.AirRoute}] airport report junction end";
-		JValue result = evalTestQuery(queryString);
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var -->{IsVarOf} [-->{IsDefinitionOf}] def report var end";
+		JValue result = evalTestQuery("OptionalPathDescription2", queryString);
 		assertEquals(0, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		JValue resultWO = evalTestQuery("OptionalPathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -862,10 +1004,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluatePrimaryPathDescription1() throws Exception {
-		String queryString = "from town: V{localities.Town}, plaza: V{junctions.Plaza} with town -->{localities.ContainsCrossroad} plaza report town end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(plazaCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("PrimaryPathDescription1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("PrimaryPathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -876,24 +1021,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluatePrimaryPathDescription2() throws Exception {
-		String queryString = "from town: V{localities.Town}, plaza: V{junctions.Plaza} with town --> plaza report town end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(plazaCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
-		assertEquals(result, resultWO);
-	}
-
-	/*
-	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateEdgePathDescription(EdgePathDescription,
-	 * Graph)'
-	 */
-	@Test
-	public void testEvaluatePrimaryPathDescription3() throws Exception {
-		String queryString = "from town: V{localities.Town}, plaza: V{junctions.Plaza} with town --> {connections.AirRoute} plaza report town end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(0, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from def: V{Definition}, whe: V{WhereExpression} with def -->{IsDefinitionOf} whe report def end";
+		JValue result = evalTestQuery("PrimaryPathDescription2", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("PrimaryPathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -904,10 +1038,45 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluatePrimaryPathDescription4() throws Exception {
-		String queryString = "from origin: V{junctions.Crossroad}, target: V{junctions.Plaza} with origin <->{connections.Footpath!} target report origin end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(1, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var --> def report var end";
+		JValue result = evalTestQuery("PrimaryPathDescription4", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("PrimaryPathDescription4 (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateEdgePathDescription(EdgePathDescription,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluatePrimaryPathDescription5() throws Exception {
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var -->{IsExprOf} def report var end";
+		JValue result = evalTestQuery("PrimaryPathDescription5", queryString);
+		assertEquals(0, result.toCollection().size());
+		JValue resultWO = evalTestQuery("PrimaryPathDescription5 (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateEdgePathDescription(EdgePathDescription,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluatePrimaryPathDescription6() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var -->{IsDefinitionOf!} def report var end";
+		JValue result = evalTestQuery("PrimaryPathDescription6", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("PrimaryPathDescription6 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1015,10 +1184,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateSequentialPathDescription1() throws Exception {
-		String queryString = "from county: V{localities.County}, airport: V{junctions.Airport} with county -->{localities.ContainsLocality} -->{connections.AirRoute} airport report county end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var  -->{IsVarOf} -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("SequentialPathDescription1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("SequentialPathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1044,8 +1216,8 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateSetComprehension() throws Exception {
-		PVector<String> list = createListWithMeat();
-		setBoundVariable("FOO", list);
+		ArrayList<JValueImpl> list = new ArrayList<JValueImpl>();
+		setBoundVariable("FOO", createBagWithMeat(list));
 		String queryString = "using FOO: from i: toSet(FOO) reportSet i end";
 		JValue result = evalTestQuery("SetComprehension", queryString);
 		assertEquals(8, result.toCollection().size());
@@ -1088,10 +1260,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateSimplePathDescription1() throws Exception {
-		String queryString = "from county: V{localities.County}, airport: V{junctions.Airport} with county --> airport report county end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{WhereExpression} with var --> def report var end";
+		JValue result = evalTestQuery("SimplePathDescription1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("SimplePathDescription1 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1107,29 +1282,38 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testEvaluateSimplePathDescription3() throws Exception {
-		String queryString = "from county: V{localities.County}, airport: V{junctions.Airport, localities.Town} with county --> airport report county end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(airportCount + townCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Definition}, def: V{BagComprehension, WhereExpression}  with var --> def report var end";
+		JValue result = evalTestQuery("SimplePathDescription3", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("SimplePathDescription3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateAggregationPathDescription1() throws Exception {
-		String queryString = "from county: V{localities.County}, loc: V{localities.Locality} with loc --<> county report loc end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(localityCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
-		assertEquals(result.toJValueSet(), resultWO.toJValueSet());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{Definition} with var --<> def report var end";
+		JValue result = evalTestQuery("SimplePathDescription2", queryString);
+		assertEquals(6, result.toCollection().size());
+		JValue resultWO = evalTestQuery("SimplePathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateAggregationPathDescription2() throws Exception {
-		String queryString = "from county: V{localities.County}, loc: V{localities.Locality} with county <>-- loc report loc end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(localityCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
-		assertEquals(result.toJValueSet(), resultWO.toJValueSet());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{Definition} with def <>-- var report var end";
+		JValue result = evalTestQuery("SimplePathDescription2", queryString);
+		assertEquals(6, result.toCollection().size());
+		JValue resultWO = evalTestQuery("SimplePathDescription2 (wo)",
+				queryString, new DefaultOptimizer());
+		assertEquals(result, resultWO);
 	}
 
 	@Test
@@ -1144,12 +1328,26 @@ public class GreqlEvaluatorTest extends GenericTest {
 	}
 
 	@Test
+	public void testEvaluateStartRestriction1() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var -->{IsVarOf} {Definition} & -->{IsDefinitionOf} def report var end";
+		JValue result = evalTestQuery("StartRestriction1", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("StartRestriction1 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	@Test
 	public void testEvaluateStartRestriction5() throws Exception {
-		String queryString1 = "from county: V{localities.County}, plaza: V{junctions.Plaza} with county -->{localities.ContainsLocality} {localities.Town} & -->{localities.ContainsCrossroad} plaza report county end";
-		String queryString2 = "from county: V{localities.County}, plaza: V{junctions.Plaza} with contains(-->{localities.ContainsLocality} {localities.Town} & -->{localities.ContainsCrossroad} plaza, county) report county end";
-		JValue result = evalTestQuery(queryString1);
-		assertEquals(plazaCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString2);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var -->{IsVarOf} {Definition} & -->{IsDefinitionOf} def report var end";
+		String queryString2 = "from var: V{Variable}, def: V{WhereExpression} with contains(-->{IsVarOf} {Definition} & -->{IsDefinitionOf} def, var) report var end";
+		JValue result = evalTestQuery("StartRestriction5", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("StartRestriction5 (wo)", queryString2);
 		assertEquals(result, resultWO);
 	}
 
@@ -1220,10 +1418,13 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateStartRestriction4() throws Exception {
-		String queryString = "from county: V{localities.County}, plaza: V{junctions.Plaza} with county -->{localities.ContainsLocality} {@ 1 = 1} & -->{localities.ContainsCrossroad} plaza report county end";
-		JValue result = evalTestQuery(queryString);
-		assertEquals(plazaCount, result.toCollection().size());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from var: V{Variable}, def: V{WhereExpression} with var  -->{IsVarOf} & {@1 = 1} -->{IsDefinitionOf} def  report var end";
+		JValue result = evalTestQuery("StartRestriction4", queryString);
+		assertEquals(4, result.toCollection().size());
+		JValue resultWO = evalTestQuery("StartRestriction4 (wo)", queryString,
+				new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1270,6 +1471,25 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateRecordConstruction(RecordConstruction,
+	 * Graph)'
+	 */
+	@Test
+	public void testEvaluateTupleAccess() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "let x := tup ( \"bratwurst\", \"currywurst\", \"steak\", \"kaenguruhfleisch\", \"spiessbraten\") in from i:V{Identifier} report x[3] end";
+		JValue result = evalTestQuery("TupleAccess", queryString);
+		assertEquals(5, result.toCollection().size());
+		assertEquals(5, result.toCollection().toJValueBag().getQuantity(
+				new JValueImpl("kaenguruhfleisch")));
+		JValue resultWO = evalTestQuery("TupleAccess (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(result, resultWO);
+	}
+
+	/*
+	 * Test method for
 	 * 'greql2.evaluator.GreqlEvaluator.evaluateTupleConstruction(TupleConstruction,
 	 * Graph)'
 	 */
@@ -1292,16 +1512,16 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	/*
 	 * Test method for
-	 * 'greql2.evaluator.GreqlEvaluator.evaluateListComprehension(ListComprehension,
+	 * 'greql2.evaluator.GreqlEvaluator.evaluateBagComprehension(BagComprehension,
 	 * Graph)'
 	 */
 	@Test
 	public void testEvaluateVarTableComprehension1() throws Exception {
-		JValueList list = new JValueList();
-		list.add(new JValueImpl(3));
-		list.add(new JValueImpl(4));
-		list.add(new JValueImpl(5));
-		setBoundVariable("FOO", list);
+		JValueBag bag = new JValueBag();
+		bag.add(new JValueImpl(3));
+		bag.add(new JValueImpl(4));
+		bag.add(new JValueImpl(5));
+		setBoundVariable("FOO", bag);
 		String queryString = "using FOO: from i:FOO, j:FOO reportTable i,j,i*j end";
 		JValue result = evalTestQuery("VarTableComprehension1", queryString);
 		assertEquals(3, result.toCollection().size());
@@ -1315,11 +1535,11 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testEvaluateVarTableComprehension2() throws Exception {
-		JValueList list = new JValueList();
-		list.add(new JValueImpl(3));
-		list.add(new JValueImpl(4));
-		list.add(new JValueImpl(5));
-		setBoundVariable("FOO", list);
+		JValueBag bag = new JValueBag();
+		bag.add(new JValueImpl(3));
+		bag.add(new JValueImpl(4));
+		bag.add(new JValueImpl(5));
+		setBoundVariable("FOO", bag);
 		String queryString = "using FOO: from i:FOO, j:FOO reportTable i,j,i*j,\"MultiplicationMatrix\" end";
 		JValue result = evalTestQuery("VarTableComprehension2", queryString);
 		assertEquals(3, result.toCollection().size());
@@ -1340,11 +1560,19 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateVertexSetExpression() throws Exception {
-		String queryString = "from i: V{localities.County} report i.name end";
-		JValue result = evalTestQuery(queryString);
-		containsAllElements(COUNTIES, result.toCollection());
-
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i: V{Variable} report i.name end";
+		JValue result = evalTestQuery("VertexSetExpression", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValueBag bag = result.toCollection().toJValueBag();
+		assertEquals(1, bag.getQuantity(new JValueImpl("a")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("b")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("c")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("d")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("i")));
+		JValue resultWO = evalTestQuery("VertexSetExpression (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1355,33 +1583,55 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testEvaluateVertexSubgraphExpression1() throws Exception {
-		String queryString = "from i:V{NamedElement} in vSubgraph{localities.Locality, ^localities.City} report i.name end";
-		JValue result = evalTestQuery(queryString);
-		containsAllElements(LOCALITIES_WITHOUT_CITIES, result.toCollection());
-
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i:V{Identifier} in vSubgraph{Expression} report i.name end";
+		JValue result = evalTestQuery("VertexSubgraphExpression1", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValueBag bag = result.toCollection().toJValueBag();
+		assertEquals(1, bag.getQuantity(new JValueImpl("a")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("b")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("c")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("d")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("i")));
 		JValue resultWO = evalTestQuery("VertexSubgraphExpression1 (wo)",
-				queryString, new DefaultOptimizer(),
-				TestVersion.ROUTE_MAP_GRAPH);
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateVertexSubgraphExpression2() throws Exception {
-		String queryString = "from i:V{NamedElement} in vSubgraph{^localities.Locality} report i.name end";
-		JValue result = evalTestQuery(queryString);
-		containsAllElements(COUNTIES, result.toCollection());
-
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i:V{Identifier} in vSubgraph{^Definition} report i.name end";
+		JValue result = evalTestQuery("VertexSubgraphExpression2", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValueBag bag = result.toCollection().toJValueBag();
+		assertEquals(1, bag.getQuantity(new JValueImpl("a")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("b")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("c")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("d")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("i")));
+		JValue resultWO = evalTestQuery("VertexSubgraphExpression2 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
 	@Test
 	public void testEvaluateVertexSubgraphExpression3() throws Exception {
-		String queryString = "from i:V{localities.County} in vSubgraph{localities.County} report i.name end";
-		JValue result = evalTestQuery(queryString);
-
-		containsAllElements(COUNTIES, result.toCollection());
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i:V{Identifier} in vSubgraph{Identifier} report i.name end";
+		JValue result = evalTestQuery("VertexSubgraphExpression3", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValueBag bag = result.toCollection().toJValueBag();
+		assertEquals(1, bag.getQuantity(new JValueImpl("a")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("b")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("c")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("d")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("i")));
+		JValue resultWO = evalTestQuery("VertexSubgraphExpression3 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1397,12 +1647,19 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testEvaluateVertexSubgraphExpression5() throws Exception {
-		String queryString = "from i:V{localities.Locality} in vSubgraph{^localities.City} report i.name end";
-		JValue result = evalTestQuery(queryString);
-
-		containsAllElements(LOCALITIES_WITHOUT_CITIES, result.toCollection());
-
-		JValue resultWO = evalQueryWithOptimizer(queryString);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from i:V{Identifier} in vSubgraph{^WhereExpression} report i.name end";
+		JValue result = evalTestQuery("VertexSubgraphExpression5", queryString);
+		assertEquals(5, result.toCollection().size());
+		JValueBag bag = result.toCollection().toJValueBag();
+		assertEquals(1, bag.getQuantity(new JValueImpl("a")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("b")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("c")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("d")));
+		assertEquals(1, bag.getQuantity(new JValueImpl("i")));
+		JValue resultWO = evalTestQuery("VertexSubgraphExpression5 (wo)",
+				queryString, new DefaultOptimizer());
 		assertEquals(result, resultWO);
 	}
 
@@ -1441,19 +1698,20 @@ public class GreqlEvaluatorTest extends GenericTest {
 	@Test
 	public void testMultipleEvaluationStarts() throws Exception {
 		String queryString = "from i: V{Identifier} report i.name end";
-		Graph datagraph = getTestGraph(TestVersion.GREQL_GRAPH);
+		Graph datagraph = getTestGraph();
 		GreqlEvaluator eval = new GreqlEvaluator(queryString, datagraph, null);
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
-		eval.getResult();
+		eval.getEvaluationResult();
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
 		eval.startEvaluation();
+		printTestFunctionFooter("MultipleEvaluationStarts");
 	}
 
 	/*
@@ -1482,12 +1740,19 @@ public class GreqlEvaluatorTest extends GenericTest {
 	 */
 	@Test
 	public void testStore() throws Exception {
-		String queryString = "from v: V{localities.County} report v.name end store as CountyNames";
-		evalTestQuery(queryString);
-		JValueList storedList = getBoundVariable("CountyNames").toCollection()
-				.toJValueList();
-
-		containsAllElements(COUNTIES, storedList);
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from v: V{Variable} report v.name end store as VariableNames";
+		evalTestQuery("Store", queryString);
+		JValueBag storedBag = getBoundVariable("VariableNames").toCollection()
+				.toJValueBag();
+		assertEquals(5, storedBag.size());
+		assertTrue(storedBag.contains(new JValueImpl("a")));
+		assertTrue(storedBag.contains(new JValueImpl("b")));
+		assertTrue(storedBag.contains(new JValueImpl("c")));
+		assertTrue(storedBag.contains(new JValueImpl("d")));
+		assertTrue(storedBag.contains(new JValueImpl("i")));
+		assertTrue(!storedBag.contains(new JValueImpl("x")));
 	}
 
 	@Test
@@ -1500,7 +1765,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testMapComprehension() throws Exception {
-		String queryString = "from x : set(1, 2, 3, 4, 5) reportMap x -> x*x end";
+		String queryString = "from x : set(1, 2, 3, 4, 5) reportMap x, x*x end";
 		JValue result = evalTestQuery("MapComprehension", queryString);
 		assertTrue(result.isMap());
 		JValueMap map = result.toJValueMap();
@@ -1514,32 +1779,23 @@ public class GreqlEvaluatorTest extends GenericTest {
 
 	@Test
 	public void testMapComprehension2() throws Exception {
-		String queryString = "from x : V{localities.County} reportMap x.name -> x end";
-		JValueMap map = evalTestQuery(queryString).toJValueMap();
-
-		containsAllKeys(COUNTIES, map);
-	}
-
-	private void containsAllKeys(Object[] counties, JValueMap map) {
-		assertEquals(counties.length, map.size());
-		containsAllElements(counties, map.keySet());
-	}
-
-	private void containsAllElements(Object[] elements,
-			JValueCollection collection) {
-
-		JValueList list = new JValueList(collection);
-		assertEquals(elements.length, list.size());
-		for (Object county : elements) {
-			assertTrue(list.remove(new JValueImpl(county)));
-		}
-		assertTrue(list.isEmpty());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from x : V{Variable} reportMap x.name, x end";
+		JValue result = evalTestQuery("MapComprehension2", queryString);
+		JValueMap map = result.toJValueMap();
+		assertEquals(5, map.size());
+		assertTrue(map.containsKey(new JValueImpl("a")));
+		assertTrue(map.containsKey(new JValueImpl("b")));
+		assertTrue(map.containsKey(new JValueImpl("c")));
+		assertTrue(map.containsKey(new JValueImpl("d")));
+		assertTrue(map.containsKey(new JValueImpl("i")));
 	}
 
 	@Test
 	public void testMapComprehension3() throws Exception {
 		// GreqlEvaluator.DEBUG_DECLARATION_ITERATIONS = true;
-		String queryString = "from x : list(1..3) reportMap x -> from y : list(1..x) reportMap y -> list(y..x) end end";
+		String queryString = "from x : list(1..3) reportMap x, from y : list(1..x) reportMap y, list(y..x) end end";
 		JValue result = evalTestQuery("MapComprehension3", queryString);
 		JValueMap map = result.toJValueMap();
 
@@ -1562,6 +1818,21 @@ public class GreqlEvaluatorTest extends GenericTest {
 	}
 
 	@Test
+	public void testTableComprehension2() throws Exception {
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from x : V{Variable} reportMap x.name, x end";
+		JValue result = evalTestQuery("MapComprehension2", queryString);
+		JValueMap map = result.toJValueMap();
+		assertEquals(5, map.size());
+		assertTrue(map.containsKey(new JValueImpl("a")));
+		assertTrue(map.containsKey(new JValueImpl("b")));
+		assertTrue(map.containsKey(new JValueImpl("c")));
+		assertTrue(map.containsKey(new JValueImpl("d")));
+		assertTrue(map.containsKey(new JValueImpl("i")));
+	}
+
+	@Test
 	public void testQueryWithoutDatagraph() throws Exception {
 		String queryString = "(3 + 4) * 7";
 		JValue result = evalTestQuery("QueryWithoutDatagraph", queryString,
@@ -1581,7 +1852,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 		GreqlEvaluator e1 = new GreqlEvaluator(query1, null, null);
 		e1.setOptimize(false);
 		e1.startEvaluation();
-		JValue r1 = e1.getResult();
+		JValue r1 = e1.getEvaluationResult();
 		String query2 = "from x : list(1..5)                   "
 				+ "      with isPrime(x)                       "
 				+ "      reportSet x, from y : from a : list(21..25) with isPrime(a+x) reportSet a end,"
@@ -1591,7 +1862,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 		GreqlEvaluator e2 = new GreqlEvaluator(query2, null, null);
 		e2.setOptimize(false);
 		e2.startEvaluation();
-		JValue r2 = e2.getResult();
+		JValue r2 = e2.getEvaluationResult();
 
 		assertEquals(r1, r2);
 	}
@@ -1602,10 +1873,10 @@ public class GreqlEvaluatorTest extends GenericTest {
 		JValue result = evalTestQuery("WhereWithSameScope", query);
 		assertTrue(result.isCollection());
 		assertTrue(result.toCollection().isJValueSet());
-		JValueSet resSet = result.toJValueSet();
-		assertEquals(10, resSet.size());
+		JValueSet resBag = result.toJValueSet();
+		assertEquals(10, resBag.size());
 		for (int i = 1; i < 11; i++) {
-			assertTrue(resSet.contains(new JValueImpl(i)));
+			assertTrue(resBag.contains(new JValueImpl(i)));
 		}
 	}
 
@@ -1615,10 +1886,10 @@ public class GreqlEvaluatorTest extends GenericTest {
 		JValue result = evalTestQuery("LetWithSameScope", query);
 		assertTrue(result.isCollection());
 		assertTrue(result.toCollection().isJValueSet());
-		JValueSet resSet = result.toJValueSet();
-		assertEquals(10, resSet.size());
+		JValueSet resBag = result.toJValueSet();
+		assertEquals(10, resBag.size());
 		for (int i = 1; i < 11; i++) {
-			assertTrue(resSet.contains(new JValueImpl(i)));
+			assertTrue(resBag.contains(new JValueImpl(i)));
 		}
 	}
 
@@ -1637,8 +1908,8 @@ public class GreqlEvaluatorTest extends GenericTest {
 				+ "     with isPrime(a + 1) and isPrime(b)        "
 				+ "          and (exists! y : list(10..20), x : list(1..30), x+a<y+b @ isPrime(x+y)) "
 				+ "     reportSet a, b end";
-		assertEquals(evalTestQuery("VariableOrder1", query),
-				evalTestQuery("VariableOrder1", query2));
+		assertEquals(evalTestQuery("VariableOrder1", query), evalTestQuery(
+				"VariableOrder1", query2));
 	}
 
 	@Test
@@ -1656,8 +1927,8 @@ public class GreqlEvaluatorTest extends GenericTest {
 				+ "     with isPrime(a + 1) and isPrime(b)        "
 				+ "          and (exists! x : list(1..30), y : list(10..20), x+a<y+b @ isPrime(x+y)) "
 				+ "     reportSet a, b end";
-		assertEquals(evalTestQuery("VariableOrder2", query),
-				evalTestQuery("VariableOrder2", query2));
+		assertEquals(evalTestQuery("VariableOrder2", query), evalTestQuery(
+				"VariableOrder2", query2));
 	}
 
 	/**
@@ -1681,8 +1952,8 @@ public class GreqlEvaluatorTest extends GenericTest {
 				+ "     with isPrime(a + 1) and isPrime(b)        "
 				+ "          and (exists! x : list(1..30), y : list(10..20), x+a<y+b @ isPrime(x+y)) "
 				+ "     reportSet a, b end";
-		GreqlEvaluator eval = new GreqlEvaluator((String) null,
-				getTestGraph(TestVersion.GREQL_GRAPH), null);
+		GreqlEvaluator eval = new GreqlEvaluator((String) null, getTestGraph(),
+				null);
 
 		Field parseTime = eval.getClass().getDeclaredField("parseTime");
 		parseTime.setAccessible(true);
@@ -1693,7 +1964,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 		for (int i = 0; i < 6; i++) {
 			eval.setQuery((i % 2 == 0) ? query1 : query2);
 			eval.startEvaluation();
-			eval.getResult();
+			eval.getEvaluationResult();
 			// eval.printEvaluationTimes();
 			if (i < 2) {
 				// The first two times, both parsing and optimizing have to be
@@ -1712,7 +1983,7 @@ public class GreqlEvaluatorTest extends GenericTest {
 		for (int i = 0; i < 6; i++) {
 			eval.setQuery((i % 2 == 0) ? query1 : query2);
 			eval.startEvaluation();
-			eval.getResult();
+			eval.getEvaluationResult();
 			// eval.printEvaluationTimes();
 			assertTrue(parseTime.getLong(eval) > 0);
 			assertEquals(0, optimizationTime.getLong(eval));

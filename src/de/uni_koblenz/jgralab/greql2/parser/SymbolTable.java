@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,49 +31,40 @@
 
 package de.uni_koblenz.jgralab.greql2.parser;
 
-import java.util.List;
+import com.sun.tools.apt.mirror.util.SourcePositionImpl;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
-public class SymbolTable extends SimpleSymbolTable {
+public class SymbolTable extends EasySymbolTable {
 
 	@Override
 	public void insert(String ident, Vertex v)
 			throws DuplicateVariableException {
+
 		if (!list.getFirst().containsKey(ident)) {
 			list.getFirst().put(ident, v);
 		} else {
 			Vertex var = list.getFirst().get(ident);
 			int offset = -1;
 			if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsDeclaredVarOf) {
-				offset = ((IsDeclaredVarOf) var
-						.getFirstIncidence(EdgeDirection.OUT))
+				offset = ((IsDeclaredVarOf) var.getFirstIncidence(EdgeDirection.OUT))
 						.get_sourcePositions().get(0).get_offset();
 			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsBoundVarOf) {
-				offset = ((IsBoundVarOf) var
-						.getFirstIncidence(EdgeDirection.OUT))
+				offset = ((IsBoundVarOf) var.getFirstIncidence(EdgeDirection.OUT))
 						.get_sourcePositions().get(0).get_offset();
 			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsVarOf) {
 				offset = ((IsVarOf) var.getFirstIncidence(EdgeDirection.OUT))
 						.get_sourcePositions().get(0).get_offset();
 			}
-			List<SourcePosition> sourcePositions = null;
-			if (v.getFirstIncidence(EdgeDirection.IN) != null) {
-				sourcePositions = ((Greql2Aggregation) v.getFirstIncidence(EdgeDirection.IN))
-						.get_sourcePositions();
-			}
-			
 			throw new DuplicateVariableException((Variable) var,
-					sourcePositions, new SourcePosition(offset,
-							ident.length()));
+					((Greql2Aggregation) v.getFirstIncidence(EdgeDirection.IN))
+					// .get_sourcePositions(), new SourcePosition(offset,
+							// ident.length()));
+							// .get_sourcePositions(), new SourcePositionImpl(v
+							// .getGraph(), offset, ident.length()));
+							.get_sourcePositions(), v.getGraph().createRecord(
+							SourcePositionImpl.class, offset, ident.length()));
 		}
 	}
 

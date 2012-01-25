@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,19 +33,17 @@ package de.uni_koblenz.jgralabtest.greql2.exception;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
-import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
-import de.uni_koblenz.jgralabtest.greql2.GenericTest;
+import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 
-public class ExceptionTest extends GenericTest {
+public class ExceptionTest extends GenericTests {
 
-	@Test(expected = GreqlException.class)
+	@Test(expected = QuerySourceException.class)
 	public void testFunctionException() throws Exception {
-		String queryString = "let x:=list(\"a\",4 ,5) in mean(x)";
+		String queryString = "let x:=list(\"a\",4 ,5) in avg(x)";
 		evalTestQuery("FunctionException", queryString);
 	}
 
-	@Test(expected =ParsingException.class)
+	@Test(expected = EvaluateException.class)
 	public void testUnknownTypeException() throws Exception {
 		String queryString = "from e:E{isEdgeOf} report e end";
 		evalTestQuery("UnknownTypeException", queryString);

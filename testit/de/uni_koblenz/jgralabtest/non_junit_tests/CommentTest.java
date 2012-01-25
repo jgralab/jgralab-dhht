@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,14 +32,13 @@ package de.uni_koblenz.jgralabtest.non_junit_tests;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralabtest.schemas.commenttest.CommentTestSchema;
 
 public class CommentTest {
 	public static void main(String[] args) {
 		System.out.println("Writing schema file CommentTestOutput.tg...");
 		try {
-			GraphIO.saveSchemaToFile(CommentTestSchema.instance(),
-					"CommentTestOutput.tg");
+			GraphIO.saveSchemaToFile("CommentTestOutput.tg", CommentTestSchema
+					.instance());
 		} catch (GraphIOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

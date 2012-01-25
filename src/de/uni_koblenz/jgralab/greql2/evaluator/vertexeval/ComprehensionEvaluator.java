@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,14 +30,13 @@
  */
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import org.pcollections.PCollection;
+import com.sun.mirror.declaration.Declaration;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
-import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
 
 public abstract class ComprehensionEvaluator extends VertexEvaluator {
 
@@ -55,7 +50,7 @@ public abstract class ComprehensionEvaluator extends VertexEvaluator {
 		super(eval);
 	}
 
-	protected abstract PCollection<Object> getResultDatastructure();
+	protected abstract JValueCollection getResultDatastructure();
 
 	protected final VertexEvaluator getResultDefinitionEvaluator() {
 		if (resultDefinitionEvaluator == null) {
@@ -74,20 +69,23 @@ public abstract class ComprehensionEvaluator extends VertexEvaluator {
 					.getFirstIsCompDeclOfIncidence(EdgeDirection.IN).getAlpha();
 			DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
 					.getMark(d);
-			varDeclLayer = (VariableDeclarationLayer) declEval.getResult();
+			varDeclLayer = (VariableDeclarationLayer) declEval.getResult(
+					subgraph).toObject();
 		}
 		return varDeclLayer;
 	}
 
 	@Override
-	public Object evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		VariableDeclarationLayer declLayer = getVariableDeclationLayer();
 		VertexEvaluator resultDefEval = getResultDefinitionEvaluator();
-		PCollection<Object> resultCollection = getResultDatastructure();
+		JValueCollection resultCollection = getResultDatastructure();
 		declLayer.reset();
-		while (declLayer.iterate()) {
-			Object localResult = resultDefEval.getResult();
-			resultCollection = resultCollection.plus(localResult);
+		int noOfVarCombinations = 0;
+		while (declLayer.iterate(subgraph)) {
+			noOfVarCombinations++;
+			JValue localResult = resultDefEval.getResult(subgraph);
+			resultCollection.add(localResult);
 		}
 		return resultCollection;
 	}

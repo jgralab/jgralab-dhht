@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,60 +33,51 @@ package de.uni_koblenz.jgralabtest.greql2;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
-
-public class ThisLiteralTest extends GenericTest {
+public class ThisLiteralTest extends GenericTests {
 
 	@Test
 	public void testThisVertex1() throws Exception {
-		String queryString = "from c: V{localities.County}, a:V{junctions.Airport} "
-				+ "with c --> & {@thisVertex = a} --> & {@thisVertex <> a} a report a "
-				+ "end";
-		Object result = evalTestQuery("ThisVertex1", queryString,
-				TestVersion.ROUTE_MAP_GRAPH);
-		Object resultOpt = evalTestQuery("ThisVertex1 (wo)", queryString,
-				new DefaultOptimizer(), TestVersion.ROUTE_MAP_GRAPH);
-		assertEquals(0, ((List<?>) result).size());
+		String queryString = "from v,w:V{WhereExpression} with v {@thisVertex<>v}& --> &{@thisVertex=v} -->  w report v end";
+		JValue result = evalTestQuery("ThisVertex1", queryString);
+		JValue resultOpt = evalTestQuery("ThisVertex1 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(0, result.toCollection().size());
 		assertEquals(result, resultOpt);
 	}
 
 	@Test
 	public void testThisVertex2() throws Exception {
-		String queryString = "from c: V{localities.County}, a1,a2:V{junctions.Airport} "
-				+ "with c {@thisVertex = c} & --> & {@thisVertex = a1} <-- a2 report a1 "
-				+ "end";
-		Object result = evalTestQuery("ThisVertex2", queryString,
-				TestVersion.ROUTE_MAP_GRAPH);
-		Object resultOpt = evalTestQuery("ThisVertex2 (wo)", queryString,
-				new DefaultOptimizer(), TestVersion.ROUTE_MAP_GRAPH);
-		assertEquals(3, ((List<?>) result).size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from v,w:V{WhereExpression}, g:V{Greql2Expression} with v {@thisVertex=v}& --> &{@thisVertex=g} <-- w report v end";
+		JValue result = evalTestQuery("ThisVertex2", queryString);
+		JValue resultOpt = evalTestQuery("ThisVertex2 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(1, result.toCollection().size());
 		assertEquals(result, resultOpt);
 	}
 
 	@Test
 	public void testThisVertex3() throws Exception {
-		String queryString = "from c: V{localities.County}, a1,a2:V{junctions.Airport} "
-				+ "with c {@thisVertex = c} & --> & {@thisVertex <> a1} <-- a2 report a1 "
-				+ "end";
-		Object result = evalTestQuery("ThisVertex3", queryString,
-				TestVersion.ROUTE_MAP_GRAPH);
-		Object resultOpt = evalTestQuery("ThisVertex3 (wo)", queryString,
-				new DefaultOptimizer(), TestVersion.ROUTE_MAP_GRAPH);
-		assertEquals(airportCount * 2 - 1, ((List<?>) result).size());
+		String queryString = "from v,w:V{WhereExpression}, g:V{Greql2Expression} with v {@thisVertex=v}& --> &{@thisVertex<>g} <-- w report v end";
+		JValue result = evalTestQuery("ThisVertex3", queryString);
+		JValue resultOpt = evalTestQuery("ThisVertex3 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(0, result.toCollection().size());
 		assertEquals(result, resultOpt);
 	}
 
 	@Test
 	public void testThisEdge1() throws Exception {
-		String queryString = "from c1,c2:V{junctions.Crossroad}  with c1 -->{@isLoop(thisEdge)} c2 report c1,c2 end";
-		Object result = evalTestQuery(queryString);
-		Object resultOpt = evalTestQuery("ThisEdge1 (wo)", queryString,
-				new DefaultOptimizer(), TestVersion.ROUTE_MAP_GRAPH);
-		assertEquals(1, ((List<?>) result).size());
+		// TODO: Broken, because the GReQL parser removes all WhereExpressions
+		// and LetExpressions!
+		String queryString = "from v:V{Definition}, w:V{WhereExpression}  with v -->{@id(thisEdge)=15}  w report v,w end";
+		JValue result = evalTestQuery("ThisEdge1", queryString);
+		JValue resultOpt = evalTestQuery("ThisEdge1 (wo)", queryString,
+				new DefaultOptimizer());
+		assertEquals(1, result.toCollection().size());
 		assertEquals(result, resultOpt);
 	}
 

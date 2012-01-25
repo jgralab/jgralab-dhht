@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,20 +35,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.pcollections.PVector;
+import com.sun.mirror.declaration.Declaration;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclaration;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
-import de.uni_koblenz.jgralab.greql2.schema.Variable;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueCollection;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 
 /**
  * Evaluates a Declaration vertex in the GReQL-2 Syntaxgraph
@@ -87,7 +84,30 @@ public class DeclarationEvaluator extends VertexEvaluator {
 	}
 
 	@Override
-	public VariableDeclarationLayer evaluate() {
+	public JValue evaluate() throws EvaluateException {
+		AbstractGraphMarker<AttributedElement> newSubgraph = null;
+		Edge edge = vertex.getFirstIsSubgraphOfIncidence();
+		if (edge != null) {
+			SubgraphExpression subgraphExp = (SubgraphExpression) edge
+					.getAlpha();
+			if (subgraphExp != null) {
+				VertexEvaluator subgraphEval = vertexEvalMarker
+						.getMark(subgraphExp);
+				JValue tempAttribute = subgraphEval.getResult(subgraph);
+				if (tempAttribute.isGraphMarker()) {
+					try {
+						newSubgraph = tempAttribute.toGraphMarker();
+					} catch (JValueInvalidTypeException exception) {
+						throw new EvaluateException(
+								"Error evaluating a Declaration : "
+										+ exception.toString());
+					}
+				}
+			}
+		}
+		if (newSubgraph == null) {
+			newSubgraph = subgraph;
+		}
 		ArrayList<VertexEvaluator> constraintList = new ArrayList<VertexEvaluator>();
 		for (IsConstraintOf consInc : vertex
 				.getIsConstraintOfIncidences(EdgeDirection.IN)) {
@@ -104,16 +124,15 @@ public class DeclarationEvaluator extends VertexEvaluator {
 			SimpleDeclaration simpleDecl = (SimpleDeclaration) inc.getAlpha();
 			SimpleDeclarationEvaluator simpleDeclEval = (SimpleDeclarationEvaluator) vertexEvalMarker
 					.getMark(simpleDecl);
-			@SuppressWarnings("unchecked")
-			PVector<VariableDeclaration> resultCollection = (PVector<VariableDeclaration>) simpleDeclEval
-					.getResult();
-			for (VariableDeclaration v : resultCollection) {
-				varDeclList.add(v);
+			JValue simpleResult = simpleDeclEval.getResult(newSubgraph);
+			JValueCollection resultCollection = simpleResult.toCollection();
+			for (JValue v : resultCollection) {
+				varDeclList.add((VariableDeclaration) v.toObject());
 			}
 		}
 		VariableDeclarationLayer declarationLayer = new VariableDeclarationLayer(
-				vertex, varDeclList, constraintList);
-		return declarationLayer;
+				vertex, varDeclList, constraintList, evaluationLogger);
+		return new JValueImpl(declarationLayer);
 	}
 
 	@Override

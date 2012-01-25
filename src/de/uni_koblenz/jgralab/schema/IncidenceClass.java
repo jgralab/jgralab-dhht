@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,25 +32,43 @@ package de.uni_koblenz.jgralab.schema;
 
 import java.util.Set;
 
-public interface IncidenceClass {
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
+
+public interface IncidenceClass extends TypedElementClass<IncidenceClass, Incidence > {
+
+	public static final String DEFAULTEDGECLASS_NAME = "Incidence";
+
 
 	/**
 	 * @return the upper multiplicity, i.e. the maximal number of edges
-	 *         connected to the vertex at the opposite end
+	 *         connected to the vertex
 	 */
-	public int getMax();
+	public int getMaxEdgesAtVertex();
+
+	/**
+	 * @return the upper multiplicity, i.e. the maximal number of vertices
+	 *         connected to the edge
+	 */
+	public int getMaxVerticesAtEdge();
 
 	/**
 	 * @return the lower multiplicity, i.e. the minimal number of edges
 	 *         connected to the vertex at the opposite end
 	 */
-	public int getMin();
+	public int getMinEdgesAtVertex();
+
+	/**
+	 * @return the lower multiplicity, i.e. the minimal number of edges
+	 *         connected to the vertex at the opposite end
+	 */
+	public int getMinVerticesAtEdge();
 
 	/**
 	 * @return the direction of this incidenceclass - either Vertex (from edge
 	 *         to vertex) or edge (from vertex to edge)
 	 */
-	public IncidenceDirection getDirection();
+	public Direction getDirection();
 
 	/**
 	 * @return the name of this incidence class, i.e. the rolename of the edge
@@ -62,42 +76,29 @@ public interface IncidenceClass {
 	 */
 	public String getRolename();
 
+	
 	/**
-	 * @return the type of this IncidenceClass, NONE for a normal edge end,
+	 * @return the type of this IncidenceClass, EDGE for a normal edge end,
 	 *         AGGREGATION for an aggregation end and COMPOSITION for a
 	 *         composition end
 	 */
-	public AggregationKind getAggregationKind();
+	public IncidenceType getIncidenceType();
 
 	/**
-	 * sets the type of this IncidenceClass, NONE for a normal edge end,
+	 * sets the type of this IncidenceClass, EDGE for a normal edge end,
 	 * AGGREGATION for an aggregation end and COMPOSITION for a composition end
 	 */
-	public void setAggregationKind(AggregationKind kind);
+	public void setIncidenceType(IncidenceType kind);
 
 	/**
-	 * @return the set of IncidenceClasses which are subsetted (i.e.
-	 *         specialized) by this IncidenceClass
+	 * @return a set of IncidenceClasses which are hidden by this at the edge
 	 */
-	public Set<IncidenceClass> getSubsettedIncidenceClasses();
+	public Set<IncidenceClass> getHiddenEndsAtEdge();
 
 	/**
-	 * @return the set of IncidenceClasses which are directly subsetted (i.e.
-	 *         specialized) by this IncidenceClass
+	 * @return a set of IncidenceClasses which are hidden by this at the vertex
 	 */
-	public Set<IncidenceClass> getOwnSubsettedIncidenceClasses();
-
-	/**
-	 * @return the set of IncidenceClasses which are redefined (i.e. specialized
-	 *         and overwritten) by this IncidenceClass
-	 */
-	public Set<IncidenceClass> getRedefinedIncidenceClasses();
-
-	/**
-	 * @return the set of IncidenceClasses which are directly redefined (i.e.
-	 *         specialized and overwritten) by this IncidenceClass
-	 */
-	public Set<IncidenceClass> getOwnRedefinedIncidenceClasses();
+	public Set<IncidenceClass> getHiddenEndsAtVertex();
 
 	/**
 	 * @return the VertexClass this IncidenceClass is connected to
@@ -109,32 +110,28 @@ public interface IncidenceClass {
 	 */
 	public EdgeClass getEdgeClass();
 
+
+
+	/**
+	 * 
+	 * @param graphElementClass
+	 * 
+	 * @return the other GraphElementClass connected to this incidenceClass,
+	 *         e.g. if graphElementClass is the EdgeClass connected, the method
+	 *         returns the VertexClass and vice versa
+	 */
+	public GraphElementClass<?,?,?,?> getOtherGraphElementClass(
+			GraphElementClass<?,?,?,?> graphElementClass);
+	
+	public GraphElementClass<?,?,?,?> getConnectedGraphElementClassOfOwnType(GraphElementClass<?,?,?,?> graphElementClass);
+	
+	public GraphElementClass<?,?,?,?> getConnectedGraphElementClassOfDualType(GraphElementClass<?,?,?,?> graphElementClass);
+
+
+
 	/**
 	 * @return the set of all role names valid for this IncidenceClass
 	 */
 	public Set<String> getAllRoles();
-
-	/**
-	 * @return the set of roles which are redefined by this IncidenceClass
-	 */
-	public Set<String> getRedefinedRoles();
-
-	/**
-	 * Marks a role which is already subsetted by this IncidenceClass as
-	 * redefined.
-	 */
-	public void addRedefinedRole(String rolename);
-
-	/**
-	 * Marks a set of roles which are already subsetted by this IncidenceClass
-	 * as redefined.
-	 */
-	public void addRedefinedRoles(Set<String> rolenames);
-
-	/**
-	 * @return the IncidenceClass at the other end of the EdgeClass this
-	 *         IncidenceClass belongs to
-	 */
-	public IncidenceClass getOpposite();
 
 }

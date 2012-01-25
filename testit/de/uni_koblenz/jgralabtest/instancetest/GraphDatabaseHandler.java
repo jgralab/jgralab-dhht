@@ -1,67 +1,31 @@
-/*
- * JGraLab - The Java Graph Laboratory
- * 
- * Copyright (C) 2006-2011 Institute for Software Technology
- *                         University of Koblenz-Landau, Germany
- *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
- * 
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www.gnu.org/licenses>.
- * 
- * Additional permission under GNU GPL version 3 section 7
- * 
- * If you modify this Program, or any covered work, by linking or combining
- * it with Eclipse (or a modified version of that program or an Eclipse
- * plugin), containing parts covered by the terms of the Eclipse Public
- * License (EPL), the licensors of this Program grant you additional
- * permission to convey the resulting work.  Corresponding Source for a
- * non-source form of such a combination shall include the source code for
- * the parts of JGraLab used as well as that of the covered work.
- */
 package de.uni_koblenz.jgralabtest.instancetest;
 
 import static org.junit.Assert.fail;
-
-import java.sql.SQLException;
-
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.impl.db.DatabasePersistableGraph;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
+import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.Schema;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalGraph;
-import de.uni_koblenz.jgralabtest.schemas.minimal.MinimalSchema;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public class GraphDatabaseHandler {
 
-	private String url;
+	private static final String url = "postgresql://helena.uni-koblenz.de:5432/";
+	// protected String url = "mysql://localhost:3306/graphdatabase5";
+	// protected String userName = "postgres";
+	private static final String databaseName = "jgralabtest2";
+	private static final String userName = "jgralabtest";
+	private static final String password = "secret";
 
-	protected GraphDatabase graphDatabase;
 
-	public GraphDatabaseHandler(String url) {
-		this.url = url;
+	protected GraphDatabaseBaseImpl graphDatabase;
+
+	public GraphDatabaseHandler() {
+		
 	}
-
+	
 	public void connectToDatabase() {
 		try {
-			graphDatabase = GraphDatabase.openGraphDatabase(url);
+			graphDatabase = GraphDatabaseBaseImpl.openGraphDatabase(url
+					+ databaseName, userName, password);
 		} catch (GraphDatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,7 +34,7 @@ public class GraphDatabaseHandler {
 
 	public void closeGraphdatabase() {
 		try {
-			graphDatabase.close();
+			this.graphDatabase.close();
 		} catch (GraphDatabaseException e) {
 			e.printStackTrace();
 		}
@@ -78,8 +42,9 @@ public class GraphDatabaseHandler {
 
 	public void loadVertexTestSchemaIntoGraphDatabase() {
 		try {
-			if (!graphDatabase.contains(VertexTestSchema.instance())) {
-				loadTestSchemaIntoGraphDatabase(VertexTestSchema.instance());
+			if (!this.graphDatabase.contains(VertexTestSchema.instance())) {
+				this
+						.loadTestSchemaIntoGraphDatabase("testit/testschemas/VertexTestSchema.tg");
 			}
 		} catch (GraphDatabaseException e) {
 			e.printStackTrace();
@@ -88,33 +53,22 @@ public class GraphDatabaseHandler {
 
 	public void loadMinimalSchemaIntoGraphDatabase() {
 		try {
-			if (!graphDatabase.contains(MinimalSchema.instance())) {
-				loadTestSchemaIntoGraphDatabase(MinimalSchema.instance());
+			if (!this.graphDatabase.contains(MinimalSchema.instance())) {
+				GraphIO.loadSchemaIntoGraphDatabase(
+						"testit/testschemas/MinimalSchema.tg",
+						this.graphDatabase);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// public void loadTestSchemaIntoGraphDatabase(String file) {
-	// try {
-	// GraphIO.loadSchemaIntoGraphDatabase(file, graphDatabase);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// fail("Could not load " + file + " into graph database.");
-	// }
-	// }
-
-	public void loadTestSchemaIntoGraphDatabase(Schema schema) {
+	public void loadTestSchemaIntoGraphDatabase(String file) {
 		try {
-			graphDatabase.insertSchema(schema);
-		} catch (GraphDatabaseException e) {
-			try {
-				graphDatabase.applyDbSchema();
-				graphDatabase.insertSchema(schema);
-			} catch (GraphDatabaseException e1) {
-				e1.printStackTrace();
-			}
+			GraphIO.loadSchemaIntoGraphDatabase(file, graphDatabase);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Could not load " + file + " into graph database.");
 		}
 	}
 
@@ -127,7 +81,7 @@ public class GraphDatabaseHandler {
 		try {
 			return MinimalSchema.instance()
 					.createMinimalGraphWithDatabaseSupport(id, vMax, eMax,
-							graphDatabase);
+							this.graphDatabase);
 		} catch (Exception exception) {
 			exception.printStackTrace();
 			fail("Could not create test graph.");
@@ -144,7 +98,7 @@ public class GraphDatabaseHandler {
 		try {
 			return VertexTestSchema.instance()
 					.createVertexTestGraphWithDatabaseSupport(id, vMax, eMax,
-							graphDatabase);
+							this.graphDatabase);
 		} catch (Exception exception) {
 			exception.printStackTrace();
 			fail("Could not create test graph");
@@ -177,7 +131,7 @@ public class GraphDatabaseHandler {
 
 	public void cleanDatabaseOfTestGraph(Graph testGraph) {
 		try {
-			if (graphDatabase.containsGraph(testGraph.getId())) {
+			if (graphDatabase.containsGraph(testGraph.getCompleteGraphUid())) {
 				graphDatabase.delete((DatabasePersistableGraph) testGraph);
 			}
 		} catch (GraphDatabaseException exception) {
@@ -199,26 +153,14 @@ public class GraphDatabaseHandler {
 		}
 	}
 
-	public void clearAllTables() {
-		try {
-			graphDatabase.clearAllTables();
-		} catch (SQLException exception) {
-			exception.printStackTrace();
-			fail("Could not clear all tables.");
-		}
-	}
-
-	public GraphDatabase getGraphDatabase() {
+	public GraphDatabaseBaseImpl getGraphDatabase() {
 		return graphDatabase;
 	}
-
+	
 	public static void main(String[] args) throws GraphDatabaseException {
-		GraphDatabaseHandler handler = new GraphDatabaseHandler(System
-				.getProperty("jgralabtest_dbconnection"));
+		GraphDatabaseHandler handler = new GraphDatabaseHandler();
 		handler.connectToDatabase();
 		handler.graphDatabase.applyDbSchema();
-		// TODO enable indices and foreign key constraints
-		// handler.graphDatabase.optimizeForGraphTraversal();
 	}
 
 }

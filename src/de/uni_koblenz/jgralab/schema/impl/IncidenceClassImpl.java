@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,81 +30,110 @@
  */
 package de.uni_koblenz.jgralab.schema.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.schema.AggregationKind;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceDirection;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public class IncidenceClassImpl implements IncidenceClass {
+public class IncidenceClassImpl extends
+		TypedElementClassImpl<IncidenceClass, Incidence> implements
+		IncidenceClass {
+
+	public static String getRolenameString(String role, VertexClass vc,
+			Direction direction, EdgeClass ec) {
+		if ((role == null) || (role.length() == 0)) {
+			return Character.toLowerCase(ec.getSimpleName().charAt(0))
+					+ (ec.getSimpleName().length() > 1 ? ec.getSimpleName()
+							.substring(1) : "")
+					+ "_"
+					+ (direction == Direction.VERTEX_TO_EDGE ? "ComesFrom"
+							: "GoesTo") + "_" + vc.getSimpleName();
+		} else {
+			return role;
+		}
+	}
 
 	public IncidenceClassImpl(EdgeClass edgeClass, VertexClass vertexClass,
-			String rolename, int minEdgesAtVertex, int maxEdgesAtVertex,
-			IncidenceDirection direction, AggregationKind aggregationKind) {
-		super();
-		this.aggregationKind = aggregationKind;
+			String rolename, boolean isAbstract, int minEdgesAtVertex,
+			int maxEdgesAtVertex, int minVerticesAtEdge, int maxVerticesAtEdge,
+			Direction direction, IncidenceType incidenceType) {
+		super(
+				edgeClass.getSimpleName()
+						+ "_"
+						+ getRolenameString(rolename, vertexClass, direction,
+								edgeClass), edgeClass.getPackage(), edgeClass
+						.getSchema());
+		this.incidenceType = incidenceType;
 		this.direction = direction;
 		this.edgeClass = edgeClass;
 		this.maxEdgesAtVertex = maxEdgesAtVertex;
 		this.minEdgesAtVertex = minEdgesAtVertex;
-		this.rolename = rolename;
-		if (rolename == null) {
-			rolename = "";
-		}
+		this.maxVerticesAtEdge = maxVerticesAtEdge;
+		this.minVerticesAtEdge = minVerticesAtEdge;
+		this.rolename = getRolenameString(rolename, vertexClass, direction,
+				edgeClass);
 		this.vertexClass = vertexClass;
-		this.subsettedIncidenceClasses = new HashSet<IncidenceClass>();
-		this.redefinedIncidenceClasses = new HashSet<IncidenceClass>();
+		setAbstract(isAbstract);
 	}
 
-	private AggregationKind aggregationKind;
+	private final Direction direction;
 
-	private IncidenceDirection direction;
+	private IncidenceType incidenceType;
 
-	private EdgeClass edgeClass;
+	private final EdgeClass edgeClass;
 
-	private VertexClass vertexClass;
+	private final VertexClass vertexClass;
 
-	private int maxEdgesAtVertex;
+	private final int maxEdgesAtVertex;
 
-	private int minEdgesAtVertex;
+	private final int minEdgesAtVertex;
 
-	private String rolename;
+	private final int maxVerticesAtEdge;
 
-	private Set<IncidenceClass> redefinedIncidenceClasses;
+	private final int minVerticesAtEdge;
 
-	private Set<IncidenceClass> subsettedIncidenceClasses;
+	private final String rolename;
+
+	private final Set<IncidenceClass> hiddenEndsAtEdge = new HashSet<IncidenceClass>();
+
+	private final Set<IncidenceClass> hiddenEndsAtVertex = new HashSet<IncidenceClass>();
+
+	/**
+	 * The class object representing the generated interface for this
+	 * AttributedElementClass
+	 */
 
 	@Override
-	public AggregationKind getAggregationKind() {
-		return aggregationKind;
-	}
-
-	@Override
-	public IncidenceClass getOpposite() {
-		if (edgeClass.getFrom() == this) {
-			return edgeClass.getTo();
+	public GraphElementClass<?, ?,?,?> getOtherGraphElementClass(
+			GraphElementClass<?, ?,?,?> connectedGc) {
+		if (connectedGc == edgeClass) {
+			return vertexClass;
 		} else {
-			return edgeClass.getFrom();
+			return edgeClass;
 		}
 	}
 
 	@Override
-	public void setAggregationKind(AggregationKind kind) {
-		if ((kind != AggregationKind.NONE)
-				&& (getOpposite().getAggregationKind() != AggregationKind.NONE)) {
-			throw new SchemaException(
-					"At least one end of each EdgeClass must be of AggregationKind NONE at EdgeClass "
-							+ edgeClass.getQualifiedName());
-		}
-		this.aggregationKind = kind;
+	public IncidenceType getIncidenceType() {
+		return incidenceType;
 	}
 
 	@Override
-	public IncidenceDirection getDirection() {
+	public void setIncidenceType(IncidenceType type) {
+		incidenceType = type;
+	}
+
+	@Override
+	public Direction getDirection() {
 		return direction;
 	}
 
@@ -118,31 +143,34 @@ public class IncidenceClassImpl implements IncidenceClass {
 	}
 
 	@Override
-	public int getMax() {
+	public int getMaxEdgesAtVertex() {
 		return maxEdgesAtVertex;
 	}
 
 	@Override
-	public int getMin() {
+	public int getMinEdgesAtVertex() {
 		return minEdgesAtVertex;
 	}
 
 	@Override
-	public Set<IncidenceClass> getRedefinedIncidenceClasses() {
-		Set<IncidenceClass> result = new HashSet<IncidenceClass>();
-		result.addAll(redefinedIncidenceClasses);
-		for (IncidenceClass ic : subsettedIncidenceClasses) {
-			result.addAll(ic.getRedefinedIncidenceClasses());
-		}
-		for (IncidenceClass ic : redefinedIncidenceClasses) {
-			result.addAll(ic.getRedefinedIncidenceClasses());
-		}
-		return result;
+	public int getMaxVerticesAtEdge() {
+		return maxVerticesAtEdge;
 	}
 
 	@Override
-	public Set<IncidenceClass> getOwnRedefinedIncidenceClasses() {
-		return redefinedIncidenceClasses;
+	public int getMinVerticesAtEdge() {
+		return minVerticesAtEdge;
+	}
+
+	public void addHiddenRolenameAtEdge(IncidenceClass ic) {
+		if ((ic == this) || (ic == null)) {
+			return;
+		}
+		hiddenEndsAtEdge.add(ic);
+	}
+
+	public void addHiddenRolenameAtVertex(IncidenceClass ic) {
+		hiddenEndsAtVertex.add(ic);
 	}
 
 	@Override
@@ -151,108 +179,312 @@ public class IncidenceClassImpl implements IncidenceClass {
 	}
 
 	@Override
-	public Set<IncidenceClass> getOwnSubsettedIncidenceClasses() {
-		return subsettedIncidenceClasses;
-	}
-
-	@Override
-	public Set<IncidenceClass> getSubsettedIncidenceClasses() {
-		Set<IncidenceClass> result = new HashSet<IncidenceClass>();
-		result.addAll(subsettedIncidenceClasses);
-		for (IncidenceClass ic : subsettedIncidenceClasses) {
-			result.addAll(ic.getSubsettedIncidenceClasses());
-		}
-		return result;
-	}
-
-	@Override
 	public VertexClass getVertexClass() {
 		return vertexClass;
 	}
 
-	public void addRedefinedRole(String rolename) {
-		boolean foundRole = false;
-
-		for (IncidenceClass ic : getSubsettedIncidenceClasses()) {
-			if (ic.getRolename().equals(rolename)) {
-				// found a base incidence class whose rolename matches
-
-				// TODO This check does not cover all illegal cases
-				// TODO Daniel's job: give a specification of illegal
-				// redefinitions
-
-				// Check if this rolename is redefined by another EdgeClass
-				// originating from the same VertexClass
-				for (EdgeClass ec : getOpposite().getVertexClass()
-						.getOwnConnectedEdgeClasses()) {
-					if (ec == edgeClass) {
-						// skip the EdgeClass of this IncidenceClass
-						continue;
-					}
-					// determine proper end
-					IncidenceClass other = direction == IncidenceDirection.IN ? ec
-							.getTo()
-							: ec.getFrom();
-					if (other.getRedefinedIncidenceClasses().contains(ic)) {
-						throw new SchemaException("The role '" + rolename
-								+ "' of EdgeClass '"
-								+ edgeClass.getQualifiedName()
-								+ "' is already redefined in EdgeClass '"
-								+ ec.getQualifiedName() + "'");
-					}
-				}
-				redefinedIncidenceClasses.add(ic);
-				foundRole = true;
-				break;
-			}
-		}
-		if (!foundRole) {
-			throw new SchemaException(
-					"The role '"
-							+ rolename
-							+ "' is not defined in any subsetted IncidenceClass, so it cannot be redefined.");
-		}
+	@Override
+	public Schema getSchema() {
+		return getEdgeClass().getSchema();
 	}
 
-	public void addRedefinedRoles(Set<String> rolenames) {
-		if (rolenames == null) {
-			return;
-		}
-		for (String role : rolenames) {
-			addRedefinedRole(role);
-		}
-	}
-
-	public void addSubsettedIncidenceClass(IncidenceClass other) {
-		EdgeClassImpl.checkIncidenceClassSpecialization(this, other);
-		if (other.getSubsettedIncidenceClasses().contains(this)) {
-			throw new SchemaException(
-					"Subsetting/Redefinition of IncidenceClasses need to be acyclic");
-		}
-		subsettedIncidenceClasses.add(other);
-	}
-
+	@Override
 	public Set<String> getAllRoles() {
 		Set<String> result = new HashSet<String>();
 		result.add(getRolename());
-		for (IncidenceClass ic : getSubsettedIncidenceClasses()) {
+		for (IncidenceClass ic : getAllSuperClasses()) {
 			result.add(ic.getRolename());
 		}
 		return result;
 	}
 
-	public Set<String> getRedefinedRoles() {
-		Set<String> result = new HashSet<String>();
-		for (IncidenceClass ic : getRedefinedIncidenceClasses()) {
-			result.add(ic.getRolename());
-		}
-		return result;
+	@Override
+	public Set<IncidenceClass> getHiddenEndsAtEdge() {
+		return hiddenEndsAtEdge;
 	}
 
-	// public Set<String> getRedefinedAndOwnRoles() {
-	// Set<String> roles = new HashSet<String>(getRedefinedRoles());
-	// roles.add(getRolename());
-	// return roles;
-	// }
+	@Override
+	public Set<IncidenceClass> getHiddenEndsAtVertex() {
+		return hiddenEndsAtVertex;
+	}
+
+	/**
+	 * checks if the incidence classes own and inherited are compatible, i.e. if
+	 * the upper multiplicity of own is lower or equal than the one of inherited
+	 * and so on
+	 * 
+	 * @param special
+	 * @param general
+	 * @return true iff the IncidenceClasses are compatible
+	 */
+	public static void checkIncidenceClassSpecialization(
+			IncidenceClass special, IncidenceClass general) {
+		// Vertex same
+		if ((special.getVertexClass() != general.getVertexClass())
+				&& (!general.getVertexClass().isSuperClassOf(
+						special.getVertexClass()))) {
+			throw new SchemaException(
+					"An IncidenceClass may specialize only IncidenceClasses whose connected vertex class is identical or a superclass of the own one. Offending"
+							+ "IncidenceClasses are "
+							+ special.getQualifiedName()
+							+ " and "
+							+ general.getQualifiedName() + ".");
+		}
+		// Edge same
+		if ((special.getEdgeClass() != general.getEdgeClass())
+				&& (!general.getEdgeClass().isSuperClassOf(
+						special.getEdgeClass()))) {
+			throw new SchemaException(
+					"An IncidenceClass may specialize only IncidenceClasses whose connected edge class is identical or a superclass of the own one. Offending"
+							+ "IncidenceClasses are "
+							+ special.getQualifiedName()
+							+ " and "
+							+ general.getQualifiedName() + ".");
+		}
+		// Multiplicities
+		if (special.getMaxEdgesAtVertex() > general.getMaxEdgesAtVertex()) {
+			throw new SchemaException(
+					"The multiplicity of an edge class may not be larger than the multiplicities of its superclass. Offending"
+							+ "EdgeClasses are "
+							+ special.getEdgeClass().getQualifiedName()
+							+ " and "
+							+ general.getEdgeClass().getQualifiedName() + ".");
+		}
+		if (special.getMaxVerticesAtEdge() > general.getMaxVerticesAtEdge()) {
+			throw new SchemaException(
+					"The multiplicity of an vertex class may not be larger than the multiplicities of its superclass. Offending"
+							+ "VertexClasses are "
+							+ special.getVertexClass().getQualifiedName()
+							+ " and "
+							+ general.getVertexClass().getQualifiedName() + ".");
+		}
+
+		// name clashes
+		HashMap<String, IncidenceClass> rolenamesAtVertex = new HashMap<String, IncidenceClass>();
+		HashMap<String, IncidenceClass> rolenamesAtEdge = new HashMap<String, IncidenceClass>();
+
+		// collect all rolenames of special
+		collectDirectRolenames(rolenamesAtVertex, rolenamesAtEdge, special);
+		collectRolenamesOfSubclasses(rolenamesAtVertex, rolenamesAtEdge,
+				special);
+		collectRolenamesOfSuperclasses(rolenamesAtVertex, rolenamesAtEdge,
+				special);
+
+		// check if a rolename of general exists at special
+		checkExistenceOfDirectRolenames(rolenamesAtVertex, rolenamesAtEdge,
+				general);
+		checkExistenceOfRolenamesOfSubclasses(rolenamesAtVertex,
+				rolenamesAtEdge, general);
+		checkExistenceOfRolenamesOfSuperclasses(rolenamesAtVertex,
+				rolenamesAtEdge, general);
+	}
+
+	/**
+	 * Checks if the rolename of all superclasses of <code>general</code> and
+	 * the corresponding rolenames of IncidenceClasses, which are connected to
+	 * their incident vertices and edges, already exists in
+	 * <code>rolenamesAtVertex</code> or <code>rolenamesAtEdge</code>.
+	 * 
+	 * @param rolenamesAtVertex
+	 * @param rolenamesAtEdge
+	 * @param general
+	 */
+	private static void checkExistenceOfRolenamesOfSuperclasses(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass general) {
+		for (IncidenceClass ic : general.getAllSuperClasses()) {
+			checkExistenceOfDirectRolenames(rolenamesAtVertex, rolenamesAtEdge,
+					ic);
+			checkExistenceOfRolenamesOfSuperclasses(rolenamesAtVertex,
+					rolenamesAtEdge, ic);
+		}
+	}
+
+	/**
+	 * Checks if the rolename of all subclasses of <code>general</code> and the
+	 * corresponding rolenames of IncidenceClasses, which are connected to their
+	 * incident vertices and edges, already exists in
+	 * <code>rolenamesAtVertex</code> or <code>rolenamesAtEdge</code>.
+	 * 
+	 * @param rolenamesAtVertex
+	 * @param rolenamesAtEdge
+	 * @param general
+	 */
+	private static void checkExistenceOfRolenamesOfSubclasses(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass general) {
+		for (IncidenceClass ic : general.getAllSubClasses()) {
+			checkExistenceOfDirectRolenames(rolenamesAtVertex, rolenamesAtEdge,
+					ic);
+			checkExistenceOfRolenamesOfSubclasses(rolenamesAtVertex,
+					rolenamesAtEdge, ic);
+		}
+	}
+
+	/**
+	 * Checks if the rolenames of all
+	 * <code>general.getVertexClass().getIncidences()</code> does not occure in
+	 * <code>rolenamesAtVertex</code> and if the rolenames of all
+	 * <code>general.getEdgeClass().getIncidences()</code> does not occure in
+	 * <code>rolenamesAtEdge</code>.
+	 * 
+	 * @param rolenamesAtVertex
+	 * @param rolenamesAtEdge
+	 * @param general
+	 */
+	private static void checkExistenceOfDirectRolenames(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass general) {
+		checkExistenceOfDirectRolenameForGraphElementClass(rolenamesAtVertex,
+				general.getVertexClass());
+		checkExistenceOfDirectRolenameForGraphElementClass(rolenamesAtEdge,
+				general.getEdgeClass());
+	}
+
+	/**
+	 * @param rolenames
+	 * @param geClass
+	 * @throws SchemaException
+	 *             if the rolename of any IncidenceClass connected to
+	 *             <code>geClass</code> is a key of <code>rolenames</code>
+	 */
+	private static void checkExistenceOfDirectRolenameForGraphElementClass(
+			HashMap<String, IncidenceClass> rolenames,
+			GraphElementClass<?, ?,?,?> geClass) {
+		for (IncidenceClass ic : geClass.getIncidenceClasses()) {
+			IncidenceClass icWithSameRolename = rolenames.get(ic.getRolename());
+			if (icWithSameRolename != null) {
+				throw new SchemaException("The rolename '" + ic.getRolename()
+						+ "' already exists at IncidenceClass '"
+						+ ic.getQualifiedName() + "'.");
+			}
+		}
+	}
+
+	private static void collectRolenamesOfSuperclasses(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass incidenceClass) {
+		for (IncidenceClass ic : incidenceClass.getDirectSuperClasses()) {
+			collectDirectRolenames(rolenamesAtVertex, rolenamesAtEdge, ic);
+			collectRolenamesOfSubclasses(rolenamesAtVertex, rolenamesAtEdge, ic);
+		}
+	}
+
+	private static void collectRolenamesOfSubclasses(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass incidenceClass) {
+		for (IncidenceClass ic : incidenceClass.getDirectSubClasses()) {
+			collectDirectRolenames(rolenamesAtVertex, rolenamesAtEdge, ic);
+			collectRolenamesOfSubclasses(rolenamesAtVertex, rolenamesAtEdge, ic);
+		}
+	}
+
+	private static void collectDirectRolenames(
+			HashMap<String, IncidenceClass> rolenamesAtVertex,
+			HashMap<String, IncidenceClass> rolenamesAtEdge,
+			IncidenceClass incidenceClass) {
+		collectDirectRolenamesOfGraphElementClass(rolenamesAtVertex,
+				incidenceClass.getVertexClass());
+		collectDirectRolenamesOfGraphElementClass(rolenamesAtEdge,
+				incidenceClass.getEdgeClass());
+	}
+
+	/**
+	 * Puts <code>&lt;rolename,IncidenceClass&gt;</code> into
+	 * <code>rolenames</code> for all {@link IncidenceClass}es connected to
+	 * <code>geClass</code>.
+	 * 
+	 * @param rolenames
+	 * @param geClass
+	 */
+	private static void collectDirectRolenamesOfGraphElementClass(
+			HashMap<String, IncidenceClass> rolenames,
+			GraphElementClass<?, ?,?,?> geClass) {
+		for (IncidenceClass ic : geClass.getIncidenceClasses()) {
+			assert rolenames.get(ic.getRolename()) == null;
+			rolenames.put(ic.getRolename(), ic);
+		}
+	}
+
+	public GraphElementClass<?, ?,?,?> getConnectedGraphElementClassOfOwnType(
+			GraphElementClass<?, ?,?,?> graphElementClass) {
+		if (graphElementClass instanceof VertexClass) {
+			return getVertexClass();
+		} else {
+			return getEdgeClass();
+		}
+	}
+
+	public GraphElementClass<?, ?,?,?> getConnectedGraphElementClassOfDualType(
+			GraphElementClass<?, ?,?,?> graphElementClass) {
+		if (graphElementClass instanceof VertexClass) {
+			return getEdgeClass();
+		} else {
+			return getVertexClass();
+		}
+	}
+
+	@Override
+	public String getVariableName() {
+		return "ic_" + getQualifiedName().replace('.', '_');
+	}
+
+	@Override
+	public IncidenceClass getDefaultClass() {
+		return getSchema().getDefaultIncidenceClass(direction);
+	}
+
+	@Override
+	protected void register() {
+		// ((PackageImpl) parentPackage).addIncidencClass(this);
+		// ((GraphClassImpl) graphClass).addIncidenceClass(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	protected void checkSpecialization(IncidenceClass superclass) {
+		checkIncidenceClassSpecialization(this, superclass);
+	}
+
+	public static IncidenceClass createDefaulIncidenceClass(SchemaImpl schema,
+			Direction dir) {
+		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
+		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
+		assert schema.getDefaultEdgeClass() != null : "DefaultEdgeClass not yet been created!";
+		assert schema.getDefaultIncidenceClass(dir) == null : "DefaultIncidenceClass has already been created";
+		IncidenceClass ic = schema.getDefaultGraphClass().createIncidenceClass(
+				schema.getDefaultEdgeClass(),
+				schema.getDefaultVertexClass(),
+				dir == Direction.EDGE_TO_VERTEX ? "EdgeToVertex"
+						: "VertexToEdge", true, 0, Integer.MAX_VALUE, 0,
+				Integer.MAX_VALUE, dir, IncidenceType.EDGE);
+		return ic;
+	}
+
+	static EdgeClass createDefaultEdgeClass(Schema schema) {
+		assert schema.getDefaultGraphClass() != null : "DefaultGraphClass has not yet been created!";
+		assert schema.getDefaultVertexClass() != null : "DefaultVertexClass has not yet been created!";
+		assert schema.getDefaultEdgeClass() == null : "DefaultEdgeClass already created!";
+		EdgeClass ec = schema.getDefaultGraphClass().createEdgeClass(
+				DEFAULTEDGECLASS_NAME);
+		System.out.println("Created default edge class: "
+				+ ec.getQualifiedName());
+		// , 0,
+		// Integer.MAX_VALUE, "", AggregationKind.NONE,
+		// schema.getDefaultVertexClass(), 0, Integer.MAX_VALUE, "",
+		// AggregationKind.NONE);
+		ec.setAbstract(true);
+		return ec;
+	}
 
 }

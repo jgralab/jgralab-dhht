@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,20 +35,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.tools.ant.taskdefs.Exit;
+import org.apache.tools.ant.taskdefs.SQLExec.Transaction;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.JGraLabList;
+import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.Transaction;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.City;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Exit;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.Motorway;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMap;
-import de.uni_koblenz.jgralabtest.schemas.motorwaymap.MotorwayMapSchema;
 
 /**
  * 
@@ -144,7 +141,7 @@ public class ConflictDetectionTest {
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			assertTrue(!v24.isValid());
-			Vertex v2 = motorwayMap.getVertex(2);
+			Vertex v2 = motorwayMap.getVertexObject(2);
 			v2.delete();
 			assertTrue(!v2.isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount);
@@ -209,7 +206,7 @@ public class ConflictDetectionTest {
 					motorwayMap.createCity();
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
-					Vertex v2 = motorwayMap.getVertex(2);
+					Vertex v2 = motorwayMap.getVertexObject(2);
 					v2.delete();
 					assertTrue(!v2.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount);
@@ -242,7 +239,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
 					motorwayMap.setCurrentTransaction(readWriteTransaction2);
-					Vertex v2 = motorwayMap.getVertex(2);
+					Vertex v2 = motorwayMap.getVertexObject(2);
 					assertTrue(v2.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 
@@ -270,9 +267,9 @@ public class ConflictDetectionTest {
 			assertTrue(!readWriteTransaction1.isValid());
 			assertFalse(readWriteTransaction2.isValid());
 			readOnlyTransaction = motorwayMap.newReadOnlyTransaction();
-			assertTrue(motorwayMap.getVertex(2) == null);
-			assertTrue(motorwayMap.getVertex(internalVCount + 1).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(2) == null);
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 1).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 2).isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 1);
 			readOnlyTransaction.commit();
 		} catch (Exception e) {
@@ -362,7 +359,7 @@ public class ConflictDetectionTest {
 			assertFalse(e22.isValid());
 			assertFalse(v25.isValid());
 			assertFalse(v26.isValid());
-			Edge e2 = motorwayMap.getEdge(2);
+			Edge e2 = motorwayMap.getEdgeObject(2);
 			e2.delete();
 			assertFalse(e2.isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 2);
@@ -439,7 +436,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
 					assertEquals(motorwayMap.getECount(), internalECount + 1);
 
-					Edge e7 = motorwayMap.getEdge(7);
+					Edge e7 = motorwayMap.getEdgeObject(7);
 					e7.delete();
 					assertFalse(e7.isValid());
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
@@ -478,7 +475,7 @@ public class ConflictDetectionTest {
 					assertEquals(motorwayMap.getVCount(), internalVCount + 2);
 					assertEquals(motorwayMap.getECount(), internalECount + 1);
 
-					Edge e7 = motorwayMap.getEdge(7);
+					Edge e7 = motorwayMap.getEdgeObject(7);
 					assertTrue(e7.isValid());
 					try {
 						long sleepTime = 0;
@@ -504,13 +501,13 @@ public class ConflictDetectionTest {
 					&& !readWriteTransaction2.isValid());
 			assertTrue(lastTransactionCommitted == lastToCommit);
 			readOnlyTransaction = motorwayMap.newReadOnlyTransaction();
-			assertTrue(motorwayMap.getEdge(7) == null);
-			assertTrue(motorwayMap.getEdge(internalECount + 1).isValid());
-			assertTrue(motorwayMap.getEdge(internalECount + 2).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 1).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 2).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 3).isValid());
-			assertTrue(motorwayMap.getVertex(internalVCount + 4).isValid());
+			assertTrue(motorwayMap.getEdgeObject(7) == null);
+			assertTrue(motorwayMap.getEdgeObject(internalECount + 1).isValid());
+			assertTrue(motorwayMap.getEdgeObject(internalECount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 1).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 2).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 3).isValid());
+			assertTrue(motorwayMap.getVertexObject(internalVCount + 4).isValid());
 			assertEquals(motorwayMap.getVCount(), internalVCount + 4);
 			assertEquals(motorwayMap.getECount(), internalECount + 1);
 			readOnlyTransaction.commit();
@@ -689,7 +686,7 @@ public class ConflictDetectionTest {
 				assertEquals(motorwayMap.getVCount(), internalVCount);
 				assertTrue(v1.isValid());
 				assertTrue(v2.isValid());
-				assertTrue(motorwayMap.getEdge(internalECount + 1) == null);
+				assertTrue(motorwayMap.getEdgeObject(internalECount + 1) == null);
 				v1.delete();
 				assertEquals(motorwayMap.getVCount(), internalVCount - 1);
 				// all incidences of v1 are deleted too
@@ -732,16 +729,16 @@ public class ConflictDetectionTest {
 	public void testConflictVseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
 			assertEquals(v2.getNextVertex(), v4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v1 = motorwayMap.getVertex(1);
-			v4 = motorwayMap.getVertex(4);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v1);
 			assertTrue(v4.isAfter(v1));
 			assertEquals(v4.getPrevVertex(), v1);
@@ -794,8 +791,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictVseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v4 = motorwayMap.getVertex(4);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -826,7 +823,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v1 = motorwayMap.getVertex(1);
+				Vertex v1 = motorwayMap.getVertexObject(1);
 				v4.putAfter(v1);
 				assertTrue(v4.isAfter(v1));
 				assertEquals(v4.getPrevVertex(), v1);
@@ -872,15 +869,15 @@ public class ConflictDetectionTest {
 	public void testConflictVseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
 			assertEquals(v2.getNextVertex(), v4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v5 = motorwayMap.getVertex(5);
+			Vertex v5 = motorwayMap.getVertexObject(5);
 			v2.putAfter(v5);
 			assertTrue(v2.isAfter(v5));
 			assertEquals(v2.getPrevVertex(), v5);
@@ -909,8 +906,8 @@ public class ConflictDetectionTest {
 	public void testConflictVseq3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			v4.putAfter(v2);
 			assertTrue(v4.isAfter(v2));
 			assertEquals(v4.getPrevVertex(), v2);
@@ -954,10 +951,10 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictVseq4() {
 		try {
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v4 = motorwayMap.getVertex(4);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v4 = motorwayMap.getVertexObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			v4 = motorwayMap.getVertex(4);
+			v4 = motorwayMap.getVertexObject(4);
 			v4.delete();
 			assertFalse(v4.isValid());
 
@@ -995,8 +992,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictVseq3And4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v4 = motorwayMap.getVertex(4);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1066,12 +1063,12 @@ public class ConflictDetectionTest {
 	public void testMergeVseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v3 = motorwayMap.getVertex(3);
-			Vertex v4 = motorwayMap.getVertex(4);
-			Vertex v5 = motorwayMap.getVertex(5);
-			Vertex v6 = motorwayMap.getVertex(6);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v3 = motorwayMap.getVertexObject(3);
+			Vertex v4 = motorwayMap.getVertexObject(4);
+			Vertex v5 = motorwayMap.getVertexObject(5);
+			Vertex v6 = motorwayMap.getVertexObject(6);
 			// Vseq at beginning <v1, v2, v3, v4, v5, v6,...>
 			assertEquals(motorwayMap.getFirstVertex(), v1);
 			assertEquals(v1.getPrevVertex(), null);
@@ -1161,12 +1158,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeVseq1Parallel(final Transaction lastToCommit) {
-		final Vertex v1 = motorwayMap.getVertex(1);
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v3 = motorwayMap.getVertex(3);
-		final Vertex v4 = motorwayMap.getVertex(4);
-		final Vertex v5 = motorwayMap.getVertex(5);
-		final Vertex v6 = motorwayMap.getVertex(6);
+		final Vertex v1 = motorwayMap.getVertexObject(1);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v3 = motorwayMap.getVertexObject(3);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
+		final Vertex v5 = motorwayMap.getVertexObject(5);
+		final Vertex v6 = motorwayMap.getVertexObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1275,12 +1272,12 @@ public class ConflictDetectionTest {
 	public void testMergeVseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v1 = motorwayMap.getVertex(1);
-			Vertex v2 = motorwayMap.getVertex(2);
-			Vertex v3 = motorwayMap.getVertex(3);
-			Vertex v4 = motorwayMap.getVertex(4);
-			Vertex v5 = motorwayMap.getVertex(5);
-			Vertex v6 = motorwayMap.getVertex(6);
+			Vertex v1 = motorwayMap.getVertexObject(1);
+			Vertex v2 = motorwayMap.getVertexObject(2);
+			Vertex v3 = motorwayMap.getVertexObject(3);
+			Vertex v4 = motorwayMap.getVertexObject(4);
+			Vertex v5 = motorwayMap.getVertexObject(5);
+			Vertex v6 = motorwayMap.getVertexObject(6);
 			// Vseq at beginning <v1, v2, v3, v4, v5, v6,...>
 			assertEquals(motorwayMap.getFirstVertex(), v1);
 			assertEquals(v1.getPrevVertex(), null);
@@ -1397,12 +1394,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeVseq2Parallel(final Transaction lastToCommit) {
-		final Vertex v1 = motorwayMap.getVertex(1);
-		final Vertex v2 = motorwayMap.getVertex(2);
-		final Vertex v3 = motorwayMap.getVertex(3);
-		final Vertex v4 = motorwayMap.getVertex(4);
-		final Vertex v5 = motorwayMap.getVertex(5);
-		final Vertex v6 = motorwayMap.getVertex(6);
+		final Vertex v1 = motorwayMap.getVertexObject(1);
+		final Vertex v2 = motorwayMap.getVertexObject(2);
+		final Vertex v3 = motorwayMap.getVertexObject(3);
+		final Vertex v4 = motorwayMap.getVertexObject(4);
+		final Vertex v5 = motorwayMap.getVertexObject(5);
+		final Vertex v6 = motorwayMap.getVertexObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1524,15 +1521,15 @@ public class ConflictDetectionTest {
 	public void testConflictEseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
 			assertEquals(e2.getNextEdge(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e4.putAfterEdge(e1);
 			assertTrue(e4.isAfterEdge(e1));
 			assertEquals(e4.getPrevEdge(), e1);
@@ -1575,9 +1572,9 @@ public class ConflictDetectionTest {
 
 	private void internalConflictEseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1653,15 +1650,15 @@ public class ConflictDetectionTest {
 	public void testConflictEseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
 			assertEquals(e2.getNextEdge(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e5 = motorwayMap.getEdge(5);
+			Edge e5 = motorwayMap.getEdgeObject(5);
 			e2.putAfterEdge(e5);
 			assertTrue(e2.isAfterEdge(e5));
 			assertEquals(e2.getPrevEdge(), e5);
@@ -1690,8 +1687,8 @@ public class ConflictDetectionTest {
 	public void testConflictEseq3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putAfterEdge(e2);
 			assertTrue(e4.isAfterEdge(e2));
 			assertEquals(e4.getPrevEdge(), e2);
@@ -1733,8 +1730,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictEseq4() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
 			e4.delete();
 			assertFalse(e4.isValid());
@@ -1771,8 +1768,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictEseq3and4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -1843,12 +1840,12 @@ public class ConflictDetectionTest {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			// t2
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 			assertEquals(motorwayMap.getFirstEdge(), e1);
 			assertEquals(e1.getPrevEdge(), null);
@@ -1937,23 +1934,23 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeEseq1Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Edge e1 = motorwayMap.getEdge(1);
-				Edge e2 = motorwayMap.getEdge(2);
-				Edge e3 = motorwayMap.getEdge(3);
-				Edge e4 = motorwayMap.getEdge(4);
-				Edge e5 = motorwayMap.getEdge(5);
-				Edge e6 = motorwayMap.getEdge(6);
+				Edge e1 = motorwayMap.getEdgeObject(1);
+				Edge e2 = motorwayMap.getEdgeObject(2);
+				Edge e3 = motorwayMap.getEdgeObject(3);
+				Edge e4 = motorwayMap.getEdgeObject(4);
+				Edge e5 = motorwayMap.getEdgeObject(5);
+				Edge e6 = motorwayMap.getEdgeObject(6);
 				// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 				assertEquals(motorwayMap.getFirstEdge(), e1);
 				assertEquals(e1.getPrevEdge(), null);
@@ -2056,12 +2053,12 @@ public class ConflictDetectionTest {
 	public void testMergeEseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 			assertEquals(motorwayMap.getFirstEdge(), e1);
 			assertEquals(e1.getPrevEdge(), null);
@@ -2178,23 +2175,23 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeEseq2Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Edge e1 = motorwayMap.getEdge(1);
-				Edge e2 = motorwayMap.getEdge(2);
-				Edge e3 = motorwayMap.getEdge(3);
-				Edge e4 = motorwayMap.getEdge(4);
-				Edge e5 = motorwayMap.getEdge(5);
-				Edge e6 = motorwayMap.getEdge(6);
+				Edge e1 = motorwayMap.getEdgeObject(1);
+				Edge e2 = motorwayMap.getEdgeObject(2);
+				Edge e3 = motorwayMap.getEdgeObject(3);
+				Edge e4 = motorwayMap.getEdgeObject(4);
+				Edge e5 = motorwayMap.getEdgeObject(5);
+				Edge e6 = motorwayMap.getEdgeObject(6);
 				// Eseq at beginning <e1, e2, e3, e4, e5, e6,...>
 				assertEquals(motorwayMap.getFirstEdge(), e1);
 				assertEquals(e1.getPrevEdge(), null);
@@ -2311,15 +2308,15 @@ public class ConflictDetectionTest {
 	public void testConflictIseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
 			assertEquals(e2.getNextIncidence(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e4.putIncidenceAfter(e1);
 			assertTrue(e4.isAfterIncidence(e1));
 			assertEquals(e4.getPrevIncidence(), e1);
@@ -2362,8 +2359,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq1Parallel(final Transaction lastToCommit,
 			String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -2394,7 +2391,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Edge e1 = motorwayMap.getEdge(1);
+				Edge e1 = motorwayMap.getEdgeObject(1);
 				e4.putIncidenceAfter(e1);
 				assertTrue(e4.isAfterIncidence(e1));
 				assertEquals(e4.getPrevIncidence(), e1);
@@ -2441,15 +2438,15 @@ public class ConflictDetectionTest {
 	public void testConflictIseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
 			assertEquals(e2.getNextIncidence(), e4);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e5 = motorwayMap.getEdge(5);
+			Edge e5 = motorwayMap.getEdgeObject(5);
 			e2.putIncidenceAfter(e5);
 			assertTrue(e2.isAfterIncidence(e5));
 			assertEquals(e2.getPrevIncidence(), e5);
@@ -2477,8 +2474,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq3() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			Vertex incidentVertex = e2.getAlpha();
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -2524,8 +2521,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq4() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			Vertex incidentVertex = e2.getAlpha();
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			incidentVertex.delete();
@@ -2564,8 +2561,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq3And4Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 		final Vertex incidentVertex = e2.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -2636,8 +2633,8 @@ public class ConflictDetectionTest {
 	public void testConflictIseq5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			e4.putIncidenceAfter(e2);
 			assertTrue(e4.isAfterIncidence(e2));
 			assertEquals(e4.getPrevIncidence(), e2);
@@ -2679,8 +2676,8 @@ public class ConflictDetectionTest {
 	@Test
 	public void testConflictIseq6() {
 		try {
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e4 = motorwayMap.getEdge(4);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e4 = motorwayMap.getEdgeObject(4);
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
 			e4.delete();
 			assertFalse(e4.isValid());
@@ -2717,8 +2714,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictIseq5And6Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e4 = motorwayMap.getEdge(4);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -2787,12 +2784,12 @@ public class ConflictDetectionTest {
 	public void testMergeIseq1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			Vertex incidentVertex = e1.getAlpha();
 			// Iseq(v1) at beginning <+e1, +e2, +e3, +e4, +e5, +e6,...>
 			assertEquals(incidentVertex.getFirstIncidence(), e1);
@@ -2880,12 +2877,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeIseq1Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 		final Vertex incidentVertex = e1.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -2995,12 +2992,12 @@ public class ConflictDetectionTest {
 	public void testMergeIseq2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Edge e1 = motorwayMap.getEdge(1);
-			Edge e2 = motorwayMap.getEdge(2);
-			Edge e3 = motorwayMap.getEdge(3);
-			Edge e4 = motorwayMap.getEdge(4);
-			Edge e5 = motorwayMap.getEdge(5);
-			Edge e6 = motorwayMap.getEdge(6);
+			Edge e1 = motorwayMap.getEdgeObject(1);
+			Edge e2 = motorwayMap.getEdgeObject(2);
+			Edge e3 = motorwayMap.getEdgeObject(3);
+			Edge e4 = motorwayMap.getEdgeObject(4);
+			Edge e5 = motorwayMap.getEdgeObject(5);
+			Edge e6 = motorwayMap.getEdgeObject(6);
 			Vertex incidentVertex = e1.getAlpha();
 			// Iseq(v1) at beginning <+e1, +e2, +e3, +e4, +e5, +e6,...>
 			assertEquals(incidentVertex.getFirstIncidence(), e1);
@@ -3118,12 +3115,12 @@ public class ConflictDetectionTest {
 	}
 
 	private void internalMergeIseq2Parallel(final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Edge e2 = motorwayMap.getEdge(2);
-		final Edge e3 = motorwayMap.getEdge(3);
-		final Edge e4 = motorwayMap.getEdge(4);
-		final Edge e5 = motorwayMap.getEdge(5);
-		final Edge e6 = motorwayMap.getEdge(6);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Edge e2 = motorwayMap.getEdgeObject(2);
+		final Edge e3 = motorwayMap.getEdgeObject(3);
+		final Edge e4 = motorwayMap.getEdgeObject(4);
+		final Edge e5 = motorwayMap.getEdgeObject(5);
+		final Edge e6 = motorwayMap.getEdgeObject(6);
 		final Vertex incidentVertex = e1.getAlpha();
 
 		thread1 = new Thread(threadGroup, "Thread1") {
@@ -3247,12 +3244,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v13 = motorwayMap.getVertex(13);
+			Vertex v13 = motorwayMap.getVertexObject(13);
 			e1.setAlpha(v13);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3292,13 +3289,13 @@ public class ConflictDetectionTest {
 
 	private void internalConflictSetAlpha1Parallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Vertex v11 = motorwayMap.getVertex(11);
+				Vertex v11 = motorwayMap.getVertexObject(11);
 				e1.setAlpha(v11);
 				try {
 					long sleepTime = 0;
@@ -3321,7 +3318,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v13 = motorwayMap.getVertex(13);
+				Vertex v13 = motorwayMap.getVertexObject(13);
 				e1.setAlpha(v13);
 
 				try {
@@ -3361,8 +3358,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3402,8 +3399,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.delete();
 			assertFalse(e1.isValid());
 
@@ -3436,8 +3433,8 @@ public class ConflictDetectionTest {
 
 	private void internalConflictSetAlpha2And3Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3506,8 +3503,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha4() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3547,12 +3544,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetAlpha5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
+			Vertex v11 = motorwayMap.getVertexObject(11);
 			v11.delete();
 			assertFalse(v11.isValid());
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e2 = motorwayMap.getEdge(2);
+			Edge e2 = motorwayMap.getEdgeObject(2);
 			e2.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3590,8 +3587,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetAlpha4And5Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3660,12 +3657,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega1() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v12 = motorwayMap.getVertex(12);
+			Vertex v12 = motorwayMap.getVertexObject(12);
 			e1.setOmega(v12);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -3711,13 +3708,13 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega1Parallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction1);
-				Vertex v10 = motorwayMap.getVertex(10);
+				Vertex v10 = motorwayMap.getVertexObject(10);
 				e1.setOmega(v10);
 				try {
 					long sleepTime = 0;
@@ -3740,7 +3737,7 @@ public class ConflictDetectionTest {
 			@Override
 			public void run() {
 				motorwayMap.setCurrentTransaction(readWriteTransaction2);
-				Vertex v12 = motorwayMap.getVertex(12);
+				Vertex v12 = motorwayMap.getVertexObject(12);
 				e1.setOmega(v12);
 
 				try {
@@ -3780,8 +3777,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega2() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3821,8 +3818,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega3() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.delete();
 			assertFalse(e1.isValid());
 
@@ -3864,8 +3861,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega2And3Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v10 = motorwayMap.getVertex(10);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v10 = motorwayMap.getVertexObject(10);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -3934,8 +3931,8 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega4() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v10 = motorwayMap.getVertexObject(10);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
@@ -3975,12 +3972,12 @@ public class ConflictDetectionTest {
 	public void testConflictSetOmega5() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v10 = motorwayMap.getVertex(10);
+			Vertex v10 = motorwayMap.getVertexObject(10);
 			v10.delete();
 			assertFalse(v10.isValid());
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Edge e1 = motorwayMap.getEdge(1);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setOmega(v10);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -4018,8 +4015,8 @@ public class ConflictDetectionTest {
 	 */
 	private void internalConflictSetOmega4And5Parallel(
 			final Transaction lastToCommit, String nameSuffix) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v10 = motorwayMap.getVertex(10);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v10 = motorwayMap.getVertexObject(10);
 
 		thread1 = new Thread(threadGroup, "Thread1") {
 			@Override
@@ -4089,12 +4086,12 @@ public class ConflictDetectionTest {
 	public void testMergeSetAlphaOmega() {
 		try {
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
-			Vertex v11 = motorwayMap.getVertex(11);
-			Edge e1 = motorwayMap.getEdge(1);
+			Vertex v11 = motorwayMap.getVertexObject(11);
+			Edge e1 = motorwayMap.getEdgeObject(1);
 			e1.setAlpha(v11);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction2);
-			Vertex v12 = motorwayMap.getVertex(12);
+			Vertex v12 = motorwayMap.getVertexObject(12);
 			e1.setOmega(v12);
 
 			motorwayMap.setCurrentTransaction(readWriteTransaction1);
@@ -4143,9 +4140,9 @@ public class ConflictDetectionTest {
 	 */
 	private void internalMergeSetAlphaOmegaParallel(
 			final Transaction lastToCommit) {
-		final Edge e1 = motorwayMap.getEdge(1);
-		final Vertex v11 = motorwayMap.getVertex(11);
-		final Vertex v12 = motorwayMap.getVertex(12);
+		final Edge e1 = motorwayMap.getEdgeObject(1);
+		final Vertex v11 = motorwayMap.getVertexObject(11);
+		final Vertex v12 = motorwayMap.getVertexObject(12);
 		try {
 			thread1 = new Thread(threadGroup, "Thread1") {
 
@@ -4456,4 +4453,791 @@ public class ConflictDetectionTest {
 		assertTrue(conflict);
 	}
 
+	@Test
+	public void changeSetWithoutSetterConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			Set<String> set = city.getGraph().createSet();
+			set.add("Test1");
+			set.add("Test2");
+			assertEquals(2, set.size());
+			city.set_testSet(set);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			Set<String> t1_set = city.get_testSet();
+			assertEquals(2, t1_set.size());
+			t1_set.add("Test3");
+			assertEquals(3, t1_set.size());
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			Set<String> t2_set = city.get_testSet();
+			assertEquals(2, t2_set.size());
+			t2_set.add("Test4");
+			assertEquals(3, t2_set.size());
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeSetWithoutSetterConflict1 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeSetWithoutSetterNoConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			Set<String> set = city.getGraph().createSet();
+			set.add("Test1");
+			set.add("Test2");
+			assertEquals(2, set.size());
+			city.set_testSet(set);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			Set<String> t1_set = city.get_testSet();
+			assertEquals(2, t1_set.size());
+			t1_set.add("Test3");
+			assertEquals(3, t1_set.size());
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			Set<String> t2_set = city.get_testSet();
+			assertEquals(2, t2_set.size());
+			t2_set.add("Test3");
+			assertEquals(3, t2_set.size());
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeSetWithoutSetterNoConflict1 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeListWithoutSetterConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<TestRecord> list = motorwayMap.createList();
+			JGraLabList<String> list1 = motorwayMap.createList();
+			JGraLabSet<String> set1 = motorwayMap.createSet();
+			list.add(motorwayMap.createTestRecord("Test1", list1, set1, 3, 3,
+					3, true));
+			List<String> list2 = motorwayMap.createList();
+			Set<String> set2 = motorwayMap.createSet();
+			list.add(motorwayMap.createTestRecord("Test2", list2, set2, 3, 3,
+					3, true));
+			assertEquals(2, list.size());
+			city.set_testList(list);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			List<TestRecord> t1_list = city.get_testList();
+			assertEquals(2, t1_list.size());
+			List<String> list3 = motorwayMap.createList();
+			Set<String> set3 = motorwayMap.createSet();
+			t1_list.add(motorwayMap.createTestRecord("Test3", list3, set3, 3,
+					3, 3, true));
+			assertEquals(3, t1_list.size());
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			List<TestRecord> t2_list = city.get_testList();
+			assertEquals(2, t2_list.size());
+			List<String> list4 = motorwayMap.createList();
+			Set<String> set4 = motorwayMap.createSet();
+			t2_list.add(motorwayMap.createTestRecord("Test4", list4, set4, 3,
+					3, 4, true));
+			assertEquals(3, t2_list.size());
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeListWithoutSetterConflict1 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeListWithoutSetterNoConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+
+			List<TestRecord> list = motorwayMap.createList();
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			TestRecord test = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			list.add(test);
+			List<String> list2 = motorwayMap.createList();
+			Set<String> set2 = motorwayMap.createSet();
+			list.add(motorwayMap.createTestRecord("Test2", list2, set2, 3, 3,
+					3, true));
+			assertEquals(2, list.size());
+			city.set_testList(list);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			List<String> list3 = motorwayMap.createList();
+			Set<String> set3 = motorwayMap.createSet();
+			TestRecord test2 = motorwayMap.createTestRecord("Test3", list3,
+					set3, 3, 3, 3, true);
+			List<TestRecord> t1List = city.get_testList();
+			assertEquals(2, t1List.size());
+			t1List.add(test2);
+			t1List = city.get_testList();
+			assertEquals(3, t1List.size());
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			List<String> list4 = motorwayMap.createList();
+			Set<String> set4 = motorwayMap.createSet();
+			TestRecord test3 = motorwayMap.createTestRecord("Test3", list4,
+					set4, 3, 3, 3, true);
+			List<TestRecord> t2List = city.get_testList();
+			assertEquals(2, t2List.size());
+			t2List.add(test3);
+			t2List = city.get_testList();
+			assertEquals(3, t2List.size());
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			// motorwayMap.newReadOnlyTransaction();
+			// GraphIO.saveGraphToFile("test", motorwayMap, null);
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeListWithoutSetterNoConflict1 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+			/*
+			 * } catch (GraphIOException e) { System.out.println("\n-
+			 * changeListWithoutSetterNoConflict1 -"); System.out.println("\n-
+			 * This should not have happened. -");
+			 * System.out.println("##########################");
+			 * e.printStackTrace(); fail();
+			 */
+		}
+	}
+
+	@Test
+	public void changeMapWithoutSetterConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			Map<String, String> map = motorwayMap.createMap();
+			map.put("Key1", "Value1");
+			map.put("Key2", "Value2");
+			assertEquals(2, map.size());
+			assertEquals(2, map.keySet().size());
+			assertEquals(2, map.values().size());
+			city.set_testMap(map);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			Map<String, String> t1_map = city.get_testMap();
+			assertEquals(2, t1_map.size());
+			t1_map.put("Key3", "Value3");
+			assertEquals(3, t1_map.size());
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			Map<String, String> t2_map = city.get_testMap();
+			assertEquals(2, t2_map.size());
+			t2_map.put("Key4", "Value4");
+			assertEquals(3, t2_map.size());
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeMapWithoutSetterConflict1 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeMapWithoutSetterNoConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			Map<String, String> map = motorwayMap.createMap();
+			map.put("Key1", "Value1");
+			map.put("Key2", "Value2");
+			assertEquals(2, map.size());
+			assertEquals(2, map.keySet().size());
+			assertEquals(2, map.values().size());
+			city.set_testMap(map);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			Map<String, String> t1_map = city.get_testMap();
+			assertEquals(2, t1_map.size());
+			t1_map.put("Key3", "Value3");
+			assertEquals(3, t1_map.size());
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			Map<String, String> t2_map = city.get_testMap();
+			assertEquals(2, t2_map.size());
+			t2_map.put("Key3", "Value3");
+			assertEquals(3, t2_map.size());
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeMapWithoutSetterNoConflict1 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			t1_record.set_c1("Test2");
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c1("Test3");
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict1 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict2() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			List<String> list1 = motorwayMap.createList();
+			list1.add("Entry1");
+			t1_record.set_c2(list1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			List<String> list2 = motorwayMap.createList();
+			list2.add("Entry2");
+			t2_record.set_c2(list2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict2 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict3() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			Set<String> set1 = motorwayMap.createSet();
+			set1.add("Entry1");
+			t1_record.set_c4(set1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			Set<String> set2 = motorwayMap.createSet();
+			set2.add("Entry2");
+			t2_record.set_c4(set2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict3 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict4() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c6(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c6(2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict4 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict5() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c7(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c7(2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict5 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict6() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c8(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c8(2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict6 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterConflict7() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c9(true);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c9(false);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+			fail();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict7 -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict1() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			t1_record.set_c1("Test2");
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c1("Test2");
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterNoConflict1 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict2() {
+		try {
+			List<String> list = motorwayMap.createList();
+			Set<String> set = motorwayMap.createSet();
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list,
+					set, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			List<String> list1 = motorwayMap.createList();
+			list1.add("Entry1");
+			t1_record.set_c2(list1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			List<String> list2 = motorwayMap.createList();
+			list2.add("Entry1");
+			t2_record.set_c2(list2);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict2 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict3() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			Set<String> set2 = motorwayMap.createSet();
+			set2.add("Entry1");
+			t1_record.set_c4(set2);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			Set<String> set3 = motorwayMap.createSet();
+			set3.add("Entry1");
+			t2_record.set_c4(set3);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterNoConflict3 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict4() {
+		try {
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c6(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c6(1);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterNoConflict4 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict5() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c7(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c7(1);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterConflict5 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict6() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c8(1);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c8(1);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterNoConflict6 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+
+	@Test
+	public void changeRecordWithoutSetterNoConflict7() {
+		try {
+			motorwayMap.setCurrentTransaction(readWriteTransaction1);
+			City city = motorwayMap.getFirstCity();
+			List<String> list1 = motorwayMap.createList();
+			Set<String> set1 = motorwayMap.createSet();
+			TestRecord record = motorwayMap.createTestRecord("Test1", list1,
+					set1, 3, 3, 3, true);
+			city.set_testRecord(record);
+			readWriteTransaction1.commit();
+
+			Transaction t1 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t1);
+			TestRecord t1_record = city.get_testRecord();
+			;
+			t1_record.set_c9(true);
+
+			Transaction t2 = motorwayMap.newTransaction();
+			motorwayMap.setCurrentTransaction(t2);
+			TestRecord t2_record = city.get_testRecord();
+			t2_record.set_c9(true);
+
+			motorwayMap.setCurrentTransaction(t1);
+			t1.commit();
+			motorwayMap.setCurrentTransaction(t2);
+			t2.commit();
+		} catch (CommitFailedException e) {
+			System.out.println("\n- changeRecordWithoutSetterNoConflict7 -");
+			System.out.println("\n- This should not have happened. -");
+			System.out.println("##########################");
+			System.out.println(e.getMessage());
+			fail();
+		}
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	/*
+	 * public static junit.framework.Test suite() { return new
+	 * JUnit4TestAdapter(ConflictDetectionTest.class); }
+	 */
 }

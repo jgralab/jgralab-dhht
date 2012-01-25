@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,6 +30,9 @@
  */
 package de.uni_koblenz.jgralab;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
 /**
  * All implementations of <code>GraphStructureListener</code> that are
  * registered at the graph, are notified about changes in the structure of the
@@ -50,7 +49,7 @@ package de.uni_koblenz.jgralab;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface GraphStructureChangedListener {
+public interface GraphStructureChangedListener extends Remote {
 
 	/**
 	 * This method is called after the vertex <code>v</code> has been added to
@@ -103,4 +102,32 @@ public interface GraphStructureChangedListener {
 	 *            the new value of <code>maxECount</code>.
 	 */
 	public void maxEdgeCountIncreased(int newValue);
+
+	/**
+	 * This method is called after the maximum incidence count has been increased to
+	 * <code>newValue</code>.
+	 * 
+	 * @param newValue
+	 *            the new value of <code>maxECount</code>.
+	 */
+	public void maxIncidenceCountIncreased(int newValue);
+
+	/**
+	 * This method is called after the Incidence <code>i</code> has been added to the
+	 * graph.
+	 * 
+	 * @param i
+	 *            the incidence that has been added.
+	 * @throws RemoteException 
+	 */
+	public void incidenceAdded(Incidence i);
+
+	/**
+	 * This method is called before the Incidence <code>i</code> is deleted.
+	 * 
+	 * @param i
+	 *            the incidence that is about to be deleted.
+	 * @throws RemoteException 
+	 */
+	void incidenceDeleted(Incidence i);
 }

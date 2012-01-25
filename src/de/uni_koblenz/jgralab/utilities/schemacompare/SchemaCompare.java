@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,7 +47,7 @@ import de.uni_koblenz.jgralab.schema.Domain;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.NamedElement;
+import de.uni_koblenz.jgralab.schema.NamedElementClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -202,7 +198,7 @@ public class SchemaCompare {
 			return;
 		}
 
-		for (GraphElementClass gec : g.getGraphElementClasses()) {
+		for (GraphElementClass<?,?> gec : g.getGraphElementClasses()) {
 			if (gec.isInternal()) {
 				continue;
 			}
@@ -214,8 +210,8 @@ public class SchemaCompare {
 		marked.add(h);
 	}
 
-	private void compareGraphElementClass(GraphElementClass g,
-			GraphElementClass h) {
+	private void compareGraphElementClass(GraphElementClass<?,?> g,
+			GraphElementClass<?,?> h) {
 		if (h == null) {
 			reportDiff("GraphElementClass: " + g.getQualifiedName(), "null");
 			return;
@@ -237,7 +233,7 @@ public class SchemaCompare {
 		marked.add(h);
 	}
 
-	private void compareAbstractness(GraphElementClass g, GraphElementClass h) {
+	private void compareAbstractness(GraphElementClass<?,?> g, GraphElementClass<?,?> h) {
 		if (g.isAbstract() ^ h.isAbstract()) {
 			reportDiff(g.getQualifiedName()
 					+ (g.isAbstract() ? " is" : " is not") + " abstract",
@@ -246,8 +242,8 @@ public class SchemaCompare {
 		}
 	}
 
-	private void compareAttribute(GraphElementClass g, Attribute a,
-			GraphElementClass h, Attribute b) {
+	private void compareAttribute(GraphElementClass<?,?> g, Attribute a,
+			GraphElementClass<?,?> h, Attribute b) {
 		if (b == null) {
 			reportDiff(g.getQualifiedName() + "." + a.getName(),
 					h.getQualifiedName() + " doesn't have such an Atrribute");
@@ -270,7 +266,7 @@ public class SchemaCompare {
 		marked.add(h);
 	}
 
-	private void compareHierarchy(GraphElementClass g, GraphElementClass h) {
+	private void compareHierarchy(GraphElementClass<?,?> g, GraphElementClass<?,?> h) {
 		// superclasses
 		Set<String> gsup = getQNameSet(g.getDirectSuperClasses());
 		Set<String> hsup = getQNameSet(h.getDirectSuperClasses());
@@ -288,9 +284,9 @@ public class SchemaCompare {
 		}
 	}
 
-	private Set<String> getQNameSet(Set<? extends NamedElement> a) {
+	private Set<String> getQNameSet(Set<? extends NamedElementClass> a) {
 		Set<String> q = new TreeSet<String>();
-		for (NamedElement aec : a) {
+		for (NamedElementClass aec : a) {
 			q.add(aec.getQualifiedName());
 		}
 		return q;

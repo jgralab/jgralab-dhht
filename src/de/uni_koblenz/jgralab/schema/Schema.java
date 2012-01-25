@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.schema;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,17 +40,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
-import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.ProgressFunction;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
+import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
-import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
 
 /**
- * The class Schema represents a grUML Schema.
+ * The class Schema represents a grUML Schema (M2).
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -88,24 +84,21 @@ public interface Schema extends Comparable<Schema> {
 
 	/**
 	 * After creating the schema, this command serves to generate code for the
-	 * schema classes, contained in {@code JavaSourceFromString} objects.
+	 * m1 classes, contained in {@code JavaSourceFromString} objects.
 	 * 
-	 * @param config
-	 *            a {@link CodeGeneratorConfiguration} specifying the requested
-	 *            implementation variant
+	 * @param transactionSupport
+	 *            create code for transaction support
 	 */
-	public Vector<InMemoryJavaSourceFile> commit(CodeGeneratorConfiguration config);
+	public Vector<JavaSourceFromString> commit(CodeGeneratorConfiguration config);
 
 	/**
-	 * after creating the schema, this command serves to make it permanent,
-	 * schema classes are generated to represent the object oriented access
-	 * layer
+	 * after creating the schema, this command serves to make it permanent, m2
+	 * classes are generated to represent the object oriented access layer
 	 * 
 	 * @param path
-	 *            the path to the schema classes which are to be generated
-	 * @param config
-	 *            a {@link CodeGeneratorConfiguration} specifying the requested
-	 *            implementation variant
+	 *            the path to the m1 classes which are to be generated
+	 * @param transactionSupport
+	 *            create code for transaction support
 	 * 
 	 * @throws GraphIOException
 	 *             if an error occured during optional compilation
@@ -114,15 +107,13 @@ public interface Schema extends Comparable<Schema> {
 			throws GraphIOException;
 
 	/**
-	 * after creating the schema, this command serves to make it permanent,
-	 * schema classes are generated to represent the object oriented access
-	 * layer
+	 * after creating the schema, this command serves to make it permanent, m2
+	 * classes are generated to represent the object oriented access layer
 	 * 
 	 * @param path
-	 *            the path to the schema classes which are to be generated
-	 * @param config
-	 *            a {@link CodeGeneratorConfiguration} specifying the requested
-	 *            implementation variant
+	 *            the path to the m1 classes which are to be generated
+	 * @param transactionSupport
+	 *            create code for transaction support
 	 * @param progressFunction
 	 *            an optional progressfunction
 	 * @throws GraphIOException
@@ -133,7 +124,7 @@ public interface Schema extends Comparable<Schema> {
 
 	/**
 	 * After creating the schema, this command serves to generate and compile
-	 * code for the schema classes. The class files are not written to disk, but
+	 * code for the m1 classes. The class files are not written to disk, but
 	 * only held in memory.
 	 * 
 	 * @param config
@@ -143,19 +134,28 @@ public interface Schema extends Comparable<Schema> {
 	public void compile(CodeGeneratorConfiguration config);
 
 	/**
-	 * Generates Java classes in a temp directory, compiles them, and packs them
-	 * in a JAR file.
+	 * After creating the schema, this command serves to generate and compile
+	 * code for the m1 classes. The class files are not written to disk, but
+	 * only held in memory.
 	 * 
+	 * @param jgralabClassPath
+	 *            the classpath to JGraLab
 	 * @param config
-	 *            the {@link CodeGeneratorConfiguration} to be used for class
-	 *            generation
-	 * @param jarFileName
-	 *            the name of the JAR file to be created
-	 * @throws IOException
-	 * @throws GraphIOException
+	 *            configures the CodeGenerator and which classes and methods to
+	 *            be created
 	 */
-	public void createJAR(CodeGeneratorConfiguration config, String jarFileName)
-			throws IOException, GraphIOException;
+	public void compile(String jgralabClassPath,
+			CodeGeneratorConfiguration config);
+
+	/**
+	 * After creating the schema, this command serves to generate and compile
+	 * code for the m1 classes. The class files are not written to disk, but
+	 * only held in memory.
+	 * 
+	 * @param jgralabClassPath
+	 *            the classpath to JGraLab
+	 */
+	public void compile(String jgralabClassPath);
 
 	/**
 	 * Creates a new Attribute <code>name</code> with domain <code>dom</code>.
@@ -173,7 +173,7 @@ public interface Schema extends Comparable<Schema> {
 	 * @return the new Attribute
 	 */
 	public Attribute createAttribute(String name, Domain dom,
-			AttributedElementClass aec, String defaultValueAsString);
+			AttributedElementClass<?, ?> aec, String defaultValueAsString);
 
 	/**
 	 * Builds a new enumeration domain, multiple domains may exist in a schema.
@@ -263,7 +263,7 @@ public interface Schema extends Comparable<Schema> {
 	 * @param qn
 	 * @return the attributed element class with the specified qualified name
 	 */
-	public AttributedElementClass getAttributedElementClass(String qn);
+	public AttributedElementClass<?, ?> getAttributedElementClass(String qn);
 
 	public BooleanDomain getBooleanDomain();
 
@@ -283,6 +283,12 @@ public interface Schema extends Comparable<Schema> {
 	 *         the name "Edge"
 	 */
 	public EdgeClass getDefaultEdgeClass();
+
+	/**
+	 * @return the default BinaryEdgeClass of the schema, that is the EdgeClass
+	 *         with the name "BinaryEdge"
+	 */
+	public BinaryEdgeClass getDefaultBinaryEdgeClass();
 
 	/**
 	 * @return the default GraphClass of the schema, that is the GraphClass with
@@ -422,6 +428,8 @@ public interface Schema extends Comparable<Schema> {
 	public Method getVertexCreateMethod(String vertexClassQName,
 			ImplementationType implementationType);
 
+	public boolean isSimpleNameUnique(String sn);
+
 	/**
 	 * Checks if the given name is a valid enumeration constant in this Schema.
 	 * 
@@ -450,7 +458,7 @@ public interface Schema extends Comparable<Schema> {
 	 *            the qualified name of the desired element
 	 * @return the corresponding NamedElement, or null if no such element exists
 	 */
-	public NamedElement getNamedElement(String qualifiedName);
+	public NamedElementClass getNamedElement(String qualifiedName);
 
 	/**
 	 * Sets the schema to allow lowercase enum constants
@@ -467,16 +475,16 @@ public interface Schema extends Comparable<Schema> {
 	 */
 	public void setGraphFactory(GraphFactory factory);
 
-	/**
-	 * Creates a string representation of this schema in the TG language. Do not
-	 * use in GraphIO.
-	 * 
-	 * @return the TG String of this schema
-	 */
-	public String toTGString();
+	public IncidenceClass getDefaultIncidenceClass(Direction dir);
 
-	public Graph createGraph(ImplementationType implementationType);
+	public List<IncidenceClass> getIncidenceClassesInTopologicalOrder();
 
-	public Graph createGraph(ImplementationType implementationType, int vCount,
-			int eCount);
+	public Integer getClassId(TypedElementClass<?, ?> schemaClass);
+
+	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass);
+
+	public Class<?> getM1ClassForId(Integer id);
+
+	public TypedElementClass<?, ?> getTypeForId(Integer id);
+
 }

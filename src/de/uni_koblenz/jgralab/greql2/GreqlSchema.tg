@@ -1,37 +1,28 @@
-// JGraLab - The Java Graph Laboratory
-// 
-// Copyright (C) 2006-2011 Institute for Software Technology
-//                         University of Koblenz-Landau, Germany
-//                         ist@uni-koblenz.de
-// 
-// For bug reports, documentation and further information, visit
-// 
-//                         http://jgralab.uni-koblenz.de
-// 
-// This program is free software; you can redistribute it and/or modify it
-// under the terms of the GNU General Public License as published by the
-// Free Software Foundation; either version 3 of the License, or (at your
-// option) any later version.
-// 
-// This program is distributed in the hope that it will be useful, but
-// WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-// Public License for more details.
-// 
-// You should have received a copy of the GNU General Public License along
-// with this program; if not, see <http://www.gnu.org/licenses>.
-// 
-// Additional permission under GNU GPL version 3 section 7
-// 
-// If you modify this Program, or any covered work, by linking or combining
-// it with Eclipse (or a modified version of that program or an Eclipse
-// plugin), containing parts covered by the terms of the Eclipse Public
-// License (EPL), the licensors of this Program grant you additional
-// permission to convey the resulting work.  Corresponding Source for a
-// non-source form of such a combination shall include the source code for
-// the parts of JGraLab used as well as that of the covered work.
+//
+// JGraLab - The Java graph laboratory
+// (c) 2006-2007 Institute for Software Technology
+//               University of Koblenz-Landau, Germany
+//
+//               ist@uni-koblenz.de
+//
+// Please report bugs to http://serres.uni-koblenz.de/bugzilla
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
 
-TGraph 2;
+DHHTGraph 1;
 Schema de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 GraphClass Greql2;
 
@@ -45,16 +36,18 @@ abstract VertexClass Greql2Vertex;
 VertexClass AlternativePathDescription: PathDescription;
 //VertexClass AttributeId: Identifier;
 VertexClass BackwardVertexSet: PathExpression;
-VertexClass ListComprehension: ComprehensionWithTableHeader;
+VertexClass BagComprehension: ComprehensionWithTableHeader;
+VertexClass BagConstruction: ValueConstruction;
 VertexClass BoolLiteral: Literal { boolValue: Boolean };
 //VertexClass CfGrammar: Expression;
 VertexClass ConditionalExpression: Expression;
 VertexClass Declaration: Greql2Vertex;
 VertexClass Definition: Greql2Vertex;
-VertexClass Direction: Greql2Vertex { dirValue: String };
+VertexClass PathDirection: Greql2Vertex { dirValue: String };
 VertexClass EdgePathDescription: PrimaryPathDescription;
 VertexClass EdgeRestriction: Greql2Vertex;
 VertexClass EdgeSetExpression: ElementSetExpression;
+VertexClass EdgeSubgraphExpression: SubgraphExpression;
 VertexClass ExponentiatedPathDescription: PathDescription;
 VertexClass ForwardVertexSet: PathExpression;
 VertexClass FunctionApplication: Expression;
@@ -62,7 +55,6 @@ VertexClass FunctionId: Identifier;
 VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String, costModel: String };
 VertexClass Identifier : Expression { name: String };
 VertexClass IntLiteral: Literal { intValue: Integer };
-VertexClass LongLiteral: Literal { longValue: Long };
 VertexClass IntermediateVertexPathDescription: PathDescription;
 VertexClass IteratedPathDescription: PathDescription { times: IterationType };
 VertexClass LetExpression: DefinitionExpression;
@@ -71,12 +63,13 @@ VertexClass ListRangeConstruction: ListConstruction;
 VertexClass Literal: Expression;
 VertexClass MapConstruction : ValueConstruction;
 VertexClass MapComprehension : Comprehension;
-VertexClass UndefinedLiteral: Literal;
+//VertexClass Nonterminal: Symbol;
+VertexClass NullLiteral: Literal;
 VertexClass OptionalPathDescription: PathDescription;
 VertexClass PathExistence: PathExpression;
 VertexClass QuantifiedExpression: Expression;
 VertexClass Quantifier: Greql2Vertex { type: QuantificationType };
-VertexClass DoubleLiteral: Literal { doubleValue: Double };
+VertexClass RealLiteral: Literal { realValue: Double };
 VertexClass RecordConstruction: ValueConstruction;
 VertexClass RecordElement: Greql2Vertex;
 VertexClass RecordId: Identifier;
@@ -98,12 +91,8 @@ VertexClass TupleConstruction: ValueConstruction;
 VertexClass TypeId: TypeOrRoleId { excluded: Boolean, type: Boolean };
 VertexClass Variable: Identifier;
 VertexClass VertexSetExpression: ElementSetExpression;
+VertexClass VertexSubgraphExpression: SubgraphExpression;
 VertexClass WhereExpression: DefinitionExpression;
-abstract VertexClass SubgraphDefinition : Greql2Vertex;
-VertexClass SubgraphRestrictedExpression : Expression;
-VertexClass EdgeTypeSubgraph : SubgraphDefinition;
-VertexClass VertexTypeSubgraph : SubgraphDefinition;
-VertexClass ExpressionDefinedSubgraph : SubgraphDefinition;
 abstract VertexClass Comprehension: Expression;
 abstract VertexClass ComprehensionWithTableHeader: Comprehension;
 abstract VertexClass DefinitionExpression: Expression;
@@ -116,70 +105,70 @@ abstract VertexClass SubgraphExpression: Expression;
 abstract VertexClass ValueConstruction: Expression;
 
 // A common super-class for all Edges that connect PathDescription vertices
-abstract EdgeClass IsPathDescriptionOf : Greql2Aggregation from PathDescription (0,*) aggregation shared to PathDescription(0,*) ;
+abstract BinaryEdgeClass IsPathDescriptionOf : Greql2Aggregation from PathDescription (0,*) (1,1) to PathDescription(0,*) (1,1);
 
-//EdgeClass IsImportedTypeOf from TypeId (0,*) to Greql2Expression (0,1) ;
-EdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription (2,*) role alternatePath aggregation shared to AlternativePathDescription (0,*);
-EdgeClass IsArgumentOf: Greql2Aggregation from Expression (0,*) role argument aggregation shared to FunctionApplication (0,*);
-EdgeClass IsBoundExprOfDefinition: IsBoundExprOf from Expression (1,1) role boundExprOfDefinition aggregation shared to DefinitionExpression (0,1);
-EdgeClass IsBoundExprOfQuantifier: IsBoundExprOf from Expression (1,1) role boundExprOfQuantifier aggregation shared to QuantifiedExpression (0,*);
-EdgeClass IsBoundVarOf: Greql2Aggregation from Variable (0,*) role boundVar aggregation shared to Greql2Expression (0,1);
-EdgeClass IsColumnHeaderExprOf: Greql2Aggregation from Expression (0,*) role columnHeader  aggregation shared to TableComprehension (0,*);
-EdgeClass IsCompDeclOf: Greql2Aggregation from Declaration (1,1) role compDecl aggregation shared to Comprehension (0,1);
+//BinaryEdgeClass IsImportedTypeOf from TypeId (0,*) (1,1)to Greql2Expression (0,1) (1,1);
+BinaryEdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription role alternatePath (2,*) (1,1) to AlternativePathDescription (0,*) (1,1);
+BinaryEdgeClass IsArgumentOf: Greql2Aggregation from Expression role argument (0,*) (1,1) to FunctionApplication (0,*) (1,1);
+BinaryEdgeClass IsBoundExprOfDefinition: IsBoundExprOf from Expression role boundExprOfDefinition (1,1) (1,1) to DefinitionExpression (0,1) (1,1);
+BinaryEdgeClass IsBoundExprOfQuantifier: IsBoundExprOf from Expression role boundExprOfQuantifier (1,1) (1,1) to QuantifiedExpression (0,*) (1,1);
+BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression (0,1) (1,1);
+BinaryEdgeClass IsColumnHeaderExprOf: Greql2Aggregation from Expression role columnHeader (0,*) (1,1)  to TableComprehension (0,*) (1,1);
+BinaryEdgeClass IsCompDeclOf: Greql2Aggregation from Declaration role compDecl (1,1) (1,1) to Comprehension (0,1) (1,1);
 // zero or one, cause MapComprehensions don't have a compResultDef but keyExpr, and valueExpr.
-EdgeClass IsCompResultDefOf: Greql2Aggregation from Expression (0,1) role compResultDef aggregation shared to Comprehension (0,*);
-EdgeClass IsConditionOf: Greql2Aggregation from Expression (1,1) role condition aggregation shared to ConditionalExpression (0,*);
-EdgeClass IsConstraintOf: Greql2Aggregation from Expression (0,*) role constraint aggregation shared to Declaration (0,*);
-EdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable (1,*) role declaredVar aggregation shared to SimpleDeclaration (0,1);
-EdgeClass IsDefinitionOf: Greql2Aggregation from Definition (1,*) role definition aggregation shared to DefinitionExpression (1,*);
-EdgeClass IsDirectionOf: Greql2Aggregation from Direction (1,1) role direction aggregation shared to PrimaryPathDescription (1,*);
-EdgeClass IsEdgeExprOf: Greql2Aggregation from Expression (1,1) role edgeExpr aggregation shared to EdgePathDescription (0,*);
-EdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction (0,*) role edgeRestr aggregation shared to PrimaryPathDescription (0,*);
-EdgeClass IsExponentOf: Greql2Aggregation from IntLiteral (1,1) role exponent aggregation shared to ExponentiatedPathDescription (0,*);
-EdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription (1,1) role exponentiatedPath aggregation shared to ExponentiatedPathDescription (0,*);
-EdgeClass IsExprOf:Greql2Aggregation from Expression (1,1) role expr aggregation shared to Definition (0,*);
-EdgeClass IsFalseExprOf: Greql2Aggregation from Expression (1,1) role falseExpr aggregation shared to ConditionalExpression (0,*);
-EdgeClass IsFirstValueOf: Greql2Aggregation from Expression (1,1) role firstValue aggregation shared to ListRangeConstruction (0,*);
-EdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId (1,1) role functionId  aggregation shared to FunctionApplication (1,*);
-EdgeClass IsGoalRestrOf: Greql2Aggregation from Expression (0,1) role goalRestr aggregation shared to PathDescription (0,*);
-EdgeClass IsIdOf: Greql2Aggregation from Identifier (0,1) role identifier aggregation shared to Greql2Expression (0,*);
-EdgeClass IsIntermediateVertexOf: Greql2Aggregation from Expression (1,1) role intermediateVertex aggregation shared to IntermediateVertexPathDescription (0,*);
-EdgeClass IsIteratedPathOf: IsPathDescriptionOf from PathDescription (1,1) role iteratedPath aggregation shared to IteratedPathDescription (0,*);
-EdgeClass IsLastValueOf: Greql2Aggregation from Expression (1,1) role lastValue aggregation shared to ListRangeConstruction (0,*);
-EdgeClass IsOptionalPathOf: IsPathDescriptionOf from PathDescription (1,1) role optionalPath aggregation shared to OptionalPathDescription (0,*);
-EdgeClass IsPartOf: Greql2Aggregation from Expression (0,*) role part aggregation shared to ValueConstruction (0,*);
-EdgeClass IsPathOf: Greql2Aggregation from Expression (1,1) role path aggregation shared to PathExpression (0,*);
-EdgeClass IsQuantifiedDeclOf: Greql2Aggregation from Declaration (1,1) role quantifiedDecl aggregation shared to QuantifiedExpression (0,1);
-EdgeClass IsQuantifierOf: Greql2Aggregation from Quantifier (1,1) role quantifier aggregation shared to QuantifiedExpression (1,*);
-EdgeClass IsQueryExprOf: Greql2Aggregation from Expression (1,1) role queryExpr aggregation shared to Greql2Expression (0,*);
-EdgeClass IsRecordElementOf: Greql2Aggregation from RecordElement (1,*) role recordElement aggregation shared to RecordConstruction (1,*);
-EdgeClass IsRecordExprOf: Greql2Aggregation from Expression (1,1) role recordExpr aggregation shared to RecordElement (0,*);
-EdgeClass IsRecordIdOf: Greql2Aggregation from RecordId (1,1) role recordId aggregation shared to RecordElement (1,*);
-EdgeClass IsRoleIdOf: Greql2Aggregation from RoleId (0,*) role roleId aggregation shared to EdgeRestriction (1,*);
-EdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression (0,1) role booleanPredicate aggregation shared to EdgeRestriction (0,1);
-EdgeClass IsRowHeaderExprOf: Greql2Aggregation from Expression (0,*) role rowHeaderExpr aggregation shared to TableComprehension (0,*);
-EdgeClass IsSequenceElementOf: IsPathDescriptionOf from PathDescription (2,*) role sequenceElement aggregation shared to SequentialPathDescription (0,*);
-EdgeClass IsSimpleDeclOf: Greql2Aggregation from SimpleDeclaration (1,*) role simpleDecl aggregation shared to Declaration (1,1);
-EdgeClass IsStartExprOf: Greql2Aggregation from Expression (0,1) role startExpr aggregation shared to PathExpression (0,*);
-EdgeClass IsStartRestrOf: Greql2Aggregation from Expression (0,1) role startRestr aggregation shared to PathDescription (0,*);
-EdgeClass IsSubPathOf: IsPathDescriptionOf from PathDescription (2,2) role subPath aggregation shared to IntermediateVertexPathDescription (0,*);
-EdgeClass IsSubgraphDefinitionOf: Greql2Aggregation from SubgraphDefinition (0,1) role subgraphDefinition aggregation shared to SubgraphRestrictedExpression (0,*);
-EdgeClass IsSubgraphDefiningExpression : Greql2Aggregation from Expression (0,1) role definingExpression aggregation shared to ExpressionDefinedSubgraph (0,*);
-EdgeClass IsExpressionOnSubgraph: Greql2Aggregation from Expression (0,1) role restrictedExpression aggregation shared to SubgraphRestrictedExpression (0,*);
-EdgeClass IsTableHeaderOf: Greql2Aggregation from Expression (0,*) role tableHeader aggregation shared to ComprehensionWithTableHeader (0,*);
-EdgeClass IsTargetExprOf: Greql2Aggregation from Expression (0,1) role targetExpr aggregation shared to PathExpression (0,*);
-EdgeClass IsKeyExprOfConstruction : Greql2Aggregation from Expression (0,*) role keyExpr aggregation shared to MapConstruction (0,*);
-EdgeClass IsValueExprOfConstruction : Greql2Aggregation from Expression (0,*) role valueExpr aggregation shared to MapConstruction (0,*);
-EdgeClass IsKeyExprOfComprehension : Greql2Aggregation from Expression (1,1) role keyExpr aggregation shared to MapComprehension (0,*);
-EdgeClass IsValueExprOfComprehension : Greql2Aggregation from Expression (1,1) role valueExpr aggregation shared to MapComprehension (0,*);
-EdgeClass IsTransposedPathOf: IsPathDescriptionOf from PathDescription (1,1) role transposedPath aggregation shared to TransposedPathDescription (0,*);
-EdgeClass IsTrueExprOf: Greql2Aggregation from Expression (1,1) role trueExpr aggregation shared to ConditionalExpression (0,*);
-EdgeClass IsTypeExprOfDeclaration: IsTypeExprOf from Expression (0,1) role typeExpr aggregation shared to SimpleDeclaration (0,*);
-EdgeClass IsTypeExprOfFunction: IsTypeExprOf from Expression (0,1) role typeExpr aggregation shared to FunctionApplication (0,*);
-EdgeClass IsTypeIdOf: Greql2Aggregation from TypeId (0,*) role typeId aggregation shared to EdgeRestriction (0,*);
-EdgeClass IsTypeRestrOfExpression: Greql2Aggregation from TypeId (0,*) role typeRestr aggregation shared to Expression (0,*);
-EdgeClass IsTypeRestrOfSubgraph: Greql2Aggregation from TypeId (0,*) role typeRestr aggregation shared to SubgraphDefinition (0,*);
-EdgeClass IsVarOf: Greql2Aggregation from Variable (1,1) role var aggregation shared to Definition (0,1);
-abstract EdgeClass Greql2Aggregation from Greql2Vertex (0,*) aggregation shared to Greql2Vertex (0,*) { sourcePositions: List<SourcePosition> } ;
-abstract EdgeClass IsBoundExprOf: Greql2Aggregation from Expression (1,1) aggregation shared to Greql2Vertex (0,*);
-abstract EdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) aggregation shared to Greql2Vertex (0,*);
+BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compResultDef (0,1) (1,1) to Comprehension (0,*) (1,1);
+BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
+BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration (0,*) (1,1);
+BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVar (1,*) (1,1) to SimpleDeclaration (0,1) (1,1);
+BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
+BinaryEdgeClass IsDirectionOf: Greql2Aggregation from PathDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
+BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription (0,*) (1,1);
+BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription (0,*) (1,1);
+BinaryEdgeClass IsExponentOf: Greql2Aggregation from IntLiteral role exponent (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
+BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
+BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);
+BinaryEdgeClass IsFalseExprOf: Greql2Aggregation from Expression role falseExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
+BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
+BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication (1,*) (1,1);
+BinaryEdgeClass IsGoalRestrOf: Greql2Aggregation from Expression role goalRestr (0,1) (1,1) to PathDescription (0,*) (1,1);
+BinaryEdgeClass IsIdOf: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression (0,*) (1,1);
+BinaryEdgeClass IsIntermediateVertexOf: Greql2Aggregation from Expression role intermediateVertex (1,1) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);
+BinaryEdgeClass IsIteratedPathOf: IsPathDescriptionOf from PathDescription role iteratedPath (1,1) (1,1) to IteratedPathDescription (0,*) (1,1);
+BinaryEdgeClass IsLastValueOf: Greql2Aggregation from Expression role lastValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
+BinaryEdgeClass IsOptionalPathOf: IsPathDescriptionOf from PathDescription role optionalPath (1,1) (1,1) to OptionalPathDescription (0,*) (1,1);
+BinaryEdgeClass IsPartOf: Greql2Aggregation from Expression role part (0,*) (1,1) to ValueConstruction (0,*) (1,1);
+BinaryEdgeClass IsPathOf: Greql2Aggregation from Expression role path (1,1) (1,1) to PathExpression (0,*) (1,1);
+BinaryEdgeClass IsQuantifiedDeclOf: Greql2Aggregation from Declaration role quantifiedDecl (1,1) (1,1) to QuantifiedExpression (0,1) (1,1);
+BinaryEdgeClass IsQuantifierOf: Greql2Aggregation from Quantifier role quantifier (1,1) (1,1) to QuantifiedExpression (1,*) (1,1);
+BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression (0,*) (1,1);
+BinaryEdgeClass IsRecordElementOf: Greql2Aggregation from RecordElement role recordElement (1,*) (1,1) to RecordConstruction (1,*) (1,1);
+BinaryEdgeClass IsRecordExprOf: Greql2Aggregation from Expression role recordExpr (1,1) (1,1) to RecordElement (0,*) (1,1);
+BinaryEdgeClass IsRecordIdOf: Greql2Aggregation from RecordId role recordId (1,1) (1,1) to RecordElement (1,*) (1,1);
+BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction (1,*) (1,1);
+BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction (0,1) (1,1);
+BinaryEdgeClass IsRowHeaderExprOf: Greql2Aggregation from Expression role rowHeaderExpr (0,*) (1,1) to TableComprehension (0,*) (1,1);
+BinaryEdgeClass IsSequenceElementOf: IsPathDescriptionOf from PathDescription role sequenceElement (2,*) (1,1) to SequentialPathDescription (0,*) (1,1);
+BinaryEdgeClass IsSimpleDeclOf: Greql2Aggregation from SimpleDeclaration role simpleDecl (1,*) (1,1) to Declaration (1,1) (1,1);
+BinaryEdgeClass IsStartExprOf: Greql2Aggregation from Expression role startExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
+BinaryEdgeClass IsStartRestrOf: Greql2Aggregation from Expression role startRestr (0,1) (1,1) to PathDescription (0,*) (1,1);
+BinaryEdgeClass IsSubPathOf: IsPathDescriptionOf from PathDescription role subPath (2,2) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);
+BinaryEdgeClass IsSubgraphDefinitionOf: Greql2Aggregation from SubgraphDefinition (0,1) role subgraphDefinition aggregation shared to SubgraphRestrictedExpression (0,*);
+BinaryEdgeClass IsSubgraphDefiningExpression : Greql2Aggregation from Expression (0,1) (1,1) role definingExpression to ExpressionDefinedSubgraph (0,*) (1,1);
+BinaryEdgeClass IsExpressionOnSubgraph: Greql2Aggregation from Expression (0,1) (1,1) role restrictedExpression to SubgraphRestrictedExpression (0,*) (1,1);
+BinaryEdgeClass IsTableHeaderOf: Greql2Aggregation from Expression role tableHeader (0,*) (1,1) to ComprehensionWithTableHeader (0,*) (1,1);
+BinaryEdgeClass IsTargetExprOf: Greql2Aggregation from Expression role targetExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
+BinaryEdgeClass IsKeyExprOfConstruction : Greql2Aggregation from Expression role keyExprOfConstr (0,*) (1,1) to MapConstruction (0,*) (1,1);
+BinaryEdgeClass IsValueExprOfConstruction : Greql2Aggregation from Expression role valueExprOfConstr (0,*) (1,1) to MapConstruction (0,*) (1,1);
+BinaryEdgeClass IsKeyExprOfComprehension : Greql2Aggregation from Expression role keyExprOfCompr (1,1) (1,1) to MapComprehension (0,*) (1,1);
+BinaryEdgeClass IsValueExprOfComprehension : Greql2Aggregation from Expression role valueExprOfCompr (1,1) (1,1) to MapComprehension (0,*) (1,1);
+BinaryEdgeClass IsTransposedPathOf: IsPathDescriptionOf from PathDescription role transposedPath (1,1) (1,1) to TransposedPathDescription (0,*) (1,1);
+BinaryEdgeClass IsTrueExprOf: Greql2Aggregation from Expression role trueExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
+BinaryEdgeClass IsTypeExprOfDeclaration: IsTypeExprOf from Expression role typeExprOfDecl (0,1) (1,1) to SimpleDeclaration (0,*) (1,1);
+BinaryEdgeClass IsTypeExprOfFunction: IsTypeExprOf from Expression role typeExprOfFunc (0,1) (1,1) to FunctionApplication (0,*) (1,1);
+BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction (0,*) (1,1);
+BinaryEdgeClass IsTypeRestrOfExpression: Greql2Aggregation from TypeId (0,*) (1,1) role typeRestrOfExpr to Expression (0,*) (1,1);
+BinaryEdgeClass IsTypeRestrOfSubgraph: Greql2Aggregation from TypeId (0,*) (1,1) role typeRestrOfSubgraph to SubgraphDefinition (0,*) (1,1);
+BinaryEdgeClass IsVarOf: Greql2Aggregation from Variable role var (1,1) (1,1) to Definition (0,1) (1,1);
+abstract BinaryEdgeClass Greql2Aggregation from Greql2Vertex (0,*) (1,1) to Greql2Vertex (0,*) (1,1) { sourcePositions: List<SourcePosition> } ;
+abstract BinaryEdgeClass IsBoundExprOf: Greql2Aggregation from Expression (1,1) (1,1) to Greql2Vertex (0,*) (1,1);
+abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) (1,1) to Greql2Vertex (0,*) (1,1);

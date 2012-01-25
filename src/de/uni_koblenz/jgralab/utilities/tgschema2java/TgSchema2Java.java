@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -130,21 +126,15 @@ public class TgSchema2Java {
 				t.setCreateJar(true);
 				t.setJarFileName(comLine.getOptionValue("j"));
 			}
-			if (comLine.hasOption("so")) {
-				t.setStandardSupportOnly();
-			} else if (comLine.hasOption("to")) {
-				t.setTransactionSupportOnly();
-			}
-
 			if (comLine.hasOption('w')) {
 				t.setTypeSpecificMethodSupport(false);
 			} else {
 				t.setTypeSpecificMethodSupport(true);
 			}
-			if (comLine.hasOption('i')) {
-				t.setImplementationMode(comLine.getOptionValue('i'));
+			if (comLine.hasOption('f')) {
+				t.setMethodsForSubclassesSupport(true);
 			} else {
-				t.setImplementationMode("standard");
+				t.setMethodsForSubclassesSupport(false);
 			}
 
 			// loading .tg-file and creating schema-object
@@ -166,41 +156,23 @@ public class TgSchema2Java {
 		schema = GraphIO.loadSchemaFromFile(tgFilename);
 	}
 
+	public void setMethodsForSubclassesSupport(boolean enabled) {
+		config.setMethodsForSubclassesSupport(enabled);
+	}
+
 	public void setTypeSpecificMethodSupport(boolean enabled) {
 		config.setTypeSpecificMethodsSupport(enabled);
 	}
 
-	@Deprecated
-	public void setTransactionSupportOnly() {
-		System.err
-				.println("Warning: this call is deprecated, use option \"-i\" instead.");
-		config.setStandardSupport(false);
-		config.setTransactionSupport(true);
-	}
-
-	@Deprecated
-	public void setStandardSupportOnly() {
-		System.err
-				.println("Warning: this call is deprecated, use option \"-i\" instead.");
-		config.setStandardSupport(true);
-		config.setTransactionSupport(false);
-	}
-
-	public void setStandardSupport(boolean value) {
-		config.setStandardSupport(value);
-	}
-
-	public void setTransactionSupport(boolean value) {
-		config.setTransactionSupport(value);
-	}
-
-	public void setDatabaseSupport(boolean value) {
-		config.setDatabaseSupport(value);
-	}
 
 	/**
 	 * Constructs an instance of TgSchema2Java with the given command line
 	 * arguments and creates the schema-object after reading the .tg-file
+	 * 
+	 * @param args
+	 *            the command line arguments; only the name of the .tg-file is
+	 *            mandatory, for the commit-path and the implementation to be
+	 *            used there exist default values
 	 */
 	public TgSchema2Java() {
 		config = new CodeGeneratorConfiguration();
@@ -365,7 +337,8 @@ public class TgSchema2Java {
 			options.add(classpath);
 		}
 		System.out.print("Starting compilation....");
-		compiler.getTask(null, fileManager, null, null, null, compilationUnits1)
+		compiler
+				.getTask(null, fileManager, null, null, null, compilationUnits1)
 				.call();
 		System.out.println("finished");
 	}
@@ -387,7 +360,6 @@ public class TgSchema2Java {
 	 */
 	public void execute() {
 		int input;
-
 		try {
 			if (isExistingSchema(schema)) {
 				System.out.println("Schema already exists in " + commitPath);
@@ -401,13 +373,16 @@ public class TgSchema2Java {
 				}
 			}
 			if (overwrite) {
+				System.out.println("Comitting schema");
 				deleteFolder(commitPath + File.separator + schema.getPathName());
 				System.out.println("Committing schema "
 						+ schema.getQualifiedName());
+				
 				schema.commit(commitPath, config);
 				System.out.println("Schema " + schema.getQualifiedName()
 						+ " committed successfully");
 			}
+			System.out.println("Before compile");
 			if (compile) {
 				System.out.println("Compiling...");
 				compile();
@@ -482,11 +457,16 @@ public class TgSchema2Java {
 		without_types.setRequired(false);
 		oh.addOption(without_types);
 
+		Option subtype_flag = new Option("f", "subtype-flag", false,
+				"(optional): Create separate methods with subtype flag");
+		subtype_flag.setRequired(false);
+		oh.addOption(subtype_flag);
+
 		Option path = new Option(
 				"p",
 				"path",
 				true,
-				"specifies the path to where the created files are stored; default is current folder (\".\")");
+				"(optional): specifies the path to where the created files are stored; default is current folder (\".\")");
 		path.setRequired(true);
 		path.setArgName("path");
 		oh.addOption(path);
@@ -563,32 +543,5 @@ public class TgSchema2Java {
 		return schema;
 	}
 
-	public void setImplementationMode(String value) {
 
-		String[] values = value.toLowerCase().split(",");
-		if (values.length > 0) {
-			// paranoid ;-) ensure nothing is activated to minimize surprises
-			setTransactionSupport(false);
-			setStandardSupport(false);
-			setDatabaseSupport(false);
-		} else {
-			throw new IllegalArgumentException(
-					"No implementation mode specified.");
-		}
-		for (String v : values) {
-			v = v.trim();
-			if (v.equals("transaction")) {
-				setTransactionSupport(true);
-			} else if (v.equals("standard")) {
-				setStandardSupport(true);
-			} else if (v.equals("database")) {
-				setDatabaseSupport(true);
-			} else {
-				throw new IllegalArgumentException(
-						"Illegal value for implementation mode: "
-								+ v
-								+ "\nOnly \"transaction\",\"standard\" and \"database\" are supported.");
-			}
-		}
-	}
 }

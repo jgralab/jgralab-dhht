@@ -1,29 +1,25 @@
 /*
  * JGraLab - The Java Graph Laboratory
- *
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * 
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- *
- * For bug reports, documentation and further information, visit
- *
- *                         http://jgralab.uni-koblenz.de
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, see <http://www.gnu.org/licenses>.
- *
+ * 
  * Additional permission under GNU GPL version 3 section 7
- *
+ * 
  * If you modify this Program, or any covered work, by linking or combining
  * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
@@ -39,32 +35,18 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
-import de.uni_koblenz.jgralab.greql2.optimizer.CommonSubgraphOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.ConditionalExpressionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.EarlySelectionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.MergeSimpleDeclarationsOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerBase;
-import de.uni_koblenz.jgralab.greql2.optimizer.PathExistenceOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.PathExistenceToDirectedPathExpressionOptimizer;
-import de.uni_koblenz.jgralab.greql2.optimizer.VariableDeclarationOrderOptimizer;
-import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralabtest.greql2.GenericTest;
+import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
 
-public class OptimizerTest extends GenericTest {
+public class OptimizerTest extends GenericTests {
 
 	static {
-		FunLib.register(IsPrime.class);
+		Greql2FunctionLibrary.instance().registerUserDefinedFunction(
+				IsPrime.class);
 	}
 
 	private Optimizer cso = new CommonSubgraphOptimizer();
-	private Optimizer eso = new EarlySelectionOptimizer();
+	private Optimizer eso = new EarySelectionOptimizer();
 	private Optimizer peo = new PathExistenceOptimizer();
 	private Optimizer petdpeo = new PathExistenceToDirectedPathExpressionOptimizer();
 	private Optimizer defo = new DefaultOptimizer();
@@ -107,68 +89,58 @@ public class OptimizerTest extends GenericTest {
 
 	private void execTimedTest(String query, String name, Optimizer o)
 			throws Exception {
-		execTimedTest(query, name, o, getTestGraph(TestVersion.GREQL_GRAPH));
+		execTimedTest(query, name, o, getTestGraph());
 	}
 
 	private void execTimedTest(String query, String name) throws Exception {
-		execTimedTest(query, name, getTestGraph(TestVersion.GREQL_GRAPH));
+		execTimedTest(query, name, getTestGraph());
 	}
 
 	private void execTimedTest(String query, String name, Graph datagraph)
 			throws Exception {
 		long start = System.currentTimeMillis();
-		Object v1 = evalTestQuery(name, query, datagraph);
+		JValue v1 = evalTestQuery(name, query, datagraph);
 		long mid = System.currentTimeMillis();
-		Object v2 = evalTestQuery(name + " (" + defo.getClass().getSimpleName()
+		JValue v2 = evalTestQuery(name + " (" + defo.getClass().getSimpleName()
 				+ ")", query, defo, datagraph);
 		long end = System.currentTimeMillis();
 		assertEquals(v1, v2);
-		// TODO test seriously
-		@SuppressWarnings("unused")
 		double noOptTime = (mid - start) / 1000d;
-		@SuppressWarnings("unused")
 		double optTime = (end - mid) / 1000d;
-		// System.out.println("Time with no optimization:      " + noOptTime
-		// + "secs");
-		// System.out.println("Time with default optimization: " + optTime
-		// + "secs");
+		System.out.println("Time with no optimization:      " + noOptTime
+				+ "secs");
+		System.out.println("Time with default optimization: " + optTime
+				+ "secs");
 	}
 
 	private void execTimedTest(String query, String name, Optimizer o,
 			Graph datagraph) throws Exception {
 		long start = System.currentTimeMillis();
-		Object v1 = evalTestQuery(name, query, datagraph);
+		JValue v1 = evalTestQuery(name, query, datagraph);
 		long mid1 = System.currentTimeMillis();
-		Object v2 = evalTestQuery(name + " (" + o.getClass().getSimpleName()
+		JValue v2 = evalTestQuery(name + " (" + o.getClass().getSimpleName()
 				+ ")", query, o, datagraph);
 		long mid2 = System.currentTimeMillis();
-		Object v3 = evalTestQuery(name + " (" + defo.getClass().getSimpleName()
+		JValue v3 = evalTestQuery(name + " (" + defo.getClass().getSimpleName()
 				+ ")", query, defo, datagraph);
 		long end = System.currentTimeMillis();
-
 		assertEquals(v1, v2);
 		assertEquals(v1, v3);
-
-		// TODO test seriously
-		@SuppressWarnings("unused")
 		double noOptTime = (mid1 - start) / 1000d;
-		@SuppressWarnings("unused")
 		double o1Time = (mid2 - mid1) / 1000d;
-		@SuppressWarnings("unused")
 		double o2Time = (end - mid2) / 1000d;
-		// System.out.println("Time with no optimization: " + noOptTime +
-		// "secs");
-		// System.out.println("Time with optimization ("
-		// + o.getClass().getSimpleName() + "): " + o1Time + "secs");
-		// System.out.println("Time with optimization ("
-		// + defo.getClass().getSimpleName() + "): " + o2Time + "secs");
+		System.out.println("Time with no optimization: " + noOptTime + "secs");
+		System.out.println("Time with optimization ("
+				+ o.getClass().getSimpleName() + "): " + o1Time + "secs");
+		System.out.println("Time with optimization ("
+				+ defo.getClass().getSimpleName() + "): " + o2Time + "secs");
 	}
 
 	@Test
 	public void testCommonSubgraphOptimizer0() throws Exception {
 		String query = "from w : list(2..10), x : list(2..10), y : list(2..10), z : list(1..2) "
 				+ "     with isPrime(x + z) and x * x > y and z > x * x "
-				+ "     reportList w, x, y, z end";
+				+ "     reportBag w, x, y, z end";
 		execTimedTest(query, "CommonSubgraphOptimizer0()", cso);
 	}
 
@@ -176,7 +148,7 @@ public class OptimizerTest extends GenericTest {
 	public void testCommonSubgraphOptimizer1() throws Exception {
 		String query = "from w : list(2..10), x : list(2..10), y : list(2..10), z : list(1..2) "
 				+ "     with isPrime(x + z) and (x + z) * z > y and x * x > y and (x + z) * z > x * x "
-				+ "     reportSet w, x, y, z, isPrime(x + y), x + z, (x + z) * z, x * x, x * w * w, w * w end";
+				+ "     report isPrime(x + y), x + z, (x + z) * z, x * x, x * w * w, w * w end";
 		execTimedTest(query, "CommonSubgraphOptimizer1()", cso);
 	}
 
@@ -186,7 +158,7 @@ public class OptimizerTest extends GenericTest {
 				+ "          b : from x : list(1..10) with isPrime(x) reportSet x end, "
 				+ "          c : from x : list(1..10) with isPrime(x) reportSet x end "
 				+ "     with forall i : a @ isPrime(i)          "
-				+ "     reportSet a, b, c end";
+				+ "     report a, b, c end";
 		execTimedTest(query, "CommonSubgraphOptimizer2()", cso);
 	}
 
@@ -257,7 +229,7 @@ public class OptimizerTest extends GenericTest {
 	public void testEarlySelectionOptimizer5() throws Exception {
 		String query = "from x : list(1..10),                  "
 				+ "          y : list(11..20)"
-				+ "     reportList from a : list(21..25),"
+				+ "     reportBag from a : list(21..25),"
 				+ "                    b : list(21..25)"
 				+ "               with isPrime(x) and isPrime(y)"
 				+ "               reportSet x, y end            "
@@ -287,7 +259,7 @@ public class OptimizerTest extends GenericTest {
 		String query = "from a, b : list(1..10),     "
 				+ "          c    : list(11..20)"
 				+ "     with isPrime(a + b) and isPrime(a + c)"
-				+ "     reportSet a, b, c end";
+				+ "     report a, b, c end";
 		execTimedTest(query, "EarlySelectionOptimizer8()", eso);
 	}
 
@@ -306,7 +278,7 @@ public class OptimizerTest extends GenericTest {
 	public void testEarlySelectionOptimizer11() throws Exception {
 		String query = "from class      : V,          "
 				+ "          superClass : V           "
-				+ "     with count(superClass -->) > 1                "
+				+ "     with count(children(superClass)) > 1                "
 				+ "          and superClass -->+ class "
 				+ "          and (exists mid, mid2 : V,                                  "
 				+ "                      mid -->+ class, "
@@ -328,7 +300,7 @@ public class OptimizerTest extends GenericTest {
 	public void testEarlySelectionOptimizer10() throws Exception {
 		String query = "from a, b, c : list(1..10)"
 				+ "     with a > b and isPrime(a + c) and isPrime(b + c)"
-				+ "     reportSet a, b, c, a > b, isPrime(a + c) end";
+				+ "     reportBag a, b, c, a > b, isPrime(a + c) end";
 		execTimedTest(query, "EarlySelectionOptimizer10()", eso);
 	}
 
@@ -344,9 +316,9 @@ public class OptimizerTest extends GenericTest {
 	private static Graph createPathExistenceOptimizerTestGraph()
 			throws Exception {
 		String query = "    from a : V{Variable},                              "
-				+ "              b : V{ListComprehension}                       "
+				+ "              b : V{BagComprehension}                       "
 				+ "         with a -->* b                                      "
-				+ "         reportList from x : list(1..10),                    "
+				+ "         reportBag from x : list(1..10),                    "
 				+ "                        y : list(11..20)                    "
 				+ "                   with isPrime(x * x + y - 1)              "
 				+ "                   reportSet x * x + y - 1, x, y, a, b end, "
@@ -361,7 +333,7 @@ public class OptimizerTest extends GenericTest {
 		String query = "from a : V{Variable},             "
 				+ "          b : V{SimpleDeclaration}     "
 				+ "     with a --> b                      "
-				+ "     reportList a, b end";
+				+ "     reportBag a, b end";
 		execTimedTest(query, "PathExistenceOptimizer1()", peo,
 				getPathExistenceOptimizerTestGraph());
 	}
@@ -371,7 +343,7 @@ public class OptimizerTest extends GenericTest {
 		String query = "from a : V{Variable},             "
 				+ "          b : V{SimpleDeclaration}     "
 				+ "     with b <-- a                      "
-				+ "     reportList a, b end";
+				+ "     reportBag a, b end";
 		execTimedTest(query, "PathExistenceOptimizer2()", peo,
 				getPathExistenceOptimizerTestGraph());
 	}
@@ -382,7 +354,7 @@ public class OptimizerTest extends GenericTest {
 				+ "          b : V{SimpleDeclaration},    "
 				+ "          c : V{Declaration}           "
 				+ "     with a --> b --> c or c <-- b <-- a or  a -->* c <-- b "
-				+ "     reportSet a, b, c end";
+				+ "     reportBag a, b, c end";
 		execTimedTest(query, "PathExistenceOptimizer3()", peo,
 				getPathExistenceOptimizerTestGraph());
 	}
@@ -392,7 +364,7 @@ public class OptimizerTest extends GenericTest {
 		String query = "from a : V{Variable},             "
 				+ "          b : V{SimpleDeclaration}     "
 				+ "     with a --> b                      "
-				+ "     reportList a, b end";
+				+ "     reportBag a, b end";
 		execTimedTest(query, "PathExistenceToDirectedPathExpOptimizer1()",
 				petdpeo, getPathExistenceOptimizerTestGraph());
 	}
@@ -402,7 +374,7 @@ public class OptimizerTest extends GenericTest {
 		String query = "from a : V{Variable},             "
 				+ "          b : V     "
 				+ "     with a --> <>-- b                      "
-				+ "     reportSet a, b end";
+				+ "     reportBag a, b end";
 		execTimedTest(query, "PathExistenceToDirectedPathExpOptimizer2()",
 				petdpeo, getPathExistenceOptimizerTestGraph());
 	}
@@ -411,7 +383,7 @@ public class OptimizerTest extends GenericTest {
 	public void testPathExistenceToDirectedPathExpOptimizer3() throws Exception {
 		String query = "from a, b : V             "
 				+ "     with a --> <>-- b                      "
-				+ "     reportSet a, b end";
+				+ "     reportBag a, b end";
 		execTimedTest(query, "PathExistenceToDirectedPathExpOptimizer3()",
 				petdpeo, getPathExistenceOptimizerTestGraph());
 	}
@@ -419,7 +391,7 @@ public class OptimizerTest extends GenericTest {
 	@Test
 	public void testPathExistenceToDirectedPathExpOptimizer4() throws Exception {
 		String query = "from a, b : V             "
-				+ "     reportList a, a --> <>-- b end";
+				+ "     reportBag a, a --> <>-- b end";
 		execTimedTest(query, "PathExistenceToDirectedPathExpOptimizer4()",
 				petdpeo, getPathExistenceOptimizerTestGraph());
 	}
@@ -428,7 +400,7 @@ public class OptimizerTest extends GenericTest {
 	public void testPathExistenceToDirectedPathExpOptimizer5() throws Exception {
 		String query = "from a, b: V, c: V{Variable}             "
 				+ "     with a (-->|--<>)+ c and c --> b"
-				+ "     reportList a, a --> <>-- b end";
+				+ "     reportBag a, a --> <>-- b end";
 		execTimedTest(query, "PathExistenceToDirectedPathExpOptimizer5()",
 				petdpeo, getPathExistenceOptimizerTestGraph());
 	}
@@ -475,7 +447,7 @@ public class OptimizerTest extends GenericTest {
 	public void testVariableDeclarationOrderOptimizer5() throws Exception {
 		String queryString = "from x:list(1..10), y:list(x..13), z:list(1..x) "
 				+ "           with x <> 0 and y <> 0 and z <> 0 "
-				+ "           reportSet isPrime(z), isPrime(z*z), isPrime(z+z*z-1) end";
+				+ "           report isPrime(z), isPrime(z*z), isPrime(z+z*z-1) end";
 		execTimedTest(queryString, "VariableDeclarationOrderOptimizer5()", vdoo);
 	}
 
@@ -501,7 +473,7 @@ public class OptimizerTest extends GenericTest {
 				+ "           with y<->+y and z<->+z  "
 				+ "           report x, y, z end";
 		execTimedTest(queryString, "VariableDeclarationOrderOptimizer8()",
-				vdoo, getTestGraph(TestVersion.GREQL_GRAPH));
+				vdoo, getTestGraph());
 	}
 
 	@Test

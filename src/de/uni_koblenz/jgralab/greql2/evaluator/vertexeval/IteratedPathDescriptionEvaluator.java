@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,15 +31,13 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IteratedPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IterationType;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 
 /**
  * Evaluates an iterated path description. Creates a NFA that accepts the
@@ -82,14 +76,14 @@ public class IteratedPathDescriptionEvaluator extends PathDescriptionEvaluator {
 	}
 
 	@Override
-	public NFA evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		PathDescription p = (PathDescription) vertex
 				.getFirstIsIteratedPathOfIncidence(EdgeDirection.IN).getAlpha();
 		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		NFA createdNFA = NFA.createIteratedPathDescriptionNFA(
 				pathEval.getNFA(), vertex.get_times() == IterationType.STAR);
-		return createdNFA;
+		return new JValueImpl(createdNFA);
 	}
 
 	@Override

@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,20 +39,17 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.pcollections.PVector;
+import com.sun.mirror.declaration.Declaration;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
-import de.uni_koblenz.jgralab.greql2.schema.TableComprehension;
-import de.uni_koblenz.jgralab.greql2.types.Table;
-import de.uni_koblenz.jgralab.greql2.types.Tuple;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTable;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueTuple;
 
 /**
  * Evaluates a TableComprehensionvertex in the GReQL-2 Syntaxgraph. A
@@ -88,7 +81,8 @@ public class TableComprehensionEvaluator extends VertexEvaluator {
 				EdgeDirection.IN).getAlpha();
 		DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
 				.getMark(d);
-		declarationLayer = (VariableDeclarationLayer) declEval.getResult();
+		declarationLayer = (VariableDeclarationLayer) declEval.getResult(
+				subgraph).toObject();
 
 		Expression columnHeader = (Expression) vertex
 				.getFirstIsColumnHeaderExprOfIncidence(EdgeDirection.IN)
@@ -128,23 +122,25 @@ public class TableComprehensionEvaluator extends VertexEvaluator {
 	}
 
 	@Override
-	public Object evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		if (!initialized) {
 			initialize();
 		}
-		TreeMap<Object, HashMap<Object, Object>> tableMap = new TreeMap<Object, HashMap<Object, Object>>();
-		Set<Object> completeColumnHeaderTuple = new HashSet<Object>();
-		TreeSet<Object> rowHeaderSet = new TreeSet<Object>();
+		TreeMap<JValue, HashMap<JValue, JValue>> tableMap = new TreeMap<JValue, HashMap<JValue, JValue>>();
+		Set<JValue> completeColumnHeaderTuple = new HashSet<JValue>();
+		TreeSet<JValue> rowHeaderSet = new TreeSet<JValue>();
 
+		int noOfVarCombinations = 0;
 		declarationLayer.reset();
-		while (declarationLayer.iterate()) {
-			Object columnHeaderEntry = columnHeaderEval.getResult();
+		while (declarationLayer.iterate(subgraph)) {
+			noOfVarCombinations++;
+			JValue columnHeaderEntry = columnHeaderEval.getResult(subgraph);
 			completeColumnHeaderTuple.add(columnHeaderEntry);
-			Object rowHeaderEntry = rowHeaderEval.getResult();
-			Object localResult = resultDefEval.getResult();
-			HashMap<Object, Object> row = tableMap.get(rowHeaderEntry);
+			JValue rowHeaderEntry = rowHeaderEval.getResult(subgraph);
+			JValue localResult = resultDefEval.getResult(subgraph);
+			HashMap<JValue, JValue> row = tableMap.get(rowHeaderEntry);
 			if (row == null) {
-				row = new HashMap<Object, Object>();
+				row = new HashMap<JValue, JValue>();
 				tableMap.put(rowHeaderEntry, row);
 				rowHeaderSet.add(rowHeaderEntry);
 				// GreqlEvaluator.println("Adding row");
@@ -152,43 +148,46 @@ public class TableComprehensionEvaluator extends VertexEvaluator {
 			row.put(columnHeaderEntry, localResult);
 		}
 
-		Table<Object> resultTable = Table.empty();
-		PVector<String> headerTuple = resultTable.getTitles();
-		TreeSet<Object> completeColumnHeaderTreeSet = new TreeSet<Object>();
-		for (Object jValueImpl : completeColumnHeaderTuple) {
+		JValueTable resultTable = new JValueTable();
+		JValueTuple headerTuple = resultTable.getHeader();
+		TreeSet<JValue> completeColumnHeaderTreeSet = new TreeSet<JValue>();
+		for (JValue jValueImpl : completeColumnHeaderTuple) {
 			completeColumnHeaderTreeSet.add(jValueImpl);
 		}
-		Iterator<Object> colIter = completeColumnHeaderTreeSet.iterator();
+		Iterator<JValue> colIter = completeColumnHeaderTreeSet.iterator();
 		IsTableHeaderOf tHeader = vertex
 				.getFirstIsTableHeaderOfIncidence(EdgeDirection.IN);
 		if (tHeader != null) {
 			VertexEvaluator theval = vertexEvalMarker.getMark(tHeader
 					.getAlpha());
-			headerTuple = headerTuple.plus((String) theval.getResult());
+			headerTuple.add(theval.getResult(subgraph));
 		} else {
-			headerTuple.plus(""); // dummy entry in the upper
+			headerTuple.add(new JValueImpl("")); // dummy entry in the upper
 			// left
 			// corner
 		}
-		while (colIter.hasNext()) {	
-			headerTuple = headerTuple.plus( colIter.next().toString());
+		while (colIter.hasNext()) {
+			headerTuple.add(colIter.next());
 		}
-		resultTable = resultTable.withTitles(headerTuple);
-		Iterator<Entry<Object, HashMap<Object, Object>>> rowIter = tableMap
+		Iterator<Entry<JValue, HashMap<JValue, JValue>>> rowIter = tableMap
 				.entrySet().iterator();
 		while (rowIter.hasNext()) {
-			Entry<Object, HashMap<Object, Object>> currentEntry = rowIter
+			Entry<JValue, HashMap<JValue, JValue>> currentEntry = rowIter
 					.next();
-			Object currentRowHeader = currentEntry.getKey();
-			HashMap<Object, Object> currentRow = currentEntry.getValue();
+			JValue currentRowHeader = currentEntry.getKey();
+			HashMap<JValue, JValue> currentRow = currentEntry.getValue();
 			colIter = completeColumnHeaderTreeSet.iterator();
-			Tuple rowTuple = Tuple.empty();
-			rowTuple = rowTuple.plus(currentRowHeader);
+			JValueTuple rowTuple = new JValueTuple(
+					completeColumnHeaderTuple.size());
+			rowTuple.add(currentRowHeader);
 			while (colIter.hasNext()) {
-				Object cellEntry = currentRow.get(colIter.next());
-				rowTuple = rowTuple.plus(cellEntry);
+				JValue cellEntry = currentRow.get(colIter.next());
+				if (cellEntry == null) {
+					cellEntry = new JValueImpl();
+				}
+				rowTuple.add(cellEntry);
 			}
-			resultTable = resultTable.plus(rowTuple);
+			resultTable.add(rowTuple);
 		}
 		return resultTable;
 	}

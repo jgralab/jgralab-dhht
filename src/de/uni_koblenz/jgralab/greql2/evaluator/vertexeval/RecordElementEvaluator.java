@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,14 +31,11 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.RecordElement;
-import de.uni_koblenz.jgralab.greql2.schema.RecordId;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
 
 /**
  * Evaluates a record element, this is for instance name:"element" in the
@@ -90,14 +83,14 @@ public class RecordElementEvaluator extends VertexEvaluator {
 	}
 
 	@Override
-	public Object evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		if (expEval == null) {
 			Expression recordElementExp = (Expression) vertex
 					.getFirstIsRecordExprOfIncidence(EdgeDirection.IN)
 					.getAlpha();
 			expEval = vertexEvalMarker.getMark(recordElementExp);
 		}
-		return expEval.getResult();
+		return expEval.getResult(subgraph);
 	}
 
 	@Override

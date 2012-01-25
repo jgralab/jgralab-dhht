@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,17 +31,19 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import org.apache.tools.ant.types.Quantifier;
+
+import com.sun.mirror.declaration.Declaration;
+
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.QuantificationType;
-import de.uni_koblenz.jgralab.greql2.schema.QuantifiedExpression;
-import de.uni_koblenz.jgralab.greql2.schema.Quantifier;
+import de.uni_koblenz.jgralab.greql2.exception.EvaluateException;
+import de.uni_koblenz.jgralab.greql2.exception.JValueInvalidTypeException;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValue;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueBoolean;
+import de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl;
 
 /**
  * Evaluates a QuantifiedExpression, a QuantifiedExpression is something like
@@ -92,7 +90,8 @@ public class QuantifiedExpressionEvaluator extends VertexEvaluator {
 				.getAlpha();
 		DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
 				.getMark(d);
-		declarationLayer = (VariableDeclarationLayer) declEval.getResult();
+		declarationLayer = (VariableDeclarationLayer) declEval.getResult(
+				subgraph).toObject();
 		Quantifier quantifier = (Quantifier) vertex
 				.getFirstIsQuantifierOfIncidence(EdgeDirection.IN).getAlpha();
 		quantificationType = quantifier.get_type();
@@ -106,54 +105,77 @@ public class QuantifiedExpressionEvaluator extends VertexEvaluator {
 	 * evaluates the QuantifiedEx
 	 */
 	@Override
-	public Boolean evaluate() {
+	public JValue evaluate() throws EvaluateException {
 		if (!initialized) {
 			initialize();
 		}
 
+		int noOfVariableCombinations = 0;
 		boolean foundTrue = false;
 		declarationLayer.reset();
 		switch (quantificationType) {
 		case EXISTS:
-			while (declarationLayer.iterate()) {
-				Object tempResult = predicateEvaluator.getResult();
-				if (tempResult instanceof Boolean) {
-					if ((Boolean) tempResult) {
-						return Boolean.TRUE;
+			while (declarationLayer.iterate(subgraph)) {
+				noOfVariableCombinations++;
+				JValue tempResult = predicateEvaluator.getResult(subgraph);
+				if (tempResult.isBoolean()) {
+					try {
+						if (tempResult.toBoolean() == JValueBoolean
+								.getTrueValue()) {
+							return new JValueImpl(JValueBoolean.getTrueValue());
+						}
+					} catch (JValueInvalidTypeException exception) {
+						throw new EvaluateException(
+								"Error evaluation Exists clause", exception);
 					}
 				}
 			}
-			return Boolean.FALSE;
+			return new JValueImpl(JValueBoolean.getFalseValue());
 		case EXISTSONE:
-			while (declarationLayer.iterate()) {
-				Object tempResult = predicateEvaluator.getResult();
-				if (tempResult instanceof Boolean) {
-					if ((Boolean) tempResult) {
-						if (foundTrue == true) {
-							return Boolean.FALSE;
-						} else {
-							foundTrue = true;
+			while (declarationLayer.iterate(subgraph)) {
+				noOfVariableCombinations++;
+				JValue tempResult = predicateEvaluator.getResult(subgraph);
+				if (tempResult.isBoolean()) {
+					try {
+						if (tempResult.toBoolean().equals(
+								JValueBoolean.getTrueValue())) {
+							if (foundTrue == true) {
+								return new JValueImpl(
+										JValueBoolean.getFalseValue());
+							} else {
+								foundTrue = true;
+							}
 						}
+					} catch (JValueInvalidTypeException exception) {
+						throw new EvaluateException(
+								"Error evaluation Exists! clause", exception);
 					}
 				}
 			}
 			if (foundTrue) {
-				return Boolean.TRUE;
+				return new JValueImpl(JValueBoolean.getTrueValue());
 			}
-			return Boolean.FALSE;
+			return new JValueImpl(JValueBoolean.getFalseValue());
 		case FORALL:
-			while (declarationLayer.iterate()) {
-				Object tempResult = predicateEvaluator.getResult();
-				if (tempResult instanceof Boolean) {
-					if (!(Boolean) tempResult) {
-						return Boolean.FALSE;
+			while (declarationLayer.iterate(subgraph)) {
+				noOfVariableCombinations++;
+				JValue tempResult = predicateEvaluator.getResult(subgraph);
+				if (tempResult.isBoolean()) {
+					try {
+						if (tempResult.toBoolean().equals(
+								JValueBoolean.getFalseValue())) {
+							return new JValueImpl(JValueBoolean.getFalseValue());
+						}
+					} catch (JValueInvalidTypeException exception) {
+						throw new EvaluateException(
+								"Error evaluation Forall clause", exception);
 					}
 				}
 			}
-			return Boolean.TRUE;
+			return new JValueImpl(Boolean.TRUE);
 		default:
-			throw new RuntimeException("FIXME: Unhandled quantification type "
-					+ quantificationType);
+			throw new EvaluateException(
+					"Found QuantifiedExpression that is neither exists, existis! not forall");
 		}
 	}
 

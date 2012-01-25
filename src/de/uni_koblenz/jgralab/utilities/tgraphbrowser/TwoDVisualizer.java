@@ -50,8 +50,6 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.types.Slice;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -90,12 +88,12 @@ public class TwoDVisualizer {
 			Boolean showAttributes, Integer pathLength,
 			RequestThread currentThread) {
 		// set currentVertex or currentEdge to the current element
-		if (currentElement instanceof Vertex) {
-			code.append("current").append("Vertex = \"")
-					.append(((Vertex) currentElement).getId()).append("\";\n");
-		} else if (currentElement instanceof Edge) {
-			code.append("current").append("Edge = \"")
-					.append(((Edge) currentElement).getId()).append("\";\n");
+		if (currentElement.isVertex()) {
+			code.append("current").append("Vertex = \"").append(
+					currentElement.toVertex().getPartialGraphId()).append("\";\n");
+		} else if (currentElement.isEdge()) {
+			code.append("current").append("Edge = \"").append(
+					currentElement.toEdge().getPartialGraphId()).append("\";\n");
 		}
 		// calculate environment
 		PSet<GraphElement> elementsToDisplay = JGraLab.set();
@@ -262,18 +260,20 @@ public class TwoDVisualizer {
 			Slice slice = (Slice) elements;
 			for (Vertex v : slice.getVertices()) {
 				totalElements++;
-				if (state.selectedVertexClasses.get(v
-						.getAttributedElementClass())) {
-					elementsToDisplay = elementsToDisplay.plus(v);
+				if (v.isVertex()
+						&& state.selectedVertexClasses.get(v.toVertex()
+								.getMetaClass())) {
+					elementsToDisplay.add(v);
 					selectedElements++;
 				}
 			}
 			for (Edge e : slice.getEdges()) {
 				totalElements++;
-				if (state.selectedEdgeClasses
-						.get(e.getAttributedElementClass())) {
-					elementsToDisplay = elementsToDisplay.plus(e
-							.getNormalEdge());
+				if (v.isEdge()
+						&& state.selectedEdgeClasses.get(v.toEdge()
+								.getMetaClass())) {
+					elementsToDisplay.add(new JValueImpl(v.toEdge()
+							.getNormalEdge()));
 					selectedElements++;
 				}
 			}
@@ -284,13 +284,14 @@ public class TwoDVisualizer {
 				totalElements++;
 				if (v instanceof Vertex
 						&& state.selectedVertexClasses.get(v
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					elementsToDisplay = elementsToDisplay.plus(v);
 					selectedElements++;
-				} else if (state.selectedEdgeClasses.get(v
-						.getAttributedElementClass())) {
-					elementsToDisplay = elementsToDisplay.plus(((Edge) v)
-							.getNormalEdge());
+				} else if (v.isEdge()
+						&& state.selectedEdgeClasses.get(v.toEdge()
+								.getMetaClass())) {
+					elementsToDisplay.add(new JValueImpl(v.toEdge()
+							.getNormalEdge()));
 					selectedElements++;
 				}
 			}
@@ -504,21 +505,21 @@ public class TwoDVisualizer {
 		}
 
 		protected void printEdge(PrintStream out, Edge e) {
-			if (!selectedEdgeClasses.get(e.getAttributedElementClass())) {
+			if (!selectedEdgeClasses.get(e.getMetaClass())) {
 				return;
 			}
 			Vertex alpha = e.getAlpha();
 			Vertex omega = e.getOmega();
 			// hide deselected vertices
-			if (!selectedVertexClasses.get(alpha.getAttributedElementClass())
+			if (!selectedVertexClasses.get(alpha.getMetaClass())
 					|| !selectedVertexClasses.get(omega
-							.getAttributedElementClass())) {
+							.getMetaClass())) {
 				return;
 			}
 
-			out.print("v" + alpha.getId() + " -> v" + omega.getId() + " [");
+			out.print("v" + alpha.getGlobalId() + " -> v" + omega.getGlobalId() + " [");
 
-			EdgeClass cls = (EdgeClass) e.getAttributedElementClass();
+			EdgeClass cls = (EdgeClass) e.getMetaClass();
 
 			out.print("dir=\"both\" ");
 			/*
@@ -552,7 +553,7 @@ public class TwoDVisualizer {
 				out.print("arrowtail=\"none\" ");
 			}
 
-			out.print(" label=\"e" + e.getId() + ": "
+			out.print(" label=\"e" + e.getGlobalId() + ": "
 					+ cls.getUniqueName().replace('$', '.') + "");
 
 			if (showAttributes && (cls.getAttributeCount() > 0)) {
@@ -585,7 +586,7 @@ public class TwoDVisualizer {
 								+ toRole : "") + "\"");
 			}
 
-			out.print(" href=\"javascript:top.showElement('e" + e.getId()
+			out.print(" href=\"javascript:top.showElement('e" + e.getGlobalId()
 					+ "');\"");
 
 			if (e == current) {
@@ -607,7 +608,7 @@ public class TwoDVisualizer {
 		}
 
 		private void printAttributes(PrintStream out, AttributedElement elem) {
-			AttributedElementClass cls = elem.getAttributedElementClass();
+			AttributedElementClass cls = elem.getMetaClass();
 			StringBuilder value = new StringBuilder();
 			for (Attribute attr : cls.getAttributeList()) {
 				String current = attr.getName();
@@ -636,15 +637,15 @@ public class TwoDVisualizer {
 		}
 
 		protected void printVertex(PrintStream out, Vertex v) {
-			AttributedElementClass cls = v.getAttributedElementClass();
-			out.print("v" + v.getId() + " [label=\"{{v" + v.getId() + "|"
+			AttributedElementClass cls = v.getMetaClass();
+			out.print("v" + v.getGlobalId() + " [label=\"{{v" + v.getGlobalId() + "|"
 					+ cls.getUniqueName().replace('$', '.') + "}");
 			if (showAttributes && (cls.getAttributeCount() > 0)) {
 				out.print("|");
 				printAttributes(out, v);
 			}
 			out.print("}\"");
-			out.print(" href=\"javascript:top.showElement('v" + v.getId()
+			out.print(" href=\"javascript:top.showElement('v" + v.getGlobalId()
 					+ "');\"");
 			if (v == current) {
 				out.print(" fillcolor=\"#FFC080\"");
@@ -659,13 +660,13 @@ public class TwoDVisualizer {
 			for (Edge e : v.incidences()) {
 				if (!elements.contains(e.getNormalEdge())
 						&& selectedEdgeClasses.get(e.getNormalEdge()
-								.getAttributedElementClass())) {
+								.getMetaClass())) {
 					// mark this vertex that it has further edges
 					// print a new node, which is completely white
 					out.println("nv" + counter
 							+ " [shape=\"plaintext\" fontcolor=\"white\"]");
 					// print the little arrow as a new edge
-					out.println("nv" + counter++ + " -> v" + v.getId()
+					out.println("nv" + counter++ + " -> v" + v.getGlobalId()
 							+ " [style=\"dashed\"]");
 					break;
 				}
