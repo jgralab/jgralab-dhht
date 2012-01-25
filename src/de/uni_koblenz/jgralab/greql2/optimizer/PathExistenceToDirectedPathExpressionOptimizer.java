@@ -43,11 +43,12 @@ import java.util.logging.Logger;
 import com.sun.mirror.declaration.Declaration;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.funlib.Intersection;
+import de.uni_koblenz.jgralab.greql2.funlib.collections.Intersection;
 
 /**
  * @author Tassilo Horn &lt;horn@uni-koblenz.de&gt;

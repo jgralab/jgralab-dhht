@@ -38,11 +38,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-
 /**
  * JsonReader is a event based Reader and provides throw extension several
  * methods for parsing. It uses on a token based Json-Parser to process a

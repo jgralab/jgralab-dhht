@@ -54,6 +54,7 @@ import de.uni_koblenz.jgralab.RandomIdGenerator;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 @RunWith(Parameterized.class)
 public class GraphTest extends InstanceTest {

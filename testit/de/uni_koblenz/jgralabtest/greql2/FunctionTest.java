@@ -42,10 +42,8 @@ import de.uni_koblenz.jgralabtest.greql2.funlib.CollectionFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.ComparisonFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.GraphFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.LogicFunctionTest;
-import de.uni_koblenz.jgralabtest.greql2.funlib.PathSystemFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.ReflectionFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.SchemaFunctionTest;
-import de.uni_koblenz.jgralabtest.greql2.funlib.SliceFunctionTest;
 import de.uni_koblenz.jgralabtest.greql2.funlib.StringFunctionTest;
 
 /**

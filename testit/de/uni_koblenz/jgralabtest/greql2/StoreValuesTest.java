@@ -21,7 +21,6 @@ import de.uni_koblenz.jgralab.greql2.serialising.HTMLOutputWriter;
 import de.uni_koblenz.jgralab.greql2.serialising.XMLOutputWriter;
 import de.uni_koblenz.jgralab.greql2.types.Path;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.CountyTags;
 
 public class StoreValuesTest {
 

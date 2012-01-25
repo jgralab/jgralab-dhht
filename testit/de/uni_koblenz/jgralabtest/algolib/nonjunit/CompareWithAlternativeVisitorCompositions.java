@@ -38,12 +38,7 @@ import java.util.Arrays;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.DFSVisitorList;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.DFSVisitor;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.SearchVisitor;
-import de.uni_koblenz.jgralab.algolib.visitors.GraphVisitor;
-import de.uni_koblenz.jgralab.algolib.visitors.GraphVisitorAdapter;
+import de.uni_koblenz.jgralab.utilities.common.GraphVisitor;
 
 /**
  * This class compares the speed of the two different visitor composition

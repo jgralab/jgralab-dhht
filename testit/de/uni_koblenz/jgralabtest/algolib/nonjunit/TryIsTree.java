@@ -1,10 +1,7 @@
 package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
-import de.uni_koblenz.jgralab.algolib.algorithms.weak_components.IsTree;
-import de.uni_koblenz.jgralab.algolib.problems.IsTreeSolver;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleSchema;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleVertex;
+import de.uni_koblenz.jgralab.greql2.funlib.IsTree;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryIsTree {
 	private static SimpleGraph getSmallGraph() {

@@ -9,11 +9,6 @@ import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.connections.Highway;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.junctions.Crossroad;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.County;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.HasCapital;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.localities.Locality;
 
 public class SubgraphRestrictionTest extends GenericTest {
 

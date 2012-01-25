@@ -36,6 +36,8 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
+import de.uni_koblenz.jgralabtest.greql2.GenericTests;
+
 public class PathSystemTest extends GenericTests {
 
 	/**

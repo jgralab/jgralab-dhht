@@ -6,14 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
-import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public abstract class TypedElementClassImpl
 	<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>,

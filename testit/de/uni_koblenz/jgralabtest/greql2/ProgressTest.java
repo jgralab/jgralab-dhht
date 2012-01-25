@@ -34,6 +34,8 @@ package de.uni_koblenz.jgralabtest.greql2;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
+import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 
 public class ProgressTest extends GenericTests {

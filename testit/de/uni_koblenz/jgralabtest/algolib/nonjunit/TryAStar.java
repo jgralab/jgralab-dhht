@@ -39,20 +39,8 @@ import java.io.File;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.AStarSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.DijkstraAlgorithm;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.FordMooreAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.BinaryDoubleFunction;
-import de.uni_koblenz.jgralab.algolib.functions.DoubleFunction;
-import de.uni_koblenz.jgralab.algolib.functions.adapters.MethodCallToBinaryDoubleFunctionAdapter;
-import de.uni_koblenz.jgralab.algolib.functions.adapters.MethodCallToDoubleFunctionAdapter;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralabtest.algolib.nonjunit.RandomGraphForAStar.LocationPoint;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Location;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Way;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedSchema;
 
 public class TryAStar {
 

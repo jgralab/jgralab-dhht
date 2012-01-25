@@ -47,9 +47,8 @@ import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
-import de.uni_koblenz.jgralab.JGraLabList;
-import de.uni_koblenz.jgralab.JGraLabSet;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 /**
  * 

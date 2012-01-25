@@ -36,14 +36,7 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.DepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.IterativeDepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.strong_components.StrongComponentsWithDFS;
-import de.uni_koblenz.jgralab.algolib.algorithms.strong_components.visitors.ReducedGraphVisitorAdapter;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleSchema;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryStrongComponents {
 	public static void main(String[] args) throws AlgorithmTerminatedException {

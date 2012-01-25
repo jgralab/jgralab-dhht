@@ -41,7 +41,6 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
-import de.uni_koblenz.jgralabtest.greql2.GenericTest;
 
 public class CollectionFunctionTest extends GenericTest {
 

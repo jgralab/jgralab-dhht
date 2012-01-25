@@ -34,7 +34,7 @@ import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphStructureChangedAdapterWithAutoRemove;
 
-public abstract class AbstractGraphMarker<T extends AttributedElement<?,?>> extends
+public abstract class AbstractGraphMarker<T extends AttributedElement> extends
 		GraphStructureChangedAdapterWithAutoRemove implements GraphMarker<T> {
 	
 	

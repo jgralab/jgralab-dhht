@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralabtest.utilities.jgralab2owl;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.utilities.jgralab2owl.JGraLab2OWL;
 
 public class JGraLab2OWLTest {
 

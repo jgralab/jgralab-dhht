@@ -46,6 +46,7 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
 
 /**
  * TODO add comment
@@ -65,16 +66,16 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "ViewImpl");
 	}
 	
-	public Vector<JavaSourceFromString> createJavaSources() {
+	public Vector<InMemoryJavaSourceFile> createJavaSources() {
 		//String className = rootBlock.getVariable("simpleClassName");
 		String implClassName = rootBlock.getVariable("simpleImplClassName");
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>(2);
+		Vector<InMemoryJavaSourceFile> javaSources = new Vector<InMemoryJavaSourceFile>(2);
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
 			createCode();
 			if (currentCycle.isImplementationVariant()) {
-				javaSources.add(new JavaSourceFromString(implClassName,
+				javaSources.add(new InMemoryJavaSourceFile(implClassName,
 						rootBlock.getCode()));
 			} 
 			currentCycle = getNextCycle();
@@ -205,8 +206,6 @@ public class ViewGraphCodeGenerator extends AttributedElementCodeGenerator<Graph
 				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
 				cs.setVariable("rname", rd.getUniqueName());
 				cs.setVariable("rtype",	rd.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				cs.setVariable("rstdtype",rd.getStandardJavaAttributeImplementationTypeName(schemaRootPackageName));
-				cs.setVariable("rsavememtype",rd.getSavememJavaAttributeImplementationTypeName(schemaRootPackageName));
 				code.addNoIndent(cs);
 			}
 		}

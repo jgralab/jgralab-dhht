@@ -38,12 +38,6 @@ import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.IterativeDepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.RecursiveDepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.SearchAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.Permutation;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
 
 public class CompareSearchAlgorithms {
 	protected Graph graph;

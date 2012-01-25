@@ -43,6 +43,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.GraphException;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
+import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 
 /**
  * Test cases for class SavepointImpl.

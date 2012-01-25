@@ -3,10 +3,6 @@ package de.uni_koblenz.jgralabtest.non_junit_tests;
 import java.util.Arrays;
 
 import de.uni_koblenz.jgralab.impl.InternalGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.DoubleSubNode;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.SubLink;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.vertextest.VertexTestSchema;
 
 public class DebugTrans {
 

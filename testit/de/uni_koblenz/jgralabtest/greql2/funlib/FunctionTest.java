@@ -45,7 +45,9 @@ import java.util.Map.Entry;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralabtest.greql2.GenericTests;
 
 /**

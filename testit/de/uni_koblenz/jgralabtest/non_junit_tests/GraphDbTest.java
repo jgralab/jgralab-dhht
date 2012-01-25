@@ -36,12 +36,6 @@ package de.uni_koblenz.jgralabtest.non_junit_tests;
 
 import java.sql.SQLException;
 
-import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
-import de.uni_koblenz.jgralabtest.schemas.jniclient.JniTestGraph;
-import de.uni_koblenz.jgralabtest.schemas.jniclient.JniTestSchema;
-import de.uni_koblenz.jgralabtest.schemas.jniclient.SimpleNode;
-
 public class GraphDbTest {
 
 	public static void main(String[] args) throws GraphDatabaseException,

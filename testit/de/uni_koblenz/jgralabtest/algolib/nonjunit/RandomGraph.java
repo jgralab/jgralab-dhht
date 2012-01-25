@@ -36,9 +36,7 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import java.util.Random;
 
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleSchema;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class RandomGraph {
 

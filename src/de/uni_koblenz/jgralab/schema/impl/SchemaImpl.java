@@ -60,11 +60,9 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
-import de.uni_koblenz.jgralab.M1ClassManager;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.codegenerator.BinaryEdgeCodeGenerator;
-import de.uni_koblenz.jgralab.codegenerator.ClassFileAbstraction;
 import de.uni_koblenz.jgralab.codegenerator.CodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.codegenerator.EdgeCodeGenerator;
@@ -72,7 +70,6 @@ import de.uni_koblenz.jgralab.codegenerator.EnumCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.GraphCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.GraphFactoryGenerator;
 import de.uni_koblenz.jgralab.codegenerator.IncidenceCodeGenerator;
-import de.uni_koblenz.jgralab.codegenerator.JavaSourceFromString;
 import de.uni_koblenz.jgralab.codegenerator.RecordCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SchemaCodeGenerator;
 import de.uni_koblenz.jgralab.codegenerator.SubordinateGraphCodeGenerator;
@@ -103,7 +100,6 @@ import de.uni_koblenz.jgralab.schema.StringDomain;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
 /**

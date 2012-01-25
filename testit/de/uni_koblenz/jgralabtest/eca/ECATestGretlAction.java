@@ -11,19 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.eca.Action;
-import de.uni_koblenz.jgralab.eca.ECAIO;
-import de.uni_koblenz.jgralab.eca.ECAIOException;
-import de.uni_koblenz.jgralab.eca.ECARule;
-import de.uni_koblenz.jgralab.eca.ECARuleManager;
-import de.uni_koblenz.jgralab.eca.events.DeleteVertexEventDescription;
-import de.uni_koblenz.jgralab.eca.events.EventDescription;
 import de.uni_koblenz.jgralab.gretl.eca.GretlTransformAction;
 import de.uni_koblenz.jgralabtest.gretl.SimpleCopyTransformation;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBook;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBookGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBookSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.Contact;
 
 public class ECATestGretlAction {
 

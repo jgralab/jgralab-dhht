@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralabtest.eca;
 
 import static org.junit.Assert.assertEquals;
 
+import java.awt.PageAttributes.MediaType;
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -10,33 +12,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User;
+
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.eca.Action;
-import de.uni_koblenz.jgralab.eca.Condition;
-import de.uni_koblenz.jgralab.eca.ECAIO;
-import de.uni_koblenz.jgralab.eca.ECAIOException;
-import de.uni_koblenz.jgralab.eca.ECARule;
-import de.uni_koblenz.jgralab.eca.ECARuleManager;
-import de.uni_koblenz.jgralab.eca.GreqlCondition;
-import de.uni_koblenz.jgralab.eca.PrintAction;
-import de.uni_koblenz.jgralab.eca.events.ChangeAttributeEventDescription;
-import de.uni_koblenz.jgralab.eca.events.ChangeEdgeEventDescription;
-import de.uni_koblenz.jgralab.eca.events.ChangeEdgeEventDescription.EdgeEnd;
-import de.uni_koblenz.jgralab.eca.events.CreateVertexEventDescription;
-import de.uni_koblenz.jgralab.eca.events.DeleteVertexEventDescription;
-import de.uni_koblenz.jgralab.eca.events.EventDescription;
 import de.uni_koblenz.jgralabtest.eca.useractions.RevertEdgeChangingAction;
 import de.uni_koblenz.jgralabtest.eca.userconditions.IsGreaterThan2012;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.Book;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.Date;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.Library;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.Loans;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.Magazin;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.MediaType;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.NewMedia;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.SimpleLibraryGraph;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.SimpleLibrarySchema;
-import de.uni_koblenz.jgralabtest.schemas.eca.simplelibrary.User;
 
 public class ECATestIO {
 

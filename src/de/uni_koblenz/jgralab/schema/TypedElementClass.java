@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.schema;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.TypedElement;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 public interface TypedElementClass
 	<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>, 

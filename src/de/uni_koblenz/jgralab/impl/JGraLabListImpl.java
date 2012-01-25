@@ -33,8 +33,6 @@ package de.uni_koblenz.jgralab.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import de.uni_koblenz.jgralab.JGraLabCloneable;
-
 /**
  * 
  * @author

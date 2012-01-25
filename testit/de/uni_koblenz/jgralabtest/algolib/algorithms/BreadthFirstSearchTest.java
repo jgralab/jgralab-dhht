@@ -49,22 +49,8 @@ import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.BreadthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.SearchVisitor;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.SearchVisitorAdapter;
-import de.uni_koblenz.jgralab.algolib.algorithms.topological_order.KahnKnuthAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.ArrayPermutation;
-import de.uni_koblenz.jgralab.algolib.functions.Function;
-import de.uni_koblenz.jgralab.algolib.functions.IntFunction;
-import de.uni_koblenz.jgralab.algolib.functions.Permutation;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.IntegerVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleEdge;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleSchema;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class BreadthFirstSearchTest extends GraphAlgorithmTest {
 

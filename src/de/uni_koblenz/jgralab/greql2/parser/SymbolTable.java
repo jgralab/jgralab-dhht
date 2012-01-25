@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralab.greql2.parser;
 
 import com.sun.tools.apt.mirror.util.SourcePositionImpl;
 
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
 

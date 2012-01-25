@@ -36,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 
 public class SystemTest extends GenericTests {
 

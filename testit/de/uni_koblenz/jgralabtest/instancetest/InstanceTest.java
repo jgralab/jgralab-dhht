@@ -37,6 +37,7 @@ import java.util.Collection;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 public abstract class InstanceTest {
 

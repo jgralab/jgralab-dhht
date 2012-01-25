@@ -46,6 +46,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 @RunWith(Parameterized.class)
 public class ImplementationModeTest extends InstanceTest {

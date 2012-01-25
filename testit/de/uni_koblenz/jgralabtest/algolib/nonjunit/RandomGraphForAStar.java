@@ -6,10 +6,6 @@ import java.util.Random;
 
 import de.uni_koblenz.jgralabtest.algolib.nonjunit.kdtree.KDTree;
 import de.uni_koblenz.jgralabtest.algolib.nonjunit.kdtree.Point;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Location;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Way;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedSchema;
 
 public class RandomGraphForAStar {
 

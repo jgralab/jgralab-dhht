@@ -43,6 +43,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
+import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
+
 public class UndoTest {
 
 	private RecordTestGraph graph;

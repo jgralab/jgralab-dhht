@@ -39,8 +39,6 @@ import java.util.Stack;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.functions.BooleanFunction;
 
 public class IterativeDepthFirstSearch2 extends DepthFirstSearch {
 

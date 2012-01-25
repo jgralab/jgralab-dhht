@@ -40,6 +40,7 @@ import java.util.Set;
 import com.sun.mirror.declaration.Declaration;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;

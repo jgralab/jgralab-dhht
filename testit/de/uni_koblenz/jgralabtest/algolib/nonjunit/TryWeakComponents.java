@@ -38,12 +38,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.BreadthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.weak_components.WeakComponentsWithBFS;
-import de.uni_koblenz.jgralab.algolib.algorithms.weak_components.visitors.VertexPartitionVisitorAdapter;
-import de.uni_koblenz.jgralab.algolib.functions.Function;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
 
 public class TryWeakComponents {
 

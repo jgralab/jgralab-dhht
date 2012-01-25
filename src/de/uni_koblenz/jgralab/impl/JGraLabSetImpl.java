@@ -33,9 +33,6 @@ package de.uni_koblenz.jgralab.impl;
 import java.util.Collection;
 import java.util.HashSet;
 
-import de.uni_koblenz.jgralab.JGraLabCloneable;
-import de.uni_koblenz.jgralab.JGraLabSet;
-
 /**
  * 
  * @author

@@ -45,7 +45,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.EdgeContainer;
 import de.uni_koblenz.jgralab.impl.disk.IncidenceContainer;
 import de.uni_koblenz.jgralab.impl.disk.VertexContainer;
-import de.uni_koblenz.jgralab.schema.exception.M1ClassAccessException;
 
 /**
  * Default implementation for GraphFactory. Per default every create-method

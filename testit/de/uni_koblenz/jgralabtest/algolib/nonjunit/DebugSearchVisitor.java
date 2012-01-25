@@ -36,11 +36,6 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.GraphAlgorithm;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.SearchAlgorithm;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.DFSVisitor;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.visitors.SearchVisitorAdapter;
-import de.uni_koblenz.jgralab.algolib.functions.IntFunction;
 
 public class DebugSearchVisitor extends SearchVisitorAdapter implements
 		DFSVisitor {

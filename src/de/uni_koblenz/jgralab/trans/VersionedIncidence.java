@@ -34,8 +34,6 @@
  */
 package de.uni_koblenz.jgralab.trans;
 
-import de.uni_koblenz.jgralab.impl.IncidenceImpl;
-import de.uni_koblenz.jgralab.impl.trans.VersionedReferenceImpl;
 
 /**
  * For internal use in validation.

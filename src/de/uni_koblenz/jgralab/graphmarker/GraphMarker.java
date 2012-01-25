@@ -55,20 +55,26 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class GraphMarker<O> extends MapGraphMarker<AttributedElement, O> {
+public interface GraphMarker<T extends AttributedElement>  {
 
-	public GraphMarker(Graph g) {
-		super(g);
-	}
+	Graph getGraph();
 
-	@Override
-	public void edgeDeleted(Edge e) {
-		tempAttributeMap.remove(e);
-	}
+	void vertexDeleted(Vertex v);
 
-	@Override
-	public void vertexDeleted(Vertex v) {
-		tempAttributeMap.remove(v);
-	}
+	boolean removeMark(T graphElement);
+
+	boolean isMarked(T graphElement);
+
+	void edgeDeleted(Edge e);
+
+	long size();
+
+	boolean isEmpty();
+
+	void clear();
+
+	Iterable<T> getMarkedElements();
+
+
 
 }

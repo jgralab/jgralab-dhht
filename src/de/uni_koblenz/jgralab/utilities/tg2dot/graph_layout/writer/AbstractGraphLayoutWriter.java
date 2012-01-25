@@ -37,8 +37,6 @@ package de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.writer;
 import java.io.IOException;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonGenerationException;
-
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.GraphLayout;
 import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.Definition;

@@ -1,8 +1,5 @@
 package de.uni_koblenz.jgralabtest.eca.userconditions;
 
-import de.uni_koblenz.jgralab.eca.Condition;
-import de.uni_koblenz.jgralab.eca.events.ChangeAttributeEvent;
-import de.uni_koblenz.jgralab.eca.events.Event;
 
 public class IsGreaterThan2012 implements Condition {
 

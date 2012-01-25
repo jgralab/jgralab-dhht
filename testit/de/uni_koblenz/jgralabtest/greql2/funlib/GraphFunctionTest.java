@@ -49,9 +49,6 @@ import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralabtest.greql2.GenericTest;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.connections.Way;
-import de.uni_koblenz.jgralabtest.schemas.greqltestschema.junctions.Crossroad;
 
 public class GraphFunctionTest extends GenericTest {
 

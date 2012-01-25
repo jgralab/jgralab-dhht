@@ -31,9 +31,6 @@
 
 package de.uni_koblenz.jgralab.plugin;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-
 import de.uni_koblenz.jgralab.JGraLab;
 
 public class Activator implements BundleActivator {

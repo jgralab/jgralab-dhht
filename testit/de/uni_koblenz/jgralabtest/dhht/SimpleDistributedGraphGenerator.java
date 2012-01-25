@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralabtest.dhht;
 
 import java.rmi.RemoteException;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseElementaryMethods;

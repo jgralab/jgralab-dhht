@@ -14,11 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.impl.db.DerbyStatementList;
-import de.uni_koblenz.jgralab.impl.db.MySqlStatementList;
-import de.uni_koblenz.jgralab.impl.db.PostgreSqlStatementList;
-import de.uni_koblenz.jgralab.impl.db.SqlStatementList;
-
 public class SQLConstantExtractor {
 
 	private static final String EMPTY = "null";

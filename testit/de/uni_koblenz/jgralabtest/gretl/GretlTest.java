@@ -35,6 +35,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.smartcardio.Card;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -62,43 +64,6 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.utilities.schemacompare.SchemaCompare;
 import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
 import de.uni_koblenz.jgralab.utilities.tg2dot.dot.GraphVizOutputFormat;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBook;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBookGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.AddressBookSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.addressbook.Contact;
-import de.uni_koblenz.jgralabtest.schemas.gretl.bedsl.BedslGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.bedsl.BedslSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.bedsl.Entity;
-import de.uni_koblenz.jgralabtest.schemas.gretl.bedsl.ReferenceAttribute;
-import de.uni_koblenz.jgralabtest.schemas.gretl.bedsl.SimpleAttribute;
-import de.uni_koblenz.jgralabtest.schemas.gretl.copy.CopyGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.copy.CopySchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.copy.Part;
-import de.uni_koblenz.jgralabtest.schemas.gretl.copy.Whole;
-import de.uni_koblenz.jgralabtest.schemas.gretl.copy.WholePart;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.Family;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.FamilyGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.FamilySchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.HasFather;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.HasMother;
-import de.uni_koblenz.jgralabtest.schemas.gretl.families.Member;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.Card;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.Chassis;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.Configuration;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.PddslGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.PddslSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.pddsl.Slot;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.BasicService;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.ComposedService;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.Database;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.ProcessService;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.ServiceGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.services.ServiceSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.varro.UMLGraph;
-import de.uni_koblenz.jgralabtest.schemas.gretl.varro.UMLSchema;
-import de.uni_koblenz.jgralabtest.schemas.gretl.varro.uml.Assoc;
-import de.uni_koblenz.jgralabtest.schemas.gretl.varro.uml.AssocEnd;
-import de.uni_koblenz.jgralabtest.schemas.gretl.varro.uml.Attribute;
 
 /**
  * @author Tassilo Horn <horn@uni-koblenz.de>

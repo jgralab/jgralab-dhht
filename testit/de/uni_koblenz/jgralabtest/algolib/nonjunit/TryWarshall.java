@@ -34,17 +34,12 @@
  */
 package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
+import javax.management.relation.Relation;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.reachability.WarshallAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.BinaryFunction;
-import de.uni_koblenz.jgralab.algolib.functions.IntFunction;
-import de.uni_koblenz.jgralab.algolib.functions.Relation;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleSchema;
-import de.uni_koblenz.jgralabtest.schemas.algolib.simple.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 @SuppressWarnings("unused")
 public class TryWarshall {

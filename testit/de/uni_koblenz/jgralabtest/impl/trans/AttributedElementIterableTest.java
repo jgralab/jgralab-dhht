@@ -43,6 +43,7 @@ import org.junit.Test;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 //import junit.framework.JUnit4TestAdapter;
 

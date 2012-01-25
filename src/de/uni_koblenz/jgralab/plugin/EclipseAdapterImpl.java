@@ -43,8 +43,7 @@ import java.util.ArrayList;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 
-import org.eclipse.core.runtime.FileLocator;
-import org.osgi.framework.Version;
+import com.sun.tools.corba.se.idl.som.cff.FileLocator;
 
 import de.uni_koblenz.jgralab.EclipseAdapter;
 import de.uni_koblenz.jgralab.schema.impl.compilation.ClassFileObject;

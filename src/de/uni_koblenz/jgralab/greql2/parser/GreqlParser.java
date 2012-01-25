@@ -42,15 +42,18 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.tools.ant.types.Quantifier;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
 
 import com.sun.mirror.declaration.Declaration;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
-import de.uni_koblenz.jgralab.greql2.funlib.IsSubPathOf;
+import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.Definition;
 
 public class GreqlParser extends ParserHelper {
 	private Map<RuleEnum, int[]> testedRules = new HashMap<RuleEnum, int[]>();

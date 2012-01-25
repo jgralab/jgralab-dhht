@@ -6,20 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.BreadthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.DepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.search.RecursiveDepthFirstSearch;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.DijkstraAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.adapters.MethodCallToDoubleFunctionAdapter;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabase;
-import de.uni_koblenz.jgralab.impl.db.GraphDatabaseException;
 import de.uni_koblenz.jgralabtest.algolib.nonjunit.RandomGraphForAStar;
 import de.uni_koblenz.jgralabtest.algolib.nonjunit.Stopwatch;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Location;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Way;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedSchema;
 
 public class GraphDbPerformance {
 

@@ -1,9 +1,5 @@
 package de.uni_koblenz.jgralabtest.eca.useractions;
 
-import de.uni_koblenz.jgralab.eca.Action;
-import de.uni_koblenz.jgralab.eca.events.ChangeAttributeEvent;
-import de.uni_koblenz.jgralab.eca.events.Event;
-import de.uni_koblenz.jgralab.eca.events.EventDescription;
 
 public class PrintNewAndOldAttributeValueAction implements Action {
 

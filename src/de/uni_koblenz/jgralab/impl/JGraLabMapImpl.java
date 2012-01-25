@@ -33,9 +33,6 @@ package de.uni_koblenz.jgralab.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uni_koblenz.jgralab.JGraLabCloneable;
-import de.uni_koblenz.jgralab.JGraLabMap;
-
 /**
  * 
  * @author

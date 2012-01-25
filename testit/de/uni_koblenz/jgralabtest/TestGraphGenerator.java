@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralabtest;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.greql2.funlib.collections.Intersection;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 
 /**

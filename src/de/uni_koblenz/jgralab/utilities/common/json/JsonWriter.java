@@ -37,12 +37,7 @@ package de.uni_koblenz.jgralab.utilities.common.json;
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonEncoding;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonGenerator.Feature;
-import org.codehaus.jackson.JsonParseException;
+import de.uni_koblenz.jgralabtest.dhht.schema.Feature;
 
 /**
  * JsonWriter provides several convenience methods to write a Json-file.

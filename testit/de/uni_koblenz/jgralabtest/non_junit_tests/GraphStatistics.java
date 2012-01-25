@@ -10,7 +10,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
-import de.uni_koblenz.jgralab.schema.NamedElement;
 
 public class GraphStatistics {
 	static Map<NamedElement, Integer> counters = new HashMap<NamedElement, Integer>();

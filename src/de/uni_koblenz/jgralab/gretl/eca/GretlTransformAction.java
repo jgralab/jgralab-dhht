@@ -5,8 +5,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.eca.Action;
-import de.uni_koblenz.jgralab.eca.events.Event;
 import de.uni_koblenz.jgralab.gretl.Context;
 import de.uni_koblenz.jgralab.gretl.Transformation;
 

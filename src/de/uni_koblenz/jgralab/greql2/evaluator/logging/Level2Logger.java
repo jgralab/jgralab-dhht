@@ -40,11 +40,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 

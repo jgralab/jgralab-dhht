@@ -1,9 +1,6 @@
 package de.uni_koblenz.jgralabtest.eca.useractions;
 
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.eca.Action;
-import de.uni_koblenz.jgralab.eca.events.CreateVertexEvent;
-import de.uni_koblenz.jgralab.eca.events.Event;
 
 public class CreateAVertexOfSameTypeAction implements Action {
 

@@ -33,6 +33,7 @@ package de.uni_koblenz.jgralabtest.impl.trans;
 import java.util.Map;
 
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.trans.CommitFailedException;
 
 public class TryNullValueForMapDomain {
 

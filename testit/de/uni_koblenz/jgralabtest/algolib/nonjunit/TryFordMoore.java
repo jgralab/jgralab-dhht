@@ -38,19 +38,6 @@ import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.algolib.algorithms.AlgorithmTerminatedException;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.FloydAlgorithm;
-import de.uni_koblenz.jgralab.algolib.algorithms.shortest_paths.FordMooreAlgorithm;
-import de.uni_koblenz.jgralab.algolib.functions.BinaryDoubleFunction;
-import de.uni_koblenz.jgralab.algolib.functions.BinaryFunction;
-import de.uni_koblenz.jgralab.algolib.functions.DoubleFunction;
-import de.uni_koblenz.jgralab.algolib.functions.Function;
-import de.uni_koblenz.jgralab.graphmarker.ArrayVertexMarker;
-import de.uni_koblenz.jgralab.graphmarker.DoubleEdgeMarker;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Location;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.Way;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedGraph;
-import de.uni_koblenz.jgralabtest.schemas.algolib.weighted.WeightedSchema;
 
 @SuppressWarnings("unused")
 public class TryFordMoore {
