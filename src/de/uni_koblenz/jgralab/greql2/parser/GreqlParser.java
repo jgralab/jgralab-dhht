@@ -73,6 +73,7 @@ public class GreqlParser extends ParserHelper {
 	private boolean predicateFulfilled = true;
 
 	private Greql2Schema schema = null;
+	
 	private Set<String> subQueryNames = null;
 
 	/**

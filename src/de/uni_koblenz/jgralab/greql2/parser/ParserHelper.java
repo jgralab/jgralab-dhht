@@ -3,33 +3,29 @@
  *
  * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
- *                         ist@uni-koblenz.de *
+ *                         ist@uni-koblenz.de
+ *
  * For bug reports, documentation and further information, visit
  *
  *                         http://jgralab.uni-koblenz.de
  *
-
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied w *
-nty of
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
- * with this program; if not, see <http://www. *
-org/licenses>.
- * 
+ * with this program; if not, see <http://www.gnu.org/licenses>.
+ *
  * Additional permission under GNU GPL version 3 section 7
- * 
- * If you modify this Program, or any covered work, by li *
-g or combining
- * it with Eclipse (or a modified version o *
-at program or an Eclipse
+ *
+ * If you modify this Program, or any covered work, by linking or combining
+ * it with Eclipse (or a modified version of that program or an Eclipse
  * plugin), containing parts covered by the terms of the Eclipse Public
  * License (EPL), the licensors of this Program grant you additional
  * permission to convey the resulting work.  Corresponding Source for a
@@ -47,15 +43,60 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import com.sun.mirror.declaration.Declaration;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
-import deimport de.uni_koblenz.jgralab.JGraLab;
-.uni_koblenz.jgralab.greql2.exception.ParsingException;
+import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.exception.UndefinedVariableException;
-import de.uni_koblenz.jgralab.greql2.funlib.Greql2FunctionLibrary;
+import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
+import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.Definition;
+import de.uni_koblenz.jgralab.greql2.schema.DefinitionExpression;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundExprOfQuantifier;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsColumnHeaderExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDefinitionOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsKeyExprOfComprehension;
+import de.uni_koblenz.jgralab.greql2.schema.IsQuantifiedDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsQueryExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsRowHeaderExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfComprehension;
+import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
+import de.uni_koblenz.jgralab.greql2.schema.MapComprehension;
+import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.QuantifiedExpression;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
+import de.uni_koblenz.jgralab.greql2.schema.TableComprehension;
+import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
+import de.uni_koblenz.jgralab.greql2.schema.ThisLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
+import de.uni_koblenz.jgralab.greql2.schema.WhereExpression;
 
 public abstract class ParserHelper {
 
@@ -67,17 +108,21 @@ public abstract class ParserHelper {
 
 	protected SymbolTable afterParsingvariableSymbolTable = null;
 
-	protected EasySymbolTable duringParsingvariableSymbolTable = null;
+	protected SimpleSymbolTable duringParsingvariableSymbolTable = null;
 
 	protected Map<String, FunctionId> functionSymbolTable = null;
 
-	protected boolean graphClea	protected SimpleSymbolTable duringParsingvariableSymbolTable = null;
-ected Token lookAhead = null;
+	protected boolean graphCleaned = false;
+
+	protected FunLib funlib = null;
+
+	protected Token lookAhead = null;
 
 	protected abstract boolean inPredicateMode();
 
-	protected final int getCurren	protected FunLib funlib = null;
- lookAhead.getOffset();
+	protected final int getCurrentOffset() {
+		if (lookAhead != null) {
+			return lookAhead.getOffset();
 		}
 		return query.length();
 	}
@@ -94,19 +139,19 @@ ected Token lookAhead = null;
 		if (pathDescr == null) {
 			pathDescr = graph.createVertex(vc);
 			edge = (Greql2Aggregation) graph.createEdge(ec, part1, pathDescr);
-			edge.set_sourcePositions((createSourcePositionList(lengthPart1,
-					offsetPart1)));
-		}
-		edge = (Greql2Aggregation) graph.createEdge(ec, part2,			edge.set_sourcePositions(createSourcePositionList(lengthPart1,
+			edge.set_sourcePositions(createSourcePositionList(lengthPart1,
 					offsetPart1));
-tPart2)));
+		}
+		edge = (Greql2Aggregation) graph.createEdge(ec, part2, pathDescr);
+		edge.set_sourcePositions(createSourcePositionList(lengthPart2,
+				offsetPart2));
 		return pathDescr;
 	}
 
 	/**
-	 * Returns the abstract syntax		edge.set_sourcePositions(createSourcePositionList(lengthPart2,
-				offsetPart2));
- query
+	 * Returns the abstract syntax graph for the input
+	 * 
+	 * @return the abstract syntax graph representing a GReQL 2 query
 	 */
 	public Greql2 getGraph() {
 		if (graph == null) {
@@ -124,16 +169,18 @@ tPart2)));
 			queue.add(root);
 			while (!queue.isEmpty()) {
 				Vertex current = queue.poll();
-				for (Edge e : current.incidences()) {
-					if (!reachableVertices.contains(e.getThat())) {
-						queue.add(e.getThat());
-						reachableVert				if (current != null) {
+				if (current != null) {
 					for (Edge e : current.incidences()) {
 						if (!reachableVertices.contains(e.getThat())) {
 							queue.add(e.getThat());
 							reachableVertices.add(e.getThat());
 						}
-eleteCandidate))) {
+					}
+				}
+			}
+			Vertex deleteCandidate = graph.getFirstVertex();
+			while ((deleteCandidate != null)
+					&& (!reachableVertices.contains(deleteCandidate))) {
 				deleteCandidate.delete();
 				deleteCandidate = graph.getFirstVertex();
 			}
@@ -151,10 +198,10 @@ eleteCandidate))) {
 		}
 	}
 
-	private void replaceDefinitionExpressions()
+	protected void replaceDefinitionExpressions()
 			throws DuplicateVariableException, UndefinedVariableException {
-		List<DefinitionExpression> list = new ArrayList<DefinitionExpression>	protected void replaceDefinitionExpressions()
-etDefinitionExpressionVertices()) {
+		List<DefinitionExpression> list = new ArrayList<DefinitionExpression>();
+		for (DefinitionExpression exp : graph.getDefinitionExpressionVertices()) {
 			list.add(exp);
 		}
 
@@ -163,13 +210,14 @@ etDefinitionExpressionVertices()) {
 			List<Definition> defList = new ArrayList<Definition>();
 			for (IsDefinitionOf isDefOf : exp
 					.getIsDefinitionOfIncidences(EdgeDirection.IN)) {
-				Definition definition = (Definition) isDefOf.getAlpha();
+				Definition definition = isDefOf.getAlpha();
 				defList.add(definition);
 			}
 			/*
 			 * if the current DefinitionExpression is a whereExpression, revert
-			 * the lis				Definition definition = isDefOf.getAlpha();
-) {
+			 * the list of definitions
+			 */
+			if (exp instanceof WhereExpression) {
 				Collections.reverse(defList);
 			}
 
@@ -179,22 +227,23 @@ etDefinitionExpressionVertices()) {
 						.getFirstIsExprOfIncidence(EdgeDirection.IN);
 				IsVarOf isVarOf = definition
 						.getFirstIsVarOfIncidence(EdgeDirection.IN);
-				Expression expr = (Expression) isExprOf.getAlpha();
-				Variable variable = (Variable) isVarOf.getAlpha();
+				Expression expr = isExprOf.getAlpha();
+				Variable variable = isVarOf.getAlpha();
 				isVarOf.delete();
 				isExprOf.delete();
-				Edge e = var				Expression expr = isExprOf.getAlpha();
-				Variable variable = isVarOf.getAlpha();
-tFirstIncidence(EdgeDirection.OUT);
+				Edge e = variable.getFirstIncidence(EdgeDirection.OUT);
+				while (e != null) {
+					e.setAlpha(expr);
+					e = variable.getFirstIncidence(EdgeDirection.OUT);
 				}
 				variable.delete();
 			}
-			Expression boundExpr = (Expression) exp
-					.getFirstIsBoundExprOfIncidence(EdgeDirection.IN)
-					.getAlpha();
-			Edge e = exp.getFirstIncidenc			Expression boundExpr = exp.getFirstIsBoundExprOfIncidence(
+			Expression boundExpr = exp.getFirstIsBoundExprOfIncidence(
 					EdgeDirection.IN).getAlpha();
-OUT);
+			Edge e = exp.getFirstIncidence(EdgeDirection.OUT);
+			while (e != null) {
+				e.setAlpha(boundExpr);
+				e = exp.getFirstIncidence(EdgeDirection.OUT);
 			}
 			exp.delete();
 		}
@@ -262,15 +311,15 @@ OUT);
 				incidenceList.add(inc);
 			}
 			for (Edge e : incidenceList) {
-				mergeVariables(e.getAlpha(), separateScope);
+		//		System.out.println("Merging variables of " + e.getAlpha().getSchemaClass().getName());
+				mergeVariables(e.getAlpha(), true);
 			}
 		}
 	}
 
 	/**
-	 * Inserts variable-vertices that are declared in the <code>u		//		System.out.println("Merging variables of " + e.getAlpha().getSchemaClass().getName());
-				mergeVariables(e.getAlpha(), true);
- table and merges variables within the
+	 * Inserts variable-vertices that are declared in the <code>using</code>
+	 * -clause into the variables symbol table and merges variables within the
 	 * query-expression.
 	 * 
 	 * @param root
@@ -282,13 +331,13 @@ OUT);
 		for (IsBoundVarOf isBoundVarOf : root
 				.getIsBoundVarOfIncidences(EdgeDirection.IN)) {
 			afterParsingvariableSymbolTable.insert(
-					((Variable) isBoundVarOf.getAlpha()).get_name(),
+					(isBoundVarOf.getAlpha()).get_name(),
 					isBoundVarOf.getAlpha());
 		}
 		IsQueryExprOf isQueryExprOf = root
 				.getFirstIsQueryExprOfIncidence(EdgeDirection.IN);
-		mergeVariables(isQueryExprOf.g					(isBoundVarOf.getAlpha()).get_name(),
-ockEnd();
+		mergeVariables(isQueryExprOf.getAlpha(), true);
+		afterParsingvariableSymbolTable.blockEnd();
 	}
 
 	/**
@@ -307,23 +356,30 @@ ockEnd();
 		}
 		for (IsDefinitionOf currentEdge : v
 				.getIsDefinitionOfIncidences(EdgeDirection.IN)) {
-			Definition definition = (Definition) currentEdge.getAlpha();
-			Variable variable = (Variable) definition.getFirstIsVarOfIncidence(
-					EdgeDirection.IN).getAlpha();
-			afterParsingvariableSymbolTab			Definition definition = currentEdge.getAlpha();
+			Definition definition = currentEdge.getAlpha();
 			Variable variable = definition.getFirstIsVarOfIncidence(
-.IN);
+					EdgeDirection.IN).getAlpha();
+			afterParsingvariableSymbolTable.insert(variable.get_name(),
+					variable);
+		}
+		Edge isBoundExprOf = v
+				.getFirstIsBoundExprOfDefinitionIncidence(EdgeDirection.IN);
 		mergeVariables(isBoundExprOf.getAlpha(), false);
 		for (IsDefinitionOf currentEdge : v
 				.getIsDefinitionOfIncidences(EdgeDirection.IN)) {
-			Definition definition = (Definition) currentEdge.getAlpha();
-			Expression expr = (Expression) definition
-					.getFirstIsExprOfIncidence(EdgeDirection.IN).getAlpha();
-			merg			Definition definition = currentEdge.getAlpha();
+			Definition definition = currentEdge.getAlpha();
 			Expression expr = definition.getFirstIsExprOfIncidence(
 					EdgeDirection.IN).getAlpha();
-a simple 
-query or
+			mergeVariables(expr, true);
+		}
+
+		if (separateScope) {
+			afterParsingvariableSymbolTable.blockEnd();
+		}
+	}
+
+	/**
+	 * Inserts variables that are declared in a declaration of a simple query or
 	 * a quantified expression into the symbol-table and merges variables that
 	 * are used in these declaration (in typeexpressions, constraints, or
 	 * subgraphs)
@@ -335,21 +391,25 @@ query or
 			throws DuplicateVariableException, UndefinedVariableException {
 		for (IsSimpleDeclOf currentEdge : v
 				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
-			SimpleDeclaration simpleDecl = (SimpleDeclaration) currentEdge
-					.getAlpha();
+			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
 			for (IsDeclaredVarOf isDeclaredVarOf : simpleDecl
-					.getIsDecla			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
-dVarOf.getAlpha();
-				afterParsingvariableSymbolTable.insert(variable.get_name(),
+					.getIsDeclaredVarOfIncidences(EdgeDirection.IN)) {
 				Variable variable = isDeclaredVarOf.getAlpha();
-v
+				afterParsingvariableSymbolTable.insert(variable.get_name(),
+						variable);
+			}
+		}
+
+		for (IsSimpleDeclOf currentEdge : v
 				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
-			SimpleDeclaration simpleDecl = (SimpleDeclaration) currentEdge
-					.getAlpha();
-			Expression expr = (Expression			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
+			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
 			Expression expr = simpleDecl.getFirstIsTypeExprOfIncidence(
 					EdgeDirection.IN).getAlpha();
-eDirection.IN)) {
+			mergeVariables(expr, true);
+		}
+
+		for (IsConstraintOf isConstraintOf : v
+				.getIsConstraintOfIncidences(EdgeDirection.IN)) {
 			mergeVariables(isConstraintOf.getAlpha(), true);
 		}
 	}
@@ -368,9 +428,9 @@ eDirection.IN)) {
 		if (separateScope) {
 			afterParsingvariableSymbolTable.blockBegin();
 		}
-		IsQuantified		mergeVariablesInDeclaration(isQuantifiedDeclOf.getAlpha());
-irection.IN);
-		mergeVariablesInDeclaration((Declaration) isQuantifiedDeclOf.getAlpha());
+		IsQuantifiedDeclOf isQuantifiedDeclOf = v
+				.getFirstIsQuantifiedDeclOfIncidence(EdgeDirection.IN);
+		mergeVariablesInDeclaration(isQuantifiedDeclOf.getAlpha());
 		IsBoundExprOfQuantifier isBoundExprOfQuantifier = v
 				.getFirstIsBoundExprOfQuantifierIncidence(EdgeDirection.IN);
 		mergeVariables(isBoundExprOfQuantifier.getAlpha(), true);
@@ -380,11 +440,11 @@ irection.IN);
 	}
 
 	/**
-	 * Inserts declared variable-vertices into the variables s	 *            contains a set- or a list-comprehension
-hension result and tableheaders
+	 * Inserts declared variable-vertices into the variables symbol table and
+	 * merges variables within the comprehension result and tableheaders
 	 * 
 	 * @param v
-	 *            contains a set- or a bag-comprehension
+	 *            contains a set- or a list-comprehension
 	 */
 	private void mergeVariablesInComprehension(Comprehension v,
 			boolean separateScope) throws DuplicateVariableException,
@@ -395,16 +455,17 @@ hension result and tableheaders
 		Edge IsCompDeclOf = v.getFirstIsCompDeclOfIncidence(EdgeDirection.IN);
 		mergeVariablesInDeclaration((Declaration) IsCompDeclOf.getAlpha());
 		Edge isCompResultDefOf = v
-				.getFirstIsCompResultDefOfIncidence(EdgeDi			// merge variables in table-headers if it's a list-comprehension
+				.getFirstIsCompResultDefOfIncidence(EdgeDirection.IN);
+		if (isCompResultDefOf != null) {
+			mergeVariables(isCompResultDefOf.getAlpha(), true);
+			// merge variables in table-headers if it's a list-comprehension
 			if (v instanceof ListComprehension) {
-/ merge variables in table-headers if it's a bag-comprehension
-			if (v instanceof BagComprehension) {
 				IsTableHeaderOf isTableHeaderOf = v
 						.getFirstIsTableHeaderOfIncidence(EdgeDirection.IN);
-				while (isTableHeaderOf != n							.getNextIsTableHeaderOfIncidence(EdgeDirection.IN);
-a(), true);
+				while (isTableHeaderOf != null) {
+					mergeVariables(isTableHeaderOf.getAlpha(), true);
 					isTableHeaderOf = isTableHeaderOf
-							.getNextIsTableHeaderOf(EdgeDirection.IN);
+							.getNextIsTableHeaderOfIncidence(EdgeDirection.IN);
 				}
 			}
 			if (v instanceof TableComprehension) {
@@ -475,10 +536,10 @@ a(), true);
 			offsetOperator = getCurrentOffset();
 		}
 
-		public void postOp(Stri			operatorName = op;
-= getLength(offsetOperator);
+		public void postOp(String op) {
+			lengthOperator = getLength(offsetOperator);
 			offsetArg2 = getCurrentOffset();
-			this.operatorName = op;
+			operatorName = op;
 		}
 
 		public FunctionApplication postArg2(Expression arg2) {
@@ -513,19 +574,23 @@ a(), true);
 		IsFunctionIdOf functionIdOf = graph
 				.createIsFunctionIdOf(functionId, fa);
 		functionIdOf.set_sourcePositions((createSourcePositionList(
-				lengthOperator, offsetOperator))			arg1Of.set_sourcePositions(createSourcePositionList(lengthArg1,
+				lengthOperator, offsetOperator)));
+		IsArgumentOf arg1Of = null;
+		if (binary) {
+			arg1Of = graph.createIsArgumentOf(arg1, fa);
+			arg1Of.set_sourcePositions(createSourcePositionList(lengthArg1,
 					offsetArg1));
-g1, fa);
-			arg1Of.set_sourcePositions((createSourcePositionLi		arg2Of.set_sourcePositions(createSourcePositionList(lengthArg2,
+		}
+		IsArgumentOf arg2Of = graph.createIsArgumentOf(arg2, fa);
+		arg2Of.set_sourcePositions(createSourcePositionList(lengthArg2,
 				offsetArg2));
-f(arg2, fa);
-			protected final PVector<SourcePosition> createSourcePositionList(
+		return fa;
+	}
+
+	protected final PVector<SourcePosition> createSourcePositionList(
 			int length, int offset) {
 		PVector<SourcePosition> list = JGraLab.vector();
 		return list.plus(new SourcePosition(length, offset));
- ArrayList<SourcePosition>();
-		list.add(graph.createSourcePosition(length, offset));
-		return list;
 	}
 
 	/**
@@ -546,11 +611,10 @@ f(arg2, fa);
 				queue.add(vertex);
 				while (!queue.isEmpty()) {
 					Greql2Vertex currentVertex = queue.poll();
-											.getSchemaClass())) {
-Vertex
+					for (Edge edge : currentVertex
 							.incidences(EdgeDirection.OUT)) {
 						if (allowedEdgesForThisVertex.contains(edge
-								.getM1Class())) {
+								.getSchemaClass())) {
 							continue;
 						}
 						Greql2Vertex omega = (Greql2Vertex) edge.getOmega();
@@ -576,11 +640,11 @@ Vertex
 				Queue<Greql2Vertex> queue = new LinkedList<Greql2Vertex>();
 				queue.add(vertex);
 				while (!queue.isEmpty()) {
-											if (allowedEdgesForThisEdge.contains(edge
-								.getSchemaClass())) {
-currentVertex
+					Greql2Vertex currentVertex = queue.poll();
+					for (Edge edge : currentVertex
 							.incidences(EdgeDirection.OUT)) {
-						if (allowedEdgesForThisEdge.contains(edge.getM1Class())) {
+						if (allowedEdgesForThisEdge.contains(edge
+								.getSchemaClass())) {
 							continue;
 						}
 						Greql2Vertex omega = (Greql2Vertex) edge.getOmega();

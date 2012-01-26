@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.pcollections.PMap;
+import org.pcollections.PVector;
+
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -814,7 +817,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *            the class for the generic type of the list
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList();
+	public <T> PVector<T> createList();
 
 	/**
 	 * 
@@ -825,7 +828,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection);
+	public <T> PVector<T> createList(Collection<? extends T> collection);
 
 	/**
 	 * 
@@ -836,7 +839,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabList<T> createList(int initialCapacity);
+	public <T> PVector<T> createList(int initialCapacity);
 
 	/**
 	 * 
@@ -846,7 +849,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *            the class for the generic type of the set
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet();
+	public <T> PVector<T> createSet();
 
 	/**
 	 * 
@@ -857,7 +860,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param collection
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection);
+	public <T> PVector<T> createSet(Collection<? extends T> collection);
 
 	/**
 	 * 
@@ -868,7 +871,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity);
+	public <T> PVector<T> createSet(int initialCapacity);
 
 	/**
 	 * 
@@ -880,7 +883,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param loadFactor
 	 * @return
 	 */
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor);
+	public <T> PVector<T> createSet(int initialCapacity, float loadFactor);
 
 	/**
 	 * 
@@ -894,7 +897,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 *            the class for the generic type of the value
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap();
+	public <K, V> PMap<K, V> createMap();
 
 	/**
 	 * 
@@ -909,7 +912,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param map
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map);
+	public <K, V>PMap<K, V> createMap(Map<? extends K, ? extends V> map);
 
 	/**
 	 * 
@@ -920,7 +923,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param initialCapacity
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity);
+	public <K, V> PMap<K, V> createMap(int initialCapacity);
 
 	/**
 	 * 
@@ -936,7 +939,7 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param loadFactor
 	 * @return
 	 */
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity, float loadFactor);
+	public <K, V> PMap<K, V> createMap(int initialCapacity, float loadFactor);
 
 	/**
 	 * Generic creation of records.

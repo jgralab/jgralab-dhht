@@ -91,6 +91,8 @@ import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
+import de.uni_koblenz.jgralab.schema.impl.compilation.ClassFileManager;
+import de.uni_koblenz.jgralab.schema.impl.compilation.SchemaClassManager;
 
 /**
  * class for loading and storing schema and graphs in tg format
@@ -1388,7 +1390,7 @@ public class GraphIO {
 			io.tgfile();
 			String schemaQName = io.schema.getQualifiedName();
 			Class<?> schemaClass = Class.forName(schemaQName, true,
-					M1ClassManager.instance(schemaQName));
+					SchemaClassManager.instance(schemaQName));
 			Method instanceMethod = schemaClass.getMethod("instance",
 					(Class<?>[]) null);
 			io.schema = (Schema) instanceMethod.invoke(null, new Object[0]);
