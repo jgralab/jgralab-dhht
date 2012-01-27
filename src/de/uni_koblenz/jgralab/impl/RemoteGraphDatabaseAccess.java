@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.pcollections.PMap;
+import org.pcollections.POrderedSet;
+import org.pcollections.PVector;
+
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Record;
 
@@ -397,39 +401,15 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	 * =====================================================================
 	 */
 
-	public <T> JGraLabList<T> createList() throws RemoteException;
+	public <T> PVector<T> createList() throws RemoteException;
 
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection)
-			throws RemoteException;
 
-	public <T> JGraLabList<T> createList(int initialCapacity)
-			throws RemoteException;
+	public <K, V> PMap<K, V> createMap() throws RemoteException;
 
-	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor)
-			throws RemoteException;
+	
+	public <T> POrderedSet<T> createSet() throws RemoteException;
 
-	public <K, V> JGraLabMap<K, V> createMap() throws RemoteException;
-
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity)
-			throws RemoteException;
-
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) throws RemoteException;
-
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map)
-			throws RemoteException;
-
-	public <T> JGraLabSet<T> createSet() throws RemoteException;
-
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection)
-			throws RemoteException;
-
-	public <T> JGraLabSet<T> createSet(int initialCapacity)
-			throws RemoteException;
-
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor)
-			throws RemoteException;
-
+	
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) throws RemoteException;
 

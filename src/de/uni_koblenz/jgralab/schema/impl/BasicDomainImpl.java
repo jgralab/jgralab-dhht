@@ -48,9 +48,17 @@ public abstract class BasicDomainImpl extends DomainImpl implements BasicDomain 
 	public boolean isComposite() {
 		return false;
 	}
+	
+	@Override
+	public boolean isPrimitive() {
+		return true;
+	}
 
 	public static final boolean isBasicDomain(String domainName) {
 		return BASIC_DOMAINS.contains(domainName);
 	}
+	
+
+
 
 }

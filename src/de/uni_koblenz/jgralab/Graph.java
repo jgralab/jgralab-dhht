@@ -32,13 +32,13 @@
 package de.uni_koblenz.jgralab;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import org.pcollections.PMap;
+import org.pcollections.PSet;
 import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
@@ -824,66 +824,10 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @param <T>
 	 *            the generic type
 	 * @param cls
-	 *            the class for the generic type of the list
-	 * @param collection
-	 * @return
-	 */
-	public <T> PVector<T> createList(Collection<? extends T> collection);
-
-	/**
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param cls
-	 *            the class for the generic type of the list
-	 * @param initialCapacity
-	 * @return
-	 */
-	public <T> PVector<T> createList(int initialCapacity);
-
-	/**
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param cls
 	 *            the class for the generic type of the set
 	 * @return
 	 */
-	public <T> PVector<T> createSet();
-
-	/**
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param cls
-	 *            the class for the generic type of the set
-	 * @param collection
-	 * @return
-	 */
-	public <T> PVector<T> createSet(Collection<? extends T> collection);
-
-	/**
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param cls
-	 *            the class for the generic type of the set
-	 * @param initialCapacity
-	 * @return
-	 */
-	public <T> PVector<T> createSet(int initialCapacity);
-
-	/**
-	 * 
-	 * @param <T>
-	 *            the generic type
-	 * @param cls
-	 *            the class for the generic type of the set
-	 * @param initialCapacity
-	 * @param loadFactor
-	 * @return
-	 */
-	public <T> PVector<T> createSet(int initialCapacity, float loadFactor);
+	public <T> PSet<T> createSet();
 
 	/**
 	 * 
@@ -898,48 +842,6 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 * @return
 	 */
 	public <K, V> PMap<K, V> createMap();
-
-	/**
-	 * 
-	 * @param <K>
-	 *            the generic type for the key
-	 * @param <V>
-	 *            the generic type for the value
-	 * @param key
-	 *            the class for the generic type of the key
-	 * @param value
-	 *            the class for the generic type of the value
-	 * @param map
-	 * @return
-	 */
-	public <K, V>PMap<K, V> createMap(Map<? extends K, ? extends V> map);
-
-	/**
-	 * 
-	 * @param key
-	 *            the class for the generic type of the key
-	 * @param value
-	 *            the class for the generic type of the value
-	 * @param initialCapacity
-	 * @return
-	 */
-	public <K, V> PMap<K, V> createMap(int initialCapacity);
-
-	/**
-	 * 
-	 * @param <K>
-	 *            the generic type for the key
-	 * @param <V>
-	 *            the generic type for the value
-	 * @param key
-	 *            the class for the generic type of the key
-	 * @param value
-	 *            the class for the generic type of the value
-	 * @param initialCapacity
-	 * @param loadFactor
-	 * @return
-	 */
-	public <K, V> PMap<K, V> createMap(int initialCapacity, float loadFactor);
 
 	/**
 	 * Generic creation of records.

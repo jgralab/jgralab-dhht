@@ -81,6 +81,11 @@ public interface Domain extends NamedElementClass {
 	 * @return true if this domain is a composite domain
 	 */
 	public boolean isComposite();
+	
+	/**
+	 * @return true if this domain is a primitive domain
+	 */
+	public boolean isPrimitive();
 
 	
 	/**

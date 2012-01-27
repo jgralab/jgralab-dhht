@@ -31,8 +31,11 @@
 
 package de.uni_koblenz.jgralab.schema.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.pcollections.ArrayPVector;
+import org.pcollections.Empty;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.codegenerator.CodeBlock;
 import de.uni_koblenz.jgralab.codegenerator.CodeSnippet;
@@ -45,7 +48,7 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 	/**
 	 * holds a list of the components of the enumeration
 	 */
-	private final List<String> constants = new ArrayList<String>();
+	private final PVector<String> constants = Empty.vector();
 
 	/**
 	 * @param qn
@@ -74,7 +77,7 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 	}
 
 	@Override
-	public List<String> getConsts() {
+	public PVector<String> getConsts() {
 		return constants;
 	}
 
@@ -138,22 +141,16 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 		return output.toString();
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof EnumDomain) {
-			EnumDomain other = (EnumDomain) o;
-			if (!getSchema().getQualifiedName().equals(
-					other.getSchema().getQualifiedName())) {
-				return false;
-			}
-			return getQualifiedName().equals(other.getQualifiedName())
-					&& getConsts().equals(other.getConsts());
-		}
-		return false;
-	}
 
 	@Override
 	public String getInitialValue() {
 		return "null";
 	}
+
+	@Override
+	public boolean isPrimitive() {
+		return false;
+	}
+
+
 }

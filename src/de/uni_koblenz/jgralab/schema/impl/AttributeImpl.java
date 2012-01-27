@@ -171,18 +171,10 @@ public class AttributeImpl implements Attribute, Comparable<Attribute> {
 			if (defaultValueAsString != null) {
 				element.readAttributeValueFromString(name, defaultValueAsString);
 			}
-
 			defaultValue = element.getAttribute(name);
 			defaultValueComputed = true;
 		} else {
-			Object cloneOfDefaultValue = null;
-
-			if (defaultValue instanceof JGraLabCloneable) {
-				cloneOfDefaultValue = ((JGraLabCloneable) defaultValue).clone();
-			} else {
-				cloneOfDefaultValue = defaultValue;
-			}
-			element.setAttribute(name, cloneOfDefaultValue);
+			element.setAttribute(name, defaultValue);
 		}
 	}
 }

@@ -12,6 +12,8 @@ import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.exception.InheritanceException;
+import de.uni_koblenz.jgralab.schema.exception.SchemaClassAccessException;
+import de.uni_koblenz.jgralab.schema.impl.compilation.SchemaClassManager;
 
 public abstract class TypedElementClassImpl
 	<ConcreteMetaClass extends TypedElementClass<ConcreteMetaClass, ConcreteInterface>,
@@ -106,10 +108,10 @@ public abstract class TypedElementClassImpl
 					+ getQualifiedName();
 			try {
 				m1Class = (Class<? extends ConcreteInterface>) Class
-						.forName(m1ClassName, true, M1ClassManager
+						.forName(m1ClassName, true, SchemaClassManager
 								.instance(getSchema().getQualifiedName()));
 			} catch (ClassNotFoundException e) {
-				throw new M1ClassAccessException(
+				throw new SchemaClassAccessException(
 						"Can't load M1 class for AttributedElementClass '"
 								+ getQualifiedName() + "'", e);
 			}
@@ -121,7 +123,7 @@ public abstract class TypedElementClassImpl
 	@Override
 	public Class<? extends ConcreteInterface> getM1ImplementationClass() {
 		if (isAbstract()) {
-			throw new M1ClassAccessException(
+			throw new SchemaClassAccessException(
 					"Can't get M1 implementation class. AttributedElementClass '"
 							+ getQualifiedName() + "' is abstract!");
 		}
@@ -131,13 +133,13 @@ public abstract class TypedElementClassImpl
 				m1ImplementationClass = (Class<? extends ConcreteInterface>) f
 						.get(m1Class);
 			} catch (SecurityException e) {
-				throw new M1ClassAccessException(e);
+				throw new SchemaClassAccessException(e);
 			} catch (NoSuchFieldException e) {
-				throw new M1ClassAccessException(e);
+				throw new SchemaClassAccessException(e);
 			} catch (IllegalArgumentException e) {
-				throw new M1ClassAccessException(e);
+				throw new SchemaClassAccessException(e);
 			} catch (IllegalAccessException e) {
-				throw new M1ClassAccessException(e);
+				throw new SchemaClassAccessException(e);
 			}
 		}
 		return m1ImplementationClass;

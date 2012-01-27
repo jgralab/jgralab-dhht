@@ -57,5 +57,4 @@ public interface EnumDomain extends Domain {
 	 */
 	void addConst(String constName);
 
-	public Class<? extends Object> getSchemaClass();
 }

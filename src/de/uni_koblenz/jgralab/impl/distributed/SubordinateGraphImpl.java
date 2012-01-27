@@ -32,8 +32,11 @@ package de.uni_koblenz.jgralab.impl.distributed;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.Map;
+
+import org.pcollections.PMap;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -466,7 +469,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	
 	
 	@Override
-	public <T> JGraLabList<T> createList() {
+	public <T> PVector<T> createList() {
 		try {
 			return storingGraphDatabase.createList();
 		} catch (RemoteException e) {
@@ -474,26 +477,9 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		}
 	}
 
-	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		try {
-			return storingGraphDatabase.createList(collection);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		try {
-			return storingGraphDatabase.createList(initialCapacity);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet() {
+	public <T> PSet<T> createSet() {
 		try {
 			return storingGraphDatabase.createSet();
 		} catch (RemoteException e) {
@@ -501,35 +487,9 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		}
 	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		try {
-			return storingGraphDatabase.createSet(collection);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		try {
-			return storingGraphDatabase.createSet(initialCapacity);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		try {
-			return storingGraphDatabase.createSet(initialCapacity, loadFactor);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
+	public <K, V> PMap<K, V> createMap() {
 		try {
 			return storingGraphDatabase.createMap();
 		} catch (RemoteException e) {
@@ -537,33 +497,6 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		}
 	}
 
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		try {
-			return storingGraphDatabase.createMap(map);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		try {
-			return storingGraphDatabase.createMap(initialCapacity);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		try {
-			return storingGraphDatabase.createMap(initialCapacity, loadFactor);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {

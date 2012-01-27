@@ -1,12 +1,16 @@
 package de.uni_koblenz.jgralab.impl.distributed;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.pcollections.Empty;
+import org.pcollections.PMap;
+import org.pcollections.POrderedSet;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
@@ -20,7 +24,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.RemoteJGraLabServer;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.impl.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
@@ -1829,7 +1832,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				getGraphObject(convertToGlobalId(1)));
 		try {
 			record.readComponentValues(io);
-		} catch (GraphIOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return record;
@@ -1840,7 +1843,7 @@ public abstract class GraphDatabaseBaseImpl extends
 			Object... components) {
 		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
 				getGraphObject(convertToGlobalId(1)));
-		record.setComponentValues(components);
+		//record.setComponentValues(components);
 		return record;
 	}
 
@@ -1851,25 +1854,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		return null;
 	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet() {
-		return new JGraLabSetImpl<T>();
-	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return new JGraLabSetImpl<T>(collection);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return new JGraLabSetImpl<T>(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
-	}
 
 	public Graph createViewGraph(Graph g, int kappa) {
 		return graphFactory.createViewGraph_DistributedStorage(g, kappa);
@@ -1879,54 +1864,22 @@ public abstract class GraphDatabaseBaseImpl extends
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public <T> POrderedSet<T> createSet() {
+		return Empty.orderedSet();
+	}
+
+
 
 	@Override
-	public <T> JGraLabList<T> createList() {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> PVector<T> createList() {
+		return Empty.vector();
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity, float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public <K, V> PMap<K, V> createMap() {
+		return Empty.map();
 	}
 
 }

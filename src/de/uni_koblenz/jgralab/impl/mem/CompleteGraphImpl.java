@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.impl.mem;
 
 import java.lang.ref.WeakReference;
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +42,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.pcollections.Empty;
+import org.pcollections.PMap;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
+
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
@@ -50,14 +54,10 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.JGraLabListImpl;
-import de.uni_koblenz.jgralab.impl.JGraLabMapImpl;
-import de.uni_koblenz.jgralab.impl.JGraLabSetImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -1574,47 +1574,22 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	// ============================================================================
 
 	@Override
-	public <T> JGraLabList<T> createList() {
-		return new JGraLabListImpl<T>();
+	public <T> PVector<T> createList() {
+		return Empty.vector();
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return new JGraLabListImpl<T>(collection);
+	public <K, V> PMap<K, V> createMap() {
+		return Empty.map();
 	}
 
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return new JGraLabListImpl<T>(initialCapacity);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
-		return new JGraLabMapImpl<K, V>();
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return new JGraLabMapImpl<K, V>(initialCapacity);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		return new JGraLabMapImpl<K, V>(initialCapacity, loadFactor);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return new JGraLabMapImpl<K, V>(map);
-	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
 		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
 		try {
 			record.readComponentValues(io);
-		} catch (GraphIOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return record;
@@ -1624,7 +1599,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) {
 		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
-		record.setComponentValues(fields);
+		//record.setComponentValues(fields);
 		return record;
 	}
 
@@ -1632,28 +1607,14 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Object... components) {
 		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
-		record.setComponentValues(components);
+		//record.setComponentValues(components);
 		return record;
 	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet() {
-		return new JGraLabSetImpl<T>();
+	public <T> PSet<T> createSet() {
+		return Empty.set();
 	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return new JGraLabSetImpl<T>(collection);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return new JGraLabSetImpl<T>(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return new JGraLabSetImpl<T>(initialCapacity, loadFactor);
-	}
 
 }

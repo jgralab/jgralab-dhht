@@ -104,4 +104,10 @@ public class RecordImpl implements de.uni_koblenz.jgralab.Record {
 	public PMap<String, Object> toPMap() {
 		return entries;
 	}
+
+	@Override
+	public void readComponentValues(GraphIO io) throws IOException,
+			GraphIOException {
+		throw new UnsupportedOperationException();
+	}
 }

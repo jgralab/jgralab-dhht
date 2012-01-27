@@ -127,6 +127,5 @@ public interface RecordDomain extends CompositeDomain {
 	public String getJavaAttributeImplementationTypeName(
 			String schemaRootPackagePrefix);
 
-	public Class<? extends Object> getSchemaClass();
 
 }

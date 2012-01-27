@@ -213,32 +213,6 @@ public abstract class AttributedElementClassImpl
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(Object o) {
-		if (o == null) {
-			return false;
-		}
-		if (getClass() == o.getClass()) {
-			ConcreteMetaClass other = (ConcreteMetaClass) o;
-			if (!qualifiedName.equals(other.getQualifiedName())) {
-				return false;
-			}
-			if (!getSchema().getQualifiedName().equals(
-					other.getSchema().getQualifiedName())) {
-				return false;
-			}
-			if (getAttributeCount() != other.getAttributeCount()) {
-				return false;
-			}
-			for (Attribute attr : getAttributeList()) {
-				if (!attr.equals(other.getAttribute(attr.getName()))) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
+	
 
 }

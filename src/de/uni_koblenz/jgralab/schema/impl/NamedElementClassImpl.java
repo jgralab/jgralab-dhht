@@ -459,7 +459,14 @@ public abstract class NamedElementClassImpl implements NamedElementClass {
 	}
 
 	@Override
-	public abstract boolean equals(Object o);
+	public final boolean equals(Object o) {
+		if (o == null || !(o instanceof NamedElementClass)) {
+			return false;
+		}
+		NamedElementClass other = (NamedElementClass) o;
+		return getSchema().equals(other.getSchema())
+				&& qualifiedName.equals(other.getQualifiedName());
+	}
 
 	@Override
 	public final boolean isInDefaultPackage() {

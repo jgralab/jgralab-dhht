@@ -1,10 +1,13 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import org.pcollections.PMap;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -659,59 +662,21 @@ public abstract class ViewGraphImpl implements Graph,
 
 
 	@Override
-	public <T> JGraLabList<T> createList() {
+	public <T> PVector<T> createList() {
 		return viewedGraph.createList();
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return viewedGraph.createList(collection);
-	}
-
-	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return viewedGraph.createList(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet() {
+	public <T> PSet<T> createSet() {
 		return viewedGraph.createSet();
 	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return viewedGraph.createSet(collection);
-	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return viewedGraph.createSet(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return viewedGraph.createSet(initialCapacity, loadFactor);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
+	public <K, V> PMap<K, V> createMap() {
 		return viewedGraph.createMap();
 	}
 
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return viewedGraph.createMap(map);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return viewedGraph.createMap(initialCapacity);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity, float loadFactor) {
-		return viewedGraph.createMap(initialCapacity, loadFactor);
-	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {

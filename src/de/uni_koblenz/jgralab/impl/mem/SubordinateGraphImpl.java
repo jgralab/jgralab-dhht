@@ -31,9 +31,12 @@
 package de.uni_koblenz.jgralab.impl.mem;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import org.pcollections.PMap;
+import org.pcollections.PSet;
+import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -220,62 +223,23 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 	@Override
-	public <T> JGraLabList<T> createList() {
+	public <T> PVector<T> createList() {
 		return containingElement.getGraph().createList();
 	}
 
-	@Override
-	public <T> JGraLabList<T> createList(Collection<? extends T> collection) {
-		return containingElement.getGraph().createList(collection);
-	}
 
 	@Override
-	public <T> JGraLabList<T> createList(int initialCapacity) {
-		return containingElement.getGraph().createList(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet() {
+	public <T> PSet<T> createSet() {
 		return containingElement.getGraph().createSet();
 	}
 
-	@Override
-	public <T> JGraLabSet<T> createSet(Collection<? extends T> collection) {
-		return containingElement.getGraph().createSet(collection);
-	}
 
 	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity) {
-		return containingElement.getGraph().createSet(initialCapacity);
-	}
-
-	@Override
-	public <T> JGraLabSet<T> createSet(int initialCapacity, float loadFactor) {
-		return containingElement.getGraph().createSet(initialCapacity,
-				loadFactor);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap() {
+	public <K, V> PMap<K, V> createMap() {
 		return containingElement.getGraph().createMap();
 	}
 
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(Map<? extends K, ? extends V> map) {
-		return containingElement.getGraph().createMap(map);
-	}
 
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity) {
-		return containingElement.getGraph().createMap(initialCapacity);
-	}
-
-	@Override
-	public <K, V> JGraLabMap<K, V> createMap(int initialCapacity,
-			float loadFactor) {
-		return containingElement.getGraph().createMap(initialCapacity,
-				loadFactor);
-	}
 
 	@Override
 	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {

@@ -47,7 +47,9 @@ import de.uni_koblenz.jgralab.schema.exception.DuplicateRecordComponentException
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
 import de.uni_koblenz.jgralab.schema.exception.NoSuchRecordComponentException;
 import de.uni_koblenz.jgralab.schema.exception.RecordCycleException;
+import de.uni_koblenz.jgralab.schema.exception.SchemaClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.WrongSchemaException;
+import de.uni_koblenz.jgralab.schema.impl.compilation.SchemaClassManager;
 
 public final class RecordDomainImpl extends CompositeDomainImpl implements
 		RecordDomain {
@@ -142,10 +144,10 @@ public final class RecordDomainImpl extends CompositeDomainImpl implements
 			String m1ClassName = getSchema().getPackagePrefix() + "."
 					+ getQualifiedName();
 			try {
-				m1Class = Class.forName(m1ClassName, true, M1ClassManager
+				m1Class = Class.forName(m1ClassName, true, SchemaClassManager
 						.instance(getSchema().getQualifiedName()));
 			} catch (ClassNotFoundException e) {
-				throw new M1ClassAccessException(
+				throw new SchemaClassAccessException(
 						"Can't load M1 class for AttributedElementClass '"
 								+ getQualifiedName() + "'", e);
 			}
@@ -218,21 +220,6 @@ public final class RecordDomainImpl extends CompositeDomainImpl implements
 		return output.toString();
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof RecordDomain) {
-			RecordDomain other = (RecordDomain) o;
-			if (!getSchema().getQualifiedName().equals(
-					other.getSchema().getQualifiedName())) {
-				return false;
-			}
-			if (!qualifiedName.equals(other.getQualifiedName())) {
-				return false;
-			}
-			return getComponents().equals(other.getComponents());
-		}
-		return false;
-	}
 
 	private void internalGetReadMethod(CodeSnippet code, String schemaPrefix,
 			String variableName, String graphIoVariableName, String attributeContainer) {
@@ -275,16 +262,21 @@ public final class RecordDomainImpl extends CompositeDomainImpl implements
 	}
 
 	@Override
-	public String getStandardJavaAttributeImplementationTypeName(
-			String schemaRootPackagePrefix) {
-		return schemaRootPackagePrefix + ".impl.std." + getQualifiedName()
-				+ "Impl";
+	public Boolean hasComponent(String name) {
+		return components.containsKey(name);
 	}
 
-	@Override
-	public String getSavememJavaAttributeImplementationTypeName(
-			String schemaRootPackagePrefix) {
-		return schemaRootPackagePrefix + ".impl.savemem." + getQualifiedName()
-				+ "Impl";
-	}
+//	@Override
+//	public String getStandardJavaAttributeImplementationTypeName(
+//			String schemaRootPackagePrefix) {
+//		return schemaRootPackagePrefix + ".impl.std." + getQualifiedName()
+//				+ "Impl";
+//	}
+//
+//	@Override
+//	public String getSavememJavaAttributeImplementationTypeName(
+//			String schemaRootPackagePrefix) {
+//		return schemaRootPackagePrefix + ".impl.savemem." + getQualifiedName()
+//				+ "Impl";
+//	}
 }

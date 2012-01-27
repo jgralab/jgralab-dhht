@@ -47,12 +47,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import javax.tools.FileObject;
-import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
-import javax.tools.JavaFileObject.Kind;
 import javax.tools.ToolProvider;
 
 import de.uni_koblenz.jgralab.Direction;
@@ -100,40 +96,24 @@ import de.uni_koblenz.jgralab.schema.StringDomain;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
+import de.uni_koblenz.jgralab.schema.exception.SchemaClassAccessException;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
+import de.uni_koblenz.jgralab.schema.impl.compilation.ClassFileManager;
+import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
+import de.uni_koblenz.jgralab.schema.impl.compilation.SchemaClassManager;
 
 /**
  * @author ist@uni-koblenz.de
  */
 public class SchemaImpl implements Schema {
-	/**
-	 * File Manager class overwriting the method {@code getJavaFileForOutput} so
-	 * that bytecode is written to a {@code ClassFileAbstraction}.
-	 * 
-	 */
-	private class ClassFileManager extends
-			ForwardingJavaFileManager<JavaFileManager> {
-
-		public ClassFileManager(JavaFileManager fm) {
-			super(fm);
-		}
-
-		@Override
-		public JavaFileObject getJavaFileForOutput(Location location,
-				String className, Kind kind, FileObject sibling) {
-			ClassFileAbstraction cfa = new ClassFileAbstraction(className);
-			M1ClassManager.instance(qualifiedName).putM1Class(className, cfa);
-			return cfa;
-		}
-	}
 
 	// we need a hard reference here, cause the M1ClassManager uses only weak
 	// references. This way, when the schema gets collected, the class manager
 	// is free for collection, too.
-	private M1ClassManager m1ClassManager = null;
+	private SchemaClassManager schemaClassManager = null;
 
-	public M1ClassManager getM1ClassManager() {
-		return m1ClassManager;
+	public SchemaClassManager getM1ClassManager() {
+		return schemaClassManager;
 	}
 
 	private final ArrayList<TypedElementClass<?, ?>> typedElementClasses = new ArrayList<TypedElementClass<?, ?>>();
@@ -272,7 +252,7 @@ public class SchemaImpl implements Schema {
 		this.name = name;
 		this.packagePrefix = packagePrefix;
 		qualifiedName = packagePrefix + "." + name;
-		m1ClassManager = M1ClassManager.instance(qualifiedName);
+		schemaClassManager = SchemaClassManager.instance(qualifiedName);
 
 		// Needs to be created before any NamedElement can be created
 		defaultPackage = PackageImpl.createDefaultPackage(this);
@@ -394,9 +374,9 @@ public class SchemaImpl implements Schema {
 		return allowLowercaseEnumConstants;
 	}
 
-	private Vector<JavaSourceFromString> createClasses(
+	private Vector<InMemoryJavaSourceFile> createClasses(
 			CodeGeneratorConfiguration config) {
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>();
+		Vector<InMemoryJavaSourceFile> javaSources = new Vector<InMemoryJavaSourceFile>();
 
 		/* create code for graph */
 		GraphCodeGenerator graphCodeGenerator = new GraphCodeGenerator(
@@ -459,8 +439,8 @@ public class SchemaImpl implements Schema {
 	}
 
 	@Override
-	public Vector<JavaSourceFromString> commit(CodeGeneratorConfiguration config) {
-		Vector<JavaSourceFromString> javaSources = new Vector<JavaSourceFromString>();
+	public Vector<InMemoryJavaSourceFile> commit(CodeGeneratorConfiguration config) {
+		Vector<InMemoryJavaSourceFile> javaSources = new Vector<InMemoryJavaSourceFile>();
 
 		// generate schema class
 		CodeGenerator schemaCodeGenerator = new SchemaCodeGenerator(this,
@@ -655,7 +635,7 @@ public class SchemaImpl implements Schema {
 		JavaFileManager jfm = null;
 
 		// commit
-		Vector<JavaSourceFromString> javaSources = commit(config);
+		Vector<InMemoryJavaSourceFile> javaSources = commit(config);
 		// compile
 		try {
 			jfm = compiler.getStandardFileManager(null, null, null);
@@ -667,7 +647,7 @@ public class SchemaImpl implements Schema {
 			throw new SchemaException(e);
 		}
 
-		ClassFileManager manager = new ClassFileManager(jfm);
+		ClassFileManager manager = new ClassFileManager(this, jfm);
 
 		Vector<String> options = new Vector<String>();
 		if (jgralabClassPath != null) {
@@ -979,7 +959,7 @@ public class SchemaImpl implements Schema {
 				if (aec == null) {
 					aec = graphClass.getEdgeClass(className);
 					if (aec == null) {
-						throw new M1ClassAccessException("class " + className
+						throw new SchemaClassAccessException("class " + className
 								+ " does not exist in schema");
 					}
 				}
@@ -990,11 +970,11 @@ public class SchemaImpl implements Schema {
 												.getUniqueName()), signature);
 			}
 		} catch (SecurityException e) {
-			throw new M1ClassAccessException("can't find create method in '"
+			throw new SchemaClassAccessException("can't find create method in '"
 					+ m1Class.getName() + "' for '"
 					+ (aec != null ? aec.getUniqueName() : className) + "'", e);
 		} catch (NoSuchMethodException e) {
-			throw new M1ClassAccessException("can't find create method in '"
+			throw new SchemaClassAccessException("can't find create method in '"
 					+ m1Class.getName() + "' for '"
 					+ (aec != null ? aec.getUniqueName() : className) + "'", e);
 		}
@@ -1080,7 +1060,7 @@ public class SchemaImpl implements Schema {
 				return m;
 			}
 		}
-		throw new M1ClassAccessException("can't find create method '"
+		throw new SchemaClassAccessException("can't find create method '"
 				+ methodName + "' in '" + m1Class.getName() + "' for '"
 				+ ec.getUniqueName() + "'");
 	}
@@ -1155,9 +1135,9 @@ public class SchemaImpl implements Schema {
 		Class<? extends Graph> m1Class;
 		try {
 			m1Class = (Class<? extends Graph>) Class.forName(implClassName,
-					true, M1ClassManager.instance(qualifiedName));
+					true, SchemaClassManager.instance(qualifiedName));
 		} catch (ClassNotFoundException e) {
-			throw new M1ClassAccessException(
+			throw new SchemaClassAccessException(
 					"can't load implementation class '" + implClassName + "'",
 					e);
 		}

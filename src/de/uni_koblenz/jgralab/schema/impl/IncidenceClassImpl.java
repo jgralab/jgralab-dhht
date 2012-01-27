@@ -445,11 +445,6 @@ public class IncidenceClassImpl extends
 		// ((GraphClassImpl) graphClass).addIncidenceClass(this);
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	protected void checkSpecialization(IncidenceClass superclass) {
