@@ -33,6 +33,8 @@ package de.uni_koblenz.jgralab.greql2.exception;
 
 import java.util.List;
 
+import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
+
 /**
  * Should be thrown if an undefined function should be used, that is a function
  * that is not part of the function libary

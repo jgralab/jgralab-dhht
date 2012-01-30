@@ -33,6 +33,10 @@
  */
 package de.uni_koblenz.jgralab.greql2;
 
+import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.impl.mem.Greql2Impl;
 import de.uni_koblenz.jgralab.greql2.serialising.Greql2Serializer;
 
 
@@ -43,12 +47,12 @@ import de.uni_koblenz.jgralab.greql2.serialising.Greql2Serializer;
 public class SerializableGreql2Impl extends Greql2Impl implements
 		SerializableGreql2 {
 	static {
-		Greql2Schema.instance().getGraphFactory().setGraphImplementationClass(
+		Greql2Schema.instance().getGraphFactory().setGraphImplementationClass_InMemoryStorage(
 				Greql2.class, SerializableGreql2Impl.class);
 	}
 
-	public SerializableGreql2Impl(int vMax, int eMax) {
-		super(vMax, eMax);
+	public SerializableGreql2Impl() {
+		super();
 	}
 
 	public SerializableGreql2Impl(java.lang.String id, int vMax, int eMax) {

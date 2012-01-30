@@ -34,7 +34,6 @@ import java.io.PrintStream;
 import java.util.regex.Pattern;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;

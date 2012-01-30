@@ -37,8 +37,6 @@ package de.uni_koblenz.jgralab.utilities.common.json;
 import java.io.File;
 import java.io.IOException;
 
-import de.uni_koblenz.jgralabtest.dhht.schema.Feature;
-
 /**
  * JsonWriter provides several convenience methods to write a Json-file.
  * However, this class is not completely implemented.

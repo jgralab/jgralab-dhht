@@ -130,7 +130,7 @@ BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription 
 BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);
 BinaryEdgeClass IsFalseExprOf: Greql2Aggregation from Expression role falseExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
-BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication (1,*) (1,1);
+BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication role functionApplication (1,*) (1,1);
 BinaryEdgeClass IsGoalRestrOf: Greql2Aggregation from Expression role goalRestr (0,1) (1,1) to PathDescription (0,*) (1,1);
 BinaryEdgeClass IsIdOf: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression (0,*) (1,1);
 BinaryEdgeClass IsIntermediateVertexOf: Greql2Aggregation from Expression role intermediateVertex (1,1) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);

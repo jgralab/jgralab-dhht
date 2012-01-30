@@ -36,8 +36,6 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import java.util.Random;
 
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
-
 public class RandomGraph {
 
 	public static SimpleGraph createTotallyRandomGraph(long seed,

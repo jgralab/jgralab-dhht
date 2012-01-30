@@ -9,14 +9,6 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
-import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedHyperedge;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_incInc;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_outInc;
 
 public class TreeGraphGenerator {
 

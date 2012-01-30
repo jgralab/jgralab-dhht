@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.sql.Savepoint;
 import java.util.Arrays;
 
 import org.apache.tools.ant.taskdefs.Exit;
@@ -43,8 +44,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 
 /**
  * Test cases for class SavepointImpl.

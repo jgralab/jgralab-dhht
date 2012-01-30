@@ -6,11 +6,6 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseElementaryMethods;
-import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
-import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
 
 public class SimpleDistributedGraphGenerator {
 

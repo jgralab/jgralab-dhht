@@ -33,7 +33,6 @@ package de.uni_koblenz.jgralab.schema.impl;
 
 import java.util.List;
 
-import org.pcollections.ArrayPVector;
 import org.pcollections.Empty;
 import org.pcollections.PVector;
 

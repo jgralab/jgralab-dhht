@@ -30,11 +30,10 @@
  */
 package de.uni_koblenz.jgralabtest.impl.trans;
 
+import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import de.uni_koblenz.jgralab.trans.InvalidSavepointException;
 
 public class Test {
 

@@ -60,8 +60,6 @@ import org.pcollections.POrderedSet;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIO.TGFilenameFilter;
@@ -70,7 +68,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.DefaultCostModel;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -81,10 +79,15 @@ import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
 import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
+import de.uni_koblenz.jgralab.greql2.serialising.Greql2Serializer;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.utilities.tgmerge.TGMerge;
+
 
 /**
  * This is the core class of the GReQL-2 Evaluator. It takes a GReQL-2 Query as
@@ -110,8 +113,8 @@ public class GreqlEvaluator {
 		Graph datagraph = null;
 		if (args.length == 2) {
 			datagraph = GraphIO.loadSchemaAndGraphFromFile(args[1],
-					CodeGeneratorConfiguration.MINIMAL,
-					new ConsoleProgressFunction("Loading"));
+					CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS,
+					new ConsoleProgressFunction("Loading"), null);
 		}
 
 		GreqlEvaluator eval = new GreqlEvaluator(query, datagraph, null);
@@ -202,7 +205,7 @@ public class GreqlEvaluator {
 	/**
 	 * The GraphMarker that stores all vertex evaluators
 	 */
-	protected GraphMarker<VertexEvaluator> vertexEvalGraphMarker;
+	protected LocalMapVertexMarker<VertexEvaluator> vertexEvalGraphMarker;
 
 	/**
 	 * The map of SimpleName to Type of types that is known in the evaluator by
@@ -213,7 +216,7 @@ public class GreqlEvaluator {
 	/**
 	 * returns the vertexEvalGraph marker that is used
 	 */
-	public final GraphMarker<VertexEvaluator> getVertexEvaluatorGraphMarker() {
+	public final LocalMapVertexMarker<VertexEvaluator> getVertexEvaluatorGraphMarker() {
 		return vertexEvalGraphMarker;
 	}
 
@@ -241,7 +244,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized PSet<Vertex> getVertexIndex(Graph graph,
 			String queryPart) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUniqueGraphId());
 		if (ref == null) {
 			return null;
 		}
@@ -263,7 +266,7 @@ public class GreqlEvaluator {
 	 */
 	public static synchronized void addVertexIndex(Graph graph,
 			String queryPart, PSet<Vertex> vertexSet) {
-		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUid());
+		SoftReference<GraphIndex> ref = graphIndizes.get(graph.getUniqueGraphId());
 		GraphIndex index = null;
 
 		if (ref != null) {
@@ -276,7 +279,7 @@ public class GreqlEvaluator {
 
 		if (index == null) {
 			index = new GraphIndex(graph);
-			graphIndizes.put(graph.getUid(),
+			graphIndizes.put(graph.getUniqueGraphId(),
 					new SoftReference<GraphIndex>(index));
 		}
 		index.addVertexSet(queryPart, vertexSet);
@@ -637,7 +640,8 @@ public class GreqlEvaluator {
 		}
 		for (FunctionApplication fa : subQueryGraph
 				.getFunctionApplicationVertices()) {
-			if (name.equals(fa.get_functionId().get_name())) {
+			IsFunctionIdOf edge = fa.getIncidentEdges(IsFunctionIdOf.class).iterator().next();
+			if (name.equals(((FunctionId) edge.getAlpha()).get_name())) {
 				throw new GreqlException("The subquery '" + name
 						+ "' is recursive.  That's not allowed!");
 			}
@@ -822,96 +826,96 @@ public class GreqlEvaluator {
 		GreqlParser parser = new GreqlParser(query, subQueryMap.keySet());
 		parser.parse();
 		queryGraph = parser.getGraph();
-		weaveInSubQueries();
+		//weaveInSubQueries();
 		parseTime = System.currentTimeMillis() - parseStartTime;
 		return true;
 	}
-
-	private void weaveInSubQueries() {
-		FunctionApplication subqueryCall = findSubQueryCall();
-		while (subqueryCall != null) {
-			TGMerge tgm = new TGMerge(queryGraph, subQueryMap.get(subqueryCall
-					.get_functionId().get_name()));
-			tgm.merge();
-			weaveInSubquery(subqueryCall);
-			subqueryCall = findSubQueryCall();
-		}
-	}
-
-	private FunctionApplication findSubQueryCall() {
-		for (FunctionApplication fa : queryGraph
-				.getFunctionApplicationVertices()) {
-			if (subQueryMap.containsKey(fa.get_functionId().get_name())) {
-				return fa;
-			}
-		}
-		return null;
-	}
-
-	private void weaveInSubquery(FunctionApplication fa) {
-		FunctionId fid = fa.get_functionId();
-		String name = fid.get_name();
-		// System.out.println("Weaving in subquery " + name);
-		Greql2Expression g2exp = null;
-		for (Greql2Expression e : queryGraph.getGreql2ExpressionVertices()) {
-			if ((e.get_queryText() != null) && e.get_queryText().equals(name)) {
-				g2exp = e;
-				break;
-			}
-		}
-		Expression exp = g2exp.get_queryExpr();
-
-		ArrayList<Variable> boundVars = new ArrayList<Variable>();
-		for (Variable bv : g2exp.get_boundVar()) {
-			boundVars.add(bv);
-		}
-
-		ArrayList<Expression> args = new ArrayList<Expression>();
-		for (Expression arg : fa.get_argument()) {
-			args.add(arg);
-		}
-
-		if (args.size() != boundVars.size()) {
-			throw new GreqlException("Subquery call to '" + name + "' has "
-					+ args.size()
-					+ " arguments, but the subquery definition has "
-					+ boundVars.size() + " formal parameters!");
-		}
-
-		for (int i = 0; i < boundVars.size(); i++) {
-			Expression arg = args.get(i);
-			Variable bv = boundVars.get(i);
-
-			Edge e = bv.getFirstIncidence();
-			while (e != null) {
-				if (e.getSchemaClass() == IsBoundVarOf.class) {
-					e = e.getNextIncidence();
-					continue;
-				}
-				e.setThis(arg);
-				e = bv.getFirstIncidence();
-			}
-		}
-
-		Edge e = fa.getFirstIncidence(EdgeDirection.OUT);
-		while (e != null) {
-			if (e.getSchemaClass() == IsFunctionIdOf.class) {
-				e = e.getNextIncidence(EdgeDirection.OUT);
-				continue;
-			}
-			e.setThis(exp);
-			e = fa.getFirstIncidence(EdgeDirection.OUT);
-		}
-
-		fa.delete();
-		if (fid.getDegree() == 0) {
-			fid.delete();
-		}
-		g2exp.delete();
-		for (Variable bv : boundVars) {
-			bv.delete();
-		}
-	}
+//
+//	private void weaveInSubQueries() {
+//		FunctionApplication subqueryCall = findSubQueryCall();
+//		while (subqueryCall != null) {
+//			TGMerge tgm = new TGMerge(queryGraph, subQueryMap.get(subqueryCall
+//					.get_functionId().get_name()));
+//			tgm.merge();
+//			weaveInSubquery(subqueryCall);
+//			subqueryCall = findSubQueryCall();
+//		}
+//	}
+//
+//	private FunctionApplication findSubQueryCall() {
+//		for (FunctionApplication fa : queryGraph
+//				.getFunctionApplicationVertices()) {
+//			if (subQueryMap.containsKey(fa.get_functionId().get_name())) {
+//				return fa;
+//			}
+//		}
+//		return null;
+//	}
+//
+//	private void weaveInSubquery(FunctionApplication fa) {
+//		FunctionId fid = fa.get_functionId();
+//		String name = fid.get_name();
+//		// System.out.println("Weaving in subquery " + name);
+//		Greql2Expression g2exp = null;
+//		for (Greql2Expression e : queryGraph.getGreql2ExpressionVertices()) {
+//			if ((e.get_queryText() != null) && e.get_queryText().equals(name)) {
+//				g2exp = e;
+//				break;
+//			}
+//		}
+//		Expression exp = g2exp.get_queryExpr();
+//
+//		ArrayList<Variable> boundVars = new ArrayList<Variable>();
+//		for (Variable bv : g2exp.get_boundVar()) {
+//			boundVars.add(bv);
+//		}
+//
+//		ArrayList<Expression> args = new ArrayList<Expression>();
+//		for (Expression arg : fa.get_argument()) {
+//			args.add(arg);
+//		}
+//
+//		if (args.size() != boundVars.size()) {
+//			throw new GreqlException("Subquery call to '" + name + "' has "
+//					+ args.size()
+//					+ " arguments, but the subquery definition has "
+//					+ boundVars.size() + " formal parameters!");
+//		}
+//
+//		for (int i = 0; i < boundVars.size(); i++) {
+//			Expression arg = args.get(i);
+//			Variable bv = boundVars.get(i);
+//
+//			Edge e = bv.getFirstIncidence();
+//			while (e != null) {
+//				if (e.getSchemaClass() == IsBoundVarOf.class) {
+//					e = e.getNextIncidence();
+//					continue;
+//				}
+//				e.setThis(arg);
+//				e = bv.getFirstIncidence();
+//			}
+//		}
+//
+//		Edge e = fa.getFirstIncidence(EdgeDirection.OUT);
+//		while (e != null) {
+//			if (e.getSchemaClass() == IsFunctionIdOf.class) {
+//				e = e.getNextIncidence(EdgeDirection.OUT);
+//				continue;
+//			}
+//			e.setThis(exp);
+//			e = fa.getFirstIncidence(EdgeDirection.OUT);
+//		}
+//
+//		fa.delete();
+//		if (fid.getDegree() == 0) {
+//			fid.delete();
+//		}
+//		g2exp.delete();
+//		for (Variable bv : boundVars) {
+//			bv.delete();
+//		}
+//	}
 
 	/**
 	 * Creates the VertexEvaluator-Object at the vertices in the syntaxgraph
@@ -920,7 +924,7 @@ public class GreqlEvaluator {
 		if (queryGraph == null) {
 			return;
 		}
-		vertexEvalGraphMarker = new GraphMarker<VertexEvaluator>(queryGraph);
+		vertexEvalGraphMarker = new LocalMapVertexMarker<VertexEvaluator>(queryGraph);
 		Vertex currentVertex = queryGraph.getFirstVertex();
 		while (currentVertex != null) {
 			VertexEvaluator vertexEval = VertexEvaluator.createVertexEvaluator(
@@ -989,7 +993,7 @@ public class GreqlEvaluator {
 					.println("#########################################################");
 			String name = "__greql-query.";
 			try {
-				queryGraph.save(name + "tg", new ConsoleProgressFunction(
+				GraphIO.saveGraphToFile(name + "tg", queryGraph, new ConsoleProgressFunction(
 						"Saving broken GReQL graph:"));
 				printGraphAsDot(queryGraph, true, name + "dot");
 			} catch (GraphIOException e) {
@@ -1044,10 +1048,10 @@ public class GreqlEvaluator {
 						.println("################### Optimized Query #####################");
 				System.out
 						.println("#########################################################");
-				System.out.println(GreqlSerializer.serializeGraph(queryGraph));
+				System.out.println(Greql2Serializer.serializeGraph(queryGraph));
 				String name = "__optimized-greql-query.";
 				try {
-					queryGraph.save(name + "tg", new ConsoleProgressFunction(
+					GraphIO.saveGraphToFile(name + "tg", queryGraph, new ConsoleProgressFunction(
 							"Saving"));
 					printGraphAsDot(queryGraph, true, name + "dot");
 				} catch (GraphIOException e) {

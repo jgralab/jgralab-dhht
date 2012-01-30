@@ -40,10 +40,16 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
+import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.ForwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
+import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
+import de.uni_koblenz.jgralab.greql2.schema.PathExpression;
 
 /**
  * This {@link Optimizer} transforms {@link PathExistence} vertices to

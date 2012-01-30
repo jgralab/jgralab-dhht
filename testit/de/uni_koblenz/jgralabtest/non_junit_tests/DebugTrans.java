@@ -2,8 +2,6 @@ package de.uni_koblenz.jgralabtest.non_junit_tests;
 
 import java.util.Arrays;
 
-import de.uni_koblenz.jgralab.impl.InternalGraph;
-
 public class DebugTrans {
 
 	/**

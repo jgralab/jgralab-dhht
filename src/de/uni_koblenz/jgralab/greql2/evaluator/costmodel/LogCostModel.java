@@ -35,7 +35,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.costmodel;
 
 import java.util.logging.LogRecord;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.AlternativePathDescriptionEvaluator;
@@ -71,6 +70,13 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TypeIdEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexSetExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexSubgraphExpressionEvaluator;
+import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.ForwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsPathDescriptionOf;
+import de.uni_koblenz.jgralab.greql2.schema.ListRangeConstruction;
+import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
 
 /**
  * This {@link CostModel} estimates the costs, cardinality and selectivity for

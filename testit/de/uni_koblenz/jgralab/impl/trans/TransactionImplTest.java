@@ -58,10 +58,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.trans.CommitFailedException;
-import de.uni_koblenz.jgralab.trans.ListPosition;
-import de.uni_koblenz.jgralab.trans.VersionedDataObject;
-import de.uni_koblenz.jgralab.trans.VertexPosition;
+import de.uni_koblenz.jgralab.greql2.parser.VertexPosition;
 
 /**
  * Test cases for class TransactionImpl.

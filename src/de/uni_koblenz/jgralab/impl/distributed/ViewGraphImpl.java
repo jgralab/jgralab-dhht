@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.pcollections.PMap;
-import org.pcollections.POrderedSet;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 

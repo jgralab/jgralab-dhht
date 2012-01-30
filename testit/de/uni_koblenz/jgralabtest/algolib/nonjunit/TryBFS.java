@@ -36,9 +36,6 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import java.util.Arrays;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
-
 public class TryBFS {
 
 	private static SimpleGraph getSmallGraph() {

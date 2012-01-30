@@ -39,7 +39,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralab.greql2.funlib.collections.Intersection;

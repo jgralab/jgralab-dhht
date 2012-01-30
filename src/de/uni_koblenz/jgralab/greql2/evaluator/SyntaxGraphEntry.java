@@ -40,8 +40,12 @@ import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
 import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 
 /**
  * This class is one entry in the Map from Query+CostModel+Optimizer to
@@ -196,7 +200,7 @@ public class SyntaxGraphEntry {
 	 */
 	public SyntaxGraphEntry(File fileName) throws GraphIOException {
 		this.syntaxGraph = (Greql2) GraphIO
-				.loadGraphFromFileWithStandardSupport(fileName.getPath(), null);
+				.loadGraphFromFile(fileName.getPath(), Greql2Schema.instance(), ImplementationType.MEMORY);
 		Greql2Expression g2e = syntaxGraph.getFirstGreql2Expression();
 		try {
 			this.queryText = (String) g2e.getAttribute("_queryText");
@@ -255,7 +259,7 @@ public class SyntaxGraphEntry {
 		String fileName = directory.getPath() + File.separator
 				+ queryText.hashCode() + "-" + costModelClassSimple + "-"
 				+ optimizerClassSimple + ".tg";
-		syntaxGraph.save(fileName);
+		GraphIO.saveGraphToFile(fileName, syntaxGraph, null);
 		logger.info("Saved SyntaxGraphEntry to \"" + fileName + "\".");
 	}
 

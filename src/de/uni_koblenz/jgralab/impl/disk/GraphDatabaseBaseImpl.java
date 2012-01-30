@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,10 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.pcollections.Empty;
-import org.pcollections.OrderedPSet;
 import org.pcollections.PMap;
 import org.pcollections.POrderedSet;
-import org.pcollections.PSet;
 import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.BinaryEdge;
@@ -20,7 +17,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Incidence;

@@ -1,7 +1,6 @@
 package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import de.uni_koblenz.jgralab.greql2.funlib.IsTree;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryIsTree {
 	private static SimpleGraph getSmallGraph() {

@@ -34,7 +34,8 @@ package de.uni_koblenz.jgralab.greql2.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
 
 /**
  * This is the base class for all exceptions that refeer to the querysource with
@@ -43,7 +44,7 @@ import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
  * @author ist@uni-koblenz.de
  * 
  */
-public class QuerySourceException extends EvaluateException {
+public class QuerySourceException {
 
 	static final long serialVersionUID = -1234561;
 
@@ -71,7 +72,6 @@ public class QuerySourceException extends EvaluateException {
 	 */
 	public QuerySourceException(String errorMessage, Greql2Vertex element,
 			List<SourcePosition> sourcePositions, Exception cause) {
-		super(errorMessage, cause);
 		this.element = element;
 		this.errorMessage = errorMessage;
 		if (sourcePositions != null) {
@@ -90,7 +90,6 @@ public class QuerySourceException extends EvaluateException {
 	 */
 	public QuerySourceException(String errorMessage, Greql2Vertex element,
 			SourcePosition sourcePosition, Exception cause) {
-		super(errorMessage, cause);
 		this.errorMessage = errorMessage;
 		this.element = element;
 		positions = new ArrayList<SourcePosition>();
@@ -124,31 +123,30 @@ public class QuerySourceException extends EvaluateException {
 	/**
 	 * returns the string of the message
 	 */
-	@Override
 	public String getMessage() {
 		StringBuilder sb = new StringBuilder();
-		if (positions.size() > 0) {
-			sb.append(errorMessage);
-			sb.append(": query part '");
-			sb.append((element != null) ? ((SerializableGreql2) element
-					.getGraph()).serialize(element) : "<unknown element>");
-			sb.append("' at position (");
-			sb.append(positions.get(0).get_offset());
-			sb.append(", ");
-			sb.append(positions.get(0).get_length());
-			sb.append(")");
-		} else {
-			sb.append(errorMessage);
-			sb.append(": query part '");
-			sb.append((element != null) ? ((SerializableGreql2) element
-					.getGraph()).serialize(element) : "<unknown element>");
-			sb.append("' at unknown position in query");
-		}
-
-		if (element != null) {
-			sb.append("\nComplete (optimized) Query: ");
-			sb.append(((SerializableGreql2) element.getGraph()).serialize());
-		}
+//		if (positions.size() > 0) {
+//			sb.append(errorMessage);
+//			sb.append(": query part '");
+//			sb.append((element != null) ? ((SerializableGreql2) element
+//					.getGraph()).serialize(element) : "<unknown element>");
+//			sb.append("' at position (");
+//			sb.append(positions.get(0).get_offset());
+//			sb.append(", ");
+//			sb.append(positions.get(0).get_length());
+//			sb.append(")");
+//		} else {
+//			sb.append(errorMessage);
+//			sb.append(": query part '");
+//			sb.append((element != null) ? ((SerializableGreql2) element
+//					.getGraph()).serialize(element) : "<unknown element>");
+//			sb.append("' at unknown position in query");
+//		}
+//
+//		if (element != null) {
+//			sb.append("\nComplete (optimized) Query: ");
+//			sb.append(((SerializableGreql2) element.getGraph()).serialize());
+//		}
 
 		return sb.toString();
 	}

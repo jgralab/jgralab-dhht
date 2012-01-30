@@ -33,9 +33,12 @@ package de.uni_koblenz.jgralab.greql2.parser;
 
 import com.sun.tools.apt.mirror.util.SourcePositionImpl;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
 
 public class SymbolTable extends EasySymbolTable {
 

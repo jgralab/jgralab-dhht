@@ -36,6 +36,9 @@ package de.uni_koblenz.jgralab.greql2.evaluator.costmodel;
 
 import com.sun.mirror.declaration.Declaration;
 
+import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
+import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
+
 /**
  * Base class for {@link CostModel}s. Holds constants that are meant to be used
  * in derived classes that implement {@link CostModel}.

@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 
 public class Degree extends DegreeFunction {
 

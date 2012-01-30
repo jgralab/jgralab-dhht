@@ -34,7 +34,6 @@
  */
 package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryDFS2 {
 	public static void main(String[] args) throws AlgorithmTerminatedException {

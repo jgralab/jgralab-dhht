@@ -32,10 +32,12 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
+import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
 
 /**
  * This is the base class for all path descriptions. It provides methods to add

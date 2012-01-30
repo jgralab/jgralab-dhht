@@ -36,7 +36,6 @@ package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryStrongComponents {
 	public static void main(String[] args) throws AlgorithmTerminatedException {

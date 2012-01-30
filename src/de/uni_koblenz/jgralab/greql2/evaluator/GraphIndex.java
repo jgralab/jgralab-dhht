@@ -105,9 +105,9 @@ public class GraphIndex {
 	 *            the graph to create the Index for
 	 */
 	public GraphIndex(Graph graph) {
-		graphId = graph.getId();
+		graphId = graph.getUniqueGraphId();
 		graphVersion = graph.getGraphVersion();
-		graphSize = graph.getECount() + graph.getVCount();
+		graphSize = (int) (graph.getECount() + graph.getVCount());
 		vertexIndex = new HashMap<String, VertexIndexEntry>();
 	}
 
@@ -115,7 +115,7 @@ public class GraphIndex {
 	 * @return true iff this index is still valid for the given graph
 	 */
 	public boolean isValid(Graph g) {
-		return ((g.getId().equals(graphId)) && (!g
+		return ((g.getUniqueGraphId().equals(graphId)) && (!g
 				.isGraphModified(graphVersion)));
 	}
 

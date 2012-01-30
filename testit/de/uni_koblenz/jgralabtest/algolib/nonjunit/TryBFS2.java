@@ -34,8 +34,6 @@
  */
 package de.uni_koblenz.jgralabtest.algolib.nonjunit;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
-import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 public class TryBFS2 {
 	public static void main(String[] args) throws AlgorithmTerminatedException {
