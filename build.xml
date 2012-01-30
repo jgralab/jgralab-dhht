@@ -98,12 +98,12 @@
 	<!-- compile src.dir and include statements for the targets
 	     it is always "targetname.src" and "targetname.includes" -->
 	<property name="core.src" value="${src.dir}/de/uni_koblenz/jgralab" />
-	<property name="core.includes" value="*.java graphmarker/** schema/** codegenerator/** impl/** jniserver/** trans/** algolib/functions/** eca/ECARuleManagerInterface.java" />
+	<property name="core.includes" value="*.java graphmarker/** schema/** algolib/** codegenerator/** impl/** jniserver/** trans/** algolib/functions/** eca/ECARuleManagerInterface.java" />
 
 	<property name="pcollections.src" value="${src.dir}/org/pcollections" />
 
 	<property name="tgtools.src" value="${src.dir}/de/uni_koblenz/jgralab/utilities" />
-	<property name="tgtools.includes" value="tgschema2java/** ant/TgSchema2JavaTask.java ant/DeleteGeneratedSchemaTask.java tg2whatever/** tgmerge/**" />
+	<property name="tgtools.includes" value="tgschema2java/** ant/TgSchema2JavaTask.java ant/DeleteGeneratedSchemaTask.java tg2whatever/**" />
 
 	<property name="greql2.src" value="${src.dir}/de/uni_koblenz/jgralab/greql2" />
 
@@ -186,7 +186,7 @@
 
 	<!-- compiles greql2 sources -->
 	<target name="greql2" depends="tgtools,algolib">
-		<tgschema2java schemaFile="${greql2.schemafile}" sourcePath="${src.dir}" implementationMode="standard" />
+		<tgschema2java schemaFile="${greql2.schemafile}" sourcePath="${src.dir}" />
 		<javac fork="true" srcdir="${greql2.src}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" source="${javac.targetVM}" target="${javac.targetVM}" includeantruntime="false">
 			<compilerarg line="-Xlint:unchecked" />
 		</javac>

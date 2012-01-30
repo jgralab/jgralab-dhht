@@ -42,13 +42,14 @@ import de.uni_koblenz.jgralab.codegenerator.CodeSnippet;
 import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.exception.InvalidNameException;
+import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
 public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 
 	/**
 	 * holds a list of the components of the enumeration
 	 */
-	private final PVector<String> constants = Empty.vector();
+	private PVector<String> constants = Empty.vector();
 
 	/**
 	 * @param qn
@@ -65,6 +66,9 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 
 	@Override
 	public void addConst(String aConst) {
+		if(((SchemaImpl)getSchema()).isFinish()){
+			throw new SchemaException("No changes to finished schema!");
+		}
 		if (constants.contains(aConst)) {
 			throw new InvalidNameException("Try to add duplicate constant '"
 					+ aConst + "' to EnumDomain" + getQualifiedName());
@@ -73,7 +77,7 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 			throw new InvalidNameException(aConst
 					+ " is not a valid enumeration constant.");
 		}
-		constants.add(aConst);
+		constants = constants.plus(aConst);
 	}
 
 	@Override

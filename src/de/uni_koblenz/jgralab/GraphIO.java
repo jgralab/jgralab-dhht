@@ -91,7 +91,6 @@ import de.uni_koblenz.jgralab.schema.impl.EdgeClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
 import de.uni_koblenz.jgralab.schema.impl.VertexClassImpl;
-import de.uni_koblenz.jgralab.schema.impl.compilation.ClassFileManager;
 import de.uni_koblenz.jgralab.schema.impl.compilation.SchemaClassManager;
 
 /**

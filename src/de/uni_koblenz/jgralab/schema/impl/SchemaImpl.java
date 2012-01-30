@@ -1382,5 +1382,10 @@ public class SchemaImpl implements Schema {
 		return m1ClassToIdMap.get(schemaClass);
 	}
 
+	public boolean isFinish() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }
