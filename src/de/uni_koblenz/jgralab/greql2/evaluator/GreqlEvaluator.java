@@ -1048,7 +1048,7 @@ public class GreqlEvaluator {
 						.println("################### Optimized Query #####################");
 				System.out
 						.println("#########################################################");
-				System.out.println(Greql2Serializer.serializeGraph(queryGraph));
+				System.out.println(Greql2Serializer.serialize(queryGraph));
 				String name = "__optimized-greql-query.";
 				try {
 					GraphIO.saveGraphToFile(name + "tg", queryGraph, new ConsoleProgressFunction(

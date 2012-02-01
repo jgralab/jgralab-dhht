@@ -120,7 +120,7 @@ BinaryEdgeClass IsCompDeclOf: Greql2Aggregation from Declaration role compDecl (
 BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compResultDef (0,1) (1,1) to Comprehension (0,*) (1,1);
 BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration (0,*) (1,1);
-BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVar (1,*) (1,1) to SimpleDeclaration (0,1) (1,1);
+BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVariable (1,*) (1,1) to SimpleDeclaration role variableDeclaration (0,1) (1,1);
 BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
 BinaryEdgeClass IsDirectionOf: Greql2Aggregation from PathDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
 BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription (0,*) (1,1);
