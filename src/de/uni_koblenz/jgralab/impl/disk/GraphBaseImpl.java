@@ -49,7 +49,6 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.GraphFactory;
-import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
@@ -221,16 +220,7 @@ public abstract class GraphBaseImpl implements Graph {
 						.getToplevelGraphForPartialGraphId(partialGraphId));
 	}
 
-	/**
-	 * Saves the partial graphs of this graph
-	 * 
-	 * @param graphIO
-	 */
-	@Deprecated
-	@Override
-	public void savePartialGraphs(GraphIO graphIO) {
-		throw new RuntimeException("Operation not yet implemented");
-	}
+
 
 	// ============================================================================
 	// Methods to access ids

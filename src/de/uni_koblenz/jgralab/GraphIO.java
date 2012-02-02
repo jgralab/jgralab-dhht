@@ -178,6 +178,7 @@ public class GraphIO {
 	/**
 	 * Maps GraphElementClasses to their containing GraphClasses
 	 */
+	@SuppressWarnings("rawtypes")
 	private final Map<GraphElementClass, GraphClass> GECsearch;
 
 	private final Map<IncidenceClass, IncidenceClassData> incidenceClassMap;
@@ -246,6 +247,7 @@ public class GraphIO {
 	/**
 	 * The value is the sigma information of the graph element.
 	 */
+	@SuppressWarnings("rawtypes")
 	private Map<GraphElement, String> sigmasOfGraphElement;
 
 	/**
@@ -297,6 +299,7 @@ public class GraphIO {
 	private JGraLabServer server;
 	private boolean isURL;
 
+	@SuppressWarnings("rawtypes")
 	private GraphIO() {
 		domains = new TreeMap<String, Domain>();
 		GECsearch = new HashMap<GraphElementClass, GraphClass>();
@@ -532,15 +535,16 @@ public class GraphIO {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void writeSigmaDefinition(GraphElementClass gec)
 			throws IOException {
 		String delim = " validsigma";
-//		for (GraphElementClass<?, ?,?,?> sigmaClass : gec.getAllowedSigmaClasses()) {
-//			space();
-//			write(delim);
-//			writeIdentifier(sigmaClass.getQualifiedName());
-//			delim = ",";
-//		}
+		for (GraphElementClass sigmaClass : gec.getAllowedSigmaClasses()) {
+			space();
+			write(delim);
+			writeIdentifier(sigmaClass.getQualifiedName());
+			delim = ",";
+		}
 	}
 
 	private void writeIncidenceClassDefintion(Package pkg, IncidenceClass ic)
@@ -1015,6 +1019,7 @@ public class GraphIO {
 		write("}");
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void writeAttributesSigmaKappa(Graph graph,
 			GraphElement next, boolean onlyLocalGraph)
 			throws IOException, GraphIOException {
@@ -1026,14 +1031,14 @@ public class GraphIO {
 		}
 
 		// write sigma
-//		GraphElement containingElement = next.getSigma();
-//		if (containingElement != null
-//				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
-//						.getGlobalId()))) {
-//			write(" sigma=");
-//			write((containingElement instanceof Vertex ? "v" : "e")
-//					+ containingElement.getGlobalId());
-//		}
+		GraphElement containingElement = next.getSigma();
+		if (containingElement != null
+				&& (!onlyLocalGraph || graph.isLocalElementId(containingElement
+						.getGlobalId()))) {
+			write(" sigma=");
+			write((containingElement instanceof Vertex ? "v" : "e")
+					+ containingElement.getGlobalId());
+		}
 
 		// write kappa
 		write(" kappa=" + next.getKappa());
@@ -2418,6 +2423,7 @@ public class GraphIO {
 		buildSigmaHierarchy(edgeClassBuffer);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void buildSigmaHierarchy(
 			Map<String, List<GraphElementClassData>> classBuffer)
 			throws GraphIOException {
@@ -2440,7 +2446,7 @@ public class GraphIO {
 						throw new GraphIOException(
 								"undefined GraphElementClass '" + sigmaQN + "'");
 					}
-				//	gec.addAllowedSigmaClass(sigma);
+					gec.addAllowedSigmaClass(sigma);
 				}
 			}
 		}
@@ -2799,6 +2805,7 @@ public class GraphIO {
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Graph graph(ProgressFunction pf,
 			ImplementationType implementationType, boolean onlyLocalGraph)
 			throws GraphIOException, RemoteException {
@@ -3043,6 +3050,7 @@ public class GraphIO {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void setSigmas(Graph graph, boolean onlyLocalGraph,
 			ImplementationType implementationType)
 			throws NumberFormatException, RemoteException {
@@ -3057,12 +3065,21 @@ public class GraphIO {
 				} else {
 					parent = graph.getEdge(parentId);
 				}
-				if (implementationType == ImplementationType.MEMORY) {
+				switch (implementationType) {
+				case MEMORY:
 					((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl) sigma
 							.getKey()).setSigma(parent);
-				} else {
+					break;
+				case DISTRIBUTED:
+					((de.uni_koblenz.jgralab.impl.distributed.GraphElementImpl) sigma
+							.getKey()).setSigma(parent);
+					break;
+				case DISK:
 					((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl) sigma
 							.getKey()).setSigma(parent);
+					break;	
+				default:
+					throw new RuntimeException("Unhandled case block");
 				}
 			}
 		}
@@ -3177,20 +3194,29 @@ public class GraphIO {
 		match(";");
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void parseKappa(GraphElement ge,
 			ImplementationType implementationType) throws GraphIOException,
 			RemoteException {
 		match("kappa");
 		match("=");
-		if (implementationType == ImplementationType.MEMORY) {
-			((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl) ge)
-					.setKappa(matchInteger());
-		} else {
-			((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl) ge)
-					.setKappa(matchInteger());
+		switch (implementationType) {
+		case MEMORY:
+			((de.uni_koblenz.jgralab.impl.mem.GraphElementImpl) ge).setKappa(matchInteger());
+			break;
+		case DISK:
+			((de.uni_koblenz.jgralab.impl.disk.GraphElementImpl) ge).setKappa(matchInteger());
+			break;
+		case DISTRIBUTED:
+			((de.uni_koblenz.jgralab.impl.distributed.GraphElementImpl) ge).setKappa(matchInteger());
+			break;
+		default:
+			throw new RuntimeException("Unhandled case block");
 		}
+	
 	}
 
+	@SuppressWarnings({ "rawtypes"})
 	private void parseSigma(GraphElement ge) throws GraphIOException {
 		if (lookAhead.equals("sigma")) {
 			match("sigma");

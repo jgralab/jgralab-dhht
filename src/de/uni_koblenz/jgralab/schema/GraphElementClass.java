@@ -93,11 +93,14 @@ public interface GraphElementClass
 	public Set<IncidenceClass> getAllIncidenceClasses();
 
 
-//	public Set<GraphElementClass> getAllowedSigmaClasses();
-//
-//
-//	public void addAllowedSigmaClass(GraphElementClass gec);
-//	
+
+	@SuppressWarnings("rawtypes")
+	public Set<GraphElementClass> getAllowedSigmaClasses();
+
+
+	@SuppressWarnings("rawtypes")
+	public void addAllowedSigmaClass(GraphElementClass gec);
+	
 	public void setAllowedKappaRange(int min, int max);
 	
 	public int getAllowedMinKappa();

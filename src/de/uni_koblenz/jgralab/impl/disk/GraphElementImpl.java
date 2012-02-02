@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.impl.disk;
 import java.rmi.RemoteException;
 import java.util.Comparator;
 
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -121,6 +120,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		this.storingDiskStorage = graphDatabase.localDiskStorage;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final boolean containsElement(GraphElement element) {
 		for (GraphElement el = element; el.getSigma() != null
@@ -230,7 +230,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), null, false);
+				anIncidenceClass.getM1Class(), false);
 	}
 
 	@Override
@@ -238,54 +238,35 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 			Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, null, false);
+				anIncidenceClass, false);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), direction, false);
-	}
-
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction) {
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, direction, false);
-	}
 
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), null, noSubclasses);
+				anIncidenceClass.getM1Class(), noSubclasses);
 	}
 
+	
+	
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(
 			Class<T> anIncidenceClass, boolean noSubclasses) {
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, null, noSubclasses);
+				anIncidenceClass,noSubclasses);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
-
+	
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext,
 			IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), null, false);
+				anIncidenceClass.getM1Class(), false);
 	}
 
 	@Override
@@ -293,27 +274,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 			Graph traversalContext, Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, null,
-				false);
-	}
-
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), direction, false);
-	}
-
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Graph traversalContext, Class<T> anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, direction,
-				false);
+		return getFirstIncidence(traversalContext, anIncidenceClass, false);
 	}
 
 	@Override
@@ -322,28 +283,9 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), null, noSubclasses);
+				anIncidenceClass.getM1Class(), noSubclasses);
 	}
 
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Graph traversalContext, Class<T> anIncidenceClass,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, null,
-				noSubclasses);
-	}
-
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
 
 	@Override
 	public final int getDegree(IncidenceClass ic) {
@@ -359,22 +301,6 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		return getDegree(localGraphDatabase.getTraversalContext(), ic, false);
 	}
 
-	@Override
-	public final int getDegree(IncidenceClass ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic,
-				direction, false);
-	}
-
-	@Override
-	public final int getDegree(Class<? extends Incidence> ic,
-			Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic,
-				direction, false);
-	}
 
 	@Override
 	public final int getDegree(Graph traversalContext, IncidenceClass ic) {
@@ -391,21 +317,6 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		return getDegree(traversalContext, ic, false);
 	}
 
-	@Override
-	public final int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(traversalContext, ic, direction, false);
-	}
-
-	@Override
-	public final int getDegree(Graph traversalContext,
-			Class<? extends Incidence> ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(traversalContext, ic, direction, false);
-	}
 
 	/**
 	 * Removes <code>moved</code> from the sequence of {@link Incidence}s at
@@ -444,6 +355,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	public abstract void sortIncidences(Comparator<Incidence> comp);
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final void addSubordinateElement(Vertex appendix) {
 		// System.out.println("Adding vertex " + appendix +
@@ -471,6 +383,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	protected abstract void addFirstSubordinateVertex(Vertex appendix);
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final void addSubordinateElement(Edge appendix) {
 		if (getSubordinateGraph().getLastEdge() != null) {
@@ -498,6 +411,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @param kappa
 	 *            <b>int</b>
 	 */
+	@SuppressWarnings("rawtypes")
 	private final void setAllKappas(int kappa) {
 		int kappaDifference = getKappa() - kappa;
 		setKappa(kappa);
@@ -536,6 +450,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
+	@SuppressWarnings("rawtypes")
 	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;

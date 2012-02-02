@@ -611,21 +611,6 @@ public abstract class IncidenceImpl implements Incidence {
 				anIncidenceClass);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
@@ -641,23 +626,6 @@ public abstract class IncidenceImpl implements Incidence {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
 				anIncidenceClass, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
 	}
 
 	@Override
