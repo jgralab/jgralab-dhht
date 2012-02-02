@@ -142,7 +142,6 @@ public abstract class IncidenceProxy implements Incidence {
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext) {
 		Incidence currentIncidence;
 		try {
-			long vertexId = storingGraphDatabase.getVertexIdAtIncidenceId(id);
 			long nextIncId = storingGraphDatabase
 					.getNextIncidenceIdAtVertexId(id);
 			currentIncidence = localGraphDatabase.getIncidenceObject(nextIncId);
@@ -422,22 +421,6 @@ public abstract class IncidenceProxy implements Incidence {
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
@@ -452,22 +435,6 @@ public abstract class IncidenceProxy implements Incidence {
 				anIncidenceClass, noSubclasses);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
-	}
 
 	// @Override
 	// public Incidence getNextIncidenceAtEdge(Graph traversalContext, Direction
@@ -536,66 +503,33 @@ public abstract class IncidenceProxy implements Incidence {
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
-				false);
+		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, false);
 	}
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
-				false);
+		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, false);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass,
-				direction, false);
-	}
 
-	@Override
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass,
-				direction, false);
-	}
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			IncidenceClass anIncidenceClass, boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
+		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, 
 				noSubclasses);
 	}
+
+
 
 	@Override
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext, anIncidenceClass, null,
-				noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtEdge(traversalContext,
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		Incidence currentIncidence = getNextIncidenceAtEdge(traversalContext,
-				direction);
+		Incidence currentIncidence = getNextIncidenceAtEdge(traversalContext);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -607,7 +541,7 @@ public abstract class IncidenceProxy implements Incidence {
 				}
 			}
 			currentIncidence = currentIncidence.getNextIncidenceAtEdge(
-					traversalContext, direction);
+					traversalContext);
 		}
 		return null;
 	}
@@ -666,21 +600,6 @@ public abstract class IncidenceProxy implements Incidence {
 				anIncidenceClass);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction);
-	}
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
@@ -698,22 +617,7 @@ public abstract class IncidenceProxy implements Incidence {
 				anIncidenceClass, noSubclasses);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
-	}
 
-	@Override
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(getGraph().getTraversalContext(),
-				anIncidenceClass, direction, noSubclasses);
-	}
 
 	@Override
 	public final Incidence getNextIncidenceAtVertex(Graph traversalContext,
@@ -773,7 +677,7 @@ public abstract class IncidenceProxy implements Incidence {
 			IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				null, false);
+				 false);
 	}
 
 	@Override
@@ -781,57 +685,25 @@ public abstract class IncidenceProxy implements Incidence {
 			Class<? extends Incidence> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				null, false);
+				 false);
 	}
 
-	@Override
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				direction, false);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				direction, false);
-	}
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			IncidenceClass anIncidenceClass, boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				null, noSubclasses);
+				noSubclasses);
 	}
+
+
 
 	@Override
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(traversalContext, anIncidenceClass,
-				null, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getNextIncidenceAtVertex(traversalContext,
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
-
-	@Override
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		Incidence currentIncidence = getNextIncidenceAtVertex(traversalContext,
-				direction);
+		Incidence currentIncidence = getNextIncidenceAtVertex(traversalContext);
 		while (currentIncidence != null) {
 			if (noSubclasses) {
 				if (anIncidenceClass == currentIncidence.getM1Class()) {
@@ -843,7 +715,7 @@ public abstract class IncidenceProxy implements Incidence {
 				}
 			}
 			currentIncidence = currentIncidence.getNextIncidenceAtVertex(
-					traversalContext, direction);
+					traversalContext);
 		}
 		return null;
 	}

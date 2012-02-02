@@ -119,6 +119,7 @@ public abstract class GraphElementProxy
 		this.storingDiskStorage = graphDatabase.inMemoryStorage;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final boolean containsElement(GraphElement element) {
 		for (GraphElement el = element; el.getSigma() != null
@@ -229,7 +230,7 @@ public abstract class GraphElementProxy
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), null, false);
+				anIncidenceClass.getM1Class(), false);
 	}
 
 	@Override
@@ -237,46 +238,26 @@ public abstract class GraphElementProxy
 			Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, null, false);
+				anIncidenceClass, false);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), direction, false);
-	}
 
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Class<T> anIncidenceClass, Direction direction) {
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, direction, false);
-	}
 
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), null, noSubclasses);
+				anIncidenceClass.getM1Class(),noSubclasses);
 	}
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(
 			Class<T> anIncidenceClass, boolean noSubclasses) {
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass, null, noSubclasses);
+				anIncidenceClass, noSubclasses);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext,
@@ -284,7 +265,7 @@ public abstract class GraphElementProxy
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), null, false);
+				anIncidenceClass.getM1Class(), false);
 	}
 
 	@Override
@@ -292,28 +273,10 @@ public abstract class GraphElementProxy
 			Graph traversalContext, Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, null,
-				false);
+		return getFirstIncidence(traversalContext, anIncidenceClass, false);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), direction, false);
-	}
 
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Graph traversalContext, Class<T> anIncidenceClass,
-			Direction direction) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, direction,
-				false);
-	}
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext,
@@ -321,7 +284,7 @@ public abstract class GraphElementProxy
 		assert anIncidenceClass != null;
 		assert isValid();
 		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), null, noSubclasses);
+				anIncidenceClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
@@ -330,19 +293,9 @@ public abstract class GraphElementProxy
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
 		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, null,
-				noSubclasses);
+		return getFirstIncidence(traversalContext, anIncidenceClass, noSubclasses);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), direction, noSubclasses);
-	}
 
 	@Override
 	public final int getDegree(IncidenceClass ic) {
@@ -358,22 +311,6 @@ public abstract class GraphElementProxy
 		return getDegree(localGraphDatabase.getTraversalContext(), ic, false);
 	}
 
-	@Override
-	public final int getDegree(IncidenceClass ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic,
-				direction, false);
-	}
-
-	@Override
-	public final int getDegree(Class<? extends Incidence> ic,
-			Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(localGraphDatabase.getTraversalContext(), ic,
-				direction, false);
-	}
 
 	@Override
 	public final int getDegree(Graph traversalContext, IncidenceClass ic) {
@@ -388,22 +325,6 @@ public abstract class GraphElementProxy
 		assert ic != null;
 		assert isValid();
 		return getDegree(traversalContext, ic, false);
-	}
-
-	@Override
-	public final int getDegree(Graph traversalContext, IncidenceClass ic,
-			Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(traversalContext, ic, direction, false);
-	}
-
-	@Override
-	public final int getDegree(Graph traversalContext,
-			Class<? extends Incidence> ic, Direction direction) {
-		assert ic != null;
-		assert isValid();
-		return getDegree(traversalContext, ic, direction, false);
 	}
 
 	/**
@@ -456,7 +377,7 @@ public abstract class GraphElementProxy
 			// subordinate graph
 			addFirstSubordinateVertex(appendix);
 		}
-		//((GraphElementImpl<?, ?, ?>) appendix).setAllKappas(getKappa() - 1);
+		((GraphElementImpl) appendix).setAllKappas(getKappa() - 1);
 		appendix.setSigma(this);
 	}
 
@@ -535,6 +456,7 @@ public abstract class GraphElementProxy
 	 * @return <code>true</code> if this GraphElement is a direct or indirect
 	 *         child of <code>parent</code>.
 	 */
+	@SuppressWarnings("rawtypes")
 	public final boolean isChildOf(GraphElement parent) {
 		if (getSigma() == null || getKappa() >= parent.getKappa()) {
 			return false;
