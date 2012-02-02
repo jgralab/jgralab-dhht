@@ -167,4 +167,5 @@ public class EdgeClassImpl extends GraphElementClassImpl<EdgeClass, Edge, Vertex
 		return topologicalOrderList;
 	}
 
+
 }

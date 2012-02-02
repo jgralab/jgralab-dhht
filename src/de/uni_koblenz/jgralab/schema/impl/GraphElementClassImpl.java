@@ -55,7 +55,8 @@ public abstract class GraphElementClassImpl
 	
 	protected GraphClass graphClass;
 
-//	protected Set<GraphElementClass<?, ?,?,?>> allowedSigmaClasses;
+	@SuppressWarnings("rawtypes")
+	protected Set<GraphElementClass> allowedSigmaClasses;
 	
 	protected int minKappa = 0;
 	
@@ -76,15 +77,17 @@ public abstract class GraphElementClassImpl
 	//	allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
 	}
 	
-//	@Override
-//	public void addAllowedSigmaClass(GraphElementClass gec) {
-//	//	allowedSigmaClasses.add(gec);
-//	}
-//	
-//	@Override
-//	public Set<GraphElementClass> getAllowedSigmaClasses() {
-//		return null; // allowedSigmaClasses;
-//	}
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void addAllowedSigmaClass(GraphElementClass gec) {
+		allowedSigmaClasses.add(gec);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public Set<GraphElementClass> getAllowedSigmaClasses() {
+		return null; // allowedSigmaClasses;
+	}
 
 	@Override
 	public GraphClass getGraphClass() {
@@ -176,6 +179,7 @@ public abstract class GraphElementClassImpl
 
 	
 
+	@SuppressWarnings("rawtypes")
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
@@ -190,6 +194,7 @@ public abstract class GraphElementClassImpl
 		return adjacentIncidenceClasses;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	protected Set<IncidenceClass> getAllAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : getAllIncidenceClasses()) {
