@@ -132,32 +132,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass);
 
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction);
-
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -186,41 +160,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtEdge(
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
 
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses);
-
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -297,36 +236,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass);
 
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
-
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
 	/**
 	 * @see #getNextIncidenceAtEdge()
@@ -359,46 +268,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
 
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses);
-
-	/**
-	 * @see #getNextIncidenceAtEdge()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtEdge(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -463,32 +332,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass);
 
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction);
-
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -517,41 +360,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtVertex(
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
 
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(IncidenceClass anIncidenceClass,
-			Direction direction, boolean noSubclasses);
-
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
 
 	/**
 	 * Returns the next {@link Incidence} in the sequence of all
@@ -627,36 +435,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass);
 
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction);
-
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction);
 
 	/**
 	 * @see #getNextIncidenceAtVertex()
@@ -689,46 +467,6 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
 			Class<? extends Incidence> anIncidenceClass, boolean noSubclasses);
 
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link IncidenceClass} the next incidence should be an
-	 *            instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			IncidenceClass anIncidenceClass, Direction direction,
-			boolean noSubclasses);
-
-	/**
-	 * @see #getNextIncidenceAtVertex()
-	 * @param traversalContext
-	 *            {@link Graph}
-	 * @param anIncidenceClass
-	 *            {@link Class} the next incidence should be an instance of
-	 * @param direction
-	 *            {@link Direction} the direction the next incidence should
-	 *            have.
-	 * @param noSubclasses
-	 *            boolean if <code>true</code> the next {@link Incidence} must
-	 *            not be an instance of an subclass of
-	 *            <code>anIncidenceClass</code>
-	 * @return {@link Incidence}
-	 */
-	@Deprecated
-	public Incidence getNextIncidenceAtVertex(Graph traversalContext,
-			Class<? extends Incidence> anIncidenceClass, Direction direction,
-			boolean noSubclasses);
 
 	/**
 	 * Returns the previous {@link Incidence} in the sequence of all

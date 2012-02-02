@@ -517,6 +517,7 @@ public class GraphIO {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void writeKappaDefintion(GraphElementClass gec)
 			throws IOException {
 		if (gec.getAllowedMinKappa() != 0
@@ -539,7 +540,9 @@ public class GraphIO {
 	private void writeSigmaDefinition(GraphElementClass gec)
 			throws IOException {
 		String delim = " validsigma";
-		for (GraphElementClass sigmaClass : gec.getAllowedSigmaClasses()) {
+		@SuppressWarnings("unchecked")
+		Iterable<GraphElementClass> iterable =  gec.getAllowedSigmaClasses();
+		for (GraphElementClass sigmaClass : iterable) {
 			space();
 			write(delim);
 			writeIdentifier(sigmaClass.getQualifiedName());

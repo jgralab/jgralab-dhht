@@ -94,6 +94,7 @@ public interface GraphElementClass
 
 
 
+
 	@SuppressWarnings("rawtypes")
 	public Set<GraphElementClass> getAllowedSigmaClasses();
 
