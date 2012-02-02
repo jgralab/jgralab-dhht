@@ -138,8 +138,7 @@ public final class ListDomainImpl extends CollectionDomainImpl implements
 				"$" + variableName + "Element", graphIoVariableName, ""), 1);
 		code.add(new CodeSnippet("\t#tmpname#.add($#name#Element);", "}",
 				"#io#.match(\"]\");"));
-		code.add(new CodeSnippet(
-				attributeContainer + "#name# = getGraph().createList();"));
+		code.add(new CodeSnippet("#name# = de.uni_koblenz.jgralab.JGraLab.vector();"));
 		code.add(new CodeSnippet(attributeContainer + "#name#.addAll(#tmpname#);"));
 		code.addNoIndent(new CodeSnippet(
 				"} else if (#io#.isNextToken(GraphIO.NULL_LITERAL)) {"));

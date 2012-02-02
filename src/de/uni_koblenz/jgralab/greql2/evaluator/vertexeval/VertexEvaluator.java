@@ -43,10 +43,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -160,7 +162,7 @@ public abstract class VertexEvaluator {
 		vertexEvalMarker = eval.getVertexEvaluatorGraphMarker();
 	}
 
-	protected void setVertexEvalMarker(GraphMarker<VertexEvaluator> marker) {
+	protected void setVertexEvalMarker(ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
 		vertexEvalMarker = marker;
 	}
 
@@ -181,7 +183,7 @@ public abstract class VertexEvaluator {
 	 *         the function name of the corresponding function for logging.
 	 */
 	public String getLoggingName() {
-		return this.getVertex().getAttributedElementClass().getSimpleName();
+		return this.getVertex().getType().getSimpleName();
 	}
 
 	/**
@@ -189,26 +191,17 @@ public abstract class VertexEvaluator {
 	 *
 	 * @return the evaluation result
 	 */
-	public Object getResult() {
+	public Object getResult() throws QuerySourceException {
 		if (result != null) {
 			return result;
 		}
-
-		// System.out.println("Evaluating : " + this);
 		try {
 			result = evaluate();
-			// System.out.println("VertexEvaluator.getResult() " + result
-			// + " of vertex " + getVertex());
 		} catch (QuerySourceException ex) {
 			removeInvalidSourcePosition(ex);
 			throw ex;
 		}
-
-		// System.out.println("Evaluating : " + this + " finished");
-		// System.out.println("Result is: " + result);
-
 		greqlEvaluator.progress(ownEvaluationCosts);
-
 		return result;
 	}
 
@@ -224,7 +217,7 @@ public abstract class VertexEvaluator {
 	 * this method does the evaluation. It must be implemented by concrete
 	 * evaluators
 	 */
-	public abstract Object evaluate();
+	public abstract Object evaluate() throws QuerySourceException;
 
 	/**
 	 * clears the evaluation result
@@ -252,8 +245,8 @@ public abstract class VertexEvaluator {
 
 	public void resetSubtreeToInitialState() {
 		resetToInitialState();
-		for (Edge e : getVertex().incidences(EdgeDirection.IN)) {
-			Vertex vertex = e.getThat();
+		for (Incidence i : getVertex().getIncidences(Direction.EDGE_TO_VERTEX)) {
+			Vertex vertex = i.getThat();
 			VertexEvaluator eval = vertexEvalMarker.getMark(vertex);
 			if (eval != null) {
 				eval.resetSubtreeToInitialState();
@@ -335,14 +328,12 @@ public abstract class VertexEvaluator {
 	public void calculateNeededAndDefinedVariables() {
 		neededVariables = new HashSet<Variable>();
 		definedVariables = new HashSet<Variable>();
-		Edge inc = getVertex().getFirstIncidence(EdgeDirection.IN);
-		while (inc != null) {
-			VertexEvaluator veval = vertexEvalMarker.getMark(inc.getAlpha());
+		for (Incidence inc : getVertex().getIncidences(Direction.EDGE_TO_VERTEX)) {
+			VertexEvaluator veval = vertexEvalMarker.getMark(inc.getThat());
 			if (veval != null) {
 				neededVariables.addAll(veval.getNeededVariables());
 				definedVariables.addAll(veval.getDefinedVariables());
 			}
-			inc = inc.getNextIncidence(EdgeDirection.IN);
 		}
 		HashSet<Variable> bothVariables = new HashSet<Variable>();
 		bothVariables.addAll(neededVariables);
@@ -434,13 +425,10 @@ public abstract class VertexEvaluator {
 	 * creates a list of possible source positions for the current vertex
 	 */
 	public List<SourcePosition> createPossibleSourcePositions() {
-		Greql2Aggregation inc = (Greql2Aggregation) getVertex()
-				.getFirstIncidence(EdgeDirection.OUT);
-		List<SourcePosition> possibleSourcePositions = new ArrayList<SourcePosition>();
-		while (inc != null) {
-			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
+		List<SourcePosition> possibleSourcePositions = JGraLab.vector();
+		for (Incidence inc : getVertex().getIncidences(Direction.VERTEX_TO_EDGE)) {
+			List<SourcePosition> sourcePositions = ((Greql2Aggregation) inc.getEdge()).get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
 		}
 		return possibleSourcePositions;
 	}
@@ -461,13 +449,10 @@ public abstract class VertexEvaluator {
 	 * vertex
 	 */
 	private void removeInvalidSourcePosition(QuerySourceException ex) {
-		Greql2Aggregation inc = (Greql2Aggregation) getVertex()
-				.getFirstIncidence(EdgeDirection.OUT);
-		List<SourcePosition> possibleSourcePositions = new ArrayList<SourcePosition>();
-		while (inc != null) {
-			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
+		List<SourcePosition> possibleSourcePositions = JGraLab.vector();
+		for (Incidence inc : getVertex().getIncidences(Direction.VERTEX_TO_EDGE)) {
+			List<SourcePosition> sourcePositions = ((Greql2Aggregation) inc.getEdge()).get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
 		}
 		if (possibleSourcePositions.size() == 0) {
 			return; // maybe the vertex is the root vertex, than it has no

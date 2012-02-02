@@ -204,7 +204,9 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISTRIBUTEDPROXIES:	
 		case DISKPROXIES:
-			code.add("public #type# #isOrGet#_#name#()  {",
+			code.add(
+					"@SupressWarnings(\"unchecked\")",
+					"public #type# #isOrGet#_#name#()  {",
 					"\ttry {",
 					 "\t\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
 					 "\t} catch (java.rmi.RemoteException ex) {",

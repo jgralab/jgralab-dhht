@@ -156,17 +156,34 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			if (aec.getSchema().getRecordDomains().size() > 0) {
 				addImports("java.util.Map");
 			}
+			switch (currentCycle) {
+			case MEMORYBASED:
+				code.setVariable("implementationType", "InMemoryStorage");
+				break;
+			case DISTRIBUTED:	
+				code.setVariable("implementationType", "DistributedStorage");
+				break;
+			case DISKBASED:
+				code.setVariable("implementationType", "DiskBasedStorage");
+				break;
+			default:
+				throw new RuntimeException("Unhandled case");
+			}
 			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
 				CodeSnippet cs = new CodeSnippet(true);
 				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
-				cs.add("\trecord.readComponentValues(io);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
+				cs.add("\ttry {");
+				cs.add("\t\trecord.readComponentValues(io);");
+				cs.add("\t} catch (IOException ex) {");
+				cs.add("\t\tthrow new GraphIOException(ex);");
+				cs.add("\t}");
 				cs.add("\treturn record;");
 				cs.add("}");
 				cs.add("");
 
 				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
 				
 
 				cs.add("\trecord.setComponentValues(fields);");
@@ -181,7 +198,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 				cs.add("");
 				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord(#rcname#.class, this);");
+				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
 				
 				for (RecordComponent entry : rd.getComponents()) {
 					cs.add("\trecord.set_" + entry.getName() + "(_"

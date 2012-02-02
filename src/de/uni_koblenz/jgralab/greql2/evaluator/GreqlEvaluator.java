@@ -84,7 +84,6 @@ import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
-import de.uni_koblenz.jgralab.greql2.serialising.Greql2Serializer;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -212,6 +211,7 @@ public class GreqlEvaluator {
 	 * The map of SimpleName to Type of types that is known in the evaluator by
 	 * import statements in the greql query
 	 */
+	@SuppressWarnings("rawtypes")
 	protected Map<String, AttributedElementClass> knownTypes = new HashMap<String, AttributedElementClass>(); // initial
 
 	/**
@@ -741,6 +741,7 @@ public class GreqlEvaluator {
 		setQuery(query);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private GreqlEvaluator(Graph datagraph, Map<String, Object> variables,
 			ProgressFunction progressFunction) {
 		this.datagraph = datagraph;
@@ -750,10 +751,11 @@ public class GreqlEvaluator {
 		this.progressFunction = progressFunction;
 	}
 
-	public void addKnownType(AttributedElementClass knownType) {
+	public void addKnownType(@SuppressWarnings("rawtypes") AttributedElementClass knownType) {
 		knownTypes.put(knownType.getSimpleName(), knownType);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public AttributedElementClass getKnownType(String typeSimpleName) {
 		return knownTypes.get(typeSimpleName);
 	}

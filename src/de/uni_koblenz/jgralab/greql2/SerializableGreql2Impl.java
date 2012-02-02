@@ -37,7 +37,7 @@ import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.impl.mem.Greql2Impl;
-import de.uni_koblenz.jgralab.greql2.serialising.Greql2Serializer;
+import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
 
 
 /**
@@ -59,7 +59,7 @@ public class SerializableGreql2Impl extends Greql2Impl implements
 		super(id, vMax, eMax);
 	}
 
-	private Greql2Serializer serializer = new Greql2Serializer();
+	private GreqlSerializer serializer = new GreqlSerializer();
 
 	@Override
 	public String serialize() {
@@ -69,7 +69,7 @@ public class SerializableGreql2Impl extends Greql2Impl implements
 	@Override
 	public String serialize(Greql2Vertex v) {
 		try {
-			return serializer.serializeGreql2Vertex(v);
+			return serializer.serializeGreqlVertex(v);
 		} catch (Exception e) {
 			System.err.println("Couldn't serialize Query.");
 			e.printStackTrace();
