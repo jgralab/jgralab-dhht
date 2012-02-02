@@ -338,6 +338,29 @@ public abstract class EdgeImpl extends
 	public final Incidence getFirstIncidence() {
 		return getFirstIncidence(getGraph().getTraversalContext());
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass,  boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(traversalContext);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return (T) currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return (T) currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtEdge(
+					traversalContext);
+		}
+		return null;
+	}
 
 	@Override
 	public final Incidence getFirstIncidence(boolean thisIncidence,

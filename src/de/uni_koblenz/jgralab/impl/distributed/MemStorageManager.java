@@ -7,6 +7,8 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This class realizes the storage of vertices, edges and incidences on the
@@ -47,12 +49,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * array of incidences
 	 */
 	private IncidenceImpl[] incidenceArray;
-	
-	
-	
 
+	private GraphDatabaseBaseImpl graphDatabase;
+	
+	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
-		//this.graphDatabase = database;
+		this.graphDatabase = database;
 	}
 
 
@@ -72,9 +74,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 
 
-	private int getLocalId(long id) {
-		return GraphDatabaseBaseImpl.convertToLocalId(id);
-	}
+//	private int getLocalId(long id) {
+//		return GraphDatabaseBaseImpl.convertToLocalId(id);
+//	}
 
 
 
@@ -108,8 +110,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 
 	@Override
 	public long getSigmaIdOfVertexId(int localElementId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localElementId)).getSigmaId();
 	}
 
 
@@ -117,33 +118,29 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setSigmaIdOfVertexId(int localElementId, long globalSigmaId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((VertexImpl) getVertexObject(localElementId)).setSigmaId(globalSigmaId);
 	}
 
 
 
 	@Override
-	public int getKappaOfVertexId(int localIncidenceId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getKappaOfVertexId(int localElementId) throws RemoteException {
+		return ((VertexImpl) getVertexObject(localElementId)).getKappa();
 	}
 
 
 
 	@Override
-	public void setKappaOfVertexId(int localIncidenceId, int kappa)
+	public void setKappaOfVertexId(int localElementId, int kappa)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		 ((VertexImpl) getVertexObject(localElementId)).setKappa(kappa);
 	}
 
 
 
 	@Override
 	public long getSigmaIdOfEdgeId(int localElementId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localElementId)).getSigmaId();
 	}
 
 
@@ -151,41 +148,36 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setSigmaIdOfEdgeId(int localElementId, long globalSigmaId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localElementId)).setSigmaId(globalSigmaId);
 	}
 
 
 
 	@Override
-	public int getKappaOfEdgeId(int localIncidenceId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getKappaOfEdgeId(int localElementId) throws RemoteException {
+		return ((EdgeImpl) getEdgeObject(localElementId)).getKappa();
 	}
 
 
 
 	@Override
-	public void setKappaOfEdgeId(int localIncidenceId, int kappa)
+	public void setKappaOfEdgeId(int localElementId, int kappa)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localElementId)).setKappa(kappa);
 	}
 
 
 
 	@Override
 	public int getVertexTypeId(int localVertexId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localVertexId)).getType().getId();
 	}
 
 
 
 	@Override
 	public long getNextVertexId(int localVertexId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localVertexId)).getNextElementId();
 	}
 
 
@@ -193,16 +185,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setNextVertexId(int localVertexId, long nextVertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((VertexImpl) getVertexObject(localVertexId)).setNextElementId(nextVertexId);
 	}
 
 
 
 	@Override
 	public long getPreviousVertexId(int localVertexId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localVertexId)).getPreviousElementId();
 	}
 
 
@@ -210,24 +200,21 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setPreviousVertexId(int localVertexId, long previousVertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((VertexImpl) getVertexObject(localVertexId)).setNextElementId(previousVertexId);
 	}
 
 
 
 	@Override
 	public int getEdgeTypeId(int localEdgeId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localEdgeId)).getType().getId();
 	}
 
 
 
 	@Override
 	public long getNextEdgeId(int localEdgeId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localEdgeId)).getNextElementId();
 	}
 
 
@@ -235,16 +222,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setNextEdgeId(int localEdgeId, long nextEdgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localEdgeId)).setNextElementId(nextEdgeId);
 	}
 
 
 
 	@Override
 	public long getPreviousEdgeId(int localEdgeId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localEdgeId)).getPreviousElementId();
 	}
 
 
@@ -252,203 +237,181 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	@Override
 	public void setPreviousEdgeId(int localEdgeId, long previousEdgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localEdgeId)).setNextElementId(previousEdgeId);
 	}
 
 
 
+
 	@Override
-	public long getFirstIncidenceIdAtVertexId(int localElementId)
+	public long getFirstIncidenceIdAtVertexId(int localVertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localVertexId)).getFirstIncidenceId();
 	}
 
 
 
 	@Override
-	public void setFirstIncidenceIdAtVertexId(int localElementId, long id)
+	public void setFirstIncidenceIdAtVertexId(int localVertexId, long incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((VertexImpl) getVertexObject(localVertexId)).setFirstIncidenceId(incidenceId);
 	}
 
 
 
 	@Override
-	public long getLastIncidenceIdAtVertexId(int localElementId)
+	public long getLastIncidenceIdAtVertexId(int localVertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(localVertexId)).getLastIncidenceId();
 	}
 
 
 
 	@Override
-	public void setLastIncidenceIdAtVertexId(int localElementId, long id)
+	public void setLastIncidenceIdAtVertexId(int localVertexId, long incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((VertexImpl) getVertexObject(localVertexId)).setLastIncidenceId(incidenceId);
 	}
 
 
 
 	@Override
-	public long getNextIncidenceIdAtVertexId(int convertToLocalId)
+	public long getNextIncidenceIdAtVertexId(int incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getNextIncidenceIdAtVertex();
 	}
 
 
 
 	@Override
-	public long getPreviousIncidenceIdAtVertexId(int convertToLocalId)
+	public long getPreviousIncidenceIdAtVertexId(int incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getPreviousIncidenceIdAtVertex();
 	}
 
 
 
 	@Override
-	public void setNextIncidenceAtVertexId(int localIncidenceId, long nextIncId)
+	public void setNextIncidenceAtVertexId(int incidenceId, long nextIncId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((IncidenceImpl) getIncidenceObject(incidenceId)).setNextIncidenceIdAtVertex(nextIncId);
 	}
 
 
 
 	@Override
-	public void setPreviousIncidenceAtVertexId(int localIncidenceId,
-			long previousIncId) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public void setPreviousIncidenceAtVertexId(int incidenceId,	long previousIncId) throws RemoteException {
+		((IncidenceImpl) getIncidenceObject(incidenceId)).setPreviousIncidenceIdAtVertex(previousIncId);
 	}
 
 
 
 	@Override
 	public long getConnectedVertexId(int incidenceId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getIncidentVertexId();
 	}
 
 
 
 	@Override
-	public long getIncidenceListVersionOfVertexId(int elementId)
+	public long getIncidenceListVersionOfVertexId(int vertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((VertexImpl) getVertexObject(vertexId)).getIncidenceListVersion();
 	}
 
 
 
 	@Override
-	public void increaseIncidenceListVersionOfVertexId(int elementId)
+	public void increaseIncidenceListVersionOfVertexId(int vertexId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		((VertexImpl) getVertexObject(vertexId)).increaseIncidenceListVersion();
 		
 	}
 
 
 
 	@Override
-	public long getFirstIncidenceIdAtEdgeId(int localElementId)
+	public long getFirstIncidenceIdAtEdgeId(int localEdgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localEdgeId)).getFirstIncidenceId();
 	}
 
 
 
 	@Override
-	public void setFirstIncidenceIdAtEdgeId(int localElementId, long l)
+	public void setFirstIncidenceIdAtEdgeId(int localEdgeId, long incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localEdgeId)).setFirstIncidenceId(incidenceId);
 	}
 
 
 
 	@Override
-	public long getLastIncidenceIdAtEdgeId(int localElementId)
+	public long getLastIncidenceIdAtEdgeId(int localEdgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(localEdgeId)).getLastIncidenceId();
 	}
 
 
 
 	@Override
-	public void setLastIncidenceIdAtEdgeId(int localElementId, long id)
+	public void setLastIncidenceIdAtEdgeId(int localEdgeId, long incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((EdgeImpl) getEdgeObject(localEdgeId)).setLastIncidenceId(incidenceId);
 	}
 
 
 
 	@Override
-	public long getNextIncidenceIdAtEdgeId(int convertToLocalId)
+	public long getNextIncidenceIdAtEdgeId(int incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getNextIncidenceIdAtEdge();
 	}
 
 
 
 	@Override
-	public long getPreviousIncidenceIdAtEdgeId(int convertToLocalId)
+	public long getPreviousIncidenceIdAtEdgeId(int incidenceId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getPreviousIncidenceIdAtEdge();
 	}
 
 
 
 	@Override
-	public void setNextIncidenceAtEdgeId(int localIncidenceId, long nextIncId)
+	public void setNextIncidenceAtEdgeId(int incidenceId, long nextIncId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		
+		((IncidenceImpl) getIncidenceObject(incidenceId)).setNextIncidenceIdAtEdge(nextIncId);
 	}
 
 
 
 	@Override
-	public void setPreviousIncidenceAtEdgeId(int localIncidenceId,
-			long previousIncId) throws RemoteException {
-		// TODO Auto-generated method stub
-		
+	public void setPreviousIncidenceAtEdgeId(int incidenceId,	long previousIncId) throws RemoteException {
+		((IncidenceImpl) getIncidenceObject(incidenceId)).setPreviousIncidenceIdAtEdge(previousIncId);
 	}
 
 
 
 	@Override
 	public long getConnectedEdgeId(int incidenceId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl) getIncidenceObject(incidenceId)).getIncidentEdgeId();
 	}
 
 
 
 	@Override
-	public long getIncidenceListVersionOfEdgeId(int elementId)
+	public long getIncidenceListVersionOfEdgeId(int edgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((EdgeImpl) getEdgeObject(edgeId)).getIncidenceListVersion();
 	}
 
 
 
 	@Override
-	public void increaseIncidenceListVersionOfEdgeId(int elementId)
+	public void increaseIncidenceListVersionOfEdgeId(int edgeId)
 			throws RemoteException {
-		// TODO Auto-generated method stub
+		((EdgeImpl) getEdgeObject(edgeId)).increaseIncidenceListVersion();
 		
 	}
 
@@ -456,8 +419,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 
 	@Override
 	public int getIncidenceTypeId(int localIncidenceId) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ((IncidenceImpl)getIncidenceObject(localIncidenceId)).getType().getId();
 	}
 
 

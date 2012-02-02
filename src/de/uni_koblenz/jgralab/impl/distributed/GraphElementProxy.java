@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.impl.distributed;
 import java.rmi.RemoteException;
 import java.util.Comparator;
 
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -277,26 +276,6 @@ public abstract class GraphElementProxy
 	}
 
 
-
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(), noSubclasses);
-	}
-
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Graph traversalContext, Class<T> anIncidenceClass,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, noSubclasses);
-	}
-
-
 	@Override
 	public final int getDegree(IncidenceClass ic) {
 		assert ic != null;
@@ -364,6 +343,7 @@ public abstract class GraphElementProxy
 	 */
 	public abstract void sortIncidences(Comparator<Incidence> comp);
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public final void addSubordinateElement(Vertex appendix) {
 		// System.out.println("Adding vertex " + appendix +

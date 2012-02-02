@@ -83,6 +83,10 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	private long incidenceListVersion = 0;
 	
+	public void increaseIncidenceListVersion() {
+		incidenceListVersion++;
+	}
+	
 	protected long firstIncidenceId;
 	
 	protected long lastIncidenceId;
@@ -374,23 +378,6 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		return getFirstIncidence(traversalContext, anIncidenceClass, false);
 	}
 
-	@Override
-	public final Incidence getFirstIncidence(Graph traversalContext,
-			IncidenceClass anIncidenceClass, boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext,
-				anIncidenceClass.getM1Class(),  noSubclasses);
-	}
-
-	@Override
-	public final <T extends Incidence> T getFirstIncidence(
-			Graph traversalContext, Class<T> anIncidenceClass,
-			boolean noSubclasses) {
-		assert anIncidenceClass != null;
-		assert isValid();
-		return getFirstIncidence(traversalContext, anIncidenceClass, noSubclasses);
-	}
 
 	@Override
 	public final int getDegree(IncidenceClass ic) {

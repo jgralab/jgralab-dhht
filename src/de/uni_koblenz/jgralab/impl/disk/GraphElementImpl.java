@@ -478,5 +478,8 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	// }
 
 	public abstract AttributeContainer getAttributeContainer();
+	
+
+
 
 }
