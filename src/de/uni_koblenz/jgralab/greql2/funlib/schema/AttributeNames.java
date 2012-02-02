@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.greql2.funlib.schema;
 
+import java.util.SortedSet;
+
 import org.pcollections.PSet;
 
 import de.uni_koblenz.jgralab.AttributedElement;
@@ -16,15 +18,18 @@ public class AttributeNames extends Function {
 				5, 5, 1.0, Category.SCHEMA_ACCESS);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PSet<String> evaluate(AttributedElementClass cls) {
 		PSet<String> result = JGraLab.set();
-		for (Attribute a : cls.getAttributeList()) {
+		SortedSet<Attribute> attributeSet = cls.getAttributeList();
+		for (Attribute a : attributeSet) {
 			result = result.plus(a.getName());
 		}
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public PSet<String> evaluate(AttributedElement el) {
-		return evaluate(el.getAttributedElementClass());
+		return evaluate((AttributedElementClass)el.getType());
 	}
 }
