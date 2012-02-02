@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,21 +38,21 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.schema.DoubleLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.RealLiteral;
 
 /**
- * Evaluates a Integer Literal, that means, provides access to the literal value
- * using the getResult(...)-Method. This is needed, because is should make no
+ * Evaluates a Double Literal, that means, provides access to the literal value
+ * using the getResult(...)-Method. This is needed, because it should make no
  * difference for the other VertexEvaluators, if a value is the result of a
  * maybe complex evaluation or if it is a literal.
  * 
  * @author ist@uni-koblenz.de
  * 
  */
-public class RealLiteralEvaluator extends VertexEvaluator {
+public class DoubleLiteralEvaluator extends VertexEvaluator {
 
-	private RealLiteral vertex;
+	private DoubleLiteral vertex;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -58,14 +62,14 @@ public class RealLiteralEvaluator extends VertexEvaluator {
 		return vertex;
 	}
 
-	public RealLiteralEvaluator(RealLiteral vertex, GreqlEvaluator eval) {
+	public DoubleLiteralEvaluator(DoubleLiteral vertex, GreqlEvaluator eval) {
 		super(eval);
 		this.vertex = vertex;
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
-		return new JValueImpl(vertex.get_realValue());
+	public Double evaluate() {
+		return vertex.get_doubleValue();
 	}
 
 	@Override

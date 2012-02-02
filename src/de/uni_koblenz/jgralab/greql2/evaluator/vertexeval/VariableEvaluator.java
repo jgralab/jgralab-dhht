@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -164,27 +164,33 @@ public class VariableEvaluator extends VertexEvaluator {
 		List<VertexEvaluator> dependingEvaluators = new ArrayList<VertexEvaluator>();
 		List<Vertex> forbiddenVertices = new ArrayList<Vertex>();
 		SimpleDeclaration simpleDecl = null;
-		if (vertex.getFirst_declaredVar() != null) {
-			simpleDecl = (SimpleDeclaration) vertex.getFirst_declaredVar().getThat();
+		if (vertex.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT) != null) {
+			simpleDecl = (SimpleDeclaration) vertex
+					.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT)
+					.getThat();
 		}
 		if (simpleDecl != null) {
 			forbiddenVertices.add(simpleDecl);
-			Declaration declaringVertex = (Declaration) simpleDecl.getFirst_simpleDecl().getThat();
+			Declaration declaringVertex = (Declaration) simpleDecl
+					.getFirstIsSimpleDeclOfIncidence().getThat();
 			if (declaringVertex
-					.getFirst_compDecl() != null) {
+					.getFirstIsCompDeclOfIncidence(EdgeDirection.OUT) != null) {
 				forbiddenVertices.add(declaringVertex
-						.getFirst_compDecl().getThat());
+						.getFirstIsCompDeclOfIncidence(EdgeDirection.OUT)
+						.getThat());
 			} else {
 				forbiddenVertices.add(declaringVertex
-						.getFirst_quantifiedDecl().getThat());
+						.getFirstIsQuantifiedDeclOfIncidence(EdgeDirection.OUT)
+						.getThat());
 			}
 		} else {
-			if (vertex.getFirst_var() != null) {
+			if (vertex.getFirstIsVarOfIncidence(EdgeDirection.OUT) != null) {
 				Definition definingVertex = (Definition) vertex
-						.getFirst_var().getThat();
+						.getFirstIsVarOfIncidence(EdgeDirection.OUT).getThat();
 				forbiddenVertices.add(definingVertex);
 				forbiddenVertices.add(definingVertex
-						.getFirst_definition().getThat());
+						.getFirstIsDefinitionOfIncidence(EdgeDirection.OUT)
+						.getThat());
 			} else {
 				// thisvertex, thisedge
 
@@ -202,11 +208,16 @@ public class VariableEvaluator extends VertexEvaluator {
 					&& (!(eval instanceof SimpleDeclarationEvaluator))) {
 				dependingEvaluators.add(eval);
 			}
-			for (Greql2Aggregation currentEdge : currentVertex.getIncidentEdges(Greql2Aggregation.class, Direction.VERTEX_TO_EDGE)) {
-				Greql2Vertex nextVertex = (Greql2Vertex) currentEdge.getOmega();
+			Greql2Aggregation currentEdge = currentVertex
+					.getFirstGreql2AggregationIncidence(EdgeDirection.OUT);
+			while (currentEdge != null) {
+				Greql2Vertex nextVertex = (Greql2Vertex) currentEdge.getThat();
 				if (!forbiddenVertices.contains(nextVertex)) {
+					// if (!(nextVertex instanceof SimpleDeclaration)) {
 					queue.add(nextVertex);
 				}
+				currentEdge = currentEdge
+						.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
 			}
 		}
 		return dependingEvaluators;

@@ -69,6 +69,7 @@ import de.uni_koblenz.jgralab.ProgressFunction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.DefaultCostModel;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
@@ -205,7 +206,7 @@ public class GreqlEvaluator {
 	/**
 	 * The GraphMarker that stores all vertex evaluators
 	 */
-	protected LocalMapVertexMarker<VertexEvaluator> vertexEvalGraphMarker;
+	protected ObjectGraphMarker<Vertex, VertexEvaluator> vertexEvalGraphMarker;
 
 	/**
 	 * The map of SimpleName to Type of types that is known in the evaluator by
@@ -216,7 +217,7 @@ public class GreqlEvaluator {
 	/**
 	 * returns the vertexEvalGraph marker that is used
 	 */
-	public final LocalMapVertexMarker<VertexEvaluator> getVertexEvaluatorGraphMarker() {
+	public final ObjectGraphMarker<Vertex, VertexEvaluator> getVertexEvaluatorGraphMarker() {
 		return vertexEvalGraphMarker;
 	}
 
@@ -1048,7 +1049,7 @@ public class GreqlEvaluator {
 						.println("################### Optimized Query #####################");
 				System.out
 						.println("#########################################################");
-				System.out.println(Greql2Serializer.serialize(queryGraph));
+				//System.out.println(Greql2Serializer.serialize(queryGraph));
 				String name = "__optimized-greql-query.";
 				try {
 					GraphIO.saveGraphToFile(name + "tg", queryGraph, new ConsoleProgressFunction(

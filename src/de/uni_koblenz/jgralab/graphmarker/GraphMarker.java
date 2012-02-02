@@ -35,10 +35,11 @@
 
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.AttributedElement;
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 
 /**
  * This class can be used to "colorize" graphs, edges and vertices. If a
@@ -55,25 +56,53 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public interface GraphMarker<T extends AttributedElement>  {
+@SuppressWarnings("rawtypes")
+public interface GraphMarker<T extends AttributedElement> extends GraphStructureChangedListener {
+	
+	/**
+	 * Checks if the given <code>graphElement</code> is marked.
+	 * 
+	 * @param graphElement
+	 *            the graph element to check.
+	 * @return true if the given <code>graphElement</code> is marked.
+	 */
+	public boolean isMarked(T graphElement) throws RemoteException;
 
-	Graph getGraph();
+	/**
+	 * Unmarks the given <code>graphElement</code>.
+	 * 
+	 * @param graphElement
+	 *            the graph element to unmark.
+	 * @return false if the given <code>graphElement</code> has already been
+	 *         unmarked.
+	 */
+	public boolean removeMark(T graphElement) throws RemoteException;
 
-	void vertexDeleted(Vertex v);
+	/**
+	 * Returns the number of marked graph elements.
+	 * 
+	 * @return the number of marked graph elements.
+	 */
+	public long size() throws RemoteException;
 
-	boolean removeMark(T graphElement);
+	/**
+	 * Checks if this graph marker is empty.
+	 * 
+	 * @return true if this graph marker is empty.
+	 */
+	public boolean isEmpty() throws RemoteException;
 
-	boolean isMarked(T graphElement);
+	/**
+	 * Unmarks all marked graph elements.
+	 */
+	public void clear() throws RemoteException;
 
-	void edgeDeleted(Edge e);
 
-	long size();
+	public abstract Iterable<T> getMarkedElements() throws RemoteException;
 
-	boolean isEmpty();
 
-	void clear();
-
-	Iterable<T> getMarkedElements();
+	
+	Graph getGraph() throws RemoteException;
 
 
 

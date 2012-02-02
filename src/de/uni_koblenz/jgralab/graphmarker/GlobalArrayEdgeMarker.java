@@ -33,8 +33,9 @@ public class GlobalArrayEdgeMarker<O> extends GlobalGraphMarker<Edge> {
 		LocalArrayEdgeMarker<O> localMarker = (LocalArrayEdgeMarker<O>) getOrCreateMarkerForPartialGraph(edge);
 		localMarker.mark(edge, value);		
 	}
+
 	
-	
+
 	
 	
 }

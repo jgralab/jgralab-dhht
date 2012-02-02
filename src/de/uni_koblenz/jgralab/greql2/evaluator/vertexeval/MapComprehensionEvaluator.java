@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,6 +37,11 @@
  */
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import org.pcollections.PCollection;
+import org.pcollections.PMap;
+
+import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
@@ -75,10 +84,10 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 	 * ()
 	 */
 	@Override
-	public JValue evaluate() throws EvaluateException {
+	public Object evaluate() {
 		VariableDeclarationLayer declLayer = getVariableDeclationLayer();
 
-		JValueMap resultMap = new JValueMap();
+		PMap<Object, Object> resultMap = JGraLab.map();
 
 		Vertex key = vertex.getFirstIsKeyExprOfComprehensionIncidence(
 				EdgeDirection.IN).getAlpha();
@@ -87,10 +96,10 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 				EdgeDirection.IN).getAlpha();
 		VertexEvaluator valEval = vertexEvalMarker.getMark(val);
 		declLayer.reset();
-		while (declLayer.iterate(subgraph)) {
-			JValue jkey = keyEval.getResult(subgraph);
-			JValue jval = valEval.getResult(subgraph);
-			resultMap.put(jkey, jval);
+		while (declLayer.iterate()) {
+			Object jkey = keyEval.getResult();
+			Object jval = valEval.getResult();
+			resultMap = resultMap.plus(jkey, jval);
 		}
 		return resultMap;
 	}
@@ -114,7 +123,7 @@ public class MapComprehensionEvaluator extends ComprehensionEvaluator {
 	}
 
 	@Override
-	protected JValueCollection getResultDatastructure() {
+	protected PCollection<Object> getResultDatastructure() {
 		return null;
 	}
 

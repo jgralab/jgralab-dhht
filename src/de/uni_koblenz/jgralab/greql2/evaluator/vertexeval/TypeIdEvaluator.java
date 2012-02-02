@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,6 +44,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.UnknownTypeException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.TypeId;
+import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
@@ -73,8 +78,8 @@ public class TypeIdEvaluator extends VertexEvaluator {
 	 *            the schema of the datagraph
 	 * @return the generated list of types
 	 */
-	protected List<AttributedElementClass> createTypeList(Schema schema)
-			throws EvaluateException {
+	protected List<AttributedElementClass> createTypeList(Schema schema) {
+
 		ArrayList<AttributedElementClass> returnTypes = new ArrayList<AttributedElementClass>();
 		AttributedElementClass elemClass = schema
 				.getAttributedElementClass(vertex.get_name());
@@ -95,10 +100,10 @@ public class TypeIdEvaluator extends VertexEvaluator {
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
+	public Object evaluate() {
 		List<AttributedElementClass> typeList = createTypeList(greqlEvaluator
 				.getDatagraph().getSchema());
-		return new JValueTypeCollection(typeList, vertex.is_excluded());
+		return new TypeCollection(typeList, vertex.is_excluded());
 	}
 
 	@Override
@@ -122,7 +127,7 @@ public class TypeIdEvaluator extends VertexEvaluator {
 	@Override
 	public String getLoggingName() {
 		StringBuilder name = new StringBuilder();
-		name.append(vertex.getMetaClass().getQualifiedName());
+		name.append(vertex.getAttributedElementClass().getQualifiedName());
 		if (vertex.is_type()) {
 			name.append("-type");
 		}

@@ -40,6 +40,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
@@ -194,16 +195,16 @@ public class AggregationTransition extends Transition {
 	public AggregationTransition(State start, State end, boolean aggregateFrom,
 			TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator predicateEvaluator,
-			GraphMarker<VertexEvaluator> graphMarker) {
+			LocalMapVertexMarker<VertexEvaluator> vertexEvalMarker) {
 		super(start, end);
 		this.aggregateFrom = aggregateFrom;
 		this.validToEdgeRoles = roles;
 		this.validFromEdgeRoles = null;
 		this.typeCollection = typeCollection;
 		this.predicateEvaluator = predicateEvaluator;
-		Vertex v = graphMarker.getGraph().getFirstVertex(ThisEdge.class);
+		Vertex v = vertexEvalMarker.getGraph().getFirstVertex(ThisEdge.class);
 		if (v != null) {
-			thisEdgeEvaluator = (ThisEdgeEvaluator) graphMarker.getMark(v);
+			thisEdgeEvaluator = (ThisEdgeEvaluator) vertexEvalMarker.getMark(v);
 		}
 	}
 

@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -30,10 +34,16 @@
  */
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import org.pcollections.PMap;
+import org.pcollections.PVector;
+
+import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsKeyExprOfConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfConstruction;
@@ -54,31 +64,31 @@ public class MapConstructionEvaluator extends VertexEvaluator {
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
-		JValueMap map = new JValueMap();
-		JValueList keys = new JValueList();
+	public Object evaluate() {
+		PMap<Object, Object> map = JGraLab.map();
+		PVector<Object> keys = JGraLab.vector();
 		for (IsKeyExprOfConstruction e : mapConstruction
 				.getIsKeyExprOfConstructionIncidences(EdgeDirection.IN)) {
 			Vertex exp = e.getAlpha();
 			VertexEvaluator expEval = vertexEvalMarker.getMark(exp);
-			keys.add(expEval.getResult(subgraph));
+			keys = keys.plus(expEval.getResult());
 		}
 
-		JValueList values = new JValueList();
+		PVector<Object> values = JGraLab.vector();
 		for (IsValueExprOfConstruction e : mapConstruction
 				.getIsValueExprOfConstructionIncidences(EdgeDirection.IN)) {
 			Vertex exp = e.getAlpha();
 			VertexEvaluator expEval = vertexEvalMarker.getMark(exp);
-			values.add(expEval.getResult(subgraph));
+			values = values.plus(expEval.getResult());
 		}
 
 		if (keys.size() != values.size()) {
-			throw new EvaluateException(
-					"The map construction has a different key than value number!");
+			throw new GreqlException("Map construction has " + keys.size()
+					+ " key(s) and " + values.size() + " value(s).");
 		}
 
 		for (int i = 0; i < keys.size(); i++) {
-			map.put(keys.get(i), values.get(i));
+			map = map.plus(keys.get(i), values.get(i));
 		}
 
 		return map;

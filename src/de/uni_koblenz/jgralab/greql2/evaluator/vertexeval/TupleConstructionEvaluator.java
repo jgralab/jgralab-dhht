@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,10 +35,13 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import org.pcollections.PCollection;
+
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.TupleConstruction;
+import de.uni_koblenz.jgralab.greql2.types.Tuple;
 
 /**
  * Evaluates a TupleConstruction vertex in the GReQL 2 syntaxgraph
@@ -50,8 +57,8 @@ public class TupleConstructionEvaluator extends ValueConstructionEvaluator {
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
-		return createValue(new JValueTuple());
+	public PCollection<Object> evaluate() {
+		return createValue(Tuple.empty());
 	}
 
 	@Override

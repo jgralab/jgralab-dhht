@@ -124,7 +124,7 @@ BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVa
 BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
 BinaryEdgeClass IsDirectionOf: Greql2Aggregation from PathDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
 BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription (0,*) (1,1);
-BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription (0,*) (1,1);
+BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription role restrictedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsExponentOf: Greql2Aggregation from IntLiteral role exponent (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);

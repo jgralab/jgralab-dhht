@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.graphmarker;
 
+import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,16 +12,10 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
+@SuppressWarnings("rawtypes")
 public abstract class GlobalGraphMarker<T extends GraphElement> extends AbstractGraphMarker<T> {
 
-//	enum GraphMarkerImplementationType {
-//		ARRAY,
-//		BITSET;
-//	}
-	
 	private static final int DEFAULT_PARTIAL_GRAPH_COUNT = 1000;
-	
-	//private GraphMarkerImplementationType implementationTypeForLocalMarkers;
 	
 	private GraphMarker<T>[] localGraphMarkers;
 	
@@ -33,7 +28,6 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	@SuppressWarnings("unchecked")
 	public GlobalGraphMarker(Graph globalGraph) {
 		super(globalGraph);
-		//implementationTypeForLocalMarkers = implementationType;
 		localGraphMarkers = new GraphMarker[DEFAULT_PARTIAL_GRAPH_COUNT];
 	}
 	
@@ -57,7 +51,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	
 
 	@Override
-	public boolean isMarked(T graphElement) {
+	public boolean isMarked(T graphElement) throws RemoteException {
 		long elementId = graphElement.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
@@ -67,7 +61,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	}
 
 	@Override
-	public boolean removeMark(T graphElement) {
+	public boolean removeMark(T graphElement) throws RemoteException {
 		long elementId = graphElement.getGlobalId();
 		int partialGraphId = GraphDatabaseBaseImpl.getPartialGraphId(elementId);
 		GraphMarker<T> localMarker = localGraphMarkers[partialGraphId];
@@ -77,7 +71,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	}
 
 	@Override
-	public long size() {
+	public long size() throws RemoteException {
 		long count = 0;
 		for (int i=0; i<localGraphMarkers.length; i++) {
 			if (localGraphMarkers[i] != null)
@@ -87,7 +81,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty() throws RemoteException {
 		for (int i=0; i<localGraphMarkers.length; i++) {
 			if ((localGraphMarkers[i] != null) && (!localGraphMarkers[i].isEmpty()))
 				return false;
@@ -96,7 +90,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 	}
 
 	@Override
-	public void clear() {
+	public void clear() throws RemoteException {
 		for (int i=0; i<localGraphMarkers.length; i++) {
 			if (localGraphMarkers[i] != null)
 				localGraphMarkers[i].clear();
@@ -129,7 +123,11 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 
 		@Override
 		public Iterator<T> iterator() {
-			return new GlobalGraphMarkerIterator();
+			try {
+				return new GlobalGraphMarkerIterator();
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		
 	}
@@ -143,7 +141,7 @@ public abstract class GlobalGraphMarker<T extends GraphElement> extends Abstract
 		private Iterator<T> currentIterator;
 		
 
-		public GlobalGraphMarkerIterator() {
+		public GlobalGraphMarkerIterator() throws RemoteException {
 			localIterators = new LinkedList<Iterator<T>>();
 			for (int i=0; i<graphMarker.localGraphMarkers.length; i++) {
 				if (graphMarker.localGraphMarkers[i] != null)

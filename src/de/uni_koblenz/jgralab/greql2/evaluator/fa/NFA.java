@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -343,14 +344,14 @@ public class NFA extends FiniteAutomaton {
 	public static NFA createAggregationPathDescriptionNFA(
 			boolean aggregateFrom, TypeCollection typeCollection,
 			Set<String> roles, VertexEvaluator predicateEvaluator,
-			GraphMarker<VertexEvaluator> marker) {
+			LocalMapVertexMarker<VertexEvaluator> vertexEvalMarker) {
 		NFA nfa = new NFA();
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
 		nfa.finalStates.get(0).inTransitions.clear();
 		AggregationTransition t = new AggregationTransition(nfa.initialState,
 				nfa.finalStates.get(0), aggregateFrom, typeCollection, roles,
-				predicateEvaluator, marker);
+				predicateEvaluator, vertexEvalMarker);
 		nfa.transitionList.add(t);
 		nfa.updateStateAttributes();
 		return nfa;

@@ -41,7 +41,7 @@ import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
  * 
  * @author ist@uni-koblenz.de Summer 2006, Diploma Thesis
  * 
- */
+ */ 
 public abstract class ElementSetExpressionEvaluator extends
 		AbstractGraphElementCollectionEvaluator {
 

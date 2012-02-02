@@ -43,17 +43,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation_greql2Aggregation_ComesFrom_Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
@@ -149,7 +148,7 @@ public abstract class VertexEvaluator {
 	 */
 	protected Set<Variable> definedVariables = null;
 
-	protected LocalMapVertexMarker<VertexEvaluator> vertexEvalMarker = null;
+	protected ObjectGraphMarker<Vertex, VertexEvaluator> vertexEvalMarker = null;
 
 	/**
 	 * @param eval
@@ -161,11 +160,11 @@ public abstract class VertexEvaluator {
 		vertexEvalMarker = eval.getVertexEvaluatorGraphMarker();
 	}
 
-	protected void setVertexEvalMarker(LocalMapVertexMarker<VertexEvaluator> marker) {
+	protected void setVertexEvalMarker(GraphMarker<VertexEvaluator> marker) {
 		vertexEvalMarker = marker;
 	}
 
-	public LocalMapVertexMarker<VertexEvaluator> getVertexEvalMarker() {
+	public ObjectGraphMarker<Vertex, VertexEvaluator> getVertexEvalMarker() {
 		return vertexEvalMarker;
 	}
 
@@ -182,7 +181,7 @@ public abstract class VertexEvaluator {
 	 *         the function name of the corresponding function for logging.
 	 */
 	public String getLoggingName() {
-		return this.getVertex().getType().getSimpleName();
+		return this.getVertex().getAttributedElementClass().getSimpleName();
 	}
 
 	/**
@@ -194,7 +193,19 @@ public abstract class VertexEvaluator {
 		if (result != null) {
 			return result;
 		}
-		result = evaluate();
+
+		// System.out.println("Evaluating : " + this);
+		try {
+			result = evaluate();
+			// System.out.println("VertexEvaluator.getResult() " + result
+			// + " of vertex " + getVertex());
+		} catch (QuerySourceException ex) {
+			removeInvalidSourcePosition(ex);
+			throw ex;
+		}
+
+		// System.out.println("Evaluating : " + this + " finished");
+		// System.out.println("Result is: " + result);
 
 		greqlEvaluator.progress(ownEvaluationCosts);
 
@@ -241,8 +252,8 @@ public abstract class VertexEvaluator {
 
 	public void resetSubtreeToInitialState() {
 		resetToInitialState();
-		for (Incidence i : getVertex().getIncidences(Direction.EDGE_TO_VERTEX)) {
-			Vertex vertex = i.getThat();
+		for (Edge e : getVertex().incidences(EdgeDirection.IN)) {
+			Vertex vertex = e.getThat();
 			VertexEvaluator eval = vertexEvalMarker.getMark(vertex);
 			if (eval != null) {
 				eval.resetSubtreeToInitialState();
@@ -324,14 +335,14 @@ public abstract class VertexEvaluator {
 	public void calculateNeededAndDefinedVariables() {
 		neededVariables = new HashSet<Variable>();
 		definedVariables = new HashSet<Variable>();
-		Incidence inc = getVertex().getFirstIncidence(Direction.EDGE_TO_VERTEX);
+		Edge inc = getVertex().getFirstIncidence(EdgeDirection.IN);
 		while (inc != null) {
-			VertexEvaluator veval = vertexEvalMarker.getMark(inc.getThat());
+			VertexEvaluator veval = vertexEvalMarker.getMark(inc.getAlpha());
 			if (veval != null) {
 				neededVariables.addAll(veval.getNeededVariables());
 				definedVariables.addAll(veval.getDefinedVariables());
 			}
-			inc = inc.getNextIncidenceAtVertex(Direction.EDGE_TO_VERTEX);
+			inc = inc.getNextIncidence(EdgeDirection.IN);
 		}
 		HashSet<Variable> bothVariables = new HashSet<Variable>();
 		bothVariables.addAll(neededVariables);
@@ -423,13 +434,13 @@ public abstract class VertexEvaluator {
 	 * creates a list of possible source positions for the current vertex
 	 */
 	public List<SourcePosition> createPossibleSourcePositions() {
-		Greql2Aggregation_greql2Aggregation_ComesFrom_Greql2Vertex inc = (Greql2Aggregation_greql2Aggregation_ComesFrom_Greql2Vertex) getVertex()
-				.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+		Greql2Aggregation inc = (Greql2Aggregation) getVertex()
+				.getFirstIncidence(EdgeDirection.OUT);
 		List<SourcePosition> possibleSourcePositions = new ArrayList<SourcePosition>();
 		while (inc != null) {
-			List<SourcePosition> sourcePositions = ((Greql2Aggregation) inc.getEdge()).get_sourcePositions();
+			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2Aggregation_ComesFrom_Greql2VertexAtVertex();
+			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
 		}
 		return possibleSourcePositions;
 	}
@@ -450,13 +461,13 @@ public abstract class VertexEvaluator {
 	 * vertex
 	 */
 	private void removeInvalidSourcePosition(QuerySourceException ex) {
-		Greql2Aggregation_greql2Aggregation_ComesFrom_Greql2Vertex inc = (Greql2Aggregation_greql2Aggregation_ComesFrom_Greql2Vertex) getVertex()
-				.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+		Greql2Aggregation inc = (Greql2Aggregation) getVertex()
+				.getFirstIncidence(EdgeDirection.OUT);
 		List<SourcePosition> possibleSourcePositions = new ArrayList<SourcePosition>();
 		while (inc != null) {
-			List<SourcePosition> sourcePositions = ((Greql2Aggregation) inc.getEdge()).get_sourcePositions();
+			List<SourcePosition> sourcePositions = inc.get_sourcePositions();
 			possibleSourcePositions.addAll(sourcePositions);
-			inc = inc.getNextGreql2Aggregation_ComesFrom_Greql2VertexAtVertex();
+			inc = inc.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
 		}
 		if (possibleSourcePositions.size() == 0) {
 			return; // maybe the vertex is the root vertex, than it has no

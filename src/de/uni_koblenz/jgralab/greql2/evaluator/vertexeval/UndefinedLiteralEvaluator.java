@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -35,7 +39,8 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.NullLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.UndefinedLiteral;
+import de.uni_koblenz.jgralab.greql2.types.Undefined;
 
 /**
  * Evaluates a Null Literal, that means, provides access to the literal value
@@ -46,9 +51,9 @@ import de.uni_koblenz.jgralab.greql2.schema.NullLiteral;
  * @author ist@uni-koblenz.de
  * 
  */
-public class NullLiteralEvaluator extends VertexEvaluator {
+public class UndefinedLiteralEvaluator extends VertexEvaluator {
 
-	private NullLiteral vertex;
+	private UndefinedLiteral vertex;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -58,14 +63,15 @@ public class NullLiteralEvaluator extends VertexEvaluator {
 		return vertex;
 	}
 
-	public NullLiteralEvaluator(NullLiteral vertex, GreqlEvaluator eval) {
+	public UndefinedLiteralEvaluator(UndefinedLiteral vertex,
+			GreqlEvaluator eval) {
 		super(eval);
 		this.vertex = vertex;
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
-		return new JValueImpl((Boolean) null);
+	public Undefined evaluate() {
+		return Undefined.UNDEFINED;
 	}
 
 	@Override

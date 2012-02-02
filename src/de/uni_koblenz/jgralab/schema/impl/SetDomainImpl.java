@@ -136,7 +136,7 @@ public final class SetDomainImpl extends CollectionDomainImpl implements
 		code.add(new CodeSnippet("\t#tmpname#.add($#name#Element);", "}",
 				"#io#.match(\"}\");", "#io#.space();"));
 		code.add(new CodeSnippet(
-				"#attributeContainer##name# = #theGraph#.createSet(#tmpname#.size());"));
+				"#attributeContainer##name# = #theGraph#.createSet();"));
 		code.add(new CodeSnippet("#attributeContainer##name#.addAll(#tmpname#);"));
 		code.addNoIndent(new CodeSnippet(
 				"} else if (#io#.isNextToken(GraphIO.NULL_LITERAL)) {"));

@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,12 +35,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
-import de.uni_koblenz.jgralab.greql2.funlib.ReachableVertices;
+import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ForwardVertexSet;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
@@ -80,29 +86,17 @@ public class ForwardVertexSetEvaluator extends PathSearchEvaluator {
 		startEval = vertexEvalMarker.getMark(startExpression);
 		searchAutomaton = new DFA(pathDescEval.getNFA());
 
-		// We log the number of states as the result size of the underlying
-		// PathDescription.
-		if (evaluationLogger != null) {
-			evaluationLogger.logResultSize("PathDescription",
-					searchAutomaton.stateList.size());
-		}
 		initialized = true;
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
+	public Object evaluate() {
 		if (!initialized) {
 			initialize();
 		}
 		Vertex startVertex = null;
-		try {
-			startVertex = startEval.getResult(subgraph).toVertex();
-		} catch (JValueInvalidTypeException exception) {
-			throw new EvaluateException(
-					"Error evaluation ForwardVertexSet, StartExpression doesn't evaluate to a vertex",
-					exception);
-		}
-		return ReachableVertices.search(startVertex, searchAutomaton, subgraph);
+		startVertex = (Vertex) startEval.getResult();
+		return ReachableVertices.search(startVertex, searchAutomaton);
 	}
 
 	@Override

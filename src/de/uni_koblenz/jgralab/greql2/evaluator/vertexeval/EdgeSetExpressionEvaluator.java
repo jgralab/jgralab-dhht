@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,12 +35,16 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import org.pcollections.PSet;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
+import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 
 /**
@@ -61,19 +69,17 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 	}
 
 	@Override
-	public JValue evaluate() throws EvaluateException {
+	public PSet<Edge> evaluate() {
 		Graph datagraph = greqlEvaluator.getDatagraph();
 		// create the resulting set
-		JValueSet resultSet = new JValueSet();
+		PSet<Edge> resultSet = JGraLab.set();
 		Edge currentEdge = datagraph.getFirstEdge();
-		JValueTypeCollection typeCollection = getTypeCollection();
+		TypeCollection typeCollection = getTypeCollection();
 		while (currentEdge != null) {
-			if ((subgraph == null) || (subgraph.isMarked(currentEdge))) {
-				AttributedElementClass edgeClass = currentEdge
-						.getMetaClass();
-				if (typeCollection.acceptsType(edgeClass)) {
-					resultSet.add(new JValueImpl(currentEdge));
-				}
+			AttributedElementClass edgeClass = currentEdge
+					.getAttributedElementClass();
+			if (typeCollection.acceptsType(edgeClass)) {
+				resultSet = resultSet.plus(currentEdge);
 			}
 			currentEdge = currentEdge.getNextEdge();
 		}

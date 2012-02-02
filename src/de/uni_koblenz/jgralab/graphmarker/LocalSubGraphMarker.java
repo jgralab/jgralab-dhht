@@ -135,7 +135,8 @@ public class LocalSubGraphMarker extends AbstractGraphMarker<GraphElement<?, ?, 
 	 * @return false if the given <code>graphElement</code> has already been
 	 *         marked.
 	 */
-	public boolean mark(GraphElement<?, ?, ?,?> graphElement) throws RemoteException {
+	@SuppressWarnings("rawtypes")
+	public boolean mark(GraphElement  graphElement) throws RemoteException {
 		version++;
 		if (graphElement instanceof Edge) {
 			return edgeGraphMarker.mark((Edge) graphElement);

@@ -58,7 +58,7 @@ import de.uni_koblenz.jgralab.GraphElement;
  * 
  */
 public abstract class LocalMapGraphMarker<T extends AttributedElement<?, ?>, O>
-		extends AbstractGraphMarker<T> {
+		extends AbstractGraphMarker<T> implements ObjectGraphMarker<T,O> {
 
 	/**
 	 * Stores the mapping between Graph, Edge or Vertex and the attribute
