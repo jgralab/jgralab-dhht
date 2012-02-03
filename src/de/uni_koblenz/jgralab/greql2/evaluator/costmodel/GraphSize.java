@@ -71,7 +71,7 @@ public class GraphSize {
 		vertexCount = dataGraph.getVCount();
 		edgeCount = dataGraph.getECount();
 		GraphClass graphClass = (GraphClass) dataGraph
-				.getMetaClass();
+				.getType();
 		knownVertexTypes = graphClass.getVertexClassCount();
 		knownEdgeTypes = graphClass.getEdgeClassCount();
 	}

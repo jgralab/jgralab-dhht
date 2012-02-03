@@ -205,7 +205,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		case DISTRIBUTEDPROXIES:	
 		case DISKPROXIES:
 			code.add(
-					"@SupressWarnings(\"unchecked\")",
+					"@SuppressWarnings(\"unchecked\")",
 					"public #type# #isOrGet#_#name#()  {",
 					"\ttry {",
 					 "\t\treturn (#typeClass#) storingGraphDatabase.get#edgeOrVertex#Attribute(elementId, \"#name#\");",
