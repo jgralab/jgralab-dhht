@@ -394,6 +394,26 @@ public abstract class VertexImpl extends
 		return i;
 	}
 
+	
+	@Override
+	public final Incidence getFirstIncidenceToEdge(Class<? extends Edge> edgeClass, Direction direction) {
+		return getFirstIncidenceToEdge(localGraphDatabase.getTraversalContext(), edgeClass, direction);
+	}
+	
+	@Override
+	public final Incidence getFirstIncidenceToEdge(Graph traversalContext, Class<? extends Edge> edgeClass, Direction direction) {
+		assert edgeClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(traversalContext);
+		while (currentIncidence != null) {
+			if (edgeClass.isInstance(currentIncidence.getEdge())) {
+				return currentIncidence;
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
+		return null;
+	}
+	
 	@Override
 	public Incidence getFirstIncidence(boolean thisIncidence,
 			IncidenceType... incidentTypes) {

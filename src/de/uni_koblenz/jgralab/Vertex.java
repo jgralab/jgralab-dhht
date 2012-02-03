@@ -500,6 +500,18 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, EdgeClass, Edg
 	// PathElement... pathElements);
 
 	
-
+	/**
+	 * This method is provided only for compatibility to old TGraph-API.
+	 * Retrieves the first incidence to an edge of the given edge class. 
+	 * Allows to use edge class names instead of (generated) incidence
+	 * class names when working with binary edgesš.
+	 * @param edgeClass 
+	 * @param direction
+	 * @return
+	 */
+	public Incidence getFirstIncidenceToEdge(Class<? extends Edge> edgeClass, Direction direction);
+	
+	public Incidence getFirstIncidenceToEdge(Graph traversalContext, Class<? extends Edge> edgeClass, Direction direction);
+	
 	
 }

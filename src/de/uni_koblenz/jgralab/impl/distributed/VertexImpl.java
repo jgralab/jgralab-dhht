@@ -253,6 +253,25 @@ public abstract class VertexImpl extends
 		}
 		return null;
 	}
+	
+	@Override
+	public final Incidence getFirstIncidenceToEdge(Class<? extends Edge> edgeClass, Direction direction) {
+		return getFirstIncidenceToEdge(graphDb.getTraversalContext(), edgeClass, direction);
+	}
+	
+	@Override
+	public final Incidence getFirstIncidenceToEdge(Graph traversalContext, Class<? extends Edge> edgeClass, Direction direction) {
+		assert edgeClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(traversalContext);
+		while (currentIncidence != null) {
+			if (edgeClass.isInstance(currentIncidence.getEdge())) {
+				return currentIncidence;
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtVertex(traversalContext);
+		}
+		return null;
+	}
 
 	@Override
 	public Iterable<Incidence> getIncidences() {
@@ -368,6 +387,7 @@ public abstract class VertexImpl extends
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Vertex> T getNextVertex(Graph traversalContext,
 			Class<T> m1VertexClass, boolean noSubclasses) {
