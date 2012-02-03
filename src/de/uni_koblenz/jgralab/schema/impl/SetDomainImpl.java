@@ -110,20 +110,19 @@ public final class SetDomainImpl extends CollectionDomainImpl implements
 			String schemaRootPackagePrefix, String variableName,
 			String graphIoVariableName, String attributeContainer) {
 		code.setVariable("name", variableName);
-		code.setVariable("tmpname", "$" + variableName);
-		code.setVariable("basedom", getBaseDomain().getJavaClassName(
-				schemaRootPackagePrefix));
-		code.setVariable("basetype",
+		code.setVariable("empty", SetDomain.EMPTY_SET);
+		code.setVariable("basedom",
+				getBaseDomain().getJavaClassName(schemaRootPackagePrefix));
+		code.setVariable(
+				"basetype",
 				getBaseDomain().getJavaAttributeImplementationTypeName(
 						schemaRootPackagePrefix));
 		code.setVariable("io", graphIoVariableName);
-		code.setVariable("attributeContainer", attributeContainer);
 
 		code.addNoIndent(new CodeSnippet("#init#"));
 		code.addNoIndent(new CodeSnippet("if (#io#.isNextToken(\"{\")) {"));
-		code
-				.add(new CodeSnippet(
-						"java.util.Set<#basedom#> #tmpname# = #theGraph#.createSet();"));
+		code.add(new CodeSnippet(SETDOMAIN_TYPE
+				+ "<#basedom#> $#name# = #empty#;"));
 		code.add(new CodeSnippet("#io#.match(\"{\");",
 				"while (!#io#.isNextToken(\"}\")) {"));
 		if (getBaseDomain().isComposite()) {
@@ -131,18 +130,17 @@ public final class SetDomainImpl extends CollectionDomainImpl implements
 		} else {
 			code.add(new CodeSnippet("\t#basetype# $#name#Element;"));
 		}
-		code.add(getBaseDomain().getReadMethod(schemaRootPackagePrefix,
-				"$" + variableName + "Element", graphIoVariableName, attributeContainer), 1);
-		code.add(new CodeSnippet("\t#tmpname#.add($#name#Element);", "}",
-				"#io#.match(\"}\");", "#io#.space();"));
-		code.add(new CodeSnippet(
-				"#name# = de.uni_koblenz.jgralab.JGraLab.set();"));
-		code.add(new CodeSnippet("#attributeContainer##name#.addAll(#tmpname#);"));
+		code.add(
+				getBaseDomain().getReadMethod(schemaRootPackagePrefix,
+						"$" + variableName + "Element", graphIoVariableName, ""), 1);
+		code.add(new CodeSnippet("\t$#name# = $#name#.plus($#name#Element);",
+				"}", "#io#.match(\"}\");", attributeContainer + "#name# = $#name#;"));
 		code.addNoIndent(new CodeSnippet(
 				"} else if (#io#.isNextToken(GraphIO.NULL_LITERAL)) {"));
-		code.add(new CodeSnippet("#io#.match();"));
-		code.addNoIndent(new CodeSnippet("}"));
+		code.add(new CodeSnippet("#io#.match();", attributeContainer +  "#name# = null;"));
+		code.addNoIndent(new CodeSnippet("} else {", "\t" + attributeContainer +  "#name# = null;", "}"));
 	}
+
 
 	private void internalGetWriteMethod(CodeList code,
 			String schemaRootPackagePrefix, String variableName,

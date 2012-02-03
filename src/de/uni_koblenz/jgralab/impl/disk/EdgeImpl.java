@@ -433,6 +433,8 @@ public abstract class EdgeImpl extends
 		assert isValid();
 		return new IncidenceIterableAtEdge<T>(this, anIncidenceClass);
 	}
+	
+
 
 	@Override
 	public final Iterable<Incidence> getIncidences(Direction direction) {

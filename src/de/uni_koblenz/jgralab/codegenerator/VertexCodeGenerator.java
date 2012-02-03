@@ -31,6 +31,11 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -88,6 +93,46 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		);
 	}
 
+	
+	protected CodeBlock createCompatibilityMethods() {
+		VertexClass vc = (VertexClass) aec;
+		CodeList code = new CodeList();
+		Set<EdgeClass> edgeClassSet = new HashSet<EdgeClass>();
+		addImports("#jgPackage#.Incidence");
+		if (currentCycle.isAbstract()) {
+			//interface, create only method declarations for own edge classes
+			for (IncidenceClass ic : vc.getIncidenceClasses()) {
+				edgeClassSet.add(ic.getEdgeClass());
+			}
+		} else {
+			for (IncidenceClass ic : vc.getAllIncidenceClasses()) {
+				edgeClassSet.add(ic.getEdgeClass());
+			}
+		}
+		for (EdgeClass ec : edgeClassSet) {
+			if (ec.isInternal())
+				continue;
+			CodeSnippet s = new CodeSnippet();
+			code.addNoIndent(s);
+			s.setVariable("edgeClassSimpleName", ec.getSimpleName());
+			s.setVariable("edgeClassQualifiedName", ec.getSchema().getPackagePrefix().concat("." + ec.getQualifiedName()));
+			s.setVariable("edgeClassUniqueName", ec.getUniqueName());
+
+			if (currentCycle.isAbstract()) {
+				s.add("/**");
+				s.add(" * Returns the first incidence leading to an edge of type #edgeClassSimpleName# or subtypes.");
+				s.add(" */");
+				s.add("public Incidence getFirstIncidenceTo#edgeClassUniqueName#(Direction direction);");
+			} else { 
+				s.add("@Override");
+				s.add("public Incidence getFirstIncidenceTo#edgeClassUniqueName#(Direction direction) {");
+				s.add("\treturn getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, direction);");
+				s.add("}");
+			}
+			s.add("");
+		}
+		return code;
+	}
 
 
 

@@ -156,18 +156,12 @@ public abstract class AttributedElementCodeGenerator<ConcreteMetaClass extends A
 				s.add("\t\tset_#name#(#attributeClassName#.valueOfPermitNull((String) data));");
 				s.add("\t} else {");
 				s.add("\t\tset_#name#((#attributeClassName#) data);");
-
-				// if(currentCycle.isDbImpl())
-				// s.add("\tsuper.setAttribute(attributeName, data);");
 				s.add("\t}");
 				s.add("\treturn;");
 				s.add("}");
 			} else {
 				s.add("if (attributeName.equals(\"#name#\")) {");
 				s.add("\tset_#name#((#attributeClassName#) data);");
-
-				// if(currentCycle.isDbImpl())
-				// s.add("\tsuper.setAttribute(attributeName, data);");
 				s.add("\treturn;");
 				s.add("}");
 			}

@@ -258,6 +258,17 @@ public abstract class VertexImpl extends
 		return null;
 	}
 	
+
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		return getFirstIncidence(traversalContext, anIncidenceClass.getM1Class(), noSubclasses);
+	}
+	
+
+	
 	@Override
 	public final Incidence getFirstIncidenceToEdge(Class<? extends Edge> edgeClass, Direction direction) {
 		return getFirstIncidenceToEdge(graph.getTraversalContext(), edgeClass, direction);

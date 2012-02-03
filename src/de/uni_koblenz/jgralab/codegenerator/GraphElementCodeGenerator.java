@@ -141,11 +141,15 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 	//	if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
 	//		code.add(createGetEdgeForRolenameMethod());
 	//	}
-
+		code.add(createCompatibilityMethods());
 		return code;
 	}
 	
 	
+	protected CodeBlock createCompatibilityMethods() {
+		return null;
+	}
+
 	protected abstract CodeBlock createLoadAttributeContainer();
 
 	
