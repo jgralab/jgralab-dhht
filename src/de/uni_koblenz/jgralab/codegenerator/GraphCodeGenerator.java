@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -42,8 +41,6 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -106,8 +103,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
-		code.add(createCreateRecordsMethods());
-		//String attributeContainerVariable = currentCycle.isDiskbasedImpl() ? "attributeContainer." : "";
 		code.add(createReadAttributesMethod(aec.getAttributeList(), ""));
 		code.add(createReadAttributesFromStringMethod(aec.getAttributeList(),""));
 		code.add(createWriteAttributesMethod(aec.getAttributeList(), ""));
@@ -117,120 +112,8 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 
 
 	
-	/**
-	 * Create "create"-methods for each RecordDomain defined in the schema.
-	 * 
-	 * @param createClass
-	 * @return
-	 */
-	private CodeBlock createCreateRecordsMethods() {
-		CodeList code = new CodeList();
-
-		if (currentCycle.isAbstract()) {
-			if (aec.getSchema().getRecordDomains().size() > 0) {
-				addImports("java.util.Map");
-				addImports("#jgPackage#.GraphIO");
-				addImports("#jgPackage#.GraphIOException");
-			}
-			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
-				CodeSnippet cs = new CodeSnippet(true);
-				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException;");
-				cs.add("");
 
 
-				cs.add("public #rcname# create#rname#(#parawtypes#);");
-
-				cs.setVariable("parawtypes", buildParametersOutput(rd
-						.getComponents(), true));
-				cs.setVariable("rcname", rd
-						.getJavaClassName(schemaRootPackageName));
-				cs.setVariable("rname", rd.getUniqueName());
-				cs.add("");
-				code.addNoIndent(cs);
-			}
-		}
-
-		if (currentCycle.isImplementationVariant()) {
-			if (aec.getSchema().getRecordDomains().size() > 0) {
-				addImports("java.util.Map");
-			}
-			switch (currentCycle) {
-			case MEMORYBASED:
-				code.setVariable("implementationType", "InMemoryStorage");
-				break;
-			case DISTRIBUTED:	
-				code.setVariable("implementationType", "DistributedStorage");
-				break;
-			case DISKBASED:
-				code.setVariable("implementationType", "DiskBasedStorage");
-				break;
-			default:
-				throw new RuntimeException("Unhandled case");
-			}
-			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
-				CodeSnippet cs = new CodeSnippet(true);
-				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
-				cs.add("\ttry {");
-				cs.add("\t\trecord.readComponentValues(io);");
-				cs.add("\t} catch (IOException ex) {");
-				cs.add("\t\tthrow new GraphIOException(ex);");
-				cs.add("\t}");
-				cs.add("\treturn record;");
-				cs.add("}");
-				cs.add("");
-				cs.add("");
-
-				cs.setVariable("parawtypes", buildParametersOutput(rd
-						.getComponents(), true));
-				cs.setVariable("parawotypes", buildParametersOutput(rd
-						.getComponents(), false));
-
-				cs.add("");
-				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
-				
-				for (RecordComponent entry : rd.getComponents()) {
-					cs.add("\trecord.set_" + entry.getName() + "(_"
-							+ entry.getName() + ");");
-				}
-				cs.add("\treturn record;");
-				cs.add("}");
-				cs.add("");
-
-				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
-				cs.setVariable("rname", rd.getUniqueName());
-				cs.setVariable("rtype",	rd.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				code.addNoIndent(cs);
-			}
-		}
-		return code;
-	}
-
-	/**
-	 * 
-	 * @param components
-	 * @param withTypes
-	 * @return
-	 */
-	private String buildParametersOutput(Collection<RecordComponent> components, boolean withTypes) {
-		StringBuilder parameters = new StringBuilder();
-		int count = 0;
-		int size = components.size();
-		for (RecordComponent entry : components) {
-			parameters.append(
-					(withTypes ? entry.getDomain()
-							.getJavaAttributeImplementationTypeName(
-									schemaRootPackageName) : "")).append(" _")
-					.append(entry.getName());
-			count++;
-			if (size != count) {
-				parameters.append(", ");
-			}
-		}
-		return parameters.toString();
-	}
-	
 	@Override
 	protected CodeBlock createConstructor() {
 		switch (currentCycle) {

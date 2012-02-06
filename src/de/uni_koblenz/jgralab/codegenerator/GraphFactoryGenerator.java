@@ -34,7 +34,6 @@ package de.uni_koblenz.jgralab.codegenerator;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -105,10 +104,6 @@ public class GraphFactoryGenerator extends CodeGenerator {
 				code.add(createFillTableForIncidence(incClass));
 			}
 		}
-		for (RecordDomain recordDomain : schema.getRecordDomains()) {
-			code.add(createFillTableForRecord(recordDomain));
-		}
-
 		s = new CodeSnippet(true);
 		s.add("}");
 		code.addNoIndent(s);
@@ -195,18 +190,6 @@ public class GraphFactoryGenerator extends CodeGenerator {
 		return code;
 	}
 
-	protected CodeBlock createFillTableForRecord(RecordDomain recordDomain) {
-
-		CodeSnippet code = new CodeSnippet(true);
-		code.setVariable("recordName", schemaRootPackageName + "." + recordDomain.getQualifiedName());
-		code.setVariable("recordMemImplName", schemaRootPackageName + ".impl.mem."	+ recordDomain.getQualifiedName());
-		code.setVariable("recordDistributedImplName", schemaRootPackageName + ".impl.distributed."	+ recordDomain.getQualifiedName());
-		code.setVariable("recordDiskImplName", schemaRootPackageName + ".impl.disk." + recordDomain.getQualifiedName());
-		code.add("setRecordImplementationClass_InMemoryStorage(#recordName#.class, #recordMemImplName#Impl.class);");
-		code.add("setRecordImplementationClass_DistributedStorage(#recordName#.class, #recordDistributedImplName#Impl.class);");
-		code.add("setRecordImplementationClass_DiskBasedStorage(#recordName#.class, #recordDiskImplName#Impl.class);");
-		return code;
-	}
 
 	protected CodeBlock createFillTableForEdge(EdgeClass edgeClass) {
 		CodeSnippet code = new CodeSnippet(true);

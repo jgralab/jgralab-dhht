@@ -32,11 +32,13 @@
 package de.uni_koblenz.jgralab.impl.mem;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -53,6 +55,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.GraphInternalMethods;
@@ -1227,5 +1230,31 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
 	}
 	
+//	
+//	@Override
+//	public Object getEnumConstant(Class<? extends Enum> enumDomain, String constantName) {
+//		Class<?> cls = enumDomain.getSchemaClass();
+//		Enum<?>[] consts = (Enum<?>[]) cls.getEnumConstants();
+//		for (int i = 0; i < consts.length; i++) {
+//			Enum<?> c = consts[i];
+//			if (c.name().equals(constantName)) {
+//				return c;
+//			}
+//		}
+//		throw new GraphException("No such enum constant '" + constantName
+//				+ "' in EnumDomain " + enumDomain);
+//	}
+
+	@Override
+	public Record createRecord(Class<? extends Record> cls,
+			Map<String, Object> values) {
+		try {
+			Constructor<?> constr = cls.getConstructor(Map.class);
+			return (Record) constr.newInstance(values);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new GraphException(e);
+		}
+	}
 	
 }

@@ -32,7 +32,6 @@ package de.uni_koblenz.jgralab.impl.mem;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -50,7 +49,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -69,6 +67,7 @@ public abstract class SubordinateGraphImpl extends
 		de.uni_koblenz.jgralab.impl.mem.GraphBaseImpl implements
 		GraphStructureChangedListener {
 
+	@SuppressWarnings("rawtypes")
 	private GraphElement  containingElement;
 
 	// TODO: Check if the respective methods are really
@@ -132,6 +131,7 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingVertex
 	 *            {@link Vertex} which contains this subordinate graph
 	 */
+	@SuppressWarnings({ "rawtypes" })
 	protected SubordinateGraphImpl(Vertex containingVertex) {
 		super(containingVertex.getGraph().getType());
 	//	System.out.println("Creating subordinate graph in vertex " + containingVertex.getLocalId());
@@ -181,6 +181,7 @@ public abstract class SubordinateGraphImpl extends
 	 * @param containingEdge
 	 *            {@link Edge} which contains this subordinate graph
 	 */
+	@SuppressWarnings("rawtypes")
 	protected SubordinateGraphImpl(Edge containingEdge) {
 		super(containingEdge.getGraph().getType());
 		subgraphId = (int) (Integer.MAX_VALUE - containingEdge.getGlobalId());
@@ -218,6 +219,7 @@ public abstract class SubordinateGraphImpl extends
 		getCompleteGraph().addGraphStructureChangedListener(this);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void initializeCommonFields(GraphElement containingElement) {
 		this.containingElement = containingElement;
 	}
@@ -289,12 +291,14 @@ public abstract class SubordinateGraphImpl extends
 	}
 
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return ((GraphElementImpl) v)
 				.isChildOf((GraphElement) getParentGraphOrElement());
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean containsEdge(Edge e) {
 		return ((GraphElementImpl) e)
@@ -323,6 +327,7 @@ public abstract class SubordinateGraphImpl extends
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = containingElement.getGraph().getVertex(id);
@@ -333,6 +338,7 @@ public abstract class SubordinateGraphImpl extends
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = containingElement.getGraph().getEdge(id);
@@ -569,6 +575,7 @@ public abstract class SubordinateGraphImpl extends
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public int compareTo(Graph arg0) {
 		if (getCompleteGraph() == arg0) {
