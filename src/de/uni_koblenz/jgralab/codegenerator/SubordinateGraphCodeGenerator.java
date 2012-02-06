@@ -31,7 +31,6 @@
 
 package de.uni_koblenz.jgralab.codegenerator;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -43,8 +42,6 @@ import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.compilation.InMemoryJavaSourceFile;
 
@@ -63,7 +60,6 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		rootBlock.setVariable("schemaName", schemaName);
 		rootBlock.setVariable("theGraph", "this");
 		rootBlock.setVariable("simpleImplClassName", rootBlock.getVariable("simpleClassName") + "SubordinateImpl");
-		//rootBlock.setVariable("simpleClassName", rootBlock.getVariable("simpleClassName") + "Subordinate");
 	}
 	
 	public Vector<InMemoryJavaSourceFile> createJavaSources() {
@@ -72,13 +68,13 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 
 		currentCycle = getNextCycle();
 		while (currentCycle != null) {
-			createCode();
-			if (currentCycle.isImplementationVariant()) {
-				System.out.println("Writing code to file " + implClassName);
-				javaSources.add(new InMemoryJavaSourceFile(implClassName,
+			if (currentCycle != GenerationCycle.ABSTRACT) {
+				createCode();
+				if (currentCycle.isImplementationVariant()) {
+					javaSources.add(new InMemoryJavaSourceFile(implClassName,
 						rootBlock.getCode()));
-				System.out.println("Written code to file " + implClassName);
-			} 
+				} 
+			}	
 			currentCycle = getNextCycle();
 		}
 		return javaSources;
@@ -98,103 +94,10 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
-		code.add(createCreateRecordsMethods());
 		return code;
 	}
 
-	/**
-	 * Create "create"-methods for each RecordDomain defined in the schema.
-	 * 
-	 * @param createClass
-	 * @return
-	 */
-	private CodeBlock createCreateRecordsMethods() {
-		CodeList code = new CodeList();
-
-		if (currentCycle.isAbstract()) {
-			if (aec.getSchema().getRecordDomains().size() > 0) {
-				addImports("java.util.Map");
-				addImports("#jgPackage#.GraphIO");
-				addImports("#jgPackage#.GraphIOException");
-			}
-			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
-				CodeSnippet cs = new CodeSnippet(true);
-				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException;");
-				cs.add("");
-
-				cs.add("public #rcname# create#rname#(Map<String, Object> fields);");
-				cs.add("");
-
-				cs.add("public #rcname# create#rname#(#parawtypes#);");
-				cs.setVariable("parawtypes", buildParametersOutput(rd.getComponents(), true));
-				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
-				cs.setVariable("rname", rd.getUniqueName());
-				cs.add("");
-				code.addNoIndent(cs);
-			}
-		}
-
-		if (currentCycle.isImplementationVariant()) {
-			if (aec.getSchema().getRecordDomains().size() > 0) {
-				addImports("java.util.Map");
-				addImports("#jgPackage#.GraphIO");
-				addImports("#jgPackage#.GraphIOException");
-				addImports("#schemaPackage#.#simpleClassName#");
-			}
-			for (RecordDomain rd : aec.getSchema().getRecordDomains()) {
-				CodeSnippet cs = new CodeSnippet(true);
-				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException {");
-				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(io);");
-				cs.add("}");
-				cs.add("");
-
-				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(fields);");
-				cs.add("}");
-				cs.add("");
-
-				cs.setVariable("parawtypes", buildParametersOutput(rd.getComponents(), true));
-				cs.setVariable("parawotypes", buildParametersOutput(rd.getComponents(), false));
-
-				cs.add("");
-				cs.add("public #rcname# create#rname#(#parawtypes#) {");
-				cs.add("\treturn ((#simpleClassName#)getCompleteGraph()).create#rname#(#parawotypes#);");
-				cs.add("}");
-				cs.add("");
-
-				cs.setVariable("rcname", rd.getJavaClassName(schemaRootPackageName));
-				cs.setVariable("rname", rd.getUniqueName());
-				cs.setVariable("rtype",	rd.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-				code.addNoIndent(cs);
-			}
-		}
-		return code;
-	}
-
-	/**
-	 * 
-	 * @param components
-	 * @param withTypes
-	 * @return
-	 */
-	private String buildParametersOutput(
-			Collection<RecordComponent> components, boolean withTypes) {
-		StringBuilder parameters = new StringBuilder();
-		int count = 0;
-		int size = components.size();
-		for (RecordComponent entry : components) {
-			parameters.append(
-					(withTypes ? entry.getDomain()
-							.getJavaAttributeImplementationTypeName(
-									schemaRootPackageName) : "")).append(" _")
-					.append(entry.getName());
-			count++;
-			if (size != count) {
-				parameters.append(", ");
-			}
-		}
-		return parameters.toString();
-	}
+	
 
 	@Override
 	protected CodeBlock createConstructor() {

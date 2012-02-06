@@ -578,7 +578,7 @@ public class SchemaImpl implements Schema {
 		// ProgressFunctionImpl pf;
 		long schemaElements = 0, currentCount = 0, interval = 1;
 		if (progressFunction != null) {
-			int elements = getNumberOfElements() * 2;
+			//int elements = getNumberOfElements() * 2;
 			progressFunction.init(getNumberOfElements());
 			interval = progressFunction.getUpdateInterval();
 		}

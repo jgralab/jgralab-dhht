@@ -32,12 +32,14 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -54,6 +56,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.GraphStructureChangedListenerWithAutoRemove;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
@@ -1265,4 +1268,17 @@ public abstract class GraphBaseImpl implements Graph {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public Record createRecord(Class<? extends Record> cls,
+			Map<String, Object> values) {
+		try {
+			Constructor<?> constr = cls.getConstructor(Map.class);
+			return (Record) constr.newInstance(values);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new GraphException(e);
+		}
+	}
+
 }

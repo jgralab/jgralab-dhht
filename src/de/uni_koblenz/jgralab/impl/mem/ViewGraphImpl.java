@@ -1,9 +1,11 @@
 package de.uni_koblenz.jgralab.impl.mem;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -21,6 +23,7 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
+import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.VertexIterable;
@@ -779,6 +782,18 @@ public abstract class ViewGraphImpl implements Graph,
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public Record createRecord(Class<? extends Record> cls,
+			Map<String, Object> values) {
+		try {
+			Constructor<?> constr = cls.getConstructor(Map.class);
+			return (Record) constr.newInstance(values);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new GraphException(e);
+		}
 	}
 
 	

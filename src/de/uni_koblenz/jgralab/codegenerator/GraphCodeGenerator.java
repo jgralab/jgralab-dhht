@@ -68,38 +68,11 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		code.setVariable("graphFactory", currentCycle.isMembasedImpl() ? "graphFactory" : "getGraphFactory()");
-		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() ? "localGraphDatabase" : "this");
+		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isProxies() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 			rootBlock.setVariable("baseClassName", "CompleteGraphImpl");
-		//	addImports("de.uni_koblenz.jgralab.impl.CompleteGraphImpl");
-		//	addImports("java.util.List");
-		//	addImports("de.uni_koblenz.jgralab.Vertex");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValue");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueSet");
-		//	addImports("de.uni_koblenz.jgralab.greql2.jvalue.JValueImpl");
-		//	addImports("de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator");
-
-			// for Vertex.reachableVertices()
-//			code.add(new CodeSnippet(
-//						"\n\tprotected GreqlEvaluator greqlEvaluator = null;\n",
-//						"@SuppressWarnings(\"unchecked\") ",
-//						"@Override ",
-//						"public synchronized <T extends Vertex> List<T> reachableVertices(Vertex startVertex, String pathDescription, Class<T> vertexType) { ",
-//						"\tif (greqlEvaluator == null) { ",
-//						"\t\tgreqlEvaluator = new GreqlEvaluator((String) null, this, null); ",
-//						"\t} ",
-//						"\tgreqlEvaluator.setVariable(\"v\", new JValueImpl(startVertex)); ",
-//						"\tgreqlEvaluator.setQuery(\"using v: v \" + pathDescription); ",
-//						"\tgreqlEvaluator.startEvaluation(); ",
-//						"\tJValueSet rs = greqlEvaluator.getEvaluationResult().toJValueSet(); ",
-//						"\tjava.util.List<T> lst = new java.util.LinkedList<T>(); ",
-//						"\tfor (JValue jv : rs) { ",
-//						"\t\tVertex v = jv.toVertex();",
-//						"\t\tif (vertexType.isInstance(v)) {",
-//						"\t\t\tlst.add((T) v);", "\t\t}", "\t}",
-//						"\treturn lst; ", "}"));
 		}
 		code.add(createGraphElementClassMethods());
 		code.add(createIteratorMethods());
