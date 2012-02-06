@@ -41,19 +41,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.tools.ant.types.Quantifier;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 
-import com.sun.mirror.declaration.Declaration;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 import de.uni_koblenz.jgralab.greql2.schema.*;
-import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.Definition;
 
 public class GreqlParser extends ParserHelper {
 	private Map<RuleEnum, int[]> testedRules = new HashMap<RuleEnum, int[]>();
@@ -156,7 +154,7 @@ public class GreqlParser extends ParserHelper {
 		parsingStack = new Stack<Integer>();
 		predicateStack = new Stack<Boolean>();
 		schema = Greql2Schema.instance();
-		graph = schema.createGreql2();
+		graph = schema.createGreql2_InMemoryStorage();
 		tokens = GreqlLexer.scan(source);
 		afterParsingvariableSymbolTable = new SymbolTable();
 		duringParsingvariableSymbolTable = new SimpleSymbolTable();
@@ -226,7 +224,7 @@ public class GreqlParser extends ParserHelper {
 
 	private final Vertex createMultipleEdgesToParent(
 			List<VertexPosition<Expression>> expressions, Vertex parent,
-			Class<? extends Edge> edgeClass) {
+			Class<? extends BinaryEdge> edgeClass) {
 		if (expressions != null) {
 			for (VertexPosition<? extends Vertex> expr : expressions) {
 				Greql2Aggregation edge = (Greql2Aggregation) graph.createEdge(
@@ -240,7 +238,7 @@ public class GreqlParser extends ParserHelper {
 
 	private final Vertex createMultipleEdgesToParent(
 			List<VertexPosition<TypeId>> expressions, Vertex parent,
-			Class<? extends Edge> edgeClass, int i) {
+			Class<? extends BinaryEdge> edgeClass, int i) {
 		if (expressions != null) {
 			for (VertexPosition<? extends Vertex> expr : expressions) {
 				Greql2Aggregation edge = (Greql2Aggregation) graph.createEdge(
@@ -254,7 +252,7 @@ public class GreqlParser extends ParserHelper {
 
 	private final Vertex createMultipleEdgesToParent(
 			List<VertexPosition<SimpleDeclaration>> expressions, Vertex parent,
-			Class<? extends Edge> edgeClass, boolean b) {
+			Class<? extends BinaryEdge> edgeClass, boolean b) {
 		if (expressions != null) {
 			for (VertexPosition<? extends Vertex> expr : expressions) {
 				Greql2Aggregation edge = (Greql2Aggregation) graph.createEdge(
@@ -268,7 +266,7 @@ public class GreqlParser extends ParserHelper {
 
 	private final Vertex createMultipleEdgesToParent(
 			List<VertexPosition<Variable>> expressions, Vertex parent,
-			Class<? extends Edge> edgeClass, String s) {
+			Class<? extends BinaryEdge> edgeClass, String s) {
 		if (expressions != null) {
 			for (VertexPosition<? extends Vertex> expr : expressions) {
 				Greql2Aggregation edge = (Greql2Aggregation) graph.createEdge(
@@ -662,7 +660,7 @@ public class GreqlParser extends ParserHelper {
 		}
 		if (type != null) {
 			if (!inPredicateMode()) {
-				for (Quantifier quantifier : graph.getQuantifierVertices()) {
+				for (de.uni_koblenz.jgralab.greql2.schema.Quantifier quantifier : graph.getQuantifierVertices()) {
 					if (quantifier.get_type() == type) {
 						return quantifier;
 					}
@@ -1481,7 +1479,7 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private final PrimaryPathDescription parseSimplePathDescription() {
-		Direction dir = null;
+		PathDirection dir = null;
 		EdgeRestriction edgeRestr = null;
 		String direction = "any";
 		int offsetDir = getCurrentOffset();
@@ -1502,16 +1500,16 @@ public class GreqlParser extends ParserHelper {
 		}
 		if (!inPredicateMode()) {
 			PrimaryPathDescription result = graph.createSimplePathDescription();
-			dir = (Direction) graph.getFirstVertex(Direction.class);
+			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextDirection();
+					dir = dir.getNextPathDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createDirection();
+				dir = graph.createPathDirection();
 				dir.set_dirValue(direction);
 			}
 			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
@@ -1560,7 +1558,7 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private final EdgePathDescription parseEdgePathDescription() {
-		Direction dir = null;
+		PathDirection dir = null;
 		boolean edgeStart = false;
 		boolean edgeEnd = false;
 		String direction = "any";
@@ -1588,16 +1586,16 @@ public class GreqlParser extends ParserHelper {
 			} else if (!edgeStart && edgeEnd) {
 				direction = "out";
 			}
-			dir = (Direction) graph.getFirstVertex(Direction.class);
+			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextDirection();
+					dir = dir.getNextPathDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createDirection();
+				dir = graph.createPathDirection();
 				dir.set_dirValue(direction);
 			}
 			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
