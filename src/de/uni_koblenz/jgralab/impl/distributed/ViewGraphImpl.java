@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.impl.distributed;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -21,7 +20,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.EdgeIterable;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
@@ -675,25 +673,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.createMap();
 	}
 
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return viewedGraph.createRecord(recordClass, io);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		return viewedGraph.createRecord(recordClass, fields);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		return viewedGraph.createRecord(recordClass, components);
-	}
-
-	
 	
 	
 	// ============================================================================

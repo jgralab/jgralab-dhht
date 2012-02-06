@@ -12,6 +12,7 @@ import org.pcollections.PVector;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Record;
 
+
 /**
  * This interface defines all methods needed to access properties of the graph
  * and its elements such as the first or last vertex of a graph, the incidence
@@ -412,12 +413,9 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public <T extends Record> T createRecord(Class<T> recordClass,
 			Map<String, Object> fields) throws RemoteException;
 
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) throws RemoteException;
-
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io)
-			throws RemoteException;
-
+	public Object getEnumConstant(Class<? extends Enum> cls, String constantName) throws RemoteException;
+	
+	
 	public String getHostname(int partialGraphId) throws RemoteException;
 
 
@@ -426,5 +424,7 @@ public interface RemoteGraphDatabaseAccess extends Remote {
 	public void releaseTraversalContext() throws RemoteException;
 
 	public void setTraversalContext(long globalId) throws RemoteException;
+
+
 
 }

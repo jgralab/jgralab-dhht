@@ -154,6 +154,11 @@ public final class EnumDomainImpl extends DomainImpl implements EnumDomain {
 	public boolean isPrimitive() {
 		return false;
 	}
+	
+	@Override
+	public boolean isBoolean() {
+		return true;
+	}
 
 
 }

@@ -254,6 +254,8 @@ public class PartialGraphDatabase extends GraphDatabaseBaseImpl implements
 		completeGraphDatabase.setTraversalContext(globalId);
 	}
 
+
+
 }
 
 

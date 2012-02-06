@@ -242,24 +242,6 @@ public abstract class SubordinateGraphImpl extends
 
 
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return containingElement.getGraph().createRecord(recordClass, io);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		return containingElement.getGraph().createRecord(recordClass, fields);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		return containingElement.getGraph().createRecord(recordClass,
-				components);
-	}
-
-	@Override
 	public Graph getView(int kappa) {
 		return containingElement.getGraph().getGraphFactory()
 				.createViewGraph_InMemoryStorage(this, kappa);

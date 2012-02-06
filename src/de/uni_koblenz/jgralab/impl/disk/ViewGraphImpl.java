@@ -677,24 +677,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.createMap();
 	}
 
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		return viewedGraph.createRecord(recordClass, io);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		return viewedGraph.createRecord(recordClass, fields);
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		return viewedGraph.createRecord(recordClass, components);
-	}
-
 	
 	
 	

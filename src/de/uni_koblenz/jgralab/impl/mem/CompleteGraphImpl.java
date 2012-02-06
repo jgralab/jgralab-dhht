@@ -1584,32 +1584,9 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 	}
 
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
-		try {
-			record.readComponentValues(io);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
-		//record.setComponentValues(fields);
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass, this);
-		//record.setComponentValues(components);
-		return record;
-	}
+	
+	
+	
 
 	@Override
 	public <T> PSet<T> createSet() {

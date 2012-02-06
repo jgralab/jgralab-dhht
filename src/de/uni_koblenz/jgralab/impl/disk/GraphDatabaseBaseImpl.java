@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.disk;
 
+import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,8 +28,10 @@ import de.uni_koblenz.jgralab.impl.ParentEntityKind;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccessWithInternalMethods;
 import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
+import de.uni_koblenz.jgralab.schema.EnumDomain;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.RecordDomain;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 /**
@@ -1797,33 +1800,31 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
-				getGraphObject(convertToGlobalId(1)));
+	public Object getEnumConstant(Class<? extends Enum> cls, String constantName) throws RemoteException {
+		Enum<?>[] consts = (Enum<?>[]) cls.getEnumConstants();
+		for (int i = 0; i < consts.length; i++) {
+			Enum<?> c = consts[i];
+			if (c.name().equals(constantName)) {
+				return c;
+			}
+		}
+		throw new GraphException("No such enum constant '" + constantName
+				+ "' in EnumDomain " + cls);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) throws RemoteException {
 		try {
-			record.readComponentValues(io);
+			Constructor<?> constr = recordClass.getConstructor(Map.class);
+			return (T) constr.newInstance(fields);
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new GraphException(e);
 		}
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
-				getGraphObject(convertToGlobalId(1)));
-
-//		record.setComponentValues(components);
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

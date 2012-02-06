@@ -542,33 +542,6 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		}
 	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, io);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, fields);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, components);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 }

@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.distributed;
 
+import java.lang.reflect.Constructor;
 import java.rmi.RemoteException;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -16,7 +17,6 @@ import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphException;
-import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Incidence;
@@ -1825,34 +1825,6 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 	}
 
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
-				getGraphObject(convertToGlobalId(1)));
-		try {
-			record.readComponentValues(io);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		T record = graphFactory.createRecord_InMemoryStorage(recordClass,
-				getGraphObject(convertToGlobalId(1)));
-		//record.setComponentValues(components);
-		return record;
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 
 	public Graph createViewGraph(Graph g, int kappa) {
@@ -1881,4 +1853,31 @@ public abstract class GraphDatabaseBaseImpl extends
 		return Empty.map();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Record> T createRecord(Class<T> recordClass,
+			Map<String, Object> fields) throws RemoteException {
+		try {
+			Constructor<?> constr = recordClass.getConstructor(Map.class);
+			return (T) constr.newInstance(fields);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new GraphException(e);
+		}
+	}
+	
+	@Override
+	public Object getEnumConstant(Class<? extends Enum> cls, String constantName) {
+		Enum<?>[] consts = (Enum<?>[]) cls.getEnumConstants();
+		for (int i = 0; i < consts.length; i++) {
+			Enum<?> c = consts[i];
+			if (c.name().equals(constantName)) {
+				return c;
+			}
+		}
+		throw new GraphException("No such enum constant '" + constantName
+				+ "' in EnumDomain " + cls.getCanonicalName());
+	}
+
+	
 }

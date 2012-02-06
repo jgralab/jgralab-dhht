@@ -51,9 +51,6 @@ public interface Record {
 
 	public void writeComponentValues(GraphIO io) throws IOException,
 			GraphIOException;
-	
-	public void readComponentValues(GraphIO io) throws IOException,
-			GraphIOException;
 
 	public PMap<String, Object> toPMap();
 }

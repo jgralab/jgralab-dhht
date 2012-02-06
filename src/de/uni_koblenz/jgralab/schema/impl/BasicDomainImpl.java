@@ -58,7 +58,10 @@ public abstract class BasicDomainImpl extends DomainImpl implements BasicDomain 
 		return BASIC_DOMAINS.contains(domainName);
 	}
 	
-
+	@Override
+	public boolean isBoolean() {
+		return false;
+	}
 
 
 }

@@ -844,34 +844,15 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	public <K, V> PMap<K, V> createMap();
 
 	/**
-	 * Generic creation of records.
-	 * 
-	 * @param <T>
-	 *            *
-	 * @param recordClass
-	 * @param io
+	 * Creates a record of type <code>RecordDomain</code> with values as
+	 * specified by <code>values</code>
+	 *
+	 * @param recordDomain
+	 * @param values
 	 * @return
 	 */
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io);
-
-	/**
-	 * 
-	 * @param <T>
-	 * @param recordClass
-	 * @param io
-	 * @return
-	 */
-	public <T extends Record> T createRecord(Class<T> recordClass, Map<String, Object> fields);
-
-	/**
-	 * 
-	 * @param <T>
-	 * @param recordClass
-	 * @param io
-	 * @return
-	 * @throws RemoteException 
-	 */
-	public <T extends Record> T createRecord(Class<T> recordClass, Object... components);
+	public Record createRecord(Class<? extends Record> recordDomain,
+			Map<String, Object> values);
 
 
 

@@ -86,6 +86,11 @@ public interface Domain extends NamedElementClass {
 	 * @return true if this domain is a primitive domain
 	 */
 	public boolean isPrimitive();
+	
+	/**
+	 * @return true iff this domain is a boolean domain
+	 */
+	public boolean isBoolean();
 
 	
 	/**
@@ -94,4 +99,6 @@ public interface Domain extends NamedElementClass {
 	 * @return
 	 */
 	public String getInitialValue();
+
+
 }

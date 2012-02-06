@@ -32,7 +32,6 @@ package de.uni_koblenz.jgralab.impl.distributed;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -49,7 +48,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.GraphClass;
@@ -236,6 +234,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	//public <T extends Incidence> T connect(Class<T> cls, Vertex vertex, Edge edge)
 
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean containsVertex(Vertex v) {
 		return ((GraphElementImpl) v)
@@ -248,6 +247,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		  (getVertexObjectForId(GraphDatabaseElementaryMethods.convertToLocalId(v.getGlobalId())) == v); 
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean containsEdge(Edge e) {
 		return ((GraphElementImpl) e)
@@ -302,6 +302,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 	// ============================================================================
 	
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Vertex getVertex(long id) {
 		Vertex v = localGraphDatabase.getVertexObject(id);
@@ -312,6 +313,7 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Edge getEdge(long id) {
 		Edge e = localGraphDatabase.getEdgeObject(id);
@@ -496,39 +498,6 @@ public abstract class SubordinateGraphImpl extends GraphBaseImpl implements
 			throw new RuntimeException(e);
 		}
 	}
-
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass, GraphIO io) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, io);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Map<String, Object> fields) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, fields);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public <T extends Record> T createRecord(Class<T> recordClass,
-			Object... components) {
-		try {
-			return storingGraphDatabase.createRecord(recordClass, components);
-		} catch (RemoteException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-
-
 	
 	
 	// ============================================================================

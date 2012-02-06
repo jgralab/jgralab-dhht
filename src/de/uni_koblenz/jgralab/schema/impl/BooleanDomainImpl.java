@@ -78,4 +78,9 @@ public final class BooleanDomainImpl extends BasicDomainImpl implements
 	public String getInitialValue() {
 		return "false";
 	}
+
+	@Override
+	public boolean isBoolean() {
+		return true;
+	}
 }
