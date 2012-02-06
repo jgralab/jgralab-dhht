@@ -463,6 +463,12 @@ public abstract class VertexProxy extends
 		}
 		return null;
 	}
+	
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+		return getFirstIncidence(traversalContext, anIncidenceClass.getM1Class(), noSubclasses);
+	}
 
 	@Override
 	public Iterable<Incidence> getIncidences() {

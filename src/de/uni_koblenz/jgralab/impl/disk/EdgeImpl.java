@@ -381,6 +381,9 @@ public abstract class EdgeImpl extends
 		return getFirstIncidence(localGraphDatabase.getTraversalContext(),
 				thisIncidence, incidentTypes);
 	}
+	
+	
+	
 
 	@Override
 	public final Incidence getFirstIncidence(Graph traversalContext,
@@ -402,6 +405,28 @@ public abstract class EdgeImpl extends
 		return null;
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Incidence> T getFirstIncidence(Graph traversalContext,
+			Class<T> anIncidenceClass, boolean noSubclasses) {
+		assert anIncidenceClass != null;
+		assert isValid();
+		Incidence currentIncidence = getFirstIncidence(traversalContext);
+		while (currentIncidence != null) {
+			if (noSubclasses) {
+				if (anIncidenceClass == currentIncidence.getM1Class()) {
+					return (T) currentIncidence;
+				}
+			} else {
+				if (anIncidenceClass.isInstance(currentIncidence)) {
+					return (T) currentIncidence;
+				}
+			}
+			currentIncidence = currentIncidence.getNextIncidenceAtEdge(
+					traversalContext);
+		}
+		return null;
+	}
 	
 
 	@Override

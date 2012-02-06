@@ -361,6 +361,12 @@ public abstract class EdgeImpl extends
 		}
 		return null;
 	}
+	
+	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+		return getFirstIncidence(traversalContext, anIncidenceClass.getM1Class(), noSubclasses);
+	}
 
 	@Override
 	public final Incidence getFirstIncidence(boolean thisIncidence,

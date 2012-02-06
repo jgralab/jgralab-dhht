@@ -255,6 +255,12 @@ public abstract class VertexImpl extends
 	}
 	
 	@Override
+	public Incidence getFirstIncidence(Graph traversalContext,
+			IncidenceClass anIncidenceClass, boolean noSubclasses) {
+		return getFirstIncidence(traversalContext, anIncidenceClass.getM1Class(), noSubclasses);
+	}
+	
+	@Override
 	public final Incidence getFirstIncidenceToEdge(Class<? extends Edge> edgeClass, Direction direction) {
 		return getFirstIncidenceToEdge(graphDb.getTraversalContext(), edgeClass, direction);
 	}

@@ -137,8 +137,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				cs.add("public #rcname# create#rname#(GraphIO io) throws GraphIOException;");
 				cs.add("");
 
-				cs.add("public #rcname# create#rname#(Map<String, Object> fields);");
-				cs.add("");
 
 				cs.add("public #rcname# create#rname#(#parawtypes#);");
 
@@ -181,14 +179,6 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				cs.add("\treturn record;");
 				cs.add("}");
 				cs.add("");
-
-				cs.add("public #rcname# create#rname#(Map<String, Object> fields) {");
-				cs.add("\t#rcname# record = #graphFactory#.createRecord_#implementationType#(#rcname#.class, this);");
-				
-
-				cs.add("\trecord.setComponentValues(fields);");
-				cs.add("\treturn record;");
-				cs.add("}");
 				cs.add("");
 
 				cs.setVariable("parawtypes", buildParametersOutput(rd
