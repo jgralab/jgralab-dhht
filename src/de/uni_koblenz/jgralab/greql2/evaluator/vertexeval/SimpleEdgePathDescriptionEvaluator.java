@@ -35,85 +35,53 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import org.pcollections.PSet;
-
-import de.uni_koblenz.jgralab.EdgeDirection;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices;
-import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
-import de.uni_koblenz.jgralab.greql2.schema.Expression;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf;
+import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
- * evaluates a BackwardVertexSet
+ * Evaluates a SimpleEdgePathDescription, that is something link v -->{isExprOf}
+ * w. Creates a NFA which accepts the simplePath the vertex to evaluate
+ * describes.
  * 
- * @author ist@uni-koblenz.de
+ * @author ist@uni-koblenz.de Summer 2006, Diploma Thesis
  * 
  */
-public class BackwardVertexSetEvaluator extends PathSearchEvaluator {
+public class SimpleEdgePathDescriptionEvaluator extends
+		SimplePathDescriptionEvaluator {
 
-	BackwardVertexSet vertex;
-
-	/**
-	 * returns the vertex this VertexEvaluator evaluates
-	 */
-	@Override
-	public Greql2Vertex getVertex() {
-		return vertex;
-	}
-
-	public BackwardVertexSetEvaluator(BackwardVertexSet vertex,
+	public SimpleEdgePathDescriptionEvaluator(SimpleEdgePathDescription vertex,
 			GreqlEvaluator eval) {
-		super(eval);
-		this.vertex = vertex;
-	}
-
-	private boolean initialized = false;
-
-	private VertexEvaluator targetEval = null;
-
-	private final void initialize() {
-		PathDescription p = (PathDescription) vertex.getFirstIsPathOfIncidence(
-				EdgeDirection.IN).getAlpha();
-		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker
-				.getMark(p);
-
-		Expression targetExpression = (Expression) vertex
-				.getFirstIsTargetExprOfIncidence(EdgeDirection.IN).getAlpha();
-		targetEval = vertexEvalMarker.getMark(targetExpression);
-		NFA revertedNFA = NFA.revertNFA(pathDescEval.getNFA());
-		searchAutomaton = new DFA(revertedNFA);
-
-		initialized = true;
+		super(vertex, eval);
 	}
 
 	@Override
-	public PSet<Vertex> evaluate() {
-		if (!initialized) {
-			initialize();
+	public NFA evaluate() {
+		TypeCollection typeCollection = new TypeCollection();
+		EdgeRestrictionEvaluator edgeRestEval = null;
+		VertexEvaluator predicateEvaluator = null;
+		for (IsEdgeRestrOf inc : vertex
+				.getIsEdgeRestrOfIncidences(Direction.VERTEX_TO_EDGE)) {
+			edgeRestEval = (EdgeRestrictionEvaluator) vertexEvalMarker
+					.getMark(inc.getAlpha());
+			typeCollection.addTypes(edgeRestEval.getTypeCollection());
+			predicateEvaluator = edgeRestEval.getPredicateEvaluator();
 		}
-		Vertex targetVertex = null;
-		targetVertex = (Vertex) targetEval.getResult();
-
-		return ReachableVertices.search(targetVertex, searchAutomaton);
+		createdNFA = NFA.createSimpleEdgePathDescriptionNFA(
+				getEdgeDirection(vertex), typeCollection,
+				getEdgeRoles(edgeRestEval), predicateEvaluator,
+				vertexEvalMarker);
+		return createdNFA;
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsBackwardVertexSet(
-				this, graphSize);
-	}
-
-	@Override
-	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityBackwardVertexSet(this, graphSize);
+		return this.greqlEvaluator.getCostModel()
+				.calculateCostsSimpleEdgePathDescription(this, graphSize);
 	}
 
 }

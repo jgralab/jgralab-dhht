@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.AggregationPathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.AlternativePathDescriptionEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.BackwardVertexSetEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.BackwardElementSetEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ConditionalExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.DeclarationEvaluator;
@@ -49,7 +49,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgePathDescriptionEva
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgeRestrictionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgeSetExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ExponentiatedPathDescriptionEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ForwardVertexSetEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ForwardElementSetEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.FunctionApplicationEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.Greql2ExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.IntLiteralEvaluator;
@@ -69,7 +69,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SequentialPathDescript
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SetComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SetConstructionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimpleDeclarationEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimplePathDescriptionEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimpleEdgePathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TableComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TransposedPathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TupleConstructionEvaluator;
@@ -151,7 +151,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 	@Override
 	public long calculateCardinalityBackwardVertexSet(
-			BackwardVertexSetEvaluator e, GraphSize graphSize) {
+			BackwardElementSetEvaluator e, GraphSize graphSize) {
 		// TODO Auto-generated method stub
 		return 5;
 	}
@@ -225,7 +225,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 	@Override
 	public long calculateCardinalityForwardVertexSet(
-			ForwardVertexSetEvaluator e, GraphSize graphSize) {
+			ForwardElementSetEvaluator e, GraphSize graphSize) {
 		// TODO Auto-generated method stub
 		return 5;
 	}
@@ -409,7 +409,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 	@Override
 	public VertexCosts calculateCostsBackwardVertexSet(
-			BackwardVertexSetEvaluator e, GraphSize graphSize) {
+			BackwardElementSetEvaluator e, GraphSize graphSize) {
 		BackwardVertexSet bwvertex = (BackwardVertexSet) e.getVertex();
 		Expression targetExpression = bwvertex
 				.getFirstIsTargetExprOfIncidence().getAlpha();
@@ -632,7 +632,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 	@Override
 	public VertexCosts calculateCostsForwardVertexSet(
-			ForwardVertexSetEvaluator e, GraphSize graphSize) {
+			ForwardElementSetEvaluator e, GraphSize graphSize) {
 		ForwardVertexSet bwvertex = (ForwardVertexSet) e.getVertex();
 		Expression targetExpression = bwvertex.getFirstIsStartExprOfIncidence()
 				.getAlpha();
@@ -1078,7 +1078,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 	@Override
 	public VertexCosts calculateCostsSimplePathDescription(
-			SimplePathDescriptionEvaluator e, GraphSize graphSize) {
+			SimpleEdgePathDescriptionEvaluator e, GraphSize graphSize) {
 		return new VertexCosts(transitionCosts, transitionCosts,
 				transitionCosts);
 	}

@@ -41,11 +41,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.tools.ant.types.Quantifier;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
-
-import com.sun.mirror.declaration.Declaration;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.JGraLab;
@@ -53,7 +50,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 import de.uni_koblenz.jgralab.greql2.schema.*;
-import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.Definition;
 
 public class GreqlParser extends ParserHelper {
 	private Map<RuleEnum, int[]> testedRules = new HashMap<RuleEnum, int[]>();
@@ -73,7 +69,7 @@ public class GreqlParser extends ParserHelper {
 	private boolean predicateFulfilled = true;
 
 	private Greql2Schema schema = null;
-	
+
 	private Set<String> subQueryNames = null;
 
 	/**
@@ -585,29 +581,121 @@ public class GreqlParser extends ParserHelper {
 		if (skipRule(pos)) {
 			return null;
 		}
-		Expression expr = parseSubgraphRestrictedExpression();
+		Expression expr = parseSubgraphExpression();
 		ruleSucceeds(RuleEnum.EXPRESSION, pos);
 		return expr;
 	}
 
+	/**
+	 * Parses the SubgraphDefinition used by a SubgraphExpression to define the
+	 * context in which the constrained {@link Expression} is supposed to be
+	 * evaluated.
+	 * 
+	 * @return A SubgraphDefinition-node
+	 */
 	private final SubgraphDefinition parseSubgraphDefinition() {
-		SubgraphDefinition definition = null;
-		int exprOffset = getCurrentOffset();
-		Expression traversalContextExpr = parseExpression();
-		if (!inPredicateMode()) {
-			int exprLength = getLength(exprOffset);
-			definition = graph.createExpressionDefinedSubgraph();
-			IsSubgraphDefiningExpression isSubgraphDefExpr = graph
-					.createIsSubgraphDefiningExpression(traversalContextExpr,
-							(ExpressionDefinedSubgraph) definition);
-			isSubgraphDefExpr.set_sourcePositions(createSourcePositionList(
-					exprLength, exprOffset));
+		switch (lookAhead(0)) {
+		case KAPPA:
+			return parseKappaSubgraphDefinition();
+		case NESTED:
+			return parseNestedSubgraphDefinition();
+		case PARTIAL:
+			return parsePartialSubgraphDefinition();
+		case LOCAL:
+			return parseLocalSubgraphDefinition();
+		default:
+			fail("Expected SubgraphDefinition not found");
+			return null;
 		}
-		return definition;
+		// SubgraphDefinition definition = null;
+		// int exprOffset = getCurrentOffset();
+		// Expression traversalContextExpr = parseExpression();
+		// if (!inPredicateMode()) {
+		// int exprLength = getLength(exprOffset);
+		// definition = graph.createExpressionDefinedSubgraph();
+		// IsSubgraphDefiningExpression isSubgraphDefExpr = graph
+		// .createIsSubgraphDefiningExpression(traversalContextExpr,
+		// (ExpressionDefinedSubgraph) definition);
+		// isSubgraphDefExpr.set_sourcePositions(createSourcePositionList(
+		// exprLength, exprOffset));
+		// }
+		// return definition;
 	}
 
-	private final Expression parseSubgraphRestrictedExpression() {
-		int pos = alreadySucceeded(RuleEnum.SUBGRAPHRESTRICTEDEXPRESSION);
+	/**
+	 * Method for parsing a LocalSubgraphDefinition, which is an access on the
+	 * (logically) local partial graph.
+	 * 
+	 * @return A LocalSubgraphDefinition-node
+	 */
+	private final LocalSubgraphDefinition parseLocalSubgraphDefinition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Method for parsing a PartialSubgraphDefinition, which is an access on a
+	 * specific partial graph (i. e. "partial(1)" for the partial graph with id
+	 * 1).
+	 * 
+	 * @return A PartialSubgraphDefinition-node
+	 */
+
+	private final PartialSubgraphDefinition parsePartialSubgraphDefinition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Method for parsing a NestedSubgraphDefinition, which is an access on the
+	 * nested graph of a specific graph-element (i. e. the subgraph nested
+	 * inside a vertex).
+	 * 
+	 * @return A NestedSubgraphDefinition-node
+	 */
+
+	private final NestedSubgraphDefinition parseNestedSubgraphDefinition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Method for parsing a KappaSubgraphDefinition, which is an access on a
+	 * view of the graph, defined by a visibility-level (kappa). Any elements
+	 * with a kappa below the specified value will not be part of the context
+	 * for the evaluation.
+	 * 
+	 * @return A KappaSubgraphDefinition-node
+	 */
+	private final KappaSubgraphDefinition parseKappaSubgraphDefinition() {
+		assert lookAhead(0) == TokenTypes.KAPPA : "Entered parse of KappaSubgraphDefinition without KAPPA-token!";
+		KappaSubgraphDefinition kappaDefinition = null;
+		match();
+		if (!inPredicateMode()) {
+			if (tryMatch(TokenTypes.LPAREN)) {
+				if (lookAhead(0) == TokenTypes.INTLITERAL) {
+					long kappa = ((IntegerToken) lookAhead).getNumber()
+							.intValue();
+					match();
+					kappaDefinition = graph.createKappaSubgraphDefinition();
+					kappaDefinition.setKappa((int) kappa);
+					if (tryMatch(TokenTypes.RPAREN)) {
+						match();
+					} else {
+						fail("No closing parenthesis in kappa-definition:");
+					}
+				} else {
+					fail("No valid number in kappa-definition:");
+				}
+			} else {
+				fail("No opening parenthesis in kappa-definition:");
+			}
+		}
+		return kappaDefinition;
+	}
+
+	private final Expression parseSubgraphExpression() {
+		int pos = alreadySucceeded(RuleEnum.SUBGRAPHEXPRESSION);
 		if (skipRule(pos)) {
 			return null;
 		}
@@ -622,24 +710,24 @@ public class GreqlParser extends ParserHelper {
 			Expression restrictedExpr = parseWhereExpression();
 			if (!inPredicateMode()) {
 				int lengthRestrExpr = getLength(offsetRestrExpr);
-				SubgraphRestrictedExpression subgraphRestrExpr = graph
-						.createSubgraphRestrictedExpression();
+				SubgraphExpression subgraphExpr = graph
+						.createSubgraphExpression();
 				IsSubgraphDefinitionOf subgraphDefOf = graph
-						.createIsSubgraphDefinitionOf(subgraphDef,
-								subgraphRestrExpr);
+						.createIsSubgraphDefinitionOf(subgraphDef, subgraphExpr);
 				subgraphDefOf.set_sourcePositions(createSourcePositionList(
 						lengthDef, offsetDef));
-				IsExpressionOnSubgraph exprOnSubgraph = graph
-						.createIsExpressionOnSubgraph(restrictedExpr,
-								subgraphRestrExpr);
-				exprOnSubgraph.set_sourcePositions(createSourcePositionList(
-						lengthRestrExpr, offsetRestrExpr));
-				result = subgraphRestrExpr;
+				IsConstrainedExpressionOf constrainedExpression = graph
+						.createIsConstrainedExpressionOf(restrictedExpr,
+								subgraphExpr);
+				constrainedExpression
+						.set_sourcePositions(createSourcePositionList(
+								lengthRestrExpr, offsetRestrExpr));
+				result = subgraphExpr;
 			}
 		} else {
 			result = parseLetExpression();
 		}
-		ruleSucceeds(RuleEnum.SUBGRAPHRESTRICTEDEXPRESSION, pos);
+		ruleSucceeds(RuleEnum.SUBGRAPHEXPRESSION, pos);
 		return result;
 	}
 
@@ -696,7 +784,7 @@ public class GreqlParser extends ParserHelper {
 			lengthQuantifiedDecl = getLength(offsetQuantifiedDecl);
 			match(TokenTypes.AT);
 			offsetQuantifiedExpr = getCurrentOffset();
-			Expression boundExpr = parseSubgraphRestrictedExpression();
+			Expression boundExpr = parseSubgraphExpression();
 			lengthQuantifiedExpr = getLength(offsetQuantifiedExpr);
 			QuantifiedExpression quantifiedExpr = null;
 			if (!inPredicateMode()) {
@@ -1452,11 +1540,11 @@ public class GreqlParser extends ParserHelper {
 		}
 		if ((lookAhead(0) == TokenTypes.RARROW)
 				|| (lookAhead(0) == TokenTypes.LARROW)
-				|| (lookAhead(0) == TokenTypes.ARROW)) {
-			return parseSimplePathDescription();
+				|| (lookAhead(0) == TokenTypes.WARROW)) {
+			return parseSimpleEdgePathDescription();
 		}
-		if ((lookAhead(0) == TokenTypes.EDGESTART)
-				|| (lookAhead(0) == TokenTypes.EDGEEND)
+		if ((lookAhead(0) == TokenTypes.SLARROW)
+				|| (lookAhead(0) == TokenTypes.SRARROW)
 				|| (lookAhead(0) == TokenTypes.EDGE)) {
 			return parseEdgePathDescription();
 		}
@@ -1480,8 +1568,13 @@ public class GreqlParser extends ParserHelper {
 		return null;
 	}
 
-	private final PrimaryPathDescription parseSimplePathDescription() {
-		Direction dir = null;
+	private final PrimaryPathDescription parseSimpleIncidencePathDescription() {
+		PrimaryPathDescription result = null;
+		return result;
+	}
+
+	private final PrimaryPathDescription parseSimpleEdgePathDescription() {
+		PathDirection dir = null;
 		EdgeRestriction edgeRestr = null;
 		String direction = "any";
 		int offsetDir = getCurrentOffset();
@@ -1492,7 +1585,7 @@ public class GreqlParser extends ParserHelper {
 		} else if (tryMatch(TokenTypes.LARROW)) {
 			direction = "in";
 		} else {
-			match(TokenTypes.ARROW);
+			match(TokenTypes.WARROW);
 		}
 		if (tryMatch(TokenTypes.LCURLY)) {
 			offsetEdgeRestr = getCurrentOffset();
@@ -1501,17 +1594,18 @@ public class GreqlParser extends ParserHelper {
 			match(TokenTypes.RCURLY);
 		}
 		if (!inPredicateMode()) {
-			PrimaryPathDescription result = graph.createSimplePathDescription();
-			dir = (Direction) graph.getFirstVertex(Direction.class);
+			PrimaryPathDescription result = graph
+					.createSimpleEdgePathDescription();
+			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextDirection();
+					dir = dir.getNextPathDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createDirection();
+				dir = graph.createPathDirection();
 				dir.set_dirValue(direction);
 			}
 			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
@@ -1560,12 +1654,12 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private final EdgePathDescription parseEdgePathDescription() {
-		Direction dir = null;
+		PathDirection dir = null;
 		boolean edgeStart = false;
 		boolean edgeEnd = false;
 		String direction = "any";
 		int offsetDir = getCurrentOffset();
-		if (tryMatch(TokenTypes.EDGESTART)) {
+		if (tryMatch(TokenTypes.SLARROW)) {
 			edgeStart = true;
 		} else {
 			match(TokenTypes.EDGE);
@@ -1574,7 +1668,7 @@ public class GreqlParser extends ParserHelper {
 		Expression expr = parseExpression();
 		int lengthExpr = getLength(offsetExpr);
 
-		if (tryMatch(TokenTypes.EDGEEND)) {
+		if (tryMatch(TokenTypes.SRARROW)) {
 			edgeEnd = true;
 		} else {
 			match(TokenTypes.EDGE);
@@ -1588,16 +1682,16 @@ public class GreqlParser extends ParserHelper {
 			} else if (!edgeStart && edgeEnd) {
 				direction = "out";
 			}
-			dir = (Direction) graph.getFirstVertex(Direction.class);
+			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextDirection();
+					dir = dir.getNextPathDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createDirection();
+				dir = graph.createPathDirection();
 				dir.set_dirValue(direction);
 			}
 			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
@@ -1721,7 +1815,7 @@ public class GreqlParser extends ParserHelper {
 		int offsetKey = getCurrentOffset();
 		Expression keyExpr = parseExpression();
 		int lengthKey = getLength(offsetKey);
-		match(TokenTypes.EDGEEND);
+		match(TokenTypes.SRARROW);
 		int offsetValue = getCurrentOffset();
 		Expression valueExpr = parseExpression();
 		int lengthValue = getLength(offsetValue);
@@ -1739,7 +1833,7 @@ public class GreqlParser extends ParserHelper {
 			offsetKey = getCurrentOffset();
 			keyExpr = parseExpression();
 			lengthKey = getLength(offsetKey);
-			match(TokenTypes.EDGEEND);
+			match(TokenTypes.SRARROW);
 			offsetValue = getCurrentOffset();
 			valueExpr = parseExpression();
 			lengthValue = getLength(offsetValue);
@@ -2181,7 +2275,7 @@ public class GreqlParser extends ParserHelper {
 				comprehension = graph.createMapComprehension();
 			}
 			map = true;
-			separator = TokenTypes.EDGEEND;
+			separator = TokenTypes.SRARROW;
 			match();
 			break;
 		default:
@@ -2379,7 +2473,7 @@ public class GreqlParser extends ParserHelper {
 		} else {
 			if (!inPredicateMode()) {
 				// create new forward-vertex-set
-				ForwardVertexSet fvs = graph.createForwardVertexSet();
+				ForwardElementSet fvs = graph.createForwardElementSet();
 				// add start expr
 				IsStartExprOf startVertexOf = graph.createIsStartExprOf(expr,
 						fvs);
@@ -2447,7 +2541,7 @@ public class GreqlParser extends ParserHelper {
 						pathDescr, offsetPathDescr, lengthPathDescr, restrExpr,
 						offsetExpr, lengthExpr, true);
 			} else {
-				BackwardVertexSet bs = graph.createBackwardVertexSet();
+				BackwardElementSet bs = graph.createBackwardElementSet();
 				IsTargetExprOf targetVertexOf = graph.createIsTargetExprOf(
 						restrExpr, bs);
 				targetVertexOf.set_sourcePositions(createSourcePositionList(

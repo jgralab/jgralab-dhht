@@ -53,7 +53,7 @@ import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
  * @author ist@uni-koblenz.de
  * 
  */
-public class ForwardVertexSetEvaluator extends PathSearchEvaluator {
+public class ForwardElementSetEvaluator extends PathSearchEvaluator {
 
 	private ForwardVertexSet vertex;
 
@@ -65,7 +65,7 @@ public class ForwardVertexSetEvaluator extends PathSearchEvaluator {
 		return vertex;
 	}
 
-	public ForwardVertexSetEvaluator(ForwardVertexSet vertex,
+	public ForwardElementSetEvaluator(ForwardVertexSet vertex,
 			GreqlEvaluator eval) {
 		super(eval);
 		this.vertex = vertex;

@@ -83,6 +83,10 @@ public class GreqlLexer {
 					put(TokenTypes.V, "V");
 					put(TokenTypes.WHERE, "where");
 					put(TokenTypes.WITH, "with");
+					put(TokenTypes.NESTED, "nested");
+					put(TokenTypes.LOCAL, "local");
+					put(TokenTypes.PARTIAL, "partial");
+					put(TokenTypes.KAPPA, "kappa");
 					put(TokenTypes.QUESTION, "?");
 					put(TokenTypes.EXCL, "!");
 					put(TokenTypes.COLON, ":");
@@ -96,12 +100,13 @@ public class GreqlLexer {
 					put(TokenTypes.RBRACK, "]");
 					put(TokenTypes.LCURLY, "{");
 					put(TokenTypes.RCURLY, "}");
-					put(TokenTypes.EDGESTART, "<-");
-					put(TokenTypes.EDGEEND, "->");
+					put(TokenTypes.SLARROW, "<-");
+					put(TokenTypes.SRARROW, "->");
 					put(TokenTypes.EDGE, "--");
 					put(TokenTypes.RARROW, "-->");
 					put(TokenTypes.LARROW, "<--");
 					put(TokenTypes.ARROW, "<->");
+					put(TokenTypes.WARROW, "<-->");
 					put(TokenTypes.ASSIGN, ":=");
 					put(TokenTypes.EQUAL, "=");
 					put(TokenTypes.MATCH, "=~");
