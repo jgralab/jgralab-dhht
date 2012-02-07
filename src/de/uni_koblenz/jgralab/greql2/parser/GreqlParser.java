@@ -46,6 +46,7 @@ import org.pcollections.PVector;
 
 
 import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
@@ -154,7 +155,7 @@ public class GreqlParser extends ParserHelper {
 		parsingStack = new Stack<Integer>();
 		predicateStack = new Stack<Boolean>();
 		schema = Greql2Schema.instance();
-		graph = schema.createGreql2_InMemoryStorage();
+		graph = schema.createGreqlSyntaxGraph_InMemoryStorage();
 		tokens = GreqlLexer.scan(source);
 		afterParsingvariableSymbolTable = new SymbolTable();
 		duringParsingvariableSymbolTable = new SimpleSymbolTable();
@@ -2138,10 +2139,10 @@ public class GreqlParser extends ParserHelper {
 				}
 			}
 		} while (tryMatch(TokenTypes.COMMA));
-		if (!inPredicateMode() && (tupConstr.getDegree(EdgeDirection.IN) == 1)) {
-			Vertex v = tupConstr.getFirstIncidence(EdgeDirection.IN).getAlpha();
-			Edge e2 = tupConstr.getFirstIncidence(EdgeDirection.OUT);
-			e2.setAlpha(v);
+		if (!inPredicateMode() && (tupConstr.getDegree(Direction.EDGE_TO_VERTEX) == 1)) {
+			Vertex v = ((BinaryEdge) tupConstr.getFirstIncidence(Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
+			Edge e2 = tupConstr.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
+			((BinaryEdge) e2).setAlpha(v);
 			tupConstr.delete();
 		}
 		return listCompr;

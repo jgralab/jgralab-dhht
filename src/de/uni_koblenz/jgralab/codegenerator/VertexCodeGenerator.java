@@ -118,6 +118,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			s.setVariable("edgeClassQualifiedName", ec.getSchema().getPackagePrefix().concat("." + ec.getQualifiedName()));
 			s.setVariable("edgeClassUniqueName", ec.getUniqueName());
 
+			//Methods to access first incidence
 			if (currentCycle.isAbstract()) {
 				s.add("/**");
 				s.add(" * Returns the first incidence leading to an edge of type #edgeClassSimpleName# or subtypes.");
@@ -127,6 +128,31 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 				s.add("@Override");
 				s.add("public Incidence getFirstIncidenceTo#edgeClassUniqueName#(Direction direction) {");
 				s.add("\treturn getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, direction);");
+				s.add("}");
+			}
+			
+			//methods to access incidence sequence 
+			if (currentCycle.isAbstract()) {
+				s.add("/**");
+				s.add(" * Returns an iterable for all incident edges of type #edgeClassSimpleName# or subtypes.");
+				s.add(" */");
+				s.add("public Iterable<#edgeClassQualifiedName#> getIncidentEdgesOfType_#edgeClassUniqueName#();");
+				s.add("");
+				s.add("");
+				s.add("/**");
+				s.add(" * Returns an iterable for all incident edges of type #edgeClassSimpleName# or subtypes.");
+				s.add(" */");
+				s.add("public Iterable<#edgeClassQualifiedName#> getIncidentEdgesOfType_#edgeClassUniqueName#(Direction direction);");
+			} else { 
+				s.add("@Override");
+				s.add("public Iterable<#edgeClassQualifiedName#> getIncidentEdgesOfType_#edgeClassUniqueName#() {");
+				s.add("\treturn getIncidentEdges(#edgeClassQualifiedName#.class);");
+				s.add("}");
+				s.add("");
+				s.add("");
+				s.add("@Override");
+				s.add("public Iterable<#edgeClassQualifiedName#> getIncidentEdgesOfType_#edgeClassUniqueName#(Direction direction) {");
+				s.add("\treturn getIncidenctEdges(#edgeClassQualifiedName#.class, direction);");
 				s.add("}");
 			}
 			s.add("");

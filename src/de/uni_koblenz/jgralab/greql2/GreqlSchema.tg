@@ -24,7 +24,7 @@
 
 DHHTGraph 1;
 Schema de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
-GraphClass Greql2;
+GraphClass GreqlSyntaxGraph;
 
 EnumDomain IterationType (STAR, PLUS);
 EnumDomain QuantificationType (FORALL, EXISTS, EXISTSONE);
@@ -67,7 +67,7 @@ VertexClass OptionalPathDescription: PathDescription;
 VertexClass PathExistence: PathExpression;
 VertexClass QuantifiedExpression: Expression;
 VertexClass Quantifier: Greql2Vertex { type: QuantificationType };
-VertexClass DoubleLiteral: Literal { realValue: Double };
+VertexClass DoubleLiteral: Literal { doubleValue: Double };
 VertexClass RecordConstruction: ValueConstruction;
 VertexClass RecordElement: Greql2Vertex;
 VertexClass RecordId: Identifier;
