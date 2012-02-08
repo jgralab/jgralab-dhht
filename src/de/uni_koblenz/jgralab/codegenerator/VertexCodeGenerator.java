@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.codegenerator;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.schema.EdgeClass;
@@ -95,6 +96,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 
 	
 	protected CodeBlock createCompatibilityMethods() {
+		addImports("#jgPackage#.Direction");
 		VertexClass vc = (VertexClass) aec;
 		CodeList code = new CodeList();
 		Set<EdgeClass> edgeClassSet = new HashSet<EdgeClass>();
@@ -117,17 +119,81 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			s.setVariable("edgeClassSimpleName", ec.getSimpleName());
 			s.setVariable("edgeClassQualifiedName", ec.getSchema().getPackagePrefix().concat("." + ec.getQualifiedName()));
 			s.setVariable("edgeClassUniqueName", ec.getUniqueName());
+			s.setVariable("incidenceClassQualifiedName", "Incidence");
+			boolean debug = vc.getSimpleName().equals("Definition") && ec.getSimpleName().equals("IsExprOf");
+			Set<IncidenceClass> ics = new HashSet<IncidenceClass>();
+			if (debug)
+				System.out.println("Handling incidence classes");
+			for (IncidenceClass ic : ec.getAllIncidenceClasses()) {
+				if (ic.isInternal())
+					continue;
+				if (ic.getVertexClass() == vc || (ic.getVertexClass().isSuperClassOf(vc)) || (ic.getVertexClass().isSubClassOf(vc)) ) {
+					if (debug)
+						System.out.println("Thinking of adding incidence class: " + ic.getSimpleName());
+					boolean superclassContained = false;
+					for (IncidenceClass superClass : ic.getAllSuperClasses()) {
+						if (ics.contains(superClass) && !superClass.isAbstract()) {
+							superclassContained = true;
+						}
+					}
+					if (!superclassContained) {
+						//remove all subclasses of the current incidence class
+						if (debug)
+							System.out.println("Adding incidence class: " + ic.getSimpleName());
+						ics.removeAll(ic.getAllSubClasses());
+						ics.add(ic);
+					} else {
+						if (debug)
+							System.out.println("Not adding incidence class: " + ic.getSimpleName());
+					}
+				}
+			}
+			//remove all abstract classes with only one contained superclass
+			Set<IncidenceClass> subclassesToBeRemoved = new HashSet<IncidenceClass>();
+			Iterator<IncidenceClass> it = ics.iterator();
+			while (it.hasNext()) {
+				IncidenceClass possibleAbstractSuperClass = it.next();
+				if (debug)
+					System.out.println("Testing possible abstract incidence class: " + possibleAbstractSuperClass.getSimpleName());
+				if (debug)
+					System.out.println("Abstract:  " + possibleAbstractSuperClass.isAbstract());
+				if (!possibleAbstractSuperClass.isAbstract())
+					continue;
+				int numberOfContainedSubclasses = 0;
+				for (IncidenceClass directSubclass : possibleAbstractSuperClass.getDirectSubClasses()) {
+					if (ics.contains(directSubclass))
+						numberOfContainedSubclasses++;
+				}
+				if (debug)
+					System.out.println("Contained Subclasses: " + numberOfContainedSubclasses);
+				if (numberOfContainedSubclasses <= 1) {
+					it.remove();
+				} else {
+					for (IncidenceClass directSubclass : possibleAbstractSuperClass.getDirectSubClasses()) {
+						if (ics.contains(directSubclass))
+							subclassesToBeRemoved.add(directSubclass);
+					}
+				}
+			}
+			
+			
+			if (ics.size() == 1) {
+				//set one and only possible incidence class name 
+				ics.iterator().hasNext();
+				IncidenceClass ic = ics.iterator().next();
+				s.setVariable("incidenceClassQualifiedName", ic.getSchema().getPackagePrefix() + "." + ic.getQualifiedName());
+			}
 
 			//Methods to access first incidence
 			if (currentCycle.isAbstract()) {
 				s.add("/**");
 				s.add(" * Returns the first incidence leading to an edge of type #edgeClassSimpleName# or subtypes.");
 				s.add(" */");
-				s.add("public Incidence getFirstIncidenceTo#edgeClassUniqueName#(Direction direction);");
+				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#(Direction direction);");
 			} else { 
 				s.add("@Override");
-				s.add("public Incidence getFirstIncidenceTo#edgeClassUniqueName#(Direction direction) {");
-				s.add("\treturn getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, direction);");
+				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#(Direction direction) {");
+				s.add("\treturn (#incidenceClassQualifiedName#) getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, direction);");
 				s.add("}");
 			}
 			
@@ -152,7 +218,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 				s.add("");
 				s.add("@Override");
 				s.add("public Iterable<#edgeClassQualifiedName#> getIncidentEdgesOfType_#edgeClassUniqueName#(Direction direction) {");
-				s.add("\treturn getIncidenctEdges(#edgeClassQualifiedName#.class, direction);");
+				s.add("\treturn getIncidentEdges(#edgeClassQualifiedName#.class, direction);");
 				s.add("}");
 			}
 			s.add("");
