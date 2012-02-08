@@ -82,6 +82,9 @@ public class IncidenceClassImpl extends
 		this.rolename = getRolenameString(rolename, vertexClass, direction,
 				edgeClass);
 		this.vertexClass = vertexClass;
+		if (edgeClass.isBinary() && edgeClass.isAbstract()) {
+			isAbstract = true;
+		}
 		setAbstract(isAbstract);
 	}
 

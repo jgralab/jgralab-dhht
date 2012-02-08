@@ -23,6 +23,8 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 			code.add(createGetOmegaSemanticsMethod());
 			//code.add(createBinaryConstructor());
 		}
+		code.add(createGetAlphaMethod());
+		code.add(createGetOmegaMethod());
 	}
 
 
@@ -95,5 +97,50 @@ public class BinaryEdgeCodeGenerator extends EdgeCodeGenerator {
 		return code;
 	}
 	
+	private CodeBlock createGetAlphaMethod() {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("alphaVertexType", bec.getSchema().getPackagePrefix() + "." +  bec.getFromIncidenceClass().getVertexClass().getQualifiedName());
+		if (currentCycle.isAbstract()) {
+			code.add(
+					 "/*",
+					 " * Overriden for type safety ",
+					 "*/",
+					 "@Override",
+					 "public #alphaVertexType# getAlpha();");
+		} else{
+			code.add(
+					 "/*",
+					 " * Overriden for type safety ",
+					 "*/",
+					 "@Override",
+					 "public #alphaVertexType# getAlpha() {",
+					 "\treturn (#alphaVertexType#) super.getAlpha();",
+					 "}");
+		}
+		return code;
+	}
+	
+	private CodeBlock createGetOmegaMethod() {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("omegaVertexType", bec.getSchema().getPackagePrefix() + "." + bec.getToIncidenceClass().getVertexClass().getQualifiedName());
+		if (currentCycle.isAbstract()) {
+			code.add(
+					 "/*",
+					 " * Overriden for type safety ",
+					 "*/",
+					 "@Override",
+					 "public #omegaVertexType# getOmega();");
+		} else{
+			code.add(
+				 "/*",
+				 " * Overriden for type safety ",
+				 "*/",
+				 "@Override",
+				 "public #omegaVertexType# getOmega() {",
+				 "\treturn (#omegaVertexType#) super.getOmega();",
+				 "}");
+		}	
+		return code;
+	}
 
 }

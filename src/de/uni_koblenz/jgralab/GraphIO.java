@@ -2106,6 +2106,8 @@ public class GraphIO {
 		EdgeClass ec = ecd.isBinaryEdge ? gc.createBinaryEdgeClass(ecd
 				.getQualifiedName()) : gc.createEdgeClass(ecd
 				.getQualifiedName());
+		
+		ec.setAbstract(ecd.isAbstract);
 		for (IncidenceClassData icd : ecd.fromIncidenceClasses) {
 			incidenceClassMap.put(gc.createIncidenceClass(ec,
 					gc.getVertexClass(icd.vertexClassName), icd.roleName,
@@ -2131,7 +2133,7 @@ public class GraphIO {
 			ec.addConstraint(constraint);
 		}
 
-		ec.setAbstract(ecd.isAbstract);
+
 		if (ecd.validKappa != null) {
 			ec.setAllowedKappaRange(ecd.validKappa[0], ecd.validKappa[1]);
 		}

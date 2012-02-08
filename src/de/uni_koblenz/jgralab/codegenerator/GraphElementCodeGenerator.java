@@ -303,7 +303,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			boolean createMethod = (!currentCycle.isAbstract()) || incidenceDefinedForExactlyThisGraphElementClass || incidenceDefinedForVertexAsDirectSuperclass;
 
 			if (createMethod) {
-				addImports("#jgPackage#.Direction");
+				//addImports("#jgPackage#.Direction");
 				if (config.hasTypeSpecificMethodsSupport()) {
 					if (!ic.isInternal()) {
 						code.addNoIndent(createFirstIncidenceMethod(ic, true));

@@ -210,8 +210,7 @@ public abstract class ParserHelper {
 		/* iterate over all definitionsexpressions in the graph */
 		for (DefinitionExpression exp : list) {
 			List<Definition> defList = new ArrayList<Definition>();
-			for (IsDefinitionOf isDefOf : exp
-					.getIsDefinitionOfIncidences(Direction.EDGE_TO_VERTEX)) {
+			for (IsDefinitionOf isDefOf : exp.getIncidentEdgesOfType_IsDefinitionOf(Direction.EDGE_TO_VERTEX)) {
 				Definition definition = isDefOf.getAlpha();
 				defList.add(definition);
 			}
@@ -226,7 +225,7 @@ public abstract class ParserHelper {
 			/* iterate over all definitions at the current definition expression */
 			for (Definition definition : defList) {
 				IsExprOf isExprOf = definition
-						.getFirstIsExprOfIncidence(Direction.EDGE_TO_VERTEX);
+						.getFirstIncidenceToIsExprOf(Direction.EDGE_TO_VERTEX).getEdge();
 				IsVarOf isVarOf = definition
 						.getFirstIsVarOfIncidence(Direction.EDGE_TO_VERTEX);
 				Expression expr = isExprOf.getAlpha();
