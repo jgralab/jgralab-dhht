@@ -31,12 +31,17 @@
 
 package de.uni_koblenz.jgralab.greql2.parser;
 
+
+
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 public class SymbolTable extends SimpleSymbolTable {
 
@@ -52,23 +57,26 @@ public class SymbolTable extends SimpleSymbolTable {
 			if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsDeclaredVarOf) {
 				offset = ((IsDeclaredVarOf) var
 						.getFirstIncidence(EdgeDirection.OUT))
+			if (var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge() instanceof IsDeclaredVarOf) {
+				offset = ((IsDeclaredVarOf) var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge())
 						.get_sourcePositions().get(0).get_offset();
 			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsBoundVarOf) {
 				offset = ((IsBoundVarOf) var
 						.getFirstIncidence(EdgeDirection.OUT))
+			} else if (var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge() instanceof IsBoundVarOf) {
+				offset = ((IsBoundVarOf) var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge())
 						.get_sourcePositions().get(0).get_offset();
-			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsVarOf) {
-				offset = ((IsVarOf) var.getFirstIncidence(EdgeDirection.OUT))
+			} else if (var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge() instanceof IsVarOf) {
+				offset = ((IsVarOf) var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge())
 						.get_sourcePositions().get(0).get_offset();
 			}
 			throw new DuplicateVariableException((Variable) var,
-					((Greql2Aggregation) v.getFirstIncidence(EdgeDirection.IN))
+					((Greql2Aggregation) v.getFirstIncidence(Direction.EDGE_TO_VERTEX).getEdge())
 					// .get_sourcePositions(), new SourcePosition(offset,
-					// ident.length()));
-					// .get_sourcePositions(), new SourcePositionImpl(v
-					// .getGraph(), offset, ident.length()));
-							.get_sourcePositions(), v.getGraph().createRecord(
-							SourcePositionImpl.class, offset, ident.length()));
+							// ident.length()));
+							// .get_sourcePositions(), new SourcePositionImpl(v
+							// .getGraph(), offset, ident.length()));
+							.get_sourcePositions(), new SourcePosition(ident.length(), offset));
 		}
 	}
 

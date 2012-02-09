@@ -40,6 +40,7 @@ import org.pcollections.PCollection;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
+import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
 
 public class IntermediateVertexTransition extends Transition {
 

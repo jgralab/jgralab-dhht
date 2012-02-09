@@ -1,13 +1,9 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2011 Institute for Software Technology
+ * Copyright (C) 2006-2010 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
- * 
- * For bug reports, documentation and further information, visit
- * 
- *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -32,10 +28,22 @@
  * non-source form of such a combination shall include the source code for
  * the parts of JGraLab used as well as that of the covered work.
  */
+/**
+ * 
+ */
+package de.uni_koblenz.jgralab.greql2;
+
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+
+
 
 /**
- * This package is part of the GReQL2-evaluator.
+ * @author Tassilo Horn &lt;horn@uni-koblenz.de&gt;
+ * 
  */
+public interface SerializableGreqlSyntaxGraph extends GreqlSyntaxGraph {
+	public String serialize();
 
-package de.uni_koblenz.jgralab.greql2.evaluator.costmodel;
-
+	public String serialize(Greql2Vertex v);
+}

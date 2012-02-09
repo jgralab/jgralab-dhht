@@ -43,9 +43,9 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
 import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 
 /**
  * This class is one entry in the Map from Query+CostModel+Optimizer to
@@ -56,12 +56,12 @@ public class SyntaxGraphEntry {
 	/**
 	 * the SyntaxGraph this entry represents
 	 */
-	private Greql2 syntaxGraph;
+	private GreqlSyntaxGraph syntaxGraph;
 
 	/**
 	 * @return the SyntaxGraph this entry represents
 	 */
-	public Greql2 getSyntaxGraph() {
+	public GreqlSyntaxGraph getSyntaxGraph() {
 		return syntaxGraph;
 	}
 
@@ -169,7 +169,7 @@ public class SyntaxGraphEntry {
 	 * @param locked
 	 *            specifies, wether the graph should be locked or not
 	 */
-	public SyntaxGraphEntry(String queryText, Greql2 graph,
+	public SyntaxGraphEntry(String queryText, GreqlSyntaxGraph graph,
 			Optimizer optimizer, CostModel costModel, boolean locked) {
 		this.queryText = queryText;
 		this.syntaxGraph = graph;
@@ -199,7 +199,7 @@ public class SyntaxGraphEntry {
 	 *             contain a constructor with zero parameters.
 	 */
 	public SyntaxGraphEntry(File fileName) throws GraphIOException {
-		this.syntaxGraph = (Greql2) GraphIO
+		this.syntaxGraph = (GreqlSyntaxGraph) GraphIO
 				.loadGraphFromFile(fileName.getPath(), Greql2Schema.instance(), ImplementationType.MEMORY);
 		Greql2Expression g2e = syntaxGraph.getFirstGreql2Expression();
 		try {

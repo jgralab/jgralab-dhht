@@ -33,10 +33,10 @@
  */
 package de.uni_koblenz.jgralab.greql2;
 
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.impl.mem.Greql2Impl;
+import de.uni_koblenz.jgralab.greql2.schema.impl.mem.GreqlSyntaxGraphImpl;
 import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
 
 
@@ -44,18 +44,18 @@ import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
  * @author Tassilo Horn &lt;horn@uni-koblenz.de&gt;
  * 
  */
-public class SerializableGreql2Impl extends Greql2Impl implements
-		SerializableGreql2 {
+public class SerializableGreqlSyntaxGraphImpl extends GreqlSyntaxGraphImpl implements
+		SerializableGreqlSyntaxGraph {
 	static {
 		Greql2Schema.instance().getGraphFactory().setGraphImplementationClass_InMemoryStorage(
-				Greql2.class, SerializableGreql2Impl.class);
+				GreqlSyntaxGraph.class, SerializableGreqlSyntaxGraphImpl.class);
 	}
 
-	public SerializableGreql2Impl() {
+	public SerializableGreqlSyntaxGraphImpl() {
 		super();
 	}
 
-	public SerializableGreql2Impl(java.lang.String id, int vMax, int eMax) {
+	public SerializableGreqlSyntaxGraphImpl(java.lang.String id, int vMax, int eMax) {
 		super(id, vMax, eMax);
 	}
 

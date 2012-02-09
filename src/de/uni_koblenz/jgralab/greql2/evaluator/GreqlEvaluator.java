@@ -70,9 +70,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.DefaultCostModel;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
@@ -82,7 +79,7 @@ import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
@@ -324,7 +321,7 @@ public class GreqlEvaluator {
 	 * gets an unlocked syntaxgraph out of the optimzedGraph map and locks it
 	 */
 	protected static synchronized SyntaxGraphEntry getOptimizedSyntaxGraph(
-			String queryString, Optimizer optimizer, CostModel costModel) {
+			String queryString, Optimizer optimizer) {
 		SoftReference<List<SyntaxGraphEntry>> ref = optimizedGraphs
 				.get(queryString);
 		List<SyntaxGraphEntry> entryList = null;
@@ -340,13 +337,11 @@ public class GreqlEvaluator {
 		}
 
 		for (SyntaxGraphEntry entry : entryList) {
-			if (entry.getCostModel().isEquivalent(costModel)) {
-				Optimizer opt = entry.getOptimizer();
-				if (((opt != null) && opt.isEquivalent(optimizer))
-						|| ((opt == null) && (optimizer == null))) {
-					if (entry.lock()) {
-						return entry;
-					}
+			Optimizer opt = entry.getOptimizer();
+			if (((opt != null) && opt.isEquivalent(optimizer))
+					|| ((opt == null) && (optimizer == null))) {
+				if (entry.lock()) {
+					return entry;
 				}
 			}
 		}
@@ -461,7 +456,7 @@ public class GreqlEvaluator {
 	/**
 	 * This attribute holds the query-graph
 	 */
-	protected Greql2 queryGraph = null;
+	protected GreqlSyntaxGraph queryGraph = null;
 
 	/**
 	 * This attribute holds the entry of the optimizedSyntaxGraph map that is
@@ -495,11 +490,6 @@ public class GreqlEvaluator {
 	 * This attribute holds the result of the evaluation
 	 */
 	protected Object result = null;
-
-	/**
-	 * This attribute holds the CostModel which estimates the evaluation costs
-	 */
-	protected CostModel costModel = null;
 
 	/**
 	 * The progress function this evaluator uses, may be null
@@ -556,7 +546,7 @@ public class GreqlEvaluator {
 	/**
 	 * Holds the greql subqueries that can be called like other greql functions.
 	 */
-	protected LinkedHashMap<String, Greql2> subQueryMap = null;
+	protected LinkedHashMap<String, GreqlSyntaxGraph> subQueryMap = null;
 
 	/**
 	 * Holds the estimated needed for evaluation time in abstract units
@@ -628,10 +618,10 @@ public class GreqlEvaluator {
 
 		parser.parse();
 
-		Greql2 subQueryGraph = parser.getGraph();
+		GreqlSyntaxGraph subQueryGraph = parser.getGraph();
 		subQueryGraph.getFirstGreql2Expression().set_queryText(name);
 		if (isOptimize()) {
-			Greql2 oldQueryGraph = queryGraph;
+			GreqlSyntaxGraph oldQueryGraph = queryGraph;
 			String oldQueryString = queryString;
 			queryGraph = subQueryGraph;
 			queryString = greqlQuery;
@@ -654,7 +644,7 @@ public class GreqlEvaluator {
 		// System.out.println(Greql2Serializer.serialize(subQueryGraph));
 	}
 
-	public Greql2 getSubQuery(String name) {
+	public GreqlSyntaxGraph getSubQuery(String name) {
 		return subQueryMap.get(name);
 	}
 
@@ -701,24 +691,11 @@ public class GreqlEvaluator {
 		return tmpDir;
 	}
 
-	/**
-	 * returns the CostModel which is used to estimate the evaluation costs
-	 */
-	public CostModel getCostModel() {
-		return costModel;
-	}
-
-	/**
-	 * sets the CostModel which is used to estimate the evaluation costs
-	 */
-	public void setCostModel(CostModel m) {
-		costModel = m;
-	}
 
 	/**
 	 * returns the query syntaxgraph
 	 */
-	public Greql2 getSyntaxGraph() {
+	public GreqlSyntaxGraph getSyntaxGraph() {
 		return queryGraph;
 	}
 
@@ -747,7 +724,7 @@ public class GreqlEvaluator {
 		this.datagraph = datagraph;
 		knownTypes = new HashMap<String, AttributedElementClass>();
 		variableMap = variables;
-		subQueryMap = new LinkedHashMap<String, Greql2>();
+		subQueryMap = new LinkedHashMap<String, GreqlSyntaxGraph>();
 		this.progressFunction = progressFunction;
 	}
 
@@ -967,13 +944,9 @@ public class GreqlEvaluator {
 		if (optimizer == null) {
 			optimizer = new DefaultOptimizer();
 		}
-		if (costModel == null) {
-			costModel = new DefaultCostModel();
-		}
 		if (useSavedOptimizedSyntaxGraph
 				&& optimizedGraphs.containsKey(queryString)) {
-			syntaxGraphEntry = getOptimizedSyntaxGraph(queryString, optimizer,
-					costModel);
+			syntaxGraphEntry = getOptimizedSyntaxGraph(queryString, optimizer);
 			if (syntaxGraphEntry != null) {
 				queryGraph = syntaxGraphEntry.getSyntaxGraph();
 				createVertexEvaluators();
@@ -1010,7 +983,7 @@ public class GreqlEvaluator {
 		createVertexEvaluators();
 		optimizer.optimize(this, queryGraph);
 		syntaxGraphEntry = new SyntaxGraphEntry(queryString, queryGraph,
-				optimizer, costModel, true);
+				optimizer, true);
 		addOptimizedSyntaxGraph(queryString, syntaxGraphEntry);
 		createVertexEvaluators();
 		optimizationTime = System.currentTimeMillis() - optimizerStartTime;
@@ -1037,10 +1010,6 @@ public class GreqlEvaluator {
 
 		long startTime = System.currentTimeMillis();
 
-		// Initialize the CostModel if there's none
-		if (costModel == null) {
-			costModel = new DefaultCostModel();
-		}
 
 		if (optimize) {
 			createOptimizedSyntaxGraph();

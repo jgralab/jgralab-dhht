@@ -37,8 +37,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2Impl;
+import de.uni_koblenz.jgralab.greql2.SerializableGreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.SerializableGreqlSyntaxGraphImpl;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2;
@@ -52,7 +52,7 @@ import de.uni_koblenz.jgralabtest.greql2.testfunctions.IsPrime;
 public class GreqlSerializationTest {
 	static {
 		Greql2Schema.instance().getGraphFactory().setGraphImplementationClass_InMemoryStorage(
-				Greql2.class, SerializableGreql2Impl.class);
+				Greql2.class, SerializableGreqlSyntaxGraphImpl.class);
 
 		Greql2FunctionLibrary.instance().registerUserDefinedFunction(
 				IsPrime.class);
@@ -62,7 +62,7 @@ public class GreqlSerializationTest {
 		Greql2 queryGraph = GreqlParser.parse(query);
 		GreqlEvaluator e1 = new GreqlEvaluator(query, queryGraph, null);
 		GreqlEvaluator e2 = new GreqlEvaluator(
-				((SerializableGreql2) queryGraph).serialize(), queryGraph, null);
+				((SerializableGreqlSyntaxGraph) queryGraph).serialize(), queryGraph, null);
 
 		e1.startEvaluation();
 		e2.startEvaluation();

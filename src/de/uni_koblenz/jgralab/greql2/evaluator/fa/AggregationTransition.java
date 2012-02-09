@@ -35,12 +35,12 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
@@ -195,16 +195,21 @@ public class AggregationTransition extends Transition {
 	public AggregationTransition(State start, State end, boolean aggregateFrom,
 			TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator predicateEvaluator,
-			LocalMapVertexMarker<VertexEvaluator> vertexEvalMarker) {
+			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end);
 		this.aggregateFrom = aggregateFrom;
-		this.validToEdgeRoles = roles;
-		this.validFromEdgeRoles = null;
+		validToEdgeRoles = roles;
+		validFromEdgeRoles = null;
 		this.typeCollection = typeCollection;
 		this.predicateEvaluator = predicateEvaluator;
-		Vertex v = vertexEvalMarker.getGraph().getFirstVertex(ThisEdge.class);
+		Vertex v;
+		try {
+			v = graphMarker.getGraph().getFirstVertex(ThisEdge.class);
+		} catch (RemoteException ex) {
+			throw new RuntimeException(ex);
+		}
 		if (v != null) {
-			thisEdgeEvaluator = (ThisEdgeEvaluator) vertexEvalMarker.getMark(v);
+			thisEdgeEvaluator = (ThisEdgeEvaluator) graphMarker.getMark(v);
 		}
 	}
 
@@ -267,7 +272,7 @@ public class AggregationTransition extends Transition {
 
 		// checks if a role restriction is set and if e has the right role
 		if (validEdgeRoles != null) {
-			EdgeClass ec = (EdgeClass) e.getAttributedElementClass();
+			EdgeClass ec = e.getType();
 			Set<String> roles = null;
 			if (e.isNormal() == checkToEdgeRoles) {
 				roles = ec.getTo().getAllRoles();
@@ -281,11 +286,17 @@ public class AggregationTransition extends Transition {
 				}
 			}
 		}
-
-		// checks if a edgeTypeRestriction is set and if e has the right type
-		AttributedElementClass edgeClass = e.getMetaClass();
-		if (!typeCollection.acceptsType(edgeClass)) {
-			return false;
+		if (rolesOnly) {
+			if (!acceptedByRole) {
+				return false;
+			}
+		} else {
+			if (!acceptedByRole) {
+				EdgeClass edgeClass = e.getType();
+				if (!typeCollection.acceptsType(edgeClass)) {
+					return false;
+				}
+			}
 		}
 
 		// checks if a boolean expression exists and if it evaluates to true
@@ -315,7 +326,7 @@ public class AggregationTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (AttributedElementClass c : typeCollection.getAllowedTypes()) {
+		for (AttributedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";

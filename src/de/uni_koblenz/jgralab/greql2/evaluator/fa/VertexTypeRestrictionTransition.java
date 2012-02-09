@@ -1,9 +1,13 @@
 /*
  * JGraLab - The Java Graph Laboratory
  * 
- * Copyright (C) 2006-2010 Institute for Software Technology
+ * Copyright (C) 2006-2011 Institute for Software Technology
  *                         University of Koblenz-Landau, Germany
  *                         ist@uni-koblenz.de
+ * 
+ * For bug reports, documentation and further information, visit
+ * 
+ *                         http://jgralab.uni-koblenz.de
  * 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -31,11 +35,11 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
-import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.AbstractGraphMarker;
+import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This transition accepts a vertex type restriction. It is used to accept
@@ -50,7 +54,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * The type collection that toggles which types are accepted and which are
 	 * not
 	 */
-	private JValueTypeCollection typeCollection;
+	private TypeCollection typeCollection;
 
 	/**
 	 * returns true if this transition and the given transition t accept the
@@ -80,7 +84,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 *            The typeIds which restricts the possible start vertices
 	 */
 	public VertexTypeRestrictionTransition(State start, State end,
-			JValueTypeCollection typeCollection) {
+			TypeCollection typeCollection) {
 		super(start, end);
 		this.typeCollection = typeCollection;
 	}
@@ -91,7 +95,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	protected VertexTypeRestrictionTransition(
 			VertexTypeRestrictionTransition t, boolean addToStates) {
 		super(t, addToStates);
-		typeCollection = new JValueTypeCollection(t.typeCollection);
+		typeCollection = new TypeCollection(t.typeCollection);
 	}
 
 	/**
@@ -129,21 +133,11 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * 
 	 * @param v
 	 *            the current vertex
-	 * @param subgraph
-	 *            the SubgraphTempAttribute which should be accepted
 	 * @return true if the transition can fire with e, false otherwise
 	 */
 	@Override
-	public boolean accepts(Vertex v, Edge e,
-			AbstractGraphMarker<AttributedElement> subgraph)
-			throws EvaluateException {
-		// it is not neccessary to check if the vertex belongs to a special
-		// subgraph, because if it does not, this method will not be called and
-		// there is no edge connected to this vertex wich belongs to the
-		// subgraph
-		// checks if a startVertexTypeRestriction is set and if v has the right
-		// type
-		AttributedElementClass vertexClass = v.getMetaClass();
+	public boolean accepts(Vertex v, Edge e) {
+		VertexClass vertexClass = v.getType();
 		if (!typeCollection.acceptsType(vertexClass)) {
 			return false;
 		}
@@ -163,7 +157,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (AttributedElementClass c : typeCollection.getAllowedTypes()) {
+		for (AttributedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";
@@ -171,4 +165,8 @@ public class VertexTypeRestrictionTransition extends Transition {
 		return "&{" + b + "}";
 	}
 
+	@Override
+	public boolean consumesEdge() {
+		return false;
+	}
 }
