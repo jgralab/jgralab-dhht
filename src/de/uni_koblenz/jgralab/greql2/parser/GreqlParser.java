@@ -51,7 +51,6 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
-import de.uni_koblenz.jgralab.greql2.optimizer.condexp.ConditionalExpression;
 import de.uni_koblenz.jgralab.greql2.schema.*;
 
 public class GreqlParser extends ParserHelper {
