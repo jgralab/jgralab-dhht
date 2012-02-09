@@ -31,8 +31,6 @@
 
 package de.uni_koblenz.jgralab.greql2.parser;
 
-import com.sun.tools.apt.mirror.util.SourcePositionImpl;
-
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
@@ -40,7 +38,7 @@ import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
 
-public class SymbolTable extends EasySymbolTable {
+public class SymbolTable extends SimpleSymbolTable {
 
 	@Override
 	public void insert(String ident, Vertex v)
@@ -52,10 +50,12 @@ public class SymbolTable extends EasySymbolTable {
 			Vertex var = list.getFirst().get(ident);
 			int offset = -1;
 			if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsDeclaredVarOf) {
-				offset = ((IsDeclaredVarOf) var.getFirstIncidence(EdgeDirection.OUT))
+				offset = ((IsDeclaredVarOf) var
+						.getFirstIncidence(EdgeDirection.OUT))
 						.get_sourcePositions().get(0).get_offset();
 			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsBoundVarOf) {
-				offset = ((IsBoundVarOf) var.getFirstIncidence(EdgeDirection.OUT))
+				offset = ((IsBoundVarOf) var
+						.getFirstIncidence(EdgeDirection.OUT))
 						.get_sourcePositions().get(0).get_offset();
 			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsVarOf) {
 				offset = ((IsVarOf) var.getFirstIncidence(EdgeDirection.OUT))
@@ -64,9 +64,9 @@ public class SymbolTable extends EasySymbolTable {
 			throw new DuplicateVariableException((Variable) var,
 					((Greql2Aggregation) v.getFirstIncidence(EdgeDirection.IN))
 					// .get_sourcePositions(), new SourcePosition(offset,
-							// ident.length()));
-							// .get_sourcePositions(), new SourcePositionImpl(v
-							// .getGraph(), offset, ident.length()));
+					// ident.length()));
+					// .get_sourcePositions(), new SourcePositionImpl(v
+					// .getGraph(), offset, ident.length()));
 							.get_sourcePositions(), v.getGraph().createRecord(
 							SourcePositionImpl.class, offset, ident.length()));
 		}

@@ -49,7 +49,9 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.ParsingException;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
+import de.uni_koblenz.jgralab.greql2.optimizer.condexp.ConditionalExpression;
 import de.uni_koblenz.jgralab.greql2.schema.*;
+import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.Definition;
 
 public class GreqlParser extends ParserHelper {
 	private Map<RuleEnum, int[]> testedRules = new HashMap<RuleEnum, int[]>();
@@ -655,8 +657,22 @@ public class GreqlParser extends ParserHelper {
 	 */
 
 	private final NestedSubgraphDefinition parseNestedSubgraphDefinition() {
-		// TODO Auto-generated method stub
-		return null;
+		assert lookAhead(0) == TokenTypes.NESTED : "Entered parse of NestedSubgraphDefinition without NESTED-token!";
+		NestedSubgraphDefinition nestedDefinition = null;
+		match();
+		if (!inPredicateMode()) {
+			if (tryMatch(TokenTypes.LPAREN)) {
+				if (lookAhead(0) == TokenTypes.IDENTIFIER) {
+					Identifier id = parseIdentifier();
+					nestedDefinition = graph.createNestedSubgraphDefinition();
+				} else {
+					fail("No identifier in nested-definition:");
+				}
+			} else {
+				fail("No opening parenthesis in nested-definition:");
+			}
+		}
+		return nestedDefinition;
 	}
 
 	/**
@@ -674,11 +690,11 @@ public class GreqlParser extends ParserHelper {
 		if (!inPredicateMode()) {
 			if (tryMatch(TokenTypes.LPAREN)) {
 				if (lookAhead(0) == TokenTypes.INTLITERAL) {
-					long kappa = ((IntegerToken) lookAhead).getNumber()
+					int kappa = ((IntegerToken) lookAhead).getNumber()
 							.intValue();
 					match();
 					kappaDefinition = graph.createKappaSubgraphDefinition();
-					kappaDefinition.setKappa((int) kappa);
+					kappaDefinition.setKappa(kappa);
 					if (tryMatch(TokenTypes.RPAREN)) {
 						match();
 					} else {
@@ -700,29 +716,42 @@ public class GreqlParser extends ParserHelper {
 			return null;
 		}
 		Expression result = null;
-		if (lookAhead(0) == TokenTypes.ON) {
-			match();
-			int offsetDef = getCurrentOffset();
-			SubgraphDefinition subgraphDef = parseSubgraphDefinition();
-			match(TokenTypes.COLON);
-			int lengthDef = getLength(offsetDef);
-			int offsetRestrExpr = getCurrentOffset();
-			Expression restrictedExpr = parseWhereExpression();
-			if (!inPredicateMode()) {
-				int lengthRestrExpr = getLength(offsetRestrExpr);
-				SubgraphExpression subgraphExpr = graph
-						.createSubgraphExpression();
-				IsSubgraphDefinitionOf subgraphDefOf = graph
-						.createIsSubgraphDefinitionOf(subgraphDef, subgraphExpr);
-				subgraphDefOf.set_sourcePositions(createSourcePositionList(
-						lengthDef, offsetDef));
-				IsConstrainedExpressionOf constrainedExpression = graph
-						.createIsConstrainedExpressionOf(restrictedExpr,
-								subgraphExpr);
-				constrainedExpression
-						.set_sourcePositions(createSourcePositionList(
-								lengthRestrExpr, offsetRestrExpr));
-				result = subgraphExpr;
+		if (lookAhead(0) == TokenTypes.LPAREN) {
+			predicateStart();
+			try {
+				match(TokenTypes.LPAREN);
+				parseSubgraphDefinition();
+				match(TokenTypes.COLON);
+			} catch (ParsingException ex) {
+			}
+			if (predicateEnd()) {
+				match();
+				int offsetDef = getCurrentOffset();
+				SubgraphDefinition subgraphDef = parseSubgraphDefinition();
+				match(TokenTypes.COLON);
+				int lengthDef = getLength(offsetDef);
+				int offsetRestrExpr = getCurrentOffset();
+				Expression constrainedExpr = parseExpression();
+				match(TokenTypes.RPAREN);
+				if (!inPredicateMode()) {
+					int lengthRestrExpr = getLength(offsetRestrExpr);
+					SubgraphExpression subgraphExpr = graph
+							.createSubgraphExpression();
+					IsSubgraphDefinitionOf subgraphDefOf = graph
+							.createIsSubgraphDefinitionOf(subgraphDef,
+									subgraphExpr);
+					subgraphDefOf.set_sourcePositions(createSourcePositionList(
+							lengthDef, offsetDef));
+					IsConstrainedExpressionOf constrainedExpression = graph
+							.createIsConstrainedExpressionOf(constrainedExpr,
+									subgraphExpr);
+					constrainedExpression
+							.set_sourcePositions(createSourcePositionList(
+									lengthRestrExpr, offsetRestrExpr));
+					result = subgraphExpr;
+				}
+			} else {
+				result = parseParenthesedExpression();
 			}
 		} else {
 			result = parseLetExpression();
@@ -1540,13 +1569,18 @@ public class GreqlParser extends ParserHelper {
 		}
 		if ((lookAhead(0) == TokenTypes.RARROW)
 				|| (lookAhead(0) == TokenTypes.LARROW)
-				|| (lookAhead(0) == TokenTypes.WARROW)) {
+				|| (lookAhead(0) == TokenTypes.ARROW)) {
 			return parseSimpleEdgePathDescription();
 		}
 		if ((lookAhead(0) == TokenTypes.SLARROW)
 				|| (lookAhead(0) == TokenTypes.SRARROW)
 				|| (lookAhead(0) == TokenTypes.EDGE)) {
 			return parseEdgePathDescription();
+		}
+		if ((lookAhead(0) == TokenTypes.IARROW)
+				|| (lookAhead(0) == TokenTypes.ILARROW)
+				|| (lookAhead(0) == TokenTypes.IRARROW)) {
+			return parseSimpleIncidencePathDescription();
 		}
 		if (tryMatch(TokenTypes.LBRACK)) {
 			int offset = getCurrentOffset();
@@ -1568,13 +1602,75 @@ public class GreqlParser extends ParserHelper {
 		return null;
 	}
 
+	/**
+	 * Parses a SimpleIncidencePathDescription (which is an incidence-arrow: +>,
+	 * <+, <+>).
+	 * 
+	 * @return A PrimaryPathDescription-node
+	 */
+
 	private final PrimaryPathDescription parseSimpleIncidencePathDescription() {
+		IncidenceDirection dir = null;
+		IncidenceRestriction restr = null;
 		PrimaryPathDescription result = null;
+		IncDirection direction = IncDirection.BOTH;
+		int offsetDir = getCurrentOffset();
+		int offsetIncRestr = 0;
+		int lengthIncRestr = 0;
+		if (tryMatch(TokenTypes.IRARROW)) {
+			direction = IncDirection.OUT;
+		} else if (tryMatch(TokenTypes.ILARROW)) {
+			direction = IncDirection.IN;
+		} else {
+			match(TokenTypes.IARROW);
+		}
+		if (!inPredicateMode()) {
+			result = graph.createSimpleIncidencePathDescription();
+			dir = (IncidenceDirection) graph
+					.getFirstVertex(IncidenceDirection.class);
+			while (dir != null) {
+				if (!dir.get_dir().equals(direction)) {
+					dir = dir.getNextIncidenceDirection();
+				} else {
+					break;
+				}
+			}
+			if (dir == null) {
+				dir = graph.createIncidenceDirection();
+				dir.set_dir(direction);
+			}
+			if (lookAhead(0) == TokenTypes.LCURLY) {
+				predicateStart();
+				try {
+					match(TokenTypes.LCURLY);
+					parseIncidenceRestriction();
+				} catch (ParsingException ex) {
+				}
+				if (predicateEnd()) {
+					match(TokenTypes.LCURLY);
+					restr = parseIncidenceRestriction();
+					match(TokenTypes.RCURLY);
+				} else {
+					ElementRestriction elementRestriction = parseElementRestriction();
+
+				}
+			}
+		}
 		return result;
 	}
 
+	private ElementRestriction parseElementRestriction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private IncidenceRestriction parseIncidenceRestriction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private final PrimaryPathDescription parseSimpleEdgePathDescription() {
-		PathDirection dir = null;
+		EdgeDirection dir = null;
 		EdgeRestriction edgeRestr = null;
 		String direction = "any";
 		int offsetDir = getCurrentOffset();
@@ -1585,7 +1681,7 @@ public class GreqlParser extends ParserHelper {
 		} else if (tryMatch(TokenTypes.LARROW)) {
 			direction = "in";
 		} else {
-			match(TokenTypes.WARROW);
+			match(TokenTypes.ARROW);
 		}
 		if (tryMatch(TokenTypes.LCURLY)) {
 			offsetEdgeRestr = getCurrentOffset();
@@ -1594,21 +1690,22 @@ public class GreqlParser extends ParserHelper {
 			match(TokenTypes.RCURLY);
 		}
 		if (!inPredicateMode()) {
-			PrimaryPathDescription result = graph
+			SimpleEdgePathDescription result = graph
 					.createSimpleEdgePathDescription();
-			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
+			dir = (EdgeDirection) graph.getFirstVertex(EdgeDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextPathDirection();
+					dir = dir.getNextEdgeDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createPathDirection();
+				dir = graph.createEdgeDirection();
 				dir.set_dirValue(direction);
 			}
-			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
+			IsEdgeDirectionOf directionOf = graph.createIsEdgeDirectionOf(dir,
+					result);
 			directionOf.set_sourcePositions(createSourcePositionList(0,
 					offsetDir));
 			if (edgeRestr != null) {
@@ -1654,7 +1751,7 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private final EdgePathDescription parseEdgePathDescription() {
-		PathDirection dir = null;
+		EdgeDirection dir = null;
 		boolean edgeStart = false;
 		boolean edgeEnd = false;
 		String direction = "any";
@@ -1682,19 +1779,20 @@ public class GreqlParser extends ParserHelper {
 			} else if (!edgeStart && edgeEnd) {
 				direction = "out";
 			}
-			dir = (PathDirection) graph.getFirstVertex(PathDirection.class);
+			dir = (EdgeDirection) graph.getFirstVertex(EdgeDirection.class);
 			while (dir != null) {
 				if (!dir.get_dirValue().equals(direction)) {
-					dir = dir.getNextPathDirection();
+					dir = dir.getNextEdgeDirection();
 				} else {
 					break;
 				}
 			}
 			if (dir == null) {
-				dir = graph.createPathDirection();
+				dir = graph.createEdgeDirection();
 				dir.set_dirValue(direction);
 			}
-			IsDirectionOf directionOf = graph.createIsDirectionOf(dir, result);
+			IsEdgeDirectionOf directionOf = graph.createIsEdgeDirectionOf(dir,
+					result);
 			directionOf.set_sourcePositions(createSourcePositionList(lengthDir,
 					offsetDir));
 			IsEdgeExprOf edgeExprOf = graph.createIsEdgeExprOf(expr, result);
