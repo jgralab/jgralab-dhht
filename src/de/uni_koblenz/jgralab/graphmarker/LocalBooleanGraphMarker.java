@@ -38,7 +38,6 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
  * This class can be used to "colorize" graphs, it supports only two "colors",
@@ -51,9 +50,9 @@ import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 @SuppressWarnings("rawtypes")
 public class LocalBooleanGraphMarker extends
-		AbstractGraphMarker<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement>> {
+		AbstractGraphMarker<GraphElement> implements BooleanGraphMarker<GraphElement> {
 
-	private final HashSet<GraphElement<? extends GraphElementClass, ? extends GraphElement,? extends GraphElementClass, ? extends GraphElement>> markedElements;
+	private final HashSet<GraphElement> markedElements;
 
 	/**
 	 * creates a new boolean graph marker
@@ -61,7 +60,7 @@ public class LocalBooleanGraphMarker extends
 	 */
 	public LocalBooleanGraphMarker(Graph g) {
 		super(g);
-		markedElements = new HashSet<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement>>();
+		markedElements = new HashSet<GraphElement>();
 	}
 
 	/**
@@ -73,7 +72,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if this GraphMarker marks the given element, false otherwise
 	 */
 	@Override
-	public final boolean isMarked( GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement> elem) {
+	public final boolean isMarked(GraphElement elem) {
 		assert (elem.getGraph() == graph);
 		return markedElements.contains(elem);
 	}
@@ -86,7 +85,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if the element has been marked successfull, false if this
 	 *         element is already marked by this GraphMarker
 	 */
-	public final boolean mark(GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement> elem) {
+	public final boolean mark(GraphElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
 				.getGraph() == graph));
 
@@ -103,7 +102,7 @@ public class LocalBooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement> elem) {
+	public final boolean removeMark(GraphElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
 				.getGraph() == graph));
 		return markedElements.remove(elem);
@@ -115,7 +114,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return the markedElements
 	 */
 	@Override
-	public Iterable<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass,? extends GraphElement>> getMarkedElements() {
+	public Iterable<GraphElement> getMarkedElements() {
 		return markedElements;
 	}
 

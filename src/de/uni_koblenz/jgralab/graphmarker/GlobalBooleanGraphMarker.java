@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.graphmarker;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 
 /**
@@ -16,13 +15,13 @@ import de.uni_koblenz.jgralab.schema.GraphElementClass;
  * @param <O> The kind of objects that can be attached to the edges as marks
  */
 @SuppressWarnings("rawtypes")
-public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass, ? extends GraphElement>> {
+public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement> implements BooleanGraphMarker<GraphElement> {
 
 	public GlobalBooleanGraphMarker(Graph globalGraph) {
 		super(globalGraph);
 	}
 
-	protected final  GraphMarker<GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass, ? extends GraphElement>> createMarkerForPartialGraph() {
+	protected final BooleanGraphMarker<GraphElement> createMarkerForPartialGraph() {
 		return  new LocalBooleanGraphMarker(graph);
 	}
 	
@@ -30,10 +29,11 @@ public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement<? e
 	 * Marks the given edge <code>edge</code> with the given object <code>value</code>
 	 * @param edge the edge to be marked
 	 * @param value the object to be used a mark
+	 * @return 
 	 */
-	public final void mark(GraphElement<? extends GraphElementClass, ? extends GraphElement, ? extends GraphElementClass, ? extends GraphElement> elem) {
+	public final boolean mark(GraphElement elem) {
 		LocalBooleanGraphMarker localMarker = (LocalBooleanGraphMarker) getOrCreateMarkerForPartialGraph(elem);
-		localMarker.mark(elem);		
+		return localMarker.mark(elem);		
 	}
 	
 	
