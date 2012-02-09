@@ -83,6 +83,10 @@ public class GreqlLexer {
 					put(TokenTypes.V, "V");
 					put(TokenTypes.WHERE, "where");
 					put(TokenTypes.WITH, "with");
+					put(TokenTypes.NESTED, "nested");
+					put(TokenTypes.LOCAL, "local");
+					put(TokenTypes.PARTIAL, "partial");
+					put(TokenTypes.KAPPA, "kappa");
 					put(TokenTypes.QUESTION, "?");
 					put(TokenTypes.EXCL, "!");
 					put(TokenTypes.COLON, ":");
@@ -96,12 +100,15 @@ public class GreqlLexer {
 					put(TokenTypes.RBRACK, "]");
 					put(TokenTypes.LCURLY, "{");
 					put(TokenTypes.RCURLY, "}");
-					put(TokenTypes.EDGESTART, "<-");
-					put(TokenTypes.EDGEEND, "->");
+					put(TokenTypes.SLARROW, "<-");
+					put(TokenTypes.SRARROW, "->");
 					put(TokenTypes.EDGE, "--");
 					put(TokenTypes.RARROW, "-->");
 					put(TokenTypes.LARROW, "<--");
 					put(TokenTypes.ARROW, "<->");
+					put(TokenTypes.IARROW, "<+>");
+					put(TokenTypes.ILARROW, "<+");
+					put(TokenTypes.IRARROW, "+>");
 					put(TokenTypes.ASSIGN, ":=");
 					put(TokenTypes.EQUAL, "=");
 					put(TokenTypes.MATCH, "=~");
@@ -134,24 +141,23 @@ public class GreqlLexer {
 
 	protected static Map<String, TokenTypes> stringToTokenMap = new HashMap<String, TokenTypes>();
 
-	
 	{
 		for (Map.Entry<TokenTypes, String> entry : fixedTokens.entrySet()) {
 			stringToTokenMap.put(entry.getValue(), entry.getKey());
 		}
 	}
-	
-	
+
 	protected static BitSet separators = new BitSet();
-	
+
 	{
-		Character[] sepArray = {';', '<', '>','(',')','{','}',':','[',']',',',' ', '\n', '\t','.','-','+','*','/','%','=','?','^','|','!','@'};
+		Character[] sepArray = { ';', '<', '>', '(', ')', '{', '}', ':', '[',
+				']', ',', ' ', '\n', '\t', '.', '-', '+', '*', '/', '%', '=',
+				'?', '^', '|', '!', '@' };
 		for (Character sep : sepArray) {
 			separators.set(sep);
 		}
 	}
-	
-	
+
 	protected String query = null;
 
 	protected int position = 0;
@@ -180,41 +186,43 @@ public class GreqlLexer {
 		String currentTokenString;
 
 		int currLength = 1;
-		for (int i=0; i<4; i++) {
-			while ((position + currLength) < query.length()-1 && !isSeparator(query.charAt(position + currLength))  && !isSeparator(query.charAt(position + currLength-1)) ) {
+		for (int i = 0; i < 4; i++) {
+			while ((position + currLength) < query.length() - 1
+					&& !isSeparator(query.charAt(position + currLength))
+					&& !isSeparator(query.charAt(position + currLength - 1))) {
 				currLength++;
 			}
-		
-			if (position+currLength < query.length()) {
-				currentTokenString = query.substring(position, position+currLength);
-			}
-			else
+
+			if (position + currLength < query.length()) {
+				currentTokenString = query.substring(position, position
+						+ currLength);
+			} else
 				currentTokenString = query.substring(position);
 			TokenTypes possibleToken = stringToTokenMap.get(currentTokenString);
 			if (possibleToken != null) {
 				recognizedTokenType = possibleToken;
 				bml = currentTokenString.length();
-			} 
-			currLength+=1;
+			}
+			currLength += 1;
 		}
 
-		
-//		// recognize fixed tokens
-//		for (Entry<TokenTypes, String> currentEntry : fixedTokens.entrySet()) {
-//			String currentString = currentEntry.getValue();
-//			int currLen = currentString.length();
-//			if (bml > currLen) {
-//				continue;
-//			}
-//			if (query.regionMatches(position, currentString, 0, currLen)) {
-//				if (((position + currLen) == query.length())
-//						|| isSeparator(query.charAt(position + currLen - 1))
-//						|| isSeparator(query.charAt(position + currLen))) {
-//					bml = currLen;
-//					recognizedTokenType = currentEntry.getKey();
-//				}
-//			}
-//		}
+		// // recognize fixed tokens
+		// for (Entry<TokenTypes, String> currentEntry : fixedTokens.entrySet())
+		// {
+		// String currentString = currentEntry.getValue();
+		// int currLen = currentString.length();
+		// if (bml > currLen) {
+		// continue;
+		// }
+		// if (query.regionMatches(position, currentString, 0, currLen)) {
+		// if (((position + currLen) == query.length())
+		// || isSeparator(query.charAt(position + currLen - 1))
+		// || isSeparator(query.charAt(position + currLen))) {
+		// bml = currLen;
+		// recognizedTokenType = currentEntry.getKey();
+		// }
+		// }
+		// }
 		// recognize strings and identifiers
 		if (recognizedTokenType == null) {
 			char separator = query.charAt(position);
@@ -272,7 +280,8 @@ public class GreqlLexer {
 						.get(TokenTypes.POS_INFINITY))
 						|| tokenText.equals(fixedTokens
 								.get(TokenTypes.NEG_INFINITY))
-						|| tokenText.equals(fixedTokens.get(TokenTypes.NOT_A_NUMBER))) {
+						|| tokenText.equals(fixedTokens
+								.get(TokenTypes.NOT_A_NUMBER))) {
 					recognizedToken = matchDoubleConstantToken(start, position
 							- start, tokenText);
 				} else if (startsWithNumber(tokenText)) {

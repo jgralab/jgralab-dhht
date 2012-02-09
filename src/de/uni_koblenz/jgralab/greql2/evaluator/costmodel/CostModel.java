@@ -37,7 +37,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator.costmodel;
 
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.AggregationPathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.AlternativePathDescriptionEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.BackwardVertexSetEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.BackwardElementSetEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ConditionalExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.DeclarationEvaluator;
@@ -45,7 +45,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgePathDescriptionEva
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgeRestrictionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.EdgeSetExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ExponentiatedPathDescriptionEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ForwardVertexSetEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ForwardElementSetEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.FunctionApplicationEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.Greql2ExpressionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.IntermediateVertexPathDescriptionEvaluator;
@@ -63,7 +63,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SequentialPathDescript
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SetComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SetConstructionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimpleDeclarationEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimplePathDescriptionEvaluator;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimpleEdgePathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TableComprehensionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TransposedPathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.TupleConstructionEvaluator;
@@ -102,7 +102,7 @@ public interface CostModel {
 			AlternativePathDescriptionEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsBackwardVertexSet(
-			BackwardVertexSetEvaluator e, GraphSize graphSize);
+			BackwardElementSetEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsListComprehension(ComprehensionEvaluator e,
 			GraphSize graphSize);
@@ -126,7 +126,7 @@ public interface CostModel {
 			ExponentiatedPathDescriptionEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsForwardVertexSet(
-			ForwardVertexSetEvaluator e, GraphSize graphSize);
+			ForwardElementSetEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsFunctionApplication(
 			FunctionApplicationEvaluator e, GraphSize graphSize);
@@ -174,7 +174,7 @@ public interface CostModel {
 			SimpleDeclarationEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsSimplePathDescription(
-			SimplePathDescriptionEvaluator e, GraphSize graphSize);
+			SimpleEdgePathDescriptionEvaluator e, GraphSize graphSize);
 
 	public VertexCosts calculateCostsAggregationPathDescription(
 			AggregationPathDescriptionEvaluator e, GraphSize graphSize);
@@ -210,7 +210,7 @@ public interface CostModel {
 	 */
 
 	public long calculateCardinalityBackwardVertexSet(
-			BackwardVertexSetEvaluator e, GraphSize graphSize);
+			BackwardElementSetEvaluator e, GraphSize graphSize);
 
 	public long calculateCardinalityListComprehension(ComprehensionEvaluator e,
 			GraphSize graphSize);
@@ -226,7 +226,7 @@ public interface CostModel {
 
 
 	public long calculateCardinalityForwardVertexSet(
-			ForwardVertexSetEvaluator e, GraphSize graphSize);
+			ForwardElementSetEvaluator e, GraphSize graphSize);
 
 	public long calculateCardinalityFunctionApplication(
 			FunctionApplicationEvaluator e, GraphSize graphSize);

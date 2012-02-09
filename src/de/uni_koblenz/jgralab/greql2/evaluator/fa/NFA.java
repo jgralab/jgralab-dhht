@@ -318,10 +318,10 @@ public class NFA extends FiniteAutomaton {
 	}
 
 	/**
-	 * Constructs a NFA which accepts the given SimplePathDescription. The
+	 * Constructs a NFA which accepts the given SimpleEdgePathDescription. The
 	 * EdgeRestrictions (RoleId, TypeId) are modeled in the Transition.
 	 */
-	public static NFA createSimplePathDescriptionNFA(
+	public static NFA createSimpleEdgePathDescriptionNFA(
 			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
 			Set<String> roles, VertexEvaluator predicateEvaluator,
 			GraphMarker<VertexEvaluator> marker) {
