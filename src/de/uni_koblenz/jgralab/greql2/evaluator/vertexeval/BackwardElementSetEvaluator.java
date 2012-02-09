@@ -56,7 +56,7 @@ import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
  * @author ist@uni-koblenz.de
  * 
  */
-public class BackwardVertexSetEvaluator extends PathSearchEvaluator {
+public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 
 	BackwardVertexSet vertex;
 
@@ -68,7 +68,7 @@ public class BackwardVertexSetEvaluator extends PathSearchEvaluator {
 		return vertex;
 	}
 
-	public BackwardVertexSetEvaluator(BackwardVertexSet vertex,
+	public BackwardElementSetEvaluator(BackwardVertexSet vertex,
 			GreqlEvaluator eval) {
 		super(eval);
 		this.vertex = vertex;

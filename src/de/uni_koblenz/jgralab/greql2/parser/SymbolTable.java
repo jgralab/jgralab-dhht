@@ -32,6 +32,7 @@
 package de.uni_koblenz.jgralab.greql2.parser;
 
 
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.exception.DuplicateVariableException;
@@ -53,9 +54,15 @@ public class SymbolTable extends SimpleSymbolTable {
 		} else {
 			Vertex var = list.getFirst().get(ident);
 			int offset = -1;
+			if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsDeclaredVarOf) {
+				offset = ((IsDeclaredVarOf) var
+						.getFirstIncidence(EdgeDirection.OUT))
 			if (var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge() instanceof IsDeclaredVarOf) {
 				offset = ((IsDeclaredVarOf) var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge())
 						.get_sourcePositions().get(0).get_offset();
+			} else if (var.getFirstIncidence(EdgeDirection.OUT) instanceof IsBoundVarOf) {
+				offset = ((IsBoundVarOf) var
+						.getFirstIncidence(EdgeDirection.OUT))
 			} else if (var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge() instanceof IsBoundVarOf) {
 				offset = ((IsBoundVarOf) var.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge())
 						.get_sourcePositions().get(0).get_offset();
