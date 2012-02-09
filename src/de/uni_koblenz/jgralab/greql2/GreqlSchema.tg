@@ -69,6 +69,7 @@ VertexClass ListConstruction: ValueConstruction;
 VertexClass ListComprehension: ComprehensionWithTableHeader;
 VertexClass ListRangeConstruction: ListConstruction;
 VertexClass Literal: Expression;
+VertexClass LocalSubgraphDefinition: SubgraphDefinition;
 VertexClass MapConstruction : ValueConstruction;
 VertexClass MapComprehension : Comprehension;
 VertexClass NestedSubgraphDefinition: SubgraphDefinition;
@@ -133,7 +134,7 @@ BinaryEdgeClass IsCompDeclOf: Greql2Aggregation from Declaration role compDecl (
 BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compResultDef (0,1) (1,1) to Comprehension (0,*) (1,1);
 BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration (0,*) (1,1);
-BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphDefinition (0,*) (1,1);
+BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphExpression (0,*) (1,1);
 BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVariable (1,*) (1,1) to SimpleDeclaration role variableDeclaration (0,1) (1,1);
 BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
 BinaryEdgeClass IsEdgeDirectionOf: Greql2Aggregation from EdgeDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
@@ -149,6 +150,8 @@ BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValu
 BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication role functionApplication (1,*) (1,1);
 BinaryEdgeClass IsGoalRestrOf: Greql2Aggregation from Expression role goalRestr (0,1) (1,1) to PathDescription (0,*) (1,1);
 BinaryEdgeClass IsIdOf: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression (0,*) (1,1);
+BinaryEdgeClass IsIdOfNestedSubgraphDefinition: Greql2Aggregation from Identifier role nestedIdent (1,*) (1,1) to NestedSubgraphDefinition (1,1) (1,1);
+BinaryEdgeClass IsIdOfPartialGraphDefinition: Greql2Aggregation from Identifier role partialIdent (1,*) (1,1) to PartialSubgraphDefinition (1,1) (1,1);
 BinaryEdgeClass IsIntermediateVertexOf: Greql2Aggregation from Expression role intermediateVertex (1,1) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);
 BinaryEdgeClass IsIteratedPathOf: IsPathDescriptionOf from PathDescription role iteratedPath (1,1) (1,1) to IteratedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsLastValueOf: Greql2Aggregation from Expression role lastValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);

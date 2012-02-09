@@ -44,8 +44,6 @@ import java.util.Stack;
 import org.pcollections.PSet;
 import org.pcollections.PVector;
 
-
-
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
@@ -634,8 +632,13 @@ public class GreqlParser extends ParserHelper {
 	 * @return A LocalSubgraphDefinition-node
 	 */
 	private final LocalSubgraphDefinition parseLocalSubgraphDefinition() {
-		// TODO Auto-generated method stub
-		return null;
+		assert lookAhead(0) == TokenTypes.LOCAL : "Entered parse of LocalSubgraphDefinition without LOCAL-token!";
+		LocalSubgraphDefinition result = null;
+		match();
+		if (!inPredicateMode()) {
+			result = graph.createLocalSubgraphDefinition();
+		}
+		return result;
 	}
 
 	/**
@@ -647,8 +650,20 @@ public class GreqlParser extends ParserHelper {
 	 */
 
 	private final PartialSubgraphDefinition parsePartialSubgraphDefinition() {
-		// TODO Auto-generated method stub
-		return null;
+		assert lookAhead(0) == TokenTypes.PARTIAL : "Entered parse of a PartialSubgraphDefinition without PARTIAL-token!";
+		PartialSubgraphDefinition result = null;
+		match();
+		if (tryMatch(TokenTypes.LPAREN)) {
+			if (!inPredicateMode()) {
+				Identifier id = parseIdentifier();
+				result = graph.createPartialSubgraphDefinition();
+				IsIdOfPartialGraphDefinition idOf = graph
+						.createIsIdOfPartialGraphDefinition(id, result);
+			}
+		} else {
+			fail("Expected opening parenthesis, but found:");
+		}
+		return result;
 	}
 
 	/**
@@ -663,17 +678,21 @@ public class GreqlParser extends ParserHelper {
 		assert lookAhead(0) == TokenTypes.NESTED : "Entered parse of NestedSubgraphDefinition without NESTED-token!";
 		NestedSubgraphDefinition nestedDefinition = null;
 		match();
-		if (!inPredicateMode()) {
-			if (tryMatch(TokenTypes.LPAREN)) {
+		if (tryMatch(TokenTypes.LPAREN)) {
+			if (!inPredicateMode()) {
+
 				if (lookAhead(0) == TokenTypes.IDENTIFIER) {
 					Identifier id = parseIdentifier();
 					nestedDefinition = graph.createNestedSubgraphDefinition();
+					IsIdOfNestedSubgraphDefinition idOf = graph
+							.createIsIdOfNestedSubgraphDefinition(id,
+									nestedDefinition);
 				} else {
 					fail("No identifier in nested-definition:");
 				}
-			} else {
-				fail("No opening parenthesis in nested-definition:");
 			}
+		} else {
+			fail("No opening parenthesis in nested-definition:");
 		}
 		return nestedDefinition;
 	}
@@ -690,8 +709,9 @@ public class GreqlParser extends ParserHelper {
 		assert lookAhead(0) == TokenTypes.KAPPA : "Entered parse of KappaSubgraphDefinition without KAPPA-token!";
 		KappaSubgraphDefinition kappaDefinition = null;
 		match();
-		if (!inPredicateMode()) {
-			if (tryMatch(TokenTypes.LPAREN)) {
+
+		if (tryMatch(TokenTypes.LPAREN)) {
+			if (!inPredicateMode()) {
 				if (lookAhead(0) == TokenTypes.INTLITERAL) {
 					int kappa = ((IntegerToken) lookAhead).getNumber()
 							.intValue();
@@ -706,9 +726,9 @@ public class GreqlParser extends ParserHelper {
 				} else {
 					fail("No valid number in kappa-definition:");
 				}
-			} else {
-				fail("No opening parenthesis in kappa-definition:");
 			}
+		} else {
+			fail("No opening parenthesis in kappa-definition:");
 		}
 		return kappaDefinition;
 	}
@@ -782,7 +802,8 @@ public class GreqlParser extends ParserHelper {
 		}
 		if (type != null) {
 			if (!inPredicateMode()) {
-				for (de.uni_koblenz.jgralab.greql2.schema.Quantifier quantifier : graph.getQuantifierVertices()) {
+				for (de.uni_koblenz.jgralab.greql2.schema.Quantifier quantifier : graph
+						.getQuantifierVertices()) {
 					if (quantifier.get_type() == type) {
 						return quantifier;
 					}
@@ -1653,22 +1674,73 @@ public class GreqlParser extends ParserHelper {
 					match(TokenTypes.LCURLY);
 					restr = parseIncidenceRestriction();
 					match(TokenTypes.RCURLY);
-				} else {
-					ElementRestriction elementRestriction = parseElementRestriction();
-
 				}
 			}
 		}
 		return result;
 	}
 
+	/**
+	 * Parses an ElementRestriction. Possible types are: {V:VertyTypeList},
+	 * {E:EdgeTypeList}, {VE: VertexAndEdgeTypeList}, {ElementSet}
+	 * 
+	 * @return
+	 */
 	private ElementRestriction parseElementRestriction() {
+		switch (lookAhead(0)) {
+		case E: {
+			match();
+			// Starting with E can only mean EdgeTypeList (if a colon follows)
+			// or an ElementSet (e. g. restricting to all Edges)
+			if (tryMatch(TokenTypes.COLON)) {
+				return parseEdgeTypeRestriction();
+			} else {
+				return parseElementSetRestriction();
+			}
+
+		}
+		case V: {
+			match();
+			// Starting with V can mean VertexTypeList (if a colon follows)...
+			if (tryMatch(TokenTypes.COLON)) {
+				return parseVertexTypeRestriction();
+				// Or a VertexAndEdgeTypeList (if an E follows)...
+			} else if (tryMatch(TokenTypes.E)) {
+				match(TokenTypes.COLON);
+				return parseMixedTypeRestriction();
+			} else {
+				// Or an ElementSet
+				return parseElementSetRestriction();
+			}
+		}
+		}
+		return null;
+	}
+
+	private ElementRestriction parseMixedTypeRestriction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private ElementRestriction parseVertexTypeRestriction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private ElementRestriction parseElementSetRestriction() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private ElementRestriction parseEdgeTypeRestriction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	private IncidenceRestriction parseIncidenceRestriction() {
-		// TODO Auto-generated method stub
+		IncidenceRestriction result = null;
+		if (!inPredicateMode()) {
+		}
 		return null;
 	}
 
@@ -2335,9 +2407,12 @@ public class GreqlParser extends ParserHelper {
 				}
 			}
 		} while (tryMatch(TokenTypes.COMMA));
-		if (!inPredicateMode() && (tupConstr.getDegree(Direction.EDGE_TO_VERTEX) == 1)) {
-			Vertex v = ((BinaryEdge) tupConstr.getFirstIncidence(Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
-			Edge e2 = tupConstr.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
+		if (!inPredicateMode()
+				&& (tupConstr.getDegree(Direction.EDGE_TO_VERTEX) == 1)) {
+			Vertex v = ((BinaryEdge) tupConstr.getFirstIncidence(
+					Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
+			Edge e2 = tupConstr.getFirstIncidence(Direction.VERTEX_TO_EDGE)
+					.getEdge();
 			((BinaryEdge) e2).setAlpha(v);
 			tupConstr.delete();
 		}
