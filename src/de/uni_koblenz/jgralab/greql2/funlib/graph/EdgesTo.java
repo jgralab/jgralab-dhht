@@ -3,6 +3,7 @@ package de.uni_koblenz.jgralab.greql2.funlib.graph;
 import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;

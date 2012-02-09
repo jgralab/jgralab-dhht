@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import org.pcollections.PVector;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.JGraLab;
@@ -102,7 +103,7 @@ public class Path {
 		return vertices.hashCode() + edges.hashCode();
 	}
 
-	public int degree(Vertex vertex, EdgeDirection dir) {
+	public int degree(Vertex vertex, Direction dir) {
 		int degree = 0;
 		switch (dir) {
 		case IN:

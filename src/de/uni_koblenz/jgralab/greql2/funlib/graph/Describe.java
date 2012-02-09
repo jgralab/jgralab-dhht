@@ -19,19 +19,19 @@ public class Describe extends Function {
 				3, 1.0, Category.GRAPH);
 	}
 
-	public PMap<String, Object> evaluate(AttributedElement el) {
+	public PMap<String, Object> evaluate(AttributedElement<?, ?> el) {
 		PMap<String, Object> result = JGraLab.map();
-		result = result.plus("type", el.getAttributedElementClass()
+		result = result.plus("type", el.getType()
 				.getQualifiedName());
 		if (el instanceof Graph) {
-			result = result.plus("id", ((Graph) el).getId());
+			result = result.plus("id", ((Graph) el).getUniqueGraphId());
 		} else {
-			result = result.plus("id", ((GraphElement) el).getId());
+			result = result.plus("id", ((GraphElement<?, ?, ?, ?>) el).getGlobalId());
 		}
-		Set<Attribute> al = el.getAttributedElementClass().getAttributeList();
+		Set<Attribute> al = el.getType().getAttributeList();
 		if (al.size() > 0) {
 			PMap<String, Object> attrs = JGraLab.map();
-			for (Attribute a : el.getAttributedElementClass()
+			for (Attribute a : el.getType()
 					.getAttributeList()) {
 				Object val = el.getAttribute(a.getName());
 				attrs = attrs.plus(a.getName(),
