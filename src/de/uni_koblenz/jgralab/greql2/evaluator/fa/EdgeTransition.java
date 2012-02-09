@@ -39,7 +39,7 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -179,7 +179,7 @@ public class EdgeTransition extends SimpleTransition {
 	public EdgeTransition(State start, State end, AllowedEdgeDirection dir,
 			TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator edgeEval, VertexEvaluator predicateEval,
-			GraphMarker<VertexEvaluator> graphMarker) {
+			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end, dir, typeCollection, roles, predicateEval,
 				graphMarker);
 		allowedEdgeEvaluator = edgeEval;

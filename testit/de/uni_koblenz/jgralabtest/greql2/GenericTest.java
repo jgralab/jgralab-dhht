@@ -37,7 +37,7 @@ import java.util.Iterator;
 import org.junit.Before;
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.greql2.SerializableGreql2;
+import de.uni_koblenz.jgralab.greql2.SerializableGreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.optimizer.DefaultOptimizer;
 import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
@@ -196,7 +196,7 @@ public class GenericTests {
 				System.out.println("Unoptimized Query:");
 				dotFileName += "unoptimized-query.dot";
 			}
-			System.out.println(((SerializableGreql2) eval.getSyntaxGraph())
+			System.out.println(((SerializableGreqlSyntaxGraph) eval.getSyntaxGraph())
 					.serialize());
 			Tg2Dot.printGraphAsDot(eval.getSyntaxGraph(), true, dotFileName);
 		}

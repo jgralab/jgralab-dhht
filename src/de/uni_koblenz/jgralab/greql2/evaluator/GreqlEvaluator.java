@@ -82,7 +82,7 @@ import de.uni_koblenz.jgralab.greql2.optimizer.Optimizer;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
 import de.uni_koblenz.jgralab.greql2.types.Undefined;
 import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
@@ -461,7 +461,7 @@ public class GreqlEvaluator {
 	/**
 	 * This attribute holds the query-graph
 	 */
-	protected Greql2 queryGraph = null;
+	protected GreqlSyntaxGraph queryGraph = null;
 
 	/**
 	 * This attribute holds the entry of the optimizedSyntaxGraph map that is
@@ -556,7 +556,7 @@ public class GreqlEvaluator {
 	/**
 	 * Holds the greql subqueries that can be called like other greql functions.
 	 */
-	protected LinkedHashMap<String, Greql2> subQueryMap = null;
+	protected LinkedHashMap<String, GreqlSyntaxGraph> subQueryMap = null;
 
 	/**
 	 * Holds the estimated needed for evaluation time in abstract units
@@ -628,10 +628,10 @@ public class GreqlEvaluator {
 
 		parser.parse();
 
-		Greql2 subQueryGraph = parser.getGraph();
+		GreqlSyntaxGraph subQueryGraph = parser.getGraph();
 		subQueryGraph.getFirstGreql2Expression().set_queryText(name);
 		if (isOptimize()) {
-			Greql2 oldQueryGraph = queryGraph;
+			GreqlSyntaxGraph oldQueryGraph = queryGraph;
 			String oldQueryString = queryString;
 			queryGraph = subQueryGraph;
 			queryString = greqlQuery;
@@ -654,7 +654,7 @@ public class GreqlEvaluator {
 		// System.out.println(Greql2Serializer.serialize(subQueryGraph));
 	}
 
-	public Greql2 getSubQuery(String name) {
+	public GreqlSyntaxGraph getSubQuery(String name) {
 		return subQueryMap.get(name);
 	}
 
@@ -718,7 +718,7 @@ public class GreqlEvaluator {
 	/**
 	 * returns the query syntaxgraph
 	 */
-	public Greql2 getSyntaxGraph() {
+	public GreqlSyntaxGraph getSyntaxGraph() {
 		return queryGraph;
 	}
 
@@ -747,7 +747,7 @@ public class GreqlEvaluator {
 		this.datagraph = datagraph;
 		knownTypes = new HashMap<String, AttributedElementClass>();
 		variableMap = variables;
-		subQueryMap = new LinkedHashMap<String, Greql2>();
+		subQueryMap = new LinkedHashMap<String, GreqlSyntaxGraph>();
 		this.progressFunction = progressFunction;
 	}
 
