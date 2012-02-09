@@ -85,6 +85,7 @@ import de.uni_koblenz.jgralab.greql2.schema.IsRowHeaderExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader;
 import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
@@ -224,27 +225,27 @@ public abstract class ParserHelper {
 
 			/* iterate over all definitions at the current definition expression */
 			for (Definition definition : defList) {
-				IsExprOf isExprOf = definition
+				IsExprOf isExprOf = (IsExprOf) definition
 						.getFirstIncidenceToIsExprOf(Direction.EDGE_TO_VERTEX).getEdge();
-				IsVarOf isVarOf = definition
-						.getFirstIsVarOfIncidence(Direction.EDGE_TO_VERTEX);
+				IsVarOf isVarOf = (IsVarOf) definition
+						.getFirstIncidenceToIsVarOf(Direction.EDGE_TO_VERTEX).getEdge();
 				Expression expr = isExprOf.getAlpha();
 				Variable variable = isVarOf.getAlpha();
 				isVarOf.delete();
 				isExprOf.delete();
-				Edge e = variable.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+				Edge e = variable.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
 				while (e != null) {
-					e.setAlpha(expr);
-					e = variable.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+					((BinaryEdge) e).setAlpha(expr);
+					e = variable.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
 				}
 				variable.delete();
 			}
-			Expression boundExpr = exp.getFirstIsBoundExprOfIncidence(
-					Direction.EDGE_TO_VERTEX).getAlpha();
-			Edge e = exp.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+			Expression boundExpr = (Expression) ((BinaryEdge) exp.getFirstIncidenceToIsBoundExprOf(
+					Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
+			Edge e = exp.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
 			while (e != null) {
-				e.setAlpha(boundExpr);
-				e = exp.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+				((BinaryEdge) e).setAlpha(boundExpr);
+				e = exp.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
 			}
 			exp.delete();
 		}
@@ -252,7 +253,7 @@ public abstract class ParserHelper {
 
 	protected void eliminateUnusedNodes() {
 		List<Vertex> deleteList = new ArrayList<Vertex>();
-		for (Vertex v : graph.vertices()) {
+		for (Vertex v : graph.getVertices()) {
 			if (v.getFirstIncidence() == null) {
 				deleteList.add(v);
 			}
@@ -294,26 +295,26 @@ public abstract class ParserHelper {
 					.get_name());
 			if (var != null) {
 				if (var != v) {
-					Edge inc = v.getFirstIncidence(Direction.VERTEX_TO_EDGE);
-					inc.setAlpha(var);
+					Edge inc = v.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
+					((BinaryEdge) inc).setAlpha(var);
 					if (v.getDegree() <= 0) {
 						v.delete();
 					}
 				}
 			} else {
 				Greql2Aggregation e = (Greql2Aggregation) v
-						.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+						.getFirstIncidence(Direction.VERTEX_TO_EDGE).getEdge();
 				throw new UndefinedVariableException((Variable) v,
 						e.get_sourcePositions());
 			}
 		} else {
 			ArrayList<Edge> incidenceList = new ArrayList<Edge>();
-			for (Edge inc : v.incidences(Direction.EDGE_TO_VERTEX)) {
-				incidenceList.add(inc);
+			for (Incidence inc : v.getIncidences(Direction.EDGE_TO_VERTEX)) {
+				incidenceList.add(inc.getEdge());
 			}
 			for (Edge e : incidenceList) {
 		//		System.out.println("Merging variables of " + e.getAlpha().getSchemaClass().getName());
-				mergeVariables(e.getAlpha(), true);
+				mergeVariables(((BinaryEdge) e).getAlpha(), true);
 			}
 		}
 	}
@@ -329,14 +330,13 @@ public abstract class ParserHelper {
 	protected final void mergeVariablesInGreql2Expression(Greql2Expression root)
 			throws DuplicateVariableException, UndefinedVariableException {
 		afterParsingvariableSymbolTable.blockBegin();
-		for (IsBoundVarOf isBoundVarOf : root
-				.getIsBoundVarOfIncidences(Direction.EDGE_TO_VERTEX)) {
+		for (IsBoundVarOf isBoundVarOf : root.getIncidentEdgesOfType_IsBoundVarOf(Direction.EDGE_TO_VERTEX)) {
 			afterParsingvariableSymbolTable.insert(
 					(isBoundVarOf.getAlpha()).get_name(),
 					isBoundVarOf.getAlpha());
 		}
 		IsQueryExprOf isQueryExprOf = root
-				.getFirstIsQueryExprOfIncidence(Direction.EDGE_TO_VERTEX);
+				.getFirstIncidenceToIsQueryExprOf(Direction.EDGE_TO_VERTEX).getEdge();
 		mergeVariables(isQueryExprOf.getAlpha(), true);
 		afterParsingvariableSymbolTable.blockEnd();
 	}
@@ -356,21 +356,21 @@ public abstract class ParserHelper {
 			afterParsingvariableSymbolTable.blockBegin();
 		}
 		for (IsDefinitionOf currentEdge : v
-				.getIsDefinitionOfIncidences(Direction.EDGE_TO_VERTEX)) {
+				.getIncidentEdgesOfType_IsDefinitionOf(Direction.EDGE_TO_VERTEX)) {
 			Definition definition = currentEdge.getAlpha();
-			Variable variable = definition.getFirstIsVarOfIncidence(
-					Direction.EDGE_TO_VERTEX).getAlpha();
+			Variable variable = definition.getFirstIncidenceToIsVarOf(
+					Direction.EDGE_TO_VERTEX).getEdge().getAlpha();
 			afterParsingvariableSymbolTable.insert(variable.get_name(),
 					variable);
 		}
 		Edge isBoundExprOf = v
-				.getFirstIsBoundExprOfDefinitionIncidence(Direction.EDGE_TO_VERTEX);
-		mergeVariables(isBoundExprOf.getAlpha(), false);
+				.getFirstIncidenceToIsBoundExprOfDefinition(Direction.EDGE_TO_VERTEX).getEdge();
+		mergeVariables(((BinaryEdge) isBoundExprOf).getAlpha(), false);
 		for (IsDefinitionOf currentEdge : v
-				.getIsDefinitionOfIncidences(Direction.EDGE_TO_VERTEX)) {
+				.getIncidentEdgesOfType_IsDefinitionOf(Direction.EDGE_TO_VERTEX)) {
 			Definition definition = currentEdge.getAlpha();
-			Expression expr = definition.getFirstIsExprOfIncidence(
-					Direction.EDGE_TO_VERTEX).getAlpha();
+			Expression expr = definition.getFirstIncidenceToIsExprOf(
+					Direction.EDGE_TO_VERTEX).getEdge().getAlpha();
 			mergeVariables(expr, true);
 		}
 
@@ -391,10 +391,10 @@ public abstract class ParserHelper {
 	private void mergeVariablesInDeclaration(Declaration v)
 			throws DuplicateVariableException, UndefinedVariableException {
 		for (IsSimpleDeclOf currentEdge : v
-				.getIsSimpleDeclOfIncidences(Direction.EDGE_TO_VERTEX)) {
+				.getIncidentEdgesOfType_IsSimpleDeclOf(Direction.EDGE_TO_VERTEX)) {
 			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
 			for (IsDeclaredVarOf isDeclaredVarOf : simpleDecl
-					.getIsDeclaredVarOfIncidences(Direction.EDGE_TO_VERTEX)) {
+					.getIncidentEdgesOfType_IsDeclaredVarOf(Direction.EDGE_TO_VERTEX)) {
 				Variable variable = isDeclaredVarOf.getAlpha();
 				afterParsingvariableSymbolTable.insert(variable.get_name(),
 						variable);
@@ -402,15 +402,15 @@ public abstract class ParserHelper {
 		}
 
 		for (IsSimpleDeclOf currentEdge : v
-				.getIsSimpleDeclOfIncidences(Direction.EDGE_TO_VERTEX)) {
+				.getIncidentEdgesOfType_IsSimpleDeclOf(Direction.EDGE_TO_VERTEX)) {
 			SimpleDeclaration simpleDecl = currentEdge.getAlpha();
-			Expression expr = simpleDecl.getFirstIsTypeExprOfIncidence(
-					Direction.EDGE_TO_VERTEX).getAlpha();
+			Expression expr = (Expression) ((BinaryEdge) simpleDecl.getFirstIncidenceToIsTypeExprOf(
+					Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
 			mergeVariables(expr, true);
 		}
 
 		for (IsConstraintOf isConstraintOf : v
-				.getIsConstraintOfIncidences(Direction.EDGE_TO_VERTEX)) {
+				.getIncidentEdgesOfType_IsConstraintOf(Direction.EDGE_TO_VERTEX)) {
 			mergeVariables(isConstraintOf.getAlpha(), true);
 		}
 	}
@@ -430,10 +430,10 @@ public abstract class ParserHelper {
 			afterParsingvariableSymbolTable.blockBegin();
 		}
 		IsQuantifiedDeclOf isQuantifiedDeclOf = v
-				.getFirstIsQuantifiedDeclOfIncidence(Direction.EDGE_TO_VERTEX);
+				.getFirstIncidenceToIsQuantifiedDeclOf(Direction.EDGE_TO_VERTEX).getEdge();
 		mergeVariablesInDeclaration(isQuantifiedDeclOf.getAlpha());
-		IsBoundExprOfQuantifier isBoundExprOfQuantifier = v
-				.getFirstIsBoundExprOfQuantifierIncidence(Direction.EDGE_TO_VERTEX);
+		IsBoundExprOfQuantifier isBoundExprOfQuantifier = (IsBoundExprOfQuantifier) v
+				.getFirstIncidenceToIsBoundExprOfQuantifier(Direction.EDGE_TO_VERTEX).getEdge();
 		mergeVariables(isBoundExprOfQuantifier.getAlpha(), true);
 		if (separateScope) {
 			afterParsingvariableSymbolTable.blockEnd();
@@ -453,43 +453,42 @@ public abstract class ParserHelper {
 		if (separateScope) {
 			afterParsingvariableSymbolTable.blockBegin();
 		}
-		Edge IsCompDeclOf = v.getFirstIsCompDeclOfIncidence(Direction.EDGE_TO_VERTEX);
-		mergeVariablesInDeclaration((Declaration) IsCompDeclOf.getAlpha());
+		Edge IsCompDeclOf = v.getFirstIncidenceToIsCompDeclOf(Direction.EDGE_TO_VERTEX).getEdge();
+		mergeVariablesInDeclaration((Declaration) ((BinaryEdge) IsCompDeclOf).getAlpha());
 		Edge isCompResultDefOf = v
-				.getFirstIsCompResultDefOfIncidence(Direction.EDGE_TO_VERTEX);
+				.getFirstIncidenceToIsCompResultDefOf(Direction.EDGE_TO_VERTEX).getEdge();
 		if (isCompResultDefOf != null) {
-			mergeVariables(isCompResultDefOf.getAlpha(), true);
+			mergeVariables(((BinaryEdge) isCompResultDefOf).getAlpha(), true);
 			// merge variables in table-headers if it's a list-comprehension
 			if (v instanceof ListComprehension) {
-				IsTableHeaderOf isTableHeaderOf = v
-						.getFirstIsTableHeaderOfIncidence(Direction.EDGE_TO_VERTEX);
-				while (isTableHeaderOf != null) {
-					mergeVariables(isTableHeaderOf.getAlpha(), true);
-					isTableHeaderOf = isTableHeaderOf
-							.getNextIsTableHeaderOfIncidence(Direction.EDGE_TO_VERTEX);
+				IsTableHeaderOf_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader inc = 
+						((ListComprehension) v).getFirst_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader();
+				while (inc != null) {
+					mergeVariables(inc.getEdge().getAlpha(), true);
+					inc = inc.getNextIsTableHeaderOf_GoesTo_ComprehensionWithTableHeaderAtVertex();
 				}
 			}
 			if (v instanceof TableComprehension) {
 				TableComprehension tc = (TableComprehension) v;
-				IsColumnHeaderExprOf ch = tc
-						.getFirstIsColumnHeaderExprOfIncidence(Direction.EDGE_TO_VERTEX);
+				IsColumnHeaderExprOf ch = (IsColumnHeaderExprOf) tc
+						.getFirstIncidenceToIsColumnHeaderExprOf(Direction.EDGE_TO_VERTEX).getEdge();
 				mergeVariables(ch.getAlpha(), true);
-				IsRowHeaderExprOf rh = tc
-						.getFirstIsRowHeaderExprOfIncidence(Direction.EDGE_TO_VERTEX);
+				IsRowHeaderExprOf rh = (IsRowHeaderExprOf) tc
+						.getFirstIncidenceToIsRowHeaderExprOf(Direction.EDGE_TO_VERTEX).getEdge();
 				mergeVariables(rh.getAlpha(), true);
-				IsTableHeaderOf th = tc
-						.getFirstIsTableHeaderOfIncidence(Direction.EDGE_TO_VERTEX);
+				IsTableHeaderOf th = (IsTableHeaderOf) tc
+						.getFirstIncidenceToIsTableHeaderOf(Direction.EDGE_TO_VERTEX).getEdge();
 				if (th != null) {
 					mergeVariables(th.getAlpha(), true);
 				}
 			}
 		}
 		if (v instanceof MapComprehension) {
-			IsKeyExprOfComprehension keyEdge = ((MapComprehension) v)
-					.getFirstIsKeyExprOfComprehensionIncidence();
+			IsKeyExprOfComprehension keyEdge = (IsKeyExprOfComprehension) ((MapComprehension) v)
+					.getFirstIncidenceToIsKeyExprOfComprehension(Direction.BOTH).getEdge();
 			mergeVariables(keyEdge.getAlpha(), true);
-			IsValueExprOfComprehension valueEdge = ((MapComprehension) v)
-					.getFirstIsValueExprOfComprehensionIncidence();
+			IsValueExprOfComprehension valueEdge = (IsValueExprOfComprehension) ((MapComprehension) v)
+					.getFirstIncidenceToIsValueExprOfComprehension(Direction.BOTH).getEdge();
 			mergeVariables(valueEdge.getAlpha(), true);
 		}
 		if (separateScope) {
@@ -607,26 +606,26 @@ public abstract class ParserHelper {
 		allowedEdgesForThisEdge.add(IsBooleanPredicateOfEdgeRestriction.class);
 
 		for (ThisLiteral vertex : graph.getThisVertexVertices()) {
-			for (Edge sourcePositionEdge : vertex.incidences(Direction.VERTEX_TO_EDGE)) {
+			for (Incidence sourcePositionEdge : vertex.getIncidences(Direction.VERTEX_TO_EDGE)) {
 				Queue<Greql2Vertex> queue = new LinkedList<Greql2Vertex>();
 				queue.add(vertex);
 				while (!queue.isEmpty()) {
 					Greql2Vertex currentVertex = queue.poll();
-					for (Edge edge : currentVertex
-							.incidences(Direction.VERTEX_TO_EDGE)) {
-						if (allowedEdgesForThisVertex.contains(edge
-								.getSchemaClass())) {
+					for (Incidence inc : currentVertex
+							.getIncidences(Direction.VERTEX_TO_EDGE)) {
+						if (allowedEdgesForThisVertex.contains(inc.getEdge()
+								.getType())) {
 							continue;
 						}
-						Greql2Vertex omega = (Greql2Vertex) edge.getOmega();
+						Greql2Vertex omega = (Greql2Vertex) ((BinaryEdge) inc.getEdge()).getOmega();
 						if (omega instanceof Greql2Expression) {
 							throw new ParsingException(
 									"This literals must not be used outside pathdescriptions",
 									vertex.get_name(),
-									((Greql2Aggregation) sourcePositionEdge)
+									((Greql2Aggregation) sourcePositionEdge.getEdge())
 											.get_sourcePositions().get(0)
 											.get_offset(),
-									((Greql2Aggregation) sourcePositionEdge)
+									((Greql2Aggregation) sourcePositionEdge.getEdge())
 											.get_sourcePositions().get(0)
 											.get_length(), query);
 						}
@@ -637,26 +636,25 @@ public abstract class ParserHelper {
 		}
 
 		for (ThisLiteral vertex : graph.getThisEdgeVertices()) {
-			for (Edge sourcePositionEdge : vertex.incidences(Direction.VERTEX_TO_EDGE)) {
+			for (Incidence sourcePositionEdge : vertex.getIncidences(Direction.VERTEX_TO_EDGE)) {
 				Queue<Greql2Vertex> queue = new LinkedList<Greql2Vertex>();
 				queue.add(vertex);
 				while (!queue.isEmpty()) {
 					Greql2Vertex currentVertex = queue.poll();
-					for (Edge edge : currentVertex
-							.incidences(Direction.VERTEX_TO_EDGE)) {
-						if (allowedEdgesForThisEdge.contains(edge
-								.getSchemaClass())) {
+					for (Incidence inc: currentVertex
+							.getIncidences(Direction.VERTEX_TO_EDGE)) {
+						if (allowedEdgesForThisEdge.contains(inc.getEdge().getType())) {
 							continue;
 						}
-						Greql2Vertex omega = (Greql2Vertex) edge.getOmega();
+						Greql2Vertex omega = (Greql2Vertex) ((BinaryEdge) inc.getEdge()).getOmega();
 						if (omega instanceof Greql2Expression) {
 							throw new ParsingException(
 									"This literals must not be used outside pathdescriptions",
 									vertex.get_name(),
-									((Greql2Aggregation) sourcePositionEdge)
+									((Greql2Aggregation) sourcePositionEdge.getEdge())
 											.get_sourcePositions().get(0)
 											.get_offset(),
-									((Greql2Aggregation) sourcePositionEdge)
+									((Greql2Aggregation) sourcePositionEdge.getEdge())
 											.get_sourcePositions().get(0)
 											.get_length(), query);
 						}
@@ -665,29 +663,35 @@ public abstract class ParserHelper {
 				}
 			}
 		}
+		/*
+		 * Remove all but one ThisEdgeLiteral and ThisVertexLiteral vertices from the
+		 * graph and relink all edges to such literals to the single remaining one.
+		 * The automatons that are used to evaluate the path descriptions highly relate
+		 * on the facts, that there in only one literal of each kind
+		 */
 		LinkedList<Vertex> literalsToDelete = new LinkedList<Vertex>();
-		ThisVertex firstThisVertex = null;
-		for (ThisVertex thisVertex : graph.getThisVertexVertices()) {
-			if (firstThisVertex == null) {
-				firstThisVertex = thisVertex;
+		ThisVertex firstThisVertexLiteral = null;
+		for (ThisVertex thisVertexLiteral : graph.getThisVertexVertices()) {
+			if (firstThisVertexLiteral == null) {
+				firstThisVertexLiteral = thisVertexLiteral;
 			} else {
-				while (thisVertex.getFirstIncidence() != null) {
-					Edge e = thisVertex.getFirstIncidence();
-					e.setThis(firstThisVertex);
+				while (thisVertexLiteral.getFirstIncidence() != null) {
+					Incidence i = thisVertexLiteral.getFirstIncidence();
+					((BinaryEdge) i.getEdge()).setOmega(firstThisVertexLiteral);
 				}
-				literalsToDelete.add(thisVertex);
+				literalsToDelete.add(thisVertexLiteral);
 			}
 		}
-		ThisEdge firstThisEdge = null;
-		for (ThisEdge thisEdge : graph.getThisEdgeVertices()) {
-			if (firstThisEdge == null) {
-				firstThisEdge = thisEdge;
+		ThisEdge firstThisEdgeLiteral = null;
+		for (ThisEdge thisEdgeLiteral : graph.getThisEdgeVertices()) {
+			if (firstThisEdgeLiteral == null) {
+				firstThisEdgeLiteral = thisEdgeLiteral;
 			} else {
-				while (thisEdge.getFirstIncidence() != null) {
-					Edge e = thisEdge.getFirstIncidence();
-					e.setThis(firstThisEdge);
+				while (thisEdgeLiteral.getFirstIncidence() != null) {
+					Edge e = thisEdgeLiteral.getFirstIncidence().getEdge();
+					((BinaryEdge) e).setOmega(firstThisEdgeLiteral);
 				}
-				literalsToDelete.add(thisEdge);
+				literalsToDelete.add(thisEdgeLiteral);
 			}
 		}
 		while (!literalsToDelete.isEmpty()) {

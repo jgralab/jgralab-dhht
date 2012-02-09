@@ -206,11 +206,11 @@ public class GreqlParser extends ParserHelper {
 				startOffset));
 	}
 
-	public static Greql2 parse(String query) {
+	public static GreqlSyntaxGraph parse(String query) {
 		return parse(query, null);
 	}
 
-	public static Greql2 parse(String query, Set<String> subQueryNames) {
+	public static GreqlSyntaxGraph parse(String query, Set<String> subQueryNames) {
 		GreqlParser parser = new GreqlParser(query, subQueryNames);
 		parser.parse();
 		return parser.getGraph();

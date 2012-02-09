@@ -178,6 +178,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 						code.addNoIndent(createNextMethod(sc, false, true));
 					}
 				}
+				code.addNoIndent(createTypesafeGetEdgeAndVertexMethod());
 			}
 		}
 		return code;
@@ -235,6 +236,40 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 					 "\treturn Direction.#direction#;",
 					 "}");
 		}
+		return code;
+	}
+	
+	private CodeBlock createTypesafeGetEdgeAndVertexMethod() {
+		CodeSnippet code = new CodeSnippet(true);
+		code.setVariable("edgeClass", aec.getSchema().getPackagePrefix() + "." + aec.getEdgeClass().getQualifiedName());
+		code.setVariable("vertexClass", aec.getSchema().getPackagePrefix() + "." + aec.getVertexClass().getQualifiedName());
+		if (currentCycle.isAbstract()) {
+			code.add(
+					"/* Provided for type safety */",
+					"@Override",
+					"public #edgeClass# getEdge();",
+					"",
+					"",
+					"/* Provided for type safety */",
+					"@Override",
+					"public #vertexClass# getVertex();");
+		} else {
+			code.add(
+					"/* Provided for type safety */",
+					"@Override",
+					"public #edgeClass# getEdge() {",
+					"\treturn (#edgeClass#) super.getEdge();",
+					"}",
+					"",
+					"",
+					"/* Provided for type safety */",
+					"@Override",
+					"public #vertexClass# getVertex() {",
+					"\treturn (#vertexClass#) super.getVertex();",
+					"}"
+					);	
+		}
+
 		return code;
 	}
 	
