@@ -57,7 +57,7 @@ public abstract class DegreeFunction extends Function {
 					break;
 				case VERTEX_TO_EDGE:
 				case EDGE_TO_VERTEX:
-					if (i.getDirection() == direction) {
+					if (i.getDirection() != direction) {
 						++degree;
 					}
 					break;

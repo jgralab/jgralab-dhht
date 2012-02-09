@@ -1,9 +1,13 @@
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
+import java.rmi.RemoteException;
+
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 import de.uni_koblenz.jgralab.greql2.funlib.NeedsGraphArgument;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
@@ -17,26 +21,31 @@ public class VertexTypeSubgraph extends Function {
 				7, 1, 1.0, Category.GRAPH);
 	}
 
-	public SubGraphMarker evaluate(Graph graph, TypeCollection typeCollection) {
-		SubGraphMarker subgraphMarker = new SubGraphMarker(graph);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public BooleanGraphMarker evaluate(Graph graph, TypeCollection typeCollection) {
+		BooleanGraphMarker subgraphMarker = new GlobalBooleanGraphMarker(graph);
 		Vertex currentVertex = graph.getFirstVertex();
+		try {
 		while (currentVertex != null) {
 			if (typeCollection.acceptsType(currentVertex
-					.getAttributedElementClass())) {
+					.getType())) {
 				subgraphMarker.mark(currentVertex);
 			}
 			currentVertex = currentVertex.getNextVertex();
 		}
 		// add all edges
 		Edge currentEdge = graph.getFirstEdge();
-		while (currentEdge != null) {
-			if (subgraphMarker.isMarked(currentEdge.getAlpha())
-					&& subgraphMarker.isMarked(currentEdge.getOmega())) {
+		while (currentEdge != null && currentEdge.isBinary()) {
+			if (subgraphMarker.isMarked(((BinaryEdge) currentEdge).getAlpha())
+					&& subgraphMarker.isMarked(((BinaryEdge) currentEdge).getOmega())) {
 				subgraphMarker.mark(currentEdge);
 			}
 			currentEdge = currentEdge.getNextEdge();
 		}
 		return subgraphMarker;
+		} catch (RemoteException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 	
 }

@@ -1,6 +1,6 @@
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 import de.uni_koblenz.jgralab.greql2.types.Path;
@@ -12,7 +12,7 @@ public class StartVertex extends Function {
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
-	public Vertex evaluate(Edge e) {
+	public Vertex evaluate(BinaryEdge e) {
 		return e.getAlpha();
 	}
 
