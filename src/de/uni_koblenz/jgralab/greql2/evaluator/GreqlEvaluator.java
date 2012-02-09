@@ -70,9 +70,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.DefaultCostModel;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
@@ -324,7 +321,7 @@ public class GreqlEvaluator {
 	 * gets an unlocked syntaxgraph out of the optimzedGraph map and locks it
 	 */
 	protected static synchronized SyntaxGraphEntry getOptimizedSyntaxGraph(
-			String queryString, Optimizer optimizer, CostModel costModel) {
+			String queryString, Optimizer optimizer) {
 		SoftReference<List<SyntaxGraphEntry>> ref = optimizedGraphs
 				.get(queryString);
 		List<SyntaxGraphEntry> entryList = null;
@@ -340,13 +337,11 @@ public class GreqlEvaluator {
 		}
 
 		for (SyntaxGraphEntry entry : entryList) {
-			if (entry.getCostModel().isEquivalent(costModel)) {
-				Optimizer opt = entry.getOptimizer();
-				if (((opt != null) && opt.isEquivalent(optimizer))
-						|| ((opt == null) && (optimizer == null))) {
-					if (entry.lock()) {
-						return entry;
-					}
+			Optimizer opt = entry.getOptimizer();
+			if (((opt != null) && opt.isEquivalent(optimizer))
+					|| ((opt == null) && (optimizer == null))) {
+				if (entry.lock()) {
+					return entry;
 				}
 			}
 		}
@@ -495,11 +490,6 @@ public class GreqlEvaluator {
 	 * This attribute holds the result of the evaluation
 	 */
 	protected Object result = null;
-
-	/**
-	 * This attribute holds the CostModel which estimates the evaluation costs
-	 */
-	protected CostModel costModel = null;
 
 	/**
 	 * The progress function this evaluator uses, may be null
@@ -701,19 +691,6 @@ public class GreqlEvaluator {
 		return tmpDir;
 	}
 
-	/**
-	 * returns the CostModel which is used to estimate the evaluation costs
-	 */
-	public CostModel getCostModel() {
-		return costModel;
-	}
-
-	/**
-	 * sets the CostModel which is used to estimate the evaluation costs
-	 */
-	public void setCostModel(CostModel m) {
-		costModel = m;
-	}
 
 	/**
 	 * returns the query syntaxgraph
@@ -967,13 +944,9 @@ public class GreqlEvaluator {
 		if (optimizer == null) {
 			optimizer = new DefaultOptimizer();
 		}
-		if (costModel == null) {
-			costModel = new DefaultCostModel();
-		}
 		if (useSavedOptimizedSyntaxGraph
 				&& optimizedGraphs.containsKey(queryString)) {
-			syntaxGraphEntry = getOptimizedSyntaxGraph(queryString, optimizer,
-					costModel);
+			syntaxGraphEntry = getOptimizedSyntaxGraph(queryString, optimizer);
 			if (syntaxGraphEntry != null) {
 				queryGraph = syntaxGraphEntry.getSyntaxGraph();
 				createVertexEvaluators();
@@ -1010,7 +983,7 @@ public class GreqlEvaluator {
 		createVertexEvaluators();
 		optimizer.optimize(this, queryGraph);
 		syntaxGraphEntry = new SyntaxGraphEntry(queryString, queryGraph,
-				optimizer, costModel, true);
+				optimizer, true);
 		addOptimizedSyntaxGraph(queryString, syntaxGraphEntry);
 		createVertexEvaluators();
 		optimizationTime = System.currentTimeMillis() - optimizerStartTime;
@@ -1037,10 +1010,6 @@ public class GreqlEvaluator {
 
 		long startTime = System.currentTimeMillis();
 
-		// Initialize the CostModel if there's none
-		if (costModel == null) {
-			costModel = new DefaultCostModel();
-		}
 
 		if (optimize) {
 			createOptimizedSyntaxGraph();
