@@ -17,6 +17,6 @@ public class HasAttribute extends Function {
 	}
 
 	public Boolean evaluate(AttributedElement<?, ?> el, String name) {
-		return evaluate(el.getAttributedElementClass(), name);
+		return evaluate(el.getType(), name);
 	}
 }

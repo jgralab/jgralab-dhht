@@ -25,6 +25,6 @@ public class AttributeNames extends Function {
 	}
 
 	public PSet<String> evaluate(AttributedElement<?, ?> el) {
-		return evaluate(el.getAttributedElementClass());
+		return evaluate(el.getType());
 	}
 }

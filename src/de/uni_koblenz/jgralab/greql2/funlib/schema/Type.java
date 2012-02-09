@@ -12,6 +12,6 @@ public class Type extends Function {
 	}
 
 	public AttributedElementClass<?, ?> evaluate(AttributedElement<?, ?> el) {
-		return el.getAttributedElementClass();
+		return el.getType();
 	}
 }

@@ -11,6 +11,6 @@ public class TypeName extends Function {
 	}
 
 	public String evaluate(AttributedElement<?, ?> el) {
-		return el.getAttributedElementClass().getQualifiedName();
+		return el.getType().getQualifiedName();
 	}
 }

@@ -16,7 +16,7 @@ public class HasType extends Function {
 
 	public <SC extends AttributedElementClass<SC, IC>, IC extends AttributedElement<SC, IC>> Boolean evaluate(
 			IC el, String qn) {
-		SC aec = el.getSchema().getAttributedElementClass(qn);
+		SC aec = (SC) el.getSchema().getAttributedElementClass(qn);
 		if (aec == null) {
 			throw new GreqlException("hasType: Schema doesn't contain a type '");
 		}
@@ -25,13 +25,13 @@ public class HasType extends Function {
 
 	private <SC extends AttributedElementClass<SC, IC>, IC extends AttributedElement<SC, IC>> Boolean evaluate(
 			IC el, SC aec) {
-		SC c = el.getAttributedElementClass();
+		SC c = el.getType();
 		return c.equals(aec) || c.isSubClassOf(aec);
 	}
 
 	public <SC extends AttributedElementClass<SC, IC>, IC extends AttributedElement<SC, IC>> Boolean evaluate(
 			IC el, TypeCollection tc) {
-		SC c = el.getAttributedElementClass();
+		SC c = el.getType();
 		return tc.acceptsType(c);
 	}
 

@@ -31,6 +31,6 @@ public class Attributes extends Function {
 	}
 
 	public PVector<PMap<String, String>> evaluate(AttributedElement<?, ?> el) {
-		return evaluate(el.getAttributedElementClass());
+		return evaluate(el.getType());
 	}
 }
