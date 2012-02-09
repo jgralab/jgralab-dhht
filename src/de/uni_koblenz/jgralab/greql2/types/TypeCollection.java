@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * Represents a set of allowed and forbidden types
@@ -51,18 +52,21 @@ public class TypeCollection {
 	/**
 	 * The set of allowed types
 	 */
-	private TreeSet<AttributedElementClass> allowedTypes;
+	@SuppressWarnings("rawtypes")
+	private TreeSet<TypedElementClass> allowedTypes;
 
 	/**
 	 * The set of forbidden types
 	 */
-	private TreeSet<AttributedElementClass> forbiddenTypes;
+	@SuppressWarnings("rawtypes")
+	private TreeSet<TypedElementClass> forbiddenTypes;
 
 	/**
 	 * returns the list of allowed types. Creates a copy of that list so the
 	 * internal list is not affected by changes of the returned list
 	 */
-	public Set<AttributedElementClass> getAllowedTypes() {
+	@SuppressWarnings("rawtypes")
+	public Set<TypedElementClass> getAllowedTypes() {
 		return allowedTypes;
 	}
 
@@ -70,7 +74,8 @@ public class TypeCollection {
 	 * returns the list of forbidden types. Creates a copy of that list so the
 	 * internal list is not affected by changes of the returned list
 	 */
-	public Set<AttributedElementClass> getForbiddenTypes() {
+	@SuppressWarnings("rawtypes")
+	public Set<TypedElementClass> getForbiddenTypes() {
 		return forbiddenTypes;
 	}
 
@@ -78,8 +83,8 @@ public class TypeCollection {
 	 * creates a new typecollection which contains no types
 	 */
 	public TypeCollection() {
-		forbiddenTypes = new TreeSet<AttributedElementClass>();
-		allowedTypes = new TreeSet<AttributedElementClass>();
+		forbiddenTypes = new TreeSet<TypedElementClass>();
+		allowedTypes = new TreeSet<TypedElementClass>();
 	}
 
 	/**
@@ -91,7 +96,7 @@ public class TypeCollection {
 	 *            toggles wether the given types should be added to the allowed
 	 *            or forbidden types
 	 */
-	public TypeCollection(Collection<AttributedElementClass> types,
+	public TypeCollection(Collection<TypedElementClass> types,
 			boolean forbidden) {
 		this();
 		if (forbidden) {
@@ -145,7 +150,8 @@ public class TypeCollection {
 	 * 
 	 * @return true if the given type is allowed, false otherwise
 	 */
-	public final boolean acceptsType(AttributedElementClass type) {
+	@SuppressWarnings("rawtypes")
+	public final boolean acceptsType(TypedElementClass type) {
 		if (allowedTypes.isEmpty()) {
 			return (!forbiddenTypes.contains(type));
 		} else {
@@ -160,11 +166,11 @@ public class TypeCollection {
 		} else {
 			StringBuffer sb = new StringBuffer();
 			String delim = "{";
-			for (AttributedElementClass aec : allowedTypes) {
+			for (TypedElementClass aec : allowedTypes) {
 				sb.append(delim).append("+").append(aec.getQualifiedName());
 				delim = " ";
 			}
-			for (AttributedElementClass aec : forbiddenTypes) {
+			for (TypedElementClass aec : forbiddenTypes) {
 				sb.append(delim).append("-").append(aec.getQualifiedName());
 				delim = " ";
 			}

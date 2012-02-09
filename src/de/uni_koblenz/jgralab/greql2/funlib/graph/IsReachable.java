@@ -38,9 +38,10 @@ package de.uni_koblenz.jgralab.greql2.funlib.graph;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.Transition;
@@ -68,7 +69,7 @@ public class IsReachable extends Function {
 		BooleanGraphMarker[] markers = new BooleanGraphMarker[dfa.stateList
 				.size()];
 		for (State s : dfa.stateList) {
-			markers[s.number] = new BooleanGraphMarker(u.getGraph());
+			markers[s.number] = new GlobalBooleanGraphMarker(u.getGraph());
 		}
 		Queue<PathSearchQueueEntry> queue = new LinkedList<PathSearchQueueEntry>();
 		PathSearchQueueEntry currentEntry = new PathSearchQueueEntry(u,
@@ -80,7 +81,7 @@ public class IsReachable extends Function {
 			if ((currentEntry.vertex == v) && currentEntry.state.isFinal) {
 				return true;
 			}
-			for (Edge inc : currentEntry.vertex.incidences()) {
+			for (Incidence inc : currentEntry.vertex.getIncidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
 					Vertex nextVertex = currentTransition.getNextVertex(
 							currentEntry.vertex, inc);

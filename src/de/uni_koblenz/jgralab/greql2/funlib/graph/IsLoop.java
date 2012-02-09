@@ -1,6 +1,6 @@
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 
 public class IsLoop extends Function {
@@ -11,7 +11,7 @@ public class IsLoop extends Function {
 				1, 1, 0.01, Category.GRAPH);
 	}
 
-	public Boolean evaluate(Edge e) {
+	public Boolean evaluate(BinaryEdge e) {
 		return e.getAlpha() == e.getOmega();
 	}
 }
