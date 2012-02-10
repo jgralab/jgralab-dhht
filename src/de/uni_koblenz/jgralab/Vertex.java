@@ -504,7 +504,7 @@ public interface Vertex extends GraphElement<VertexClass, Vertex, EdgeClass, Edg
 	 * This method is provided only for compatibility to old TGraph-API.
 	 * Retrieves the first incidence to an edge of the given edge class. 
 	 * Allows to use edge class names instead of (generated) incidence
-	 * class names when working with binary edgesš.
+	 * class names when working with binary edges.
 	 * @param edgeClass 
 	 * @param direction
 	 * @return
