@@ -47,8 +47,6 @@ import java.util.Map;
 import org.apache.tools.ant.types.Quantifier;
 import org.junit.Test;
 
-import com.sun.mirror.declaration.Declaration;
-
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Vertex;
@@ -60,14 +58,20 @@ import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
 import de.uni_koblenz.jgralab.greql2.schema.AggregationPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.AlternativePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.DoubleLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
-import de.uni_koblenz.jgralab.greql2.schema.ForwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.ElementRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
+import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
+import de.uni_koblenz.jgralab.greql2.schema.IncidenceDirection;
+import de.uni_koblenz.jgralab.greql2.schema.IncidenceRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.IntermediateVertexPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.IsAlternativePathOf;
@@ -75,12 +79,14 @@ import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsCompDeclOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsCompResultDefOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsEdgeExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsFirstValueOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsFunctionIdOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsIncTypeIdOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsIntermediateVertexOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsLastValueOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsPartOf;
@@ -92,12 +98,18 @@ import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsStartExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubPathOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTargetExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression;
 import de.uni_koblenz.jgralab.greql2.schema.IteratedPathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.KappaSubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ListConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.ListRangeConstruction;
+import de.uni_koblenz.jgralab.greql2.schema.LocalSubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.NestedSubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.PartialSubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
 import de.uni_koblenz.jgralab.greql2.schema.QuantificationType;
 import de.uni_koblenz.jgralab.greql2.schema.QuantifiedExpression;
@@ -108,8 +120,12 @@ import de.uni_koblenz.jgralab.greql2.schema.RoleId;
 import de.uni_koblenz.jgralab.greql2.schema.SequentialPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.SetConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleEdgePathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.SimplePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.StringLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
 import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
 import de.uni_koblenz.jgralab.greql2.schema.TypeId;
 import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
@@ -904,14 +920,117 @@ public class ParserTest {
 	}
 
 	@Test
-	public void testSimplePathDescription() throws Exception {
+	public void testSimpleEdgePathDescription() throws Exception {
 		Greql2 graph = parseQuery("using v: v --> ");
-		SimplePathDescription pathDescr = graph.getFirstSimplePathDescription();
+		SimpleEdgePathDescription pathDescr = graph
+				.getFirstSimpleEdgePathDescription();
 		// TODO test seriously
 		// for (Vertex v : graph.vertices()) {
 		// System.out.println("VErtex: " + v);
 		// }
 		assertNotNull(pathDescr);
+	}
+
+	@Test
+	public void testSimpleIncidencePathDescription() throws Exception {
+		Greql2 graph = parseQuery("using v: v +>");
+		SimpleIncidencePathDescription pathDescr = graph.getFirstSimpleIncidencePathDescription;
+		assertNotNull(pathDescr);
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
+		assertNotNull(incDirection);
+		assertTrue(incDirection.get_dir() == IncDirection.OUT);
+
+		graph = parseQuery("using v: v <+");
+		SimpleIncidencePathDescription pathDescr = graph.getFirstSimpleIncidencePathDescription;
+		assertNotNull(pathDescr);
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
+		assertNotNull(incDirection);
+		assertTrue(incDirection.get_dir() == IncDirection.IN);
+
+		graph = parseQuery("using v: v <+>");
+		SimpleIncidencePathDescription pathDescr = graph.getFirstSimpleIncidencePathDescription;
+		assertNotNull(pathDescr);
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
+		assertNotNull(incDirection);
+		assertTrue(incDirection.get_dir() == IncDirection.BOTH);
+
+		graph = parseQuery("using v: v +> {V:V}");
+		SimpleIncidencePathDescription pathDescr = graph.getFirstSimpleIncidencePathDescription;
+		assertNotNull(pathDescr);
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
+		assertNotNull(incDirection);
+		assertTrue(incDirection.get_dir() == IncDirection.OUT);
+		ElementRestriction elementRest = graph.getFirstElementRestriction();
+		assertNotNull(elementRest);
+
+		graph = parseQuery("using v: v <+{IncType1}");
+		SimpleIncidencePathDescription pathDescr = graph.getFirstSimpleIncidencePathDescription;
+		assertNotNull(pathDescr);
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
+		assertNotNull(incDirection);
+		assertTrue(incDirection.get_dir() == IncDirection.IN);
+		IncidenceRestriction incRestriction = graph
+				.getFirstIncidenceRestriction();
+		assertNotNull(incRestriction);
+		IsIncTypeIdOf typeIdOf = graph.getFirstIsIncTypeIdOf();
+		assertNotNull(typeIdOf);
+
+	}
+
+	@Test
+	public void testSubgraphExpression() throws Exception {
+		Greql2 graph = parseQuery("(kappa(1) : using v: v +>)");
+		SubgraphExpression subExpr = graph.getFirstSubgraphExpression();
+		assertNotNull(subExpr);
+		SubgraphDefinition subDef = graph.getFirstSubgraphDefinition();
+		assertNotNull(subDef);
+		assertTrue(subDef instanceof KappaSubgraphDefinition);
+		assertTrue(subDef.getKappa() == 1);
+		IsSubgraphDefinitionOf subDefOf = graph
+				.getFirstIsSubgraphDefinitionOf();
+		assertNotNull(subDefOf);
+		assertTrue(subDefOf.getAlpha() == subDef);
+		assertTrue(subDefOf.getOmega() == subExpr);
+
+		graph = parseQuery("(local : true)");
+		subExpr = graph.getFirstSubgraphExpression();
+		assertNotNull(subExpr);
+		subDef = graph.getFirstSubgraphDefinition();
+		assertNotNull(subDef);
+		assertTrue(subDef instanceof LocalSubgraphDefinition);
+		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		assertNotNull(subDefOf);
+		assertTrue(subDefOf.getAlpha() == subDef);
+		assertTrue(subDefOf.getOmega() == subExpr);
+
+		graph = parseQuery("(partial(2) : true)");
+		subExpr = graph.getFirstSubgraphExpression();
+		assertNotNull(subExpr);
+		subDef = graph.getFirstSubgraphDefinition();
+		assertNotNull(subDef);
+		assertTrue(subDef instanceof PartialSubgraphDefinition);
+		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		assertNotNull(subDefOf);
+		assertTrue(subDefOf.getAlpha() == subDef);
+		assertTrue(subDefOf.getOmega() == subExpr);
+
+		graph = parseQuery("using v: (subgraph(v) : from e:E report e end)");
+		subExpr = graph.getFirstSubgraphExpression();
+		assertNotNull(subExpr);
+		subDef = graph.getFirstSubgraphDefinition();
+		assertNotNull(subDef);
+		assertTrue(subDef instanceof NestedSubgraphDefinition);
+		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		assertNotNull(subDefOf);
+		assertTrue(subDefOf.getAlpha() == subDef);
+		assertTrue(subDefOf.getOmega() == subExpr);
+		Comprehension comp = graph.getFirstComprehension();
+		assertNotNull(comp);
+		IsConstrainedExpressionOf isConstExpr = graph
+				.getFirstIsCgonstrainedExpressionOf();
+		assertNotNull(isConstExpr);
+		assertTrue(isConstExpr.getAlpha(), comp);
+		assertTrue(isConstExpr.getOmega(), subExpr);
 	}
 
 	@Test
