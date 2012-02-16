@@ -35,11 +35,10 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf_goalRestrictedPathDescr;
+import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf_startRestrictedPathDescr;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -56,6 +55,12 @@ import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
  */
 public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 
+	/** 
+	 * The costs of on transition
+	 **/
+	protected int transitionCosts = 1;
+	
+	
 	/**
 	 * The NFA which is created out of this PathDescription
 	 */
@@ -106,22 +111,22 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	protected void addGoalRestrictions() {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator goalRestEval = null;
-		IsGoalRestrOf inc = pathDesc
-				.getFirstIsGoalRestrOfIncidence(EdgeDirection.IN);
+		IsGoalRestrOf_goalRestrictedPathDescr inc = pathDesc
+				.getFirst_goalRestrictedPathDescr();
 		if (inc == null) {
 			return;
 		}
 		TypeCollection typeCollection = new TypeCollection();
 		while (inc != null) {
 			VertexEvaluator vertexEval = vertexEvalMarker.getMark(inc
-					.getAlpha());
+					.getThat());
 			if (vertexEval instanceof TypeIdEvaluator) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEval;
 				typeCollection.addTypes((TypeCollection) typeEval.getResult());
 			} else {
 				goalRestEval = vertexEval;
 			}
-			inc = inc.getNextIsGoalRestrOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextGoalRestrictedPathDescrAtVertex();
 		}
 		NFA.addGoalTypeRestriction(getNFA(), typeCollection);
 		if (goalRestEval != null) {
@@ -139,22 +144,21 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	protected void addStartRestrictions() {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator startRestEval = null;
-		IsStartRestrOf inc = pathDesc
-				.getFirstIsStartRestrOfIncidence(EdgeDirection.IN);
+		IsStartRestrOf_startRestrictedPathDescr inc = pathDesc.getFirst_startRestrictedPathDescr();
 		if (inc == null) {
 			return;
 		}
 		TypeCollection typeCollection = new TypeCollection();
 		while (inc != null) {
 			VertexEvaluator vertexEval = vertexEvalMarker.getMark(inc
-					.getAlpha());
+					.getThat());
 			if (vertexEval instanceof TypeIdEvaluator) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEval;
 				typeCollection.addTypes((TypeCollection) typeEval.getResult());
 			} else {
 				startRestEval = vertexEval;
 			}
-			inc = inc.getNextIsStartRestrOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextStartRestrictedPathDescrAtVertex();
 		}
 		NFA.addStartTypeRestriction(getNFA(), typeCollection);
 		if (startRestEval != null) {

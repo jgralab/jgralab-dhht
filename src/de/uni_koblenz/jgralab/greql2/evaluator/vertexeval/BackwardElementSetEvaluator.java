@@ -37,15 +37,14 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import org.pcollections.PSet;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices;
-import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
+import de.uni_koblenz.jgralab.greql2.schema.BackwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
@@ -58,7 +57,7 @@ import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
  */
 public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 
-	BackwardVertexSet vertex;
+	BackwardElementSet vertex;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -68,7 +67,7 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 		return vertex;
 	}
 
-	public BackwardElementSetEvaluator(BackwardVertexSet vertex,
+	public BackwardElementSetEvaluator(BackwardElementSet vertex,
 			GreqlEvaluator eval) {
 		super(eval);
 		this.vertex = vertex;
@@ -79,13 +78,11 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 	private VertexEvaluator targetEval = null;
 
 	private final void initialize() {
-		PathDescription p = (PathDescription) vertex.getFirstIsPathOfIncidence(
-				EdgeDirection.IN).getAlpha();
-		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker
-				.getMark(p);
+		PathDescription p = (PathDescription) vertex.getFirst_isPathOf_GoesTo_PathExpression().getThat();
+		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker.getMark(p);
 
 		Expression targetExpression = (Expression) vertex
-				.getFirstIsTargetExprOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isTargetExprOf_GoesTo_PathExpression().getThat();
 		targetEval = vertexEvalMarker.getMark(targetExpression);
 		NFA revertedNFA = NFA.revertNFA(pathDescEval.getNFA());
 		searchAutomaton = new DFA(revertedNFA);
@@ -106,14 +103,27 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsBackwardVertexSet(
-				this, graphSize);
+		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_GoesTo_PathExpression().getThat();
+		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
+				targetExpression);
+		long targetCosts = vertexEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		PathDescription p = (PathDescription) vertex
+				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
+		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(p);
+		long pathDescCosts = pathDescEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long searchCosts = Math.round(pathDescCosts * searchFactor
+				* Math.sqrt(graphSize.getEdgeCount()));
+		long ownCosts = searchCosts;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = targetCosts + pathDescCosts + iteratedCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityBackwardVertexSet(this, graphSize);
+		return 5;
 	}
 
 }

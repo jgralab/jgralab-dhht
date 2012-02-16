@@ -388,47 +388,13 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 	@Override
 	public VertexCosts calculateCostsAlternativePathDescription(
 			AlternativePathDescriptionEvaluator e, GraphSize graphSize) {
-		AlternativePathDescription p = (AlternativePathDescription) e
-				.getVertex();
-		long aggregatedCosts = 0;
-		IsAlternativePathOf inc = p
-				.getFirstIsAlternativePathOfIncidence(EdgeDirection.IN);
-		long alternatives = 0;
-		while (inc != null) {
-			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) e
-					.getVertexEvalMarker().getMark(inc.getAlpha());
-			aggregatedCosts += pathEval
-					.getCurrentSubtreeEvaluationCosts(graphSize);
-			inc = inc.getNextIsAlternativePathOfIncidence(EdgeDirection.IN);
-			alternatives++;
-		}
-		aggregatedCosts += 10 * alternatives;
-		return new VertexCosts(10 * alternatives, 10 * alternatives,
-				aggregatedCosts);
+
 	}
 
 	@Override
 	public VertexCosts calculateCostsBackwardVertexSet(
 			BackwardElementSetEvaluator e, GraphSize graphSize) {
-		BackwardVertexSet bwvertex = (BackwardVertexSet) e.getVertex();
-		Expression targetExpression = bwvertex
-				.getFirstIsTargetExprOfIncidence().getAlpha();
-		VertexEvaluator vertexEval = e.getVertexEvalMarker().getMark(
-				targetExpression);
-		long targetCosts = vertexEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		PathDescription p = (PathDescription) bwvertex
-				.getFirstIsPathOfIncidence().getAlpha();
-		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) e
-				.getVertexEvalMarker().getMark(p);
-		long pathDescCosts = pathDescEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		long searchCosts = Math.round(pathDescCosts * searchFactor
-				* Math.sqrt(graphSize.getEdgeCount()));
-		long ownCosts = searchCosts;
-		long iteratedCosts = ownCosts * e.getVariableCombinations(graphSize);
-		long subtreeCosts = targetCosts + pathDescCosts + iteratedCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
+
 	}
 
 	/*
@@ -1086,8 +1052,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 	@Override
 	public VertexCosts calculateCostsAggregationPathDescription(
 			AggregationPathDescriptionEvaluator e, GraphSize graphSize) {
-		return new VertexCosts(transitionCosts, transitionCosts,
-				transitionCosts);
+
 	}
 
 	/*

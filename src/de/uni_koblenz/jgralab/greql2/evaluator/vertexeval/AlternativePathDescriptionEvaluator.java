@@ -37,14 +37,13 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import java.util.ArrayList;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.schema.AlternativePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsAlternativePathOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription;
 
 /**
  * Evaluates an alternative path description. Creates a NFA that accepts the
@@ -91,22 +90,33 @@ public class AlternativePathDescriptionEvaluator extends
 
 	@Override
 	public NFA evaluate() {
-		IsAlternativePathOf inc = vertex
-				.getFirstIsAlternativePathOfIncidence(EdgeDirection.IN);
+		IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription inc = vertex
+				.getFirst_isAlternativePathOf_GoesTo_AlternativePathDescription();
 		ArrayList<NFA> nfaList = new ArrayList<NFA>();
 		while (inc != null) {
 			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
-					.getMark(inc.getAlpha());
+					.getMark(inc.getThat());
 			nfaList.add(pathEval.getNFA());
-			inc = inc.getNextIsAlternativePathOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsAlternativePathOf_GoesTo_AlternativePathDescriptionAtVertex();
 		}
 		return NFA.createAlternativePathDescriptionNFA(nfaList);
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsAlternativePathDescription(this, graphSize);
+		long aggregatedCosts = 0;
+		IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription inc = vertex
+				.getFirst_isAlternativePathOf_GoesTo_AlternativePathDescription();
+		long alternatives = 0;
+		while (inc != null) {
+			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(inc.getThat());
+			aggregatedCosts += pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextIsAlternativePathOf_GoesTo_AlternativePathDescriptionAtVertex();
+			alternatives++;
+		}
+		aggregatedCosts += 10 * alternatives;
+		return new VertexCosts(10 * alternatives, 10 * alternatives,
+				aggregatedCosts);
 	}
 
 }

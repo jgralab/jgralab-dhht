@@ -39,18 +39,20 @@ package de.uni_koblenz.jgralab.greql2.serialising;
 
 import java.util.Iterator;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeTypeSubgraph;
 import de.uni_koblenz.jgralab.greql2.funlib.graph.VertexTypeSubgraph;
 import de.uni_koblenz.jgralab.greql2.schema.AggregationPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.AlternativePathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.BackwardVertexSet;
 import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ConditionalExpression;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.Definition;
 import de.uni_koblenz.jgralab.greql2.schema.DefinitionExpression;
+import de.uni_koblenz.jgralab.greql2.schema.DoubleLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
@@ -58,21 +60,20 @@ import de.uni_koblenz.jgralab.greql2.schema.ElementSetExpression;
 import de.uni_koblenz.jgralab.greql2.schema.ExponentiatedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ExpressionDefinedSubgraph;
-import de.uni_koblenz.jgralab.greql2.schema.ForwardVertexSet;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Identifier;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.IntermediateVertexPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsExpressionOnSubgraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
 import de.uni_koblenz.jgralab.greql2.schema.IteratedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.IterationType;
 import de.uni_koblenz.jgralab.greql2.schema.LetExpression;
+import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ListConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.ListRangeConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.Literal;
@@ -95,13 +96,13 @@ import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.SimplePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.StringLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
-import de.uni_koblenz.jgralab.greql2.schema.SubgraphRestrictedExpression;
 import de.uni_koblenz.jgralab.greql2.schema.TableComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
 import de.uni_koblenz.jgralab.greql2.schema.TransposedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.TupleConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.TypeId;
+import de.uni_koblenz.jgralab.greql2.schema.UndefinedLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.ValueConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
@@ -115,7 +116,7 @@ public class GreqlSerializer {
 
 	private StringBuffer sb = null;
 
-	public static String serializeGraph(Greql2 greqlGraph) {
+	public static String serializeGraph(GreqlSyntaxGraph greqlGraph) {
 		GreqlSerializer s = new GreqlSerializer();
 		return s.serializeGreqlVertex(greqlGraph.getFirstGreql2Expression());
 	}
@@ -134,15 +135,15 @@ public class GreqlSerializer {
 	private void serializeGreql2Vertex(Greql2Vertex v, boolean addSpace) {
 		if (v instanceof Declaration) {
 			Declaration d = (Declaration) v;
-			if (d.getFirstIsQuantifiedDeclOfIncidence() != null) {
+			if (d.getFirstIncidenceToIsQuantifiedDeclOf(Direction.BOTH) != null) {
 				serializeDeclaration((Declaration) v, false);
 			} else {
 				serializeDeclaration((Declaration) v, true);
 			}
 		} else if (v instanceof Definition) {
 			serializeDefinition((Definition) v);
-		} else if (v instanceof Direction) {
-			serializeDirection((Direction) v);
+		} else if (v instanceof EdgeDirection) {
+			serializeDirection((EdgeDirection) v);
 		} else if (v instanceof EdgeRestriction) {
 			serializeEdgeRestriction((EdgeRestriction) v);
 		} else if (v instanceof Greql2Expression) {
@@ -219,14 +220,14 @@ public class GreqlSerializer {
 		}
 	}
 
-	private void serializeDirection(Direction v) {
+	private void serializeDirection(EdgeDirection v) {
 		sb.append(v.get_dirValue());
 	}
 
 	private void serializeDefinition(Definition v) {
-		serializeVariable(v.get_var());
+		serializeVariable((Variable) v.getFirst_isVarOf_GoesTo_Definition().getThat());
 		sb.append(" := ");
-		serializeExpression(v.get_expr(), false);
+		serializeExpression((Expression) v.getFirst_isExprOf_GoesTo_Definition().getThat(), false);
 	}
 
 	private void serializeDeclaration(Declaration v, boolean declOfFWR) {

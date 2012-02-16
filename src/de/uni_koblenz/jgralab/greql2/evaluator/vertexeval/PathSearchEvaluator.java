@@ -51,7 +51,13 @@ public abstract class PathSearchEvaluator extends VertexEvaluator {
 	 * The DFA used for PathSearch
 	 */
 	protected DFA searchAutomaton;
-
+	
+	
+	/**
+	 * A factor needed to calculate search costs
+	 */
+	protected int searchFactor = 10;
+	
 	/**
 	 * this is the GReQL-Function which evaluates the pathexistence
 	 */
