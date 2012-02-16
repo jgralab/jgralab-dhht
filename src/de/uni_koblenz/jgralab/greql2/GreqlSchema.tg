@@ -29,6 +29,7 @@ GraphClass GreqlSyntaxGraph;
 EnumDomain IncDirection (IN, OUT, BOTH);
 EnumDomain IterationType (STAR, PLUS);
 EnumDomain QuantificationType (FORALL, EXISTS, EXISTSONE);
+EnumDomain RestrictionType (EDGE, VERTEX, BOTH);
 RecordDomain SourcePosition (offset:Integer, length: Integer);
 
 // A common superclass for all vertices of GReQL2-vertices
@@ -51,7 +52,7 @@ VertexClass EdgeSetExpression: ElementSetExpression;
 VertexClass EdgeSubgraphDefinition: SubgraphDefinition;
 abstract VertexClass ElementRestriction: Greql2Vertex;
 VertexClass ElementSetRestriction: ElementRestriction;
-VertexClass ElementTypeRestriction: ElementRestriction;
+VertexClass ElementTypeRestriction: ElementRestriction {restrType: RestrictionType};
 VertexClass ExponentiatedPathDescription: PathDescription;
 VertexClass ForwardElementSet: PathExpression;
 VertexClass FunctionApplication: Expression;
@@ -138,7 +139,6 @@ BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition 
 BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration (0,*) (1,1);
 BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphExpression (0,*) (1,1);
 BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVariable (1,*) (1,1) to SimpleDeclaration role variableDeclaration (0,1) (1,1);
-BinaryEdgeClass IsDeclarationOf: Greql2Aggregation from SimpleDeclaration role declaredElement (1,*) (1,1) to ElementSetRestriction (1,*) (1,1);
 BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
 BinaryEdgeClass IsEdgeDirectionOf: Greql2Aggregation from EdgeDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
 BinaryEdgeClass IsIncDirectionOf: Greql2Aggregation from IncidenceDirection role direction (1,1) (1,1) to SimpleIncidencePathDescription (1,*) (1,1);
@@ -149,6 +149,7 @@ BinaryEdgeClass IsIncRestrOf: Greql2Aggregation from IncidenceRestriction role i
 BinaryEdgeClass IsExponentOf: Greql2Aggregation from IntLiteral role exponent (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);
+BinaryEdgeClass IsExpressionOfRestriction: Greql2Aggregation from Expression role expression (1,1) (1,1) to ElementSetRestriction (0,*) (1,1);
 BinaryEdgeClass IsFalseExprOf: Greql2Aggregation from Expression role falseExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
 BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication role functionApplication (1,*) (1,1);

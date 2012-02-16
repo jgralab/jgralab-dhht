@@ -1730,7 +1730,7 @@ public class GreqlParser extends ParserHelper {
 			// Starting with E can only mean EdgeTypeList (if a colon follows)
 			// or an ElementSet (e. g. restricting to all Edges)
 			if (tryMatch(TokenTypes.COLON)) {
-				return parseTypeRestriction();
+				return parseTypeRestriction(RestrictionType.EDGE);
 			} else {
 				return parseElementSetRestriction();
 			}
@@ -1740,11 +1740,11 @@ public class GreqlParser extends ParserHelper {
 			match();
 			// Starting with V can mean VertexTypeList (if a colon follows)...
 			if (tryMatch(TokenTypes.COLON)) {
-				return parseTypeRestriction();
+				return parseTypeRestriction(RestrictionType.VERTEX);
 				// Or a VertexAndEdgeTypeList (if an E follows)...
 			} else if (tryMatch(TokenTypes.E)) {
 				match(TokenTypes.COLON);
-				return parseTypeRestriction();
+				return parseTypeRestriction(RestrictionType.BOTH);
 			} else {
 				// Or an ElementSet
 				return parseElementSetRestriction();
@@ -1755,23 +1755,24 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private ElementRestriction parseElementSetRestriction() {
-		List<VertexPosition<SimpleDeclaration>> declarationList = parseDeclarationList();
-		if (declarationList != null && declarationList.size() > 0) {
+		Expression expr = parseExpression();
+		if (expr != null) {
 			ElementSetRestriction setRestriction = graph
 					.createElementSetRestriction();
-			for (VertexPosition<SimpleDeclaration> declaration : declarationList) {
-				graph.createIsDeclarationOf(declaration.node, setRestriction);
-			}
+			graph.createIsExpressionOfRestriction(expr, setRestriction);
 			return setRestriction;
+		} else {
+			fail("No Expression found in ElementSetRestriction");
 		}
 		return null;
 	}
 
-	private ElementRestriction parseTypeRestriction() {
+	private ElementRestriction parseTypeRestriction(RestrictionType rType) {
 		List<VertexPosition<TypeId>> typeList = parseTypeExpressionList();
 		if (typeList != null && typeList.size() > 0) {
 			ElementTypeRestriction typeRestriction = graph
 					.createElementTypeRestriction();
+			typeRestriction.set_restrType(rType);
 			for (VertexPosition<TypeId> type : typeList) {
 				graph.createIsTypeIdOfRestriction(type.node, typeRestriction);
 			}
