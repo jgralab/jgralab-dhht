@@ -132,19 +132,19 @@ BinaryEdgeClass IsCompDeclOf: Greql2Aggregation from Declaration role compDecl (
 // zero or one, cause MapComprehensions don't have a compResultDef but keyExpr, and valueExpr.
 BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compResultDef (0,1) (1,1) to Comprehension (0,*) (1,1);
 BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
-BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration (0,*) (1,1);
+BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration role constrainedDeclaration (0,*) (1,1);
 BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphExpression (0,*) (1,1);
 BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVariable (1,*) (1,1) to SimpleDeclaration role variableDeclaration (0,1) (1,1);
 BinaryEdgeClass IsDeclarationOf: Greql2Aggregation from SimpleDeclaration role declaredElement (1,*) (1,1) to ElementSetRestriction (1,*) (1,1);
 BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
 BinaryEdgeClass IsEdgeDirectionOf: Greql2Aggregation from EdgeDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
 BinaryEdgeClass IsIncDirectionOf: Greql2Aggregation from IncidenceDirection role direction (1,1) (1,1) to SimpleIncidencePathDescription (1,*) (1,1);
-BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription (0,*) (1,1);
+BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription role parentEdgePathDescr (0,*) (1,1);
 BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription role restrictedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsEndRestrictionOf: Greql2Aggregation from ElementRestriction role endRestriction (0,1) (1,1) to PathDescription (0,*) (1,1);
 BinaryEdgeClass IsIncRestrOf: Greql2Aggregation from IncidenceRestriction role incRestr (0,*) (1,1) to SimpleIncidencePathDescription role restrictedIncidencePathDescription (0,*) (1,1);
 BinaryEdgeClass IsExponentOf: Greql2Aggregation from IntLiteral role exponent (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
-BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
+BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription role parentExponentiatedPathDescr (0,*) (1,1);
 BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);
 BinaryEdgeClass IsFalseExprOf: Greql2Aggregation from Expression role falseExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
@@ -165,11 +165,11 @@ BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr 
 BinaryEdgeClass IsRecordElementOf: Greql2Aggregation from RecordElement role recordElement (1,*) (1,1) to RecordConstruction (1,*) (1,1);
 BinaryEdgeClass IsRecordExprOf: Greql2Aggregation from Expression role recordExpr (1,1) (1,1) to RecordElement (0,*) (1,1);
 BinaryEdgeClass IsRecordIdOf: Greql2Aggregation from RecordId role recordId (1,1) (1,1) to RecordElement (1,*) (1,1);
-BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction (1,*) (1,1);
+BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction role edgeRestrWithRoleId (1,*) (1,1);
 BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction (0,1) (1,1);
 BinaryEdgeClass IsRowHeaderExprOf: Greql2Aggregation from Expression role rowHeaderExpr (0,*) (1,1) to TableComprehension (0,*) (1,1);
 BinaryEdgeClass IsSequenceElementOf: IsPathDescriptionOf from PathDescription role sequenceElement (2,*) (1,1) to SequentialPathDescription (0,*) (1,1);
-BinaryEdgeClass IsSimpleDeclOf: Greql2Aggregation from SimpleDeclaration role simpleDecl (1,*) (1,1) to Declaration (1,1) (1,1);
+BinaryEdgeClass IsSimpleDeclOf: Greql2Aggregation from SimpleDeclaration role simpleDecl (1,*) (1,1) to Declaration role parentDeclaration (1,1) (1,1);
 BinaryEdgeClass IsStartExprOf: Greql2Aggregation from Expression role startExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
 BinaryEdgeClass IsStartRestrOf: Greql2Aggregation from Expression role startRestr (0,1) (1,1) to PathDescription role startRestrPathDescr (0,*) (1,1);
 //BinaryEdgeClass IsStartRestrictionOf: Greql2Aggregation from ElementRestriction role startRestriction (0,1) (1,1) to PathDescription (0,*) (1,1);
@@ -186,7 +186,7 @@ BinaryEdgeClass IsTransposedPathOf: IsPathDescriptionOf from PathDescription rol
 BinaryEdgeClass IsTrueExprOf: Greql2Aggregation from Expression role trueExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
 BinaryEdgeClass IsTypeExprOfDeclaration: IsTypeExprOf from Expression role typeExprOfDecl (0,1) (1,1) to SimpleDeclaration (0,*) (1,1);
 BinaryEdgeClass IsTypeExprOfFunction: IsTypeExprOf from Expression role typeExprOfFunc (0,1) (1,1) to FunctionApplication (0,*) (1,1);
-BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction (0,*) (1,1);
+BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction role parentEdgeRestrOfTypeId (0,*) (1,1);
 BinaryEdgeClass IsTypeIdOfRestriction: Greql2Aggregation from TypeId role restrTypeId (0,*) (1,1) to ElementTypeRestriction (0,*) (1,1);
 BinaryEdgeClass IsIncTypeIdOf: Greql2Aggregation from TypeId role incTypeId (0,*) (1,1) to IncidenceRestriction (0,*) (1,1);
 BinaryEdgeClass IsTypeRestrOfExpression: Greql2Aggregation from TypeId role typeRestrOfExpr (0,*) (1,1) to Expression (0,*) (1,1);

@@ -35,6 +35,7 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
@@ -84,7 +85,7 @@ public class ConditionalExpressionEvaluator extends VertexEvaluator {
 	@Override
 	public Object evaluate() {
 		Expression condition = (Expression) vertex
-				.getFirstIsConditionOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirstIncidenceToIsConditionOf(Direction.EDGE_TO_VERTEX).getThat();
 		VertexEvaluator conditionEvaluator = vertexEvalMarker
 				.getMark(condition);
 		Object conditionResult = conditionEvaluator.getResult();
@@ -93,11 +94,11 @@ public class ConditionalExpressionEvaluator extends VertexEvaluator {
 		Boolean value = (Boolean) conditionResult;
 		if (value.booleanValue()) {
 			expressionToEvaluate = (Expression) vertex
-					.getFirstIsTrueExprOfIncidence(EdgeDirection.IN).getAlpha();
+					.getFirstIncidenceToIsTrueExprOf(Direction.EDGE_TO_VERTEX).getThat();
 		} else {
 			expressionToEvaluate = (Expression) vertex
-					.getFirstIsFalseExprOfIncidence(EdgeDirection.IN)
-					.getAlpha();
+					.getFirstIncidenceToIsFalseExprOf(Direction.EDGE_TO_VERTEX)
+					.getThat();
 		}
 
 		if (expressionToEvaluate != null) {
@@ -112,8 +113,31 @@ public class ConditionalExpressionEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCostsConditionalExpression(this, graphSize);
+		Expression condition = (Expression) vertex.getFirstIncidenceToIsConditionOf(Direction.EDGE_TO_VERTEX)
+				.getThat();
+		VertexEvaluator conditionEvaluator = getVertexEvalMarker().getMark(
+				condition);
+		long conditionCosts = conditionEvaluator
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		Expression expressionToEvaluate;
+		expressionToEvaluate = (Expression) vertex.getFirstIncidenceToIsTrueExprOf(Direction.EDGE_TO_VERTEX)
+				.getThat();
+		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
+				expressionToEvaluate);
+		long trueCosts = vertexEval.getCurrentSubtreeEvaluationCosts(graphSize);
+		expressionToEvaluate = (Expression) vertex.getFirstIncidenceToIsFalseExprOf(Direction.EDGE_TO_VERTEX)
+				.getThat();
+		vertexEval = getVertexEvalMarker().getMark(expressionToEvaluate);
+		long falseCosts = vertexEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long maxCosts = trueCosts;
+		if (falseCosts > trueCosts) {
+			maxCosts = falseCosts;
+		}
+		long ownCosts = 4;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + maxCosts + conditionCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 }

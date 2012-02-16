@@ -38,6 +38,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
@@ -45,9 +46,13 @@ import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction;
+import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOfEdgeRestriction_GoesTo_EdgeRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.IsRoleIdOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf_parentEdgeRestrOfTypeId;
+import de.uni_koblenz.jgralab.greql2.schema.PathExpression;
 import de.uni_koblenz.jgralab.greql2.schema.RoleId;
+import de.uni_koblenz.jgralab.greql2.types.Path;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
@@ -122,36 +127,48 @@ public class EdgeRestrictionEvaluator extends VertexEvaluator {
 	public Object evaluate() {
 		if (typeCollection == null) {
 			typeCollection = new TypeCollection();
-			IsTypeIdOf typeInc = vertex
-					.getFirstIsTypeIdOfIncidence(EdgeDirection.IN);
+			IsTypeIdOf_parentEdgeRestrOfTypeId typeInc = vertex.getFirst_parentEdgeRestrOfTypeId();
 			while (typeInc != null) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEvalMarker
-						.getMark(typeInc.getAlpha());
+						.getMark(typeInc.getThat());
 				typeCollection.addTypes((TypeCollection) typeEval.getResult());
-				typeInc = typeInc.getNextIsTypeIdOfIncidence(EdgeDirection.IN);
+				typeInc = typeInc.getNextParentEdgeRestrOfTypeIdAtVertex();
 			}
 		}
 
-		if (vertex.getFirstIsRoleIdOfIncidence() != null) {
+		if (vertex.getFirst_edgeRestrWithRoleId() != null) {
 			validRoles = new HashSet<String>();
-			for (IsRoleIdOf e : vertex.getIsRoleIdOfIncidences()) {
+			for (IsRoleIdOf e : vertex.getIncidentEdgesOfType_IsRoleIdOf()) {
 				RoleId role = (RoleId) e.getAlpha();
 				validRoles.add(role.get_name());
 			}
 		}
-		IsBooleanPredicateOfEdgeRestriction predInc = vertex
-				.getFirstIsBooleanPredicateOfEdgeRestrictionIncidence(EdgeDirection.IN);
+		IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOfEdgeRestriction_GoesTo_EdgeRestriction predInc = vertex
+				.getFirstIncidenceToIsBooleanPredicateOfEdgeRestriction(Direction.EDGE_TO_VERTEX);
 		if (predInc != null) {
 			// System.out.println("Found a BooleanPredicateOfEdge");
-			predicateEvaluator = vertexEvalMarker.getMark(predInc.getAlpha());
+			predicateEvaluator = vertexEvalMarker.getMark(predInc.getThat());
 		}
 		return null;
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsEdgeRestriction(this, graphSize);
+		long subtreeCosts = 0;
+		if (vertex.getFirstIncidenceToIsTypeIdOf(Direction.EDGE_TO_VERTEX) != null) {
+			TypeIdEvaluator tEval = (TypeIdEvaluator) getVertexEvalMarker()
+					.getMark(
+							vertex.getFirstIncidenceToIsTypeIdOf(Direction.EDGE_TO_VERTEX)
+									.getThat());
+			subtreeCosts += tEval.getCurrentSubtreeEvaluationCosts(graphSize);
+		}
+		if (vertex.getFirstIncidenceToIsRoleIdOf(Direction.EDGE_TO_VERTEX) != null) {
+			subtreeCosts += 1;
+		}
+
+		long transitionCosts = 5;
+		return new VertexCosts(transitionCosts, transitionCosts, subtreeCosts
+				+ transitionCosts);
 	}
 
 }

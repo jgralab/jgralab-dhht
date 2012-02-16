@@ -1,3 +1,4 @@
+
 /*
  * JGraLab - The Java Graph Laboratory
  * 
@@ -41,16 +42,18 @@ import java.util.List;
 
 import org.pcollections.PVector;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclaration;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf_constrainedDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_parentDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
@@ -66,6 +69,8 @@ public class DeclarationEvaluator extends VertexEvaluator {
 	 * This is the declaration vertex
 	 */
 	private Declaration vertex;
+	
+	private int declarationCostsFactor = 5;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -90,7 +95,7 @@ public class DeclarationEvaluator extends VertexEvaluator {
 	public VariableDeclarationLayer evaluate() {
 		ArrayList<VertexEvaluator> constraintList = new ArrayList<VertexEvaluator>();
 		for (IsConstraintOf consInc : vertex
-				.getIsConstraintOfIncidences(EdgeDirection.IN)) {
+				.getIncidentEdgesOfType_IsConstraintOf(Direction.EDGE_TO_VERTEX)) {
 			VertexEvaluator curEval = vertexEvalMarker.getMark(consInc
 					.getAlpha());
 			if (curEval != null) {
@@ -100,7 +105,7 @@ public class DeclarationEvaluator extends VertexEvaluator {
 		/* create list of VariableDeclaration objects */
 		List<VariableDeclaration> varDeclList = new ArrayList<VariableDeclaration>();
 		for (IsSimpleDeclOf inc : vertex
-				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
+				.getIncidentEdgesOfType_IsSimpleDeclOf(Direction.EDGE_TO_VERTEX)) {
 			SimpleDeclaration simpleDecl = (SimpleDeclaration) inc.getAlpha();
 			SimpleDeclarationEvaluator simpleDeclEval = (SimpleDeclarationEvaluator) vertexEvalMarker
 					.getMark(simpleDecl);
@@ -118,8 +123,32 @@ public class DeclarationEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel().calculateCostsDeclaration(
-				this, graphSize);
+		IsSimpleDeclOf_parentDeclaration inc = vertex.getFirst_parentDeclaration();
+		long simpleDeclCosts = 0;
+		while (inc != null) {
+			SimpleDeclaration simpleDecl = (SimpleDeclaration) inc.getThat();
+			SimpleDeclarationEvaluator simpleEval = (SimpleDeclarationEvaluator) getVertexEvalMarker().getMark(simpleDecl);
+			simpleDeclCosts += simpleEval
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextParentDeclarationAtVertex();
+		}
+
+		IsConstraintOf_constrainedDeclaration consInc = vertex.getFirst_constrainedDeclaration();
+		int constraintsCosts = 0;
+		while (consInc != null) {
+			VertexEvaluator constraint = getVertexEvalMarker().getMark(
+					consInc.getThat());
+			constraintsCosts += constraint
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			consInc = consInc.getNextConstrainedDeclarationAtVertex();
+		}
+
+		long iterationCosts = getDefinedVariableCombinations(graphSize)
+				* declarationCostsFactor;
+		long ownCosts = iterationCosts + 2;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + constraintsCosts + simpleDeclCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	/**
@@ -138,8 +167,16 @@ public class DeclarationEvaluator extends VertexEvaluator {
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCardinalityDeclaration(
-				this, graphSize);
+		IsConstraintOf_constrainedDeclaration inc = vertex.getFirst_constrainedDeclaration();
+		double selectivity = 1.0;
+		while (inc != null) {
+			VertexEvaluator constEval = getVertexEvalMarker().getMark(
+					inc.getThat());
+			selectivity *= constEval.getEstimatedSelectivity(graphSize);
+			inc = inc.getNextConstrainedDeclarationAtVertex();
+		}
+		return Math.round(getDefinedVariableCombinations(graphSize)
+				* selectivity);
 	}
 
 }
