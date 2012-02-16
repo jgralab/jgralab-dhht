@@ -35,12 +35,13 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
+import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.ExponentiatedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
@@ -85,11 +86,11 @@ public class ExponentiatedPathDescriptionEvaluator extends
 	@Override
 	public NFA evaluate() {
 		PathDescription p = (PathDescription) vertex
-				.getFirstIsExponentiatedPathOfIncidence().getAlpha();
+				.getFirstIncidenceToIsExponentiatedPathOf(Direction.BOTH).getThat();
 		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		VertexEvaluator exponentEvaluator = vertexEvalMarker.getMark(vertex
-				.getFirstIsExponentOfIncidence(EdgeDirection.IN).getAlpha());
+				.getFirstIncidenceToIsExponentOf(Direction.BOTH).getThat());
 		Object exponentValue = exponentEvaluator.getResult();
 		int exponent = 0;
 		if (exponentValue instanceof Integer) {

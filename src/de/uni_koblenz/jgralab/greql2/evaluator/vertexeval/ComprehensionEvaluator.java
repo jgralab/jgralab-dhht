@@ -36,11 +36,12 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import org.pcollections.PCollection;
 
-import de.uni_koblenz.jgralab.EdgeDirection;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 
 public abstract class ComprehensionEvaluator extends VertexEvaluator {
@@ -60,8 +61,8 @@ public abstract class ComprehensionEvaluator extends VertexEvaluator {
 	protected final VertexEvaluator getResultDefinitionEvaluator() {
 		if (resultDefinitionEvaluator == null) {
 			Expression resultDefinition = (Expression) getVertex()
-					.getFirstIsCompResultDefOfIncidence(EdgeDirection.IN)
-					.getAlpha();
+					.getFirstIncidenceToIsCompResultDefOf(Direction.EDGE_TO_VERTEX)
+					.getThat();
 			resultDefinitionEvaluator = vertexEvalMarker
 					.getMark(resultDefinition);
 		}
@@ -71,7 +72,7 @@ public abstract class ComprehensionEvaluator extends VertexEvaluator {
 	protected final VariableDeclarationLayer getVariableDeclationLayer() {
 		if (varDeclLayer == null) {
 			Declaration d = (Declaration) getVertex()
-					.getFirstIsCompDeclOfIncidence(EdgeDirection.IN).getAlpha();
+					.getFirstIncidenceToIsCompDeclOf(Direction.EDGE_TO_VERTEX).getThat();
 			DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
 					.getMark(d);
 			varDeclLayer = (VariableDeclarationLayer) declEval.getResult();

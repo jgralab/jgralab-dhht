@@ -37,10 +37,9 @@ package de.uni_koblenz.jgralab.greql2.evaluator;
 
 import java.util.List;
 
-import com.sun.mirror.declaration.Declaration;
-
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.WrongResultTypeException;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 
 /**
  * This class models all Variables of one Declaration-Vertex. It allows to

@@ -37,13 +37,17 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import org.pcollections.PSet;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
+import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 
@@ -77,7 +81,7 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 		TypeCollection typeCollection = getTypeCollection();
 		while (currentEdge != null) {
 			AttributedElementClass edgeClass = currentEdge
-					.getAttributedElementClass();
+					.getType();
 			if (typeCollection.acceptsType(edgeClass)) {
 				resultSet = resultSet.plus(currentEdge);
 			}
@@ -88,14 +92,30 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsEdgeSetExpression(this, graphSize);
+		long typeRestrCosts = 0;
+		IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression inc = vertex.getFirst_isTypeRestrOfExpression_GoesTo_Expression();
+		while (inc != null) {
+			TypeIdEvaluator tideval = (TypeIdEvaluator) getVertexEvalMarker()
+					.getMark(inc.getThat());
+			typeRestrCosts += tideval
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextIsTypeRestrOfExpression_GoesTo_ExpressionAtVertex();
+		}
+
+		long edgeSetExpressionCostsFactor = 10;
+		long ownCosts = graphSize.getEdgeCount() * edgeSetExpressionCostsFactor ;
+		return new VertexCosts(ownCosts, ownCosts, typeRestrCosts + ownCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityEdgeSetExpression(this, graphSize);
+		Incidence inc = vertex.getFirstIncidenceToIsTypeRestrOfExpression(Direction.BOTH);
+		double selectivity = 1.0;
+		if (inc != null) {
+			TypeIdEvaluator typeIdEval = (TypeIdEvaluator) getVertexEvalMarker().getMark(inc.getThat());
+			selectivity = typeIdEval.getEstimatedSelectivity(graphSize);
+		}
+		return Math.round(graphSize.getEdgeCount() * selectivity);
 	}
 
 }
