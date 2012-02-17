@@ -127,7 +127,7 @@ VertexClass ElementTypeRestriction: ElementRestriction {restrType: RestrictionTy
 BinaryEdgeClass IsStartRestrictionOf: Greql2Aggregation from ElementRestriction role startRestr (0,1) (1,1) to PathDescription role isStartRestrictionOf_omega (0,*) (1,1);
 BinaryEdgeClass IsEndRestrictionOf: Greql2Aggregation from ElementRestriction role endRestriction (0,1) (1,1) to PathDescription role isEndRestrictionOf_omega (0,*) (1,1);
 BinaryEdgeClass IsTypeIdOfRestriction: Greql2Aggregation from TypeId role restrTypeId (0,*) (1,1) to ElementTypeRestriction role isTypeIdOfRestriction_omega (0,*) (1,1);
-BinaryEdgeClass IsExpressionOfRestriction: Greql2Aggregation from Expression role restrExpression (0,*) (1,1) to ElementTypeRestriction role isExpressionOfRestriction_omega (0,*) (1,1);
+BinaryEdgeClass IsExpressionOfRestriction: Greql2Aggregation from Expression role restrExpression (0,*) (1,1) to ElementSetRestriction role isExpressionOfRestriction_omega (0,*) (1,1);
 
 
 VertexClass IncidenceDirection: Greql2Vertex { dir: IncDirection };
