@@ -38,14 +38,16 @@ RecordDomain SourcePosition (offset:Integer, length: Integer);
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////
 
 abstract VertexClass Greql2Vertex;
-VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String};
 abstract VertexClass Expression: Greql2Vertex;
 
-BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression (0,1) (1,1);
-BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression (0,*) (1,1);
 abstract BinaryEdgeClass Greql2Aggregation from Greql2Vertex (0,*) (1,1) to Greql2Vertex (0,*) (1,1) { sourcePositions: List<SourcePosition> } ;
 abstract BinaryEdgeClass IsBoundExprOf: Greql2Aggregation from Expression (1,1) (1,1) to Greql2Vertex (0,*) (1,1);
 abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) (1,1) to Greql2Vertex (0,*) (1,1);
+
+VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String};
+BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression role isBoundVarOf_omega (0,1) (1,1);
+BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression role isQueryExprOf_omega (0,*) (1,1);
+
 
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////
 \\\\\\\\\\                      PATH EXPRESSIONS                     //////////
@@ -56,26 +58,29 @@ VertexClass PathExistence: PathExpression;
 VertexClass BackwardElementSet: PathExpression;
 VertexClass ForwardElementSet: PathExpression;
 
-BinaryEdgeClass IsStartExprOf: Greql2Aggregation from Expression role startExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
-BinaryEdgeClass IsTargetExprOf: Greql2Aggregation from Expression role targetExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
+BinaryEdgeClass IsStartExprOf: Greql2Aggregation from Expression role startExpr (0,1) (1,1) to PathExpression role isStartExprOf_omega (0,*) (1,1);
+BinaryEdgeClass IsTargetExprOf: Greql2Aggregation from Expression role targetExpr (0,1) (1,1) to PathExpression role isTargetExprOf_omega (0,*) (1,1);
 
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////
 \\\\\\\\\\                      PATH DESCRIPTIONS                    //////////
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////
 
+//common superclasses for all path descriptions and their relationships
 abstract VertexClass PathDescription: Expression;
+abstract BinaryEdgeClass IsPathDescriptionOf : Greql2Aggregation from PathDescription (0,*) (1,1) to PathDescription(0,*) (1,1);
+
 abstract VertexClass PrimaryPathDescription: PathDescription;
 abstract VertexClass SimplePathDescription: PrimaryPathDescription;
 VertexClass SimpleIncidencePathDescription: SimplePathDescription;
 VertexClass SimpleEdgePathDescription: SimplePathDescription;
 VertexClass AggregationPathDescription: PrimaryPathDescription {outAggregation: Boolean};
+VertexClass EdgePathDescription: PrimaryPathDescription;
+
 
 VertexClass AlternativePathDescription: PathDescription;
 
-VertexClass EdgePathDescription: PrimaryPathDescription;
-BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction role edgeRestrWithRoleId (1,*) (1,1);
-BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction (0,1) (1,1);
-BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction role parentEdgeRestrOfTypeId (0,*) (1,1);
+
+
 
 
 VertexClass ExponentiatedPathDescription: PathDescription;
@@ -85,14 +90,15 @@ VertexClass OptionalPathDescription: PathDescription;
 VertexClass SequentialPathDescription: PathDescription;
 VertexClass TransposedPathDescription: PathDescription;
 
-
-
-// A common super-class for all Edges that connect PathDescription vertices
-abstract BinaryEdgeClass IsPathDescriptionOf : Greql2Aggregation from PathDescription (0,*) (1,1) to PathDescription(0,*) (1,1);
-BinaryEdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription role alternatePathOf (2,*) (1,1) to AlternativePathDescription  (0,*) (1,1);
-
 BinaryEdgeClass IsEdgeDirectionOf: Greql2Aggregation from EdgeDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
 BinaryEdgeClass IsIncDirectionOf: Greql2Aggregation from IncidenceDirection role direction (1,1) (1,1) to SimpleIncidencePathDescription (1,*) (1,1);
+
+
+
+
+BinaryEdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription role alternativePathOf (2,*) (1,1) to AlternativePathDescription role isAlternativePathOf_omega (0,*) (1,1);
+
+
 BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription role parentEdgePathDescr (0,*) (1,1);
 BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription role restrictedPathDescription (0,*) (1,1);
 BinaryEdgeClass IsEndRestrictionOf: Greql2Aggregation from ElementRestriction role endRestriction (0,1) (1,1) to PathDescription (0,*) (1,1);
@@ -128,8 +134,10 @@ BinaryEdgeClass IsTypeIdOfRestriction: Greql2Aggregation from TypeId role restrT
 VertexClass IncidenceDirection: Greql2Vertex { dir: IncDirection };
 
 VertexClass IncidenceRestriction: Greql2Vertex;
-BinaryEdgeClass IsIncTypeIdOf: Greql2Aggregation from TypeId role incTypeId (0,*) (1,1) to IncidenceRestriction (0,*) (1,1);
-
+BinaryEdgeClass IsIncTypeIdOf: Greql2Aggregation from TypeId role incTypeId (0,*) (1,1) to IncidenceRestriction role isIncTypeIdOf_omega (0,*) (1,1);
+BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction role isRoleIdOf_omega (1,*) (1,1);
+BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction role isBooleanPredicateOf_omega (0,1) (1,1);
+BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction role isTypeIdOf_omega (0,*) (1,1);
 
 
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////
