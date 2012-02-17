@@ -149,7 +149,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * transition has fired. This is the vertex itself
 	 */
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
+	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
 
@@ -166,7 +166,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return false;
 	}
 }

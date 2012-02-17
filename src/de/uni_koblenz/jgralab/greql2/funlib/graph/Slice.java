@@ -210,12 +210,12 @@ public class Slice extends Function {
 			}
 			for (Edge inc : currentEntry.vertex.incidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = currentTransition.getNextVertex(
+					Vertex nextVertex = currentTransition.getNextElement(
 							currentEntry.vertex, inc);
 					if (!isMarked(nextVertex, currentTransition.endState, inc)
 							&& currentTransition.accepts(currentEntry.vertex,
 									inc)) {
-						Edge traversedEdge = currentTransition.consumesEdge() ? inc
+						Edge traversedEdge = currentTransition.consumesIncidence() ? inc
 								: null;
 						/*
 						 * if the vertex is not marked with the state, add it to

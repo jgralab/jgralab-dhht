@@ -44,10 +44,10 @@ public class MultiplicityConstraintViolation extends ConstraintViolation {
 	private String message;
 
 	public MultiplicityConstraintViolation(IncidenceClass ic, String message,
-			Set<? extends GraphElement<?,?,?>> offendingElems) {
+			Set<? extends GraphElement> offendingElems) {
 		super(ic);
 		this.message = message;
-		offendingElements = offendingElems;
+		offendingElements = (Set<? extends TypedElement<?, ?>>) offendingElems;
 	}
 
 	@Override

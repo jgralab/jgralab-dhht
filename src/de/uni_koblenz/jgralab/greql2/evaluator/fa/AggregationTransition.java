@@ -38,7 +38,10 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
@@ -48,6 +51,7 @@ import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 /**
  * This transition accepts an AggregationPathDescription. Am
@@ -243,17 +247,19 @@ public class AggregationTransition extends Transition {
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
 	@Override
-	public boolean accepts(Vertex v, Edge e) {
-		if (e == null) {
+	public boolean accepts(GraphElement elem, Incidence inc) {
+		if (inc == null) {
 			return false;
 		}
-
+		if (inc.getEdge().isBinary())
+			return false;
+		
 		if (aggregateFrom) {
-			if (e.getThatAggregationKind() == AggregationKind.NONE) {
+			if ( inc.getThatSemantics() == IncidenceType.EDGE) {
 				return false;
 			}
 		} else {
-			if (e.getThisAggregationKind() == AggregationKind.NONE) {
+			if (inc.getThisSemantics() == IncidenceType.EDGE) {
 				return false;
 			}
 		}
@@ -318,8 +324,8 @@ public class AggregationTransition extends Transition {
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
-		return e.getThat();
+	public Vertex getNextElement(GraphElement elem, Incidence inc) {
+		return (Vertex) ((elem instanceof Edge) ? inc.getVertex() : inc.getEdge());
 	}
 
 	@Override
@@ -340,7 +346,7 @@ public class AggregationTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return true;
 	}
 }

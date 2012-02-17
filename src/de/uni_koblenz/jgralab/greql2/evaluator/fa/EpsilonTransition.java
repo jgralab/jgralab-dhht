@@ -103,7 +103,7 @@ public class EpsilonTransition extends Transition {
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
+	public Vertex getNextElement(Vertex v, Edge e) {
 		if (e.getAlpha() == v) {
 			return e.getOmega();
 		} else {
@@ -126,7 +126,7 @@ public class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return false;
 	}
 }

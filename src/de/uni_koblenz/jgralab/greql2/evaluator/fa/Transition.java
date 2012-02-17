@@ -36,6 +36,8 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -174,20 +176,20 @@ public abstract class Transition {
 	 * returns true if this transition accepts the given combination of Vertex
 	 * and Edge
 	 */
-	public abstract boolean accepts(Vertex v, Edge e);
+	public abstract boolean accepts(GraphElement elem, Incidence inc);
 
 	/**
-	 * returns the vertex of the datagraph which can be visited after this
-	 * transition has fired. This can be either the vertex itself or the vertex
-	 * at the end of the edge
+	 * returns the element (vertex or edge) of the datagraph which can be visited after this
+	 * transition has fired. This can be either the current element itself or the other one
+	 * at the incidence
 	 */
-	public abstract Vertex getNextVertex(Vertex v, Edge e);
+	public abstract Vertex getNextElement(GraphElement elem, Incidence inc);
 
 	/**
 	 * @return true if the transition consumes an edge (e.g. for a
 	 *         SimpleTransition), false otherwise (e.g. for a goal restriction
 	 *         which does not traverse and consume an edge)
 	 */
-	public abstract boolean consumesEdge();
+	public abstract boolean consumesIncidence();
 
 }

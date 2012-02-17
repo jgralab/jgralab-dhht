@@ -145,14 +145,14 @@ public class PathSystem extends Function {
 
 			for (Edge inc : currentVertex.incidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = currentTransition.getNextVertex(
+					Vertex nextVertex = currentTransition.getNextElement(
 							currentVertex, inc);
 
 					if (!isMarked(marker, nextVertex,
 							currentTransition.endState)) {
 						if (currentTransition.accepts(currentVertex, inc)) {
 							Edge traversedEdge = currentTransition
-									.consumesEdge() ? inc : null;
+									.consumesIncidence() ? inc : null;
 							PathSystemMarkerEntry newEntry = markVertex(marker,
 									nextVertex, currentTransition.endState,
 									currentVertex, traversedEdge,
