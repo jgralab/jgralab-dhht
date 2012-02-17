@@ -136,15 +136,6 @@ import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
 public class DefaultCostModel extends CostModelBase implements CostModel {
 
 
-	@Override
-	public long calculateCardinalityListComprehension(ComprehensionEvaluator e,
-			GraphSize graphSize) {
-		ListComprehension listComp = (ListComprehension) e.getVertex();
-		Declaration decl = listComp.getFirstIsCompDeclOfIncidence().getAlpha();
-		DeclarationEvaluator declEval = (DeclarationEvaluator) e
-				.getVertexEvalMarker().getMark(decl);
-		return declEval.getEstimatedCardinality(graphSize);
-	}
 
 	@Override
 	public long calculateCardinalityConditionalExpression(
@@ -172,51 +163,6 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 	}
 
 
-
-
-
-	@Override
-	public long calculateCardinalityListConstruction(
-			ListConstructionEvaluator e, GraphSize graphSize) {
-		ListConstruction listCons = (ListConstruction) e.getVertex();
-		IsPartOf inc = listCons.getFirstIsPartOfIncidence();
-		long parts = 0;
-		while (inc != null) {
-			parts++;
-			inc = inc.getNextIsPartOfIncidence();
-		}
-		return parts;
-	}
-
-	@Override
-	public long calculateCardinalityListRangeConstruction(
-			ListRangeConstructionEvaluator e, GraphSize graphSize) {
-		ListRangeConstruction exp = (ListRangeConstruction) e.getVertex();
-		VertexEvaluator startExpEval = e.getVertexEvalMarker().getMark(
-				exp.getFirstIsFirstValueOfIncidence(EdgeDirection.IN)
-						.getAlpha());
-		VertexEvaluator targetExpEval = e.getVertexEvalMarker()
-				.getMark(
-						exp.getFirstIsLastValueOfIncidence(EdgeDirection.IN)
-								.getAlpha());
-		long range = 0;
-		if (startExpEval instanceof IntLiteralEvaluator) {
-			if (targetExpEval instanceof IntLiteralEvaluator) {
-				try {
-					range = (((Number) targetExpEval.getResult()).longValue() - ((Number) startExpEval
-							.getResult()).longValue()) + 1;
-				} catch (Exception ex) {
-					// if an exception occurs, the default value is used, so no
-					// exceptionhandling is needed
-				}
-			}
-		}
-		if (range > 0) {
-			return range;
-		} else {
-			return defaultListRangeSize;
-		}
-	}
 
 	@Override
 	public long calculateCardinalityRecordConstruction(
@@ -309,41 +255,6 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seede.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel#
-	 * calculateCostsListComprehension
-	 * (de.uni_koblenz.jgralab.greql2.evaluator.vertexeval
-	 * .ListComprehensionEvaluator,
-	 * de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize)
-	 */
-	@Override
-	public VertexCosts calculateCostsListComprehension(
-			ComprehensionEvaluator e, GraphSize graphSize) {
-		ListComprehension listComp = (ListComprehension) e.getVertex();
-		Declaration decl = listComp.getFirstIsCompDeclOfIncidence().getAlpha();
-		DeclarationEvaluator declEval = (DeclarationEvaluator) e
-				.getVertexEvalMarker().getMark(decl);
-		long declCosts = declEval.getCurrentSubtreeEvaluationCosts(graphSize);
-
-		Vertex resultDef = listComp.getFirstIsCompResultDefOfIncidence()
-				.getAlpha();
-		VertexEvaluator resultDefEval = e.getVertexEvalMarker().getMark(
-				resultDef);
-		long resultCosts = resultDefEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-
-		long ownCosts = declEval.getEstimatedCardinality(graphSize)
-				* addToListCosts;
-		long iteratedCosts = ownCosts * e.getVariableCombinations(graphSize);
-		long subtreeCosts = iteratedCosts + resultCosts + declCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
-
-
-
-
 
 
 
@@ -372,110 +283,6 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 	}
 
 
-
-	@Override
-	public VertexCosts calculateCostsIntermediateVertexPathDescription(
-			IntermediateVertexPathDescriptionEvaluator e, GraphSize graphSize) {
-		IntermediateVertexPathDescription pathDesc = (IntermediateVertexPathDescription) e
-				.getVertex();
-		IsSubPathOf inc = pathDesc.getFirstIsSubPathOfIncidence();
-		PathDescriptionEvaluator firstPathEval = (PathDescriptionEvaluator) e
-				.getVertexEvalMarker().getMark(inc.getAlpha());
-		inc = inc.getNextIsSubPathOfIncidence();
-		PathDescriptionEvaluator secondPathEval = (PathDescriptionEvaluator) e
-				.getVertexEvalMarker().getMark(inc.getAlpha());
-		long firstCosts = firstPathEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		long secondCosts = secondPathEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		VertexEvaluator vertexEval = e.getVertexEvalMarker().getMark(
-				pathDesc.getFirstIsIntermediateVertexOfIncidence().getAlpha());
-		long intermVertexCosts = vertexEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		long ownCosts = 10;
-		long iteratedCosts = 10;
-		long subtreeCosts = iteratedCosts + intermVertexCosts + firstCosts
-				+ secondCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
-
-	@Override
-	public VertexCosts calculateCostsIteratedPathDescription(
-			IteratedPathDescriptionEvaluator e, GraphSize graphSize) {
-		IteratedPathDescription iterPath = (IteratedPathDescription) e
-				.getVertex();
-		VertexEvaluator pathEval = e.getVertexEvalMarker().getMark(
-				iterPath.getFirstIsIteratedPathOfIncidence(EdgeDirection.IN)
-						.getAlpha());
-		long ownCosts = 5;
-		long iteratedCosts = 5;
-		long subtreeCosts = ownCosts
-				+ pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seede.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel#
-	 * calculateCostsListConstruction
-	 * (de.uni_koblenz.jgralab.greql2.evaluator.vertexeval
-	 * .ListConstructionEvaluator,
-	 * de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize)
-	 */
-	@Override
-	public VertexCosts calculateCostsListConstruction(
-			ListConstructionEvaluator e, GraphSize graphSize) {
-		ListConstruction listCons = (ListConstruction) e.getVertex();
-		IsPartOf inc = listCons.getFirstIsPartOfIncidence();
-		long parts = 0;
-		long partCosts = 0;
-		while (inc != null) {
-			VertexEvaluator veval = e.getVertexEvalMarker().getMark(
-					inc.getAlpha());
-			partCosts += veval.getCurrentSubtreeEvaluationCosts(graphSize);
-			parts++;
-			inc = inc.getNextIsPartOfIncidence();
-		}
-
-		long ownCosts = (parts * addToListCosts) + 2;
-		long iteratedCosts = ownCosts * e.getVariableCombinations(graphSize);
-		long subtreeCosts = iteratedCosts + partCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
-
-	@Override
-	public VertexCosts calculateCostsListRangeConstruction(
-			ListRangeConstructionEvaluator e, GraphSize graphSize) {
-		ListRangeConstruction exp = (ListRangeConstruction) e.getVertex();
-		VertexEvaluator startExpEval = e.getVertexEvalMarker().getMark(
-				exp.getFirstIsFirstValueOfIncidence().getAlpha());
-		VertexEvaluator targetExpEval = e.getVertexEvalMarker().getMark(
-				exp.getFirstIsLastValueOfIncidence().getAlpha());
-		long startCosts = startExpEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		long targetCosts = targetExpEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		long range = 0;
-		if (startExpEval instanceof IntLiteralEvaluator) {
-			if (targetExpEval instanceof IntLiteralEvaluator) {
-				try {
-					range = (((Number) targetExpEval.getResult()).longValue() - ((Number) startExpEval
-							.getResult()).longValue()) + 1;
-				} catch (Exception ex) {
-					// if an exception occurs, the default value is used, so no
-					// exceptionhandling is needed
-				}
-			}
-		}
-		if (range <= 0) {
-			range = defaultListRangeSize;
-		}
-		long ownCosts = addToListCosts * range;
-		long iteratedCosts = ownCosts * e.getVariableCombinations(graphSize);
-		long subtreeCosts = iteratedCosts + startCosts + targetCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
 
 	@Override
 	public VertexCosts calculateCostsOptionalPathDescription(

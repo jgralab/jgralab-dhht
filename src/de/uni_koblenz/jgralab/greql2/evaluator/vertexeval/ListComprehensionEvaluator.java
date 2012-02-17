@@ -42,11 +42,14 @@ import org.pcollections.PCollection;
 import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.JGraLab;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf_isTableHeaderOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
 import de.uni_koblenz.jgralab.greql2.types.Table;
 
@@ -92,13 +95,13 @@ public class ListComprehensionEvaluator extends ComprehensionEvaluator {
 	@Override
 	protected PCollection<Object> getResultDatastructure() {
 		if (createHeader == null) {
-			if (vertex.getFirstIsTableHeaderOfIncidence(EdgeDirection.IN) != null) {
+			if (vertex.getFirst_isTableHeaderOf_omega() != null) {
 				headerEvaluators = new ArrayList<VertexEvaluator>();
 				createHeader = true;
-				for (IsTableHeaderOf tableInc : vertex
-						.getIsTableHeaderOfIncidences(EdgeDirection.IN)) {
+				for (IsTableHeaderOf_isTableHeaderOf_omega tableInc : vertex
+						.getIncidences(IsTableHeaderOf_isTableHeaderOf_omega.class)) {
 					VertexEvaluator headerEval = vertexEvalMarker
-							.getMark(tableInc.getAlpha());
+							.getMark(tableInc.getThat());
 					headerEvaluators.add(headerEval);
 				}
 			} else {
@@ -119,14 +122,29 @@ public class ListComprehensionEvaluator extends ComprehensionEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsListComprehension(
-				this, graphSize);
+		Declaration decl = (Declaration) vertex.getFirst_isCompDeclOf_omega().getThat();
+		DeclarationEvaluator declEval = (DeclarationEvaluator) 
+				getVertexEvalMarker().getMark(decl);
+		long declCosts = declEval.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		Vertex resultDef = vertex.getFirst_isCompDeclOf_omega().getThat();
+		VertexEvaluator resultDefEval = getVertexEvalMarker().getMark(
+				resultDef);
+		long resultCosts = resultDefEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		long ownCosts = declEval.getEstimatedCardinality(graphSize)
+				* 1;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + resultCosts + declCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityListComprehension(this, graphSize);
+		Declaration decl = (Declaration) vertex.getFirst_isCompDeclOf_omega().getThat();
+		DeclarationEvaluator declEval = (DeclarationEvaluator) getVertexEvalMarker().getMark(decl);
+		return declEval.getEstimatedCardinality(graphSize);
 	}
 
 }

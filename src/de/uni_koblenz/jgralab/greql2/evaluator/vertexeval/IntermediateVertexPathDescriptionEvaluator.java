@@ -43,6 +43,7 @@ import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IntermediateVertexPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubPathOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubPathOf_isSubPathOf_omega;
 
 /**
  * Evaluates an IntermediateVertexPathDescription.
@@ -83,26 +84,42 @@ public class IntermediateVertexPathDescriptionEvaluator extends
 
 	@Override
 	public NFA evaluate() {
-		IsSubPathOf inc = vertex.getFirstIsSubPathOfIncidence(EdgeDirection.IN);
+		IsSubPathOf_isSubPathOf_omega inc = vertex.getFirst_isSubPathOf_omega();
 		PathDescriptionEvaluator firstEval = (PathDescriptionEvaluator) vertexEvalMarker
-				.getMark(inc.getAlpha());
+				.getMark(inc.getThat());
 		NFA firstNFA = firstEval.getNFA();
-		inc = inc.getNextIsSubPathOfIncidence(EdgeDirection.IN);
+		inc = inc.getNextIsSubPathOf_omegaAtVertex();
 		PathDescriptionEvaluator secondEval = (PathDescriptionEvaluator) vertexEvalMarker
-				.getMark(inc.getAlpha());
+				.getMark(inc.getThat());
 		NFA secondNFA = secondEval.getNFA();
 		VertexEvaluator vertexEval = vertexEvalMarker.getMark(vertex
-				.getFirstIsIntermediateVertexOfIncidence(EdgeDirection.IN)
-				.getAlpha());
+				.getFirst_isIntermediateVertexOf_omega()
+				.getThat());
 		return NFA.createIntermediateVertexPathDescriptionNFA(firstNFA,
 				vertexEval, secondNFA);
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsIntermediateVertexPathDescription(this,
-						graphSize);
+		IsSubPathOf_isSubPathOf_omega inc = vertex.getFirst_isSubPathOf_omega();
+		PathDescriptionEvaluator firstPathEval = (PathDescriptionEvaluator) 
+				getVertexEvalMarker().getMark(inc.getThat());
+		inc = inc.getNextIsSubPathOf_omegaAtVertex();
+		PathDescriptionEvaluator secondPathEval = (PathDescriptionEvaluator) 
+				getVertexEvalMarker().getMark(inc.getThat());
+		long firstCosts = firstPathEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long secondCosts = secondPathEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
+				vertex.getFirst_isIntermediateVertexOf_omega().getThat());
+		long intermVertexCosts = vertexEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long ownCosts = 10;
+		long iteratedCosts = 10;
+		long subtreeCosts = iteratedCosts + intermVertexCosts + firstCosts
+				+ secondCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 }

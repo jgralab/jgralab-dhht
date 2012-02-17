@@ -86,9 +86,9 @@ public class ListRangeConstructionEvaluator extends VertexEvaluator {
 
 	private void getEvals() {
 		Expression firstElementExpression = (Expression) vertex
-				.getFirstIsFirstValueOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isFirstValueOf_omega().getThat();
 		Expression lastElementExpression = (Expression) vertex
-				.getFirstIsLastValueOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isLastValueOf_omega().getThat();
 		firstElementEvaluator = vertexEvalMarker
 				.getMark(firstElementExpression);
 		lastElementEvaluator = vertexEvalMarker.getMark(lastElementExpression);
@@ -121,14 +121,50 @@ public class ListRangeConstructionEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsListRangeConstruction(this, graphSize);
+		long startCosts = firstElementEvaluator
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long targetCosts = lastElementEvaluator
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long range = 0;
+		if (firstElementEvaluator instanceof IntLiteralEvaluator) {
+			if (lastElementEvaluator instanceof IntLiteralEvaluator) {
+				try {
+					range = (((Number) lastElementEvaluator.getResult()).longValue() - ((Number) firstElementEvaluator
+							.getResult()).longValue()) + 1;
+				} catch (Exception ex) {
+					// if an exception occurs, the default value is used, so no
+					// exceptionhandling is needed
+				}
+			}
+		}
+		if (range <= 0) {
+			range = 10;
+		}
+		long ownCosts =  range;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + startCosts + targetCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityListRangeConstruction(this, graphSize);
+		long range = 0;
+		if (firstElementEvaluator instanceof IntLiteralEvaluator) {
+			if (lastElementEvaluator instanceof IntLiteralEvaluator) {
+				try {
+					range = (((Number) lastElementEvaluator.getResult()).longValue() - ((Number) firstElementEvaluator
+							.getResult()).longValue()) + 1;
+				} catch (Exception ex) {
+					// if an exception occurs, the default value is used, so no
+					// exceptionhandling is needed
+				}
+			}
+		}
+		if (range > 0) {
+			return range;
+		} else {
+			return 10;
+		}
 	}
 
 }
