@@ -84,8 +84,7 @@ public class TransposedPathDescriptionEvaluator extends
 	@Override
 	public NFA evaluate() {
 		PathDescription p = (PathDescription) vertex
-				.getFirstIsTransposedPathOfIncidence(EdgeDirection.IN)
-				.getAlpha();
+				.getFirst_isTransposedPathOf_omega().getThat();
 		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		return NFA.createTransposedPathDescriptionNFA(pathEval.getNFA());
@@ -93,8 +92,14 @@ public class TransposedPathDescriptionEvaluator extends
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsTransposedPathDescription(this, graphSize);
+		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(
+						vertex.getFirst_isTransposedPathOf_omega()
+								.getThat());
+		long pathCosts = pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
+		long transpositionCosts = pathCosts / 20;
+		long subtreeCosts = transpositionCosts + pathCosts;
+		return new VertexCosts(transpositionCosts, transpositionCosts,
+				subtreeCosts);
 	}
 
 }

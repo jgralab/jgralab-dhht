@@ -40,6 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
@@ -63,7 +64,6 @@ public class ThisEdgeEvaluator extends VariableEvaluator {
 	 */
 	public ThisEdgeEvaluator(ThisEdge vertex, GreqlEvaluator eval) {
 		super(vertex, eval);
-		// this.vertex = vertex;
 	}
 
 	// calculates the set of depending expressions of this evaluator, but using
@@ -84,15 +84,14 @@ public class ThisEdgeEvaluator extends VariableEvaluator {
 					&& (!(eval instanceof SimpleDeclarationEvaluator))) {
 				dependingEvaluators.add(eval);
 			}
-			Greql2Aggregation currentEdge = currentVertex
-					.getFirstGreql2AggregationIncidence(EdgeDirection.OUT);
+			Incidence currentEdge = currentVertex
+					.getFirstIncidence();
 			while (currentEdge != null) {
 				Greql2Vertex nextVertex = (Greql2Vertex) currentEdge.getThat();
 				if (!(nextVertex instanceof PathDescription)) {
 					queue.add(nextVertex);
 				}
-				currentEdge = currentEdge
-						.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
+				currentEdge = currentEdge.getNextIncidenceAtVertex();
 			}
 		}
 		return dependingEvaluators;

@@ -31,13 +31,17 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf_constrainedExpression;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf_isConstrainedExpressionOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
 
@@ -54,6 +58,8 @@ public class SubgraphExpressionEvaluator extends
 	protected SubgraphExpression vertex;
 
 	SubgraphDefinitionEvaluator subgraphDefinitionEval;
+	
+	VertexEvaluator exprEval = null;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -67,33 +73,32 @@ public class SubgraphExpressionEvaluator extends
 	public Object evaluate() {
 		// take traversal context for subgraph
 		if (subgraphDefinitionEval == null) {
-			IsSubgraphDefinitionOf isSubgraphDef = vertex
-					.getFirstIsSubgraphDefinitionOfIncidence(EdgeDirection.IN);
+			IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega isSubgraphDef = vertex
+					.getFirst_isSubgraphDefinitionOf_omega();
 			SubgraphDefinition defVertex = (SubgraphDefinition) isSubgraphDef
 					.getThat();
 			subgraphDefinitionEval = (SubgraphDefinitionEvaluator) vertexEvalMarker
 					.getMark(defVertex);
 		}
-		TraversalContext subgraph = (TraversalContext) subgraphDefinitionEval
+		Graph subgraph = (Graph) subgraphDefinitionEval
 				.getResult();
 
 		// take restricted expression
 		if (exprEval == null) {
-			IsExpressionOnSubgraph isExprOn = vertex
-					.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
+			IsConstrainedExpressionOf_isConstrainedExpressionOf_omega isExprOn =  vertex
+					.getFirst_isConstrainedExpressionOf_omega();
 			Expression expr = (Expression) isExprOn.getThat();
 			exprEval = (VertexEvaluator) vertexEvalMarker.getMark(expr);
 		}
 
 		// set traversal context
-		TraversalContext oldTraversalContext = graph.getTraversalContext();
-		graph.setTraversalContext(subgraph);
+		subgraph.useAsTraversalContext();
 
 		// evaluate restricted expression with traversal context
 		result = exprEval.getResult();
 
 		// release traversal context
-		graph.setTraversalContext(oldTraversalContext);
+		subgraph.releaseTraversalContext();
 		return result;
 	}
 
@@ -103,8 +108,8 @@ public class SubgraphExpressionEvaluator extends
 		// greqlEvaluator.getCostModel().calculateCostsSubgraphRestrictedExpression(this,
 		// graphSize);
 		if (subgraphDefinitionEval == null) {
-			IsSubgraphDefinitionOf isSubgraphDef = vertex
-					.getFirstIsSubgraphDefinitionOfIncidence(EdgeDirection.IN);
+			IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega isSubgraphDef = vertex
+					.getFirst_isSubgraphDefinitionOf_omega();
 			SubgraphDefinition defVertex = (SubgraphDefinition) isSubgraphDef
 					.getThat();
 			subgraphDefinitionEval = (SubgraphDefinitionEvaluator) vertexEvalMarker
@@ -113,8 +118,8 @@ public class SubgraphExpressionEvaluator extends
 
 		// take restricted expression
 		if (exprEval == null) {
-			IsExpressionOnSubgraph isExprOn = vertex
-					.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
+			IsConstrainedExpressionOf_isConstrainedExpressionOf_omega isExprOn =vertex
+					.getFirst_isConstrainedExpressionOf_omega();
 			Expression expr = (Expression) isExprOn.getThat();
 			exprEval = (VertexEvaluator) vertexEvalMarker.getMark(expr);
 		}

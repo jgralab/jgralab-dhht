@@ -296,7 +296,7 @@ public abstract class DefaultWriter {
 	 * @param s
 	 *            the SubGraphMarker to write
 	 */
-	protected void writeSubGraphMarker(SubGraphMarker s) throws Exception {
+	protected void writeSubGraphMarker(GraphMarker s) throws Exception {
 		cantWrite(s);
 	}
 

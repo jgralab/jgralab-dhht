@@ -96,7 +96,7 @@ public class TypeCollection {
 	 *            toggles wether the given types should be added to the allowed
 	 *            or forbidden types
 	 */
-	public TypeCollection(Collection<TypedElementClass> types,
+	public TypeCollection(Collection<? extends TypedElementClass> types,
 			boolean forbidden) {
 		this();
 		if (forbidden) {
