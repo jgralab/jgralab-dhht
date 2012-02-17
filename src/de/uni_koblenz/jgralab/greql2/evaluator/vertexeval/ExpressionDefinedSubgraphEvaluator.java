@@ -7,6 +7,7 @@ import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ExpressionDefinedSubgraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression_isSubgraphDefiningExpression_omega;
 
 public class ExpressionDefinedSubgraphEvaluator extends SubgraphDefinitionEvaluator {
 
@@ -24,7 +25,8 @@ public class ExpressionDefinedSubgraphEvaluator extends SubgraphDefinitionEvalua
 	public Object evaluate() {
 		if (subgraphDefExprEvaluator == null) {	
 			ExpressionDefinedSubgraph exprDefinedSubgraph = (ExpressionDefinedSubgraph) vertex;
-			IsSubgraphDefiningExpression isSubgraphDefiningExpression = exprDefinedSubgraph.getFirstIsSubgraphDefiningExpressionIncidence(EdgeDirection.IN);
+			IsSubgraphDefiningExpression_isSubgraphDefiningExpression_omega isSubgraphDefiningExpression 
+				= exprDefinedSubgraph.getFirst_isSubgraphDefiningExpression_omega();
 			Expression subgraphDefExpr = (Expression) isSubgraphDefiningExpression.getThat();
 			subgraphDefExprEvaluator = vertexEvalMarker.getMark(subgraphDefExpr);
 		}	
@@ -34,7 +36,8 @@ public class ExpressionDefinedSubgraphEvaluator extends SubgraphDefinitionEvalua
 	@Override
 	protected VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
 		ExpressionDefinedSubgraph exprDefinedSubgraph = (ExpressionDefinedSubgraph) vertex;
-		IsSubgraphDefiningExpression isSubgraphDefiningExpression = exprDefinedSubgraph.getFirstIsSubgraphDefiningExpressionIncidence(EdgeDirection.IN);
+		IsSubgraphDefiningExpression_isSubgraphDefiningExpression_omega isSubgraphDefiningExpression 
+		= exprDefinedSubgraph.getFirst_isSubgraphDefiningExpression_omega();
 		Expression subgraphDefExpr = (Expression) isSubgraphDefiningExpression.getThat();
 		subgraphDefExprEvaluator = vertexEvalMarker.getMark(subgraphDefExpr);
 		return subgraphDefExprEvaluator.calculateSubtreeEvaluationCosts(graphSize);

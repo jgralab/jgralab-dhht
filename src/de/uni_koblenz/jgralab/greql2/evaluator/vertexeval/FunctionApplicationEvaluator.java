@@ -50,7 +50,9 @@ import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf_isArgumentOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfFunction_isTypeExprOfFunction_omega;
 import de.uni_koblenz.jgralab.greql2.schema.TypeId;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -94,9 +96,7 @@ public class FunctionApplicationEvaluator extends VertexEvaluator {
 	 */
 	public String getFunctionName() {
 		if (functionName == null) {
-			FunctionId id = (FunctionId) vertex
-					.getFirstIsFunctionIdOfIncidence(EdgeDirection.IN)
-					.getAlpha();
+			FunctionId id = (FunctionId) vertex.getFirst_isFunctionIdOf_omega().getThat();
 			functionName = id.get_name();
 		}
 		return functionName;
@@ -146,15 +146,15 @@ public class FunctionApplicationEvaluator extends VertexEvaluator {
 	 */
 	protected ArrayList<VertexEvaluator> createVertexEvaluatorList() {
 		ArrayList<VertexEvaluator> vertexEvalList = new ArrayList<VertexEvaluator>();
-		IsArgumentOf inc = vertex
-				.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
+		IsArgumentOf_isArgumentOf_omega inc = vertex
+				.getFirst_isArgumentOf_omega();
 		while (inc != null) {
-			Expression currentParameterExpr = (Expression) inc.getAlpha();
+			Expression currentParameterExpr = (Expression) inc.getThat();
 			// maybe the vertex has no evaluator
 			VertexEvaluator paramEval = vertexEvalMarker
 					.getMark(currentParameterExpr);
 			vertexEvalList.add(paramEval);
-			inc = inc.getNextIsArgumentOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsArgumentOf_omegaAtVertex();
 		}
 		return vertexEvalList;
 	}
@@ -164,17 +164,17 @@ public class FunctionApplicationEvaluator extends VertexEvaluator {
 	 */
 	private TypeCollection createTypeArgument() {
 		TypeId typeId;
-		IsTypeExprOf typeEdge = vertex
-				.getFirstIsTypeExprOfIncidence(EdgeDirection.IN);
+		IsTypeExprOfFunction_isTypeExprOfFunction_omega typeEdge = vertex
+				.getFirst_isTypeExprOfFunction_omega();
 		TypeCollection typeCollection = null;
 		if (typeEdge != null) {
 			typeCollection = new TypeCollection();
 			while (typeEdge != null) {
-				typeId = (TypeId) typeEdge.getAlpha();
+				typeId = (TypeId) typeEdge.getThat();
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEvalMarker
 						.getMark(typeId);
 				typeCollection.addTypes((TypeCollection) typeEval.getResult());
-				typeEdge = typeEdge.getNextIsTypeExprOfIncidence(EdgeDirection.IN);
+				typeEdge = typeEdge.getNextIsTypeExprOfFunction_omegaAtVertex();
 			}
 		}
 		return typeCollection;
@@ -220,20 +220,53 @@ public class FunctionApplicationEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsFunctionApplication(this, graphSize);
+		IsArgumentOf_isArgumentOf_omega inc = vertex
+				.getFirst_isArgumentOf_omega();
+		long argCosts = 0;
+		ArrayList<Long> elements = new ArrayList<Long>();
+		while (inc != null) {
+			VertexEvaluator argEval = getVertexEvalMarker().getMark(
+					inc.getThat());
+			argCosts += argEval.getCurrentSubtreeEvaluationCosts(graphSize);
+			elements.add(argEval.getEstimatedCardinality(graphSize));
+			inc = inc.getNextIsArgumentOf_omegaAtVertex();
+		}
+
+		Function func = getFunction();
+		long ownCosts = func.getEstimatedCosts(elements);
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + argCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public double calculateEstimatedSelectivity(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateSelectivityFunctionApplication(this, graphSize);
+		Function func = getFunction();
+		if (func != null) {
+			return func.getSelectivity();
+		} else {
+			return 1;
+		}
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityFunctionApplication(this, graphSize);
+		IsArgumentOf_isArgumentOf_omega inc = vertex
+				.getFirst_isArgumentOf_omega();
+		int elements = 0;
+		while (inc != null) {
+			VertexEvaluator argEval = getVertexEvalMarker().getMark(
+					inc.getThat());
+			elements += argEval.getEstimatedCardinality(graphSize);
+			inc = inc.getNextIsArgumentOf_omegaAtVertex();
+		}
+
+		Function func = getFunction();
+		if (func != null) {
+			return func.getEstimatedCardinality(elements);
+		} else {
+			return 1;
+		}
 	}
 
 }

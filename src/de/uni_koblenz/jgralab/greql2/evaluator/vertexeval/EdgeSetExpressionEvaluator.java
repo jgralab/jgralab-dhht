@@ -47,7 +47,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSetExpression;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression_isTypeRestrOfExpression_omega;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 
@@ -72,6 +72,7 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 		super(vertex, eval);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public PSet<Edge> evaluate() {
 		Graph datagraph = greqlEvaluator.getDatagraph();
@@ -93,13 +94,13 @@ public class EdgeSetExpressionEvaluator extends ElementSetExpressionEvaluator {
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
 		long typeRestrCosts = 0;
-		IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression inc = vertex.getFirst_isTypeRestrOfExpression_GoesTo_Expression();
+		IsTypeRestrOfExpression_isTypeRestrOfExpression_omega inc = vertex.getFirst_isTypeRestrOfExpression_omega();
 		while (inc != null) {
 			TypeIdEvaluator tideval = (TypeIdEvaluator) getVertexEvalMarker()
 					.getMark(inc.getThat());
 			typeRestrCosts += tideval
 					.getCurrentSubtreeEvaluationCosts(graphSize);
-			inc = inc.getNextIsTypeRestrOfExpression_GoesTo_ExpressionAtVertex();
+			inc = inc.getNextIsTypeRestrOfExpression_omegaAtVertex();
 		}
 
 		long edgeSetExpressionCostsFactor = 10;

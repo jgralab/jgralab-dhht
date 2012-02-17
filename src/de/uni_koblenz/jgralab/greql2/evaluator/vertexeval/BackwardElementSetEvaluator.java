@@ -82,7 +82,7 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker.getMark(p);
 
 		Expression targetExpression = (Expression) vertex
-				.getFirst_isTargetExprOf_GoesTo_PathExpression().getThat();
+				.getFirst_isTargetExprOf_omega().getThat();
 		targetEval = vertexEvalMarker.getMark(targetExpression);
 		NFA revertedNFA = NFA.revertNFA(pathDescEval.getNFA());
 		searchAutomaton = new DFA(revertedNFA);
@@ -103,7 +103,7 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_GoesTo_PathExpression().getThat();
+		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_omega().getThat();
 		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
 				targetExpression);
 		long targetCosts = vertexEval

@@ -51,9 +51,9 @@ import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf_constrainedDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf_isConstraintOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_parentDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
@@ -123,24 +123,24 @@ public class DeclarationEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		IsSimpleDeclOf_parentDeclaration inc = vertex.getFirst_parentDeclaration();
+		IsSimpleDeclOf_isSimpleDeclOf_omega inc = vertex.getFirst_isSimpleDeclOf_omega();
 		long simpleDeclCosts = 0;
 		while (inc != null) {
 			SimpleDeclaration simpleDecl = (SimpleDeclaration) inc.getThat();
 			SimpleDeclarationEvaluator simpleEval = (SimpleDeclarationEvaluator) getVertexEvalMarker().getMark(simpleDecl);
 			simpleDeclCosts += simpleEval
 					.getCurrentSubtreeEvaluationCosts(graphSize);
-			inc = inc.getNextParentDeclarationAtVertex();
+			inc = inc.getNextIsSimpleDeclOf_omegaAtVertex();
 		}
 
-		IsConstraintOf_constrainedDeclaration consInc = vertex.getFirst_constrainedDeclaration();
+		IsConstraintOf_isConstraintOf_omega consInc = vertex.getFirst_isConstraintOf_omega();
 		int constraintsCosts = 0;
 		while (consInc != null) {
 			VertexEvaluator constraint = getVertexEvalMarker().getMark(
 					consInc.getThat());
 			constraintsCosts += constraint
 					.getCurrentSubtreeEvaluationCosts(graphSize);
-			consInc = consInc.getNextConstrainedDeclarationAtVertex();
+			consInc = consInc.getNextIsConstraintOf_omegaAtVertex();
 		}
 
 		long iterationCosts = getDefinedVariableCombinations(graphSize)
@@ -167,13 +167,13 @@ public class DeclarationEvaluator extends VertexEvaluator {
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		IsConstraintOf_constrainedDeclaration inc = vertex.getFirst_constrainedDeclaration();
+		IsConstraintOf_isConstraintOf_omega inc = vertex.getFirst_isConstraintOf_omega();
 		double selectivity = 1.0;
 		while (inc != null) {
 			VertexEvaluator constEval = getVertexEvalMarker().getMark(
 					inc.getThat());
 			selectivity *= constEval.getEstimatedSelectivity(graphSize);
-			inc = inc.getNextConstrainedDeclarationAtVertex();
+			inc = inc.getNextIsConstraintOf_omegaAtVertex();
 		}
 		return Math.round(getDefinedVariableCombinations(graphSize)
 				* selectivity);

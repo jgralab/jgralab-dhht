@@ -43,12 +43,13 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.UndefinedVariableException;
 import de.uni_koblenz.jgralab.greql2.exception.UnknownTypeException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsIdOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf_isBoundVarOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsIdOfStoreClause;
+import de.uni_koblenz.jgralab.greql2.schema.IsIdOfStoreClause_isIdOfStoreClause_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -95,20 +96,20 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 	}
 
 	private void initializeBoundVariables() {
-		IsBoundVarOf inc = vertex
-				.getFirstIsBoundVarOfIncidence(EdgeDirection.IN);
+		IsBoundVarOf_isBoundVarOf_omega inc = vertex
+				.getFirst_isBoundVarOf_omega();
 		while (inc != null) {
-			Variable currentBoundVariable = inc.getAlpha();
+			Variable currentBoundVariable = (Variable) inc.getThat();
 			Object variableValue = boundVariables.get(currentBoundVariable
 					.get_name());
 			if (variableValue == null) {
 				throw new UndefinedVariableException(currentBoundVariable,
-						createSourcePositions(inc));
+						createSourcePositions(inc.getEdge()));
 			}
 			VariableEvaluator variableEval = (VariableEvaluator) vertexEvalMarker
 					.getMark(currentBoundVariable);
 			variableEval.setValue(variableValue);
-			inc = inc.getNextIsBoundVarOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsBoundVarOf_omegaAtVertex();
 		}
 	}
 
@@ -168,16 +169,15 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 			}
 		}
 
-		Expression boundExpression = vertex.getFirstIsQueryExprOfIncidence(
-				EdgeDirection.IN).getAlpha();
+		Expression boundExpression = (Expression) vertex.getFirst_isQueryExprOf_omega().getThat();
 		VertexEvaluator eval = vertexEvalMarker.getMark(boundExpression);
 		Object result = eval.getResult();
 		// if the query contains a "store as " - clause, there is a
 		// "isIdOfInc"-Incidence connected with the Greql2Expression
-		IsIdOf storeInc = vertex.getFirstIsIdOfIncidence(EdgeDirection.IN);
+		IsIdOfStoreClause_isIdOfStoreClause_omega storeInc = vertex.getFirst_isIdOfStoreClause_omega();
 		if (storeInc != null) {
 			VertexEvaluator storeEval = vertexEvalMarker.getMark(storeInc
-					.getAlpha());
+					.getThat());
 			String varName = storeEval.getResult().toString();
 			boundVariables.put(varName, result);
 		}
@@ -186,8 +186,20 @@ public class Greql2ExpressionEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsGreql2Expression(
-				this, graphSize);
+		VertexEvaluator queryExpEval = getVertexEvalMarker().getMark(
+				vertex.getFirst_isQueryExprOf_omega().getThat());
+		long queryCosts = queryExpEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		IsBoundVarOf_isBoundVarOf_omega boundVarInc = vertex.getFirst_isBoundVarOf_omega();
+		int boundVars = 0;
+		while (boundVarInc != null) {
+			boundVars++;
+			boundVarInc = boundVarInc.getNextIsBoundVarOf_omegaAtVertex();
+		}
+		long ownCosts = boundVars * 5;
+		long iteratedCosts = ownCosts;
+		long subtreeCosts = ownCosts + queryCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 }

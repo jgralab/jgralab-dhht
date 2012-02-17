@@ -69,7 +69,7 @@ import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundExprOfQuantifier;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundExprOfQuantifiedExpr;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsColumnHeaderExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
@@ -85,7 +85,7 @@ import de.uni_koblenz.jgralab.greql2.schema.IsRowHeaderExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader;
+import de.uni_koblenz.jgralab.greql2.schema.IsTableHeaderOf_isTableHeaderOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.ListComprehension;
@@ -432,8 +432,8 @@ public abstract class ParserHelper {
 		IsQuantifiedDeclOf isQuantifiedDeclOf = v
 				.getFirstIncidenceToIsQuantifiedDeclOf(Direction.EDGE_TO_VERTEX).getEdge();
 		mergeVariablesInDeclaration(isQuantifiedDeclOf.getAlpha());
-		IsBoundExprOfQuantifier isBoundExprOfQuantifier = (IsBoundExprOfQuantifier) v
-				.getFirstIncidenceToIsBoundExprOfQuantifier(Direction.EDGE_TO_VERTEX).getEdge();
+		IsBoundExprOfQuantifiedExpr isBoundExprOfQuantifier = (IsBoundExprOfQuantifiedExpr) v
+				.getFirstIncidenceToIsBoundExprOfQuantifiedExpr(Direction.EDGE_TO_VERTEX).getEdge();
 		mergeVariables(isBoundExprOfQuantifier.getAlpha(), true);
 		if (separateScope) {
 			afterParsingvariableSymbolTable.blockEnd();
@@ -461,11 +461,11 @@ public abstract class ParserHelper {
 			mergeVariables(((BinaryEdge) isCompResultDefOf).getAlpha(), true);
 			// merge variables in table-headers if it's a list-comprehension
 			if (v instanceof ListComprehension) {
-				IsTableHeaderOf_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader inc = 
-						((ListComprehension) v).getFirst_isTableHeaderOf_GoesTo_ComprehensionWithTableHeader();
+				IsTableHeaderOf_isTableHeaderOf_omega inc = 
+						((ListComprehension) v).getFirst_isTableHeaderOf_omega();
 				while (inc != null) {
 					mergeVariables(inc.getEdge().getAlpha(), true);
-					inc = inc.getNextIsTableHeaderOf_GoesTo_ComprehensionWithTableHeaderAtVertex();
+					inc = inc.getNextIsTableHeaderOf_omegaAtVertex();
 				}
 			}
 			if (v instanceof TableComprehension) {

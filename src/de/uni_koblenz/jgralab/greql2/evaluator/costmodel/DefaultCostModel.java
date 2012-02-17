@@ -157,7 +157,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 					trueInc.getAlpha());
 			trueCard = trueEval.getEstimatedCardinality(graphSize);
 		}
-		IsFalseExprOf falseInc = condExp.getFirstIsFalseExprOfIncidence();
+		IsFalseExprOf falseInc = condExp.getFirstIsFalseExprOf_omega();
 		long falseCard = 0;
 		if (falseInc != null) {
 			VertexEvaluator falseEval = e.getVertexEvalMarker().getMark(
@@ -173,27 +173,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 
 
-	@Override
-	public long calculateCardinalityFunctionApplication(
-			FunctionApplicationEvaluator e, GraphSize graphSize) {
-		FunctionApplication funApp = (FunctionApplication) e.getVertex();
-		IsArgumentOf inc = funApp
-				.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-		int elements = 0;
-		while (inc != null) {
-			VertexEvaluator argEval = e.getVertexEvalMarker().getMark(
-					inc.getAlpha());
-			elements += argEval.getEstimatedCardinality(graphSize);
-			inc = inc.getNextIsArgumentOfIncidence(EdgeDirection.IN);
-		}
 
-		Function func = e.getFunction();
-		if (func != null) {
-			return func.getEstimatedCardinality(elements);
-		} else {
-			return 1;
-		}
-	}
 
 	@Override
 	public long calculateCardinalityListConstruction(
@@ -368,31 +348,6 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 
 	@Override
-	public VertexCosts calculateCostsExponentiatedPathDescription(
-			ExponentiatedPathDescriptionEvaluator e, GraphSize graphSize) {
-		ExponentiatedPathDescription p = (ExponentiatedPathDescription) e
-				.getVertex();
-		long exponent = defaultExponent;
-		VertexEvaluator expEval = e.getVertexEvalMarker().getMark(
-				p.getFirstIsExponentOfIncidence(EdgeDirection.IN).getAlpha());
-		if (expEval instanceof IntLiteralEvaluator) {
-			try {
-				exponent = ((Number) expEval.getResult()).longValue();
-			} catch (Exception ex) {
-			}
-		}
-		long exponentCosts = expEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		VertexEvaluator pathEval = e.getVertexEvalMarker().getMark(
-				p.getFirstIsExponentiatedPathOfIncidence(EdgeDirection.IN)
-						.getAlpha());
-		long pathCosts = pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
-		long ownCosts = ((pathCosts * exponent) * 1) / 3;
-		long subtreeCosts = pathCosts + ownCosts + exponentCosts;
-		return new VertexCosts(ownCosts, ownCosts, subtreeCosts);
-	}
-
-	@Override
 	public VertexCosts calculateCostsForwardVertexSet(
 			ForwardElementSetEvaluator e, GraphSize graphSize) {
 		ForwardVertexSet bwvertex = (ForwardVertexSet) e.getVertex();
@@ -416,68 +371,7 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seede.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel#
-	 * calculateCostsFunctionApplication
-	 * (de.uni_koblenz.jgralab.greql2.evaluator.
-	 * vertexeval.FunctionApplicationEvaluator,
-	 * de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize)
-	 */
-	@Override
-	public VertexCosts calculateCostsFunctionApplication(
-			FunctionApplicationEvaluator e, GraphSize graphSize) {
-		FunctionApplication funApp = (FunctionApplication) e.getVertex();
 
-		IsArgumentOf inc = funApp
-				.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-		long argCosts = 0;
-		ArrayList<Long> elements = new ArrayList<Long>();
-		while (inc != null) {
-			VertexEvaluator argEval = e.getVertexEvalMarker().getMark(
-					inc.getAlpha());
-			argCosts += argEval.getCurrentSubtreeEvaluationCosts(graphSize);
-			elements.add(argEval.getEstimatedCardinality(graphSize));
-			inc = inc.getNextIsArgumentOfIncidence(EdgeDirection.IN);
-		}
-
-		Function func = e.getFunction();
-		long ownCosts = func.getEstimatedCosts(elements);
-		long iteratedCosts = ownCosts * e.getVariableCombinations(graphSize);
-		long subtreeCosts = iteratedCosts + argCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seede.uni_koblenz.jgralab.greql2.evaluator.costmodel.CostModel#
-	 * calculateCostsGreql2Expression
-	 * (de.uni_koblenz.jgralab.greql2.evaluator.vertexeval
-	 * .Greql2ExpressionEvaluator,
-	 * de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize)
-	 */
-	@Override
-	public VertexCosts calculateCostsGreql2Expression(
-			Greql2ExpressionEvaluator e, GraphSize graphSize) {
-		Greql2Expression greqlExp = (Greql2Expression) e.getVertex();
-		VertexEvaluator queryExpEval = e.getVertexEvalMarker().getMark(
-				greqlExp.getFirstIsQueryExprOfIncidence().getAlpha());
-		long queryCosts = queryExpEval
-				.getCurrentSubtreeEvaluationCosts(graphSize);
-		logger.info("QueryCosts: " + queryCosts);
-		IsBoundVarOf boundVarInc = greqlExp.getFirstIsBoundVarOfIncidence();
-		int boundVars = 0;
-		while (boundVarInc != null) {
-			boundVars++;
-			boundVarInc = boundVarInc.getNextIsBoundVarOfIncidence();
-		}
-		long ownCosts = boundVars * greql2ExpressionCostsFactor;
-		long iteratedCosts = ownCosts;
-		long subtreeCosts = ownCosts + queryCosts;
-		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
-	}
 
 	@Override
 	public VertexCosts calculateCostsIntermediateVertexPathDescription(
@@ -985,17 +879,6 @@ public class DefaultCostModel extends CostModelBase implements CostModel {
 
 
 
-
-	@Override
-	public double calculateSelectivityFunctionApplication(
-			FunctionApplicationEvaluator e, GraphSize graphSize) {
-		Function func = e.getFunction();
-		if (func != null) {
-			return func.getSelectivity();
-		} else {
-			return 1;
-		}
-	}
 
 	@Override
 	public double calculateSelectivityPathExistence(PathExistenceEvaluator e,

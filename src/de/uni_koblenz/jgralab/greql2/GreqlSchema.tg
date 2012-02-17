@@ -47,7 +47,7 @@ abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) (
 VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String};
 BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression role isBoundVarOf_omega (0,1) (1,1);
 BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression role isQueryExprOf_omega (0,*) (1,1);
-BinaryEdgeClass IsIdOf: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression (0,*) (1,1);
+BinaryEdgeClass IsIdOfStoreClause: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression role isIdOfStoreClause_omega (0,*) (1,1);
 
 
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\

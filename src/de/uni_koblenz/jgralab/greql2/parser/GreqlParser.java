@@ -524,7 +524,7 @@ public class GreqlParser extends ParserHelper {
 			Identifier ident = graph.createIdentifier();
 			offset = getCurrentOffset();
 			ident.set_name(matchIdentifier());
-			IsIdOf isId = graph.createIsIdOf(ident, rootExpr);
+			IsIdOfStoreClause isId = graph.createIsIdOfStoreClause(ident, rootExpr);
 			isId.set_sourcePositions(createSourcePositionList(offset));
 		}
 		match(TokenTypes.EOF);

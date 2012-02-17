@@ -43,7 +43,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.schema.AlternativePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.IsAlternativePathOf_isAlternativePathOf_omega;
 
 /**
  * Evaluates an alternative path description. Creates a NFA that accepts the
@@ -90,14 +90,14 @@ public class AlternativePathDescriptionEvaluator extends
 
 	@Override
 	public NFA evaluate() {
-		IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription inc = vertex
-				.getFirst_isAlternativePathOf_GoesTo_AlternativePathDescription();
+		IsAlternativePathOf_isAlternativePathOf_omega inc = vertex
+				.getFirst_isAlternativePathOf_omega();
 		ArrayList<NFA> nfaList = new ArrayList<NFA>();
 		while (inc != null) {
 			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 					.getMark(inc.getThat());
 			nfaList.add(pathEval.getNFA());
-			inc = inc.getNextIsAlternativePathOf_GoesTo_AlternativePathDescriptionAtVertex();
+			inc = inc.getNextIsAlternativePathOf_omegaAtVertex();
 		}
 		return NFA.createAlternativePathDescriptionNFA(nfaList);
 	}
@@ -105,13 +105,13 @@ public class AlternativePathDescriptionEvaluator extends
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
 		long aggregatedCosts = 0;
-		IsAlternativePathOf_isAlternativePathOf_GoesTo_AlternativePathDescription inc = vertex
-				.getFirst_isAlternativePathOf_GoesTo_AlternativePathDescription();
+		IsAlternativePathOf_isAlternativePathOf_omega inc = vertex
+				.getFirst_isAlternativePathOf_omega();
 		long alternatives = 0;
 		while (inc != null) {
 			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(inc.getThat());
 			aggregatedCosts += pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
-			inc = inc.getNextIsAlternativePathOf_GoesTo_AlternativePathDescriptionAtVertex();
+			inc = inc.getNextIsAlternativePathOf_omegaAtVertex();
 			alternatives++;
 		}
 		aggregatedCosts += 10 * alternatives;
