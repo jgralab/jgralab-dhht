@@ -42,7 +42,7 @@ abstract VertexClass Expression: Greql2Vertex;
 
 abstract BinaryEdgeClass Greql2Aggregation from Greql2Vertex (0,*) (1,1) to Greql2Vertex (0,*) (1,1) { sourcePositions: List<SourcePosition> } ;
 abstract BinaryEdgeClass IsBoundExprOf: Greql2Aggregation from Expression (1,1) (1,1) to Greql2Vertex (0,*) (1,1);
-abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) (1,1) to Greql2Vertex (0,*) (1,1);
+abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression role typeExpression (0,*) (1,1) to Greql2Vertex role isTypeExprOf_omega (0,*) (1,1);
 
 VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String};
 BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression role isBoundVarOf_omega (0,1) (1,1);

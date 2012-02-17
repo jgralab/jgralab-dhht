@@ -41,7 +41,10 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsPartOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsPartOf_isPartOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsRecordElementOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsRecordElementOf_isRecordElementOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.RecordConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.RecordElement;
 import de.uni_koblenz.jgralab.impl.RecordImpl;
@@ -81,29 +84,47 @@ public class RecordConstructionEvaluator extends VertexEvaluator {
 	@Override
 	public Record evaluate() {
 		RecordImpl resultRecord = RecordImpl.empty();
-		IsRecordElementOf inc = vertex
-				.getFirstIsRecordElementOfIncidence(EdgeDirection.IN);
+		IsRecordElementOf_isRecordElementOf_omega inc = vertex
+				.getFirst_isRecordElementOf_omega();
 		while (inc != null) {
-			RecordElement currentElement = inc.getAlpha();
+			RecordElement currentElement = (RecordElement) inc.getThat();
 			RecordElementEvaluator vertexEval = (RecordElementEvaluator) vertexEvalMarker
 					.getMark(currentElement);
 			resultRecord = resultRecord.plus(vertexEval.getId(),
 					vertexEval.getResult());
-			inc = inc.getNextIsRecordElementOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsRecordElementOf_omegaAtVertex();
 		}
 		return resultRecord;
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateCostsRecordConstruction(
-				this, graphSize);
+		IsPartOf_isPartOf_omega inc = vertex.getFirst_isPartOf_omega();
+		long recElems = 0;
+		long recElemCosts = 0;
+		while (inc != null) {
+			RecordElement recElem = (RecordElement) inc.getThat();
+			VertexEvaluator veval = getVertexEvalMarker().getMark(recElem);
+			recElemCosts += veval.getCurrentSubtreeEvaluationCosts(graphSize);
+			recElems++;
+			inc = inc.getNextIsPartOf_omegaAtVertex();
+		}
+
+		long ownCosts = (recElems * 1) + 2;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + recElemCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityRecordConstruction(this, graphSize);
+		IsRecordElementOf_isRecordElementOf_omega inc = vertex.getFirst_isRecordElementOf_omega();
+		long parts = 0;
+		while (inc != null) {
+			parts++;
+			inc = inc.getNextIsRecordElementOf_omegaAtVertex();
+		}
+		return parts;
 	}
 
 }

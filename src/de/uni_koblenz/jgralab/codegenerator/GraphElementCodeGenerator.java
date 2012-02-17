@@ -306,10 +306,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 				//addImports("#jgPackage#.Direction");
 				if (config.hasTypeSpecificMethodsSupport()) {
 					if (!ic.isInternal()) {
-						code.addNoIndent(createFirstIncidenceMethod(ic, true));
-						if (config.hasMethodsForSubclassesSupport() && !ic.isAbstract()) {
-							code.addNoIndent(createFirstIncidenceMethod(ic, false));
-						}
+						code.addNoIndent(createFirstIncidenceMethod(ic));
 					}	
 				}
 			}
@@ -320,25 +317,20 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		
 	
 	
-	private CodeBlock createFirstIncidenceMethod(IncidenceClass ic, boolean typeFlag) {
+	private CodeBlock createFirstIncidenceMethod(IncidenceClass ic) {
 		CodeSnippet s = new CodeSnippet();
 		s.setVariable("incidenceClassName", ic.getRolename());
 		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
-		s.setVariable("typeflagFormalParam", typeFlag ? "boolean noSubtypes" : "");
-		s.setVariable("typeflagActualParam", typeFlag ? ", noSubtypes" : "");
 		if (currentCycle.isAbstract()) {
 			//create interface
 			s.add("/*",
 				  " * @return the first #incidenceClassName# incidence at this #ownElementClass# ");
-			if (typeFlag) {
-				s.add(" * @param noSubclass if set to true, only incidence of class #incidenceClassName# but not of subclasses will be returned");
-			}
 			s.add("*/",
-				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#);"); 	
+				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#();"); 	
 		} else {
 			s.add("@Override",
-			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) {");
-			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
+			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#() {");
+			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class);");
 			s.add("}");
 			
 		}
