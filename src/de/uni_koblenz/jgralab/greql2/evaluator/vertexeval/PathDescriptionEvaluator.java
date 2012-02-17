@@ -37,8 +37,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf_goalRestrictedPathDescr;
-import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf_startRestrictedPathDescr;
+import de.uni_koblenz.jgralab.greql2.schema.IsGoalRestrOf_isGoalRestrOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsStartRestrOf_isStartRestrOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -111,8 +111,8 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	protected void addGoalRestrictions() {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator goalRestEval = null;
-		IsGoalRestrOf_goalRestrictedPathDescr inc = pathDesc
-				.getFirst_goalRestrictedPathDescr();
+		IsGoalRestrOf_isGoalRestrOf_omega inc = pathDesc
+				.getFirst_isGoalRestrOf_omega();
 		if (inc == null) {
 			return;
 		}
@@ -126,7 +126,7 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 			} else {
 				goalRestEval = vertexEval;
 			}
-			inc = inc.getNextGoalRestrictedPathDescrAtVertex();
+			inc = inc.getNextIsGoalRestrOf_omegaAtVertex();
 		}
 		NFA.addGoalTypeRestriction(getNFA(), typeCollection);
 		if (goalRestEval != null) {
@@ -144,7 +144,7 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 	protected void addStartRestrictions() {
 		PathDescription pathDesc = (PathDescription) getVertex();
 		VertexEvaluator startRestEval = null;
-		IsStartRestrOf_startRestrictedPathDescr inc = pathDesc.getFirst_startRestrictedPathDescr();
+		IsStartRestrOf_isStartRestrOf_omega inc = pathDesc.getFirst_isStartRestrOf_omega();
 		if (inc == null) {
 			return;
 		}
@@ -158,7 +158,7 @@ public abstract class PathDescriptionEvaluator extends VertexEvaluator {
 			} else {
 				startRestEval = vertexEval;
 			}
-			inc = inc.getNextStartRestrictedPathDescrAtVertex();
+			inc = inc.getNextIsStartRestrOf_omegaAtVertex();
 		}
 		NFA.addStartTypeRestriction(getNFA(), typeCollection);
 		if (startRestEval != null) {

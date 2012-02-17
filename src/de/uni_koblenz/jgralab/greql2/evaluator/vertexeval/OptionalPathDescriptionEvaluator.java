@@ -83,7 +83,7 @@ public class OptionalPathDescriptionEvaluator extends PathDescriptionEvaluator {
 	@Override
 	public NFA evaluate() {
 		PathDescription p = (PathDescription) vertex
-				.getFirstIsOptionalPathOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isOptionalPathOf_omega().getThat();
 		PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		return NFA.createOptionalPathDescriptionNFA(pathEval.getNFA());
@@ -91,8 +91,13 @@ public class OptionalPathDescriptionEvaluator extends PathDescriptionEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsOptionalPathDescription(this, graphSize);
+		VertexEvaluator pathEval = getVertexEvalMarker().getMark(
+				vertex.getFirst_isOptionalPathOf_omega().getThat());
+		long ownCosts = 5;
+		long iteratedCosts = 5;
+		long subtreeCosts = ownCosts
+				+ pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 }

@@ -6,3 +6,4 @@ src/de/uni_koblenz/jgralab/gretl/template
 testit/de/uni_koblenz/jgralabtest/schemas
 testit/jgralabtest.properties
 testit/testdata/*
+/testit
