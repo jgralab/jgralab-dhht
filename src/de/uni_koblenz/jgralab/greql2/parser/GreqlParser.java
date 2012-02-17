@@ -853,7 +853,7 @@ public class GreqlParser extends ParserHelper {
 						lengthQuantifiedDecl, offsetQuantifiedDecl));
 				// add predicate
 				IsBoundExprOf boundExprOf = graph
-						.createIsBoundExprOfQuantifier(boundExpr,
+						.createIsBoundExprOfQuantifiedExpr(boundExpr,
 								quantifiedExpr);
 				boundExprOf.set_sourcePositions(createSourcePositionList(
 						lengthQuantifiedExpr, offsetQuantifiedExpr));
