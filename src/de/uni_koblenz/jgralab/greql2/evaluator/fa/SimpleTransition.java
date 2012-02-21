@@ -267,11 +267,7 @@ public class SimpleTransition extends Transition {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
-	 */
+
 	@Override
 	public boolean accepts(Vertex v, Edge e) {
 		if (e == null) {

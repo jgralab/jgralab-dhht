@@ -47,9 +47,9 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * This transition accepts an AggregationPathDescription. Am
@@ -245,11 +245,11 @@ public class AggregationTransition extends Transition {
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
 	@Override
-	public boolean accepts(GraphElement elem, Incidence inc) {
-		if (inc == null) {
+	public boolean accepts(Vertex vertex, Edge e) {
+		if (e == null) {
 			return false;
 		}
-		if (inc.getEdge().isBinary())
+		if (e.isBinary())
 			return false;
 		
 		if (aggregateFrom) {
@@ -330,7 +330,7 @@ public class AggregationTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (AttributedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
+		for (TypedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";

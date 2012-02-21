@@ -35,6 +35,7 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -176,6 +177,9 @@ public abstract class Transition {
 	 * and Edge
 	 */
 	public abstract boolean accepts(GraphElement elem, Incidence inc);
+	
+	@Deprecated
+	public abstract boolean accepts(Vertex vertex, Edge e);
 
 	/**
 	 * returns the element (vertex or edge) of the datagraph which can be visited after this
