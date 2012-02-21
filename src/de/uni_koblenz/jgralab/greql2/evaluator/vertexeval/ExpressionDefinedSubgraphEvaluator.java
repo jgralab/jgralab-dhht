@@ -3,10 +3,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ExpressionDefinedSubgraph;
-import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression_isSubgraphDefiningExpression_omega;
 
 public class ExpressionDefinedSubgraphEvaluator extends SubgraphDefinitionEvaluator {

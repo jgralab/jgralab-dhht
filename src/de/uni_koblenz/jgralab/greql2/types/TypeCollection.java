@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**

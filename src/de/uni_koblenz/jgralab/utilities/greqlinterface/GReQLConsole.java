@@ -53,6 +53,7 @@ import de.uni_koblenz.ist.utilities.option_handler.OptionHandler;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.WorkInProgress;
 import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
@@ -85,10 +86,10 @@ public class GReQLConsole {
 					System.out.println("Loading schema from file");
 				}
 				Schema schema = GraphIO.loadSchemaFromFile(filename);
-				schema.compile(CodeGeneratorConfiguration.MINIMAL);
+				schema.compile(CodeGeneratorConfiguration.WITHOUT_TYPESPECIFIC_METHODS);
 			}
-			graph = GraphIO.loadGraphFromFileWithStandardSupport(filename,
-					(verbose ? new ConsoleProgressFunction("Loading") : null));
+			graph = GraphIO.loadGraphFromFile(filename, null,
+					(verbose ? new ConsoleProgressFunction("Loading") : null), ImplementationType.MEMORY);
 		} catch (GraphIOException e) {
 			e.printStackTrace();
 		}

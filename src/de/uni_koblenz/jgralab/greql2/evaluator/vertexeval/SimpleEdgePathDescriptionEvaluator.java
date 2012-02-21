@@ -35,12 +35,10 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf_isEdgeRestrOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleEdgePathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;

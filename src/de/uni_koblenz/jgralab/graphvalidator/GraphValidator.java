@@ -44,9 +44,11 @@ import java.util.TreeSet;
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.ImplementationType;
+import de.uni_koblenz.jgralab.TypedElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
@@ -55,6 +57,7 @@ import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.Constraint;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 
 
@@ -107,37 +110,37 @@ public class GraphValidator {
 		IncidenceClass to = ec.getIncidenceClassesInTopologicalOrder().get(0);
 		IncidenceClass from = ec.getIncidenceClassesInTopologicalOrder().get(1);
 		
-		int toMin = to.getMin();
-		int toMax = to.getMax();
+		int toMinAtVertex = to.getMinEdgesAtVertex();
+		int toMaxAtVertex = to.getMaxEdgesAtVertex();
 		Set<AttributedElement<?, ?>> badOutgoing = new HashSet<AttributedElement<?, ?>>();
-		for (Vertex v : graph.vertices(from.getVertexClass())) {
-			int degree = v.getDegree(ec, Direction.EDGE_TO_VERTEX);
-			if ((degree < toMin) || (degree > toMax)) {
+		for (Vertex v : graph.getVertices(to.getVertexClass())) {
+			int degree = v.getDegree(to);
+			if ((degree < toMinAtVertex) || (degree > toMaxAtVertex)) {
 				badOutgoing.add(v);
 			}
 		}
 		if (!badOutgoing.isEmpty()) {
-			brokenConstraints.add(new MultiplicityConstraintViolation(ec,
-					"Invalid number of outgoing edges, allowed are (" + toMin
-							+ "," + (toMax == Integer.MAX_VALUE ? "*" : toMax)
-							+ ").", badOutgoing));
+			brokenConstraints.add(new MultiplicityConstraintViolation(to,
+					"Invalid number of outgoing edges, allowed are (" + toMinAtVertex
+							+ "," + (toMaxAtVertex == Integer.MAX_VALUE ? "*" : toMaxAtVertex)
+							+ ").", (Set<? extends GraphElement>) badOutgoing));
 		}
 
-		int fromMin = ec.getFrom().getMin();
-		int fromMax = ec.getFrom().getMax();
+		int fromMin = from.getMinEdgesAtVertex();
+		int fromMax = from.getMaxVerticesAtEdge();
 		Set<AttributedElement<?, ?>> badIncoming = new HashSet<AttributedElement<?, ?>>();
-		for (Vertex v : graph.vertices(ec.getTo().getVertexClass())) {
-			int degree = v.getDegree(ec, EdgeDirection.IN);
+		for (Vertex v : graph.getVertices(from.getVertexClass())) {
+			int degree = v.getDegree(from);
 			if ((degree < fromMin) || (degree > fromMax)) {
 				badIncoming.add(v);
 			}
 		}
 		if (!badIncoming.isEmpty()) {
-			brokenConstraints.add(new MultiplicityConstraintViolation(ec,
+			brokenConstraints.add(new MultiplicityConstraintViolation(from,
 					"Invalid number of incoming edges, allowed are (" + fromMin
 							+ ","
 							+ (fromMax == Integer.MAX_VALUE ? "*" : fromMax)
-							+ ").", badIncoming));
+							+ ").", (Set<? extends GraphElement>) badIncoming));
 		}
 
 		return brokenConstraints;
@@ -263,8 +266,8 @@ public class GraphValidator {
 
 			bw.append("<title>");
 			bw.append("Validation Report for the "
-					+ graph.getSchemaClass().getSimpleName() + " with id "
-					+ graph.getId() + ".");
+					+ graph.getType().getSimpleName() + " with id "
+					+ graph.getUniqueGraphId() + ".");
 			bw.append("</title>");
 			bw.append("</head>");
 
@@ -274,7 +277,7 @@ public class GraphValidator {
 			if (brokenConstraints.size() == 0) {
 				bw.append("<p><b>The graph is valid!</b></p>");
 			} else {
-				bw.append("<p><b>The " + graph.getSchemaClass().getSimpleName()
+				bw.append("<p><b>The " + graph.getType().getSimpleName()
 						+ " violates " + brokenConstraints.size()
 						+ " constraints.</b></p>");
 				// Here goes the table
@@ -309,7 +312,7 @@ public class GraphValidator {
 					bw.append("</td>");
 					bw.append("<td class=\"" + cssClass + "\">");
 					if (ci.getOffendingElements() != null) {
-						for (AttributedElement<?, ?> ae : ci
+						for (TypedElement<?, ?> ae : ci
 								.getOffendingElements()) {
 							bw.append(ae.toString());
 							bw.append("<br/>");

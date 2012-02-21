@@ -9,7 +9,6 @@ import org.pcollections.PMap;
 import org.pcollections.POrderedSet;
 import org.pcollections.PVector;
 
-import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.Record;
 
 

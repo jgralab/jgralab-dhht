@@ -33,8 +33,8 @@
  */
 package de.uni_koblenz.jgralab.greql2;
 
-import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 
 
 

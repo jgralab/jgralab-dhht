@@ -32,7 +32,6 @@
 package de.uni_koblenz.jgralab.impl.distributed;
 
 import java.rmi.RemoteException;
-import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -47,7 +46,6 @@ import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.ProgressFunction;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;

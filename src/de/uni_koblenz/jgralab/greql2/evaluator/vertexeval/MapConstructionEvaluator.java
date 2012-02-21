@@ -43,12 +43,9 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsKeyExprOfConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.IsKeyExprOfConstruction_isKeyExprOfConstruction_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfComprehension_isValueExprOfComprehension_omega;
-import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.IsValueExprOfConstruction_isValueExprOfConstruction_omega;
 import de.uni_koblenz.jgralab.greql2.schema.MapConstruction;
 

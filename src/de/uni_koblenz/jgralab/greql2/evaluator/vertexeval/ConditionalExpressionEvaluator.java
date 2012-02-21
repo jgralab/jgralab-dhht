@@ -40,12 +40,9 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.ConditionalExpression;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsFalseExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsFalseExprOf_isFalseExprOf_omega;
-import de.uni_koblenz.jgralab.greql2.schema.IsTrueExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTrueExprOf_isTrueExprOf_omega;
 
 /**
