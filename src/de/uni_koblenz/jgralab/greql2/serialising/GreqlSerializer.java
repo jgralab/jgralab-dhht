@@ -166,7 +166,7 @@ public class GreqlSerializer {
 
 	private void serializeSimpleDeclaration(SimpleDeclaration v) {
 		boolean first = true;
-		for (Variable var : v.get_declaredVar()) {
+		for (Variable var : v.get declaredVar()) {
 			if (first) {
 				first = false;
 			} else {

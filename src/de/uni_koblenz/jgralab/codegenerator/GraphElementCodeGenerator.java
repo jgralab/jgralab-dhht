@@ -134,13 +134,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 			code.add(createFirstIncidenceMethods());
-		//	code.add(rolenameGenerator.createRolenameMethods(currentCycle
-		//			.isStdOrSaveMemOrDbImplOrTransImpl()));
-		//	code.add(createIncidenceIteratorMethods());
+
 		}
-	//	if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-	//		code.add(createGetEdgeForRolenameMethod());
-	//	}
 		code.add(createCompatibilityMethods());
 		return code;
 	}
@@ -307,6 +302,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 				if (config.hasTypeSpecificMethodsSupport()) {
 					if (!ic.isInternal()) {
 						code.addNoIndent(createFirstIncidenceMethod(ic));
+						code.addNoIndent(createIncidenceIteratorMethod(ic));
 					}	
 				}
 			}
@@ -400,6 +396,28 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		}
 		return code;
 	}
+	
+
+	private CodeBlock createIncidenceIteratorMethod(IncidenceClass ic) {
+		CodeSnippet s = new CodeSnippet();
+		s.setVariable("incidenceClassName", ic.getRolename());
+		s.setVariable("incidenceUniqueClassName", ic.getUniqueName());
+		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
+		if (currentCycle.isAbstract()) {
+			s.add("/**");
+			s.add(" * Returns an Iterable for all incidences that are of type #incidenceClassName# or subtypes.");
+			s.add(" */");
+			s.add("public Iterable<#qualifiedIncidenceClassName#> get#incidenceUniqueClassName#Incidences();");
+		} else {
+			s.add("@Override");
+			s.add("public Iterable<#qualifiedIncidenceClassName#> get#incidenceUniqueClassName#Incidences() {");
+			s.add("\treturn new IncidenceIterable(#qualifiedIncidenceClassName#.class);");
+			s.add("}");
+			
+		}
+		return s;
+	}	
+
 
 
 	

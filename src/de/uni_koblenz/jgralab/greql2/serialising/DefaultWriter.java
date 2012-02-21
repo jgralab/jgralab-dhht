@@ -433,8 +433,6 @@ public abstract class DefaultWriter {
 			writeEnum((Enum<?>) o);
 		} else if (o instanceof Graph) {
 			writeGraph((Graph) o);
-		} else if (o instanceof SubGraphMarker) {
-			writeSubGraphMarker((SubGraphMarker) o);
 		} else if (o instanceof DFA) {
 			writeDFA((DFA) o);
 		} else if (o instanceof NFA) {
