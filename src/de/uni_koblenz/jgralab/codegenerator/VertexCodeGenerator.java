@@ -228,7 +228,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 
 	protected CodeBlock createIncidenceIteratorMethod(IncidenceClass ic) {
 		CodeSnippet s = new CodeSnippet();
-		addImports("#jgImplPackage#.IncidenceIterable");
+		addImports("#jgImplPackage#.IncidenceIterableAtVertex");
 		s.setVariable("incidenceClassName", ic.getRolename());
 		s.setVariable("incidenceUniqueClassName", ic.getUniqueName());
 		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
@@ -240,7 +240,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		} else {
 			s.add("@Override");
 			s.add("public Iterable<#qualifiedIncidenceClassName#> get#incidenceUniqueClassName#Incidences() {");
-			s.add("\treturn new IncidenceIterableAtVertex(#qualifiedIncidenceClassName#.class);");
+			s.add("\treturn new IncidenceIterableAtVertex(this, #qualifiedIncidenceClassName#.class);");
 			s.add("}");
 			
 		}

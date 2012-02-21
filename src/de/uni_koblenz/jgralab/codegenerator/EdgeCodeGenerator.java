@@ -105,7 +105,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 
 	protected CodeBlock createIncidenceIteratorMethod(IncidenceClass ic) {
 		CodeSnippet s = new CodeSnippet();
-		addImports("#jgImplPackage#.IncidenceIterable");
+		addImports("#jgImplPackage#.IncidenceIterableAtEdge");
 		s.setVariable("incidenceClassName", ic.getRolename());
 		s.setVariable("incidenceUniqueClassName", ic.getUniqueName());
 		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
@@ -117,7 +117,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		} else {
 			s.add("@Override");
 			s.add("public Iterable<#qualifiedIncidenceClassName#> get#incidenceUniqueClassName#Incidences() {");
-			s.add("\treturn new IncidenceIterableAtEdge(#qualifiedIncidenceClassName#.class);");
+			s.add("\treturn new IncidenceIterableAtEdge(this, #qualifiedIncidenceClassName#.class);");
 			s.add("}");
 			
 		}
