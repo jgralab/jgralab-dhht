@@ -400,6 +400,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 
 	private CodeBlock createIncidenceIteratorMethod(IncidenceClass ic) {
 		CodeSnippet s = new CodeSnippet();
+		addImports("#jgImplPackage#.IncidenceIterable");
 		s.setVariable("incidenceClassName", ic.getRolename());
 		s.setVariable("incidenceUniqueClassName", ic.getUniqueName());
 		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
