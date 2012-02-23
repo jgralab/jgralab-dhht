@@ -33,6 +33,7 @@
  */
 package de.uni_koblenz.jgralab.greql2.optimizer;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,19 +41,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import com.sun.mirror.declaration.Declaration;
-
 import de.uni_koblenz.jgralab.JGraLab;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.SimpleDeclarationEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * Optimizes the order of {@link Variable} declarations for each
@@ -102,7 +104,7 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		GraphSize graphSize;
 		if (eval.getDatagraph() != null) {
@@ -111,7 +113,7 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 			graphSize = OptimizerUtility.getDefaultGraphSize();
 		}
 
-		GraphMarker<VertexEvaluator> marker = eval
+		ObjectGraphMarker<Vertex, VertexEvaluator> marker = eval
 				.getVertexEvaluatorGraphMarker();
 
 		ArrayList<List<VariableDeclarationOrderUnit>> unitsList = new ArrayList<List<VariableDeclarationOrderUnit>>();
@@ -174,7 +176,11 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 			}
 		}
 		for (SimpleDeclaration sd : oldSDs) {
-			marker.removeMark(sd);
+			try {
+				marker.removeMark(sd);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
 			sd.delete();
 		}
 
@@ -190,10 +196,10 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 
 	private List<Variable> collectVariablesInDeclarationOrder(Declaration decl) {
 		ArrayList<Variable> varList = new ArrayList<Variable>();
-		for (IsSimpleDeclOf isSD : decl.getIsSimpleDeclOfIncidences()) {
-			for (IsDeclaredVarOf isVar : ((SimpleDeclaration) isSD.getAlpha())
-					.getIsDeclaredVarOfIncidences()) {
-				varList.add((Variable) isVar.getAlpha());
+		for (IsSimpleDeclOf_isSimpleDeclOf_omega isSD : decl.getIsSimpleDeclOf_isSimpleDeclOf_omegaIncidences()) {
+			for (IsDeclaredVarOf_isDeclaredVarOf_omega isVar : ((SimpleDeclaration) isSD.getThat())
+					.getIsDeclaredVarOf_isDeclaredVarOf_omegaIncidences()) {
+				varList.add((Variable) isVar.getThat());
 			}
 		}
 		return varList;
@@ -219,11 +225,11 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 	 */
 	private Set<Variable> collectVariablesDeclaredBy(Declaration decl) {
 		HashSet<Variable> vars = new HashSet<Variable>();
-		for (IsSimpleDeclOf inc : decl
-				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
+		for (IsSimpleDeclOf_isSimpleDeclOf_omega inc : decl
+				.getIsSimpleDeclOf_isSimpleDeclOf_omegaIncidences()) {
 			vars.addAll(OptimizerUtility
 					.collectVariablesDeclaredBy((SimpleDeclaration) inc
-							.getAlpha()));
+							.getThat()));
 		}
 		return vars;
 	}

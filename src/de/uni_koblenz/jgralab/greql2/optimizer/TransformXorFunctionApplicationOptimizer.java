@@ -36,14 +36,19 @@ package de.uni_koblenz.jgralab.greql2.optimizer;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
+import de.uni_koblenz.jgralab.greql2.funlib.logics.Xor;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf_isArgumentOf_omega;
 
 /**
  * Replaces all {@link Xor} {@link FunctionApplication}s in the {@link Greql2}
@@ -83,7 +88,7 @@ public class TransformXorFunctionApplicationOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		ArrayList<FunctionApplication> xors = new ArrayList<FunctionApplication>();
 		for (FunctionApplication funApp : syntaxgraph
@@ -96,10 +101,10 @@ public class TransformXorFunctionApplicationOptimizer extends OptimizerBase {
 		for (FunctionApplication xor : xors) {
 			somethingWasTransformed = true;
 			// Figure out the two arguments of the Xor
-			IsArgumentOf isArgOf = xor.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-			Expression arg1 = (Expression) isArgOf.getAlpha();
-			isArgOf = isArgOf.getNextIsArgumentOf(EdgeDirection.IN);
-			Expression arg2 = (Expression) isArgOf.getAlpha();
+			IsArgumentOf_isArgumentOf_omega isArgOf = xor.getFirst_isArgumentOf_omega();
+			Expression arg1 = (Expression) isArgOf.getThat();
+			isArgOf = isArgOf.getNextIsArgumentOf_omegaAtVertex();
+			Expression arg2 = (Expression) isArgOf.getThat();
 
 			// The rule is: a xor b = a and ~b or ~a and b
 
@@ -143,13 +148,13 @@ public class TransformXorFunctionApplicationOptimizer extends OptimizerBase {
 
 			// relink all edges that started in the Xor vertex
 			ArrayList<Edge> edgesToBeRelinked = new ArrayList<Edge>();
-			Edge e = xor.getFirstIncidence(EdgeDirection.OUT);
-			while (e != null) {
-				edgesToBeRelinked.add(e);
-				e = e.getNextIncidence(EdgeDirection.OUT);
+			Incidence inc = xor.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+			while (inc != null) {
+				edgesToBeRelinked.add(inc.getEdge());
+				inc = inc.getNextIncidenceAtVertex(Direction.VERTEX_TO_EDGE);
 			}
 			for (Edge edge : edgesToBeRelinked) {
-				edge.setAlpha(or);
+				((BinaryEdge) edge).setAlpha(or);
 			}
 
 			logger.finer(optimizerHeaderString() + "Transformed " + xor

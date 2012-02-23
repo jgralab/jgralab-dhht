@@ -39,15 +39,20 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
+import de.uni_koblenz.jgralab.greql2.funlib.collections.Contains;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
 import de.uni_koblenz.jgralab.greql2.schema.PathExpression;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * This {@link Optimizer} transforms {@link PathExistence} vertices to
@@ -62,7 +67,7 @@ public class PathExistenceOptimizer extends OptimizerBase {
 	private static Logger logger = JGraLab
 			.getLogger(PathExistenceOptimizer.class.getPackage().getName());
 
-	private Greql2 syntaxgraph;
+	private GreqlSyntaxGraph syntaxgraph;
 
 	private boolean anOptimizationWasDone = false;
 
@@ -90,7 +95,7 @@ public class PathExistenceOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		if (syntaxgraph.getFirstVertex(PathExistence.class) == null) {
 			return false;
@@ -149,16 +154,16 @@ public class PathExistenceOptimizer extends OptimizerBase {
 	 *            a {@link PathExistence} vertex
 	 */
 	private void maybeTransformPathExistence(PathExistence pe) {
-		Expression startExp = (Expression) pe.getFirstIsStartExprOfIncidence(
-				EdgeDirection.IN).getAlpha();
-		Expression targetExp = (Expression) pe.getFirstIsTargetExprOfIncidence(
-				EdgeDirection.IN).getAlpha();
+		Expression startExp = (Expression) pe.getFirstIncidenceToIsStartExprOf(
+				Direction.EDGE_TO_VERTEX).getThat();
+		Expression targetExp = (Expression) pe.getFirstIncidenceToIsTargetExprOf(
+				Direction.EDGE_TO_VERTEX).getThat();
 
 		if ((startExp instanceof Variable) && (targetExp instanceof Variable)) {
 			Variable s = (Variable) startExp;
 			Variable t = (Variable) targetExp;
-			if ((s.getFirstIsBoundVarOfIncidence() != null)
-					&& (t.getFirstIsBoundVarOfIncidence() != null)) {
+			if ((s.getFirstIncidenceToIsBoundVarOf() != null)
+					&& (t.getFirstIncidenceToIsBoundVarOf() != null)) {
 				logger.finer(optimizerHeaderString()
 						+ "PathExistence has form var1 --> var2 where both vars are externally bound, skipping...");
 			}
@@ -234,11 +239,11 @@ public class PathExistenceOptimizer extends OptimizerBase {
 
 		anOptimizationWasDone = true;
 
-		Edge inc = pe.getFirstIncidence(EdgeDirection.OUT);
-		Set<Edge> edgesToRelink = new HashSet<Edge>();
+		Incidence inc = pe.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+		Set<Incidence> edgesToRelink = new HashSet<Incidence>();
 		while (inc != null) {
 			edgesToRelink.add(inc);
-			inc = inc.getNextIncidence(EdgeDirection.OUT);
+			inc = inc.getNextIncidenceAtVertex(Direction.VERTEX_TO_EDGE);
 		}
 		FunctionApplication contains = syntaxgraph.createFunctionApplication();
 		FunctionId containsId = OptimizerUtility.findOrCreateFunctionId(
@@ -246,20 +251,20 @@ public class PathExistenceOptimizer extends OptimizerBase {
 		syntaxgraph.createIsFunctionIdOf(containsId, contains);
 		PathExpression vertexSet;
 		if (forward) {
-			vertexSet = syntaxgraph.createForwardVertexSet();
+			vertexSet = syntaxgraph.createForwardElementSet();
 			syntaxgraph.createIsStartExprOf(startOrTargetExp, vertexSet);
 		} else {
-			vertexSet = syntaxgraph.createBackwardVertexSet();
+			vertexSet = syntaxgraph.createBackwardElementSet();
 			syntaxgraph.createIsTargetExprOf(startOrTargetExp, vertexSet);
 		}
 		syntaxgraph.createIsPathOf(
-				(Expression) pe.getFirstIsPathOfIncidence(EdgeDirection.IN)
-						.getAlpha(), vertexSet);
+				(Expression) pe.getFirstIncidenceToIsPathOf(Direction.EDGE_TO_VERTEX)
+						.getThat(), vertexSet);
 
 		syntaxgraph.createIsArgumentOf(vertexSet, contains);
 		syntaxgraph.createIsArgumentOf(otherExp, contains);
-		for (Edge edge : edgesToRelink) {
-			edge.setAlpha(contains);
+		for (Incidence inc2 : edgesToRelink) {
+			((BinaryEdge) inc2.getEdge()).setAlpha(contains);
 		}
 		pe.delete();
 	}

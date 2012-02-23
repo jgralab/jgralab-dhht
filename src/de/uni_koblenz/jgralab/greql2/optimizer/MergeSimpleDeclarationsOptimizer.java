@@ -38,16 +38,12 @@ import java.util.logging.Logger;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.GetEdge;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_simpleDecl;
 import de.uni_koblenz.jgralab.greql2.schema.IsTargetExprOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration_isTypeExprOfDeclaration_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 
