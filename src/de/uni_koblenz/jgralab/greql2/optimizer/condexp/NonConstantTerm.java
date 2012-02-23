@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerUtility;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 
 /**
  * TODO: (heimdall) Comment class!
@@ -57,7 +58,7 @@ public class NonConstantTerm extends Formula {
 
 	@Override
 	public String toString() {
-		return "v" + expression.getUid();
+		return "v" + expression.getGlobalId();
 	}
 
 	@Override

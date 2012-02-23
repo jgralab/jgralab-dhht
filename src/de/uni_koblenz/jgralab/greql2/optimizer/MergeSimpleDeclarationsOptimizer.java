@@ -35,15 +35,20 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import com.sun.mirror.declaration.Declaration;
-
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
+import de.uni_koblenz.jgralab.greql2.funlib.graph.GetEdge;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_simpleDecl;
 import de.uni_koblenz.jgralab.greql2.schema.IsTargetExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfDeclaration_isTypeExprOfDeclaration_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 
 /**
@@ -88,7 +93,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph) {
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph) {
 		anOptimizationWasDone = false;
 
 		findAndMergeSimpleDeclarations(syntaxgraph);
@@ -107,19 +112,19 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 	 * @param syntaxgraph
 	 *            a {@link Greql2} graph
 	 */
-	private void findAndMergeSimpleDeclarations(Greql2 syntaxgraph) {
+	private void findAndMergeSimpleDeclarations(GreqlSyntaxGraph syntaxgraph) {
 		HashMap<String, ArrayList<SimpleDeclaration>> mergableSDMap = new HashMap<String, ArrayList<SimpleDeclaration>>();
 		Declaration decl = syntaxgraph.getFirstDeclaration();
 		while (decl != null) {
-			IsSimpleDeclOf isSimpleDeclOf = decl
-					.getFirstIsSimpleDeclOfIncidence(EdgeDirection.IN);
+			IsSimpleDeclOf_isSimpleDeclOf_omega isSimpleDeclOf = decl
+					.getFirst_isSimpleDeclOf_omega();
 			while (isSimpleDeclOf != null) {
-				SimpleDeclaration sDecl = (SimpleDeclaration) isSimpleDeclOf
-						.getAlpha();
-				String key = decl.getUid()
+				SimpleDeclaration sDecl = (SimpleDeclaration) isSimpleDeclOf.
+						getEdge().getAlpha();
+				String key = decl.getGlobalId()
 						+ "-"
-						+ sDecl.getFirstIsTypeExprOfIncidence(EdgeDirection.IN)
-								.getAlpha().getUid();
+						+ ((IsDeclaredVarOf) sDecl.getFirstIncidenceToIsTypeExprOf(Direction.EDGE_TO_VERTEX).getEdge())
+								.getAlpha().getGlobalId();
 				if (mergableSDMap.containsKey(key)) {
 					// We've found another SimpleDeclaration with the same type
 					// expression under the current Declaration, thus we add it
@@ -131,7 +136,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 					simpleDecls.add(sDecl);
 					mergableSDMap.put(key, simpleDecls);
 				}
-				isSimpleDeclOf = isSimpleDeclOf.getNextIsSimpleDeclOf();
+				isSimpleDeclOf = isSimpleDeclOf.getNextIsSimpleDeclOf_omegaAtVertex();
 			}
 			decl = decl.getNextDeclaration();
 		}
@@ -150,34 +155,34 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 		for (Entry<String, ArrayList<SimpleDeclaration>> e : mergableSDMap
 				.entrySet()) {
 			SimpleDeclaration survivor = e.getValue().get(0);
-			Declaration decl = (Declaration) survivor.getFirstIsSimpleDeclOfIncidence()
+			Declaration decl = (Declaration) survivor.getFirstIncidenceToIsSimpleDeclOf().getEdge()
 					.getOmega();
-			IsSimpleDeclOf isSDOfSurvivor = survivor
-					.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT);
-			IsTypeExprOfDeclaration isTEODSurvivor = survivor
-					.getFirstIsTypeExprOfDeclarationIncidence(EdgeDirection.IN);
+			IsSimpleDeclOf_simpleDecl isSDOfSurvivor = survivor
+					.getFirst_simpleDecl();
+			IsTypeExprOfDeclaration_isTypeExprOfDeclaration_omega isTEODSurvivor = survivor
+					.getFirst_isTypeExprOfDeclaration_omega();
 
 			for (SimpleDeclaration s : e.getValue()) {
 
-				IsSimpleDeclOf isSDOfS = s
-						.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT);
+				IsSimpleDeclOf_simpleDecl isSDOfS = s
+						.getFirst_simpleDecl();
 
 				if (isNextInIncidenceList(decl, isSDOfSurvivor, isSDOfS)) {
 					logger.finer(optimizerHeaderString()
 							+ "Merging all variables of " + s + " into "
 							+ survivor + ".");
 
-					while (s.getFirstIsDeclaredVarOfIncidence() != null) {
-						s.getFirstIsDeclaredVarOfIncidence().setOmega(survivor);
+					while (s.getFirstIncidenceToIsDeclaredVarOf() != null) {
+						s.getFirstIncidenceToIsDeclaredVarOf().getEdge().setOmega(survivor);
 					}
 
 					// merge the sourcePositions
-					OptimizerUtility.mergeSourcePositions(isSDOfS,
-							isSDOfSurvivor);
-					IsTypeExprOfDeclaration isTEODS = s
-							.getFirstIsTypeExprOfDeclarationIncidence(EdgeDirection.IN);
-					OptimizerUtility.mergeSourcePositions(isTEODS,
-							isTEODSurvivor);
+					OptimizerUtility.mergeSourcePositions(isSDOfS.getEdge(),
+							isSDOfSurvivor.getEdge());
+					IsTypeExprOfDeclaration_isTypeExprOfDeclaration_omega isTEODS = s
+							.getFirstIncidenceToIsTypeExprOfDeclaration(Direction.EDGE_TO_VERTEX);
+					OptimizerUtility.mergeSourcePositions(isTEODS.getEdge(),
+							isTEODSurvivor.getEdge());
 
 					s.delete();
 					anOptimizationWasDone = true;
@@ -201,15 +206,15 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 	 *         <code>decl</code>, <code>false</code> otherwise
 	 */
 	private boolean isNextInIncidenceList(Declaration decl,
-			IsSimpleDeclOf isSDOfSurvivor, IsSimpleDeclOf isSDOfS) {
-		IsSimpleDeclOf edge = decl.getFirstIsSimpleDeclOfIncidence();
+			IsSimpleDeclOf_simpleDecl isSDOfSurvivor, IsSimpleDeclOf_simpleDecl isSDOfS) {
+		IsSimpleDeclOf_isSimpleDeclOf_omega edge = decl.getFirst_isSimpleDeclOf_omega();
 		while (edge != null) {
-			if (edge.getNormalEdge() != isSDOfSurvivor) {
-				edge = edge.getNextIsSimpleDeclOf();
+			if (edge.getEdge() != isSDOfSurvivor.getEdge()) {
+				edge = edge.getNextIsSimpleDeclOf_omegaAtVertex();
 				continue;
 			}
-			IsSimpleDeclOf nextEdge = edge.getNextIsSimpleDeclOf();
-			if ((nextEdge != null) && (nextEdge.getNormalEdge() == isSDOfS)) {
+			IsSimpleDeclOf_isSimpleDeclOf_omega nextEdge = edge.getNextIsSimpleDeclOf_omegaAtVertex();
+			if ((nextEdge != null) && (nextEdge.getEdge() == isSDOfS.getEdge())) {
 				return true;
 			} else {
 				return false;

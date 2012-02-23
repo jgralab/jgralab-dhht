@@ -35,13 +35,17 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import de.uni_koblenz.jgralab.JGraLab;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * @author ist@uni-koblenz.de
@@ -80,7 +84,7 @@ public class DefaultOptimizer extends OptimizerBase {
 	 * .jgralab.greql2.evaluator.GreqlEvaluator,
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		logger.fine(optimizerHeaderString()
 				+ "Starting optimization.  Fasten your seatbelts!");
@@ -91,7 +95,7 @@ public class DefaultOptimizer extends OptimizerBase {
 		// optimizers
 		Optimizer cso = new CommonSubgraphOptimizer();
 		Optimizer pe2dpeo = new PathExistenceToDirectedPathExpressionOptimizer();
-		Optimizer eso = new EarySelectionOptimizer();
+		Optimizer eso = new EarlySelectionOptimizer();
 		Optimizer peo = new PathExistenceOptimizer();
 		Optimizer vdoo = new VariableDeclarationOrderOptimizer();
 		Optimizer ceo = new ConditionalExpressionOptimizer();
@@ -170,11 +174,11 @@ public class DefaultOptimizer extends OptimizerBase {
 	}
 
 	@SuppressWarnings("unused")
-	private void printCosts(GreqlEvaluator eval, Greql2 syntaxgraph) {
-		logger.fine("Optimizer: Optimizing " + syntaxgraph.getUid() + ".\n"
+	private void printCosts(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph) {
+		logger.fine("Optimizer: Optimizing " + syntaxgraph.getUniqueGraphId() + ".\n"
 				+ "This syntaxgraph has " + syntaxgraph.getECount()
 				+ " edges and " + syntaxgraph.getVCount() + " vertexes.");
-		GraphMarker<VertexEvaluator> marker = eval
+		ObjectGraphMarker<Vertex, VertexEvaluator> marker = eval
 				.getVertexEvaluatorGraphMarker();
 		VertexEvaluator veval;
 		GraphSize graphSize = new GraphSize(syntaxgraph);

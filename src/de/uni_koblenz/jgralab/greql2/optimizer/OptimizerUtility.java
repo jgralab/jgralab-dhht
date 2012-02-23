@@ -38,16 +38,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.optimizer.condexp.And;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.SourcePosition;
 import de.uni_koblenz.jgralab.greql2.schema.ThisLiteral;
@@ -81,8 +83,8 @@ public class OptimizerUtility {
 		if (v1 == v2) {
 			return true;
 		}
-		for (Edge inc : v1.incidences(EdgeDirection.IN)) {
-			if (isAbove(inc.getAlpha(), v2)) {
+		for (Incidence inc : v1.getIncidences(Direction.EDGE_TO_VERTEX)) {
+			if (isAbove(((Greql2Aggregation) inc.getEdge()).getAlpha(), v2)) {
 				return true;
 			}
 		}
@@ -98,7 +100,7 @@ public class OptimizerUtility {
 	 *         {@link FunctionApplication} of {@link And}.
 	 */
 	public static boolean isAnd(FunctionApplication funApp) {
-		return ((FunctionId) funApp.getFirstIsFunctionIdOfIncidence().getAlpha())
+		return ((FunctionId) funApp.getFirstIncidenceToIsFunctionIdOf().getEdge().getAlpha())
 				.get_name().equals("and");
 	}
 
@@ -111,7 +113,7 @@ public class OptimizerUtility {
 	 *         {@link FunctionApplication} of {@link And}.
 	 */
 	public static boolean isOr(FunctionApplication funApp) {
-		return ((FunctionId) funApp.getFirstIsFunctionIdOfIncidence().getAlpha())
+		return ((FunctionId) funApp.getFirstIncidenceToIsFunctionIdOf().getEdge().getAlpha())
 				.get_name().equals("or");
 	}
 
@@ -124,7 +126,7 @@ public class OptimizerUtility {
 	 *         {@link FunctionApplication} of {@link And}.
 	 */
 	public static boolean isXor(FunctionApplication funApp) {
-		return ((FunctionId) funApp.getFirstIsFunctionIdOfIncidence().getAlpha())
+		return ((FunctionId) funApp.getFirstIncidenceToIsFunctionIdOf().getEdge().getAlpha())
 				.get_name().equals("xor");
 	}
 
@@ -137,7 +139,7 @@ public class OptimizerUtility {
 	 *         {@link FunctionApplication} of {@link And}.
 	 */
 	public static boolean isNot(FunctionApplication funApp) {
-		return ((FunctionId) funApp.getFirstIsFunctionIdOfIncidence().getAlpha())
+		return ((FunctionId) funApp.getFirstIncidenceToIsFunctionIdOf().getEdge().getAlpha())
 				.get_name().equals("not");
 	}
 
@@ -181,7 +183,7 @@ public class OptimizerUtility {
 	 *         <code>name</code> as its name attribute. If no such
 	 *         {@link FunctionId} exists it will be created.
 	 */
-	public static FunctionId findOrCreateFunctionId(String name, Greql2 graph) {
+	public static FunctionId findOrCreateFunctionId(String name, GreqlSyntaxGraph graph) {
 		for (FunctionId fid : graph.getFunctionIdVertices()) {
 			if (fid.get_name().equals(name)) {
 				return fid;
@@ -200,7 +202,7 @@ public class OptimizerUtility {
 	 * @param graph
 	 *            the {@link Greql2} syntaxgraph
 	 */
-	public static void createMissingSourcePositions(Greql2 graph) {
+	public static void createMissingSourcePositions(GreqlSyntaxGraph graph) {
 		for (Greql2Aggregation aggr : graph.getGreql2AggregationEdges()) {
 			if (aggr.get_sourcePositions() == null) {
 				aggr.set_sourcePositions(new ArrayList<SourcePosition>());
@@ -216,9 +218,9 @@ public class OptimizerUtility {
 	 */
 	public static Set<Variable> collectVariablesDeclaredBy(SimpleDeclaration sd) {
 		HashSet<Variable> vars = new HashSet<Variable>();
-		for (IsDeclaredVarOf inc : sd
-				.getIsDeclaredVarOfIncidences(EdgeDirection.IN)) {
-			vars.add((Variable) inc.getAlpha());
+		for (IsDeclaredVarOf_isDeclaredVarOf_omega inc : sd
+				.getIsDeclaredVarOf_isDeclaredVarOf_omegaIncidences()) {
+			vars.add((Variable) inc.getEdge().getAlpha());
 		}
 		return vars;
 	}
@@ -255,16 +257,16 @@ public class OptimizerUtility {
 		// GreqlEvaluator.println("collectVariablesBelow(" + vertex + ")");
 		if ((vertex instanceof Variable) && !(vertex instanceof ThisLiteral)) {
 			Variable v = (Variable) vertex;
-			if (v.getFirstIsBoundVarOfIncidence(EdgeDirection.OUT) == null) {
+			if (v.getFirstIncidenceToIsBoundVarOf(Direction.VERTEX_TO_EDGE) == null) {
 				// it's no externally bound variable, but a variable declared in
 				// that query...
 				vars.add(v);
 			}
 			return vars;
 		}
-		for (Edge inc : vertex.incidences(EdgeDirection.IN)) {
+		for (Incidence inc : vertex.getIncidences(Direction.EDGE_TO_VERTEX)) {
 			// GreqlEvaluator.println(inc + " <-- " + inc.getAlpha());
-			collectInternallyDeclaredVariablesBelow(inc.getAlpha(), vars);
+			collectInternallyDeclaredVariablesBelow(((Greql2Aggregation) inc.getEdge()).getAlpha(), vars);
 		}
 		return vars;
 	}
@@ -295,10 +297,10 @@ public class OptimizerUtility {
 		}
 
 		HashSet<Vertex> nextOrphans = new HashSet<Vertex>();
-		for (Edge inc : vertex.incidences(EdgeDirection.IN)) {
-			nextOrphans.add(inc.getAlpha());
+		for (Incidence inc : vertex.getIncidences(Direction.EDGE_TO_VERTEX)) {
+			nextOrphans.add(((Greql2Aggregation) inc.getEdge()).getAlpha());
 		}
-		if ((vertex.getFirstIncidence(EdgeDirection.OUT) == null)
+		if ((vertex.getFirstIncidence(Direction.VERTEX_TO_EDGE) == null)
 				&& !verticesToOmit.contains(vertex)) {
 			// vertex is orphaned
 			alreadyDeletedVertices.add(vertex);

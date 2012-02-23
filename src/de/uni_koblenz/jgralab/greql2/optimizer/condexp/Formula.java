@@ -37,16 +37,18 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.optimizer.OptimizerUtility;
 import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf_isArgumentOf_omega;
 
 /**
  * TODO: (heimdall) Comment class!
@@ -99,29 +101,27 @@ public abstract class Formula {
 		if (exp instanceof FunctionApplication) {
 			FunctionApplication funApp = (FunctionApplication) exp;
 			if (OptimizerUtility.isAnd(funApp)) {
-				IsArgumentOf inc = funApp
-						.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-				Expression leftArg = (Expression) inc.getAlpha();
-				Expression rightArg = (Expression) inc.getNextIsArgumentOf(
-						EdgeDirection.IN).getAlpha();
+				IsArgumentOf_isArgumentOf_omega inc = funApp
+						.getFirst_isArgumentOf_omega();
+				Expression leftArg = (Expression) inc.getEdge().getAlpha();
+				Expression rightArg = (Expression) inc.getNextIsArgumentOf_omegaAtVertex().getThat();
 				return new And(eval, createFormulaFromExpressionInternal(eval,
 						leftArg), createFormulaFromExpressionInternal(eval,
 						rightArg));
 			}
 			if (OptimizerUtility.isOr(funApp)) {
-				IsArgumentOf inc = funApp
-						.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-				Expression leftArg = (Expression) inc.getAlpha();
-				Expression rightArg = (Expression) inc.getNextIsArgumentOf(
-						EdgeDirection.IN).getAlpha();
+				IsArgumentOf_isArgumentOf_omega inc = funApp
+						.getFirst_isArgumentOf_omega();
+				Expression leftArg = (Expression) inc.getEdge().getAlpha();
+				Expression rightArg = (Expression) inc.getNextIsArgumentOf_omegaAtVertex().getThat();
 				return new Or(eval, createFormulaFromExpressionInternal(eval,
 						leftArg), createFormulaFromExpressionInternal(eval,
 						rightArg));
 			}
 			if (OptimizerUtility.isNot(funApp)) {
-				IsArgumentOf inc = funApp
-						.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
-				Expression arg = (Expression) inc.getAlpha();
+				IsArgumentOf_isArgumentOf_omega inc = funApp
+						.getFirst_isArgumentOf_omega();
+				Expression arg = (Expression) inc.getThat();
 				return new Not(eval, createFormulaFromExpressionInternal(eval,
 						arg));
 			}
@@ -194,7 +194,7 @@ public abstract class Formula {
 	private boolean isFunApp(Vertex exp, String functionName) {
 		if (exp instanceof FunctionApplication) {
 			FunctionApplication funApp = (FunctionApplication) exp;
-			return ((FunctionId) funApp.getFirstIsFunctionIdOfIncidence().getAlpha())
+			return ((FunctionId) funApp.getFirstIncidenceToIsFunctionIdOf().getEdge().getAlpha())
 					.get_name().equals(functionName);
 		}
 		return false;
@@ -210,8 +210,8 @@ public abstract class Formula {
 		if (isFunApp(v, name)) {
 			return true;
 		}
-		for (Edge e : v.incidences(EdgeDirection.IN)) {
-			if (containsFunApp(e.getAlpha(), name)) {
+		for (Incidence e : v.getIncidences(Direction.EDGE_TO_VERTEX)) {
+			if (containsFunApp(((IsArgumentOf) e.getEdge()).getAlpha(), name)) {
 				return true;
 			}
 		}
