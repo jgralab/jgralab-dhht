@@ -190,10 +190,20 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 				s.add(" * Returns the first incidence leading to an edge of type #edgeClassSimpleName# or subtypes.");
 				s.add(" */");
 				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#(Direction direction);");
+				s.add("");
+				s.add("/**");
+				s.add(" * Returns the first incidence leading to an edge of type #edgeClassSimpleName# or subtypes.");
+				s.add(" */");
+				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#();");
 			} else { 
 				s.add("@Override");
 				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#(Direction direction) {");
 				s.add("\treturn (#incidenceClassQualifiedName#) getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, direction);");
+				s.add("}");
+				s.add("");
+				s.add("@Override");
+				s.add("public #incidenceClassQualifiedName# getFirstIncidenceTo#edgeClassUniqueName#() {");
+				s.add("\treturn (#incidenceClassQualifiedName#) getFirstIncidenceToEdge(#edgeClassQualifiedName#.class, Direction.BOTH);");
 				s.add("}");
 			}
 			

@@ -84,12 +84,7 @@ public class GraphLayoutFactory {
 		this.evaluator = evaluator;
 		schema = evaluator.getSchema();
 	}
-
-	public void setJsonGraphLayoutFilename(File graphLayoutFile) {
-		this.graphLayoutFile = graphLayoutFile;
-		reader = new JsonGraphLayoutReader(evaluator);
-	}
-
+	
 	public void setPListGraphLayoutFilename(File graphLayoutFile) {
 		this.graphLayoutFile = graphLayoutFile;
 		reader = new PListGraphLayoutReader(evaluator);

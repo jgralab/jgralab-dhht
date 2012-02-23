@@ -104,7 +104,7 @@ public class GraphLayout {
 	}
 
 	public TypeDefinition getTypeDefinition(AttributedElement element) {
-		return getTypeDefinition(element.getAttributedElementClass());
+		return getTypeDefinition((AttributedElement) element.getType());
 	}
 
 	public TypeDefinition getTypeDefinition(String attributedElementClassName) {
@@ -121,11 +121,11 @@ public class GraphLayout {
 	}
 
 	public TypeDefinition getTypeDefinition(Vertex vertex) {
-		return vertexTypeDefinitions.get(vertex.getAttributedElementClass());
+		return vertexTypeDefinitions.get(vertex.getType());
 	}
 
 	public TypeDefinition getTypeDefinition(Edge edge) {
-		return edgeTypeDefinitions.get(edge.getAttributedElementClass());
+		return edgeTypeDefinitions.get(edge.getType());
 	}
 
 	public Map<String, String> getGlobalVariables() {

@@ -82,7 +82,7 @@ public class XMLOutputWriter extends DefaultWriter implements XMLConstants {
 		writer.writeStartDocument("UTF-8", "1.0");
 		writer.writeStartElement(OBJECT);
 		if (getGraph() != null) {
-			writer.writeAttribute(ATTR_GRAPH_ID, getGraph().getId());
+			writer.writeAttribute(ATTR_GRAPH_ID, getGraph().getUniqueGraphId());
 		}
 	}
 
@@ -144,10 +144,10 @@ public class XMLOutputWriter extends DefaultWriter implements XMLConstants {
 	@Override
 	protected void writeEdge(Edge edge) throws XMLStreamException {
 		writer.writeEmptyElement(EDGE);
-		writer.writeAttribute(ATTR_ID, Integer.toString(edge.getId()));
+		writer.writeAttribute(ATTR_ID, Long.toString(edge.getGlobalId()));
 		if (edge.getGraph() != getGraph()) {
 			writer.writeAttribute(ATTR_GRAPH_ID,
-					String.valueOf(edge.getGraph().getId()));
+					String.valueOf(edge.getGraph().getGlobalId()));
 		}
 	}
 
@@ -176,7 +176,7 @@ public class XMLOutputWriter extends DefaultWriter implements XMLConstants {
 	@Override
 	protected void writeGraph(Graph graph) throws XMLStreamException {
 		writer.writeEmptyElement(GRAPH);
-		writer.writeAttribute(ATTR_GRAPH_ID, graph.getId());
+		writer.writeAttribute(ATTR_GRAPH_ID, graph.getUniqueGraphId());
 	}
 
 	/*
@@ -321,10 +321,10 @@ public class XMLOutputWriter extends DefaultWriter implements XMLConstants {
 	@Override
 	protected void writeVertex(Vertex vertex) throws XMLStreamException {
 		writer.writeEmptyElement(VERTEX);
-		writer.writeAttribute(ATTR_ID, String.valueOf(vertex.getId()));
+		writer.writeAttribute(ATTR_ID, String.valueOf(vertex.getGlobalId()));
 		if (vertex.getGraph() != getGraph()) {
 			writer.writeAttribute(ATTR_GRAPH_ID,
-					String.valueOf(vertex.getGraph().getId()));
+					String.valueOf(vertex.getGraph().getUniqueGraphId()));
 		}
 	}
 

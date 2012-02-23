@@ -146,6 +146,7 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
+			code.addNoIndent(createTypesafeGetEdgeAndVertexMethod());
 		}
 		code.add(createGetDirectionMethod());
 		return code;
@@ -178,7 +179,6 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 						code.addNoIndent(createNextMethod(sc, false, true));
 					}
 				}
-				code.addNoIndent(createTypesafeGetEdgeAndVertexMethod());
 			}
 		}
 		return code;

@@ -41,6 +41,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_hasAttribute_ComesFrom_AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.CollectionDomain;
 import de.uni_koblenz.jgralab.schema.Constraint;
@@ -731,10 +732,10 @@ public class SchemaGraph2Schema {
 			de.uni_koblenz.jgralab.Vertex gElement) {
 
 		// Loop over all HasAttibute edge of a given GraphElementClass
-		for (HasAttribute gHasAttribute : gElement.getIncidentEdges(
-				HasAttribute.class, OUTGOING)) {
+		for (HasAttribute_hasAttribute_ComesFrom_AttributedElementClass gHasAttribute : gElement.getIncidences(
+				HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class)) {
 
-			createAttribute(xElement, gHasAttribute);
+			createAttribute(xElement, gHasAttribute.getEdge());
 		}
 	}
 

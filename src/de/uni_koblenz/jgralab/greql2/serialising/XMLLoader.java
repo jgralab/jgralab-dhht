@@ -55,7 +55,7 @@ public class XMLLoader extends XmlProcessor implements XMLConstants {
 	public XMLLoader(Graph... graphs) {
 		id2GraphMap = new HashMap<String, Graph>(graphs.length);
 		for (Graph g : graphs) {
-			id2GraphMap.put(g.getId(), g);
+			id2GraphMap.put(g.getUniqueGraphId(), g);
 		}
 
 		schemaName2Schema = new HashMap<String, Schema>(graphs.length);
@@ -210,7 +210,7 @@ public class XMLLoader extends XmlProcessor implements XMLConstants {
 			Edge e = g.getEdge(id);
 			if (e == null) {
 				throw new SerialisingException("There's no edge with id '" + id
-						+ "' in graph '" + g.getId() + "'.", null);
+						+ "' in graph '" + g.getUniqueGraphId() + "'.", null);
 			}
 			val = e;
 			// ---------------------------------------------------------------
@@ -281,7 +281,7 @@ public class XMLLoader extends XmlProcessor implements XMLConstants {
 			Vertex v = g.getVertex(id);
 			if (v == null) {
 				throw new SerialisingException("There's no vertex with id '"
-						+ id + "' in graph '" + g.getId() + "'.", null);
+						+ id + "' in graph '" + g.getUniqueGraphId() + "'.", null);
 			}
 			val = v;
 			// ---------------------------------------------------------------
