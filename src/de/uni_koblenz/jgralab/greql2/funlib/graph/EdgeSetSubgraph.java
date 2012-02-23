@@ -4,10 +4,10 @@ import java.rmi.RemoteException;
 
 import org.pcollections.PCollection;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
@@ -25,7 +25,7 @@ public class EdgeSetSubgraph extends Function {
 
 	@SuppressWarnings("rawtypes")
 	public GraphMarker evaluate(Graph graph, PCollection<Edge> edgeSet) {
-		BooleanGraphMarker<GraphElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
+		BooleanGraphMarker<AttributedElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
 		Edge currentEdge = graph.getFirstEdge();
 		while (currentEdge != null) {
 			if (edgeSet.contains(currentEdge)) {

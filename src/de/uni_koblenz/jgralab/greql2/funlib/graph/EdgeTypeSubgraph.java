@@ -2,10 +2,10 @@ package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
 import java.rmi.RemoteException;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
@@ -23,7 +23,7 @@ public class EdgeTypeSubgraph extends Function {
 
 	@SuppressWarnings("rawtypes")
 	public BooleanGraphMarker evaluate(Graph graph, TypeCollection typeCollection) {
-		BooleanGraphMarker<GraphElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
+		BooleanGraphMarker<AttributedElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
 		Edge currentEdge = graph.getFirstEdge();
 		while (currentEdge != null) {
 			if (typeCollection.acceptsType(currentEdge

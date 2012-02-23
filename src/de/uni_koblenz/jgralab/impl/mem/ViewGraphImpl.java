@@ -149,6 +149,11 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 	
 	@Override
+	public Graph getGraph() {
+		return getCompleteGraph();
+	}
+	
+	@Override
 	public Graph getLocalPartialGraph() {
 		return viewedGraph.getLocalPartialGraph();
 	}

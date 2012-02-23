@@ -80,4 +80,10 @@ extends TypedElement<ConcreteAttributedElementClass, ConcreteInterface> {
 			throws NoSuchAttributeException;
 
 	void initializeAttributesWithDefaultValues();
+	
+	/**
+	 * Returns the graph this element belongs to, or this graph itself
+	 * @return
+	 */
+	public Graph getGraph();
 }

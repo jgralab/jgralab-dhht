@@ -5,10 +5,10 @@ import java.rmi.RemoteException;
 
 import org.pcollections.PCollection;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
@@ -27,7 +27,7 @@ public class ElementSetSubgraph extends Function {
 	@SuppressWarnings("rawtypes")
 	public BooleanGraphMarker evaluate(Graph graph, PCollection<Vertex> vertexSet, PCollection<Edge> edgeSet) {
 		try {
-		BooleanGraphMarker<GraphElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
+		BooleanGraphMarker<AttributedElement> subgraphMarker = new GlobalBooleanGraphMarker(graph);
 		for (Vertex currentVertex : vertexSet) {
 			subgraphMarker.mark(currentVertex);
 		}

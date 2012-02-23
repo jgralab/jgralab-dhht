@@ -50,9 +50,9 @@ import de.uni_koblenz.jgralab.Vertex;
 
 @SuppressWarnings("rawtypes")
 public class LocalBooleanGraphMarker extends
-		AbstractGraphMarker<GraphElement> implements BooleanGraphMarker<GraphElement> {
+		AbstractGraphMarker<AttributedElement> implements BooleanGraphMarker<AttributedElement> {
 
-	private final HashSet<GraphElement> markedElements;
+	private final HashSet<AttributedElement> markedElements;
 
 	/**
 	 * creates a new boolean graph marker
@@ -60,7 +60,7 @@ public class LocalBooleanGraphMarker extends
 	 */
 	public LocalBooleanGraphMarker(Graph g) {
 		super(g);
-		markedElements = new HashSet<GraphElement>();
+		markedElements = new HashSet<AttributedElement>();
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if this GraphMarker marks the given element, false otherwise
 	 */
 	@Override
-	public final boolean isMarked(GraphElement elem) {
+	public final boolean isMarked(AttributedElement elem) {
 		assert (elem.getGraph() == graph);
 		return markedElements.contains(elem);
 	}
@@ -85,7 +85,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if the element has been marked successfull, false if this
 	 *         element is already marked by this GraphMarker
 	 */
-	public final boolean mark(GraphElement elem) {
+	public final boolean mark(AttributedElement elem) {
 		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
 				.getGraph() == graph));
 
@@ -102,8 +102,8 @@ public class LocalBooleanGraphMarker extends
 	 *         <code>false</code> otherwise
 	 */
 	@Override
-	public final boolean removeMark(GraphElement elem) {
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+	public final boolean removeMark(AttributedElement elem) {
+		assert ((elem instanceof AttributedElement && ((AttributedElement<?, ?>) elem)
 				.getGraph() == graph));
 		return markedElements.remove(elem);
 	}
@@ -114,7 +114,7 @@ public class LocalBooleanGraphMarker extends
 	 * @return the markedElements
 	 */
 	@Override
-	public Iterable<GraphElement> getMarkedElements() {
+	public Iterable<AttributedElement> getMarkedElements() {
 		return markedElements;
 	}
 

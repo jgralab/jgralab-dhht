@@ -2,7 +2,7 @@ package de.uni_koblenz.jgralab.graphmarker;
 
 
 import de.uni_koblenz.jgralab.Graph;
-import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.AttributedElement;
 
 
 /**
@@ -15,13 +15,13 @@ import de.uni_koblenz.jgralab.GraphElement;
  * @param <O> The kind of objects that can be attached to the edges as marks
  */
 @SuppressWarnings("rawtypes")
-public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement> implements BooleanGraphMarker<GraphElement> {
+public class GlobalBooleanGraphMarker extends GlobalGraphMarker<AttributedElement> implements BooleanGraphMarker<AttributedElement> {
 
 	public GlobalBooleanGraphMarker(Graph globalGraph) {
 		super(globalGraph);
 	}
 
-	protected final BooleanGraphMarker<GraphElement> createMarkerForPartialGraph() {
+	protected final BooleanGraphMarker<AttributedElement> createMarkerForPartialGraph() {
 		return  new LocalBooleanGraphMarker(graph);
 	}
 	
@@ -31,7 +31,7 @@ public class GlobalBooleanGraphMarker extends GlobalGraphMarker<GraphElement> im
 	 * @param value the object to be used a mark
 	 * @return 
 	 */
-	public final boolean mark(GraphElement elem) {
+	public final boolean mark(AttributedElement elem) {
 		LocalBooleanGraphMarker localMarker = (LocalBooleanGraphMarker) getOrCreateMarkerForPartialGraph(elem);
 		return localMarker.mark(elem);		
 	}

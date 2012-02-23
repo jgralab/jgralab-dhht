@@ -108,7 +108,6 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathLength.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathSystem.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices.class);
-		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Slice.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.StartVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.This.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.That.class);
