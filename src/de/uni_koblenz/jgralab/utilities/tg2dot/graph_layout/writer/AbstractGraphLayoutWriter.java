@@ -50,25 +50,6 @@ import de.uni_koblenz.jgralab.utilities.tg2dot.graph_layout.definition.TypeDefin
  */
 public abstract class AbstractGraphLayoutWriter {
 
-	/**
-	 * Writes a GraphLayout to a Json-file.
-	 * 
-	 * @param filename
-	 *            Json-file name.
-	 * @param layout
-	 *            GraphLayout, which is written out.
-	 */
-	public static void writeLayoutToAJsonFile(String filename,
-			GraphLayout layout) {
-		JsonGraphLayoutWriter writer = new JsonGraphLayoutWriter();
-		try {
-			writer.startProcessing(filename, layout);
-		} catch (JsonGenerationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Writes a definition to the file.
@@ -81,7 +62,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 * @throws IOException
 	 */
 	protected abstract void writeDefinition(String name, Definition definition)
-			throws JsonGenerationException, IOException;
+			throws IOException;
 
 	/**
 	 * Writes all {@link ElementDefinition}s to the file.
@@ -92,7 +73,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 * @throws IOException
 	 */
 	protected abstract void writeElementDefinitions(GraphLayout layout)
-			throws JsonGenerationException, IOException;
+			throws IOException;
 
 	/**
 	 * Writes all TypeDefinitions to the file.
@@ -105,7 +86,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 */
 	protected abstract void writeTypeDefinitions(
 			Map<AttributedElementClass, TypeDefinition> definitions)
-			throws JsonGenerationException, IOException;
+			throws IOException;
 
 	/**
 	 * Writes all TypeDefinitions to the file.
@@ -116,7 +97,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 * @throws IOException
 	 */
 	protected abstract void writeTypeDefinitions(GraphLayout layout)
-			throws JsonGenerationException, IOException;
+			throws  IOException;
 
 	/**
 	 * Writes all constants to the file.
@@ -127,7 +108,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 * @throws IOException
 	 */
 	protected abstract void writeConstants(GraphLayout layout)
-			throws JsonGenerationException, IOException;
+			throws  IOException;
 
 	/**
 	 * Starts the processing of the GraphLayout to the file.
@@ -138,7 +119,7 @@ public abstract class AbstractGraphLayoutWriter {
 	 * @throws IOException
 	 */
 	public void startProcessing(String filename, GraphLayout layout)
-			throws JsonGenerationException, IOException {
+			throws IOException {
 		initializeResources(filename);
 		writeConstants(layout);
 		writeTypeDefinitions(layout);

@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="/common/lib/apache/commons/cli/commons-cli-1.2.jar"/>
 	<classpathentry kind="lib" path="/common/lib/apache/ant/ant.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
+	<classpathentry kind="lib" path="lib/plist/org.riediger.plist.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

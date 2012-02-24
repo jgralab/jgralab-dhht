@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 import org.pcollections.PVector;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -106,25 +107,25 @@ public class Path {
 	public int degree(Vertex vertex, Direction dir) {
 		int degree = 0;
 		switch (dir) {
-		case IN:
+		case EDGE_TO_VERTEX:
 			for (Edge e : edges) {
-				if (e.getOmega() == vertex) {
+				if (((BinaryEdge) e).getOmega() == vertex) {
 					degree++;
 				}
 			}
 			return degree;
-		case OUT:
+		case VERTEX_TO_EDGE:
 			for (Edge e : edges) {
-				if (e.getAlpha() == vertex) {
+				if (((BinaryEdge) e).getAlpha() == vertex) {
 					degree++;
 				}
 			}
 			return degree;
-		case INOUT:
+		case BOTH:
 			for (Edge e : edges) {
-				if (e.getOmega() == vertex) {
+				if (((BinaryEdge) e).getOmega() == vertex) {
 					degree++;
-				} else if (e.getAlpha() == vertex) {
+				} else if (((BinaryEdge) e).getAlpha() == vertex) {
 					degree++;
 				}
 			}

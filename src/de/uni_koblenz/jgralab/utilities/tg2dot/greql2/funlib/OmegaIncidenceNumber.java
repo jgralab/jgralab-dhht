@@ -35,7 +35,8 @@
 
 package de.uni_koblenz.jgralab.utilities.tg2dot.greql2.funlib;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 
 public class OmegaIncidenceNumber extends Function {
@@ -45,10 +46,10 @@ public class OmegaIncidenceNumber extends Function {
 				2, 1, 1.0, Category.GRAPH);
 	}
 
-	public Integer evaluate(Edge edge) {
+	public Integer evaluate(BinaryEdge edge) {
 		int num = 1;
-		for (Edge incidence : edge.getOmega().incidences()) {
-			if (incidence.getReversedEdge() == edge) {
+		for (Incidence incidence : edge.getOmega().getIncidences()) {
+			if (incidence.getEdge() == edge) {
 				return num;
 			}
 			num++;

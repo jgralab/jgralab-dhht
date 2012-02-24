@@ -44,6 +44,7 @@ import java.util.Queue;
 
 import org.pcollections.PSet;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -477,7 +478,7 @@ public class PathSystem {
 	 *         vertex or an empty set, if the vertex is not part of this
 	 *         pathsystem
 	 */
-	public PSet<Edge> edgesConnected(Vertex vertex, EdgeDirection direction) {
+	public PSet<Edge> edgesConnected(Vertex vertex, Direction direction) {
 		assertFinished();
 		if (vertex == null) {
 			return null;
@@ -493,17 +494,17 @@ public class PathSystem {
 					continue;
 				}
 				switch (direction) {
-				case IN:
+				case EDGE_TO_VERTEX:
 					if (edge.isNormal()) {
 						addEdgeToResult(resultSet, edge, vertex);
 					}
 					break;
-				case OUT:
+				case VERTEX_TO_EDGE:
 					if (!edge.isNormal()) {
 						addEdgeToResult(resultSet, edge, vertex);
 					}
 					break;
-				case INOUT:
+				case BOTH:
 					addEdgeToResult(resultSet, edge, vertex);
 					break;
 				default:
