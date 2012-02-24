@@ -104,11 +104,8 @@ public class EpsilonTransition extends Transition {
 	 */
 	@Override
 	public Vertex getNextElement(Vertex v, Edge e) {
-		if (e.getAlpha() == v) {
-			return e.getOmega();
-		} else {
-			return e.getAlpha();
-		}
+		throw new UnsupportedOperationException(
+				"EpsilonTransition.getNextElement(...) has been called. That should not happen, there should be no epsilon-transitions in the DFA used for path search. Check the DFA-Constructor");
 	}
 
 	/**

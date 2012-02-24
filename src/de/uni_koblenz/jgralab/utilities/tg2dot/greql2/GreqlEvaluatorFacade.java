@@ -39,14 +39,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
-import de.uni_koblenz.jgralab.schema.AggregationKind;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.utilities.tg2dot.greql2.funlib.AbbreviateString;
@@ -182,14 +184,22 @@ public class GreqlEvaluatorFacade {
 	 *            A VertexClass.
 	 */
 	private void setStaticVariablesOfGreqlEvaluator(EdgeClass edgeClass) {
+		IncidenceClass toIC = null;
+		IncidenceClass fromIC = null;
+		for (IncidenceClass inc : edgeClass.getAllIncidenceClasses()) {
+			if (inc.getDirection() == Direction.EDGE_TO_VERTEX)
+				fromIC = inc;
+			if (inc.getDirection() == Direction.VERTEX_TO_EDGE)
+				toIC = inc;
+		}
+		
+		IncidenceType semanticType = fromIC.getIncidenceType();
+		setVariable(SHARED_THIS, semanticType == IncidenceType.AGGREGATION);
+		setVariable(COMPOSITE_THIS, semanticType ==IncidenceType.COMPOSITION);
 
-		AggregationKind semanticType = edgeClass.getFrom().getAggregationKind();
-		setVariable(SHARED_THIS, semanticType == AggregationKind.SHARED);
-		setVariable(COMPOSITE_THIS, semanticType == AggregationKind.COMPOSITE);
-
-		semanticType = edgeClass.getTo().getAggregationKind();
-		setVariable(SHARED_THAT, semanticType == AggregationKind.SHARED);
-		setVariable(COMPOSITE_THAT, semanticType == AggregationKind.COMPOSITE);
+		semanticType = toIC.getIncidenceType();
+		setVariable(SHARED_THAT, semanticType == IncidenceType.AGGREGATION);
+		setVariable(COMPOSITE_THAT, semanticType == IncidenceType.COMPOSITION);
 	}
 
 	/**
@@ -233,7 +243,7 @@ public class GreqlEvaluatorFacade {
 			AttributedElement attributedElement, int graphSequenceIndex) {
 
 		setVariable(ELEMENT, attributedElement);
-		setVariable(TYPE, attributedElement.getAttributedElementClass());
+		setVariable(TYPE, attributedElement.getType());
 		setVariable(ELEMENT_SEQUENCE_INDEX, graphSequenceIndex);
 	}
 

@@ -415,7 +415,7 @@ public class PathSystem {
 			Entry<PathSystemKey, PathSystemEntry> entry) {
 		return typeCollection == null
 				|| typeCollection.acceptsType(entry.getValue().getParentEdge()
-						.getAttributedElementClass());
+						.getType());
 	}
 
 	public boolean isOutgoingEdge(Entry<PathSystemKey, PathSystemEntry> entry,
@@ -452,7 +452,7 @@ public class PathSystem {
 			PathSystemEntry pe = entry.getValue();
 			if ((typeCol == null)
 					|| typeCol.acceptsType(pe.getParentEdge()
-							.getAttributedElementClass())) {
+							.getType())) {
 				if (pe.getParentVertex() == vertex) {
 					degree++;
 				}

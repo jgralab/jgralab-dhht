@@ -47,7 +47,7 @@ public class AttributeType extends Function {
 	}
 
 	public String evaluate(AttributedElement el, String name) {
-		return evaluate(el.getAttributedElementClass(), name);
+		return evaluate((AttributedElement) el.getType(), name);
 	}
 
 	public String evaluate(AttributedElementClass aec, String name) {

@@ -47,6 +47,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
@@ -277,12 +278,12 @@ public class AggregationTransition extends Transition {
 
 		// checks if a role restriction is set and if e has the right role
 		if (validEdgeRoles != null) {
-			EdgeClass ec = e.getType();
+			BinaryEdgeClass ec = (BinaryEdgeClass) e.getType();
 			Set<String> roles = null;
 			if (e.isNormal() == checkToEdgeRoles) {
-				roles = ec.getTo().getAllRoles();
+				roles = ec.getToIncidenceClass().getAllRoles();
 			} else {
-				roles = ec.getFrom().getAllRoles();
+				roles = ec.getFromIncidenceClass().getAllRoles();
 			}
 			for (String role : roles) {
 				if (validEdgeRoles.contains(role)) {

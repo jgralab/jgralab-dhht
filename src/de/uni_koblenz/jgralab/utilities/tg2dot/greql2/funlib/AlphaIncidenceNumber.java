@@ -35,7 +35,9 @@
 
 package de.uni_koblenz.jgralab.utilities.tg2dot.greql2.funlib;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 
 public class AlphaIncidenceNumber extends Function {
@@ -47,8 +49,8 @@ public class AlphaIncidenceNumber extends Function {
 
 	public Integer evaluate(Edge edge) {
 		int num = 1;
-		for (Edge incidence : edge.getAlpha().incidences()) {
-			if (incidence == edge) {
+		for (Incidence incidence : ((BinaryEdge) edge).getAlpha().getIncidences()) {
+			if (incidence.getEdge() == edge) {
 				return num;
 			}
 			num++;
