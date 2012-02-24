@@ -246,6 +246,7 @@ public class AggregationTransition extends Transition {
 	 */
 	@Override
 	public boolean accepts(Vertex vertex, Edge e) {
+		Incidence inc;
 		if (e == null) {
 			return false;
 		}

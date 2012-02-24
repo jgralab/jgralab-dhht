@@ -30,8 +30,8 @@ VertexClass EdgeClass: GraphElementClass;
 VertexClass BinaryEdgeClass: EdgeClass;
 
 VertexClass IncidenceClass:TypedElementClass {direction: Direction, incidenceType: IncidenceType, maxEdgesAtVertex: Integer, minEdgesAtVertex: Integer, minVerticesAtEdge: Integer, maxVerticesAtEdge: Integer, roleName : String};
-BinaryEdgeClass ConnectsToVertexClass from IncidenceClass  (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
-BinaryEdgeClass ConnectsToEdgeClass from IncidenceClass (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
+BinaryEdgeClass ConnectsToVertexClass from IncidenceClass role incidenceClassAtVertex  (0,*) (1,1) to VertexClass role connectedVertexClass (1,1) (1,1);
+BinaryEdgeClass ConnectsToEdgeClass from IncidenceClass role incidenceClassAtEdge (0,*) (1,1) to EdgeClass role connectedEdgeClass (1,1) (1,1);
 BinaryEdgeClass HidesIncidenceClassAtVertexClass from IncidenceClass role hidingIncidenceClassAtVertex (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtVertex (0,*) (1,1);
 BinaryEdgeClass HidesIncidenceClassAtEdgeClass from IncidenceClass role hidingIncidenceClassAtEdge (0,*) (1,1) to IncidenceClass role hiddenIncidenceClassAtEdge (0,*) (1,1);
 
@@ -43,14 +43,14 @@ BinaryEdgeClass SpecializesIncidenceClass: SpecializesTypedElementClass from Inc
 
 Comment structure.Attribute "The defaultValue is a string constant in TG syntax, compatible to the Domain of the Attribute.\ndefaultValue may be null (which means no default value is specified).";
 VertexClass Attribute {name: String, defaultValue: String};
-BinaryEdgeClass HasDomain from Attribute (0,*) (1,1) to domains.Domain role domain (1,1) (1,1);
+BinaryEdgeClass HasDomain from Attribute role attributeWithDomain (0,*) (1,1) to domains.Domain role domainOfAttribute (1,1) (1,1);
 BinaryEdgeClass HasConstraint from AttributedElementClass role constrainedElement  (1,1) (1,1) to Constraint role constraint (0,*) (1,1) COMPOSITE;
-BinaryEdgeClass HasAttribute from AttributedElementClass (1,1) (1,1) to Attribute role attribute (0,*) (1,1) COMPOSITE;
-BinaryEdgeClass ContainsSubPackage from Package (0,1) (1,1) to Package role subpackage (0,*) (1,1) COMPOSITE;
-BinaryEdgeClass ContainsDomain from Package (1,1) (1,1) to domains.Domain (0,*) (1,1) COMPOSITE;
-BinaryEdgeClass ContainsGraphElementClass from Package (1,1) (1,1) to GraphElementClass (0,*) (1,1) COMPOSITE;
-BinaryEdgeClass ContainsDefaultPackage from Schema (0,1) (1,1) to Package (1,1) (1,1) COMPOSITE;
-BinaryEdgeClass DefinesGraphClass from Schema (1,1) (1,1) to GraphClass role graphClass (1,1) (1,1) COMPOSITE;
+BinaryEdgeClass HasAttribute from AttributedElementClass role attributedElement (1,1) (1,1) to Attribute role attribute (0,*) (1,1) COMPOSITE;
+BinaryEdgeClass ContainsSubPackage from Package role superpackage (0,1) (1,1) to Package role subpackage (0,*) (1,1) COMPOSITE;
+BinaryEdgeClass ContainsDomain from Package role packageOfDomain (1,1) (1,1) to domains.Domain role domainInPackage (0,*) (1,1) COMPOSITE;
+BinaryEdgeClass ContainsGraphElementClass from Package role packageOfElement (1,1) (1,1) to GraphElementClass role packagedElement (0,*) (1,1) COMPOSITE;
+BinaryEdgeClass ContainsDefaultPackage from Schema role schemaOfPackage (0,1) (1,1) to Package role defaultPackage (1,1) (1,1) COMPOSITE;
+BinaryEdgeClass DefinesGraphClass from Schema role schemaOfGraphClass (1,1) (1,1) to GraphClass role graphClass (1,1) (1,1) COMPOSITE;
 
 
 Package domains;
@@ -67,8 +67,8 @@ abstract VertexClass Domain: structure.NamedElementClass;
 VertexClass DoubleDomain: BasicDomain;
 VertexClass BooleanDomain: BasicDomain;
 abstract VertexClass CollectionDomain: Domain;
-BinaryEdgeClass HasBaseDomain from CollectionDomain (0,*) (1,1) to Domain role basedomain (1,1) (1,1);
-BinaryEdgeClass HasValueDomain from MapDomain (0,*) (1,1) to Domain role valuedomain (1,1) (1,1);
-BinaryEdgeClass HasKeyDomain from MapDomain (0,*) (1,1) to Domain role keydomain (1,1) (1,1);
-BinaryEdgeClass HasRecordDomainComponent from RecordDomain (0,*) (1,1) to Domain role componentdomain (1,*)  (1,1)  AGGREGATE {name: String};
+BinaryEdgeClass HasBaseDomain from CollectionDomain role collectionDomain (0,*) (1,1) to Domain role baseDomain (1,1) (1,1);
+BinaryEdgeClass HasValueDomain from MapDomain role mapDomainOfValue (0,*) (1,1) to Domain role valueDomain (1,1) (1,1);
+BinaryEdgeClass HasKeyDomain from MapDomain role mapDomainOfKey (0,*) (1,1) to Domain role keyDomain (1,1) (1,1);
+BinaryEdgeClass HasRecordDomainComponent from RecordDomain role recordDomainOfComponent (0,*) (1,1) to Domain role componentDomain (1,*)  (1,1)  AGGREGATE {name: String};
 
