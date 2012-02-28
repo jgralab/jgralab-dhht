@@ -107,8 +107,9 @@ public class SimpleDeclarationEvaluator extends VertexEvaluator {
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
 		// Calculate the costs for the type definition
-		VertexEvaluator typeExprEval = getVertexEvalMarker().getMark(
-				vertex.getFirst_isTypeExprOf_omega().getThat());
+		VertexEvaluator typeExprEval = 
+		getVertexEvalMarker().getMark(
+				vertex.getFirst_isTypeExprOfDeclaration_omega().getThat());
 
 		long typeCosts = typeExprEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);

@@ -242,7 +242,7 @@ public class VariableEvaluator extends VertexEvaluator {
 		if (inc != null) {
 			SimpleDeclaration decl = (SimpleDeclaration) inc.getThat();
 			VertexEvaluator typeExpEval = getVertexEvalMarker().getMark(
-					decl.getFirst_isTypeExprOf_omega().getThat());
+					decl.getFirst_isTypeExprOfDeclaration_omega().getThat());
 			return typeExpEval.getEstimatedCardinality(graphSize);
 		} else {
 			// if there exists no "isDeclaredVarOf"-Edge, the variable is not

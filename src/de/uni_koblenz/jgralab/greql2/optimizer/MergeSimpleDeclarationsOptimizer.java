@@ -119,7 +119,7 @@ public class MergeSimpleDeclarationsOptimizer extends OptimizerBase {
 						getEdge().getAlpha();
 				String key = decl.getGlobalId()
 						+ "-"
-						+ ((IsDeclaredVarOf) sDecl.getFirstIncidenceToIsTypeExprOf(Direction.EDGE_TO_VERTEX).getEdge())
+						+ ((IsDeclaredVarOf) sDecl.getFirstIncidenceToIsDeclaredVarOf(Direction.EDGE_TO_VERTEX).getEdge())
 								.getAlpha().getGlobalId();
 				if (mergableSDMap.containsKey(key)) {
 					// We've found another SimpleDeclaration with the same type
