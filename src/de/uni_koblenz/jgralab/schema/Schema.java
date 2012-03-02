@@ -486,5 +486,7 @@ public interface Schema extends Comparable<Schema> {
 	public Class<?> getM1ClassForId(Integer id);
 
 	public TypedElementClass<?, ?> getTypeForId(Integer id);
+	
+	public int getNumberOfTypedElementClasses();
 
 }
