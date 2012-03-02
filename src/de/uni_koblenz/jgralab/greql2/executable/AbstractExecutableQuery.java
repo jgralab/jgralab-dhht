@@ -7,8 +7,6 @@ import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 public abstract class AbstractExecutableQuery implements ExecutableQuery {
 
 	protected static boolean checkDirection(boolean isVertex, Incidence inc, IncDirection dir) {
-		if (dir == IncDirection.BOTH)
-			return true;
 		if (isVertex) {
 			if (dir == IncDirection.IN)
 				return inc.getDirection() == Direction.EDGE_TO_VERTEX;

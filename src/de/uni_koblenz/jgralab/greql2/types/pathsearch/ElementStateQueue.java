@@ -65,11 +65,11 @@ public class ElementStateQueue {
 		size = initialSize;
 	}
 
-	public final void put(Vertex v, int s) {
+	public final void put(GraphElement e, int s) {
 		if (last == first + size - 1) {
 			resize();
 		}
-		elements[last % size] = v;
+		elements[last % size] = e;
 		states[last % size] = s;
 		last++;
 	}

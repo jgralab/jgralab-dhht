@@ -14,6 +14,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.executable.queries.SampleQuery;
 import de.uni_koblenz.jgralab.greql2.parser.GreqlParser;
+import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 
 
@@ -25,7 +26,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -42,7 +43,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -58,7 +59,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -73,7 +74,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -88,7 +89,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -103,7 +104,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -119,7 +120,7 @@ public class ExecutableGreqlTest {
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {
@@ -131,12 +132,17 @@ public class ExecutableGreqlTest {
 	
 	@Test
 	public void testGenerateForwardVertexSet() {
-		//String query = "using X,Y: from x:X, y:Y with (y % 2 <> 1) and (x % 3 = 0) reportList x*y end";
 		String query = "from v:V{MyVertex} report v--> end";
 		GreqlEvaluator eval = new GreqlEvaluator(query, null, null);
 		ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker = eval.getVertexEvaluators();
 		GreqlSyntaxGraph queryGraph = eval.getSyntaxGraph();
-		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker);
+		if (queryGraph == null) {
+			System.out.println("Query graph is null");
+			queryGraph = GreqlParser.parse(query);
+			if (queryGraph == null)
+				System.out.println("Parsign exception");
+		}
+		GreqlCodeGenerator greqlcodeGen = new GreqlCodeGenerator(queryGraph, graphMarker, Greql2Schema.instance());
 		try {
 			greqlcodeGen.createFiles("/Users/dbildh/repos/git/jgralab-dhht/src/");
 		} catch (GraphIOException e) {

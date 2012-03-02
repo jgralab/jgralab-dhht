@@ -38,8 +38,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import com.sun.tools.internal.ws.wscompile.Options.Target;
-
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
@@ -58,7 +56,7 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
  * diploma thesis is not finished.
  * 
  */
-public class SimpleIncidenceTransition_Db extends Transition {
+public class AggregationIncidenceTransition_Db extends Transition {
 
 	protected VertexEvaluator predicateEvaluator;
 	
@@ -75,16 +73,6 @@ public class SimpleIncidenceTransition_Db extends Transition {
 
 	public TypeCollection getTypeCollection() {
 		return typeCollection;
-	}
-	
-	/**
-	 * this transition may accept edges in direction in, out or any
-	 */
-	protected IncDirection validDirection;
-	
-	
-	public IncDirection getAllowedDirection() {
-		return validDirection;
 	}
 
 	/**
@@ -106,19 +94,19 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	public boolean equalSymbol(Transition t) {
 		if (t instanceof SimpleIncidenceTransition_Db) {
 			SimpleIncidenceTransition_Db st = (SimpleIncidenceTransition_Db) t;
-			if ((validDirection == st.getAllowedDirection()) && (typeCollection == st.getTypeCollection()) && (predicateEvaluator == st.getPredicateEvaluator()))
+			if ((typeCollection == st.getTypeCollection()) && (predicateEvaluator == st.getPredicateEvaluator()))
 					return true;
 		}			
 		return  false;
 	}
 
+
 	/**
 	 * Copy-constructor, creates a copy of the given transition
 	 */
-	protected SimpleIncidenceTransition_Db(SimpleIncidenceTransition_Db t, boolean addToStates) {
+	protected AggregationIncidenceTransition_Db(AggregationIncidenceTransition_Db t, boolean addToStates) {
 		super(t, addToStates);
-		validDirection = t.validDirection;
-		typeCollection = new TypeCollection(t.typeCollection);
+		typeCollection = t.typeCollection;
 		predicateEvaluator = t.predicateEvaluator;
 		thisEdgeEvaluator = t.thisEdgeEvaluator;
 	}
@@ -128,7 +116,7 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 */
 	@Override
 	public Transition copy(boolean addToStates) {
-		return new SimpleIncidenceTransition_Db(this, addToStates);
+		return new AggregationIncidenceTransition_Db(this, addToStates);
 	}
 
 	/**
@@ -144,19 +132,11 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 *            The direction of the accepted edges, may be EdeDirection.IN,
 	 *            EdgeDirection.OUT or EdgeDirection.ANY
 	 */
-	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir, TypeCollection typeColl) {
+	public AggregationIncidenceTransition_Db(State start, State end,  TypeCollection typeColl) {
 		super(start, end);
-		validDirection = dir;
 		typeCollection = typeColl;
-		
 	}
 	
-	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir) {
-		super(start, end);
-		validDirection = dir;
-		typeCollection = null;
-		
-	}
 
 	/**
 	 * Creates a new transition from start state to end state. The Transition
@@ -177,13 +157,11 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 *            The set of accepted edge role names, or null if any role is
 	 *            accepted
 	 */
-	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir,
+	public AggregationIncidenceTransition_Db(State start, State end, 
 			TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator predicateEvaluator,
 			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end);
-		validDirection = dir;
-
 		this.typeCollection = typeCollection;
 		this.predicateEvaluator = predicateEvaluator;
 		Vertex v;

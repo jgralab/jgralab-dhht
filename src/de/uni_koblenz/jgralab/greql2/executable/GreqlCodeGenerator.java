@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.greql2.executable;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
@@ -14,12 +13,12 @@ import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.codegenerator.CodeList;
 import de.uni_koblenz.jgralab.codegenerator.CodeSnippet;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
+import de.uni_koblenz.jgralab.greql2.evaluator.fa.AggregationIncidenceTransition_Db;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.SimpleIncidenceTransition_Db;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.Transition;
-import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.PathDescriptionEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
@@ -36,6 +35,7 @@ import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Identifier;
+import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf_isArgumentOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf_isBoundVarOf_omega;
@@ -52,19 +52,19 @@ import de.uni_koblenz.jgralab.greql2.schema.ListRangeConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.Literal;
 import de.uni_koblenz.jgralab.greql2.schema.LongLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.MapComprehension;
-import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.QuantifiedExpression;
 import de.uni_koblenz.jgralab.greql2.schema.Quantifier;
 import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.SetConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.StringLiteral;
+import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
+import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
 import de.uni_koblenz.jgralab.greql2.schema.TypeId;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
@@ -195,12 +195,16 @@ public class GreqlCodeGenerator extends CodeGenerator {
 		//thisVertex and thisEdge should be handled separately before literal and variable
 		//in path evaluators, direct access to the respecitve vertices needs to be 
 		//encapulated
-		if (queryExpr instanceof Variable) {
-			return createCodeForVariable((Variable) queryExpr);
-		}
 		if (queryExpr instanceof Literal) {
 			return createCodeForLiteral((Literal) queryExpr);
 		}
+		if (queryExpr instanceof Variable) {
+			return createCodeForVariable((Variable) queryExpr);
+		}
+		if (queryExpr instanceof ForwardElementSet) {
+			return createCodeForForwardElementSet((ForwardElementSet) queryExpr);
+		}
+		
 		return "UnsupportedElement";
 	}
 
@@ -554,6 +558,12 @@ public class GreqlCodeGenerator extends CodeGenerator {
 		if (literal instanceof BoolLiteral) {
 			return  Boolean.toString(((BoolLiteral)literal).is_boolValue());
 		}
+		if (literal instanceof ThisEdge) {
+			return  "thisIncidence";
+		}
+		if (literal instanceof ThisVertex) {
+			return  "thisElement";
+		}
 		return "UndefinedLiteral";
 	}
 
@@ -605,144 +615,225 @@ public class GreqlCodeGenerator extends CodeGenerator {
 	
 	private String createCodeForForwardElementSet(ForwardElementSet fws) {
 		DFA dfa = null;
-		PathDescription pathDescr = (PathDescription) fws.getFirst_isPathOf_GoesTo_PathExpression().getThat();
-		PathDescriptionEvaluator pathDescrEval = (PathDescriptionEvaluator) vertexEvalGraphMarker.getMark(pathDescr);
-		dfa = ((NFA)pathDescrEval.getResult()).getDFA();
+//		PathDescription pathDescr = (PathDescription) fws.getFirst_isPathOf_GoesTo_PathExpression().getThat();
+//		PathDescriptionEvaluator pathDescrEval = (PathDescriptionEvaluator) vertexEvalGraphMarker.getMark(pathDescr);
+//		dfa = ((NFA)pathDescrEval.getResult()).getDFA();
+		NFA nfa = NFA.createSimpleIncidenceTransition_Db();
+		dfa = nfa.getDFA();
 		Expression startElementExpr = (Expression) fws.getFirst_isStartExprOf_omega().getThat();
 		CodeList list = new CodeList();
 		addImports("org.pcollections.PCollection");
-	//	addImports("java.util.BitSet");
-		addImports("java.util.HashMap");
+		addImports("org.pcollections.PSet");
+		addImports("java.util.HashSet");
+		addImports("java.util.BitSet");
 		addImports("de.uni_koblenz.jgralab.JGraLab");
 		addImports("de.uni_koblenz.jgralab.GraphElement");
+		addImports("de.uni_koblenz.jgralab.Incidence");
 		addImports("de.uni_koblenz.jgralab.greql2.types.pathsearch.ElementStateQueue");
 		CodeSnippet initSnippet = new CodeSnippet();
 		list.add(initSnippet);
-		initSnippet.add("PSet<Vertex> resultSet = JGraLab.set();");
+		initSnippet.add("PSet<GraphElement> resultSet = JGraLab.set();");
 		initSnippet.add("//one BitSet for each state");
-	//	initSnippet.add("BitSet[] markedElements = new BitSet[#stateCount#];");
-		initSnippet.add("HashMap[] markedElements = new HashMap[#stateCount#];");
+		initSnippet.add("HashSet<GraphElement>[] markedElements = new HashSet[#stateCount#];");
 		initSnippet.setVariable("stateCount", Integer.toString(dfa.stateList.size()));
 		initSnippet.add("for (int i=0; i<#stateCount#;i++) {");
-	//	initSnippet.add("\tmarkedElements[i] = new BitSet();");
-		initSnippet.add("\tmarkedElements[i] = new HashMap(100);");
+		initSnippet.add("\tmarkedElements[i] = new HashSet(100);");
 		initSnippet.add("}");
-		initSnippet.add("GraphElement startElement = (Graphelement)" + createCodeForExpression(startElementExpr) + ";");
+		initSnippet.add("BitSet finalStates = new BitSet();");
+		for (State s : dfa.stateList) {
+			if (s.isFinal) {
+				initSnippet.add("finalStates.set(" + s.number + ");");
+			}
+		}
+		initSnippet.add("GraphElement startElement = (GraphElement)" + createCodeForExpression(startElementExpr) + ";");
 		initSnippet.add("ElementStateQueue queue = new ElementStateQueue();");
-		initSnippet.add("markedElements[" + dfa.initialState.number + "].set(startVertex.getLocalId());");
-		initSnippet.add("queue.put(v, " + dfa.initialState.number + ");");
+		initSnippet.add("markedElements[" + dfa.initialState.number + "].add(startElement);");
+		initSnippet.add("int stateNumber;");
+		initSnippet.add("GraphElement element;");
+		initSnippet.add("int nextStateNumber;");
+		initSnippet.add("GraphElement nextElement;");
+		initSnippet.add("boolean isVertex;");
+		initSnippet.add("queue.put((GraphElement)v, " + dfa.initialState.number + ");");
 		initSnippet.add("while (queue.hasNext()) {");
-		initSnippet.add("GraphElement element = queue.currentElement;");
-		initSnippet.add("State state = queue.currentState;");
-		initSnippet.add("if (state.isFinal) {");
-		initSnippet.add("\tresultSet = resultSet.plus(vertex);");
-		initSnippet.add("}");
-		initSnippet.add("int nextStateNumber = 0;");
-		initSnippet.add("GraphElement nextElement = null;");
-		initSnippet.add("boolean isVertex = element instanceof Vertex;");
-		initSnippet.add("for (Incidence inc = element.getFirstIncidence();");
+		initSnippet.add("\telement = queue.currentElement;");
+		initSnippet.add("\tstateNumber = queue.currentState;");
+		initSnippet.add("\tif (finalStates.get(stateNumber)) {");
+		initSnippet.add("\t\tresultSet = resultSet.plus(element);");
+		initSnippet.add("\t}");
+		initSnippet.add("\tisVertex = element instanceof Vertex;");
+		initSnippet.add("\tfor (Incidence inc = element.getFirstIncidence();");
 		initSnippet.add("\t\tinc != null; inc = isVertex ? inc.getNextIncidenceAtVertex() : inc.getNextIncidenceAtEdge()) {");
-		initSnippet.add("\tswitch (stateNumber) {");
+		initSnippet.add("\t\tswitch (stateNumber) {");
 		for (State curState : dfa.stateList) {
-			CodeSnippet stateSnippet = new CodeSnippet();
-			list.add(stateSnippet);
-			stateSnippet.add("\t\tcase " + curState.number + ":");
+			CodeList stateCodeList = new CodeList();
+			list.add(stateCodeList);
+			stateCodeList.add(new CodeSnippet("\t\tcase " + curState.number + ":"));
 			for (Transition curTrans : curState.outTransitions) {
+				System.out.println("Handling transition " + curTrans.getStartState().number + " --> " + curTrans.endState.number + ":" + curTrans);
+				CodeList transitionCodeList = new CodeList();
+				stateCodeList.add(transitionCodeList);
 				CodeSnippet transBeginSnippet = new CodeSnippet();
-				list.add(transBeginSnippet);
+				transitionCodeList.addNoIndent(transBeginSnippet);
 				//Generate code to get next vertex and state number
-			//	initSnippet.add("\t\t\tnextStateNumber = " + curTrans.endState.number + ";");
 				if (curTrans.consumesIncidence()) {
 					transBeginSnippet.add("\t\t\tnextElement = isVertex ? inc.getEdge() : inc.getVertex();"); 
 				} else {
 					transBeginSnippet.add("\t\t\tnextElement = element;");
 				}					
 				//Generate code to check if next element is marked
-				//TODO: Handle edge marking
-				transBeginSnippet.add("\t\t\tif (!markedElements[" + curTrans.endState.number + "].get(nextElement.getLocalId())) {");
-				//TODO: Generate code to check if transition may fire
-				transBeginSnippet.add("//No code to check acceptance of incidence/element pair by transition generated");
-				
-				list.add(createSnippetForTransition(curTrans));
-				
-				
-
+				transBeginSnippet.add("\t\t\tif (!markedElements[" + curTrans.endState.number + "].contains(nextElement)) {");
+				transitionCodeList.add(createCodeForTransition(curTrans),2);
+				transitionCodeList.add(new CodeSnippet("\t\t\t}"));
 			}
-			initSnippet.add("break");
+			stateCodeList.add(new CodeSnippet("\t\tbreak;//break case block"));
 		}
-		
-		initSnippet.add("}");
-		initSnippet.add("return resultSet;");
+		CodeSnippet finalSnippet = new CodeSnippet();
+		finalSnippet.add("\t\t}");
+		finalSnippet.add("\t}");
+		finalSnippet.add("}");
+		finalSnippet.add("return resultSet;");
+		list.add(finalSnippet);
 		return createMethod(list);
 	}
 	
 	
 	private CodeSnippet createAddToQueueSnippet(int number) {
-		CodeSnippet transEndSnippet = new CodeSnippet();
-		transEndSnippet.add("\t\t\t\tmarkedElements[" + number + "].add(nextElement);");
-		transEndSnippet.add("\t\t\t\tqueue.put(nextElement," + number + ");");
-		transEndSnippet.add("\t\t\t}");
-		return transEndSnippet;
+		CodeSnippet annToQueueSnippet = new CodeSnippet();
+		annToQueueSnippet.add("markedElements[" + number + "].add(nextElement);");
+		annToQueueSnippet.add("queue.put(nextElement," + number + ");");
+		return annToQueueSnippet;
 	}
+
+	
 
 	
 	
 	private int acceptedIncidenceTypesNumber = 0;
 	
 	
-	private CodeBlock createSnippetForTransition(Transition trans) {
-		CodeList list = new CodeList();
+	private CodeBlock createCodeForTransition(Transition trans) {
 		if (trans instanceof SimpleIncidenceTransition_Db) {
-			SimpleIncidenceTransition_Db simpleTrans = (SimpleIncidenceTransition_Db) trans;
-			addImports("de.uni_koblenz.jgralab.greql2.schema.IncDirection");
-			CodeSnippet snip = new CodeSnippet();
-			snip.add("if (inc != null) {");
-			snip.add("if (checkDirection(isVertex, inc, IncDirection." + simpleTrans.getAllowedDirection().toString() + "{");
-			//if incidence types are specified for the transition, create code the check these types
-			int openedBraces = 1;
-			TypeCollection typeCollection = simpleTrans.getTypeCollection();
-			if (typeCollection != null) {
-				addStaticField("java.util.BitSet", "acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber, "new java.util.BitSet();");	
-				if (typeCollection.getAllowedTypes().isEmpty()) {
-					//all types but the forbidden ones are allowed
-					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", true");
-					for (TypedElementClass tc : typeCollection.getForbiddenTypes()) {
-						addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +", false);" );
-					}
-				} else {
-					//only allowed type are allowed, others are forbidden
-					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", false");
-					for (TypedElementClass tc : typeCollection.getAllowedTypes()) {
-						addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +",  true);" );
-					}
-				}
-				snip.add("if (acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + "inc.getType().getId()) {" );	
-				acceptedIncidenceTypesNumber++;
-				openedBraces++;
-			}
-			VertexEvaluator predicateEval = simpleTrans.getPredicateEvaluator();
-			if (predicateEval != null ) {
-				//create code for the boolean expression restricting this transition
-				//add class fields for this literals, TODO: only if thisIncidence/thisElement literals are used in this predicate
-				createThisLiterals();
-				snip.add("thisIncidence = inc;");
-				snip.add("thisElement = element;");
-				snip.add("if (" + createCodeForExpression((Expression)predicateEval.getVertex()) + ") {");
-				openedBraces++;
-			}
-			
-			//add element to queue
-			list.add(snip);
-			list.add(createAddToQueueSnippet(trans.endState.number));
-
-			
-			CodeSnippet closingSnippet = new CodeSnippet();
-			for (int i=0; i<openedBraces; i++) {
-				closingSnippet.add("}");
-			}
-			list.add(closingSnippet);
+			return createCodeForSimpleIncidenceTransition_Db((SimpleIncidenceTransition_Db) trans);
 		}
-		return list;
+		if (trans instanceof AggregationIncidenceTransition_Db) {
+			return createCodeForAggregationIncidenceTransition_Db((AggregationIncidenceTransition_Db) trans);
+		}
+		return new CodeSnippet("FAILURE: TRANSITION TYPE IS UNKNOWN TO GREQL CODE GENERATOR " + trans.getClass().getSimpleName()); 
+	}
+	
+	private CodeBlock createCodeForSimpleIncidenceTransition_Db(SimpleIncidenceTransition_Db trans) {
+		CodeList resultList = new CodeList();
+		CodeList curr = resultList;
+		addImports("de.uni_koblenz.jgralab.greql2.schema.IncDirection");
+		if (trans.getAllowedDirection() != IncDirection.BOTH) {
+			addImports("de.uni_koblenz.jgralab.Direction");
+			switch (trans.getAllowedDirection()) {
+			case IN: 
+				curr.add(new CodeSnippet("if (isVertex ^ (inc.getDirection() == Direction.VERTEX_TO_EDGE)) {" ));
+			    break;
+			case OUT: 
+				curr.add(new CodeSnippet("if (isVertex ^ (inc.getDirection() == Direction.EDGE_TO_VERTEX)) {" ));
+				break;
+			}
+		    CodeList body = new CodeList();
+		    curr.add(body);
+		    curr.add(new CodeSnippet("}"));
+		    curr = body;
+		}
+		TypeCollection typeCollection = trans.getTypeCollection();
+		if (typeCollection != null) {
+			addStaticField("java.util.BitSet", "acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber, "new java.util.BitSet();");	
+			if (typeCollection.getAllowedTypes().isEmpty()) {
+				//all types but the forbidden ones are allowed
+				addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", true);");
+				for (TypedElementClass tc : typeCollection.getForbiddenTypes()) {
+					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +", false);" );
+				}
+			} else {
+				//only allowed type are allowed, others are forbidden
+				addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", false);");
+				for (TypedElementClass tc : typeCollection.getAllowedTypes()) {
+					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +",  true);" );
+				}
+			}
+			curr.add(new CodeSnippet("if (acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".get(inc.getType().getId())) {" ));	
+			acceptedIncidenceTypesNumber++;
+		    CodeList body = new CodeList();
+		    curr.add(body);
+		    curr.add(new CodeSnippet("}"));
+		    curr = body;
+		}
+		VertexEvaluator predicateEval = trans.getPredicateEvaluator();
+		if (predicateEval != null ) {
+			//create code for the boolean expression restricting this transition
+			//add class fields for this literals, TODO: only if thisIncidence/thisElement literals are used in this predicate
+			createThisLiterals();
+			CodeSnippet predicateSnippet = new CodeSnippet();
+			predicateSnippet.add("thisIncidence = inc;");
+			predicateSnippet.add("thisElement = element;");
+			predicateSnippet.add("if (" + createCodeForExpression((Expression)predicateEval.getVertex()) + ") {");
+		    CodeList body = new CodeList();
+		    curr.add(body);
+		    curr.addNoIndent(new CodeSnippet("}"));
+		    curr = body;
+		}
+		//add element to queue
+		curr.add(createAddToQueueSnippet(trans.endState.number));
+		return resultList;
+	}
+	
+	private CodeBlock createCodeForAggregationIncidenceTransition_Db(AggregationIncidenceTransition_Db trans) {
+		CodeList resultList = new CodeList();
+		CodeList curr = resultList;
+		addImports("de.uni_koblenz.jgralab.greql2.schema.IncDirection");
+		addImports("de.uni_koblenz.jgralab.schema.IncidenceType");
+		{
+		curr.add(new CodeSnippet("if (inc.getType().getIncidenceType() != IncidenceType.EDGE) {" ));
+	    CodeList body = new CodeList();
+	    curr.add(body);
+	    curr.add(new CodeSnippet("}"));
+	    curr = body;
+		}
+		TypeCollection typeCollection = trans.getTypeCollection();
+		if (typeCollection != null) {
+			addStaticField("java.util.BitSet", "acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber, "new java.util.BitSet();");	
+			if (typeCollection.getAllowedTypes().isEmpty()) {
+				//all types but the forbidden ones are allowed
+				addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", true);");
+				for (TypedElementClass tc : typeCollection.getForbiddenTypes()) {
+					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +", false);" );
+				}
+			} else {
+				//only allowed type are allowed, others are forbidden
+				addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(0," + schema.getNumberOfTypedElementClasses() + ", false);");
+				for (TypedElementClass tc : typeCollection.getAllowedTypes()) {
+					addStaticInitializer("acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".set(" + schema.getClassId(tc) +",  true);" );
+				}
+			}
+			curr.add(new CodeSnippet("if (acceptedIncidenceTypes_" + acceptedIncidenceTypesNumber + ".get(inc.getType().getId())) {" ));	
+			acceptedIncidenceTypesNumber++;
+		    CodeList body = new CodeList();
+		    curr.add(body);
+		    curr.add(new CodeSnippet("}"));
+		    curr = body;
+		}
+		VertexEvaluator predicateEval = trans.getPredicateEvaluator();
+		if (predicateEval != null ) {
+			//create code for the boolean expression restricting this transition
+			//add class fields for this literals, TODO: only if thisIncidence/thisElement literals are used in this predicate
+			createThisLiterals();
+			CodeSnippet predicateSnippet = new CodeSnippet();
+			predicateSnippet.add("thisIncidence = inc;");
+			predicateSnippet.add("thisElement = element;");
+			predicateSnippet.add("if (" + createCodeForExpression((Expression)predicateEval.getVertex()) + ") {");
+		    CodeList body = new CodeList();
+		    curr.add(body);
+		    curr.add(new CodeSnippet("}"));
+		    curr = body;
+		}
+		//add element to queue
+		curr.add(createAddToQueueSnippet(trans.endState.number));
+		return resultList;
 	}
 	
 	//Helper methods
