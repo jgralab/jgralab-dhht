@@ -38,6 +38,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -275,15 +276,15 @@ public class SimpleTransition extends Transition {
 	 */
 	@Override
 	public boolean accepts(Vertex v, Incidence i) {
-		if (e == null) {
+		if (i == null) {
 			return false;
 		}
 		if (validDirection == AllowedEdgeDirection.OUT) {
-			if (!e.isNormal()) {
+			if (!(i.getDirection() == Direction.VERTEX_TO_EDGE)) {
 				return false;
 			}
 		} else if (validDirection == AllowedEdgeDirection.IN) {
-			if (e.isNormal()) {
+			if (i.getDirection() == Direction.EDGE_TO_VERTEX) {
 				return false;
 			}
 		}

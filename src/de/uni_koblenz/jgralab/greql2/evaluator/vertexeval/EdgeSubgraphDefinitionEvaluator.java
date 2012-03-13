@@ -1,10 +1,13 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfSubgraphDefinition;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 /**
  * Evaluator-class for an {@link EdgeSubgraphDefinition}, which defines a
@@ -23,6 +26,13 @@ public class EdgeSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
+		IsTypeExprOfSubgraphDefinition typeExprEdge = vertex
+				.getIncidentEdges(IsTypeExprOfSubgraphDefinition.class)
+				.iterator().next();
+		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExprEdge
+				.getAlpha());
+		Iterable<Edge> edges = graph.getEdges((EdgeClass) exprEval.getResult());
+		// Create a Graph from the edges
 		return null;
 	}
 

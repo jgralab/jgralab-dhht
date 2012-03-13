@@ -624,21 +624,12 @@ public class GreqlParser extends ParserHelper {
 			fail("Expected SubgraphDefinition not found");
 			return null;
 		}
-		// SubgraphDefinition definition = null;
-		// int exprOffset = getCurrentOffset();
-		// Expression traversalContextExpr = parseExpression();
-		// if (!inPredicateMode()) {
-		// int exprLength = getLength(exprOffset);
-		// definition = graph.createExpressionDefinedSubgraph();
-		// IsSubgraphDefiningExpression isSubgraphDefExpr = graph
-		// .createIsSubgraphDefiningExpression(traversalContextExpr,
-		// (ExpressionDefinedSubgraph) definition);
-		// isSubgraphDefExpr.set_sourcePositions(createSourcePositionList(
-		// exprLength, exprOffset));
-		// }
-		// return definition;
 	}
 
+	/**
+	 * Parses an {@link EdgeSubgraphDefinition}, which is: "eSubgraph(EdgeType)".
+	 * @return
+	 */
 	private SubgraphDefinition parseEdgeSubgraphDefinition() {
 		assert lookAhead(0) == TokenTypes.ESUBGRAPH : "Entered parse of EdgeSubgraphDefinition without ESUBGRAPH-token!";
 		EdgeSubgraphDefinition result = null;
@@ -655,6 +646,10 @@ public class GreqlParser extends ParserHelper {
 		return result;
 	}
 
+	/**
+	 * Parses a {@link VertexSubgraphDefinition}, which is: "vSubgaph(VertexType)".
+	 * @return
+	 */
 	private SubgraphDefinition parseVertexSubgraphDefinition() {
 		assert lookAhead(0) == TokenTypes.VSUBGRAPH : "Entered parse of VertexSubgraphDefinition without VSUBGRAPH-token!";
 		VertexSubgraphDefinition result = null;
@@ -1742,6 +1737,14 @@ public class GreqlParser extends ParserHelper {
 	 * {E:EdgeTypeList}, {VE: VertexAndEdgeTypeList}, {ElementSet}, {TypeList @
 	 * Expression}.
 	 * 
+	 * The grammatical rules are:
+	 * 
+	 * ElementRestriction = "{" ElementSetRestriction | ElementTypeRestriction "}";
+	 * ElementSetRestriction = Expression;
+	 * ElementTypeRestriction = ("E:" | "V:" | "VE:") TypeList;
+	 * 
+	 * In this context a TypeList is either exclusively edges, exclusive vertices, or both. Depending on
+	 * how it is specified (by E, V or VE).
 	 * 
 	 * @return An ElementRestriction-node
 	 */
