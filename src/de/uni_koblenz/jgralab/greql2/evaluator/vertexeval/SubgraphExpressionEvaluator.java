@@ -31,12 +31,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
@@ -54,6 +56,7 @@ public class SubgraphExpressionEvaluator extends
 	protected SubgraphExpression vertex;
 
 	SubgraphDefinitionEvaluator subgraphDefinitionEval;
+	VertexEvaluator constrainedExpressionEval;
 
 	/**
 	 * returns the vertex this VertexEvaluator evaluates
@@ -65,35 +68,30 @@ public class SubgraphExpressionEvaluator extends
 
 	@Override
 	public Object evaluate() {
-		// take traversal context for subgraph
-		if (subgraphDefinitionEval == null) {
-			IsSubgraphDefinitionOf isSubgraphDef = vertex
-					.getFirstIsSubgraphDefinitionOfIncidence(EdgeDirection.IN);
-			SubgraphDefinition defVertex = (SubgraphDefinition) isSubgraphDef
-					.getThat();
-			subgraphDefinitionEval = (SubgraphDefinitionEvaluator) vertexEvalMarker
-					.getMark(defVertex);
-		}
-		TraversalContext subgraph = (TraversalContext) subgraphDefinitionEval
-				.getResult();
+		Graph subgraph = (Graph) subgraphDefinitionEval.getResult();
 
 		// take restricted expression
-		if (exprEval == null) {
-			IsExpressionOnSubgraph isExprOn = vertex
-					.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
-			Expression expr = (Expression) isExprOn.getThat();
-			exprEval = (VertexEvaluator) vertexEvalMarker.getMark(expr);
+		if (constrainedExpressionEval == null) {
+			IsConstrainedExpressionOf isConsExp = vertex
+					.getAlphaEdges(IsConstrainedExpressionOf.class).iterator()
+					.next();
+			Expression expr = (Expression) isConsExp.getAlpha();
+			constrainedExpressionEval = (VertexEvaluator) vertexEvalMarker
+					.getMark(expr);
 		}
 
 		// set traversal context
-		TraversalContext oldTraversalContext = graph.getTraversalContext();
-		graph.setTraversalContext(subgraph);
+		if (subgraph != null) {
+			subgraph.useAsTraversalContext();
+		}
 
 		// evaluate restricted expression with traversal context
-		result = exprEval.getResult();
+		result = constrainedExpressionEval.getResult();
 
 		// release traversal context
-		graph.setTraversalContext(oldTraversalContext);
+		if (subgraph != null) {
+			subgraph.releaseTraversalContext();
+		}
 		return result;
 	}
 

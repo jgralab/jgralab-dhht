@@ -593,6 +593,17 @@ public class GreqlParser extends ParserHelper {
 	 * context in which the constrained {@link Expression} is supposed to be
 	 * evaluated.
 	 * 
+	 * The grammatical rules are:
+	 * 
+	 * SubgraphDefinition = KappaSubgraphDefintion | PartialSubgraphDefinition | LocalSubgraphDefinition |
+	 * 		EdgeSubgraphDefinition | VertexSubgraphDefinition | NestedSubgraphDefinition;
+	 * KappaSubgraphDefinition = "kappa(" Intliteral ")";
+	 * PartialSubgraphDefinition = "partial(" Intliteral ")";
+	 * LocalSubgraphDefinition = "local";
+	 * EdgeSubgraphDefinition = "eSubgraph(" EdgeType ")";
+	 * VertexSubgraphDefinition = "vSubgraph(" VertexType ")";
+	 * NestedSubgraphDefinition = "nested(" Identifier ")";
+	 * 
 	 * @return A SubgraphDefinition-node
 	 */
 	private final SubgraphDefinition parseSubgraphDefinition() {
@@ -605,6 +616,10 @@ public class GreqlParser extends ParserHelper {
 			return parsePartialSubgraphDefinition();
 		case LOCAL:
 			return parseLocalSubgraphDefinition();
+		case VSUBGRAPH:
+			return parseVertexSubgraphDefinition();
+		case ESUBGRAPH:
+			return parseEdgeSubgraphDefinition();
 		default:
 			fail("Expected SubgraphDefinition not found");
 			return null;
@@ -622,6 +637,38 @@ public class GreqlParser extends ParserHelper {
 		// exprLength, exprOffset));
 		// }
 		// return definition;
+	}
+
+	private SubgraphDefinition parseEdgeSubgraphDefinition() {
+		assert lookAhead(0) == TokenTypes.ESUBGRAPH : "Entered parse of EdgeSubgraphDefinition without ESUBGRAPH-token!";
+		EdgeSubgraphDefinition result = null;
+		match();
+		match(TokenTypes.LPAREN);
+		Expression typeExpression = parseExpression();
+		match(TokenTypes.RPAREN);
+		if (!inPredicateMode()) {
+			result = graph.createEdgeSubgraphDefinition();
+			IsTypeExprOfSubgraphDefinition typeExpr = graph
+					.createIsTypeExprOfSubgraphDefinition(typeExpression,
+							result);
+		}
+		return result;
+	}
+
+	private SubgraphDefinition parseVertexSubgraphDefinition() {
+		assert lookAhead(0) == TokenTypes.VSUBGRAPH : "Entered parse of VertexSubgraphDefinition without VSUBGRAPH-token!";
+		VertexSubgraphDefinition result = null;
+		match();
+		match(TokenTypes.LPAREN);
+		Expression typeExpression = parseExpression();
+		match(TokenTypes.RPAREN);
+		if (!inPredicateMode()) {
+			result = graph.createVertexSubgraphDefinition();
+			IsTypeExprOfSubgraphDefinition typeExpr = graph
+					.createIsTypeExprOfSubgraphDefinition(typeExpression,
+							result);
+		}
+		return result;
 	}
 
 	/**
@@ -653,8 +700,8 @@ public class GreqlParser extends ParserHelper {
 		PartialSubgraphDefinition partialDefinition = null;
 		match();
 		if (tryMatch(TokenTypes.LPAREN)) {
+			IntLiteral id = (IntLiteral) parseLiteral();
 			if (!inPredicateMode()) {
-				Identifier id = parseIdentifier();
 				partialDefinition = graph.createPartialSubgraphDefinition();
 				IsIdOfPartialGraphDefinition idOf = graph
 						.createIsIdOfPartialGraphDefinition(id,
@@ -679,17 +726,17 @@ public class GreqlParser extends ParserHelper {
 		NestedSubgraphDefinition nestedDefinition = null;
 		match();
 		if (tryMatch(TokenTypes.LPAREN)) {
-			if (!inPredicateMode()) {
 
-				if (lookAhead(0) == TokenTypes.IDENTIFIER) {
-					Identifier id = parseIdentifier();
+			if (lookAhead(0) == TokenTypes.IDENTIFIER) {
+				Identifier id = parseIdentifier();
+				if (!inPredicateMode()) {
 					nestedDefinition = graph.createNestedSubgraphDefinition();
 					IsIdOfNestedSubgraphDefinition idOf = graph
 							.createIsIdOfNestedSubgraphDefinition(id,
 									nestedDefinition);
-				} else {
-					fail("No identifier in nested-definition:");
 				}
+			} else {
+				fail("No identifier in nested-definition:");
 			}
 		} else {
 			fail("No opening parenthesis in nested-definition:");
@@ -711,21 +758,19 @@ public class GreqlParser extends ParserHelper {
 		match();
 
 		if (tryMatch(TokenTypes.LPAREN)) {
-			if (!inPredicateMode()) {
-				if (lookAhead(0) == TokenTypes.INTLITERAL) {
-					int kappa = ((IntegerToken) lookAhead).getNumber()
-							.intValue();
-					match();
-					kappaDefinition = graph.createKappaSubgraphDefinition();
-					kappaDefinition.setKappa(kappa);
-					if (tryMatch(TokenTypes.RPAREN)) {
-						match();
-					} else {
-						fail("No closing parenthesis in kappa-definition:");
+			if (lookAhead(0) == TokenTypes.INTLITERAL) {
+				int kappa = ((IntegerToken) lookAhead).getNumber().intValue();
+				match();
+				if (tryMatch(TokenTypes.RPAREN)) {
+					if (!inPredicateMode()) {
+						kappaDefinition = graph.createKappaSubgraphDefinition();
+						kappaDefinition.set_kappa(kappa);
 					}
 				} else {
-					fail("No valid number in kappa-definition:");
+					fail("No closing parenthesis in kappa-definition:");
 				}
+			} else {
+				fail("No valid number in kappa-definition:");
 			}
 		} else {
 			fail("No opening parenthesis in kappa-definition:");
@@ -733,6 +778,16 @@ public class GreqlParser extends ParserHelper {
 		return kappaDefinition;
 	}
 
+	/**
+	 * Parses a <code>SubgraphExpression</code>.
+	 * 
+	 * The grammatical rule for SubgraphExpressions is:
+	 * 
+	 * SubgraphExpression = "(" SubgraphDefinition ":" Expression ")";
+	 * SubgraphDefinition = KappaSubgraphDefintion | PartialSubgraphDefinition | LocalSubgraphDefinition |
+	 * 		EdgeSubgraphDefinition | VertexSubgraphDefinition | NestedSubgraphDefinition;
+	 * @return
+	 */
 	private final Expression parseSubgraphExpression() {
 		int pos = alreadySucceeded(RuleEnum.SUBGRAPHEXPRESSION);
 		if (skipRule(pos)) {
@@ -1198,12 +1253,12 @@ public class GreqlParser extends ParserHelper {
 			}
 		}
 		if (secondPart) {
-			return parseValueAccess2(expr, offset, length);
+			return parseValueAccess(expr, offset, length);
 		}
 		return expr;
 	}
 
-	private final Expression parseValueAccess2(Expression arg1, int offsetArg1,
+	private final Expression parseValueAccess(Expression arg1, int offsetArg1,
 			int lengthArg1) {
 		String name = "get";
 		int offsetOperator = getCurrentOffset();
@@ -1246,15 +1301,15 @@ public class GreqlParser extends ParserHelper {
 			}
 		}
 		if (secondPart) {
-			return parseValueAccess2(result, offsetArg1, getLength(offsetArg2));
+			return parseValueAccess(result, offsetArg1, getLength(offsetArg2));
 		}
 		return result;
 	}
 
 	private final Expression parsePrimaryExpression() {
-		if (lookAhead(0) == TokenTypes.LPAREN) {
-			return parseParenthesedExpression();
-		}
+		// if (lookAhead(0) == TokenTypes.LPAREN) {
+		// return parseParenthesedExpression();
+		// }
 
 		if ((lookAhead(0) == TokenTypes.V) || (lookAhead(0) == TokenTypes.E)) {
 			return parseRangeExpression();
@@ -1404,6 +1459,21 @@ public class GreqlParser extends ParserHelper {
 			int offsetPart2 = getCurrentOffset();
 			PathDescription part2 = parseSequentialPathDescription();
 			int lengthPart2 = getLength(offsetPart2);
+			// If there is a LCURLY it must be an ElmentRestriction
+			if (lookAhead(0) == TokenTypes.LCURLY) {
+				predicateStart();
+				match(TokenTypes.LCURLY);
+				parseElementRestriction();
+				match(TokenTypes.RCURLY);
+				if (predicateEnd()) {
+					match(TokenTypes.LCURLY);
+					ElementRestriction elementRest = parseElementRestriction();
+					match(TokenTypes.RCURLY);
+					if (!inPredicateMode()) {
+						graph.createIsEndRestrictionOf(elementRest, part2);
+					}
+				}
+			}
 			if (!inPredicateMode()) {
 				return addPathElement(SequentialPathDescription.class,
 						IsSequenceElementOf.class, null, part1, offsetPart1,
@@ -1417,8 +1487,6 @@ public class GreqlParser extends ParserHelper {
 
 	private final PathDescription parseStartRestrictedPathDescription() {
 		int offsetRest = getCurrentOffset();
-		List<VertexPosition<? extends TypeOrRoleId>> typeIds = null;
-		Expression expr = null;
 		ElementRestriction restriction = null;
 		int lengthRestr = 0;
 		int offsetRestr = 0;
@@ -1429,24 +1497,15 @@ public class GreqlParser extends ParserHelper {
 			} catch (ParsingException ex) {
 			}
 			if (predicateEnd()) {
+				offsetRestr = getCurrentOffset();
 				restriction = parseElementRestriction();
+				lengthRestr = getLength(offsetRestr);
 				match(TokenTypes.RCURLY);
+				tryMatch(TokenTypes.AMP); // We just have to remove a possible
+											// AMP because of legacy
+											// restrictions ("{ Restr } & -->")
 			} else {
-				predicateStart();
-				try {
-					parseTypeAndRoleExpressionList();
-				} catch (ParsingException ex) {
-				}
-				if (predicateEnd()) {
-					typeIds = parseTypeAndRoleExpressionList();
-				}
-				if (tryMatch(TokenTypes.AT)) {
-					offsetRestr = getCurrentOffset();
-					expr = parseExpression();
-					lengthRestr = getLength(offsetRestr);
-				}
-				match(TokenTypes.RCURLY);
-				match(TokenTypes.AMP);
+				fail("No valid start restriction found:");
 			}
 		}
 		PathDescription pathDescr = parseGoalRestrictedPathDescription();
@@ -1454,20 +1513,9 @@ public class GreqlParser extends ParserHelper {
 			if (restriction != null) {
 				IsStartRestrictionOf startRestrictionOf = graph
 						.createIsStartRestrictionOf(restriction, pathDescr);
-			}
-			if (expr != null) {
-				IsStartRestrOf startRestrOf = graph.createIsStartRestrOf(expr,
-						pathDescr);
-				startRestrOf.set_sourcePositions(createSourcePositionList(
-						lengthRestr, offsetRest));
-			}
-			if (typeIds != null) {
-				for (VertexPosition<? extends TypeOrRoleId> t : typeIds) {
-					IsStartRestrOf startRestrOf = graph.createIsStartRestrOf(
-							t.node, pathDescr);
-					startRestrOf.set_sourcePositions(createSourcePositionList(
-							t.length, t.offset));
-				}
+				startRestrictionOf
+						.set_sourcePositions(createSourcePositionList(
+								lengthRestr, offsetRest));
 			}
 		}
 		return pathDescr;
@@ -1475,42 +1523,18 @@ public class GreqlParser extends ParserHelper {
 
 	private final PathDescription parseGoalRestrictedPathDescription() {
 		PathDescription pathDescr = parseIteratedOrTransposedPathDescription();
-		if (tryMatch(TokenTypes.AMP)) {
-			match(TokenTypes.LCURLY);
-			predicateStart();
-			try {
-				parseTypeAndRoleExpressionList();
-			} catch (ParsingException ex) {
-			}
-			if (predicateEnd()) {
-				List<VertexPosition<? extends TypeOrRoleId>> typeIds = parseTypeAndRoleExpressionList();
-				if (!inPredicateMode()) {
-					for (VertexPosition<? extends TypeOrRoleId> t : typeIds) {
-						IsGoalRestrOf goalRestrOf = graph.createIsGoalRestrOf(
-								t.node, pathDescr);
-						goalRestrOf
-								.set_sourcePositions(createSourcePositionList(
-										t.length, t.offset));
-					}
-				}
-			}
-			if (tryMatch(TokenTypes.AT)) {
-				int offset = getCurrentOffset();
-				Expression expr = parseExpression();
-				int length = getLength(offset);
-				if (!inPredicateMode()) {
-					IsGoalRestrOf goalRestrOf = graph.createIsGoalRestrOf(expr,
-							pathDescr);
-					goalRestrOf.set_sourcePositions(createSourcePositionList(
-							length, offset));
-				}
-			}
-			match(TokenTypes.RCURLY);
-		}
+		tryMatch(TokenTypes.AMP); // EndRestriction might start with an AMP
+									// because of legacy restriction types
 		if (tryMatch(TokenTypes.LCURLY)) {
+			int offset = getCurrentOffset();
 			ElementRestriction elementRestriction = parseElementRestriction();
-			IsEndRestrictionOf endRestictionOf = graph
-					.createIsEndRestrictionOf(elementRestriction, pathDescr);
+			int length = getLength(offset);
+			if (!inPredicateMode()) {
+				IsEndRestrictionOf endRestictionOf = graph
+						.createIsEndRestrictionOf(elementRestriction, pathDescr);
+				endRestictionOf.set_sourcePositions(createSourcePositionList(
+						length, offset));
+			}
 			match(TokenTypes.RCURLY);
 		}
 		return pathDescr;
@@ -1680,19 +1704,24 @@ public class GreqlParser extends ParserHelper {
 				dir = graph.createIncidenceDirection();
 				dir.set_dir(direction);
 			}
-			// A LCURLY after an Incidence-arrow can be either an
-			// IncidenceRestriction (restriction of the incidence itself) or an
-			// ElementRestriction (restriction of the results)
-			if (lookAhead(0) == TokenTypes.LCURLY) {
-				predicateStart();
-				try {
-					match(TokenTypes.LCURLY);
-					parseTypeExpressionList();
-				} catch (ParsingException ex) {
-				}
-				if (predicateEnd()) {
-					match(TokenTypes.LCURLY);
-					List<VertexPosition<TypeId>> restr = parseTypeExpressionList();
+		}
+		// A LCURLY after an Incidence-arrow can be either an
+		// IncidenceRestriction (restriction of the incidence itself) or an
+		// ElementRestriction (restriction of the results)
+		// An IncidenceRestriction has to be parsed with it's corresponding
+		// Incidence, the ElementRestriction must be parsed outside.
+		if (lookAhead(0) == TokenTypes.LCURLY) {
+			predicateStart();
+			try {
+				match(TokenTypes.LCURLY);
+				parseTypeExpressionList();
+			} catch (ParsingException ex) {
+			}
+			if (predicateEnd()) {
+				match(TokenTypes.LCURLY);
+				List<VertexPosition<TypeId>> restr = parseTypeExpressionList();
+				match(TokenTypes.RCURLY);
+				if (!inPredicateMode()) {
 					for (VertexPosition<TypeId> restriction : restr) {
 						IncidenceRestriction incRestr = graph
 								.createIncidenceRestriction();
@@ -1701,14 +1730,8 @@ public class GreqlParser extends ParserHelper {
 						// Connect each restriction to the PathDescription-node
 						graph.createIsIncRestrOf(incRestr, result);
 					}
-					match(TokenTypes.RCURLY);
-				} else {
-					// If there is a LCURLY which is not an IncidenceRestriction
-					// it must be an ElmentRestriction
-					match(TokenTypes.LCURLY);
-					ElementRestriction elementRest = parseElementRestriction();
-					graph.createIsEndRestrictionOf(elementRest, result);
 				}
+
 			}
 		}
 		return result;
@@ -1716,40 +1739,88 @@ public class GreqlParser extends ParserHelper {
 
 	/**
 	 * Parses an ElementRestriction. Possible types are: {V:VertexTypeList},
-	 * {E:EdgeTypeList}, {VE: VertexAndEdgeTypeList}, {ElementSet}
+	 * {E:EdgeTypeList}, {VE: VertexAndEdgeTypeList}, {ElementSet}, {TypeList @
+	 * Expression}.
 	 * 
-	 * TODO a way to distinguish between EdgeTypeList and VertexTypeList.
-	 * Possible before evaluation...?
 	 * 
-	 * @return
+	 * @return An ElementRestriction-node
 	 */
 	private ElementRestriction parseElementRestriction() {
-		switch (lookAhead(0)) {
-		case E: {
-			match();
-			// Starting with E can only mean EdgeTypeList (if a colon follows)
-			// or an ElementSet (e. g. restricting to all Edges)
-			if (tryMatch(TokenTypes.COLON)) {
-				return parseTypeRestriction(RestrictionType.EDGE);
-			} else {
-				return parseElementSetRestriction();
+		// Have to account for legacy Start- and GoalRestrictions first ({Type,
+		// Type, Type @ exp}).
+		predicateStart();
+		try {
+			parseTypeRestriction(RestrictionType.BOTH);
+			if (tryMatch(TokenTypes.AT)) {
+				parseExpression();
 			}
+		} catch (ParsingException ex) {
+		}
+		if (predicateEnd()) {
+			ElementRestriction result = parseTypeRestriction(RestrictionType.BOTH);
+			if (tryMatch(TokenTypes.AT)) {
+				Expression expr = parseExpression();
+				if (!inPredicateMode()) {
+					IsExpressionOfRestriction exprOfRestr = graph
+							.createIsExpressionOfRestriction(expr, result);
+				}
+			}
+			return result;
+		} else {
+			switch (lookAhead(0)) {
+			case E: {
+				predicateStart();
+				try {
+					match(TokenTypes.E);
+					// Starting with E can only mean EdgeTypeList (if a colon
+					// follows)
+					match(TokenTypes.COLON);
+					parseTypeRestriction(RestrictionType.EDGE);
+				} catch (ParsingException ex) {
+				}
+				if (predicateEnd()) {
+					match(TokenTypes.E);
+					match(TokenTypes.COLON);
+					return parseTypeRestriction(RestrictionType.EDGE);
+				} else {
+					// or an ElementSet (e. g. restricting to all Edges)
+					return parseElementSetRestriction();
+				}
 
-		}
-		case V: {
-			match();
-			// Starting with V can mean VertexTypeList (if a colon follows)...
-			if (tryMatch(TokenTypes.COLON)) {
-				return parseTypeRestriction(RestrictionType.VERTEX);
-				// Or a VertexAndEdgeTypeList (if an E follows)...
-			} else if (tryMatch(TokenTypes.E)) {
-				match(TokenTypes.COLON);
-				return parseTypeRestriction(RestrictionType.BOTH);
-			} else {
-				// Or an ElementSet
-				return parseElementSetRestriction();
 			}
-		}
+			case V: {
+				predicateStart();
+				try {
+					match(TokenTypes.V);
+					// Starting with V can mean VertexTypeList (if a colon
+					// follows)...
+					match(TokenTypes.COLON);
+					parseTypeRestriction(RestrictionType.VERTEX);
+				} catch (ParsingException ex) {
+				}
+				if (predicateEnd()) {
+					match(TokenTypes.V);
+					match(TokenTypes.COLON);
+					return parseTypeRestriction(RestrictionType.VERTEX);
+					// Or a VertexAndEdgeTypeList (if an E follows)...
+				}
+				predicateStart();
+				try {
+					match(TokenTypes.E);
+					match(TokenTypes.COLON);
+				} catch (ParsingException ex) {
+				}
+				if (predicateEnd()) {
+					match(TokenTypes.E);
+					match(TokenTypes.COLON);
+
+					return parseTypeRestriction(RestrictionType.BOTH);
+				} else {
+					// Or an ElementSet
+					return parseElementSetRestriction();
+				}
+			}
+			}
 		}
 		return null;
 	}
@@ -1769,14 +1840,17 @@ public class GreqlParser extends ParserHelper {
 
 	private ElementRestriction parseTypeRestriction(RestrictionType rType) {
 		List<VertexPosition<TypeId>> typeList = parseTypeExpressionList();
-		if (typeList != null && typeList.size() > 0) {
-			ElementTypeRestriction typeRestriction = graph
-					.createElementTypeRestriction();
-			typeRestriction.set_restrType(rType);
-			for (VertexPosition<TypeId> type : typeList) {
-				graph.createIsTypeIdOfRestriction(type.node, typeRestriction);
+		if (!inPredicateMode()) {
+			if (typeList != null && typeList.size() > 0) {
+				ElementTypeRestriction typeRestriction = graph
+						.createElementTypeRestriction();
+				typeRestriction.set_restrType(rType);
+				for (VertexPosition<TypeId> type : typeList) {
+					graph.createIsTypeIdOfRestriction(type.node,
+							typeRestriction);
+				}
+				return typeRestriction;
 			}
-			return typeRestriction;
 		}
 		return null;
 	}
@@ -2616,7 +2690,7 @@ public class GreqlParser extends ParserHelper {
 		} catch (ParsingException ex) {
 		}
 		if (predicateEnd()) {
-			expr = parseRegBackwardVertexSetOrPathSystem();
+			expr = parseRegBackwardElementSetOrPathSystem();
 		} else {
 			predicateStart();
 			try {
@@ -2637,7 +2711,7 @@ public class GreqlParser extends ParserHelper {
 					} catch (ParsingException ex) {
 					}
 					if (predicateEnd()) {
-						expr = parseRegPathExistenceOrForwardVertexSet(expr,
+						expr = parseRegPathExistenceOrForwardElementSet(expr,
 								offsetArg1, lengthArg1);
 					}
 				}
@@ -2649,7 +2723,7 @@ public class GreqlParser extends ParserHelper {
 		return expr;
 	}
 
-	private final Expression parseRegPathExistenceOrForwardVertexSet(
+	private final Expression parseRegPathExistenceOrForwardElementSet(
 			Expression expr, int offsetArg1, int lengthArg1) {
 		int offsetExpr = getCurrentOffset();
 		int offsetPathDescr = getCurrentOffset();
@@ -2667,9 +2741,9 @@ public class GreqlParser extends ParserHelper {
 				int lengthExpr = getLength(offsetExpr);
 				PathExistence pe = graph.createPathExistence();
 				// add start vertex
-				IsStartExprOf startVertexOf = graph.createIsStartExprOf(expr,
+				IsStartExprOf startElementOf = graph.createIsStartExprOf(expr,
 						pe);
-				startVertexOf.set_sourcePositions(createSourcePositionList(
+				startElementOf.set_sourcePositions(createSourcePositionList(
 						lengthArg1, offsetArg1));
 				// add target vertex
 				IsTargetExprOf targetVertexOf = graph.createIsTargetExprOf(
@@ -2734,7 +2808,7 @@ public class GreqlParser extends ParserHelper {
 		return null;
 	}
 
-	private final Expression parseRegBackwardVertexSetOrPathSystem() {
+	private final Expression parseRegBackwardElementSetOrPathSystem() {
 		boolean isPathSystem = false;
 		int offsetPathDescr = getCurrentOffset();
 		PathDescription pathDescr = parseAltPathDescription();

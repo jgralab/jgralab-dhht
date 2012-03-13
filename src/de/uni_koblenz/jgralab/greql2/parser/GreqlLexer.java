@@ -87,6 +87,8 @@ public class GreqlLexer {
 					put(TokenTypes.LOCAL, "local");
 					put(TokenTypes.PARTIAL, "partial");
 					put(TokenTypes.KAPPA, "kappa");
+					put(TokenTypes.ESUBGRAPH, "eSubgraph");
+					put(TokenTypes.VSUBGRAPH, "vSubgraph");
 					put(TokenTypes.QUESTION, "?");
 					put(TokenTypes.EXCL, "!");
 					put(TokenTypes.COLON, ":");
@@ -196,8 +198,9 @@ public class GreqlLexer {
 			if (position + currLength < query.length()) {
 				currentTokenString = query.substring(position, position
 						+ currLength);
-			} else
+			} else {
 				currentTokenString = query.substring(position);
+			}
 			TokenTypes possibleToken = stringToTokenMap.get(currentTokenString);
 			if (possibleToken != null) {
 				recognizedTokenType = possibleToken;

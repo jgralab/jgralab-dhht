@@ -39,6 +39,7 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
@@ -273,7 +274,7 @@ public class SimpleTransition extends Transition {
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
 	@Override
-	public boolean accepts(Vertex v, Edge e) {
+	public boolean accepts(Vertex v, Incidence i) {
 		if (e == null) {
 			return false;
 		}

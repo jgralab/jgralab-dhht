@@ -1,9 +1,12 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import java.util.Iterator;
+
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
+import de.uni_koblenz.jgralab.greql2.schema.IsIdOfPartialGraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.PartialSubgraphDefinition;
 
 /**
@@ -19,19 +22,25 @@ public class PartialSubgraphDefinitionEvaluator extends
 	public PartialSubgraphDefinitionEvaluator(PartialSubgraphDefinition vertex,
 			GreqlEvaluator eval) {
 		super(vertex, eval);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
-		// TODO Auto-generated method stub
+		if (vertex != null) {
+			Iterator<IsIdOfPartialGraphDefinition> partialIds = vertex
+					.getAlphaEdges(IsIdOfPartialGraphDefinition.class)
+					.iterator();
+			if (partialIds.hasNext()) {
+				return graph.getPartialGraph(partialIds.next().getAlpha()
+						.get_intValue());
+			}
+		}
 		return null;
 	}
 
 	@Override
 	protected VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexCosts(5, 5, 0);
 	}
 
 }

@@ -36,6 +36,7 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -172,9 +173,17 @@ public abstract class Transition {
 
 	/**
 	 * returns true if this transition accepts the given combination of Vertex
-	 * and Edge
+	 * and Incidence
 	 */
-	public abstract boolean accepts(Vertex v, Edge e);
+	public abstract boolean accepts(Vertex v, Incidence i);
+
+	/**
+	 * returns true if this transition accepts the given combination of Edge and Incidence
+	 * @param e
+	 * @param i
+	 * @return
+	 */
+	public abstract boolean accepts(Edge e, Incidence i);
 
 	/**
 	 * returns the vertex of the datagraph which can be visited after this

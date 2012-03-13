@@ -19,19 +19,16 @@ public class EdgeSubgraphDefinitionEvaluator extends
 	public EdgeSubgraphDefinitionEvaluator(EdgeSubgraphDefinition vertex,
 			GreqlEvaluator eval) {
 		super(vertex, eval);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	protected VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexCosts(5, 5, 0);
 	}
 
 }

@@ -20,7 +20,6 @@ public class VertexSubgraphDefinitionEvaluator extends
 	public VertexSubgraphDefinitionEvaluator(VertexSubgraphDefinition vertex,
 			GreqlEvaluator eval) {
 		super(vertex, eval);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -31,8 +30,7 @@ public class VertexSubgraphDefinitionEvaluator extends
 
 	@Override
 	protected VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexCosts(5, 5, 0);
 	}
 
 }
