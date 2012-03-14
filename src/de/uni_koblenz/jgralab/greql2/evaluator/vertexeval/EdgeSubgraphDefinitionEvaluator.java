@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
@@ -32,6 +33,10 @@ public class EdgeSubgraphDefinitionEvaluator extends
 		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExprEdge
 				.getAlpha());
 		Iterable<Edge> edges = graph.getEdges((EdgeClass) exprEval.getResult());
+		Graph markerGraph = graph.getGraphFactory().createGraph_InMemoryStorage(graph.getClass(), graph.getUniqueGraphId() + " edgeSubgraph");
+		for (Edge edge : edges) {
+			markerGraph.
+		}
 		// Create a Graph from the edges
 		return null;
 	}

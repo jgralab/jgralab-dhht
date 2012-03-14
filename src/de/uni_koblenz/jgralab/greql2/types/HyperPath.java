@@ -35,6 +35,7 @@ public class HyperPath {
 	public HyperPath reverse() {
 		PVector<GraphElement> es = JGraLab.vector();
 		PVector<Incidence> is = JGraLab.vector();
+		Edge
 		for (int i = es.size() - 1; i >= 0; --i) {
 			es = es.plus(elements.get(i));
 		}

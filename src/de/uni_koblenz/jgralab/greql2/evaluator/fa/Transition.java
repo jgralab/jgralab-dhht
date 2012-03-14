@@ -191,7 +191,7 @@ public abstract class Transition {
 	 * transition has fired. This can be either the current element itself or the other one
 	 * at the incidence
 	 */
-	public abstract Vertex getNextElement(GraphElement elem, Incidence inc);
+	public abstract GraphElement getNextElement(GraphElement elem, Incidence inc);
 
 	/**
 	 * @return true if the transition consumes an edge (e.g. for a
