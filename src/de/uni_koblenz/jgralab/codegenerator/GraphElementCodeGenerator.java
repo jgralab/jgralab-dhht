@@ -8,6 +8,7 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementClass<MetaClass, ?,?,?>> extends AttributedElementCodeGenerator<MetaClass> {
 
@@ -134,13 +135,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		if (config.hasTypeSpecificMethodsSupport() && !currentCycle.isClassOnly()) {
 			code.add(createNextMethods());
 			code.add(createFirstIncidenceMethods());
-		//	code.add(rolenameGenerator.createRolenameMethods(currentCycle
-		//			.isStdOrSaveMemOrDbImplOrTransImpl()));
-		//	code.add(createIncidenceIteratorMethods());
+
 		}
-	//	if (currentCycle.isStdOrSaveMemOrDbImplOrTransImpl()) {
-	//		code.add(createGetEdgeForRolenameMethod());
-	//	}
 		code.add(createCompatibilityMethods());
 		return code;
 	}
@@ -306,10 +302,8 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 				//addImports("#jgPackage#.Direction");
 				if (config.hasTypeSpecificMethodsSupport()) {
 					if (!ic.isInternal()) {
-						code.addNoIndent(createFirstIncidenceMethod(ic, true));
-						if (config.hasMethodsForSubclassesSupport() && !ic.isAbstract()) {
-							code.addNoIndent(createFirstIncidenceMethod(ic, false));
-						}
+						code.addNoIndent(createFirstIncidenceMethod(ic));
+						code.addNoIndent(createIncidenceIteratorMethod(ic));
 					}	
 				}
 			}
@@ -320,25 +314,20 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		
 	
 	
-	private CodeBlock createFirstIncidenceMethod(IncidenceClass ic, boolean typeFlag) {
+	private CodeBlock createFirstIncidenceMethod(IncidenceClass ic) {
 		CodeSnippet s = new CodeSnippet();
 		s.setVariable("incidenceClassName", ic.getRolename());
 		s.setVariable("qualifiedIncidenceClassName", schemaRootPackageName + "." +  ic.getQualifiedName());
-		s.setVariable("typeflagFormalParam", typeFlag ? "boolean noSubtypes" : "");
-		s.setVariable("typeflagActualParam", typeFlag ? ", noSubtypes" : "");
 		if (currentCycle.isAbstract()) {
 			//create interface
 			s.add("/*",
 				  " * @return the first #incidenceClassName# incidence at this #ownElementClass# ");
-			if (typeFlag) {
-				s.add(" * @param noSubclass if set to true, only incidence of class #incidenceClassName# but not of subclasses will be returned");
-			}
 			s.add("*/",
-				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#);"); 	
+				  "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#();"); 	
 		} else {
 			s.add("@Override",
-			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#(#typeflagFormalParam#) {");
-			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class#typeflagActualParam#);");
+			     "public #qualifiedIncidenceClassName# getFirst_#incidenceClassName#() {");
+			s.add("\treturn getFirstIncidence(#qualifiedIncidenceClassName#.class);");
 			s.add("}");
 			
 		}
@@ -408,6 +397,9 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		}
 		return code;
 	}
+	
+
+	protected abstract CodeBlock createIncidenceIteratorMethod(IncidenceClass ic);
 
 
 	

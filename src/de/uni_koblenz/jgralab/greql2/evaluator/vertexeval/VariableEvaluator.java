@@ -42,15 +42,15 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.Definition;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Aggregation;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_declaredVariable;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
@@ -138,8 +138,7 @@ public class VariableEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel().calculateCostsVariable(this,
-				graphSize);
+		return new VertexCosts(1, 1, 1);
 	}
 
 	@Override
@@ -164,33 +163,28 @@ public class VariableEvaluator extends VertexEvaluator {
 		List<VertexEvaluator> dependingEvaluators = new ArrayList<VertexEvaluator>();
 		List<Vertex> forbiddenVertices = new ArrayList<Vertex>();
 		SimpleDeclaration simpleDecl = null;
-		if (vertex.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT) != null) {
+		if (vertex.getFirst_declaredVariable() != null) {
 			simpleDecl = (SimpleDeclaration) vertex
-					.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT)
-					.getThat();
+					.getFirst_declaredVariable().getThat();
 		}
 		if (simpleDecl != null) {
 			forbiddenVertices.add(simpleDecl);
 			Declaration declaringVertex = (Declaration) simpleDecl
-					.getFirstIsSimpleDeclOfIncidence().getThat();
-			if (declaringVertex
-					.getFirstIsCompDeclOfIncidence(EdgeDirection.OUT) != null) {
+					.getFirst_isTypeExprOfDeclaration_omega().getThat();
+			if (declaringVertex.getFirst_compDecl() != null) {
 				forbiddenVertices.add(declaringVertex
-						.getFirstIsCompDeclOfIncidence(EdgeDirection.OUT)
-						.getThat());
+						.getFirst_compDecl().getThat());
 			} else {
 				forbiddenVertices.add(declaringVertex
-						.getFirstIsQuantifiedDeclOfIncidence(EdgeDirection.OUT)
-						.getThat());
+						.getFirst_quantifiedDecl().getThat());
 			}
 		} else {
-			if (vertex.getFirstIsVarOfIncidence(EdgeDirection.OUT) != null) {
+			if (vertex.getFirst_declaredVariable() != null) {
 				Definition definingVertex = (Definition) vertex
-						.getFirstIsVarOfIncidence(EdgeDirection.OUT).getThat();
+						.getFirst_declaredVariable().getThat();
 				forbiddenVertices.add(definingVertex);
 				forbiddenVertices.add(definingVertex
-						.getFirstIsDefinitionOfIncidence(EdgeDirection.OUT)
-						.getThat());
+						.getFirst_definition().getThat());
 			} else {
 				// thisvertex, thisedge
 
@@ -208,16 +202,15 @@ public class VariableEvaluator extends VertexEvaluator {
 					&& (!(eval instanceof SimpleDeclarationEvaluator))) {
 				dependingEvaluators.add(eval);
 			}
-			Greql2Aggregation currentEdge = currentVertex
-					.getFirstGreql2AggregationIncidence(EdgeDirection.OUT);
+			Incidence currentEdge = currentVertex
+					.getFirstIncidence();
 			while (currentEdge != null) {
 				Greql2Vertex nextVertex = (Greql2Vertex) currentEdge.getThat();
 				if (!forbiddenVertices.contains(nextVertex)) {
 					// if (!(nextVertex instanceof SimpleDeclaration)) {
 					queue.add(nextVertex);
 				}
-				currentEdge = currentEdge
-						.getNextGreql2AggregationIncidence(EdgeDirection.OUT);
+				currentEdge = currentEdge.getNextIncidenceAtVertex();
 			}
 		}
 		return dependingEvaluators;
@@ -245,8 +238,18 @@ public class VariableEvaluator extends VertexEvaluator {
 	 * variable may get during evaluation
 	 */
 	public long calculateEstimatedAssignments(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel().calculateVariableAssignments(
-				this, graphSize);
+		IsDeclaredVarOf_declaredVariable inc = vertex.getFirst_declaredVariable();
+		if (inc != null) {
+			SimpleDeclaration decl = (SimpleDeclaration) inc.getThat();
+			VertexEvaluator typeExpEval = getVertexEvalMarker().getMark(
+					decl.getFirst_isTypeExprOfDeclaration_omega().getThat());
+			return typeExpEval.getEstimatedCardinality(graphSize);
+		} else {
+			// if there exists no "isDeclaredVarOf"-Edge, the variable is not
+			// declared but defined, so there exists only 1 possible assignment
+			return 1;
+		}
 	}
+
 
 }

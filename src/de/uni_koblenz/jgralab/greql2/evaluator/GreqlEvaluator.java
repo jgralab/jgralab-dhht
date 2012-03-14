@@ -915,6 +915,12 @@ public class GreqlEvaluator {
 			currentVertex = currentVertex.getNextVertex();
 		}
 	}
+	
+	public ObjectGraphMarker<Vertex, VertexEvaluator> getVertexEvaluators() {
+		if (vertexEvalGraphMarker == null)
+			createVertexEvaluators();
+		return vertexEvalGraphMarker;
+	}
 
 	/**
 	 * clears the tempresults that are stored in the VertexEvaluators-Objects at

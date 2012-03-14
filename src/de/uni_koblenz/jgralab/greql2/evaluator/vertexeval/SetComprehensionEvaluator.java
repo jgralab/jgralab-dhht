@@ -38,9 +38,11 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 import org.pcollections.PCollection;
 
 import de.uni_koblenz.jgralab.JGraLab;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
 import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 
 /**
@@ -85,14 +87,29 @@ public class SetComprehensionEvaluator extends ComprehensionEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsSetComprehension(this, graphSize);
+		Declaration decl = (Declaration) vertex.getFirst_isCompDeclOf_omega().getThat();
+		DeclarationEvaluator declEval = (DeclarationEvaluator) getVertexEvalMarker().getMark(decl);
+		long declCosts = declEval.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		Vertex resultDef = vertex.getFirst_isCompResultDefOf_omega()
+				.getThat();
+		VertexEvaluator resultDefEval = getVertexEvalMarker().getMark(
+				resultDef);
+		long resultCosts = resultDefEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		long ownCosts = resultDefEval.getEstimatedCardinality(graphSize)
+				* 1;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + resultCosts + declCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalitySetComprehension(this, graphSize);
+		Declaration decl = (Declaration) vertex.getFirst_isCompDeclOf_omega().getThat();
+		DeclarationEvaluator declEval = (DeclarationEvaluator) getVertexEvalMarker().getMark(decl);
+		return declEval.getEstimatedCardinality(graphSize);
 	}
 
 }

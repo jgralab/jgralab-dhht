@@ -43,6 +43,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression_isTypeRestrOfExpression_omega;
 import de.uni_koblenz.jgralab.greql2.schema.VertexSetExpression;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
@@ -86,7 +87,7 @@ public class VertexSetExpressionEvaluator extends ElementSetExpressionEvaluator 
 			Vertex currentVertex = datagraph.getFirstVertex();
 			while (currentVertex != null) {
 				if (typeCollection.acceptsType(currentVertex
-						.getAttributedElementClass())) {
+						.getType())) {
 					resultSet = resultSet.plus(currentVertex);
 				}
 				currentVertex = currentVertex.getNextVertex();
@@ -104,14 +105,30 @@ public class VertexSetExpressionEvaluator extends ElementSetExpressionEvaluator 
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsVertexSetExpression(this, graphSize);
+		long typeRestrCosts = 0;
+		IsTypeRestrOfExpression_isTypeRestrOfExpression_omega inc = vertex.getFirst_isTypeRestrOfExpression_omega();
+		while (inc != null) {
+			TypeIdEvaluator tideval = (TypeIdEvaluator) getVertexEvalMarker()
+					.getMark(inc.getThat());
+			typeRestrCosts += tideval
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextIsTypeRestrOfExpression_omegaAtVertex();
+		}
+
+		long ownCosts = graphSize.getVertexCount()
+				* 1;
+		return new VertexCosts(ownCosts, ownCosts, typeRestrCosts + ownCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalityVertexSetExpression(this, graphSize);
+		IsTypeRestrOfExpression_isTypeRestrOfExpression_omega inc = vertex.getFirst_isTypeRestrOfExpression_omega();
+		double selectivity = 1.0;
+		if (inc != null) {
+			TypeIdEvaluator typeIdEval = (TypeIdEvaluator) getVertexEvalMarker().getMark(inc.getThat());
+			selectivity = typeIdEval.getEstimatedSelectivity(graphSize);
+		}
+		return Math.round(graphSize.getVertexCount() * selectivity);
 	}
 
 }

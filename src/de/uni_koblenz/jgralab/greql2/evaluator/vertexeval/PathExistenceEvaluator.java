@@ -41,7 +41,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib.FunctionInfo;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
@@ -78,12 +77,11 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public Object evaluate() {
-		PathDescription p = (PathDescription) vertex.getFirstIsPathOfIncidence(
-				EdgeDirection.IN).getAlpha();
+		PathDescription p = (PathDescription) vertex.getFirst_isPathOf_GoesTo_PathExpression().getThat();
 		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		Expression startExpression = (Expression) vertex
-				.getFirstIsStartExprOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isStartExprOf_omega().getThat();
 		VertexEvaluator startEval = vertexEvalMarker.getMark(startExpression);
 		Object res = startEval.getResult();
 		/**
@@ -96,7 +94,7 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 		Vertex startVertex = (Vertex) res;
 
 		Expression targetExpression = (Expression) vertex
-				.getFirstIsTargetExprOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isTargetExprOf_omega().getThat();
 		VertexEvaluator targetEval = vertexEvalMarker.getMark(targetExpression);
 		Vertex targetVertex = null;
 		res = targetEval.getResult();
@@ -121,14 +119,32 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel().calculateCostsPathExistence(
-				this, graphSize);
+		Expression startExpression = (Expression) vertex.getFirst_isStartExprOf_omega().getThat();
+		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
+				startExpression);
+		long startCosts = vertexEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_omega().getThat();
+		vertexEval = getVertexEvalMarker().getMark(targetExpression);
+		long targetCosts = vertexEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		PathDescription p = (PathDescription) vertex
+				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
+		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(p);
+		long pathDescCosts = pathDescEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		long searchCosts = Math.round(((pathDescCosts * searchFactor) / 2.0)
+				* Math.sqrt(graphSize.getEdgeCount()));
+		long ownCosts = searchCosts;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = targetCosts + pathDescCosts + iteratedCosts
+				+ startCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public double calculateEstimatedSelectivity(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateSelectivityPathExistence(
-				this, graphSize);
+		return 0.1;
 	}
 
 }

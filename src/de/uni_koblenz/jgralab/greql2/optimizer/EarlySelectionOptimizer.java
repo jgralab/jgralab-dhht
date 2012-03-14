@@ -41,31 +41,38 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
-import com.sun.mirror.declaration.Declaration;
-
 import de.uni_koblenz.jgralab.AttributedElement;
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
-import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
+import de.uni_koblenz.jgralab.greql2.schema.Identifier;
+import de.uni_koblenz.jgralab.greql2.schema.IsArgumentOf_isArgumentOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf_isConstraintOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsVarOf;
 import de.uni_koblenz.jgralab.greql2.schema.RecordConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.RecordElement;
 import de.uni_koblenz.jgralab.greql2.schema.RecordId;
 import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.schema.Attribute;
 
 /**
@@ -75,12 +82,12 @@ import de.uni_koblenz.jgralab.schema.Attribute;
  * @author ist@uni-koblenz.de
  * 
  */
-public class EarySelectionOptimizer extends OptimizerBase {
+public class EarlySelectionOptimizer extends OptimizerBase {
 
 	private static Logger logger = JGraLab
-			.getLogger(EarySelectionOptimizer.class.getPackage().getName());
+			.getLogger(EarlySelectionOptimizer.class.getPackage().getName());
 
-	private Greql2 syntaxgraph;
+	private GreqlSyntaxGraph syntaxgraph;
 
 	/*
 	 * (non-Javadoc)
@@ -91,7 +98,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 */
 	@Override
 	public boolean isEquivalent(Optimizer optimizer) {
-		if (optimizer instanceof EarySelectionOptimizer) {
+		if (optimizer instanceof EarlySelectionOptimizer) {
 			return true;
 		}
 		return false;
@@ -106,7 +113,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		this.syntaxgraph = syntaxgraph;
 
@@ -144,11 +151,11 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		HashMap<SimpleDeclaration, Set<Expression>> movableExpressions = new HashMap<SimpleDeclaration, Set<Expression>>();
 
 		// find all movable constraints in all Declarations
-		for (Declaration decl : syntaxgraph.getDeclarationVertices()) {
-			IsConstraintOf isConst = decl
-					.getFirstIsConstraintOfIncidence(EdgeDirection.IN);
+		for (de.uni_koblenz.jgralab.greql2.schema.Declaration decl : syntaxgraph.getDeclarationVertices()) {
+			IsConstraintOf_isConstraintOf_omega isConst = decl
+					.getFirst_isConstraintOf_omega();
 			while (isConst != null) {
-				Expression exp = (Expression) isConst.getAlpha();
+				Expression exp = (Expression) isConst.getThat();
 				for (Entry<SimpleDeclaration, Set<Expression>> e : collectMovableExpressions(
 						exp).entrySet()) {
 					if (movableExpressions.containsKey(e.getKey())) {
@@ -157,7 +164,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 						movableExpressions.put(e.getKey(), e.getValue());
 					}
 				}
-				isConst = isConst.getNextIsConstraintOf(EdgeDirection.IN);
+				isConst = isConst.getNextIsConstraintOf_omegaAtVertex();
 			}
 		}
 
@@ -180,9 +187,9 @@ public class EarySelectionOptimizer extends OptimizerBase {
 					public int compare(SimpleDeclaration sd1,
 							SimpleDeclaration sd2) {
 						Declaration decl1 = (Declaration) sd1
-								.getFirstIsSimpleDeclOfIncidence().getOmega();
+								.getFirstIncidenceToIsSimpleDeclOf().getEdge().getOmega();
 						Declaration decl2 = (Declaration) sd2
-								.getFirstIsSimpleDeclOfIncidence().getOmega();
+								.getFirstIncidenceToIsSimpleDeclOf().getEdge().getOmega();
 						if (OptimizerUtility.isAbove(decl1, decl2)) {
 							return 1;
 						}
@@ -194,8 +201,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 				});
 
 		for (SimpleDeclaration sd : simpleDeclsWithMovableExpressions) {
-			Declaration parentDecl = (Declaration) sd.getFirstIsSimpleDeclOfIncidence()
-					.getOmega();
+			Declaration parentDecl = (Declaration) sd.getFirstIncidenceToIsSimpleDeclOf().getEdge().getOmega();
 			Set<Variable> varsDeclaredBySd = OptimizerUtility
 					.collectVariablesDeclaredBy(sd);
 			// Check if there's a predicate needing only part of the variables
@@ -273,8 +279,8 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		logger.finer(sb.toString() + " with predicates " + predicates + ".");
 
 		Declaration parentDeclOfOrigSD = (Declaration) origSD
-				.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).getOmega();
-		assert parentDeclOfOrigSD.getDegree(EdgeDirection.OUT) == 1;
+				.getFirstIncidenceToIsSimpleDeclOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
+
 
 		// First we search the edges that access the variables to be moved,
 		// which have to be relinked to the record access funApp later.
@@ -319,7 +325,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		Declaration newInnerDecl = syntaxgraph.createDeclaration();
 		syntaxgraph.createIsCompDeclOf(newInnerDecl, newInnerCompr);
 		syntaxgraph.createIsCompResultDefOf(newOuterRecord, newInnerCompr);
-		origSD.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).setOmega(newInnerDecl);
+		origSD.getFirstIncidenceToIsSimpleDeclOf(Direction.VERTEX_TO_EDGE).getEdge().setOmega(newInnerDecl);
 
 		Expression newCombinedConstraint = createConjunction(
 				new ArrayList<Expression>(predicates), new HashSet<Variable>());
@@ -347,8 +353,8 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			// funApp
 			for (Edge edge : e.getValue()) {
 				if (edge.isValid()) {
-					edge.setAlpha(funApp);
-					assert edge.getAlpha() == funApp;
+					((BinaryEdge) edge).setAlpha(funApp);
+					assert ((BinaryEdge) edge).getAlpha() == funApp;
 				}
 			}
 		}
@@ -381,7 +387,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		Variable newInnerVar = undeclaredVars.iterator().next();
 
 		// Connect the edges
-		origSD.getFirstIsTypeExprOfIncidence(EdgeDirection.IN).setOmega(newInnerSD);
+		((BinaryEdge) origSD.getFirstIncidenceToIsTypeExprOf(Direction.EDGE_TO_VERTEX).getEdge()).setOmega(newInnerSD);
 		syntaxgraph.createIsTypeExprOfDeclaration(newSetComp, origSD);
 		syntaxgraph.createIsCompDeclOf(newDecl, newSetComp);
 		syntaxgraph.createIsSimpleDeclOf(newInnerSD, newDecl);
@@ -391,25 +397,27 @@ public class EarySelectionOptimizer extends OptimizerBase {
 
 		for (Expression exp : predicates) {
 			removeExpressionFromOriginalConstraint(exp, (Declaration) origSD
-					.getFirstIsSimpleDeclOfIncidence().getOmega());
+					.getFirstIncidenceToIsSimpleDeclOf().getEdge().getOmega());
 		}
 	}
 
 	private void removeExpressionFromOriginalConstraint(Expression exp,
 			Declaration origDecl) throws OptimizerException {
-		if (exp.getFirstIsConstraintOfIncidence(EdgeDirection.OUT) != null) {
+		if (exp.getFirstIncidenceToIsConstraintOf(Direction.VERTEX_TO_EDGE) != null) {
 			// This was the only constraint expression of the parent
 			// Declaration, so we can simply delete it, unless it's used in
 			// other places. In that case, only the edge may be
 			// deleted. deleteOrphanedVertices() DTRT.
-			exp.getFirstIsConstraintOfIncidence(EdgeDirection.OUT).delete();
+			exp.getFirstIncidenceToIsConstraintOf(Direction.VERTEX_TO_EDGE).delete();
 			OptimizerUtility.deleteOrphanedVerticesBelow(exp,
 					new HashSet<Vertex>());
 			return;
 		}
 
 		ArrayList<Edge> upEdges = new ArrayList<Edge>();
-		for (Edge e : exp.incidences(EdgeDirection.OUT)) {
+		for (Incidence i : exp.getIncidences(Direction.VERTEX_TO_EDGE)) {
+			BinaryEdge e = (BinaryEdge) i.getEdge();
+			
 			if ((e.getOmega() instanceof FunctionApplication)
 					&& existsForwardPathExcludingOtherTargetClassVertices(e,
 							origDecl)) {
@@ -423,7 +431,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			if (!upEdge.isValid()) {
 				continue;
 			}
-			FunctionApplication funApp = (FunctionApplication) upEdge
+			FunctionApplication funApp = (FunctionApplication) ((BinaryEdge) upEdge)
 					.getOmega();
 			if (funApp == null) {
 				throw new OptimizerException(
@@ -431,18 +439,18 @@ public class EarySelectionOptimizer extends OptimizerBase {
 								+ upEdge + ".");
 			}
 			Expression otherArg = null;
-			for (IsArgumentOf inc : funApp
-					.getIsArgumentOfIncidences(EdgeDirection.IN)) {
-				if (inc.getNormalEdge() != upEdge.getNormalEdge()) {
-					otherArg = (Expression) inc.getAlpha();
+			for (IsArgumentOf_isArgumentOf_omega inc : funApp
+					.getIsArgumentOf_isArgumentOf_omegaIncidences()) {
+				if (inc.getEdge() != upEdge) {
+					otherArg = (Expression) inc.getEdge().getAlpha();
 				}
 			}
 			ArrayList<Edge> funAppEdges = new ArrayList<Edge>();
-			for (Edge funAppEdge : funApp.incidences(EdgeDirection.OUT)) {
-				funAppEdges.add(funAppEdge);
+			for (Incidence funAppInc : funApp.getIncidences(Direction.VERTEX_TO_EDGE)) {
+				funAppEdges.add(funAppInc.getEdge());
 			}
 			for (Edge fae : funAppEdges) {
-				fae.setAlpha(otherArg);
+				((BinaryEdge) fae).setAlpha(otherArg);
 			}
 			OptimizerUtility.deleteOrphanedVerticesBelow(funApp,
 					new HashSet<Vertex>());
@@ -463,7 +471,8 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		// GreqlEvaluator.println("collectEdgesComingFrom(" + startVertex + ", "
 		// + targetEdge + ")");
 		HashSet<Edge> edges = new HashSet<Edge>();
-		for (Edge e : var.incidences(EdgeDirection.OUT)) {
+		for (Incidence i : var.getIncidences(Direction.VERTEX_TO_EDGE)) {
+			Edge e = i.getEdge();
 			if ((e instanceof IsDeclaredVarOf) || (e instanceof IsBoundVarOf)
 					|| (e instanceof IsVarOf)) {
 				continue;
@@ -537,10 +546,10 @@ public class EarySelectionOptimizer extends OptimizerBase {
 				&& OptimizerUtility.isAnd((FunctionApplication) exp)) {
 			// For AND expressions we dive deeper into the arguments.
 			FunctionApplication funApp = (FunctionApplication) exp;
-			IsArgumentOf isArg = funApp.getFirstIsArgumentOfIncidence(EdgeDirection.IN);
+			IsArgumentOf_isArgumentOf_omega isArg = funApp.getFirst_isArgumentOf_omega();
 			while (isArg != null) {
 				for (Entry<SimpleDeclaration, Set<Expression>> entry : collectMovableExpressions(
-						(Expression) isArg.getAlpha()).entrySet()) {
+						(Expression) isArg.getEdge().getAlpha()).entrySet()) {
 					if (movableExpressions.containsKey(entry.getKey())) {
 						movableExpressions.get(entry.getKey()).addAll(
 								entry.getValue());
@@ -549,7 +558,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 								.put(entry.getKey(), entry.getValue());
 					}
 				}
-				isArg = isArg.getNextIsArgumentOf(EdgeDirection.IN);
+				isArg = isArg.getNextIsArgumentOf_omegaAtVertex();
 			}
 			return movableExpressions;
 		}
@@ -559,8 +568,8 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			// Only collect those SimpleDeclarations whose parent Declaration
 			// has more than one SimpleDeclaration or which declare more than
 			// one variable.
-			Declaration parent = (Declaration) sd.getFirstIsSimpleDeclOfIncidence(
-					EdgeDirection.OUT).getOmega();
+			Declaration parent = (Declaration) sd.getFirstIncidenceToIsSimpleDeclOf(
+					Direction.VERTEX_TO_EDGE).getEdge().getOmega();
 			if ((collectSimpleDeclarationsOf(parent).size() > 1)
 					|| (OptimizerUtility.collectVariablesDeclaredBy(sd).size() > 1)) {
 				if (movableExpressions.containsKey(sd)) {
@@ -594,7 +603,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 
 		SimpleDeclaration sd = null, oldSd = null;
 		for (Variable var : neededVars) {
-			sd = (SimpleDeclaration) var.getFirstIsDeclaredVarOfIncidence().getOmega();
+			sd = (SimpleDeclaration) var.getFirstIncidenceToIsDeclaredVarOf().getEdge().getOmega();
 			if ((oldSd != null) && (sd != oldSd)) {
 				// the last variable was declared in another
 				// SimpleDeclaration
@@ -622,12 +631,12 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		Declaration localDecl = findNearestDeclarationAbove(exp);
 		for (SimpleDeclaration sd : collectSimpleDeclarationsOf(localDecl)) {
 			for (Variable var : neededVars) {
-				IsDeclaredVarOf inc = sd.getFirstIsDeclaredVarOfIncidence();
+				IsDeclaredVarOf_isDeclaredVarOf_omega inc = sd.getFirst_isDeclaredVarOf_omega();
 				while (inc != null) {
-					if (inc.getAlpha() == var) {
+					if (inc.getThat() == var) {
 						neededLocalVars.add(var);
 					}
-					inc = inc.getNextIsDeclaredVarOf();
+					inc = inc.getNextIsDeclaredVarOf_omegaAtVertex();
 				}
 			}
 		}
@@ -646,19 +655,19 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 */
 	private boolean existsForwardPathExcludingOtherTargetClassVertices(
 			Edge edge, Vertex target) {
-		Vertex omega = edge.getOmega();
+		Vertex omega = ((BinaryEdge) edge).getOmega();
 
 		if (omega == target) {
 			return true;
 		}
 
-		if (omega.getMetaClass().getM1Class() == target
-				.getMetaClass().getM1Class()) {
+		if (omega.getType().getM1Class() == target
+				.getType().getM1Class()) {
 			return false;
 		}
 
-		for (Edge e : omega.incidences(EdgeDirection.OUT)) {
-			if (existsForwardPathExcludingOtherTargetClassVertices(e, target)) {
+		for (Incidence i : omega.getIncidences(Direction.VERTEX_TO_EDGE)) {
+			if (existsForwardPathExcludingOtherTargetClassVertices(i.getEdge(), target)) {
 				return true;
 			}
 		}
@@ -676,9 +685,9 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 */
 	private List<SimpleDeclaration> collectSimpleDeclarationsOf(Declaration decl) {
 		ArrayList<SimpleDeclaration> sds = new ArrayList<SimpleDeclaration>();
-		for (IsSimpleDeclOf inc : decl
-				.getIsSimpleDeclOfIncidences(EdgeDirection.IN)) {
-			sds.add((SimpleDeclaration) inc.getAlpha());
+		for (IsSimpleDeclOf_isSimpleDeclOf_omega inc : decl
+				.getIsSimpleDeclOf_isSimpleDeclOf_omegaIncidences()) {
+			sds.add((SimpleDeclaration) inc.getThat());
 		}
 		return sds;
 	}
@@ -698,7 +707,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		HashSet<Variable> undeclaredVars = new HashSet<Variable>();
 		for (Variable var : OptimizerUtility
 				.collectInternallyDeclaredVariablesBelow(vertex)) {
-			if (var.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT) == null) {
+			if (var.getFirstIncidenceToIsDeclaredVarOf(Direction.VERTEX_TO_EDGE) == null) {
 				undeclaredVars.add(var);
 			}
 		}
@@ -728,7 +737,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 * @return the root {@link Vertex} of the copy
 	 */
 	@SuppressWarnings("unchecked")
-	private Vertex copySubgraph(Vertex origVertex, Greql2 graph,
+	private Vertex copySubgraph(Vertex origVertex, GreqlSyntaxGraph graph,
 			Set<Variable> variablesToBeCopied,
 			HashMap<Variable, Variable> copiedVarMap) {
 		// GreqlEvaluator.println("copySubgraph(" + origVertex + ", graph, "
@@ -747,7 +756,7 @@ public class EarySelectionOptimizer extends OptimizerBase {
 		}
 
 		Class<? extends Vertex> vertexClass = (Class<? extends Vertex>) origVertex
-				.getMetaClass().getM1Class();
+				.getType().getM1Class();
 		Vertex topVertex = graph.createVertex(vertexClass);
 		copyAttributes(origVertex, topVertex);
 
@@ -757,16 +766,16 @@ public class EarySelectionOptimizer extends OptimizerBase {
 			copiedVarMap.put((Variable) origVertex, newVar);
 		}
 
-		Edge origEdge = origVertex.getFirstIncidence(EdgeDirection.IN);
+		Incidence origInc = origVertex.getFirstIncidence(Direction.EDGE_TO_VERTEX);
 		Vertex subVertex;
 
-		while (origEdge != null) {
-			subVertex = copySubgraph(origEdge.getAlpha(), graph,
+		while (origInc != null) {
+			subVertex = copySubgraph(((BinaryEdge) origInc.getEdge()).getAlpha(), graph,
 					variablesToBeCopied, copiedVarMap);
-			Class<? extends Edge> edgeClass = (Class<? extends Edge>) origEdge
-					.getMetaClass().getM1Class();
+			Class<? extends BinaryEdge> edgeClass = (Class<? extends BinaryEdge>) origInc.getEdge()
+					.getType().getM1Class();
 			graph.createEdge(edgeClass, subVertex, topVertex);
-			origEdge = origEdge.getNextIncidence(EdgeDirection.IN);
+			origInc = origInc.getNextIncidenceAtVertex(Direction.EDGE_TO_VERTEX);
 		}
 
 		return topVertex;
@@ -782,9 +791,9 @@ public class EarySelectionOptimizer extends OptimizerBase {
 	 *            another {@link AttributedElement} whose runtime type equals
 	 *            <code>from</code>'s type.
 	 */
-	private void copyAttributes(AttributedElement from, AttributedElement to) {
-		for (Attribute attr : from.getMetaClass()
-				.getAttributeList()) {
+	private void copyAttributes(AttributedElement<?,?> from, AttributedElement<?,?> to) {
+		SortedSet<Attribute> attrList = from.getType().getAttributeList();
+		for (Attribute attr : attrList) {
 			to.setAttribute(attr.getName(), from.getAttribute(attr.getName()));
 		}
 	}

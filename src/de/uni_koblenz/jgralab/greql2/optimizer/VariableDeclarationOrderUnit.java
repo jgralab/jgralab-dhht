@@ -37,15 +37,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.mirror.declaration.Declaration;
-
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
-import de.uni_koblenz.jgralab.greql2.evaluator.costmodel.GraphSize;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
+import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOf;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * Models various aspects of {@link Variable}s used by the
@@ -62,7 +66,7 @@ public class VariableDeclarationOrderUnit implements
 	private Set<Vertex> dependentVertices;
 	private long variableValueChangeCosts = Long.MIN_VALUE;
 	private long typeExpressionCardinality = Long.MIN_VALUE;
-	private GraphMarker<VertexEvaluator> vertexEvalMarker;
+	private ObjectGraphMarker<Vertex, VertexEvaluator> vertexEvalMarker;
 	private GraphSize graphSize;
 	private SimpleDeclaration simpleDeclarationOfVariable;
 	private Expression typeExpressionOfVariable;
@@ -80,15 +84,15 @@ public class VariableDeclarationOrderUnit implements
 	 *            the {@link GraphSize} of the datagraph
 	 */
 	VariableDeclarationOrderUnit(Variable var, Declaration declaringDecl,
-			GraphMarker<VertexEvaluator> marker, GraphSize graphSize) {
+			ObjectGraphMarker<Vertex, VertexEvaluator> marker, GraphSize graphSize) {
 		this.variable = var;
 		this.declaringDeclaration = declaringDecl;
 		this.vertexEvalMarker = marker;
 		this.graphSize = graphSize;
 		this.simpleDeclarationOfVariable = (SimpleDeclaration) this.variable
-				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT).getOmega();
-		this.typeExpressionOfVariable = (Expression) this.simpleDeclarationOfVariable
-				.getFirstIsTypeExprOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirstIncidenceToIsDeclaredVarOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
+		this.typeExpressionOfVariable = (Expression) ((IsTypeExprOf) this.simpleDeclarationOfVariable
+				.getFirstIncidenceToIsTypeExprOf(Direction.EDGE_TO_VERTEX).getEdge()).getAlpha();
 
 		// Collect all vertices that depend on the variable and thus need to be
 		// recalculated when it changes its value.
@@ -114,8 +118,8 @@ public class VariableDeclarationOrderUnit implements
 		if (variable != vertex) {
 			dependentVertices.add(vertex);
 		}
-		for (Edge e : vertex.incidences(EdgeDirection.OUT)) {
-			addDependendVertices(e.getOmega());
+		for (Incidence inc : vertex.getIncidences(Direction.VERTEX_TO_EDGE)) {
+			addDependendVertices(inc.getThat());
 		}
 	}
 
@@ -142,9 +146,10 @@ public class VariableDeclarationOrderUnit implements
 			if (sd == simpleDeclarationOfVariable) {
 				continue;
 			}
-			for (Variable var : sd.get_declaredVar()) {
+			for (IsDeclaredVarOf_isDeclaredVarOf_omega varInc : sd.getIsDeclaredVarOf_isDeclaredVarOf_omegaIncidences()) {
 				// if it is already in the set, then the extension was already
 				// done.
+				Variable var = (Variable) varInc.getThat();
 				if (!dependentVertices.contains(var)) {
 					extensionWasNeeded = true;
 					addDependendVertices(var);
@@ -252,7 +257,7 @@ public class VariableDeclarationOrderUnit implements
 
 		// If there can be no decision made on costs and cardinality, then the
 		// variable with the lower ID should come first.
-		if (variable.getUid() < o.getVariable().getUid()) {
+		if (variable.getGlobalId() < o.getVariable().getGlobalId()) {
 			return -1;
 		} else {
 			return 1;

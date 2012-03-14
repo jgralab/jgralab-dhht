@@ -42,11 +42,8 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.EdgePathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsEdgeExprOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression;
+import de.uni_koblenz.jgralab.greql2.schema.IsEdgeRestrOf_isEdgeRestrOf_omega;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
@@ -67,15 +64,14 @@ public class EdgePathDescriptionEvaluator extends
 	public NFA evaluate() {
 		EdgePathDescription edgePD = (EdgePathDescription) vertex;
 		
-		Edge evalEdge = edgePD.getFirst_parentEdgePathDescr().getEdge();
+		Edge evalEdge = edgePD.getFirst_isEdgeExprOf_omega().getEdge();
 		VertexEvaluator edgeEval = null;
 		if (evalEdge != null) {
 			edgeEval = vertexEvalMarker.getMark(((BinaryEdge) evalEdge).getAlpha());
 		}
 		TypeCollection typeCollection = new TypeCollection();
 		
-		IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression inc  = 
-				(IsTypeRestrOfExpression_isTypeRestrOfExpression_GoesTo_Expression) vertex.getFirstIncidenceToIsTypeRestrOfExpression(Direction.EDGE_TO_VERTEX);
+		IsEdgeRestrOf_isEdgeRestrOf_omega inc = vertex.getFirst_isEdgeRestrOf_omega();
 		EdgeRestrictionEvaluator edgeRestEval = null;
 		VertexEvaluator predicateEvaluator = null;
 		if (inc != null) {

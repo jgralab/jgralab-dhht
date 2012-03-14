@@ -41,7 +41,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.ExponentiatedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.PathDescription;
@@ -105,8 +104,23 @@ public class ExponentiatedPathDescriptionEvaluator extends
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsExponentiatedPathDescription(this, graphSize);
+		long exponent = 5;
+		VertexEvaluator expEval = getVertexEvalMarker().getMark(
+				vertex.getFirst_isExponentOf_omega().getThat());
+		if (expEval instanceof IntLiteralEvaluator) {
+			try {
+				exponent = ((Number) expEval.getResult()).longValue();
+			} catch (Exception ex) {
+			}
+		}
+		long exponentCosts = expEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+		VertexEvaluator pathEval = getVertexEvalMarker().getMark(
+				vertex.getFirst_isExponentiatedPathOf_omega().getThat());
+		long pathCosts = pathEval.getCurrentSubtreeEvaluationCosts(graphSize);
+		long ownCosts = ((pathCosts * exponent) * 1) / 3;
+		long subtreeCosts = pathCosts + ownCosts + exponentCosts;
+		return new VertexCosts(ownCosts, ownCosts, subtreeCosts);
 	}
 
 }

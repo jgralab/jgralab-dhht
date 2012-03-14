@@ -69,7 +69,6 @@ import de.uni_koblenz.jgralab.greql2.schema.ElementRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
-import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.IncidenceRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;

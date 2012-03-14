@@ -130,6 +130,19 @@ public class GraphFactoryImpl implements GraphFactory {
 		vertexMap_MemBasedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMap_MemBasedStorage = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 
+		graphMap_DistributedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		graphProxyMap_DistributedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		viewGraphMap_DistributedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForVertexMap_DistributedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		subordinateGraphForEdgeMap_DistributedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
+		edgeMap_DistributedStorage = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		vertexMap_DistributedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceMap_DistributedStorage = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+
+		edgeProxyMap_DistributedStorage = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
+		vertexProxyMap_DistributedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
+		incidenceProxyMap_DistributedStorage = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
+		
 		graphMap_DiskBasedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		graphProxyMap_DiskBasedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
 		viewGraphMap_DiskBasedStorage = new HashMap<Class<? extends Graph>, Constructor<? extends Graph>>();
@@ -138,10 +151,6 @@ public class GraphFactoryImpl implements GraphFactory {
 		edgeMap_DiskBasedStorage = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		vertexMap_DiskBasedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
 		incidenceMap_DiskBasedStorage = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
-
-		edgeProxyMap_DistributedStorage = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
-		vertexProxyMap_DistributedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();
-		incidenceProxyMap_DistributedStorage = new HashMap<Class<? extends Incidence>, Constructor<? extends Incidence>>();
 		
 		edgeProxyMap_DiskBasedStorage = new HashMap<Class<? extends Edge>, Constructor<? extends Edge>>();
 		vertexProxyMap_DiskBasedStorage = new HashMap<Class<? extends Vertex>, Constructor<? extends Vertex>>();

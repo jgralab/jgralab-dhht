@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -13,7 +14,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl;
 
 @SuppressWarnings("rawtypes")
-public abstract class GlobalGraphMarker<T extends GraphElement> extends AbstractGraphMarker<T> {
+public abstract class GlobalGraphMarker<T extends AttributedElement> extends AbstractGraphMarker<T> {
 
 	private static final int DEFAULT_PARTIAL_GRAPH_COUNT = 1000;
 	

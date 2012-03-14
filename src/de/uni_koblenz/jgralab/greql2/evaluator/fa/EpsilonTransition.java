@@ -103,12 +103,9 @@ public class EpsilonTransition extends Transition {
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
-		if (e.getAlpha() == v) {
-			return e.getOmega();
-		} else {
-			return e.getAlpha();
-		}
+	public Vertex getNextElement(Vertex v, Edge e) {
+		throw new UnsupportedOperationException(
+				"EpsilonTransition.getNextElement(...) has been called. That should not happen, there should be no epsilon-transitions in the DFA used for path search. Check the DFA-Constructor");
 	}
 
 	/**
@@ -126,7 +123,7 @@ public class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return false;
 	}
 }

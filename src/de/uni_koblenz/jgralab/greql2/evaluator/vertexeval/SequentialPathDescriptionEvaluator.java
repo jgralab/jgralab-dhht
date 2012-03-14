@@ -41,9 +41,8 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsSequenceElementOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSequenceElementOf_isSequenceElementOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SequentialPathDescription;
 
 public class SequentialPathDescriptionEvaluator extends
@@ -78,22 +77,34 @@ public class SequentialPathDescriptionEvaluator extends
 
 	@Override
 	public NFA evaluate() {
-		IsSequenceElementOf inc = vertex
-				.getFirstIsSequenceElementOfIncidence(EdgeDirection.IN);
+		IsSequenceElementOf_isSequenceElementOf_omega inc = vertex
+				.getFirst_isSequenceElementOf_omega();
 		ArrayList<NFA> nfaList = new ArrayList<NFA>();
 		while (inc != null) {
 			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) vertexEvalMarker
-					.getMark(inc.getAlpha());
+					.getMark(inc.getThat());
 			nfaList.add(pathEval.getNFA());
-			inc = inc.getNextIsSequenceElementOfIncidence(EdgeDirection.IN);
+			inc = inc.getNextIsSequenceElementOf_omegaAtVertex();
 		}
 		return NFA.createSequentialPathDescriptionNFA(nfaList);
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsSequentialPathDescription(this, graphSize);
+		long aggregatedCosts = 0;
+		IsSequenceElementOf_isSequenceElementOf_omega inc = vertex
+				.getFirst_isSequenceElementOf_omega();
+		long alternatives = 0;
+		while (inc != null) {
+			PathDescriptionEvaluator pathEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(inc.getThat());
+			aggregatedCosts += pathEval
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextIsSequenceElementOf_omegaAtVertex();
+			alternatives++;
+		}
+		aggregatedCosts += 10 * alternatives;
+		return new VertexCosts(10 * alternatives, 10 * alternatives,
+				aggregatedCosts);
 	}
 
 }

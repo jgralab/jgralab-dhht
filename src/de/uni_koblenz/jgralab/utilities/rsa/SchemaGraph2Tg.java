@@ -36,19 +36,42 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.Constraint;
-import de.uni_koblenz.jgralab.schema.Domain;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.EnumDomain;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.NamedElementClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent_componentDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_connectedEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attributedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint_constrainedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtEdgeClass_hidingIncidenceClassAtEdge;
+import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtVertexClass_hidingIncidenceClassAtVertex;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
+
+
+/**
+ * TODO (24.01.2012) This tool does currently not convert sigma and kappa information and needs to be deleted or adapted
+ * @author dbildh
+ *
+ */
 
 public class SchemaGraph2Tg {
 
@@ -201,33 +224,33 @@ public class SchemaGraph2Tg {
 		println(SCHEMA, SPACE, schema.get_packagePrefix(), DOT,
 				schema.get_name(), DELIMITER, NEWLINE);
 
-		Package defaultPackage = (Package) schema
-				.getFirstContainsDefaultPackageIncidence(EdgeDirection.OUT).getThat();
+		de.uni_koblenz.jgralab.grumlschema.structure.Package defaultPackage = (de.uni_koblenz.jgralab.grumlschema.structure.Package) schema
+				.getFirstIncidenceToContainsDefaultPackage(Direction.VERTEX_TO_EDGE).getThat();
 		setCurrentPackageName(defaultPackage);
 
 		// graphclass
-		GraphClass gc = (GraphClass) schema.getFirstDefinesGraphClassIncidence(
-				EdgeDirection.OUT).getOmega();
+		GraphClass gc = (GraphClass) schema.getFirstIncidenceToDefinesGraphClass(
+				Direction.VERTEX_TO_EDGE).getThat();
 		printGraphClass(gc);
 		printComments(gc);
 
-		printPackageWithElements((Package) schema
-				.getFirstContainsDefaultPackageIncidence(EdgeDirection.OUT).getThat());
+		printPackageWithElements((de.uni_koblenz.jgralab.grumlschema.structure.Package) schema
+				.getFirstIncidenceToContainsDefaultPackage(Direction.VERTEX_TO_EDGE).getThat());
 	}
 
-	private void printPackageWithElements(Package gPackage) {
+	private void printPackageWithElements(de.uni_koblenz.jgralab.grumlschema.structure.Package gPackage) {
 		setCurrentPackageName(gPackage);
 		printComments(gPackage);
 		println(PACKAGE, SPACE, currentPackageName, DELIMITER);
 
 		for (ContainsDomain cd : gPackage
-				.getContainsDomainIncidences(EdgeDirection.OUT)) {
-			printDomain((Domain) cd.getThat());
+				.getIncidentEdgesOfType_ContainsDomain(Direction.VERTEX_TO_EDGE)) {
+			printDomain((Domain) cd.getOmega());
 		}
 
 		for (ContainsGraphElementClass cgec : gPackage
-				.getContainsGraphElementClassIncidences(EdgeDirection.OUT)) {
-			GraphElementClass gec = (GraphElementClass) cgec.getThat();
+				.getIncidentEdgesOfType_ContainsGraphElementClass(Direction.VERTEX_TO_EDGE)) {
+			GraphElementClass gec = (GraphElementClass) cgec.getOmega();
 			if (gec instanceof EdgeClass) {
 				printEdgeClass((EdgeClass) gec);
 			} else {
@@ -236,17 +259,17 @@ public class SchemaGraph2Tg {
 		}
 
 		for (ContainsSubPackage csp : gPackage
-				.getContainsSubPackageIncidences(EdgeDirection.OUT)) {
-			printPackageWithElements((Package) csp.getThat());
+				.getIncidentEdgesOfType_ContainsSubPackage(Direction.VERTEX_TO_EDGE)) {
+			printPackageWithElements((de.uni_koblenz.jgralab.grumlschema.structure.Package) csp.getOmega());
 		}
 	}
 
-	private void setCurrentPackageName(Package pkg) {
+	private void setCurrentPackageName(de.uni_koblenz.jgralab.grumlschema.structure.Package pkg) {
 		currentPackageName = pkg.get_qualifiedName();
 	}
 
 	private void printComments(NamedElementClass ne) {
-		for (Annotates ann : ne.getAnnotatesIncidences(EdgeDirection.IN)) {
+		for (Annotates_annotatedElement ann : ne.getAnnotates_annotatedElementIncidences()) {
 			Comment com = (Comment) ann.getThat();
 			println(COMMENT, SPACE, ne.get_qualifiedName(), SPACE,
 					GraphIO.toUtfString(com.get_text()), DELIMITER);
@@ -261,17 +284,17 @@ public class SchemaGraph2Tg {
 		print(VERTEX_CLASS, SPACE, shortName(vc.get_qualifiedName()));
 
 		// superclasses
-		if (vc.getFirstSpecializesVertexClassIncidence(EdgeDirection.OUT) != null) {
+		if (vc.getFirstIncidenceToSpecializesVertexClass(Direction.VERTEX_TO_EDGE) != null) {
 			print(COLON, SPACE);
 			boolean first = true;
 			for (SpecializesVertexClass svc : vc
-					.getSpecializesVertexClassIncidences(EdgeDirection.OUT)) {
+					.getIncidentEdgesOfType_SpecializesVertexClass(Direction.VERTEX_TO_EDGE)) {
 				if (first) {
 					first = false;
 				} else {
 					print(COMMA, SPACE);
 				}
-				VertexClass superVC = (VertexClass) svc.getThat();
+				VertexClass superVC = (VertexClass) svc.getOmega();
 				print(shortName(superVC.get_qualifiedName()));
 			}
 		}
@@ -292,30 +315,33 @@ public class SchemaGraph2Tg {
 		print(EDGE_CLASS, SPACE, shortName(ec.get_qualifiedName()));
 
 		// superclasses
-		if (ec.getFirstSpecializesEdgeClassIncidence(EdgeDirection.OUT) != null) {
+		if (ec.getFirstIncidenceToSpecializesEdgeClass(Direction.VERTEX_TO_EDGE) != null) {
 			print(COLON, SPACE);
 			boolean first = true;
 			for (SpecializesEdgeClass svc : ec
-					.getSpecializesEdgeClassIncidences(EdgeDirection.OUT)) {
+					.getIncidentEdgesOfType_SpecializesEdgeClass(Direction.VERTEX_TO_EDGE)) {
 				if (first) {
 					first = false;
 				} else {
 					print(COMMA, SPACE);
 				}
-				EdgeClass superEC = (EdgeClass) svc.getThat();
+				EdgeClass superEC = (EdgeClass) svc.getOmega();
 				print(shortName(superEC.get_qualifiedName()));
 			}
 		}
 
-		// from/to
-		IncidenceClass fromIC = (IncidenceClass) ec.getFirstComesFromIncidence(
-				EdgeDirection.OUT).getThat();
-		IncidenceClass toIC = (IncidenceClass) ec.getFirstGoesToIncidence(
-				EdgeDirection.OUT).getThat();
-		VertexClass fromVC = (VertexClass) fromIC.getFirstEndsAtIncidence(
-				EdgeDirection.OUT).getThat();
-		VertexClass toVC = (VertexClass) toIC.getFirstEndsAtIncidence(EdgeDirection.OUT)
-				.getThat();
+
+		IncidenceClass toIC = null;
+		IncidenceClass fromIC = null;
+		for (ConnectsToEdgeClass_connectedEdgeClass inc : ec.getConnectsToEdgeClass_connectedEdgeClassIncidences()) {
+			IncidenceClass ic = (IncidenceClass) inc.getThat();
+			if (ic.get_direction() == de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE)
+				fromIC = ic;
+			if (ic.get_direction() == de.uni_koblenz.jgralab.grumlschema.structure.Direction.EDGE_TO_VERTEX)
+				toIC = ic;
+		}
+		VertexClass fromVC = (VertexClass) fromIC.getFirst_incidenceClassAtVertex().getThat();
+		VertexClass toVC = (VertexClass) toIC.getFirst_incidenceClassAtVertex().getThat();
 
 		print(SPACE, FROM, SPACE, shortName(fromVC.get_qualifiedName()));
 		printMultiplicitiesAndRoles(fromIC);
@@ -332,13 +358,13 @@ public class SchemaGraph2Tg {
 
 	private void printAggregation(IncidenceClass inc) {
 		assert inc != null;
-		switch (inc.get_aggregation()) {
-		case NONE:
+		switch (inc.get_incidenceType()) {
+		case EDGE:
 			break;
-		case SHARED:
+		case AGGREGATION:
 			print(SPACE, AGGREGATION, SPACE, AGG_SHARED);
 			break;
-		case COMPOSITE:
+		case COMPOSITION:
 			print(SPACE, AGGREGATION, SPACE, AGG_COMPOSITE);
 			break;
 		}
@@ -372,21 +398,44 @@ public class SchemaGraph2Tg {
 	}
 
 	private void printMultiplicitiesAndRoles(IncidenceClass ic) {
-		String min = ic.get_min() == Integer.MAX_VALUE ? STAR : String
-				.valueOf(ic.get_min());
-		String max = ic.get_max() == Integer.MAX_VALUE ? STAR : String
-				.valueOf(ic.get_max());
-		print(SPACE, ROUND_BRACKET_OPENED, min, COMMA, max,
-				ROUND_BRACKET_CLOSED);
-
 		if ((ic.get_roleName() != null) && !ic.get_roleName().isEmpty()) {
 			print(SPACE, ROLE, SPACE, ic.get_roleName());
 		}
+	
+		String minV = ic.get_minVerticesAtEdge() == Integer.MAX_VALUE ? STAR : String
+				.valueOf(ic.get_minVerticesAtEdge());
+		String maxV = ic.get_maxVerticesAtEdge() == Integer.MAX_VALUE ? STAR : String
+				.valueOf(ic.get_maxVerticesAtEdge());
 
-		if (ic.getFirstRedefinesIncidence(EdgeDirection.OUT) != null) {
+		print(SPACE, ROUND_BRACKET_OPENED, minV, COMMA, maxV,
+				ROUND_BRACKET_CLOSED);
+
+
+		if (ic.getFirst_hidingIncidenceClassAtVertex() != null) {
 			print(SPACE, REDEFINES, SPACE);
 			boolean first = true;
-			for (Redefines r : ic.getRedefinesIncidences(EdgeDirection.OUT)) {
+			for (HidesIncidenceClassAtVertexClass_hidingIncidenceClassAtVertex r : ic.getHidesIncidenceClassAtVertexClass_hidingIncidenceClassAtVertexIncidences()) {
+				if (first) {
+					first = false;
+				} else {
+					print(COMMA, SPACE);
+				}
+				IncidenceClass redefined = (IncidenceClass) r.getThat();
+				print(redefined.get_roleName());
+			}
+		}
+		
+		
+		String minE = ic.get_minEdgesAtVertex() == Integer.MAX_VALUE ? STAR : String
+				.valueOf(ic.get_minEdgesAtVertex());
+		String maxE = ic.get_maxEdgesAtVertex() == Integer.MAX_VALUE ? STAR : String
+				.valueOf(ic.get_maxEdgesAtVertex());
+		print(SPACE, ROUND_BRACKET_OPENED, minE, COMMA, maxE,
+				ROUND_BRACKET_CLOSED);	
+		if (ic.getFirst_hidingIncidenceClassAtVertex() != null) {
+			print(SPACE, REDEFINES, SPACE);
+			boolean first = true;
+			for (HidesIncidenceClassAtEdgeClass_hidingIncidenceClassAtEdge r : ic.getHidesIncidenceClassAtEdgeClass_hidingIncidenceClassAtEdgeIncidences()) {
 				if (first) {
 					first = false;
 				} else {
@@ -431,15 +480,15 @@ public class SchemaGraph2Tg {
 		print(RECORD_DOMAIN, SPACE, dom.get_qualifiedName(), SPACE,
 				ROUND_BRACKET_OPENED);
 		boolean first = true;
-		for (HasRecordDomainComponent hc : dom
-				.getHasRecordDomainComponentIncidences(EdgeDirection.OUT)) {
+		for (HasRecordDomainComponent_componentDomain hc : dom
+				.getHasRecordDomainComponent_componentDomainIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				print(COMMA, SPACE);
 			}
 			Domain compDom = (Domain) hc.getThat();
-			print(hc.get_name(), COLON, SPACE,
+			print(hc.getEdge().get_name(), COLON, SPACE,
 					shortName(compDom.get_qualifiedName()));
 		}
 		println(ROUND_BRACKET_CLOSED, DELIMITER);
@@ -453,8 +502,8 @@ public class SchemaGraph2Tg {
 	}
 
 	private void printConstraints(AttributedElementClass aec) {
-		for (HasConstraint hc : aec
-				.getHasConstraintIncidences(EdgeDirection.OUT)) {
+		for (HasConstraint_constrainedElement hc : aec
+				.getHasConstraint_constrainedElementIncidences()) {
 			Constraint constr = (Constraint) hc.getThat();
 			print(SPACE, SQUARE_BRACKET_OPENED);
 
@@ -471,20 +520,20 @@ public class SchemaGraph2Tg {
 	}
 
 	private void printAttributes(AttributedElementClass aec) {
-		if (aec.getFirstHasAttributeIncidence(EdgeDirection.OUT) == null) {
+		if (aec.getFirst_attributedElement() == null) {
 			return;
 		}
 
 		print(SPACE, CURLY_BRACKET_OPENED);
 		boolean first = true;
-		for (HasAttribute ha : aec.getHasAttributeIncidences(EdgeDirection.OUT)) {
+		for (HasAttribute_attributedElement ha : aec.getHasAttribute_attributedElementIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				print(COMMA, SPACE);
 			}
 			Attribute attr = (Attribute) ha.getThat();
-			Domain dom = (Domain) attr.getFirstHasDomainIncidence(EdgeDirection.OUT)
+			Domain dom = (Domain) attr.getFirst_attributeWithDomain()
 					.getThat();
 			print(attr.get_name(), COLON, SPACE,
 					shortName(dom.get_qualifiedName()));

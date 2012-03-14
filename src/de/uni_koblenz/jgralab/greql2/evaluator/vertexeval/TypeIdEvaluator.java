@@ -108,14 +108,28 @@ public class TypeIdEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel().calculateCostsTypeId(this,
-				graphSize);
+		long costs = graphSize.getKnownEdgeTypes()
+				+ graphSize.getKnownVertexTypes();
+		return new VertexCosts(costs, costs, costs);
 	}
 
 	@Override
 	public double calculateEstimatedSelectivity(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel().calculateSelectivityTypeId(this,
-				graphSize);
+		int typesInSchema = (int) Math
+				.round((graphSize.getKnownEdgeTypes() + graphSize
+						.getKnownVertexTypes()) / 2.0);
+		double selectivity = 1.0;
+		if (vertex.is_type()) {
+			selectivity = 1.0 / typesInSchema;
+		} else {
+			double avgSubclasses = (graphSize.getAverageEdgeSubclasses() + graphSize
+					.getAverageVertexSubclasses()) / 2.0;
+			selectivity = avgSubclasses / typesInSchema;
+		}
+		if (vertex.is_excluded()) {
+			selectivity = 1 - selectivity;
+		}
+		return selectivity;
 	}
 
 	/*
@@ -127,7 +141,7 @@ public class TypeIdEvaluator extends VertexEvaluator {
 	@Override
 	public String getLoggingName() {
 		StringBuilder name = new StringBuilder();
-		name.append(vertex.getAttributedElementClass().getQualifiedName());
+		name.append(vertex.getType().getQualifiedName());
 		if (vertex.is_type()) {
 			name.append("-type");
 		}

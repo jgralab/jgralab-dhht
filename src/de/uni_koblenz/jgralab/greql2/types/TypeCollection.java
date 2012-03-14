@@ -39,7 +39,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
@@ -96,7 +95,7 @@ public class TypeCollection {
 	 *            toggles wether the given types should be added to the allowed
 	 *            or forbidden types
 	 */
-	public TypeCollection(Collection<TypedElementClass> types,
+	public TypeCollection(Collection<? extends TypedElementClass> types,
 			boolean forbidden) {
 		this();
 		if (forbidden) {

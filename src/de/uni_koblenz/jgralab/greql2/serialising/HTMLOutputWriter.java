@@ -225,25 +225,25 @@ public class HTMLOutputWriter extends DefaultWriter {
 	@Override
 	protected void writeVertex(Vertex vertex) throws IOException {
 		if (createElementLinks) {
-			out.println("<a href=\"v" + vertex.getId() + "\">v"
-					+ vertex.getId() + ": "
-					+ vertex.getAttributedElementClass().getUniqueName()
+			out.println("<a href=\"v" + vertex.getGlobalId() + "\">v"
+					+ vertex.getGlobalId() + ": "
+					+ vertex.getType().getUniqueName()
 					+ "</a>");
 		} else {
-			out.println("v" + vertex.getId() + ": "
-					+ vertex.getAttributedElementClass().getUniqueName());
+			out.println("v" + vertex.getGlobalId() + ": "
+					+ vertex.getType().getUniqueName());
 		}
 	}
 
 	@Override
 	protected void writeEdge(Edge edge) throws IOException {
 		if (createElementLinks) {
-			out.println("<a href=\"e" + edge.getId() + "\">e" + edge.getId()
-					+ ": " + edge.getAttributedElementClass().getUniqueName()
+			out.println("<a href=\"e" + edge.getGlobalId() + "\">e" + edge.getGlobalId()
+					+ ": " + edge.getType().getUniqueName()
 					+ "</a>");
 		} else {
-			out.println("e" + edge.getId() + ": "
-					+ edge.getAttributedElementClass().getUniqueName());
+			out.println("e" + edge.getGlobalId() + ": "
+					+ edge.getType().getUniqueName());
 		}
 	}
 
@@ -276,11 +276,11 @@ public class HTMLOutputWriter extends DefaultWriter {
 	@Override
 	protected void writeGraph(Graph gr) throws IOException {
 		if (createElementLinks) {
-			out.println("<a href=\"g" + gr.getId() + "\">" + gr.getId() + ": "
-					+ gr.getAttributedElementClass().getUniqueName() + "</a>");
+			out.println("<a href=\"g" + gr.getGlobalId() + "\">" + gr.getGlobalId() + ": "
+					+ gr.getType().getUniqueName() + "</a>");
 		} else {
-			out.println(gr.getId() + ": "
-					+ gr.getAttributedElementClass().getUniqueName());
+			out.println(gr.getGlobalId() + ": "
+					+ gr.getType().getUniqueName());
 		}
 	}
 
@@ -389,7 +389,7 @@ public class HTMLOutputWriter extends DefaultWriter {
 		}
 		out.println("</head><body>");
 		if (getGraph() != null) {
-			out.print("<p>Graph id: " + getGraph().getId() + "</p>");
+			out.print("<p>Graph id: " + getGraph().getUniqueGraphId() + "</p>");
 		}
 		out.print("<p>Result size: ");
 		if (rootValue instanceof PCollection) {

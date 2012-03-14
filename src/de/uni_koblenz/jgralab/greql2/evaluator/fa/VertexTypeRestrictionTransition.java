@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -149,7 +150,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * transition has fired. This is the vertex itself
 	 */
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
+	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
 
@@ -157,7 +158,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (AttributedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
+		for (TypedElementClass c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";
@@ -166,7 +167,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return false;
 	}
 }

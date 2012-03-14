@@ -32,7 +32,6 @@ package de.uni_koblenz.jgralab.impl.disk;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.Map;
 
 import org.pcollections.PMap;
 import org.pcollections.PSet;
@@ -49,7 +48,6 @@ import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.GraphStructureChangedListener;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
-import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.GraphClass;

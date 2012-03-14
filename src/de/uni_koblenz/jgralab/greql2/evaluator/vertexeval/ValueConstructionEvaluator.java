@@ -40,10 +40,9 @@ import java.util.ArrayList;
 import org.pcollections.PCollection;
 
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsPartOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsPartOf_isPartOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.ValueConstruction;
 
 /**
@@ -75,19 +74,19 @@ abstract public class ValueConstructionEvaluator extends VertexEvaluator {
 	public final PCollection<Object> createValue(PCollection<Object> collection) {
 		if (partEvaluators == null) {
 			int partCount = 0;
-			IsPartOf inc = vertex.getFirstIsPartOfIncidence(EdgeDirection.IN);
+			IsPartOf_isPartOf_omega inc = vertex.getFirst_isPartOf_omega();
 			while (inc != null) {
 				partCount++;
-				inc = inc.getNextIsPartOfIncidence(EdgeDirection.IN);
+				inc = inc.getNextIsPartOf_omegaAtVertex();
 			}
-			inc = vertex.getFirstIsPartOfIncidence(EdgeDirection.IN);
+			inc = vertex.getFirst_isPartOf_omega();
 			partEvaluators = new ArrayList<VertexEvaluator>(partCount);
 			while (inc != null) {
-				Expression currentExpression = (Expression) inc.getAlpha();
+				Expression currentExpression = (Expression) inc.getThat();
 				VertexEvaluator vertexEval = vertexEvalMarker
 						.getMark(currentExpression);
 				partEvaluators.add(vertexEval);
-				inc = inc.getNextIsPartOfIncidence(EdgeDirection.IN);
+				inc = inc.getNextIsPartOf_omegaAtVertex();
 			}
 		}
 		for (int i = 0; i < partEvaluators.size(); i++) {

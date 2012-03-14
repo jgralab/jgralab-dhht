@@ -524,7 +524,7 @@ public class GreqlParser extends ParserHelper {
 			Identifier ident = graph.createIdentifier();
 			offset = getCurrentOffset();
 			ident.set_name(matchIdentifier());
-			IsIdOf isId = graph.createIsIdOf(ident, rootExpr);
+			IsIdOfStoreClause isId = graph.createIsIdOfStoreClause(ident, rootExpr);
 			isId.set_sourcePositions(createSourcePositionList(offset));
 		}
 		match(TokenTypes.EOF);
@@ -903,7 +903,7 @@ public class GreqlParser extends ParserHelper {
 						lengthQuantifiedDecl, offsetQuantifiedDecl));
 				// add predicate
 				IsBoundExprOf boundExprOf = graph
-						.createIsBoundExprOfQuantifier(boundExpr,
+						.createIsBoundExprOfQuantifiedExpr(boundExpr,
 								quantifiedExpr);
 				boundExprOf.set_sourcePositions(createSourcePositionList(
 						lengthQuantifiedExpr, offsetQuantifiedExpr));
@@ -1248,12 +1248,12 @@ public class GreqlParser extends ParserHelper {
 			}
 		}
 		if (secondPart) {
-			return parseValueAccess(expr, offset, length);
+			return parseValueAccess2(expr, offset, length);
 		}
 		return expr;
 	}
 
-	private final Expression parseValueAccess(Expression arg1, int offsetArg1,
+	private final Expression parseValueAccess2(Expression arg1, int offsetArg1,
 			int lengthArg1) {
 		String name = "get";
 		int offsetOperator = getCurrentOffset();
@@ -1296,15 +1296,15 @@ public class GreqlParser extends ParserHelper {
 			}
 		}
 		if (secondPart) {
-			return parseValueAccess(result, offsetArg1, getLength(offsetArg2));
+			return parseValueAccess2(result, offsetArg1, getLength(offsetArg2));
 		}
 		return result;
 	}
 
 	private final Expression parsePrimaryExpression() {
-		// if (lookAhead(0) == TokenTypes.LPAREN) {
-		// return parseParenthesedExpression();
-		// }
+		if (lookAhead(0) == TokenTypes.LPAREN) {
+			return parseParenthesedExpression();
+		}
 
 		if ((lookAhead(0) == TokenTypes.V) || (lookAhead(0) == TokenTypes.E)) {
 			return parseRangeExpression();

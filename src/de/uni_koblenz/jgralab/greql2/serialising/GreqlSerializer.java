@@ -40,11 +40,13 @@ package de.uni_koblenz.jgralab.greql2.serialising;
 import java.util.Iterator;
 
 import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeTypeSubgraph;
 import de.uni_koblenz.jgralab.greql2.funlib.graph.VertexTypeSubgraph;
 import de.uni_koblenz.jgralab.greql2.schema.AggregationPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.AlternativePathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.BackwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.Comprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ConditionalExpression;
@@ -60,6 +62,7 @@ import de.uni_koblenz.jgralab.greql2.schema.ElementSetExpression;
 import de.uni_koblenz.jgralab.greql2.schema.ExponentiatedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ExpressionDefinedSubgraph;
+import de.uni_koblenz.jgralab.greql2.schema.ForwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
@@ -68,8 +71,8 @@ import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Identifier;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.IntermediateVertexPathDescription;
-import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefiningExpression;
-import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IteratedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.IterationType;
 import de.uni_koblenz.jgralab.greql2.schema.LetExpression;
@@ -88,7 +91,6 @@ import de.uni_koblenz.jgralab.greql2.schema.QuantifiedExpression;
 import de.uni_koblenz.jgralab.greql2.schema.Quantifier;
 import de.uni_koblenz.jgralab.greql2.schema.RecordConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.RecordElement;
-import de.uni_koblenz.jgralab.greql2.schema.RoleId;
 import de.uni_koblenz.jgralab.greql2.schema.SequentialPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.SetConstruction;
@@ -96,12 +98,12 @@ import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.SimplePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.StringLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
 import de.uni_koblenz.jgralab.greql2.schema.TableComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
 import de.uni_koblenz.jgralab.greql2.schema.TransposedPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.TupleConstruction;
-import de.uni_koblenz.jgralab.greql2.schema.TypeId;
 import de.uni_koblenz.jgralab.greql2.schema.UndefinedLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.ValueConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
@@ -166,22 +168,22 @@ public class GreqlSerializer {
 
 	private void serializeSimpleDeclaration(SimpleDeclaration v) {
 		boolean first = true;
-		for (Variable var : v.get_declaredVar()) {
+		for (IsDeclaredVarOf_isDeclaredVarOf_omega varInc : v.getIsDeclaredVarOf_isDeclaredVarOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeVariable(var);
+			serializeVariable((Variable)varInc.getThat());
 		}
 		sb.append(": ");
-		serializeExpression(v.get_typeExpr(), false);
+		serializeExpression((Expression) v.getFirst_isTypeExprOf_omega().getThat(), false);
 	}
 
 	private void serializeRecordElement(RecordElement v) {
-		serializeIdentifier(v.get_recordId());
+		serializeIdentifier((Identifier) v.getFirst_isRecordIfOf_omega().getThat());
 		sb.append(" : ");
-		serializeExpression(v.get_recordExpr(), false);
+		serializeExpression((Expression) v.getFirst_isRecordExprOf_omega().getThat(), false);
 	}
 
 	private void serializeQuantifier(Quantifier v) {
@@ -203,17 +205,17 @@ public class GreqlSerializer {
 
 	private void serializeEdgeRestriction(EdgeRestriction v) {
 		String delim = "";
-		for (TypeId tid : v.get_typeId()) {
+		for (Incidence tidInc : v.getIsTypeIdOf_isTypeIdOf_omegaIncidences()) {
 			sb.append(delim);
-			serializeIdentifier(tid);
+			serializeIdentifier((Identifier) tidInc.getThat());
 			delim = ",";
 		}
-		for (RoleId rid : v.get_roleId()) {
+		for (Incidence ridInc : v.getIsRoleIdOf_isRoleIdOf_omegaIncidences()) {
 			sb.append(delim);
 			delim = ",";
-			serializeIdentifier(rid);
+			serializeIdentifier((Identifier) ridInc.getThat());
 		}
-		Expression predicate = v.get_booleanPredicate();
+		Expression predicate = (Expression) v.getFirst_isBooleanPredicateOf_omega().getThat();
 		if (predicate != null) {
 			sb.append(" @ ");
 			serializeExpression(predicate, false);
@@ -225,24 +227,24 @@ public class GreqlSerializer {
 	}
 
 	private void serializeDefinition(Definition v) {
-		serializeVariable((Variable) v.getFirst_isVarOf_GoesTo_Definition().getThat());
+		serializeVariable((Variable) v.getFirst_isVarOf_omega().getThat());
 		sb.append(" := ");
-		serializeExpression((Expression) v.getFirst_isExprOf_GoesTo_Definition().getThat(), false);
+		serializeExpression((Expression) v.getFirst_isExprOf_omega().getThat(), false);
 	}
 
 	private void serializeDeclaration(Declaration v, boolean declOfFWR) {
 		boolean first = true;
-		for (SimpleDeclaration sd : v.get_simpleDecl()) {
+		for (Incidence sdInc : v.getIsSimpleDeclOf_isSimpleDeclOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeSimpleDeclaration(sd);
+			serializeSimpleDeclaration((SimpleDeclaration) sdInc.getThat());
 		}
 
 		first = true;
-		for (Expression constraint : v.get_constraint()) {
+		for (Incidence constrInc: v.getIsConstraintOf_isConstraintOf_omegaIncidences()) {
 			if (declOfFWR) {
 				sb.append(" with ");
 			} else {
@@ -250,30 +252,28 @@ public class GreqlSerializer {
 				// comma
 				sb.append(", ");
 			}
-			serializeExpression(constraint, false);
+			serializeExpression((Expression) constrInc.getThat(), false);
 		}
 	}
 
 	private void serializeGreql2Expression(Greql2Expression greql2Expression) {
-		Iterable<? extends Variable> boundVars = greql2Expression
-				.get_boundVar();
+		Iterable<? extends Incidence> boundVars = greql2Expression
+				.getIsBoundVarOf_isBoundVarOf_omegaIncidences();
 		if (boundVars.iterator().hasNext()) {
 			sb.append("using ");
 			boolean first = true;
-			for (Variable v : boundVars) {
+			for (Incidence i : boundVars) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(", ");
 				}
-				serializeVariable(v);
+				serializeVariable((Variable) i.getThat());
 			}
 			sb.append(':');
 		}
 
-		// TODO: What's the Identifier which may be at the IsIdOf edge???
-
-		serializeExpression(greql2Expression.get_queryExpr(), false);
+		serializeExpression((Expression) greql2Expression.getFirst_isQueryExprOf_omega().getThat(), false);
 	}
 
 	private void serializeExpression(Expression exp, boolean addSpace) {
@@ -299,8 +299,8 @@ public class GreqlSerializer {
 			serializePathDescription((PathDescription) exp);
 		} else if (exp instanceof PathExpression) {
 			serializePathExpression((PathExpression) exp);
-		} else if (exp instanceof SubgraphRestrictedExpression) {
-			serializeSubgraphRestrictedExpression((SubgraphRestrictedExpression) exp);
+		} else if (exp instanceof SubgraphExpression) {
+			serializeSubgraphExpression((SubgraphExpression) exp);
 		} else if (exp instanceof ValueConstruction) {
 			serializeValueConstruction((ValueConstruction) exp);
 		} else {
@@ -334,13 +334,13 @@ public class GreqlSerializer {
 			sb.append("tup(");
 		}
 		boolean first = true;
-		for (Expression val : exp.get_part()) {
+		for (Incidence inc : exp.getIsPartOf_isPartOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeExpression(val, false);
+			serializeExpression((Expression) inc.getThat(), false);
 		}
 		if (!implicit) {
 			sb.append(")");
@@ -350,13 +350,13 @@ public class GreqlSerializer {
 	private void serializeSetConstruction(SetConstruction exp) {
 		sb.append("set(");
 		boolean first = true;
-		for (Expression val : exp.get_part()) {
+		for (Incidence inc : exp.getIsPartOf_isPartOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeExpression(val, false);
+			serializeExpression((Expression) inc.getThat(), false);
 		}
 		sb.append(")");
 	}
@@ -364,27 +364,27 @@ public class GreqlSerializer {
 	private void serializeRecordConstruction(RecordConstruction exp) {
 		sb.append("rec(");
 		boolean first = true;
-		for (RecordElement re : exp.get_recordElement()) {
+		for (Incidence inc : exp.getIsRecordElementOf_isRecordElementOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeRecordElement(re);
+			serializeRecordElement((RecordElement) inc.getThat());
 		}
 		sb.append(')');
 	}
 
 	private void serializeMapConstruction(MapConstruction exp) {
 		sb.append("map(");
-		Iterator<? extends Expression> vals = exp.get_valueExpr().iterator();
+		Iterator<? extends Incidence> valIncs = exp.getIsValueExprOfComprehension_valueExprOfComprIncidences().iterator();
 		String sep = "";
-		for (Expression key : exp.get_keyExpr()) {
+		for (Incidence keyInc : exp.getIsKeyExprOfComprehension_keyExprOfComprIncidences()) {
 			sb.append(sep);
 			sep = ", ";
-			serializeExpression(key, true);
+			serializeExpression((Expression) keyInc.getThat(), true);
 			sb.append("-> ");
-			serializeExpression(vals.next(), false);
+			serializeExpression((Expression) valIncs.next().getThat(), false);
 		}
 
 		sb.append(")");
@@ -394,36 +394,35 @@ public class GreqlSerializer {
 		sb.append("list(");
 		if (exp instanceof ListRangeConstruction) {
 			ListRangeConstruction lrc = (ListRangeConstruction) exp;
-			serializeExpression(lrc.get_firstValue(), false);
+			serializeExpression((Expression) lrc.getFirst_isFirstValueOf_omega().getThat(), false);
 			sb.append("..");
-			serializeExpression(lrc.get_lastValue(), false);
+			serializeExpression((Expression) lrc.getFirst_isLastValueOf_omega().getThat(), false);
 		} else {
 			boolean first = true;
-			for (Expression val : exp.get_part()) {
+			for (Incidence inc : exp.getIsPartOf_isPartOf_omegaIncidences()) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(", ");
 				}
-				serializeExpression(val, false);
+				serializeExpression((Expression) inc.getThat(), false);
 			}
 		}
 		sb.append(")");
 	}
 
-	private void serializeSubgraphRestrictedExpression(
-			SubgraphRestrictedExpression exp) {
+	private void serializeSubgraphExpression(
+			SubgraphExpression exp) {
 		sb.append("on");
 		// serialize left
-		IsSubgraphDefinitionOf isSubgraphDefOf = exp
-				.getFirstIsSubgraphDefinitionOfIncidence(EdgeDirection.IN);
+		IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega isSubgraphDefOf = exp.getFirst_isSubgraphDefinitionOf_omega();
 		serializeSubgraphDefinition((SubgraphDefinition) isSubgraphDefOf
 				.getThat());
 		sb.append(":");
 		// serialize right
-		IsExpressionOnSubgraph isExprOnSubgraph = exp
-				.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
-		serializeExpression((Expression) isExprOnSubgraph.getThat(), true);
+//		IsR isExprOnSubgraph = exp
+//				.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
+//		serializeExpression((Expression) isExprOnSubgraph.getThat(), true);
 	}
 
 	private void serializeSubgraphDefinition(SubgraphDefinition def) {
@@ -437,28 +436,28 @@ public class GreqlSerializer {
 			}
 			sb.append("Subgraph{");
 			boolean first = true;
-			for (TypeId t : def.get_typeRestr()) {
+			for (Incidence inc : def.getIsTypeRestrOfSubgraph_isTypeRestrOfSubgraph_omegaIncidences()) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(", ");
 				}
-				serializeIdentifier(t);
+				serializeIdentifier((Identifier) inc.getThat());
 			}
 			sb.append('}');
 		} else {
 			// subgraph expression defined by arbitrary expression
-			IsSubgraphDefiningExpression isDefExpr = ((ExpressionDefinedSubgraph) def)
-					.getFirstIsSubgraphDefiningExpressionIncidence(EdgeDirection.IN);
-			serializeExpression(isDefExpr.getAlpha(), true);
+			Incidence isDefExpr = ((ExpressionDefinedSubgraph) def)
+					.getFirst_isSubgraphDefiningExpression_omega();
+			serializeExpression((Expression) isDefExpr.getThat(), true);
 		}
 	}
 
 	private void serializePathExpression(PathExpression exp) {
-		if (exp instanceof BackwardVertexSet) {
-			serializeBackwardVertexSet((BackwardVertexSet) exp);
-		} else if (exp instanceof ForwardVertexSet) {
-			serializeForwardVertexSet((ForwardVertexSet) exp);
+		if (exp instanceof BackwardElementSet) {
+			serializeBackwardElementSet((BackwardElementSet) exp);
+		} else if (exp instanceof ForwardElementSet) {
+			serializeForwardElementSet((ForwardElementSet) exp);
 		} else if (exp instanceof PathExistence) {
 			serializePathExistence((PathExistence) exp);
 		} else {
@@ -467,28 +466,28 @@ public class GreqlSerializer {
 	}
 
 	private void serializePathExistence(PathExistence exp) {
-		serializeExpression(exp.get_startExpr(), true);
-		serializeExpression(exp.get_path(), true);
-		serializeExpression(exp.get_targetExpr(), false);
+		serializeExpression((Expression) exp.getFirst_isStartExprOf_omega().getThat(), true);
+		serializeExpression((Expression) exp.getFirst_isPathOf_GoesTo_PathExpression().getThat(), true);
+		serializeExpression((Expression) exp.getFirst_isTargetExprOf_omega().getThat(), false);
 	}
 
-	private void serializeForwardVertexSet(ForwardVertexSet exp) {
-		serializeExpression(exp.get_startExpr(), true);
-		serializeExpression(exp.get_path(), false);
+	private void serializeForwardElementSet(ForwardElementSet exp) {
+		serializeExpression((Expression) exp.getFirst_isStartExprOf_omega().getThat(), true);
+		serializeExpression((Expression) exp.getFirst_isTargetExprOf_omega().getThat(), false);
 	}
 
-	private void serializeBackwardVertexSet(BackwardVertexSet exp) {
-		serializeExpression(exp.get_path(), true);
-		serializeExpression(exp.get_targetExpr(), false);
+	private void serializeBackwardElementSet(BackwardElementSet exp) {
+		serializeExpression((Expression) exp.getFirst_isStartExprOf_omega().getThat(), true);
+		serializeExpression((Expression) exp.getFirst_isTargetExprOf_omega().getThat(), false);
 	}
 
 	private void serializePathDescription(PathDescription exp) {
 		if (!((exp instanceof PrimaryPathDescription) || (exp instanceof OptionalPathDescription))) {
 			sb.append('(');
 		}
-		if (exp.get_startRestr() != null) {
+		if (exp.getFirst_isStartRestrictionOf_omega() != null) {
 			sb.append("{");
-			serializeExpression(exp.get_startRestr(), false);
+			serializeExpression((Expression) exp.getFirst_isStartRestrictionOf_omega().getThat(), false);
 			sb.append("} & ");
 		}
 
@@ -512,9 +511,9 @@ public class GreqlSerializer {
 			throw new GreqlException("Unknown PathDescription " + exp + ".");
 		}
 
-		if (exp.get_goalRestr() != null) {
+		if (exp.getFirst_isGoalRestrOf_omega() != null) {
 			sb.append(" & {");
-			serializeExpression(exp.get_goalRestr(), false);
+			serializeExpression((Expression) exp.getFirst_isGoalRestrOf_omega().getThat(), false);
 			sb.append("}");
 		}
 		if (!((exp instanceof PrimaryPathDescription) || (exp instanceof OptionalPathDescription))) {
@@ -534,16 +533,16 @@ public class GreqlSerializer {
 					+ ".");
 		}
 
-		if (exp.get_edgeRestr().iterator().hasNext()) {
+		if (exp.getIsEdgeRestrOf_isEdgeRestrOf_omegaIncidences().iterator().hasNext()) {
 			sb.append("{");
 			boolean first = true;
-			for (EdgeRestriction er : exp.get_edgeRestr()) {
+			for (Incidence inc : exp.getIsEdgeRestrOf_isEdgeRestrOf_omegaIncidences()) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(", ");
 				}
-				serializeEdgeRestriction(er);
+				serializeEdgeRestriction((EdgeRestriction) inc.getThat());
 			}
 			sb.append("}");
 		}
@@ -559,7 +558,7 @@ public class GreqlSerializer {
 	}
 
 	private void serializeSimplePathDescription(SimplePathDescription exp) {
-		String dir = exp.get_direction().get_dirValue();
+		String dir = ((EdgeDirection) exp.getFirst_isEdgeDirOf_omega().getThat()).get_dirValue();
 		if (dir.equals("out")) {
 			sb.append("-->");
 		} else if (dir.equals("in")) {
@@ -570,72 +569,72 @@ public class GreqlSerializer {
 	}
 
 	private void serializeEdgePathDescription(EdgePathDescription exp) {
-		String dir = exp.get_direction().get_dirValue();
+		String dir = ((EdgeDirection) exp.getFirst_isEdgeDirOf_omega().getThat()).get_dirValue();
 		if (dir.equals("out")) {
 			sb.append("--");
-			serializeExpression(exp.get_edgeExpr(), false);
+			serializeExpression((Expression) exp.getFirst_isEdgeExprOf_omega().getThat(), false);
 			sb.append("->");
 		} else if (dir.equals("in")) {
 			sb.append("<-");
-			serializeExpression(exp.get_edgeExpr(), false);
+			serializeExpression((Expression) exp.getFirst_isEdgeExprOf_omega().getThat(), false);
 			sb.append("--");
 		} else {
 			sb.append("<-");
-			serializeExpression(exp.get_edgeExpr(), false);
+			serializeExpression((Expression) exp.getFirst_isEdgeExprOf_omega().getThat(), false);
 			sb.append("->");
 		}
 	}
 
 	private void serializeTransposedPathDescription(
 			TransposedPathDescription exp) {
-		serializePathDescription(exp.get_transposedPath());
+		serializePathDescription((PathDescription) exp.getFirst_isTransposedPathOf_omega().getThat());
 		sb.append("^T");
 	}
 
 	private void serializeSequentialPathDescription(
 			SequentialPathDescription exp) {
-		for (PathDescription pd : exp.get_sequenceElement()) {
-			serializePathDescription(pd);
+		for (Incidence pdInc : exp.getIsSequenceElementOf_isSequenceElementOf_omegaIncidences()) {
+			serializePathDescription((PathDescription) pdInc.getThat());
 			sb.append(' ');
 		}
 	}
 
 	private void serializeOptionalPathDescription(OptionalPathDescription exp) {
 		sb.append('[');
-		serializePathDescription(exp.get_optionalPath());
+		serializePathDescription((PathDescription) exp.getFirst_isOptionalPathOf_omega().getThat());
 		sb.append(']');
 	}
 
 	private void serializeIteratedPathDescription(IteratedPathDescription exp) {
-		serializePathDescription(exp.get_iteratedPath());
+		serializePathDescription((PathDescription) exp.getFirst_isIteratedPathOf_omega().getThat());
 		sb.append(exp.get_times() == IterationType.STAR ? '*' : '+');
 	}
 
 	private void serializeIntermediateVertexPathDescription(
 			IntermediateVertexPathDescription exp) {
-		Iterator<? extends PathDescription> sub = exp.get_subPath().iterator();
-		serializePathDescription(sub.next());
-		serializeExpression(exp.get_intermediateVertex(), false);
-		serializePathDescription(sub.next());
+		Iterator<? extends Incidence> sub = exp.getIsSubPathOf_isSubPathOf_omegaIncidences().iterator();
+		serializePathDescription((PathDescription) sub.next().getThat());
+		serializeExpression((Expression) exp.getFirst_isIntermediateVertexOf_omega().getThat(), false);
+		serializePathDescription((PathDescription) sub.next().getThat());
 	}
 
 	private void serializeExponentiatedPathDescription(
 			ExponentiatedPathDescription exp) {
-		serializePathDescription(exp.get_exponentiatedPath());
+		serializePathDescription((PathDescription) exp.getFirst_isExponentiatedPathOf_omega().getThat());
 		sb.append('^');
-		serializeLiteral(exp.get_exponent());
+		serializeLiteral((Literal) exp.getFirst_isExponentOf_omega().getThat());;
 	}
 
 	private void serializeAlternativePathDescription(
 			AlternativePathDescription exp) {
 		boolean first = true;
-		for (PathDescription a : exp.get_alternatePath()) {
+		for (Incidence inc : exp.getIsAlternativePathOf_isAlternativePathOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(" | ");
 			}
-			serializePathDescription(a);
+			serializePathDescription((PathDescription) inc.getThat());
 		}
 	}
 
@@ -649,7 +648,7 @@ public class GreqlSerializer {
 					+ ".");
 		}
 
-		Iterable<? extends TypeId> typeRestrictions = exp.get_typeRestr();
+		Iterable<? extends Incidence> typeRestrictions = exp.getIsTypeRestrOfExpression_isTypeRestrOfExpression_omegaIncidences();
 
 		if (!typeRestrictions.iterator().hasNext()) {
 			return;
@@ -657,10 +656,10 @@ public class GreqlSerializer {
 
 		sb.append("{");
 		String sep = "";
-		for (TypeId t : typeRestrictions) {
+		for (Incidence tinc : typeRestrictions) {
 			sb.append(sep);
 			sep = ", ";
-			serializeIdentifier(t);
+			serializeIdentifier((Identifier) tinc.getThat());
 		}
 		sb.append("}");
 	}
@@ -677,37 +676,37 @@ public class GreqlSerializer {
 	}
 
 	private void serializeWhereExpression(WhereExpression exp) {
-		serializeExpression(exp.get_boundExprOfDefinition(), true);
+		serializeExpression((Expression) exp.getFirst_isBoundExprOf_GoesTo_Greql2Vertex().getThat(), true);
 		sb.append("where ");
 		boolean first = true;
-		for (Definition def : exp.get_definition()) {
+		for (Incidence defInc : exp.getIsDefinitionOf_isDefinitionOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeDefinition(def);
+			serializeDefinition((Definition) defInc.getThat());
 		}
 	}
 
 	private void serializeLetExpression(LetExpression exp) {
 		sb.append("let ");
 		boolean first = true;
-		for (Definition def : exp.get_definition()) {
+		for (Incidence defInc : exp.getIsDefinitionOf_isDefinitionOf_omegaIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeDefinition(def);
+			serializeDefinition((Definition) defInc.getThat());
 		}
 		sb.append(" in ");
-		serializeExpression(exp.get_boundExprOfDefinition(), true);
+		serializeExpression((Expression) exp.getFirst_isBoundExprOf_GoesTo_Greql2Vertex().getThat(), true);
 	}
 
 	private void serializeComprehension(Comprehension exp) {
 		sb.append("from ");
-		serializeDeclaration(exp.get_compDecl(), true);
+		serializeDeclaration((Declaration) exp.getFirst_isCompDeclOf_omega().getThat(), true);
 		if (exp instanceof SetComprehension) {
 			sb.append(" reportSet ");
 		} else if (exp instanceof ListComprehension) {
@@ -718,16 +717,16 @@ public class GreqlSerializer {
 			sb.append(" reportMap ");
 			MapComprehension mc = (MapComprehension) exp;
 			// MapComprehensions have no compResultDef, but key and valueExprs
-			serializeExpression(mc.get_keyExpr(), false);
+			serializeExpression((Expression) mc.getFirst_isKeyExprOfComprehension_omega().getThat(), false);
 			sb.append(", ");
-			serializeExpression(mc.get_valueExpr(), true);
+			serializeExpression((Expression) mc.getFirst_isValueExprOfComprehension_omega().getThat(), true);
 			sb.append("end");
 			return;
 		} else {
 			throw new GreqlException("Unknown Comprehension " + exp + ".");
 		}
 
-		Expression result = exp.get_compResultDef();
+		Expression result = (Expression) exp.getFirst_isCompResultDefOf_omega().getThat();;
 
 		if (result instanceof TupleConstruction) {
 			// here the tup() can be omitted
@@ -741,11 +740,11 @@ public class GreqlSerializer {
 
 	private void serializeQuantifiedExpression(QuantifiedExpression exp) {
 		sb.append('(');
-		serializeQuantifier(exp.get_quantifier());
+		serializeQuantifier((Quantifier) exp.getFirst_isQuantifierOf_omega().getThat());
 		sb.append(' ');
-		serializeDeclaration(exp.get_quantifiedDecl(), false);
+		serializeDeclaration((Declaration) exp.getFirst_isQuantifiedDeclOf_omega().getThat(), false);
 		sb.append(" @ ");
-		serializeExpression(exp.get_boundExprOfQuantifier(), false);
+		serializeExpression((Expression) exp.getFirst_isBoundExprOfQuantifiedExpr_omega().getThat(), false);
 		sb.append(')');
 	}
 
@@ -776,7 +775,7 @@ public class GreqlSerializer {
 	}
 
 	private void serializeFunctionApplication(FunctionApplication exp) {
-		FunctionId fid = exp.get_functionId();
+		FunctionId fid = (FunctionId) exp.getFirst_isFunctionIdOf_omega().getThat();
 		String id = fid.get_name();
 
 		if (id.equals("add")) {
@@ -835,13 +834,13 @@ public class GreqlSerializer {
 		serializeIdentifier(fid);
 		sb.append('(');
 		boolean first = true;
-		for (Expression arg : exp.get_argument()) {
+		for (Incidence argInc : exp.getIsArgumentOf_argumentIncidences()) {
 			if (first) {
 				first = false;
 			} else {
 				sb.append(", ");
 			}
-			serializeExpression(arg, false);
+			serializeExpression((Expression) argInc.getThat(), false);
 		}
 		sb.append(")");
 	}
@@ -850,7 +849,7 @@ public class GreqlSerializer {
 			String operator) {
 		sb.append("(");
 		boolean first = true;
-		for (Expression arg : exp.get_argument()) {
+		for (Incidence argInc : exp.getIsArgumentOf_argumentIncidences()) {
 			if (first) {
 				first = false;
 			} else {
@@ -862,17 +861,17 @@ public class GreqlSerializer {
 					sb.append(' ').append(operator).append(' ');
 				}
 			}
-			serializeExpression(arg, false);
+			serializeExpression((Expression) argInc.getThat(), false);
 		}
 		sb.append(")");
 	}
 
 	private void serializeConditionalExpression(ConditionalExpression expression) {
-		serializeExpression(expression.get_condition(), true);
+		serializeExpression((Expression) expression.getFirst_isConditionOf_omega().getThat(), true);
 		sb.append("? ");
-		serializeExpression(expression.get_trueExpr(), true);
+		serializeExpression((Expression) expression.getFirst_isTrueExprOf_omega().getThat(), true);
 		sb.append(": ");
-		serializeExpression(expression.get_falseExpr(), true);
+		serializeExpression((Expression) expression.getFirst_isFalseExprOf_omega().getThat(), true);
 	}
 
 	private void serializeVariable(Variable v) {

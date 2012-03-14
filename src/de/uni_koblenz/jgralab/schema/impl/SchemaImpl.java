@@ -1377,6 +1377,11 @@ public class SchemaImpl implements Schema {
 	
 	private Map<Class<? extends TypedElement<?, ?>>, Integer> m1ClassToIdMap = new HashMap <Class<? extends TypedElement<?, ?>>, Integer>();
 
+	
+	@Override
+	public int getNumberOfTypedElementClasses() {
+		return typedElementClasses.size();
+	}
 	@Override
 	public Integer getClassId(Class<? extends TypedElement<?, ?>> schemaClass) {
 		return m1ClassToIdMap.get(schemaClass);

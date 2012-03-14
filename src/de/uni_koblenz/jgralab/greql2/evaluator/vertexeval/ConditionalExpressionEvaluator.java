@@ -40,9 +40,10 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.ConditionalExpression;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.IsFalseExprOf_isFalseExprOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsTrueExprOf_isTrueExprOf_omega;
 
 /**
  * Evaluates a ConditionalExpression vertex in the GReQL-2 Syntaxgraph
@@ -139,5 +140,27 @@ public class ConditionalExpressionEvaluator extends VertexEvaluator {
 		long subtreeCosts = iteratedCosts + maxCosts + conditionCosts;
 		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
-
+	
+	@Override
+	public long calculateEstimatedCardinality(GraphSize graphSize) {
+		IsTrueExprOf_isTrueExprOf_omega trueInc = vertex.getFirst_isTrueExprOf_omega();
+		long trueCard = 0;
+		if (trueInc != null) {
+			VertexEvaluator trueEval = getVertexEvalMarker().getMark(
+					trueInc.getThat());
+			trueCard = trueEval.getEstimatedCardinality(graphSize);
+		}
+		IsFalseExprOf_isFalseExprOf_omega falseInc = vertex.getFirst_isFalseExprOf_omega();
+		long falseCard = 0;
+		if (falseInc != null) {
+			VertexEvaluator falseEval = getVertexEvalMarker().getMark(
+					falseInc.getThat());
+			falseCard = falseEval.getEstimatedCardinality(graphSize);
+		}
+		long maxCard = trueCard;
+		if (falseCard > maxCard) {
+			maxCard = falseCard;
+		}
+		return maxCard;
+	}
 }

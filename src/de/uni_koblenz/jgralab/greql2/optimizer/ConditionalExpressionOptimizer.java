@@ -39,7 +39,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
@@ -47,9 +49,9 @@ import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
 import de.uni_koblenz.jgralab.greql2.optimizer.condexp.Formula;
 import de.uni_koblenz.jgralab.greql2.schema.BoolLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
 
 /**
@@ -65,13 +67,13 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 					.getName());
 
 	private static class VertexEdgeClassTuple {
-		public VertexEdgeClassTuple(Greql2Vertex v, Class<? extends Edge> ec) {
+		public VertexEdgeClassTuple(Greql2Vertex v, Class<? extends BinaryEdge> ec) {
 			this.v = v;
 			this.ec = ec;
 		}
 
 		Greql2Vertex v;
-		Class<? extends Edge> ec;
+		Class<? extends BinaryEdge> ec;
 	}
 
 	/*
@@ -98,7 +100,7 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		boolean simplifiedOrOptimized = false;
 
@@ -155,9 +157,9 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 			FunctionApplication top) {
 		LinkedList<VertexEdgeClassTuple> list = new LinkedList<VertexEdgeClassTuple>();
 		assert top.isValid();
-		for (Edge e : top.incidences(EdgeDirection.OUT)) {
-			list.add(new VertexEdgeClassTuple((Greql2Vertex) e.getOmega(),
-					(Class<? extends Edge>) e.getM1Class()));
+		for (Incidence i : top.getIncidences(Direction.VERTEX_TO_EDGE)) {
+			list.add(new VertexEdgeClassTuple((Greql2Vertex) ((BinaryEdge) i.getEdge()).getOmega(),
+					(Class<? extends BinaryEdge>) i.getEdge().getM1Class()));
 		}
 		return list;
 	}
@@ -174,8 +176,8 @@ public class ConditionalExpressionOptimizer extends OptimizerBase {
 					return f;
 				}
 			}
-			for (Edge e : v.incidences(EdgeDirection.IN)) {
-				queue.offer((Greql2Vertex) e.getAlpha());
+			for (Incidence i : v.getIncidences(Direction.EDGE_TO_VERTEX)) {
+				queue.offer((Greql2Vertex) ((BinaryEdge) i.getEdge()).getAlpha());
 			}
 		}
 		return null;

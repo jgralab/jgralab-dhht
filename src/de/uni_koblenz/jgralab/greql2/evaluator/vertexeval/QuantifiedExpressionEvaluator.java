@@ -40,7 +40,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclarationLayer;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Declaration;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.QuantificationType;
@@ -88,16 +87,14 @@ public class QuantifiedExpressionEvaluator extends VertexEvaluator {
 
 	private void initialize() {
 		Declaration d = (Declaration) vertex
-				.getFirstIsQuantifiedDeclOfIncidence(EdgeDirection.IN)
-				.getAlpha();
+				.getFirst_isQuantifiedDeclOf_omega().getThat();
 		DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
 				.getMark(d);
 		declarationLayer = (VariableDeclarationLayer) declEval.getResult();
 		Quantifier quantifier = (Quantifier) vertex
-				.getFirstIsQuantifierOfIncidence(EdgeDirection.IN).getAlpha();
+				.getFirst_isQuantifierOf_omega().getThat();
 		quantificationType = quantifier.get_type();
-		Expression b = (Expression) vertex.getFirstIsBoundExprOfIncidence(
-				EdgeDirection.IN).getAlpha();
+		Expression b = (Expression) vertex.getFirst_isBoundExprOfQuantifiedExpr_omega().getThat();
 		predicateEvaluator = vertexEvalMarker.getMark(b);
 		initialized = true;
 	}
@@ -159,8 +156,23 @@ public class QuantifiedExpressionEvaluator extends VertexEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCostsQuantifiedExpression(this, graphSize);
+		Declaration d = (Declaration) vertex
+				.getFirst_isQuantifiedDeclOf_omega().getThat();
+		DeclarationEvaluator declEval = (DeclarationEvaluator) vertexEvalMarker
+				.getMark(d);
+		Expression b = (Expression) vertex.getFirst_isBoundExprOfQuantifiedExpr_omega().getThat();
+
+		
+		long declCosts = declEval.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		VertexEvaluator boundExprEval = getVertexEvalMarker().getMark(b);
+		long boundExprCosts = boundExprEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		long ownCosts = 20;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + declCosts + boundExprCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 }

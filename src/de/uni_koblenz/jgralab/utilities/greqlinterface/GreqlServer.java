@@ -42,39 +42,45 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.RemoteException;
-impimport de.uni_koblenz.jgralab.AttributedElement;
-ort java.util.Collections;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
-import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.codegenerator.CodeGeneratorConfiguration;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
-import de.uni_koblenz.jgralab.impl.ConsoleP	private final Socket socket;
+import de.uni_koblenz.jgralab.greql2.types.Path;
+import de.uni_koblenz.jgralab.greql2.types.PathSystem;
+import de.uni_koblenz.jgralab.greql2.types.Slice;
+import de.uni_koblenz.jgralab.greql2.types.Types;
+import de.uni_koblenz.jgralab.impl.ConsoleProgressFunction;
+import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
+
+public class GreqlServer extends Thread {
+
+	private static Thread clientHandlerLoop;
+	private static HashSet<GreqlServer> clients = new HashSet<GreqlServer>();
+
+	private final Socket socket;
 	private final BufferedReader in;
 	private final PrintWriter out;
 	private final GreqlEvaluator eval;
-ate static HashSet<GreqlServer> clients = new HashSet<GreqlServer>();
-
-	private Socket socket;
-	private BufferedRea	// static {
-	// GreqlEvaluator.DEBUG_OPTIMIZATION = true;
-	// }
-
-der in;
-	private PrintWriter out;
-	private GreqlEvaluator eval;
 	private String graphFile;
 	private static Map<String, Graph> dataGraphs = Collections
 			.synchronizedMap(new HashMap<String, Graph>());
+
+	// static {
+	// GreqlEvaluator.DEBUG_OPTIMIZATION = true;
+	// }
 
 	public GreqlServer(Socket s) throws IOException {
 		socket = s;
@@ -93,8 +99,11 @@ der in;
 		switch (target) {
 		case CLIENT:
 			out.println(message);
-			br			while (((line = in.readLine()) != null) && !isInterrupted()) {
-case BOTH:
+			break;
+		case SERVER:
+			System.out.println(message);
+			break;
+		case BOTH:
 			out.println(message);
 			System.out.println(message);
 			break;
@@ -110,16 +119,15 @@ case BOTH:
 	public void run() {
 		try {
 			String line = null;
-			while ((line = in.readLine()) != null && !isInterrupted()) {
+			while (((line = in.readLine()) != null) && !isInterrupted()) {
 				if (line.startsWith("g:")) {
-					g								new ConsoleProgressFunction("Loading"));
- g = dataGraphs.get(graphFile);
+					graphFile = line.substring(2);
+					Graph g = dataGraphs.get(graphFile);
 					if (g == null) {
 						println("Loading " + graphFile + ".", PrintTarget.BOTH,
 								true);
-						g = GraphIO.loadSchemaAndGraphFromFile(graphFile,
-								CodeGeneratorConfiguration.MINIMAL,
-								new ConsoleProgressFunction());
+						g = GraphIO.loadGraphFromFile(graphFile, null,
+								new ConsoleProgressFunction("Loading"), ImplementationType.MEMORY);
 						dataGraphs.put(graphFile, g);
 					}
 					eval.setDatagraph(g);
@@ -151,97 +159,104 @@ case BOTH:
 		}
 	}
 
-	private void saveAsDot(JValue val, String dotFileName) throws RemoteException {
+	private void saveAsDot(Object val, String dotFileName) throws IOException {
 		Graph g = eval.getDatagraph();
 		LocalBooleanGraphMarker marker = new LocalBooleanGraphMarker(g);
 		markResultElements(val, marker);
 		for (Edge e : g.getEdges()) {
-			boolean incidencesMarked = true;
-			for (Incidence i : e.getIncidences()) {
-				if (!marker.isMarked(i.getVertex())) {
-					incidencesMarked = false;
-					break;
-				}
+			boolean incVerticesMarked = true;
+			for (Vertex v : e.getIncidentVertices()) {
+				if (!marker.isMarked(v))
+					incVerticesMarked = false;
 			}
-			if (incidencesMarked) {
+			if (incVerticesMarked) {
 				marker.mark(e);
 			}
 		}
-		//TODO: Uncomment as soon as TG2Dot works
-		//Tg2Dot.printGraphAsD		} else if (val instanceof Map) {
+		Tg2Dot.printGraphAsDot(marker, false, dotFileName);
+	}
+
+	private void markResultElements(Object val, LocalBooleanGraphMarker marker) {
+		if (val instanceof Collection) {
+			Collection<?> coll = (Collection<?>) val;
+			for (Object v : coll) {
+				markResultElements(v, marker);
+			}
+		} else if (val instanceof Map) {
 			for (Entry<? extends Object, ? extends Object> e : ((Map<?, ?>) val)
 					.entrySet()) {
-raphMarker marker) throws RemoteException {
-		if (val.isCollec		} else if (val instanceof Slice) {
+				markResultElements(e.getKey(), marker);
+				markResultElements(e.getValue(), marker);
+			}
+		} else if (val instanceof Slice) {
 			Slice slice = (Slice) val;
 			for (Vertex v : slice.getVertices()) {
 				marker.mark(v);
- (val.isMap			for (Edge e : slice.getEdges()) {
+			}
+			for (Edge e : slice.getEdges()) {
 				marker.mark(e);
-t()) {
-				ma		} else if (val instanceof PathSystem) {
+			}
+		} else if (val instanceof PathSystem) {
 			PathSystem pathSystem = (PathSystem) val;
 			for (Vertex v : pathSystem.getVertices()) {
 				marker.mark(v);
-for (JValue			for (Edge e : pathSystem.getEdges()) {
+			}
+			for (Edge e : pathSystem.getEdges()) {
 				marker.mark(e);
-ue e : slice.		} else if (val instanceof Path) {
+			}
+		} else if (val instanceof Path) {
 			Path path = (Path) val;
 			for (Vertex v : path.getVertexTrace()) {
-hSystem = val.toPathS			for (Edge e : path.getEdgeTrace()) {
-m.nodes()) {
-				marke		} else if (val instanceof AttributedElement) {
-			marker.mark((AttributedElement) val);
-.toEdge());
-			}
-		} else if (val.isPath()) {
-			JValuePath path = val.toPath();
-			for (Vertex v : path.nodeTrace()) {
 				marker.mark(v);
 			}
-			fo	private Object evalQuery(String queryFile) throws IOException {
- if (val.isAttributedElement()) {
-			marker.mark(val.toAttributedElement());
+			for (Edge e : path.getEdgeTrace()) {
+				marker.mark(e);
+			}
+		} else if (val instanceof AttributedElement) {
+			marker.mark((GraphElement) val);
 		} else {
-			println("'" + val + "' is n		Object result = null;
-				+ "s			long startTime = System.			result = eval.getResult();
-			long evalTime = System.currentTimeMillis() - startTime;
-dered for DOT output.",
-					Pri			out.println("Evaluation took " + evalTime + "ms.");
-			out.println();
-ntT			if (result instanceof Collection) {
-				Collection<?> coll = (Collection<?>) result;
-ception {
+			println("'" + val + "' is no AttributedElement, "
+					+ "so it won't be considered for DOT output.",
+					PrintTarget.BOTH, false);
+		}
+	}
+
+	private Object evalQuery(String queryFile) throws IOException {
 		println("Evaling query file " + queryFile + ".", PrintTarget.BOTH, true);
 		eval.setQueryFile(new File(queryFile));
-		JValue result = null				for (Object jv : coll) {
-tion();
-			result = eval.getEvaluationResult();
-			println("<r			} else if (result instanceof Map) {
-				Map<?, ?> map = (Map<?, ?>) result;
-				println("Result map contains " + map.size() + " map entries.\n",
-result.isCollection()) {
-				JValue				for (Entry<? extends Object, ? extends Object> e : map
-						.entrySet()) {
-"Result collection (" + coll.getClass().getSimpleName()
-						+ ") contains 				println("Result is a single element of type "
-						+ Types.getGreqlTypeName(result) + ".\n",
+		Object result = null;
+		try {
+			long startTime = System.currentTimeMillis();
+			eval.startEvaluation();
+			result = eval.getResult();
+			long evalTime = System.currentTimeMillis() - startTime;
+			println("<result not printed>", PrintTarget.SERVER, false);
+			out.println();
+			out.println("Evaluation took " + evalTime + "ms.");
+			out.println();
+			out.println("Evaluation Result:");
+			out.println("==================");
+			if (result instanceof Collection) {
+				Collection<?> coll = (Collection<?>) result;
+				println("Result collection (" + coll.getClass().getSimpleName()
+						+ ") contains " + coll.size() + " elements.\n",
 						PrintTarget.CLIENT, true);
-alue jv : coll) {
+				for (Object jv : coll) {
 					println(jv.toString(), PrintTarget.CLIENT, false);
 				}
-			} else if (result.isMap()) {
-				JValueMap map = result.toJValueMap();
-				println(
-						"Result map contains " + map.size() + " map entries.\n",
+			} else if (result instanceof Map) {
+				Map<?, ?> map = (Map<?, ?>) result;
+				println("Result map contains " + map.size() + " map entries.\n",
 						PrintTarget.CLIENT, true);
-				for (Entry<JValue, JValue> e : map.entrySet()) {
+				for (Entry<? extends Object, ? extends Object> e : map
+						.entrySet()) {
 					println(e.getKey() + " --> " + e.getValue(),
 							PrintTarget.CLIENT, false);
 				}
 			} else {
-				println("Result is a single element.\n", PrintTarget.CLIENT,
-						true);
+				println("Result is a single element of type "
+						+ Types.getGreqlTypeName(result) + ".\n",
+						PrintTarget.CLIENT, true);
 				println(result.toString(), PrintTarget.CLIENT, false);
 			}
 			out.flush();

@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
+import de.uni_koblenz.jgralab.greql2.schema.IsPartOf_isPartOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SetConstruction;
 
 /**
@@ -60,14 +61,32 @@ public class SetConstructionEvaluator extends ValueConstructionEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsSetConstruction(this, graphSize);
+		IsPartOf_isPartOf_omega inc = vertex.getFirst_isPartOf_omega();
+		long parts = 0;
+		long partCosts = 0;
+		while (inc != null) {
+			VertexEvaluator veval = getVertexEvalMarker().getMark(
+					inc.getThat());
+			partCosts += veval.getCurrentSubtreeEvaluationCosts(graphSize);
+			parts++;
+			inc = inc.getNextIsPartOf_omegaAtVertex();
+		}
+
+		long ownCosts = (parts * 1) + 2;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + partCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalitySetConstruction(this, graphSize);
+		IsPartOf_isPartOf_omega inc = vertex.getFirst_isPartOf_omega();
+		long parts = 0;
+		while (inc != null) {
+			parts++;
+			inc = inc.getNextIsPartOf_omegaAtVertex();
+		}
+		return parts;
 	}
 
 }

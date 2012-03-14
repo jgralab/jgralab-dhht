@@ -126,26 +126,57 @@ import de.uni_koblenz.jgralab.graphmarker.LocalGenericGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalIntegerVertexMarker;
 import de.uni_koblenz.jgralab.graphvalidator.ConstraintViolation;
 import de.uni_koblenz.jgralab.graphvalidator.GraphValidator;
-import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.GrumlSchema;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
+import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.StringDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_connectedEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_incidenceClassAtEdge;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass_connectedVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass_incidenceClassAtVertex;
+import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass_packageOfElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attributedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain_domainOfAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceType;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn_nestedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn_nestingElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Package;
+import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass_subIncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass_subclass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesTypedElementClass_superclass;
+import de.uni_koblenz.jgralab.grumlschema.structure.TypedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.impl.mem.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.mem.VertexImpl;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
-import de.uni_koblenz.jgralab.schema.CollectionDomain;
-import de.uni_koblenz.jgralab.schema.Constraint;
-import de.uni_koblenz.jgralab.schema.Domain;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.EnumDomain;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.IncidenceType;
-import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElementClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.StringDomain;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.utilities.tg2dot.Tg2Dot;
 
 /**
@@ -677,7 +708,7 @@ public class Rsa2Tg extends XmlProcessor {
 	@Override
 	public void startDocument() {
 
-		sg = GrumlSchema.instance().createSchemaGraphInMem();
+		sg = GrumlSchema.instance().createSchemaGraph_InMemoryStorage();
 
 		// Initializing all necessary data structures for processing purposes.
 		xmiIdStack = new Stack<String>();
@@ -786,7 +817,7 @@ public class Rsa2Tg extends XmlProcessor {
 	private void createDefaultPackage() {
 		// Creates a default Package, links it and pushes it to the
 		// packageStack.
-		Package defaultPackage = sg.createPackage();
+		de.uni_koblenz.jgralab.grumlschema.structure.Package defaultPackage = sg.createPackage();
 		defaultPackage.set_qualifiedName("");
 		sg.createContainsDefaultPackage(schema, defaultPackage);
 		packageStack.push(defaultPackage);
@@ -2182,7 +2213,7 @@ public class Rsa2Tg extends XmlProcessor {
 			Set<IncidenceClass> subsettingIncidenceClasses) {
 		subsettingIncidenceClasses.remove(ic);
 		for (Incidence inc : ic
-				.getIncidences(SpecializesIncidenceClass_specializesIncidenceClass_ComesFrom_IncidenceClass.class)) {
+				.getIncidences(SpecializesIncidenceClass_subIncidenceClass.class)) {
 			removeSuperIncidenceClasses((IncidenceClass) inc.getThat(),
 					subsettingIncidenceClasses);
 		}
@@ -2328,7 +2359,7 @@ public class Rsa2Tg extends XmlProcessor {
 							.getVertex() : e.getFirstIncidence().getVertex());
 					EdgeClass oldEdgeClass = (EdgeClass) ((BinaryEdge) incidenceClass
 							.getFirstIncidence(
-									ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
+									ConnectsToEdgeClass_incidenceClassAtEdge.class)
 							.getEdge()).getOmega();
 					if (!edgeStereotypedEdgeClasses.contains(oldEdgeClass)) {
 						// this is not a composition edge between two
@@ -2387,7 +2418,7 @@ public class Rsa2Tg extends XmlProcessor {
 			de.uni_koblenz.jgralab.Direction direction,
 			AttributedElementClass oldVertexClass, EdgeClass newEdgeClass) {
 		assert oldEdgeClass
-				.getDegree(ConnectsToEdgeClass_connectedEdgeClassImpl.class) <= 2;
+				.getDegree(ConnectsToEdgeClass_connectedEdgeClass.class) <= 2;
 		IncidenceClass from = null;
 		IncidenceClass to = null;
 		Edge containsGraphElementClass = null;
@@ -2395,7 +2426,7 @@ public class Rsa2Tg extends XmlProcessor {
 			if (ConnectsToEdgeClass.class.isInstance(edge)) {
 				IncidenceClass ic = (IncidenceClass) ((ConnectsToEdgeClass) edge)
 						.getAlpha();
-				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+				if (ic.get_direction() == de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE) {
 					from = ic;
 				} else {
 					to = ic;
@@ -2413,9 +2444,9 @@ public class Rsa2Tg extends XmlProcessor {
 		containsGraphElementClass.delete();
 		assert from != null && to != null : currentClassId;
 
-		Direction directionOfNewIncidence = extractDirection(from,
+		 de.uni_koblenz.jgralab.grumlschema.structure.Direction directionOfNewIncidence = extractDirection(from,
 				oldVertexClass);
-		IncidenceClass atVertex = directionOfNewIncidence == Direction.VERTEX_TO_EDGE ? from
+		IncidenceClass atVertex = directionOfNewIncidence ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE ? from
 				: to;
 		IncidenceClass atEdge = atVertex == from ? to : from;
 
@@ -2484,7 +2515,7 @@ public class Rsa2Tg extends XmlProcessor {
 				newIncidenceClass,
 				(VertexClass) ((BinaryEdge) atVertex
 						.getFirstIncidence(
-								ConnectsToVertexClass_connectsToVertexClass_ComesFrom_IncidenceClass.class)
+								ConnectsToVertexClass_incidenceClassAtVertex.class)
 						.getEdge()).getOmega());
 		sg.createConnectsToEdgeClass(newIncidenceClass, newEdgeClass);
 
@@ -2525,7 +2556,7 @@ public class Rsa2Tg extends XmlProcessor {
 		return qualifiedName.substring(qualifiedName.lastIndexOf('.') + 1);
 	}
 
-	private Direction extractDirection(IncidenceClass from,
+	private  de.uni_koblenz.jgralab.grumlschema.structure.Direction extractDirection(IncidenceClass from,
 			AttributedElementClass oldVertexClass) {
 		for (ConnectsToVertexClass ctvc : from
 				.getIncidentEdges(ConnectsToVertexClass.class)) {
@@ -2534,13 +2565,13 @@ public class Rsa2Tg extends XmlProcessor {
 				// VertexClasss <--oldEdgeClass-from- oldVertexClass
 				// will result in
 				// VertexClass <--newEdgeClass
-				return Direction.EDGE_TO_VERTEX;
+				return  de.uni_koblenz.jgralab.grumlschema.structure.Direction.EDGE_TO_VERTEX;
 			}
 		}
 		// VertexClasss -from-oldEdgeClass--> oldVertexClass
 		// will result in
 		// VertexClass -->newEdgeClass
-		return Direction.VERTEX_TO_EDGE;
+		return  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE;
 	}
 
 	/**
@@ -2579,8 +2610,8 @@ public class Rsa2Tg extends XmlProcessor {
 
 		// remove all GraphElementClasses
 		for (Incidence i = pkg
-				.getFirstIncidence(ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class); i != null; i = i
-				.getNextIncidenceAtVertex(ContainsGraphElementClass_containsGraphElementClass_ComesFrom_Package.class)) {
+				.getFirstIncidence(ContainsGraphElementClass_packageOfElement.class); i != null; i = i
+				.getNextIncidenceAtVertex(ContainsGraphElementClass_packageOfElement.class)) {
 			ContainsGraphElementClass c = (ContainsGraphElementClass) i
 					.getEdge();
 			GraphElementClass gec = (GraphElementClass) c.getOmega();
@@ -2601,7 +2632,7 @@ public class Rsa2Tg extends XmlProcessor {
 							.getAlpha();
 					EdgeClass ec = (EdgeClass) ((ConnectsToEdgeClass) incClassAtEdgeClass
 							.getFirstIncidence(
-									ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
+									ConnectsToEdgeClass_incidenceClassAtEdge.class)
 							.getEdge()).getOmega();
 					deleteIncidentIncidenceClasses(ec);
 					// remove Attributes of EdgeClass
@@ -2638,8 +2669,8 @@ public class Rsa2Tg extends XmlProcessor {
 	 */
 	private void removeAttributes(AttributedElementClass aec) {
 		for (Incidence inc = aec
-				.getFirstIncidence(HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class); inc != null; inc = inc
-				.getNextIncidenceAtVertex(HasAttribute_hasAttribute_ComesFrom_AttributedElementClass.class)) {
+				.getFirstIncidence(HasAttribute_attributedElement.class); inc != null; inc = inc
+				.getNextIncidenceAtVertex(HasAttribute_attributedElement.class)) {
 			HasAttribute ha = (HasAttribute) inc.getEdge();
 			ha.getOmega().delete();
 		}
@@ -2751,7 +2782,7 @@ public class Rsa2Tg extends XmlProcessor {
 								+ "' of EdgeClass '"
 								+ ((NamedElementClass) supClass
 										.getFirstIncidence(
-												ConnectsToEdgeClass_connectsToEdgeClass_ComesFrom_IncidenceClass.class)
+												ConnectsToEdgeClass_incidenceClassAtEdge.class)
 										.getThat()).get_qualifiedName() + "'");
 					}
 					throw new ProcessingException(
@@ -3369,7 +3400,7 @@ public class Rsa2Tg extends XmlProcessor {
 			inc.set_maxEdgesAtVertex(DEFAULT_MAX_MULTIPLICITY);
 			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
 			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
-			inc.set_direction(Direction.VERTEX_TO_EDGE);
+			inc.set_direction(de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE);
 			sg.createConnectsToEdgeClass(inc, ec);
 			sg.createConnectsToVertexClass(inc, vc);
 			idMap.put(sourceEnd, inc);
@@ -3378,7 +3409,7 @@ public class Rsa2Tg extends XmlProcessor {
 		inc = (IncidenceClass) idMap.get(targetEnd);
 		if (inc != null) {
 			assert inc.isValid();
-			assert inc.get_direction() == Direction.VERTEX_TO_EDGE;
+			assert inc.get_direction() ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE;
 
 			VertexClass vc = null;
 			for (ConnectsToVertexClass ctvc : inc
@@ -3390,7 +3421,7 @@ public class Rsa2Tg extends XmlProcessor {
 			IncidenceClass to = sg.createIncidenceClass();
 
 			IncidenceClass from = inc;
-			to.set_direction(Direction.EDGE_TO_VERTEX);
+			to.set_direction(de.uni_koblenz.jgralab.grumlschema.structure.Direction.EDGE_TO_VERTEX);
 			to.set_incidenceType(from.get_incidenceType());
 			to.set_abstract(from.is_abstract());
 			to.set_minVerticesAtEdge(from.get_minVerticesAtEdge());
@@ -3428,7 +3459,7 @@ public class Rsa2Tg extends XmlProcessor {
 			inc.set_maxEdgesAtVertex(DEFAULT_MAX_MULTIPLICITY);
 			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
 			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
-			inc.set_direction(Direction.EDGE_TO_VERTEX);
+			inc.set_direction( de.uni_koblenz.jgralab.grumlschema.structure.Direction.EDGE_TO_VERTEX);
 			sg.createConnectsToEdgeClass(inc, ec);
 			sg.createConnectsToVertexClass(inc, vc);
 			idMap.put(targetEnd, inc);
@@ -3702,7 +3733,7 @@ public class Rsa2Tg extends XmlProcessor {
 			for (ConnectsToEdgeClass ctec : e
 					.getIncidentEdges(ConnectsToEdgeClass.class)) {
 				IncidenceClass ic = (IncidenceClass) ctec.getAlpha();
-				if (ic.get_direction() == Direction.VERTEX_TO_EDGE) {
+				if (ic.get_direction() ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE) {
 					from = ic;
 				} else {
 					to = ic;
@@ -3732,8 +3763,8 @@ public class Rsa2Tg extends XmlProcessor {
 			}
 
 			// "from" end is marked navigable, swap edge direction
-			assert to.get_direction() == Direction.VERTEX_TO_EDGE;
-			assert from.get_direction() == Direction.EDGE_TO_VERTEX;
+			assert to.get_direction() ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE;
+			assert from.get_direction() ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.EDGE_TO_VERTEX;
 		}
 
 	}
@@ -3868,7 +3899,7 @@ public class Rsa2Tg extends XmlProcessor {
 			for (ConnectsToEdgeClass ctec : ec
 					.getIncidentEdges(ConnectsToEdgeClass.class)) {
 				IncidenceClass inc = (IncidenceClass) ctec.getAlpha();
-				if (inc.get_direction() == Direction.VERTEX_TO_EDGE) {
+				if (inc.get_direction() ==  de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE) {
 					if (from == null) {
 						from = inc;
 					}
@@ -3884,7 +3915,7 @@ public class Rsa2Tg extends XmlProcessor {
 			if ((toRole == null) || toRole.equals("")) {
 				toRole = ((VertexClass) ((ConnectsToVertexClass) to
 						.getFirstIncidence(
-								ConnectsToVertexClass_connectsToVertexClass_ComesFrom_IncidenceClass.class)
+								ConnectsToVertexClass_incidenceClassAtVertex.class)
 						.getEdge()).getOmega()).get_qualifiedName();
 				int p = toRole.lastIndexOf('.');
 				if (p >= 0) {
@@ -3923,7 +3954,7 @@ public class Rsa2Tg extends XmlProcessor {
 				if ((fromRole == null) || fromRole.equals("")) {
 					fromRole = ((VertexClass) ((ConnectsToVertexClass) from
 							.getFirstIncidence(
-									ConnectsToVertexClass_connectsToVertexClass_ComesFrom_IncidenceClass.class)
+									ConnectsToVertexClass_incidenceClassAtVertex.class)
 							.getEdge()).getOmega()).get_qualifiedName();
 					int p = fromRole.lastIndexOf('.');
 					if (p >= 0) {
@@ -4033,13 +4064,13 @@ public class Rsa2Tg extends XmlProcessor {
 				assert att.getDegree(HasAttribute_attribute.class) == 1 : "Attribute '"
 						+ att.get_name()
 						+ "' of "
-						+ att.getFirst_attribute(false).getThat().getM1Class()
+						+ att.getFirst_attribute().getThat().getM1Class()
 								.getSimpleName()
 						+ " '"
 						+ ((AttributedElementClass) att.getFirst_attribute(
-								false).getThat()).get_qualifiedName()
+								).getThat()).get_qualifiedName()
 						+ "' has "
-						+ att.getDegree(HasDomain_domain.class)
+						+ att.getDegree(HasDomain_domainOfAttribute.class)
 						+ " domain(s)";
 				continue;
 			}
@@ -4053,7 +4084,7 @@ public class Rsa2Tg extends XmlProcessor {
 						"Undefined Domain with ID '" + domainId + "' found.");
 			}
 
-			assert att.getDegree(HasDomain_domain.class) == 1;
+			assert att.getDegree(HasDomain_domainOfAttribute.class) == 1;
 		}
 
 		// If 'attributeType' is not empty, there will be a Domain objects
@@ -4615,7 +4646,7 @@ public class Rsa2Tg extends XmlProcessor {
 					i.getEdge().delete();
 				} else if (i.getEdge() instanceof HasAttribute) {
 					Attribute att = (Attribute) i.getThat();
-					Edge d = att.getFirst_attribute(false).getEdge();
+					Edge d = att.getFirst_attribute().getEdge();
 					if (d != null) {
 						Domain dom = (Domain) i.getThat();
 						HasRecordDomainComponent comp = sg
@@ -4998,7 +5029,7 @@ public class Rsa2Tg extends XmlProcessor {
 			inc.set_minVerticesAtEdge(DEFAULT_MIN_MULTIPLICITY);
 			inc.set_maxVerticesAtEdge(DEFAULT_MAX_MULTIPLICITY);
 			inc.set_abstract(false);
-			inc.set_direction(Direction.VERTEX_TO_EDGE);
+			inc.set_direction( de.uni_koblenz.jgralab.grumlschema.structure.Direction.VERTEX_TO_EDGE);
 			assert ec != null;
 			if (vc != null) {
 				sg.createConnectsToVertexClass(inc, vc);
@@ -5045,7 +5076,7 @@ public class Rsa2Tg extends XmlProcessor {
 					if (VertexClass.class.isInstance(ae)) {
 						for (ConnectsToVertexClass ctvc : inc
 								.getIncidentEdges(ConnectsToVertexClass.class)) {
-							((ConnectsToVertexClassImpl) ctvc)
+							((ConnectsToVertexClass) ctvc)
 									.setOmega((VertexClass) ae);
 							break;
 						}

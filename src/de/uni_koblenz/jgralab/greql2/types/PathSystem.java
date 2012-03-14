@@ -44,12 +44,14 @@ import java.util.Queue;
 
 import org.pcollections.PSet;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
+import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 
 public class PathSystem {
 
@@ -413,7 +415,7 @@ public class PathSystem {
 			Entry<PathSystemKey, PathSystemEntry> entry) {
 		return typeCollection == null
 				|| typeCollection.acceptsType(entry.getValue().getParentEdge()
-						.getAttributedElementClass());
+						.getType());
 	}
 
 	public boolean isOutgoingEdge(Entry<PathSystemKey, PathSystemEntry> entry,
@@ -450,7 +452,7 @@ public class PathSystem {
 			PathSystemEntry pe = entry.getValue();
 			if ((typeCol == null)
 					|| typeCol.acceptsType(pe.getParentEdge()
-							.getAttributedElementClass())) {
+							.getType())) {
 				if (pe.getParentVertex() == vertex) {
 					degree++;
 				}
@@ -476,7 +478,7 @@ public class PathSystem {
 	 *         vertex or an empty set, if the vertex is not part of this
 	 *         pathsystem
 	 */
-	public PSet<Edge> edgesConnected(Vertex vertex, EdgeDirection direction) {
+	public PSet<Edge> edgesConnected(Vertex vertex, Direction direction) {
 		assertFinished();
 		if (vertex == null) {
 			return null;
@@ -492,17 +494,17 @@ public class PathSystem {
 					continue;
 				}
 				switch (direction) {
-				case IN:
+				case EDGE_TO_VERTEX:
 					if (edge.isNormal()) {
 						addEdgeToResult(resultSet, edge, vertex);
 					}
 					break;
-				case OUT:
+				case VERTEX_TO_EDGE:
 					if (!edge.isNormal()) {
 						addEdgeToResult(resultSet, edge, vertex);
 					}
 					break;
-				case INOUT:
+				case BOTH:
 					addEdgeToResult(resultSet, edge, vertex);
 					break;
 				default:

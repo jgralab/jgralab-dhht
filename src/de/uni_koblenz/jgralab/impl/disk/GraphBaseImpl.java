@@ -173,6 +173,11 @@ public abstract class GraphBaseImpl implements Graph {
 
 	@Override
 	public abstract Graph getCompleteGraph();
+	
+	@Override
+	public Graph getGraph() {
+		return getCompleteGraph();
+	}
 
 	@Override
 	public abstract Graph getLocalPartialGraph();

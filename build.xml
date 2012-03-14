@@ -148,7 +148,7 @@
 	</target>
 
 	<!-- compile -->
-	<target name="compile" depends="pcollections,core,tgtools,greql2,algolib,graphvalidator,rsa,utilities,gretl_and_eca,generatetestschemas">
+	<target name="compile" depends="pcollections,core,tgtools,gruml,greql2,algolib,graphvalidator,rsa,utilities,gretl_and_eca,generatetestschemas">
 		<mkdir dir="testit/testdata" />
 	</target>
 
@@ -205,7 +205,7 @@
 		</javac>
 	</target>
 
-	<target name="rsa" depends="tg2dot,gruml,graphvalidator">
+	<target name="rsa" depends="tg2dot,graphvalidator">
 		<javac fork="true" srcdir="${rsa.src}" includes="${rsa.includes}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" source="${javac.targetVM}" target="${javac.targetVM}" includeantruntime="false">
 			<compilerarg line="-Xlint:unchecked" />
 		</javac>
@@ -232,8 +232,8 @@
 	</target>
 
 	<!-- generates the gruml schema and compiles it -->
-	<target name="gruml" depends="tgtools,greql2">
-		<tgschema2java schemaFile="${gruml.schemafile}" sourcePath="${src.dir}" implementationMode="standard" />
+	<target name="gruml" depends="tgtools">
+		<tgschema2java schemaFile="${gruml.schemafile}" sourcePath="${src.dir}" />
 		<javac fork="true" srcdir="${gruml.src}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" source="${javac.targetVM}" target="${javac.targetVM}" includeantruntime="false">
 			<compilerarg line="-Xlint:unchecked" />
 		</javac>

@@ -98,7 +98,6 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Id.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.InDegree.class);
-		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsAcyclic.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsIsolated.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsLoop.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsReachable.class);
@@ -109,11 +108,9 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathLength.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathSystem.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices.class);
-		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Slice.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.StartVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.This.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.That.class);
-		register(de.uni_koblenz.jgralab.greql2.funlib.graph.TopologicalSort.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.VertexTrace.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Vertices.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.VertexTypeSubgraph.class);

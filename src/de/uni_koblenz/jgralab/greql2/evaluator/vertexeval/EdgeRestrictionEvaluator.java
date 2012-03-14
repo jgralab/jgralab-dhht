@@ -42,17 +42,12 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeRestriction;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction;
-import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOfEdgeRestriction_GoesTo_EdgeRestriction;
+import de.uni_koblenz.jgralab.greql2.schema.IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsRoleIdOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf_parentEdgeRestrOfTypeId;
-import de.uni_koblenz.jgralab.greql2.schema.PathExpression;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeIdOf_isTypeIdOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.RoleId;
-import de.uni_koblenz.jgralab.greql2.types.Path;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
@@ -127,23 +122,23 @@ public class EdgeRestrictionEvaluator extends VertexEvaluator {
 	public Object evaluate() {
 		if (typeCollection == null) {
 			typeCollection = new TypeCollection();
-			IsTypeIdOf_parentEdgeRestrOfTypeId typeInc = vertex.getFirst_parentEdgeRestrOfTypeId();
+			IsTypeIdOf_isTypeIdOf_omega typeInc = vertex.getFirst_isTypeIdOf_omega();
 			while (typeInc != null) {
 				TypeIdEvaluator typeEval = (TypeIdEvaluator) vertexEvalMarker
 						.getMark(typeInc.getThat());
 				typeCollection.addTypes((TypeCollection) typeEval.getResult());
-				typeInc = typeInc.getNextParentEdgeRestrOfTypeIdAtVertex();
+				typeInc = typeInc.getNextIsTypeIdOf_omegaAtVertex();
 			}
 		}
 
-		if (vertex.getFirst_edgeRestrWithRoleId() != null) {
+		if (vertex.getFirst_isRoleIdOf_omega() != null) {
 			validRoles = new HashSet<String>();
 			for (IsRoleIdOf e : vertex.getIncidentEdgesOfType_IsRoleIdOf()) {
 				RoleId role = (RoleId) e.getAlpha();
 				validRoles.add(role.get_name());
 			}
 		}
-		IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOfEdgeRestriction_GoesTo_EdgeRestriction predInc = vertex
+		IsBooleanPredicateOfEdgeRestriction_isBooleanPredicateOf_omega predInc = vertex
 				.getFirstIncidenceToIsBooleanPredicateOfEdgeRestriction(Direction.EDGE_TO_VERTEX);
 		if (predInc != null) {
 			// System.out.println("Found a BooleanPredicateOfEdge");

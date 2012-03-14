@@ -35,9 +35,11 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+import java.rmi.RemoteException;
+
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisVertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisVertex;
@@ -106,13 +108,19 @@ public class BoolExpressionTransition extends Transition {
 	 * Creates a new transition from start state to end state.
 	 */
 	public BoolExpressionTransition(State start, State end,
-			VertexEvaluator boolEval, GraphMarker<VertexEvaluator> graphMarker) {
+			VertexEvaluator boolEval, ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end);
 		boolExpressionEvaluator = boolEval;
-		Vertex v = graphMarker.getGraph().getFirstVertex(ThisVertex.class);
-		if (v != null) {
-			thisVertexEvaluator = (ThisVertexEvaluator) graphMarker.getMark(v);
+		Vertex v;
+		try {
+			v = graphMarker.getGraph().getFirstVertex(ThisVertex.class);
+			if (v != null) {
+				thisVertexEvaluator = (ThisVertexEvaluator) graphMarker.getMark(v);
+			}
+		} catch (RemoteException e) {
+			throw new RuntimeException(e);
 		}
+
 	}
 
 	/*
@@ -143,7 +151,7 @@ public class BoolExpressionTransition extends Transition {
 	}
 
 	@Override
-	public Vertex getNextVertex(Vertex v, Edge e) {
+	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
 
@@ -155,7 +163,7 @@ public class BoolExpressionTransition extends Transition {
 	}
 
 	@Override
-	public boolean consumesEdge() {
+	public boolean consumesIncidence() {
 		return false;
 	}
 }

@@ -492,7 +492,7 @@ public abstract class VertexEvaluator {
 		String fullClassName = vertexClass.getName();
 		// remove the "Impl" ...
 		fullClassName = fullClassName.substring(0, fullClassName.length() - 4);
-		fullClassName = fullClassName.replaceFirst(".impl.std.", ".");
+		fullClassName = fullClassName.replaceFirst(".impl.mem.", ".");
 		// remove the packages
 		String className = fullClassName.substring(fullClassName
 				.lastIndexOf(".") + 1);

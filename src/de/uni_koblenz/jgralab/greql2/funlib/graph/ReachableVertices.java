@@ -39,7 +39,7 @@ import java.util.HashSet;
 
 import org.pcollections.PSet;
 
-import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
@@ -79,12 +79,12 @@ public class ReachableVertices extends Function {
 			if (state.isFinal) {
 				resultSet = resultSet.plus(vertex);
 			}
-			for (Edge inc = vertex.getFirstIncidence(); inc != null; inc = inc
-					.getNextIncidence()) {
+			for (Incidence inc = vertex.getFirstIncidence(); inc != null; inc = inc
+					.getNextIncidenceAtVertex()) {
 				int size = state.outTransitions.size();
 				for (int i = 0; i < size; i++) {
 					Transition currentTransition = state.outTransitions.get(i);
-					Vertex nextVertex = currentTransition.getNextVertex(vertex,
+					Vertex nextVertex = currentTransition.getNextElement(vertex,
 							inc);
 					if (!markedElements[currentTransition.endState.number]
 							.contains(nextVertex)) {

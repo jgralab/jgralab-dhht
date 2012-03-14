@@ -237,7 +237,7 @@ public abstract class CodeGenerator {
 		aPackage = aPackage.replace(".", File.separator);
 
 		File dir = new File(pathPrefix + aPackage);
-
+		System.out.println("Writing code to file " + dir.getAbsolutePath());
 		if (dir.exists()) {
 			if (!dir.isDirectory()) {
 				throw new GraphIOException("'" + dir.getAbsolutePath()

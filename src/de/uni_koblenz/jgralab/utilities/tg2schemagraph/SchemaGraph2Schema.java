@@ -40,26 +40,55 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
-import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
-import de.uni_koblenz.jgralab.schema.CollectionDomain;
-import de.uni_koblenz.jgralab.schema.Constraint;
-import de.uni_koblenz.jgralab.schema.Domain;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.EnumDomain;
-import de.uni_koblenz.jgralab.schema.GraphClass;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.NamedElementClass;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasBaseDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasKeyDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasValueDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.SetDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates;
+import de.uni_koblenz.jgralab.grumlschema.structure.Annotates_annotatedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.BinaryEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Comment;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Constraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDefaultPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsGraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.ContainsSubPackage_superpackage;
+import de.uni_koblenz.jgralab.grumlschema.structure.DefinesGraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attributedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasConstraint;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HidesIncidenceClassAtVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.MayBeNestedIn;
+import de.uni_koblenz.jgralab.grumlschema.structure.NamedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Schema;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesIncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 import de.uni_koblenz.jgralab.schema.RecordDomain.RecordComponent;
-import de.uni_koblenz.jgralab.schema.SetDomain;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 import de.uni_koblenz.jgralab.schema.impl.ConstraintImpl;
 import de.uni_koblenz.jgralab.schema.impl.GraphElementClassImpl;
 import de.uni_koblenz.jgralab.schema.impl.IncidenceClassImpl;
-import de.uni_koblenz.jgralab.schema.impl.SchemaImpl;
+
+
+
 
 /**
  * Converts a GrumlSchema SchemaGraph into a Schema.
@@ -224,7 +253,7 @@ public class SchemaGraph2Schema {
 		assert ((name != null) && (packagePrefix != null)) : "One of attributes \"name\" or \"packagePrefix\" is null";
 
 		// Creates a Schema with the given attributes
-		xSchema = new SchemaImpl(name, packagePrefix);
+		xSchema = new de.uni_koblenz.jgralab.schema.impl.SchemaImpl(name, packagePrefix);
 
 		// Check
 		assert (xSchema.getName().equals(name) && xSchema.getPackagePrefix()
@@ -276,7 +305,7 @@ public class SchemaGraph2Schema {
 				gSchema, ContainsDefaultPackage.class, OUTGOING);
 		assert (containsDefaultPackage != null) : "No \"ContainsDefaultPackage\" edge defined.";
 		assert (containsDefaultPackage.getOmega() instanceof Package) : "FIXME! That should be an instance of \"Package\".";
-		Package defaultPackage = (Package) containsDefaultPackage.getOmega();
+		de.uni_koblenz.jgralab.grumlschema.structure.Package defaultPackage = (de.uni_koblenz.jgralab.grumlschema.structure.Package) containsDefaultPackage.getOmega();
 
 		// Starts the recursive collecting process with the DefaultPackage
 		getAllGraphElementClassesAndDomains(defaultPackage);
@@ -292,7 +321,7 @@ public class SchemaGraph2Schema {
 	 *            Package, of which all GraphElementClass and Domain objects are
 	 *            retrieved.
 	 */
-	private void getAllGraphElementClassesAndDomains(Package gPackage) {
+	private void getAllGraphElementClassesAndDomains(de.uni_koblenz.jgralab.grumlschema.structure.Package gPackage) {
 
 		// DOMAINS
 
@@ -305,14 +334,13 @@ public class SchemaGraph2Schema {
 		// SUBPACKAGES
 
 		// Loop over all subpackages
-		for (ContainsSubPackage containsSubPackage : gPackage.getIncidentEdges(
-				ContainsSubPackage.class, OUTGOING)) {
+		for (ContainsSubPackage_superpackage containsSubPackage : gPackage.getContainsSubPackage_superpackageIncidences()) {
 			assert ((containsSubPackage != null) && (containsSubPackage
-					.getOmega() instanceof Package)) : "FIXME! That should be an instance of Package.";
+					.getThat() instanceof Package)) : "FIXME! That should be an instance of Package.";
 
 			// Recursion
-			getAllGraphElementClassesAndDomains((Package) containsSubPackage
-					.getOmega());
+			getAllGraphElementClassesAndDomains((de.uni_koblenz.jgralab.grumlschema.structure.Package) containsSubPackage
+					.getThat());
 		}
 	}
 
@@ -323,7 +351,7 @@ public class SchemaGraph2Schema {
 	 * @param gPackage
 	 *            Package, of which all GraphElementClass objects are retrieved.
 	 */
-	private void getAllGraphElementClasses(Package gPackage) {
+	private void getAllGraphElementClasses(de.uni_koblenz.jgralab.grumlschema.structure.Package gPackage) {
 
 		// Loop over all GraphElementClass objects of this Package
 		for (ContainsGraphElementClass containsGraphElementClass : gPackage
@@ -356,7 +384,7 @@ public class SchemaGraph2Schema {
 	 * @param gPackage
 	 *            Package, of which all Domain objects are retrieved.
 	 */
-	private void getAllDomains(Package gPackage) {
+	private void getAllDomains(de.uni_koblenz.jgralab.grumlschema.structure.Package gPackage) {
 
 		// Loop over all Domains of this Package
 		for (ContainsDomain containsDomain : gPackage.getIncidentEdges(
@@ -584,10 +612,10 @@ public class SchemaGraph2Schema {
 	 * Converts a given GraphElementClass objects into corresponding
 	 * GraphElementClass object of the Schema.
 	 */
-	private de.uni_koblenz.jgralab.schema.GraphElementClass<?, ?> createGraphElementClass(
+	private de.uni_koblenz.jgralab.schema.GraphElementClass<?, ?,?,?> createGraphElementClass(
 			GraphElementClass gElement) {
 
-		de.uni_koblenz.jgralab.schema.GraphElementClass<?, ?> element = null;
+		de.uni_koblenz.jgralab.schema.GraphElementClass<?, ?,?,?> element = null;
 
 		if (gElement instanceof VertexClass) {
 			// VertexClass is created.
@@ -731,10 +759,10 @@ public class SchemaGraph2Schema {
 			de.uni_koblenz.jgralab.Vertex gElement) {
 
 		// Loop over all HasAttibute edge of a given GraphElementClass
-		for (HasAttribute gHasAttribute : gElement.getIncidentEdges(
-				HasAttribute.class, OUTGOING)) {
+		for (HasAttribute_attributedElement gHasAttribute : gElement.getIncidences(
+				HasAttribute_attributedElement.class)) {
 
-			createAttribute(xElement, gHasAttribute);
+			createAttribute(xElement, gHasAttribute.getEdge());
 		}
 	}
 
@@ -919,9 +947,9 @@ public class SchemaGraph2Schema {
 			GraphElementClass gContainingVC = (GraphElementClass) gMbni
 					.getOmega();
 
-			GraphElementClassImpl<?, ?> xContainedVC = (GraphElementClassImpl<?, ?>) xSchema
+			GraphElementClassImpl<?, ?,?,?> xContainedVC = (GraphElementClassImpl<?, ?,?,?>) xSchema
 					.getAttributedElementClass(gContainedVC.get_qualifiedName());
-			GraphElementClassImpl<?, ?> xContainingVC = (GraphElementClassImpl<?, ?>) xSchema
+			GraphElementClassImpl<?, ?,?,?> xContainingVC = (GraphElementClassImpl<?, ?,?,?>) xSchema
 					.getAttributedElementClass(gContainingVC
 							.get_qualifiedName());
 

@@ -37,15 +37,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.sun.mirror.declaration.Declaration;
-
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionApplication;
 import de.uni_koblenz.jgralab.greql2.schema.FunctionId;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstraintOf_isConstraintOf_omega;
 
 /**
  * Merges all constraint {@link Expression}s that are connected to a
@@ -84,7 +85,7 @@ public class MergeConstraintsOptimizer extends OptimizerBase {
 	 * de.uni_koblenz.jgralab.greql2.schema.Greql2)
 	 */
 	@Override
-	public boolean optimize(GreqlEvaluator eval, Greql2 syntaxgraph)
+	public boolean optimize(GreqlEvaluator eval, GreqlSyntaxGraph syntaxgraph)
 			throws OptimizerException {
 		ArrayList<Declaration> declarations = new ArrayList<Declaration>();
 		for (Declaration decl : syntaxgraph.getDeclarationVertices()) {
@@ -94,10 +95,10 @@ public class MergeConstraintsOptimizer extends OptimizerBase {
 		boolean constraintsGotMerged = false;
 		for (Declaration decl : declarations) {
 			ArrayList<IsConstraintOf> constraintEdges = new ArrayList<IsConstraintOf>();
-			for (IsConstraintOf constraint : decl
-					.getIsConstraintOfIncidences(EdgeDirection.IN)) {
-				constraintEdges.add(constraint);
-				constraint = constraint.getNextIsConstraintOf();
+			for (IsConstraintOf_isConstraintOf_omega constraint : decl
+					.getIsConstraintOf_isConstraintOf_omegaIncidences()) {
+				constraintEdges.add(constraint.getEdge());
+				constraint = constraint.getNextIsConstraintOf_omegaAtVertex();
 			}
 			if (constraintEdges.size() > 1) {
 				constraintsGotMerged = true;
@@ -130,7 +131,7 @@ public class MergeConstraintsOptimizer extends OptimizerBase {
 	 * @return a conjunction of all constraints
 	 */
 	public Expression createConjunction(List<IsConstraintOf> constraintEdges,
-			Greql2 syntaxgraph) {
+			GreqlSyntaxGraph syntaxgraph) {
 		if (constraintEdges.size() == 1) {
 			return (Expression) constraintEdges.get(0).getAlpha();
 		}

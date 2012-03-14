@@ -11,7 +11,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.SubGraphMarker;
+import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
@@ -296,7 +296,7 @@ public abstract class DefaultWriter {
 	 * @param s
 	 *            the SubGraphMarker to write
 	 */
-	protected void writeSubGraphMarker(SubGraphMarker s) throws Exception {
+	protected void writeSubGraphMarker(GraphMarker s) throws Exception {
 		cantWrite(s);
 	}
 
@@ -433,8 +433,6 @@ public abstract class DefaultWriter {
 			writeEnum((Enum<?>) o);
 		} else if (o instanceof Graph) {
 			writeGraph((Graph) o);
-		} else if (o instanceof SubGraphMarker) {
-			writeSubGraphMarker((SubGraphMarker) o);
 		} else if (o instanceof DFA) {
 			writeDFA((DFA) o);
 		} else if (o instanceof NFA) {

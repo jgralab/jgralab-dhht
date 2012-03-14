@@ -37,6 +37,7 @@ package de.uni_koblenz.jgralab.utilities.tg2dot.greql2.funlib;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 public class OmegaRolename extends Function {
@@ -47,11 +48,11 @@ public class OmegaRolename extends Function {
 	}
 
 	public String evaluate(Edge e) {
-		return evaluate((EdgeClass) e.getAttributedElementClass());
+		return evaluate((EdgeClass) e.getType());
 	}
 
 	public String evaluate(EdgeClass ec) {
-		String rolename = ec.getTo().getRolename();
+		String rolename = ((BinaryEdgeClass)ec).getToIncidenceClass().getRolename();
 		rolename = rolename == null ? "" : rolename;
 		return rolename;
 	}

@@ -35,6 +35,7 @@
 
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
+import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -62,6 +63,7 @@ public class IsReachable extends Function {
 	}
 
 	public Boolean evaluate(Vertex u, Vertex v, DFA dfa) {
+		try {
 		if (u.getGraph() != v.getGraph()) {
 			throw new IllegalArgumentException(
 					"The vertices are in different graphs, but must be in the same graph.");
@@ -83,7 +85,7 @@ public class IsReachable extends Function {
 			}
 			for (Incidence inc : currentEntry.vertex.getIncidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = currentTransition.getNextVertex(
+					Vertex nextVertex = currentTransition.getNextElement(
 							currentEntry.vertex, inc);
 					boolean isMarked = markers[currentTransition.endState.number]
 							.isMarked(nextVertex);
@@ -97,6 +99,9 @@ public class IsReachable extends Function {
 					}
 				}
 			}
+		}
+		} catch (RemoteException ex) {
+			throw new RuntimeException(ex);
 		}
 		return false;
 	}

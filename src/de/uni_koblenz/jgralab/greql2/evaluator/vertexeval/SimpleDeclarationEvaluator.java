@@ -44,11 +44,10 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VariableDeclaration;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
-import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOf_isTypeExprOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
@@ -88,44 +87,65 @@ public class SimpleDeclarationEvaluator extends VertexEvaluator {
 	 */
 	@Override
 	public PVector<VariableDeclaration> evaluate() {
-		IsTypeExprOf inc = vertex
-				.getFirstIsTypeExprOfIncidence(EdgeDirection.IN);
-		Expression typeExpression = (Expression) inc.getAlpha();
+		IsTypeExprOf_isTypeExprOf_omega inc = vertex
+				.getFirst_isTypeExprOf_omega();
+		Expression typeExpression = (Expression) inc.getThat();
 		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExpression);
 		PVector<VariableDeclaration> varDeclList = JGraLab.vector();
-		IsDeclaredVarOf varInc = vertex
-				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.IN);
+		IsDeclaredVarOf_isDeclaredVarOf_omega varInc = vertex
+				.getFirst_isDeclaredVarOf_omega();
 		while (varInc != null) {
 			VariableDeclaration varDecl = new VariableDeclaration(
-					(Variable) varInc.getAlpha(), exprEval, vertex,
+					(Variable) varInc.getThat(), exprEval, vertex,
 					greqlEvaluator);
 			varDeclList = varDeclList.plus(varDecl);
-			varInc = varInc.getNextIsDeclaredVarOfIncidence(EdgeDirection.IN);
+			varInc = varInc.getNextIsDeclaredVarOf_omegaAtVertex();
 		}
 		return varDeclList;
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		return this.greqlEvaluator.getCostModel()
-				.calculateCostsSimpleDeclaration(this, graphSize);
+		// Calculate the costs for the type definition
+		VertexEvaluator typeExprEval = 
+		getVertexEvalMarker().getMark(
+				vertex.getFirst_isTypeExprOfDeclaration_omega().getThat());
+
+		long typeCosts = typeExprEval
+				.getCurrentSubtreeEvaluationCosts(graphSize);
+
+		// Calculate the costs for the declared variables
+		long declaredVarCosts = 0;
+		IsDeclaredVarOf_isDeclaredVarOf_omega inc = vertex
+				.getFirst_isDeclaredVarOf_omega();
+		while (inc != null) {
+			VariableEvaluator varEval = (VariableEvaluator) getVertexEvalMarker().getMark(inc.getThat());
+			declaredVarCosts += varEval
+					.getCurrentSubtreeEvaluationCosts(graphSize);
+			inc = inc.getNextIsDeclaredVarOf_omegaAtVertex();
+		}
+
+		long ownCosts = 2;
+		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
+		long subtreeCosts = iteratedCosts + declaredVarCosts + typeCosts;
+		return new VertexCosts(ownCosts, iteratedCosts, subtreeCosts);
 	}
 
 	@Override
 	public void calculateNeededAndDefinedVariables() {
 		neededVariables = new HashSet<Variable>();
 		definedVariables = new HashSet<Variable>();
-		IsDeclaredVarOf varInc = vertex
-				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.IN);
+		IsDeclaredVarOf_isDeclaredVarOf_omega varInc = vertex
+				.getFirst_isDeclaredVarOf_omega();
 		while (varInc != null) {
-			definedVariables.add((Variable) varInc.getAlpha());
-			varInc = varInc.getNextIsDeclaredVarOfIncidence(EdgeDirection.IN);
+			definedVariables.add((Variable) varInc.getThat());
+			varInc = varInc.getNextIsDeclaredVarOf_omegaAtVertex();
 		}
-		IsTypeExprOf typeInc = vertex
-				.getFirstIsTypeExprOfIncidence(EdgeDirection.IN);
+		IsTypeExprOf_isTypeExprOf_omega typeInc = vertex
+				.getFirst_isTypeExprOf_omega();
 		if (typeInc != null) {
 			VertexEvaluator veval = vertexEvalMarker
-					.getMark(typeInc.getAlpha());
+					.getMark(typeInc.getThat());
 			if (veval != null) {
 				neededVariables.addAll(veval.getNeededVariables());
 			}
@@ -134,8 +154,13 @@ public class SimpleDeclarationEvaluator extends VertexEvaluator {
 
 	@Override
 	public long calculateEstimatedCardinality(GraphSize graphSize) {
-		return greqlEvaluator.getCostModel()
-				.calculateCardinalitySimpleDeclaration(this, graphSize);
+		VertexEvaluator typeExprEval = getVertexEvalMarker()
+				.getMark(vertex.getFirst_isTypeExprOf_omega().getThat());
+		long singleCardinality = typeExprEval
+				.getEstimatedCardinality(graphSize);
+		long wholeCardinality = singleCardinality
+				* getDefinedVariables().size();
+		return wholeCardinality;
 	}
 
 }

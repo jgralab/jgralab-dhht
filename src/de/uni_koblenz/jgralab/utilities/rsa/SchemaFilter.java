@@ -35,17 +35,24 @@ import java.util.regex.Pattern;
 
 import de.uni_koblenz.jgralab.AttributedElement;
 import de.uni_koblenz.jgralab.graphmarker.LocalBooleanGraphMarker;
-import de.uni_koblenz.jgralab.greql2.funlib.schema.HasAttribute;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
-import de.uni_koblenz.jgralab.schema.CollectionDomain;
-import de.uni_koblenz.jgralab.schema.Domain;
-import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.EnumDomain;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.MapDomain;
-import de.uni_koblenz.jgralab.schema.RecordDomain;
-import de.uni_koblenz.jgralab.schema.VertexClass;
+import de.uni_koblenz.jgralab.grumlschema.SchemaGraph;
+import de.uni_koblenz.jgralab.grumlschema.domains.CollectionDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.Domain;
+import de.uni_koblenz.jgralab.grumlschema.domains.EnumDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.HasRecordDomainComponent_recordDomainOfComponent;
+import de.uni_koblenz.jgralab.grumlschema.domains.MapDomain;
+import de.uni_koblenz.jgralab.grumlschema.domains.RecordDomain;
+import de.uni_koblenz.jgralab.grumlschema.structure.Attribute;
+import de.uni_koblenz.jgralab.grumlschema.structure.AttributedElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.ConnectsToEdgeClass_connectedEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.Direction;
+import de.uni_koblenz.jgralab.grumlschema.structure.EdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.GraphElementClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.HasAttribute_attributedElement;
+import de.uni_koblenz.jgralab.grumlschema.structure.IncidenceClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesEdgeClass_superEdgeClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.SpecializesVertexClass_superVertexClass;
+import de.uni_koblenz.jgralab.grumlschema.structure.VertexClass;
 
 /**
  * This class handles the filtering of schemas. It is used for example in
@@ -211,8 +218,8 @@ public class SchemaFilter {
 			VertexClass currentGraphElementClass) {
 		processed.mark(currentGraphElementClass);
 		includes.removeMark(currentGraphElementClass);
-		for (SpecializesVertexClass current : currentGraphElementClass
-				.getSpecializesVertexClassIncidences(EdgeDirection.IN)) {
+		for (SpecializesVertexClass_superVertexClass current : currentGraphElementClass
+				.getSpecializesVertexClass_superVertexClassIncidences()) {
 			VertexClass superclass = (VertexClass) current.getThat();
 			excludeGraphElementClass(processed, superclass);
 		}
@@ -230,8 +237,8 @@ public class SchemaFilter {
 			EdgeClass currentGraphElementClass) {
 		processed.mark(currentGraphElementClass);
 		includes.removeMark(currentGraphElementClass);
-		for (SpecializesEdgeClass current : currentGraphElementClass
-				.getSpecializesEdgeClassIncidences(EdgeDirection.IN)) {
+		for (SpecializesEdgeClass_superEdgeClass current : currentGraphElementClass
+				.getSpecializesEdgeClass_superEdgeClassIncidences()) {
 			EdgeClass superclass = (EdgeClass) current.getThat();
 			excludeGraphElementClass(processed, superclass);
 		}
@@ -245,10 +252,10 @@ public class SchemaFilter {
 		for (AttributedElementClass currentAttributedElementClass : schemaGraph
 				.getAttributedElementClassVertices()) {
 			if (includes.isMarked(currentAttributedElementClass)) {
-				for (HasAttribute currentAttributeLink : currentAttributedElementClass
-						.getHasAttributeIncidences()) {
+				for (HasAttribute_attributedElement currentAttributeLink : currentAttributedElementClass
+						.getHasAttribute_attributedElementIncidences()) {
 					Domain currentDomain = (Domain) ((Attribute) currentAttributeLink
-							.getThat()).getFirstHasDomainIncidence().getThat();
+							.getThat()).getFirst_attributeWithDomain().getThat();
 					includeDomain(currentDomain);
 				}
 			}
@@ -280,8 +287,8 @@ public class SchemaFilter {
 	 *            the MapDomain to include.
 	 */
 	private void includeDomain(MapDomain md) {
-		includeDomain((Domain) md.getFirstHasKeyDomainIncidence().getThat());
-		includeDomain((Domain) md.getFirstHasValueDomainIncidence().getThat());
+		includeDomain((Domain) md.getFirst_mapDomainOfKey().getThat());
+		includeDomain((Domain) md.getFirst_mapDomainOfValue().getThat());
 	}
 
 	/**
@@ -291,7 +298,7 @@ public class SchemaFilter {
 	 *            the CollectionDomain to include.
 	 */
 	private void includeDomain(CollectionDomain cd) {
-		includeDomain((Domain) cd.getFirstHasBaseDomainIncidence().getThat());
+		includeDomain((Domain) cd.getFirst_collectionDomain().getThat());
 	}
 
 	/**
@@ -313,8 +320,8 @@ public class SchemaFilter {
 	private void includeDomain(RecordDomain rd) {
 		includes.mark(rd);
 		// recursively include all RecordDomainComponentDomains
-		for (HasRecordDomainComponent currentRecordDomainComponentEdgeClass : rd
-				.getHasRecordDomainComponentIncidences()) {
+		for (HasRecordDomainComponent_recordDomainOfComponent currentRecordDomainComponentEdgeClass : rd
+				.getHasRecordDomainComponent_recordDomainOfComponentIncidences()) {
 			includeDomain((Domain) currentRecordDomainComponentEdgeClass
 					.getThat());
 		}
@@ -327,14 +334,19 @@ public class SchemaFilter {
 		for (EdgeClass currentEdgeClass : schemaGraph.getEdgeClassVertices()) {
 			if (includes.isMarked(currentEdgeClass)) {
 				// only look at included EdgeClasses
-				IncidenceClass fromIC = (IncidenceClass) currentEdgeClass
-						.getFirstComesFromIncidence().getOmega();
-				VertexClass fromVC = (VertexClass) fromIC.getFirstEndsAtIncidence()
-						.getOmega();
-				IncidenceClass toIC = (IncidenceClass) currentEdgeClass
-						.getFirstGoesToIncidence().getOmega();
-				VertexClass toVC = (VertexClass) toIC.getFirstEndsAtIncidence()
-						.getOmega();
+				IncidenceClass fromIC = null;
+				IncidenceClass toIC = null;
+				for (ConnectsToEdgeClass_connectedEdgeClass inc : currentEdgeClass.getConnectsToEdgeClass_connectedEdgeClassIncidences()) {
+					IncidenceClass ic = (IncidenceClass)inc.getThat();
+					if (ic.get_direction() == Direction.EDGE_TO_VERTEX)
+						toIC = ic;
+					if (ic.get_direction() == Direction.VERTEX_TO_EDGE)
+						fromIC = ic;
+				}
+				
+				VertexClass fromVC = (VertexClass) fromIC.getFirst_incidenceClassAtVertex()
+						.getThat();
+				VertexClass toVC = (VertexClass) toIC.getFirst_incidenceClassAtEdge().getThat();
 				if (!includes.isMarked(fromVC) || !includes.isMarked(toVC)) {
 					// exclude all EdgeClasses whose to or from VertexClasses
 					// are already excluded
@@ -380,8 +392,8 @@ public class SchemaFilter {
 			// abstract and already excluded
 			return false;
 		}
-		for (SpecializesVertexClass current : currentVertexClass
-				.getSpecializesVertexClassIncidences(EdgeDirection.IN)) {
+		for (SpecializesVertexClass_superVertexClass current : currentVertexClass
+				.getSpecializesVertexClass_superVertexClassIncidences()) {
 			if (!isVertexClassExcluded(processed, (VertexClass) current
 					.getThat())) {
 				// at least one subclass is not excluded

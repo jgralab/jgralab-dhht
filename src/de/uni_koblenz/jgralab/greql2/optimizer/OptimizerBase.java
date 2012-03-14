@@ -36,18 +36,26 @@ package de.uni_koblenz.jgralab.greql2.optimizer;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.sun.mirror.declaration.Declaration;
-
+import de.uni_koblenz.jgralab.BinaryEdge;
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
+import de.uni_koblenz.jgralab.greql2.exception.GreqlException;
 import de.uni_koblenz.jgralab.greql2.exception.OptimizerException;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2;
+import de.uni_koblenz.jgralab.greql2.schema.Declaration;
+import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
+import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsBoundVarOf_boundVar;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsSimpleDeclOf_isSimpleDeclOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.Variable;
 
 /**
  * Base class for all {@link Optimizer}s which defines some useful methods that
@@ -65,7 +73,7 @@ public abstract class OptimizerBase implements Optimizer {
 	protected void recreateVertexEvaluators(GreqlEvaluator eval) {
 		try {
 			eval.createVertexEvaluators();
-		} catch (EvaluateException e) {
+		} catch (GreqlException e) {
 			e.printStackTrace();
 			throw new OptimizerException(
 					"Exception while re-creating VertexEvaluators.", e);
@@ -92,17 +100,17 @@ public abstract class OptimizerBase implements Optimizer {
 		assert from.isValid() && to.isValid() : "Relinking invalid vertices!";
 
 		// System.out.println("    relink: " + from + " --> " + to);
-		Edge e = from.getFirstIncidence(EdgeDirection.IN);
-		while (e != null) {
-			Edge newE = e.getNextIncidence(EdgeDirection.IN);
-			e.setOmega(to);
-			e = newE;
+		Incidence inc = from.getFirstIncidence(Direction.EDGE_TO_VERTEX);
+		while (inc != null) {
+			Edge e = inc.getEdge();
+			inc = inc.getNextIncidenceAtVertex(Direction.EDGE_TO_VERTEX);
+			((BinaryEdge) e).setOmega(to);
 		}
-		e = from.getFirstIncidence(EdgeDirection.OUT);
-		while (e != null) {
-			Edge newE = e.getNextIncidence(EdgeDirection.OUT);
-			e.setAlpha(to);
-			e = newE;
+		inc = from.getFirstIncidence(Direction.VERTEX_TO_EDGE);
+		while (inc != null) {
+			Edge e = inc.getEdge();
+			inc = inc.getNextIncidenceAtVertex(Direction.VERTEX_TO_EDGE);
+			((BinaryEdge) e).setAlpha(to);
 		}
 	}
 
@@ -131,20 +139,19 @@ public abstract class OptimizerBase implements Optimizer {
 		if (var1 == var2) {
 			return false;
 		}
-		IsBoundVarOf ibvo1 = var1.getFirstIsBoundVarOfIncidence();
-		IsBoundVarOf ibvo2 = var2.getFirstIsBoundVarOfIncidence();
+		IsBoundVarOf_boundVar ibvo1 = var1.getFirstIncidenceToIsBoundVarOf();
+		IsBoundVarOf_boundVar ibvo2 = var2.getFirstIncidenceToIsBoundVarOf();
 
 		if (ibvo1 != null) {
 			if (ibvo2 == null) {
 				// Externally bound vars are always before locally declared vars
 				return true;
 			}
-			Greql2Expression root = (Greql2Expression) ibvo1.getOmega();
-			for (IsBoundVarOf ibvo : root.getIsBoundVarOfIncidences()) {
-				ibvo = (IsBoundVarOf) ibvo.getNormalEdge();
-				if (ibvo == ibvo1) {
+			Greql2Expression root = (Greql2Expression) ibvo1.getEdge().getOmega();
+			for (IsBoundVarOf ibvo : root.getIncidentEdgesOfType_IsBoundVarOf()) {
+				if (ibvo == ibvo1.getEdge()) {
 					return true;
-				} else if (ibvo == ibvo2) {
+				} else if (ibvo == ibvo2.getEdge()) {
 					return false;
 				}
 			}
@@ -155,52 +162,51 @@ public abstract class OptimizerBase implements Optimizer {
 		}
 
 		SimpleDeclaration sd1 = (SimpleDeclaration) var1
-				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT).getOmega();
-		Declaration decl1 = (Declaration) sd1.getFirstIsSimpleDeclOfIncidence(
-				EdgeDirection.OUT).getOmega();
+				.getFirstIncidenceToIsDeclaredVarOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
+		Declaration decl1 = (Declaration) sd1.getFirstIncidenceToIsSimpleDeclOf(
+				Direction.VERTEX_TO_EDGE).getEdge().getOmega();
 		SimpleDeclaration sd2 = (SimpleDeclaration) var2
-				.getFirstIsDeclaredVarOfIncidence(EdgeDirection.OUT).getOmega();
-		Declaration decl2 = (Declaration) sd2.getFirstIsSimpleDeclOfIncidence(
-				EdgeDirection.OUT).getOmega();
+				.getFirstIncidenceToIsDeclaredVarOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
+		Declaration decl2 = (Declaration) sd2.getFirstIncidenceToIsSimpleDeclOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
 
 		if (decl1 == decl2) {
 			if (sd1 == sd2) {
 				// var1 and var2 are declared in the same SimpleDeclaration,
 				// so the order of the IsDeclaredVarOf edges matters.
-				IsDeclaredVarOf inc = sd1
-						.getFirstIsDeclaredVarOfIncidence(EdgeDirection.IN);
+				IsDeclaredVarOf_isDeclaredVarOf_omega inc = sd1
+						.getFirstIncidenceToIsDeclaredVarOf(Direction.EDGE_TO_VERTEX);
 				while (inc != null) {
-					if (inc.getAlpha() == var1) {
+					if (inc.getEdge().getAlpha() == var1) {
 						return true;
 					}
-					if (inc.getAlpha() == var2) {
+					if (inc.getEdge().getAlpha() == var2) {
 						return false;
 					}
-					inc = inc.getNextIsDeclaredVarOf(EdgeDirection.IN);
+					inc = inc.getNextIsDeclaredVarOf_omegaAtVertex();
 				}
 			} else {
 				// var1 and var2 are declared in the same Declaration but
 				// different SimpleDeclarations, so the order of the
 				// SimpleDeclarations matters.
-				IsSimpleDeclOf inc = decl1
-						.getFirstIsSimpleDeclOfIncidence(EdgeDirection.IN);
+				IsSimpleDeclOf_isSimpleDeclOf_omega inc = decl1
+						.getFirstIncidenceToIsSimpleDeclOf(Direction.EDGE_TO_VERTEX);
 				while (inc != null) {
-					if (inc.getAlpha() == sd1) {
+					if (inc.getEdge().getAlpha() == sd1) {
 						return true;
 					}
-					if (inc.getAlpha() == sd2) {
+					if (inc.getEdge().getAlpha() == sd2) {
 						return false;
 					}
-					inc = inc.getNextIsSimpleDeclOf(EdgeDirection.IN);
+					inc = inc.getNextIsSimpleDeclOf_omegaAtVertex();
 				}
 			}
 		} else {
 			// start and target are declared in different Declarations, so we
 			// have to check if start was declared in the outer Declaration.
-			Vertex declParent1 = decl1.getFirstIncidence(EdgeDirection.OUT)
-					.getOmega();
-			Vertex declParent2 = decl2.getFirstIncidence(EdgeDirection.OUT)
-					.getOmega();
+			Vertex declParent1 = ((BinaryEdge) decl1.getFirstIncidence(Direction.VERTEX_TO_EDGE)
+					.getEdge()).getOmega();
+			Vertex declParent2 = ((BinaryEdge) decl2.getFirstIncidence(Direction.VERTEX_TO_EDGE)
+					.getEdge()).getOmega();
 			if (OptimizerUtility.isAbove(declParent1, declParent2)) {
 				return true;
 			} else {
@@ -224,13 +230,13 @@ public abstract class OptimizerBase implements Optimizer {
 			return (Declaration) vertex;
 		}
 		Declaration result = null;
-		Edge inc = vertex.getFirstIncidence(EdgeDirection.OUT);
+		Incidence inc = vertex.getFirstIncidence(Direction.VERTEX_TO_EDGE);
 		while (inc != null) {
-			result = findNearestDeclarationAbove(inc.getOmega());
+			result = findNearestDeclarationAbove(((BinaryEdge) inc.getEdge()).getOmega());
 			if (result != null) {
 				return result;
 			}
-			inc = inc.getNextIncidence(EdgeDirection.OUT);
+			inc = inc.getNextIncidenceAtVertex(Direction.VERTEX_TO_EDGE);
 		}
 		return null;
 	}
@@ -250,7 +256,7 @@ public abstract class OptimizerBase implements Optimizer {
 	 */
 	protected SimpleDeclaration splitSimpleDeclaration(SimpleDeclaration sd,
 			Set<Variable> varsToBeSplit) {
-		Greql2 syntaxgraph = (Greql2) sd.getGraph();
+		GreqlSyntaxGraph syntaxgraph = (GreqlSyntaxGraph) sd.getGraph();
 		Set<Variable> varsDeclaredBySD = OptimizerUtility
 				.collectVariablesDeclaredBy(sd);
 
@@ -259,30 +265,30 @@ public abstract class OptimizerBase implements Optimizer {
 			return sd;
 		}
 		Declaration parentDecl = (Declaration) sd
-				.getFirstIsSimpleDeclOfIncidence(EdgeDirection.OUT).getOmega();
-		IsSimpleDeclOf oldEdge = sd.getFirstIsSimpleDeclOfIncidence();
+				.getFirstIncidenceToIsSimpleDeclOf(Direction.VERTEX_TO_EDGE).getEdge().getOmega();
+		IsSimpleDeclOf oldEdge = sd.getFirstIncidenceToIsSimpleDeclOf().getEdge();
 		SimpleDeclaration newSD = syntaxgraph.createSimpleDeclaration();
 		IsSimpleDeclOf newEdge = syntaxgraph.createIsSimpleDeclOf(newSD,
 				parentDecl);
 		syntaxgraph.createIsTypeExprOfDeclaration((Expression) sd
-				.getFirstIsTypeExprOfDeclarationIncidence(EdgeDirection.IN)
-				.getAlpha(), newSD);
-		newEdge.getReversedEdge().putIncidenceAfter(oldEdge.getReversedEdge());
+				.getFirstIncidenceToIsTypeExprOfDeclaration(Direction.EDGE_TO_VERTEX)
+				.getEdge().getAlpha(), newSD);
+		newEdge.getFirst_greql2Aggregation_GoesTo_Greql2Vertex().putAfterAtVertex(oldEdge.getFirst_greql2Aggregation_GoesTo_Greql2Vertex());
 
 		for (Variable var : varsToBeSplit) {
-			IsDeclaredVarOf inc = sd
-					.getFirstIsDeclaredVarOfIncidence(EdgeDirection.IN);
-			HashSet<IsDeclaredVarOf> relinkIncs = new HashSet<IsDeclaredVarOf>();
+			IsDeclaredVarOf_isDeclaredVarOf_omega inc = sd
+					.getFirst_isDeclaredVarOf_omega();
+			HashSet<IsDeclaredVarOf_isDeclaredVarOf_omega> relinkIncs = new HashSet<IsDeclaredVarOf_isDeclaredVarOf_omega>();
 			while (inc != null) {
-				if (inc.getAlpha() == var) {
+				if (inc.getEdge().getAlpha() == var) {
 					// This inc is now declared by newSD, so we need to relink
 					// the edge.
 					relinkIncs.add(inc);
 				}
-				inc = inc.getNextIsDeclaredVarOf(EdgeDirection.IN);
+				inc = inc.getNextIsDeclaredVarOf_omegaAtVertex();
 			}
-			for (IsDeclaredVarOf relinkEdge : relinkIncs) {
-				relinkEdge.setOmega(newSD);
+			for (IsDeclaredVarOf_isDeclaredVarOf_omega relinkEdge : relinkIncs) {
+				relinkEdge.getEdge().setOmega(newSD);
 			}
 		}
 		return newSD;
