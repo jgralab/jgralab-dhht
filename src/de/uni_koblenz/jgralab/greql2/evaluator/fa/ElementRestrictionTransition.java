@@ -6,6 +6,10 @@ import de.uni_koblenz.jgralab.Vertex;
 
 public class ElementRestrictionTransition extends Transition {
 
+	protected ElementRestrictionTransition(Transition t, boolean addToStates) {
+		super(t, addToStates);
+	}
+
 	@Override
 	public String edgeString() {
 		// TODO Auto-generated method stub
@@ -20,8 +24,7 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public Transition copy(boolean addToStates) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ElementRestrictionTransition(this, addToStates);
 	}
 
 	@Override
@@ -32,7 +35,6 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public boolean isEpsilon() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
