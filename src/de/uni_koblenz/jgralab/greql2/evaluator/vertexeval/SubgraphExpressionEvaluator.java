@@ -35,11 +35,9 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
-import de.uni_koblenz.jgralab.greql2.schema.EdgeDirection;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf;
-import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
 
@@ -75,9 +73,8 @@ public class SubgraphExpressionEvaluator extends
 			IsConstrainedExpressionOf isConsExp = vertex
 					.getAlphaEdges(IsConstrainedExpressionOf.class).iterator()
 					.next();
-			Expression expr = (Expression) isConsExp.getAlpha();
-			constrainedExpressionEval = (VertexEvaluator) vertexEvalMarker
-					.getMark(expr);
+			Expression expr = isConsExp.getAlpha();
+			constrainedExpressionEval = vertexEvalMarker.getMark(expr);
 		}
 
 		// set traversal context
@@ -101,8 +98,8 @@ public class SubgraphExpressionEvaluator extends
 		// greqlEvaluator.getCostModel().calculateCostsSubgraphRestrictedExpression(this,
 		// graphSize);
 		if (subgraphDefinitionEval == null) {
-			IsSubgraphDefinitionOf isSubgraphDef = vertex
-					.getFirstIsSubgraphDefinitionOfIncidence(EdgeDirection.IN);
+			IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega isSubgraphDef = vertex
+					.getFirst_isSubgraphDefinitionOf_omega();
 			SubgraphDefinition defVertex = (SubgraphDefinition) isSubgraphDef
 					.getThat();
 			subgraphDefinitionEval = (SubgraphDefinitionEvaluator) vertexEvalMarker
@@ -111,10 +108,10 @@ public class SubgraphExpressionEvaluator extends
 
 		// take restricted expression
 		if (exprEval == null) {
-			IsExpressionOnSubgraph isExprOn = vertex
-					.getFirstIsExpressionOnSubgraphIncidence(EdgeDirection.IN);
+			IsConstrainedExpressionOf_isConstrainedExpressionOf_omega isExprOn = vertex
+					.getFirst_isConstrainedExpressionOf_omega();
 			Expression expr = (Expression) isExprOn.getThat();
-			exprEval = (VertexEvaluator) vertexEvalMarker.getMark(expr);
+			exprEval = vertexEvalMarker.getMark(expr);
 		}
 		long ownCosts = 10;
 		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);

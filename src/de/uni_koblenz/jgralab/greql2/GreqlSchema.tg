@@ -32,7 +32,6 @@ EnumDomain QuantificationType (FORALL, EXISTS, EXISTSONE);
 EnumDomain RestrictionType (EDGE, VERTEX, BOTH);
 RecordDomain SourcePosition (offset:Integer, length: Integer);
 
-
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 //////////          COMMON SUPERCLASSES AND TOPLEVEL CLASSES         \\\\\\\\\\ 
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -312,18 +311,6 @@ VertexClass Variable: Identifier;
 VertexClass VertexSetExpression: ElementSetExpression;
 VertexClass VertexSubgraphDefinition: ElementSubgraphDefinition;
 VertexClass ExpressionDefinedSubgraph : SubgraphDefinition;
-VertexClass WhereExpression: DefinitionExpression;
-VertexClass UndefinedLiteral: Literal;
-abstract VertexClass Comprehension: Expression;
-abstract VertexClass ComprehensionWithTableHeader: Comprehension;
-abstract VertexClass DefinitionExpression: Expression;
-abstract VertexClass ElementSetExpression: Expression;
-abstract VertexClass Expression: Greql2Vertex;
-abstract VertexClass PathDescription: Expression;
-abstract VertexClass PathExpression: Expression;
-abstract VertexClass PrimaryPathDescription: PathDescription;
-abstract VertexClass ValueConstruction: Expression;
-
 
 //BinaryEdgeClass IsImportedTypeOf from TypeId (0,*) (1,1)to Greql2Expression (0,1) (1,1);
 BinaryEdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription role alternatePathOf (2,*) (1,1) to AlternativePathDescription  (0,*) (1,1);
