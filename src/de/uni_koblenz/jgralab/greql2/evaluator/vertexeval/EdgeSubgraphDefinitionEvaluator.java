@@ -33,7 +33,7 @@ public class EdgeSubgraphDefinitionEvaluator extends
 		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExprEdge
 				.getAlpha());
 		Iterable<Edge> edges = graph.getEdges((EdgeClass) exprEval.getResult());
-		Graph markerGraph = graph.getGraphFactory().createGraph_InMemoryStorage(graph.getClass(), graph.getUniqueGraphId() + " edgeSubgraph");
+		Graph markerGraph = graph.
 		for (Edge edge : edges) {
 			markerGraph.
 		}

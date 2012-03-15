@@ -2,12 +2,13 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import java.util.Iterator;
 
+import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
-import de.uni_koblenz.jgralab.greql2.schema.Identifier;
-import de.uni_koblenz.jgralab.greql2.schema.IsIdOfNestedSubgraphDefinition;
+import de.uni_koblenz.jgralab.greql2.schema.IsExprOfNestedSubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.NestedSubgraphDefinition;
 
 /**
@@ -21,6 +22,8 @@ import de.uni_koblenz.jgralab.greql2.schema.NestedSubgraphDefinition;
 public class NestedSubgraphDefinitionEvaluator extends
 		SubgraphDefinitionEvaluator {
 
+	private VertexEvaluator startEval = null;
+
 	public NestedSubgraphDefinitionEvaluator(NestedSubgraphDefinition vertex,
 			GreqlEvaluator eval) {
 		super(vertex, eval);
@@ -28,26 +31,26 @@ public class NestedSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
+		Graph result = null;
 		if (vertex != null) {
 
-			Iterator<IsIdOfNestedSubgraphDefinition> idEdges = vertex
-					.getAlphaEdges(IsIdOfNestedSubgraphDefinition.class)
+			Iterator<IsExprOfNestedSubgraphDefinition> exprEdges = vertex
+					.getAlphaEdges(IsExprOfNestedSubgraphDefinition.class)
 					.iterator();
-			if (idEdges.hasNext()) {
-				Iterator<Identifier> id = idEdges.next()
-						.getAlphaVertices(Identifier.class).iterator();
-				if (id.hasNext()) {
-					String name = id.next().get_name();
-				}
+			if (exprEdges.hasNext()) {
+				startEval = vertexEvalMarker.getMark(exprEdges.next()
+						.getAlpha());
+				GraphElement<?, ?, ?, ?> element = (GraphElement<?, ?, ?, ?>) startEval
+						.getResult();
+				result = element.getSubordinateGraph();
 			}
 		}
-		return null;
+		return result;
 	}
 
 	@Override
 	protected VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		// TODO Auto-generated method stub
-		return null;
+		return new VertexCosts(5, 5, 0);
 	}
 
 }

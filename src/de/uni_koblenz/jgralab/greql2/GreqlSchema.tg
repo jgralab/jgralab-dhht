@@ -46,7 +46,7 @@ abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression role ty
 VertexClass Greql2Expression: Greql2Vertex { importedTypes: Set<String>, queryText: String, optimizer: String};
 BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression role isBoundVarOf_omega (0,1) (1,1);
 BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression role isQueryExprOf_omega (0,*) (1,1);
-BinaryEdgeClass IsIdOfStoreClause: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression role isIdOfStoreClause_omega (0,*) (1,1);
+BinaryEdgeClass IsIdOfStoreClause: Greql2Aggregation from Identifier role identifierOfStore (0,1) (1,1) to Greql2Expression role isIdOfStoreClause_omega (0,*) (1,1);
 
 
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -119,8 +119,6 @@ BinaryEdgeClass IsStartRestrOf: Greql2Aggregation from Expression role startRest
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 VertexClass EdgeDirection: Greql2Vertex { dirValue: String };
 VertexClass EdgeRestriction: Greql2Vertex;
-VertexClass EdgeSetExpression: ElementSetExpression;
-VertexClass EdgeSubgraphDefinition: ElementSubgraphDefinition;
 abstract VertexClass ElementRestriction: Greql2Vertex;
 VertexClass ElementSetRestriction: ElementRestriction;
 
@@ -134,11 +132,6 @@ BinaryEdgeClass IsExpressionOfRestriction: Greql2Aggregation from Expression rol
 VertexClass IncidenceDirection: Greql2Vertex { dir: IncDirection };
 
 VertexClass IncidenceRestriction: Greql2Vertex;
-VertexClass IntLiteral: Literal { intValue: Integer };
-VertexClass IntermediateVertexPathDescription: PathDescription;
-VertexClass IteratedPathDescription: PathDescription { times: IterationType };
-VertexClass KappaSubgraphDefinition: SubgraphDefinition { kappa: Integer };
-VertexClass LetExpression: DefinitionExpression;
 BinaryEdgeClass IsIncTypeIdOf: Greql2Aggregation from TypeId role incTypeId (0,*) (1,1) to IncidenceRestriction role isIncTypeIdOf_omega (0,*) (1,1);
 BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction role isRoleIdOf_omega (1,*) (1,1);
 BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction role isBooleanPredicateOf_omega (0,1) (1,1);
@@ -208,7 +201,7 @@ BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compRe
 
 VertexClass QuantifiedExpression: Expression;
 VertexClass Quantifier: Greql2Vertex { type: QuantificationType };
-BinaryEdgeClass IsBoundExprOfQuantifiedExpr: IsBoundExprOf from Expression role boundExprOfQuantifier (1,1) (1,1) to QuantifiedExpression role isBoundExprOfQuantifiedExpr_omega (0,*) (1,1);
+BinaryEdgeClass IsBoundExprOfQuantifiedExpr: IsBoundExprOf from Expression role boundExprOfQuantified (1,1) (1,1) to QuantifiedExpression role isBoundExprOfQuantifiedExpr_omega (0,*) (1,1);
 BinaryEdgeClass IsQuantifiedDeclOf: Greql2Aggregation from Declaration role quantifiedDecl (1,1) (1,1) to QuantifiedExpression role isQuantifiedDeclOf_omega (0,1) (1,1);
 BinaryEdgeClass IsQuantifierOf: Greql2Aggregation from Quantifier role quantifier (1,1) (1,1) to QuantifiedExpression role isQuantifierOf_omega (1,*) (1,1);
 
@@ -264,19 +257,21 @@ BinaryEdgeClass IsVarOf: Greql2Aggregation from Variable role var (1,1) (1,1) to
 ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 VertexClass SubgraphExpression: Expression;
 abstract VertexClass SubgraphDefinition: Greql2Vertex;
-VertexClass EdgeSubgraphDefinition: SubgraphDefinition;
-VertexClass KappaSubgraphDefinition: SubgraphDefinition;
+abstract VertexClass ElementSubgraphDefinition: SubgraphDefinition;
+VertexClass KappaSubgraphDefinition: SubgraphDefinition { kappa: Integer };
 VertexClass LocalSubgraphDefinition: SubgraphDefinition;
 VertexClass NestedSubgraphDefinition: SubgraphDefinition;
 VertexClass PartialSubgraphDefinition: SubgraphDefinition;
-VertexClass VertexSubgraphDefinition: SubgraphDefinition;
 VertexClass ExpressionDefinedSubgraph : SubgraphDefinition;
+VertexClass EdgeSubgraphDefinition: ElementSubgraphDefinition;
+VertexClass VertexSubgraphDefinition: ElementSubgraphDefinition;
+
 
 BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphExpression role isConstrainedExpressionOf_omega (0,*) (1,1);
 BinaryEdgeClass IsSubgraphDefinitionOf: Greql2Aggregation from SubgraphDefinition role subgraphDefinition (1,1) (1,1) to SubgraphExpression role isSubgraphDefinitionOf_omega (1,*) (1,1);
 BinaryEdgeClass IsSubgraphDefiningExpression : Greql2Aggregation from Expression role definingExpression (0,1) (1,1) to ExpressionDefinedSubgraph  role isSubgraphDefiningExpression_omega (0,*) (1,1);
-BinaryEdgeClass IsIdOfNestedSubgraphDefinition: Greql2Aggregation from Identifier role nestedIdent (1,*) (1,1) to NestedSubgraphDefinition  role isIdOfNestedSubgraphDefinition_omega (1,1) (1,1);
-BinaryEdgeClass IsIdOfPartialGraphDefinition: Greql2Aggregation from Identifier role partialIdent (1,*) (1,1) to PartialSubgraphDefinition role isIdOfPartialGraphDefinition_omega (1,1) (1,1);
+BinaryEdgeClass IsExprOfNestedSubgraphDefinition: Greql2Aggregation from Expression role nestedExpr (1,*) (1,1) to NestedSubgraphDefinition  role isIdOfNestedSubgraphDefinition_omega (1,1) (1,1);
+BinaryEdgeClass IsIdOfPartialGraphDefinition: Greql2Aggregation from IntLiteral role partialIdent (1,*) (1,1) to PartialSubgraphDefinition (1,1) (1,1);
 BinaryEdgeClass IsTypeRestrOfSubgraph: Greql2Aggregation from TypeId role typeRestrOfSubgraph (0,*) (1,1)  to SubgraphDefinition role isTypeRestrOfSubgraph_omega (0,*) (1,1);
 
 
@@ -308,84 +303,11 @@ abstract VertexClass TypeOrRoleId: Identifier;
 VertexClass RoleId: TypeOrRoleId;
 VertexClass TypeId: TypeOrRoleId { excluded: Boolean, type: Boolean };
 VertexClass Variable: Identifier;
-VertexClass VertexSetExpression: ElementSetExpression;
-VertexClass VertexSubgraphDefinition: ElementSubgraphDefinition;
-VertexClass ExpressionDefinedSubgraph : SubgraphDefinition;
 
 //BinaryEdgeClass IsImportedTypeOf from TypeId (0,*) (1,1)to Greql2Expression (0,1) (1,1);
-BinaryEdgeClass IsAlternativePathOf: IsPathDescriptionOf from PathDescription role alternatePathOf (2,*) (1,1) to AlternativePathDescription  (0,*) (1,1);
-BinaryEdgeClass IsArgumentOf: Greql2Aggregation from Expression role argument (0,*) (1,1) to FunctionApplication (0,*) (1,1);
-BinaryEdgeClass IsBoundExprOfDefinition: IsBoundExprOf from Expression role boundExprOfDefinition (1,1) (1,1) to DefinitionExpression (0,1) (1,1);
 BinaryEdgeClass IsBoundExprOfQuantifier: IsBoundExprOf from Expression role boundExprOfQuantifier (1,1) (1,1) to QuantifiedExpression (0,*) (1,1);
-BinaryEdgeClass IsBoundVarOf: Greql2Aggregation from Variable role boundVar (0,*) (1,1) to Greql2Expression (0,1) (1,1);
-BinaryEdgeClass IsColumnHeaderExprOf: Greql2Aggregation from Expression role columnHeader (0,*) (1,1)  to TableComprehension (0,*) (1,1);
-BinaryEdgeClass IsCompDeclOf: Greql2Aggregation from Declaration role compDecl (1,1) (1,1) to Comprehension (0,1) (1,1);
-// zero or one, cause MapComprehensions don't have a compResultDef but keyExpr, and valueExpr.
-BinaryEdgeClass IsCompResultDefOf: Greql2Aggregation from Expression role compResultDef (0,1) (1,1) to Comprehension (0,*) (1,1);
-BinaryEdgeClass IsConditionOf: Greql2Aggregation from Expression role condition (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
-BinaryEdgeClass IsConstraintOf: Greql2Aggregation from Expression role constraint (0,*) (1,1) to Declaration role constrainedDeclaration (0,*) (1,1);
-BinaryEdgeClass IsConstrainedExpressionOf: Greql2Aggregation from Expression role constrainedExpression (1,1) (1,1) to SubgraphExpression (0,*) (1,1);
-BinaryEdgeClass IsDeclaredVarOf: Greql2Aggregation from Variable role declaredVariable (1,*) (1,1) to SimpleDeclaration role variableDeclaration (0,1) (1,1);
-BinaryEdgeClass IsDefinitionOf: Greql2Aggregation from Definition role definition (1,*) (1,1) to DefinitionExpression (1,*) (1,1);
-BinaryEdgeClass IsEdgeDirectionOf: Greql2Aggregation from EdgeDirection role direction (1,1) (1,1) to PrimaryPathDescription (1,*) (1,1);
-BinaryEdgeClass IsIncDirectionOf: Greql2Aggregation from IncidenceDirection role direction (1,1) (1,1) to SimpleIncidencePathDescription (1,*) (1,1);
-BinaryEdgeClass IsEdgeExprOf: Greql2Aggregation from Expression role edgeExpr (1,1) (1,1) to EdgePathDescription role parentEdgePathDescr (0,*) (1,1);
-BinaryEdgeClass IsEdgeRestrOf: Greql2Aggregation from EdgeRestriction role edgeRestr (0,*) (1,1) to PrimaryPathDescription role restrictedPathDescription (0,*) (1,1);
-BinaryEdgeClass IsEndRestrictionOf: Greql2Aggregation from ElementRestriction role endRestriction (0,1) (1,1) to PathDescription (0,*) (1,1);
-BinaryEdgeClass IsIncRestrOf: Greql2Aggregation from IncidenceRestriction role incRestr (0,*) (1,1) to SimpleIncidencePathDescription role restrictedIncidencePathDescription (0,*) (1,1);
-BinaryEdgeClass IsExponentOf: Greql2Aggregation from IntLiteral role exponent (1,1) (1,1) to ExponentiatedPathDescription (0,*) (1,1);
-BinaryEdgeClass IsExponentiatedPathOf: IsPathDescriptionOf from PathDescription role exponentiatedPath (1,1) (1,1) to ExponentiatedPathDescription role parentExponentiatedPathDescr (0,*) (1,1);
-BinaryEdgeClass IsExprOf:Greql2Aggregation from Expression role expr (1,1) (1,1) to Definition (0,*) (1,1);
-BinaryEdgeClass IsExpressionOfRestriction: Greql2Aggregation from Expression role expression (1,*) (1,1) to ElementRestriction (0,*) (1,1);
-BinaryEdgeClass IsFalseExprOf: Greql2Aggregation from Expression role falseExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
-BinaryEdgeClass IsFirstValueOf: Greql2Aggregation from Expression role firstValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
-BinaryEdgeClass IsFunctionIdOf: Greql2Aggregation from FunctionId role functionId (1,1) (1,1)  to FunctionApplication role functionApplication (1,*) (1,1);
-BinaryEdgeClass IsGoalRestrOf: Greql2Aggregation from Expression role goalRestr (0,1) (1,1) to PathDescription role goalRestrPathDescr (0,*) (1,1);
 BinaryEdgeClass IsIdOf: Greql2Aggregation from Identifier role identifier (0,1) (1,1) to Greql2Expression (0,*) (1,1);
-BinaryEdgeClass IsIdOfNestedSubgraphDefinition: Greql2Aggregation from Identifier role nestedIdent (1,*) (1,1) to NestedSubgraphDefinition (1,1) (1,1);
-BinaryEdgeClass IsIdOfPartialGraphDefinition: Greql2Aggregation from IntLiteral role partialIdent (1,*) (1,1) to PartialSubgraphDefinition (1,1) (1,1);
-BinaryEdgeClass IsIntermediateVertexOf: Greql2Aggregation from Expression role intermediateVertex (1,1) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);
-BinaryEdgeClass IsIteratedPathOf: IsPathDescriptionOf from PathDescription role iteratedPath (1,1) (1,1) to IteratedPathDescription (0,*) (1,1);
-BinaryEdgeClass IsLastValueOf: Greql2Aggregation from Expression role lastValue (1,1) (1,1) to ListRangeConstruction (0,*) (1,1);
-BinaryEdgeClass IsOptionalPathOf: IsPathDescriptionOf from PathDescription role optionalPath (1,1) (1,1) to OptionalPathDescription (0,*) (1,1);
-BinaryEdgeClass IsPartOf: Greql2Aggregation from Expression role part (0,*) (1,1) to ValueConstruction (0,*) (1,1);
-BinaryEdgeClass IsPathOf: Greql2Aggregation from Expression role path (1,1) (1,1) to PathExpression (0,*) (1,1);
-BinaryEdgeClass IsQuantifiedDeclOf: Greql2Aggregation from Declaration role quantifiedDecl (1,1) (1,1) to QuantifiedExpression (0,1) (1,1);
-BinaryEdgeClass IsQuantifierOf: Greql2Aggregation from Quantifier role quantifier (1,1) (1,1) to QuantifiedExpression (1,*) (1,1);
-BinaryEdgeClass IsQueryExprOf: Greql2Aggregation from Expression role queryExpr (1,1) (1,1) to Greql2Expression (0,*) (1,1);
-BinaryEdgeClass IsRecordElementOf: Greql2Aggregation from RecordElement role recordElement (1,*) (1,1) to RecordConstruction (1,*) (1,1);
-BinaryEdgeClass IsRecordExprOf: Greql2Aggregation from Expression role recordExpr (1,1) (1,1) to RecordElement (0,*) (1,1);
-BinaryEdgeClass IsRecordIdOf: Greql2Aggregation from RecordId role recordId (1,1) (1,1) to RecordElement (1,*) (1,1);
-BinaryEdgeClass IsRoleIdOf: Greql2Aggregation from RoleId role roleId (0,*) (1,1) to EdgeRestriction role edgeRestrWithRoleId (1,*) (1,1);
-BinaryEdgeClass IsBooleanPredicateOfEdgeRestriction: Greql2Aggregation from Expression role booleanPredicate (0,1) (1,1) to EdgeRestriction (0,1) (1,1);
-BinaryEdgeClass IsRowHeaderExprOf: Greql2Aggregation from Expression role rowHeaderExpr (0,*) (1,1) to TableComprehension (0,*) (1,1);
-BinaryEdgeClass IsSequenceElementOf: IsPathDescriptionOf from PathDescription role sequenceElement (2,*) (1,1) to SequentialPathDescription (0,*) (1,1);
-BinaryEdgeClass IsSimpleDeclOf: Greql2Aggregation from SimpleDeclaration role simpleDecl (1,*) (1,1) to Declaration role parentDeclaration (1,1) (1,1);
-BinaryEdgeClass IsStartExprOf: Greql2Aggregation from Expression role startExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
-BinaryEdgeClass IsStartRestrictionOf: Greql2Aggregation from ElementRestriction role startRestriction (0,1) (1,1) to PathDescription (0,*) (1,1);
-BinaryEdgeClass IsSubPathOf: IsPathDescriptionOf from PathDescription role subPath (2,2) (1,1) to IntermediateVertexPathDescription (0,*) (1,1);
-BinaryEdgeClass IsSubgraphDefinitionOf: Greql2Aggregation from SubgraphDefinition role subgraphDefinition (1,1) (1,1) to SubgraphExpression (1,*) (1,1);
-BinaryEdgeClass IsSubgraphDefiningExpression : Greql2Aggregation from Expression role definingExpression (0,1) (1,1) to ExpressionDefinedSubgraph (0,*) (1,1);
-BinaryEdgeClass IsTableHeaderOf: Greql2Aggregation from Expression role tableHeader (0,*) (1,1) to ComprehensionWithTableHeader (0,*) (1,1);
-BinaryEdgeClass IsTargetExprOf: Greql2Aggregation from Expression role targetExpr (0,1) (1,1) to PathExpression (0,*) (1,1);
-BinaryEdgeClass IsKeyExprOfConstruction : Greql2Aggregation from Expression role keyExprOfConstr (0,*) (1,1) to MapConstruction (0,*) (1,1);
-BinaryEdgeClass IsValueExprOfConstruction : Greql2Aggregation from Expression role valueExprOfConstr (0,*) (1,1) to MapConstruction (0,*) (1,1);
-BinaryEdgeClass IsKeyExprOfComprehension : Greql2Aggregation from Expression role keyExprOfCompr (1,1) (1,1) to MapComprehension (0,*) (1,1);
-BinaryEdgeClass IsValueExprOfComprehension : Greql2Aggregation from Expression role valueExprOfCompr (1,1) (1,1) to MapComprehension (0,*) (1,1);
-BinaryEdgeClass IsTransposedPathOf: IsPathDescriptionOf from PathDescription role transposedPath (1,1) (1,1) to TransposedPathDescription (0,*) (1,1);
-BinaryEdgeClass IsTrueExprOf: Greql2Aggregation from Expression role trueExpr (1,1) (1,1) to ConditionalExpression (0,*) (1,1);
-BinaryEdgeClass IsTypeExprOfDeclaration: IsTypeExprOf from Expression role typeExprOfDecl (0,1) (1,1) to SimpleDeclaration (0,*) (1,1);
 BinaryEdgeClass IsTypeExprOfSubgraphDefinition: IsTypeExprOf from Expression role typeExprOfSubDef (0,1) (1,1) to ElementSubgraphDefinition (0,*) (1,1);
-BinaryEdgeClass IsTypeExprOfFunction: IsTypeExprOf from Expression role typeExprOfFunc (0,1) (1,1) to FunctionApplication (0,*) (1,1);
-BinaryEdgeClass IsTypeIdOf: Greql2Aggregation from TypeId role typeId (0,*) (1,1) to EdgeRestriction role parentEdgeRestrOfTypeId (0,*) (1,1);
-BinaryEdgeClass IsTypeIdOfRestriction: Greql2Aggregation from TypeId role restrTypeId (0,*) (1,1) to ElementTypeRestriction (0,*) (1,1);
-BinaryEdgeClass IsIncTypeIdOf: Greql2Aggregation from TypeId role incTypeId (0,*) (1,1) to IncidenceRestriction (0,*) (1,1);
-BinaryEdgeClass IsTypeRestrOfExpression: Greql2Aggregation from TypeId role typeRestrOfExpr (0,*) (1,1) to Expression (0,*) (1,1);
-BinaryEdgeClass IsTypeRestrOfSubgraph: Greql2Aggregation from TypeId role typeRestrOfSubgraph (0,*) (1,1)  to SubgraphDefinition (0,*) (1,1);
-BinaryEdgeClass IsVarOf: Greql2Aggregation from Variable role var (1,1) (1,1) to Definition (0,1) (1,1);
-abstract BinaryEdgeClass Greql2Aggregation from Greql2Vertex (0,*) (1,1) to Greql2Vertex (0,*) (1,1) { sourcePositions: List<SourcePosition> } ;
-abstract BinaryEdgeClass IsBoundExprOf: Greql2Aggregation from Expression (1,1) (1,1) to Greql2Vertex (0,*) (1,1);
-abstract BinaryEdgeClass IsTypeExprOf: Greql2Aggregation from Expression (0,*) (1,1) to Greql2Vertex (0,*) (1,1);
 
 
 
