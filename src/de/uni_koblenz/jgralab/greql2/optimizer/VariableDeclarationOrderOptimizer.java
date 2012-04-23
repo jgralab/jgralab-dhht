@@ -33,7 +33,6 @@
  */
 package de.uni_koblenz.jgralab.greql2.optimizer;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -178,7 +177,7 @@ public class VariableDeclarationOrderOptimizer extends OptimizerBase {
 		for (SimpleDeclaration sd : oldSDs) {
 			try {
 				marker.removeMark(sd);
-			} catch (RemoteException e) {
+			} catch (java.rmi.RemoteException e) {
 				throw new RuntimeException(e);
 			}
 			sd.delete();
