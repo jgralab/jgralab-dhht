@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
@@ -50,14 +51,26 @@ public class ElementRestrictionTransition extends Transition {
 		return false;
 	}
 
-	@Override
+	@Deprecated
 	public Vertex getNextVertex(Vertex v, Edge e) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	@Deprecated
 	public boolean consumesEdge() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean consumesIncidence() {
 		// TODO Auto-generated method stub
 		return false;
 	}

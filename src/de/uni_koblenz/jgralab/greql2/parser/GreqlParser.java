@@ -726,8 +726,8 @@ public class GreqlParser extends ParserHelper {
 				Identifier id = parseIdentifier();
 				if (!inPredicateMode()) {
 					nestedDefinition = graph.createNestedSubgraphDefinition();
-					IsIdOfNestedSubgraphDefinition idOf = graph
-							.createIsIdOfNestedSubgraphDefinition(id,
+					IsExprOfNestedSubgraphDefinition idOf = graph
+							.createIsExprOfNestedSubgraphDefinition(id,
 									nestedDefinition);
 				}
 			} else {

@@ -197,10 +197,6 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	}
 
 
-	@Override
-	public boolean accepts(GraphElement elem, Incidence inc) {
-		return false;
-	}
 
 	/**
 	 * returns the vertex of the datagraph which can be visited after this
@@ -219,6 +215,18 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return true;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

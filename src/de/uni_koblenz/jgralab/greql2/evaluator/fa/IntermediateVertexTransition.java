@@ -38,6 +38,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import org.pcollections.PCollection;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.serialising.GreqlSerializer;
@@ -123,7 +125,7 @@ public class IntermediateVertexTransition extends Transition {
 	 * 
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
-	@Override
+	@Deprecated
 	public boolean accepts(Vertex v, Edge e) {
 		// checks if a intermediateVertexExpression exists and if the end-vertex
 		// of e is part of the result of this expression
@@ -146,7 +148,7 @@ public class IntermediateVertexTransition extends Transition {
 	 * returns the vertex of the datagraph which can be visited after this
 	 * transition has fired. This is the vertex itself
 	 */
-	@Override
+	@Deprecated
 	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
@@ -161,5 +163,23 @@ public class IntermediateVertexTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return false;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

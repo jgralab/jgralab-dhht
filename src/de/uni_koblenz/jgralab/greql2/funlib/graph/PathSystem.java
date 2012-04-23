@@ -153,8 +153,7 @@ public class PathSystem extends Function {
 
 			for (Incidence inc : currentVertex.getIncidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = currentTransition.getNextElement(
-							currentVertex, inc);
+					Vertex nextVertex = null; //currentTransition.getNextElement(currentVertex, inc);
 
 					if (!isMarked(marker, nextVertex,
 							currentTransition.endState)) {

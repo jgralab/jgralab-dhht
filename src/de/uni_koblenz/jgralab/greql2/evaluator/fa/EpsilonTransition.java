@@ -36,6 +36,8 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 
 /**
@@ -92,7 +94,7 @@ public class EpsilonTransition extends Transition {
 	 * This method should not be called because all epsilon-transitions should
 	 * be eliminated before the pathsearch strarts
 	 */
-	@Override
+	@Deprecated
 	public boolean accepts(Vertex v, Edge e) {
 		throw new UnsupportedOperationException(
 				"EpsilonTransition.accepts(...) has been called. That should not happen, there should be no epsilon-transitions in the DFA used for path search. Check the DFA-Constructor");
@@ -102,7 +104,7 @@ public class EpsilonTransition extends Transition {
 	 * returns the vertex of the datagraph which can be visited after this
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
-	@Override
+	@Deprecated
 	public Vertex getNextElement(Vertex v, Edge e) {
 		throw new UnsupportedOperationException(
 				"EpsilonTransition.getNextElement(...) has been called. That should not happen, there should be no epsilon-transitions in the DFA used for path search. Check the DFA-Constructor");
@@ -125,5 +127,23 @@ public class EpsilonTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return false;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -219,7 +219,7 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	}
 
 
-	@Override
+	@Deprecated
 	public boolean accepts(GraphElement elem, Incidence inc) {
 		return false;
 	}
@@ -241,6 +241,18 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return true;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

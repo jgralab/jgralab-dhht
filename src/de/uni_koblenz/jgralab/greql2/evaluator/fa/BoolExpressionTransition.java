@@ -38,6 +38,8 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisVertexEvaluator;
@@ -138,7 +140,7 @@ public class BoolExpressionTransition extends Transition {
 	 * 
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
-	@Override
+	@Deprecated
 	public boolean accepts(Vertex v, Edge e) {
 		if (thisVertexEvaluator != null) {
 			thisVertexEvaluator.setValue(v);
@@ -150,7 +152,7 @@ public class BoolExpressionTransition extends Transition {
 		return false;
 	}
 
-	@Override
+	@Deprecated
 	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
@@ -165,5 +167,23 @@ public class BoolExpressionTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return false;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
