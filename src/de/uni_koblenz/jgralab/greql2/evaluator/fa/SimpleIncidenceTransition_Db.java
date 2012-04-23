@@ -38,7 +38,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import com.sun.tools.internal.ws.wscompile.Options.Target;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
