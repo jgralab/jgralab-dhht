@@ -1,6 +1,5 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import sun.org.mozilla.javascript.internal.EvaluatorException;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
@@ -25,8 +24,7 @@ public class KappaSubgraphDefinitionEvaluator extends
 	@Override
 	public Object evaluate() throws QuerySourceException {
 		if (vertex == null) {
-			throw new EvaluatorException(
-					"No Subgraph-Definition via kappa found.");
+			return null;
 		}
 		int kappa = ((KappaSubgraphDefinition) vertex).get_kappa();
 		return graph.getView(kappa);

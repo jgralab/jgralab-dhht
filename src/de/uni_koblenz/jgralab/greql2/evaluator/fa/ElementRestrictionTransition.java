@@ -4,11 +4,17 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 public class ElementRestrictionTransition extends Transition {
 
-	protected ElementRestrictionTransition(Transition t, boolean addToStates) {
+	private TypeCollection types = null;
+
+	protected ElementRestrictionTransition(Transition t, boolean addToStates,
+			TypeCollection types) {
 		super(t, addToStates);
+		this.types = types;
 	}
 
 	@Override
@@ -25,7 +31,7 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public Transition copy(boolean addToStates) {
-		return new ElementRestrictionTransition(this, addToStates);
+		return new ElementRestrictionTransition(this, addToStates, types);
 	}
 
 	@Override
@@ -53,14 +59,26 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public boolean consumesIncidence() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
+		boolean typeAccepted = false;
+
+		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
+			if (((TypedElementClass<?, ?>) e.getType()) == eClass) {
+				typeAccepted = true;
+				break;
+			}
+		}
+		if (!typeAccepted) {
+			return false;
+		}
+
+		// TODO jtheegarten: check for concrete elements defined as the
+		// restriction, but might be better as its own transition
+		return true;
 	}
 
 	@Override
