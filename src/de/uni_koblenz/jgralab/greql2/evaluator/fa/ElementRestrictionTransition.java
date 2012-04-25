@@ -64,6 +64,10 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		return accepts(e);
+	}
+
+	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
