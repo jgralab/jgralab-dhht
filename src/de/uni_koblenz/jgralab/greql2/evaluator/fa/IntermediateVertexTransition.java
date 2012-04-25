@@ -166,19 +166,14 @@ public class IntermediateVertexTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(Vertex v, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

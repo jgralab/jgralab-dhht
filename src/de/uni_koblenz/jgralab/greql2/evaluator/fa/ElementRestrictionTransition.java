@@ -39,18 +39,6 @@ public class ElementRestrictionTransition extends Transition {
 		return false;
 	}
 
-	@Override
-	public boolean accepts(Vertex v, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	@Deprecated
 	public Vertex getNextVertex(Vertex v, Edge e) {
 		// TODO Auto-generated method stub
@@ -64,15 +52,22 @@ public class ElementRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean consumesIncidence() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -40,7 +40,6 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.AttributedElementClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
@@ -174,20 +173,15 @@ public class VertexTypeRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(Vertex v, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

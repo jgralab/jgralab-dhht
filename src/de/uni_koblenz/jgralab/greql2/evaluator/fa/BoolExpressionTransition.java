@@ -110,14 +110,16 @@ public class BoolExpressionTransition extends Transition {
 	 * Creates a new transition from start state to end state.
 	 */
 	public BoolExpressionTransition(State start, State end,
-			VertexEvaluator boolEval, ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
+			VertexEvaluator boolEval,
+			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end);
 		boolExpressionEvaluator = boolEval;
 		Vertex v;
 		try {
 			v = graphMarker.getGraph().getFirstVertex(ThisVertex.class);
 			if (v != null) {
-				thisVertexEvaluator = (ThisVertexEvaluator) graphMarker.getMark(v);
+				thisVertexEvaluator = (ThisVertexEvaluator) graphMarker
+						.getMark(v);
 			}
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
@@ -170,19 +172,14 @@ public class BoolExpressionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(Vertex v, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

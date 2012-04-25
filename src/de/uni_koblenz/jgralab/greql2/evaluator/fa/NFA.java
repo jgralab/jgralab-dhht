@@ -313,10 +313,10 @@ public class NFA extends FiniteAutomaton {
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
 		nfa.finalStates.get(0).inTransitions.clear();
-		SimpleTransition t = new EdgeTransition(nfa.initialState,
-				nfa.finalStates.get(0), dir, typeCollection, roles, edgeEval,
-				predicateEvaluator, marker);
-		nfa.transitionList.add(t);
+		// SimpleTransition t = new EdgeTransition(nfa.initialState,
+		// nfa.finalStates.get(0), dir, typeCollection, roles, edgeEval,
+		// predicateEvaluator, marker);
+		// nfa.transitionList.add(t);
 		nfa.updateStateAttributes();
 		return nfa;
 	}
@@ -333,10 +333,10 @@ public class NFA extends FiniteAutomaton {
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
 		nfa.finalStates.get(0).inTransitions.clear();
-		SimpleTransition t = new SimpleTransition(nfa.initialState,
-				nfa.finalStates.get(0), dir, typeCollection, roles,
-				predicateEvaluator, marker);
-		nfa.transitionList.add(t);
+		// SimpleTransition t = new SimpleTransition(nfa.initialState,
+		// nfa.finalStates.get(0), dir, typeCollection, roles,
+		// predicateEvaluator, marker);
+		// nfa.transitionList.add(t);
 		nfa.updateStateAttributes();
 		return nfa;
 	}

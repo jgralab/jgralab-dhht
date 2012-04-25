@@ -38,17 +38,14 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * This transition is used only in the GReQL 2 Java Code Generator as long 
@@ -59,7 +56,7 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public class AggregationIncidenceTransition_Db extends Transition {
 
 	protected VertexEvaluator predicateEvaluator;
-	
+
 	public VertexEvaluator getPredicateEvaluator() {
 		return predicateEvaluator;
 	}
@@ -94,17 +91,19 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	public boolean equalSymbol(Transition t) {
 		if (t instanceof SimpleIncidenceTransition_Db) {
 			SimpleIncidenceTransition_Db st = (SimpleIncidenceTransition_Db) t;
-			if ((typeCollection == st.getTypeCollection()) && (predicateEvaluator == st.getPredicateEvaluator()))
-					return true;
-		}			
-		return  false;
+			if ((typeCollection == st.getTypeCollection())
+					&& (predicateEvaluator == st.getPredicateEvaluator())) {
+				return true;
+			}
+		}
+		return false;
 	}
-
 
 	/**
 	 * Copy-constructor, creates a copy of the given transition
 	 */
-	protected AggregationIncidenceTransition_Db(AggregationIncidenceTransition_Db t, boolean addToStates) {
+	protected AggregationIncidenceTransition_Db(
+			AggregationIncidenceTransition_Db t, boolean addToStates) {
 		super(t, addToStates);
 		typeCollection = t.typeCollection;
 		predicateEvaluator = t.predicateEvaluator;
@@ -132,11 +131,11 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	 *            The direction of the accepted edges, may be EdeDirection.IN,
 	 *            EdgeDirection.OUT or EdgeDirection.ANY
 	 */
-	public AggregationIncidenceTransition_Db(State start, State end,  TypeCollection typeColl) {
+	public AggregationIncidenceTransition_Db(State start, State end,
+			TypeCollection typeColl) {
 		super(start, end);
 		typeCollection = typeColl;
 	}
-	
 
 	/**
 	 * Creates a new transition from start state to end state. The Transition
@@ -157,7 +156,7 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	 *            The set of accepted edge role names, or null if any role is
 	 *            accepted
 	 */
-	public AggregationIncidenceTransition_Db(State start, State end, 
+	public AggregationIncidenceTransition_Db(State start, State end,
 			TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator predicateEvaluator,
 			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
@@ -196,14 +195,13 @@ public class AggregationIncidenceTransition_Db extends Transition {
 		return false;
 	}
 
-
-
 	/**
-	 * returns the vertex of the datagraph which can be visited after this
-	 * transition has fired. This is the vertex at the end of the edge
+	 * returns the element of the datagraph which can be visited after this
+	 * transition has fired. This is the element at the end of the incidence
 	 */
 	@Override
-	public Vertex getNextElement(GraphElement elem, Incidence inc) {
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		return inc.getThat();
 	}
 
@@ -218,13 +216,7 @@ public class AggregationIncidenceTransition_Db extends Transition {
 	}
 
 	@Override
-	public boolean accepts(Vertex v, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean accepts(Edge e, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}

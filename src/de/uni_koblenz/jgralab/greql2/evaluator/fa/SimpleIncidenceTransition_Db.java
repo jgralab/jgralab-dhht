@@ -38,8 +38,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.rmi.RemoteException;
 import java.util.Set;
 
-
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
@@ -49,7 +47,6 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * This transition is used only in the GReQL 2 Java Code Generator as long 
@@ -60,7 +57,7 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public class SimpleIncidenceTransition_Db extends Transition {
 
 	protected VertexEvaluator predicateEvaluator;
-	
+
 	public VertexEvaluator getPredicateEvaluator() {
 		return predicateEvaluator;
 	}
@@ -75,13 +72,12 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	public TypeCollection getTypeCollection() {
 		return typeCollection;
 	}
-	
+
 	/**
 	 * this transition may accept edges in direction in, out or any
 	 */
 	protected IncDirection validDirection;
-	
-	
+
 	public IncDirection getAllowedDirection() {
 		return validDirection;
 	}
@@ -105,16 +101,20 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	public boolean equalSymbol(Transition t) {
 		if (t instanceof SimpleIncidenceTransition_Db) {
 			SimpleIncidenceTransition_Db st = (SimpleIncidenceTransition_Db) t;
-			if ((validDirection == st.getAllowedDirection()) && (typeCollection == st.getTypeCollection()) && (predicateEvaluator == st.getPredicateEvaluator()))
-					return true;
-		}			
-		return  false;
+			if ((validDirection == st.getAllowedDirection())
+					&& (typeCollection == st.getTypeCollection())
+					&& (predicateEvaluator == st.getPredicateEvaluator())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
 	 * Copy-constructor, creates a copy of the given transition
 	 */
-	protected SimpleIncidenceTransition_Db(SimpleIncidenceTransition_Db t, boolean addToStates) {
+	protected SimpleIncidenceTransition_Db(SimpleIncidenceTransition_Db t,
+			boolean addToStates) {
 		super(t, addToStates);
 		validDirection = t.validDirection;
 		typeCollection = new TypeCollection(t.typeCollection);
@@ -143,18 +143,19 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 *            The direction of the accepted edges, may be EdeDirection.IN,
 	 *            EdgeDirection.OUT or EdgeDirection.ANY
 	 */
-	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir, TypeCollection typeColl) {
+	public SimpleIncidenceTransition_Db(State start, State end,
+			IncDirection dir, TypeCollection typeColl) {
 		super(start, end);
 		validDirection = dir;
 		typeCollection = typeColl;
-		
+
 	}
-	
+
 	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir) {
 		super(start, end);
 		validDirection = dir;
 		typeCollection = null;
-		
+
 	}
 
 	/**
@@ -176,8 +177,8 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 *            The set of accepted edge role names, or null if any role is
 	 *            accepted
 	 */
-	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir,
-			TypeCollection typeCollection, Set<String> roles,
+	public SimpleIncidenceTransition_Db(State start, State end,
+			IncDirection dir, TypeCollection typeCollection, Set<String> roles,
 			VertexEvaluator predicateEvaluator,
 			ObjectGraphMarker<Vertex, VertexEvaluator> graphMarker) {
 		super(start, end);
@@ -217,7 +218,7 @@ public class SimpleIncidenceTransition_Db extends Transition {
 		return false;
 	}
 
-
+	@Override
 	@Deprecated
 	public boolean accepts(GraphElement elem, Incidence inc) {
 		return false;
@@ -240,18 +241,6 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return true;
-	}
-
-	@Override
-	public boolean accepts(Vertex v, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

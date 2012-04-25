@@ -49,7 +49,6 @@ import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.IncidenceType;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
@@ -251,18 +250,19 @@ public class AggregationTransition extends Transition {
 		if (e == null) {
 			return false;
 		}
-		if (e.isBinary())
+		if (e.isBinary()) {
 			return false;
-		
-//		if (aggregateFrom) {
-//			if ( inc.getThatSemantics() == IncidenceType.EDGE) {
-//				return false;
-//			}
-//		} else {
-//			if (inc.getThisSemantics() == IncidenceType.EDGE) {
-//				return false;
-//			}
-//		}
+		}
+
+		// if (aggregateFrom) {
+		// if ( inc.getThatSemantics() == IncidenceType.EDGE) {
+		// return false;
+		// }
+		// } else {
+		// if (inc.getThisSemantics() == IncidenceType.EDGE) {
+		// return false;
+		// }
+		// }
 
 		Set<String> validEdgeRoles = validToEdgeRoles;
 		boolean checkToEdgeRoles = true;
@@ -280,11 +280,11 @@ public class AggregationTransition extends Transition {
 		if (validEdgeRoles != null) {
 			BinaryEdgeClass ec = (BinaryEdgeClass) e.getType();
 			Set<String> roles = null;
-//			if (e.isNormal() == checkToEdgeRoles) {
-//				roles = ec.getToIncidenceClass().getAllRoles();
-//			} else {
-//				roles = ec.getFromIncidenceClass().getAllRoles();
-//			}
+			// if (e.isNormal() == checkToEdgeRoles) {
+			// roles = ec.getToIncidenceClass().getAllRoles();
+			// } else {
+			// roles = ec.getFromIncidenceClass().getAllRoles();
+			// }
 			for (String role : roles) {
 				if (validEdgeRoles.contains(role)) {
 					acceptedByRole = true;
@@ -325,7 +325,8 @@ public class AggregationTransition extends Transition {
 	 */
 	@Override
 	public Vertex getNextElement(GraphElement elem, Incidence inc) {
-		return (Vertex) ((elem instanceof Edge) ? inc.getVertex() : inc.getEdge());
+		return (Vertex) ((elem instanceof Edge) ? inc.getVertex() : inc
+				.getEdge());
 	}
 
 	@Override
@@ -351,14 +352,9 @@ public class AggregationTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(Vertex v, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	@Override
-	public boolean accepts(Edge e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }
