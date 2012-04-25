@@ -40,6 +40,7 @@ import java.util.Set;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
@@ -298,19 +299,19 @@ public class SimpleTransition extends Transition {
 
 		// checks if a role restriction is set and if e has the right role
 		if (validEdgeRoles != null) {
-			EdgeClass ec = e.getType();
-			Set<String> roles = null;
-			if (e.isNormal() == checkToEdgeRoles) {
-				roles = ec.getTo().getAllRoles();
-			} else {
-				roles = ec.getFrom().getAllRoles();
-			}
-			for (String role : roles) {
-				if (validEdgeRoles.contains(role)) {
-					acceptedByRole = true;
-					break;
-				}
-			}
+//			EdgeClass ec = e.getType();
+//			Set<String> roles = null;
+//			if (e.isNormal() == checkToEdgeRoles) {
+//				roles = ec.getTo().getAllRoles();
+//			} else {
+//				roles = ec.getFrom().getAllRoles();
+//			}
+//			for (String role : roles) {
+//				if (validEdgeRoles.contains(role)) {
+//					acceptedByRole = true;
+//					break;
+//				}
+//			}
 		}
 		if (rolesOnly) {
 			if (!acceptedByRole) {
@@ -318,18 +319,18 @@ public class SimpleTransition extends Transition {
 			}
 		} else {
 			if (!acceptedByRole) {
-				EdgeClass edgeClass = e.getType();
-				if (!typeCollection.acceptsType(edgeClass)) {
-					return false;
-				}
+//				EdgeClass edgeClass = e.getType();
+//				if (!typeCollection.acceptsType(edgeClass)) {
+//					return false;
+//				}
 			}
 		}
 
 		// checks if a boolean expression exists and if it evaluates to true
 		if (predicateEvaluator != null) {
-			if (thisEdgeEvaluator != null) {
-				thisEdgeEvaluator.setValue(e);
-			}
+//			if (thisEdgeEvaluator != null) {
+//				thisEdgeEvaluator.setValue(e);
+//			}
 			Object res = predicateEvaluator.getResult();
 			if (res instanceof Boolean) {
 				return (Boolean) res;
@@ -343,9 +344,9 @@ public class SimpleTransition extends Transition {
 	 * returns the vertex of the datagraph which can be visited after this
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
-	@Override
+	@Deprecated
 	public Vertex getNextElement(Vertex v, Edge e) {
-		return e.getThat();
+		return null;// e.getThat();
 	}
 
 	@Override
@@ -369,6 +370,18 @@ public class SimpleTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return true;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

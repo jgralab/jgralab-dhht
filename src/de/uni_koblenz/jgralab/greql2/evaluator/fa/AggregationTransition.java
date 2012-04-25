@@ -245,7 +245,7 @@ public class AggregationTransition extends Transition {
 	 * 
 	 * @see greql2.evaluator.fa.Transition#accepts(jgralab.Vertex, jgralab.Edge)
 	 */
-	@Override
+	@Deprecated
 	public boolean accepts(Vertex vertex, Edge e) {
 		Incidence inc;
 		if (e == null) {
@@ -254,15 +254,15 @@ public class AggregationTransition extends Transition {
 		if (e.isBinary())
 			return false;
 		
-		if (aggregateFrom) {
-			if ( inc.getThatSemantics() == IncidenceType.EDGE) {
-				return false;
-			}
-		} else {
-			if (inc.getThisSemantics() == IncidenceType.EDGE) {
-				return false;
-			}
-		}
+//		if (aggregateFrom) {
+//			if ( inc.getThatSemantics() == IncidenceType.EDGE) {
+//				return false;
+//			}
+//		} else {
+//			if (inc.getThisSemantics() == IncidenceType.EDGE) {
+//				return false;
+//			}
+//		}
 
 		Set<String> validEdgeRoles = validToEdgeRoles;
 		boolean checkToEdgeRoles = true;
@@ -280,11 +280,11 @@ public class AggregationTransition extends Transition {
 		if (validEdgeRoles != null) {
 			BinaryEdgeClass ec = (BinaryEdgeClass) e.getType();
 			Set<String> roles = null;
-			if (e.isNormal() == checkToEdgeRoles) {
-				roles = ec.getToIncidenceClass().getAllRoles();
-			} else {
-				roles = ec.getFromIncidenceClass().getAllRoles();
-			}
+//			if (e.isNormal() == checkToEdgeRoles) {
+//				roles = ec.getToIncidenceClass().getAllRoles();
+//			} else {
+//				roles = ec.getFromIncidenceClass().getAllRoles();
+//			}
 			for (String role : roles) {
 				if (validEdgeRoles.contains(role)) {
 					acceptedByRole = true;
@@ -348,5 +348,17 @@ public class AggregationTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return true;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

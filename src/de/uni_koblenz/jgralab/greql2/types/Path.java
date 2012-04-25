@@ -36,18 +36,19 @@ public class Path {
 		for (int i = vs.size() - 1; i >= 0; --i) {
 			vs = vs.plus(vertices.get(i));
 		}
-		for (int i = es.size() - 1; i >= 0; --i) {
-			es = es.plus(edges.get(i).getReversedEdge());
-		}
+//		for (int i = es.size() - 1; i >= 0; --i) {
+//			es = es.plus(edges.get(i).getReversedEdge());
+//		}
 		return new Path(vs, es);
 	}
 
 	public Path append(Edge e) {
-		if (e.getThis() != getEndVertex()) {
-			throw new IllegalArgumentException("Can't append " + e
-					+ " to this Path (e.getThis() !=" + getEndVertex() + ")");
-		}
-		return new Path(vertices.plus(e.getThat()), edges.plus(e));
+//		if (e.getThis() != getEndVertex()) {
+//			throw new IllegalArgumentException("Can't append " + e
+//					+ " to this Path (e.getThis() !=" + getEndVertex() + ")");
+//		}
+//		return new Path(vertices.plus(e.getThat()), edges.plus(e));
+		return null;
 	}
 
 	public Vertex getStartVertex() {
@@ -73,12 +74,12 @@ public class Path {
 	public boolean isTrail() {
 		HashSet<Vertex> h = new HashSet<Vertex>();
 		h.add(getStartVertex());
-		for (Edge e : edges) {
-			if (h.contains(e.getThat())) {
-				return false;
-			}
-			h.add(e.getThat());
-		}
+//		for (Edge e : edges) {
+//			if (h.contains(e.getThat())) {
+//				return false;
+//			}
+//			h.add(e.getThat());
+//		}
 		return true;
 	}
 
@@ -156,9 +157,9 @@ public class Path {
 			sb.append("empty");
 		} else {
 			sb.append(vertices.get(0));
-			for (Edge e : edges) {
-				sb.append(" ").append(e).append(" ").append(e.getThat());
-			}
+//			for (Edge e : edges) {
+//				sb.append(" ").append(e).append(" ").append(e.getThat());
+//			}
 		}
 		return sb.toString();
 	}

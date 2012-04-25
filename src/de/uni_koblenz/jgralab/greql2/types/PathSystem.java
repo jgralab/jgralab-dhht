@@ -392,22 +392,22 @@ public class PathSystem {
 			return -1;
 		}
 		int degree = 0;
-		boolean countIncomingEdges = direction == EdgeDirection.IN
-				|| direction == EdgeDirection.INOUT;
-		boolean countOutgoingEdges = direction == EdgeDirection.OUT
-				|| direction == EdgeDirection.INOUT;
+//		boolean countIncomingEdges = direction == EdgeDirection.IN
+//				|| direction == EdgeDirection.INOUT;
+//		boolean countOutgoingEdges = direction == EdgeDirection.OUT
+//				|| direction == EdgeDirection.INOUT;
 
-		for (Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
-				.entrySet()) {
-			if (isAcceptedByTypeCollection(typeCol, entry)) {
-				if (countOutgoingEdges && isOutgoingEdge(entry, vertex)) {
-					degree++;
-				}
-				if (countIncomingEdges && isIncommingEdge(entry, vertex)) {
-					degree++;
-				}
-			}
-		}
+//		for (Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
+//				.entrySet()) {
+//			if (isAcceptedByTypeCollection(typeCol, entry)) {
+//				if (countOutgoingEdges && isOutgoingEdge(entry, vertex)) {
+//					degree++;
+//				}
+//				if (countIncomingEdges && isIncommingEdge(entry, vertex)) {
+//					degree++;
+//				}
+//			}
+//		}
 		return degree;
 	}
 
@@ -493,61 +493,63 @@ public class PathSystem {
 				if (edge == null) {
 					continue;
 				}
-				switch (direction) {
-				case EDGE_TO_VERTEX:
-					if (edge.isNormal()) {
-						addEdgeToResult(resultSet, edge, vertex);
-					}
-					break;
-				case VERTEX_TO_EDGE:
-					if (!edge.isNormal()) {
-						addEdgeToResult(resultSet, edge, vertex);
-					}
-					break;
-				case BOTH:
-					addEdgeToResult(resultSet, edge, vertex);
-					break;
-				default:
-					throw new RuntimeException(
-							"FIXME: Incomplete switch statement in JValuePathSystem");
-				}
+//				switch (direction) {
+//				case EDGE_TO_VERTEX:
+//					if (edge.isNormal()) {
+//						addEdgeToResult(resultSet, edge, vertex);
+//					}
+//					break;
+//				case VERTEX_TO_EDGE:
+//					if (!edge.isNormal()) {
+//						addEdgeToResult(resultSet, edge, vertex);
+//					}
+//					break;
+//				case BOTH:
+//					addEdgeToResult(resultSet, edge, vertex);
+//					break;
+//				default:
+//					throw new RuntimeException(
+//							"FIXME: Incomplete switch statement in JValuePathSystem");
+//				}
 			} else if (entry.getValue().getParentVertex() == vertex) {
 				Edge edge = entry.getValue().getParentEdge();
 				if (edge == null) {
 					continue;
 				}
-				switch (direction) {
-				case IN:
-					if (!edge.isNormal()) {
-						resultSet = addEdgeToResult(resultSet, edge, vertex);
-					}
-					break;
-				case OUT:
-					if (edge.isNormal()) {
-						resultSet = addEdgeToResult(resultSet, edge, vertex);
-					}
-					break;
-				case INOUT:
-					resultSet = addEdgeToResult(resultSet, edge, vertex);
-					break;
-				default:
-					throw new RuntimeException(
-							"FIXME: Incomplete switch statement in JValuePathSystem");
-				}
+//				switch (direction) {
+//				case IN:
+//					if (!edge.isNormal()) {
+//						resultSet = addEdgeToResult(resultSet, edge, vertex);
+//					}
+//					break;
+//				case OUT:
+//					if (edge.isNormal()) {
+//						resultSet = addEdgeToResult(resultSet, edge, vertex);
+//					}
+//					break;
+//				case INOUT:
+//					resultSet = addEdgeToResult(resultSet, edge, vertex);
+//					break;
+//				default:
+//					throw new RuntimeException(
+//							"FIXME: Incomplete switch statement in JValuePathSystem");
+//				}
 			}
 		}
-		return resultSet;
+		return null;
+		//return resultSet;
 	}
 
 	private PSet<Edge> addEdgeToResult(PSet<Edge> resultSet, Edge edge,
 			Vertex context) {
-		if (context == edge.getAlpha()) {
-			return resultSet.plus(edge.getNormalEdge());
-		} else if (context == edge.getOmega()) {
-			return resultSet.plus(edge.getNormalEdge().getReversedEdge());
-		} else {
-			return resultSet;
-		}
+//		if (context == edge.getAlpha()) {
+//			return resultSet.plus(edge.getNormalEdge());
+//		} else if (context == edge.getOmega()) {
+//			return resultSet.plus(edge.getNormalEdge().getReversedEdge());
+//		} else {
+//			return resultSet;
+//		}
+		return null;
 	}
 
 	/**
@@ -639,16 +641,16 @@ public class PathSystem {
 	public Path extractPath(PathSystemKey key) {
 		assertFinished();
 		Path path = Path.start(key.getVertex());
-		while (key != null) {
-			PathSystemEntry entry = keyToEntryMap.get(key);
-			if (entry.getParentEdge() != null) {
-				path = path.append(entry.getParentEdge().getReversedEdge());
-				key = new PathSystemKey(entry.getParentVertex(),
-						entry.getParentStateNumber());
-			} else {
-				key = null;
-			}
-		}
+//		while (key != null) {
+//			PathSystemEntry entry = keyToEntryMap.get(key);
+//			if (entry.getParentEdge() != null) {
+//				path = path.append(entry.getParentEdge().getReversedEdge());
+//				key = new PathSystemKey(entry.getParentVertex(),
+//						entry.getParentStateNumber());
+//			} else {
+//				key = null;
+//			}
+//		}
 		return path.reverse();
 	}
 

@@ -95,15 +95,15 @@ public class PathSystemEntry {
 	 */
 	@Override
 	public String toString() {
-		if (getParentVertex() != null) {
-			return "(V: " + getParentVertex().getId() + ", S: "
-					+ getParentStateNumber() + ", E: "
-					+ getParentEdge().getId() + " ,D: " + getDistanceToRoot()
-					+ ")";
-		} else {
-			return "(RootVertex Distance: " + getDistanceToRoot() + ")";
-		}
-
+//		if (getParentVertex() != null) {
+//			return "(V: " + getParentVertex().getId() + ", S: "
+//					+ getParentStateNumber() + ", E: "
+//					+ getParentEdge().getId() + " ,D: " + getDistanceToRoot()
+//					+ ")";
+//		} else {
+//			return "(RootVertex Distance: " + getDistanceToRoot() + ")";
+//		}
+		return "";
 	}
 
 	/**

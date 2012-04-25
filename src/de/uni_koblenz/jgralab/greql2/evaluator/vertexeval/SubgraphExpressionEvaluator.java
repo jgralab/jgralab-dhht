@@ -108,7 +108,6 @@ public class SubgraphExpressionEvaluator extends
 					.getMark(defVertex);
 		}
 
-
 		// take restricted expression
 		if (constrainedExpressionEval == null) {
 			IsConstrainedExpressionOf_isConstrainedExpressionOf_omega isExprOn = vertex
@@ -120,8 +119,6 @@ public class SubgraphExpressionEvaluator extends
 		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
 		long subtree = subgraphDefinitionEval
 				.getCurrentSubtreeEvaluationCosts(graphSize)
-				+ constrainedExpressionEval
-						.getCurrentSubtreeEvaluationCosts(graphSize)
 				+ constrainedExpressionEval.getCurrentSubtreeEvaluationCosts(graphSize)
 				+ iteratedCosts;
 

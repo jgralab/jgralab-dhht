@@ -76,7 +76,8 @@ public class PathSystemKey {
 	 */
 	@Override
 	public String toString() {
-		return "(V: " + vertex.getId() + ", S: " + stateNumber + ")";
+		//return "(V: " + vertex.getId() + ", S: " + stateNumber + ")";
+		return "";
 	}
 
 	public Vertex getVertex() {

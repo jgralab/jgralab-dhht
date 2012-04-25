@@ -39,7 +39,6 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 
-
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
@@ -61,7 +60,7 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public class SimpleIncidenceTransition_Db extends Transition {
 
 	protected VertexEvaluator predicateEvaluator;
-
+	
 	public VertexEvaluator getPredicateEvaluator() {
 		return predicateEvaluator;
 	}
@@ -76,12 +75,13 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	public TypeCollection getTypeCollection() {
 		return typeCollection;
 	}
-
+	
 	/**
 	 * this transition may accept edges in direction in, out or any
 	 */
 	protected IncDirection validDirection;
-
+	
+	
 	public IncDirection getAllowedDirection() {
 		return validDirection;
 	}
@@ -147,14 +147,14 @@ public class SimpleIncidenceTransition_Db extends Transition {
 		super(start, end);
 		validDirection = dir;
 		typeCollection = typeColl;
-
+		
 	}
-
+	
 	public SimpleIncidenceTransition_Db(State start, State end, IncDirection dir) {
 		super(start, end);
 		validDirection = dir;
 		typeCollection = null;
-
+		
 	}
 
 	/**
@@ -216,6 +216,7 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	public boolean isEpsilon() {
 		return false;
 	}
+
 
 	@Deprecated
 	public boolean accepts(GraphElement elem, Incidence inc) {

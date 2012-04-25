@@ -85,8 +85,7 @@ public class IsReachable extends Function {
 			}
 			for (Incidence inc : currentEntry.vertex.getIncidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = currentTransition.getNextElement(
-							currentEntry.vertex, inc);
+					Vertex nextVertex = null; //currentTransition.getNextElement(currentEntry.vertex, inc);
 					boolean isMarked = markers[currentTransition.endState.number]
 							.isMarked(nextVertex);
 					boolean transitionIsPossible = currentTransition.accepts(

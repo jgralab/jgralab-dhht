@@ -36,6 +36,8 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.AttributedElementClass;
@@ -136,7 +138,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 *            the current vertex
 	 * @return true if the transition can fire with e, false otherwise
 	 */
-	@Override
+	@Deprecated
 	public boolean accepts(Vertex v, Edge e) {
 		VertexClass vertexClass = v.getType();
 		if (!typeCollection.acceptsType(vertexClass)) {
@@ -149,7 +151,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * returns the vertex of the datagraph which can be visited after this
 	 * transition has fired. This is the vertex itself
 	 */
-	@Override
+	@Deprecated
 	public Vertex getNextElement(Vertex v, Edge e) {
 		return v;
 	}
@@ -169,5 +171,23 @@ public class VertexTypeRestrictionTransition extends Transition {
 	@Override
 	public boolean consumesIncidence() {
 		return false;
+	}
+
+	@Override
+	public boolean accepts(Vertex v, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accepts(Edge e, Incidence i) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
