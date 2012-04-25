@@ -726,8 +726,8 @@ public class GreqlParser extends ParserHelper {
 				Identifier id = parseIdentifier();
 				if (!inPredicateMode()) {
 					nestedDefinition = graph.createNestedSubgraphDefinition();
-					IsIdOfNestedSubgraphDefinition idOf = graph
-							.createIsIdOfNestedSubgraphDefinition(id,
+					IsExprOfNestedSubgraphDefinition idOf = graph
+							.createIsExprOfNestedSubgraphDefinition(id,
 									nestedDefinition);
 				}
 			} else {
@@ -744,6 +744,8 @@ public class GreqlParser extends ParserHelper {
 	 * view of the graph, defined by a visibility-level (kappa). Any elements
 	 * with a kappa below the specified value will not be part of the context
 	 * for the evaluation.
+	 * 
+	 * KappaSubgraphDefinition = "kappa(" IntLiteral ")";
 	 * 
 	 * @return A KappaSubgraphDefinition-node
 	 */

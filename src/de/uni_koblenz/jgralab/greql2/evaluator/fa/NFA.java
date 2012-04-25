@@ -48,7 +48,6 @@ import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
-import de.uni_koblenz.jgralab.greql2.schema.IsBoundExprOf_isBoundExprOf_ComesFrom_Expression;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
@@ -323,10 +322,10 @@ public class NFA extends FiniteAutomaton {
 	}
 
 	/**
-	 * Constructs a NFA which accepts the given SimplePathDescription. The
+	 * Constructs a NFA which accepts the given SimpleEdgePathDescription. The
 	 * EdgeRestrictions (RoleId, TypeId) are modeled in the Transition.
 	 */
-	public static NFA createSimplePathDescriptionNFA(
+	public static NFA createSimpleEdgePathDescriptionNFA(
 			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
 			Set<String> roles, VertexEvaluator predicateEvaluator,
 			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
@@ -421,7 +420,8 @@ public class NFA extends FiniteAutomaton {
 	 *            the VertexEvaluator, which restricts this nfa
 	 */
 	public static void addGoalBooleanRestriction(NFA nfa,
-			VertexEvaluator boolEval, ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
+			VertexEvaluator boolEval,
+			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
 		State newEndState;
 		if (nfa.finalStates.size() == 1) {
 			newEndState = nfa.finalStates.get(0);
@@ -453,7 +453,8 @@ public class NFA extends FiniteAutomaton {
 	 *            the VertexEvaluator, which restricts this nfa
 	 */
 	public static void addStartBooleanRestriction(NFA nfa,
-			VertexEvaluator boolEval, ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
+			VertexEvaluator boolEval,
+			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
 		State newInitialState = new State();
 		nfa.stateList.add(newInitialState);
 		BoolExpressionTransition trans = new BoolExpressionTransition(
@@ -518,18 +519,22 @@ public class NFA extends FiniteAutomaton {
 		State endState = new State();
 		nfa.stateList.add(endState);
 		endState.isFinal = true;
-		endState.number = 2;	
+		endState.number = 2;
 		nfa.finalStates.add(endState);
 		Set<TypedElementClass> types = new HashSet<TypedElementClass>();
-		types.add(Greql2Schema.instance().getIncidenceClassesInTopologicalOrder().get(7));
+		types.add(Greql2Schema.instance()
+				.getIncidenceClassesInTopologicalOrder().get(7));
 		TypeCollection typeColl = new TypeCollection(types, false);
-		Transition t= new SimpleIncidenceTransition_Db(startState, interState, IncDirection.IN, typeColl);
+		Transition t = new SimpleIncidenceTransition_Db(startState, interState,
+				IncDirection.IN, typeColl);
 		nfa.transitionList.add(t);
-		t= new SimpleIncidenceTransition_Db(endState, interState, IncDirection.IN, typeColl);
+		t = new SimpleIncidenceTransition_Db(endState, interState,
+				IncDirection.IN, typeColl);
 		nfa.transitionList.add(t);
-		t= new AggregationIncidenceTransition_Db(interState, endState, typeColl);
+		t = new AggregationIncidenceTransition_Db(interState, endState,
+				typeColl);
 		nfa.transitionList.add(t);
 		return nfa;
 	}
-	
+
 }

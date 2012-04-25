@@ -35,10 +35,8 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * Is baseclass of all transitions. Has one start and one endstate.
@@ -173,18 +171,10 @@ public abstract class Transition {
 	public abstract boolean isEpsilon();
 
 	/**
-	 * returns true if this transition accepts the given combination of Vertex
-	 * and Incidence
+	 * returns true if this transition accepts the given combination of {@link GraphElement}
+	 * and {@link Incidence}
 	 */
-	public abstract boolean accepts(Vertex v, Incidence i);
-
-	/**
-	 * returns true if this transition accepts the given combination of Edge and Incidence
-	 * @param e
-	 * @param i
-	 * @return
-	 */
-	public abstract boolean accepts(Edge e, Incidence i);
+	public abstract boolean accepts(GraphElement e, Incidence i);
 
 	/**
 	 * returns the element (vertex or edge) of the datagraph which can be visited after this

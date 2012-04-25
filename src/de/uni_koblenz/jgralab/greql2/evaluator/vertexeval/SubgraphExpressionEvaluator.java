@@ -38,6 +38,8 @@ import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf;
+import de.uni_koblenz.jgralab.greql2.schema.IsConstrainedExpressionOf_isConstrainedExpressionOf_omega;
+import de.uni_koblenz.jgralab.greql2.schema.IsSubgraphDefinitionOf_isSubgraphDefinitionOf_omega;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphExpression;
 
@@ -106,18 +108,21 @@ public class SubgraphExpressionEvaluator extends
 					.getMark(defVertex);
 		}
 
+
 		// take restricted expression
-		if (exprEval == null) {
+		if (constrainedExpressionEval == null) {
 			IsConstrainedExpressionOf_isConstrainedExpressionOf_omega isExprOn = vertex
 					.getFirst_isConstrainedExpressionOf_omega();
 			Expression expr = (Expression) isExprOn.getThat();
-			exprEval = vertexEvalMarker.getMark(expr);
+			constrainedExpressionEval = vertexEvalMarker.getMark(expr);
 		}
 		long ownCosts = 10;
 		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
 		long subtree = subgraphDefinitionEval
 				.getCurrentSubtreeEvaluationCosts(graphSize)
-				+ exprEval.getCurrentSubtreeEvaluationCosts(graphSize)
+				+ constrainedExpressionEval
+						.getCurrentSubtreeEvaluationCosts(graphSize)
+				+ constrainedExpressionEval.getCurrentSubtreeEvaluationCosts(graphSize)
 				+ iteratedCosts;
 
 		return new VertexCosts(ownCosts, iteratedCosts, subtree);
