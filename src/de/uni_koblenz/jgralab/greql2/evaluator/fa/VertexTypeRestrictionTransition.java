@@ -159,7 +159,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (TypedElementClass c : typeCollection.getAllowedTypes()) {
+		for (TypedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";
@@ -173,7 +173,8 @@ public class VertexTypeRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

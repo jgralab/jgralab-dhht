@@ -220,16 +220,17 @@ public class SimpleIncidenceTransition_Db extends Transition {
 
 	@Override
 	@Deprecated
-	public boolean accepts(GraphElement elem, Incidence inc) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		return false;
 	}
 
 	/**
-	 * returns the vertex of the datagraph which can be visited after this
-	 * transition has fired. This is the vertex at the end of the edge
+	 * returns the {@link GraphElement} of the datagraph which can be visited after this
+	 * transition has fired. This is the Element at the end of the incidence
 	 */
 	@Override
-	public Vertex getNextElement(GraphElement elem, Incidence inc) {
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		return inc.getThat();
 	}
 

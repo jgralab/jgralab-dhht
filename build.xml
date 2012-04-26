@@ -148,7 +148,7 @@
 	</target>
 
 	<!-- compile -->
-	<target name="compile" depends="pcollections,core,tgtools,gruml,greql2,algolib,graphvalidator,rsa,utilities,gretl_and_eca,generatetestschemas">
+	<target name="compile" depends="pcollections,core,tgtools,gruml,algolib,greql2,graphvalidator,rsa,utilities,gretl_and_eca,generatetestschemas">
 		<mkdir dir="testit/testdata" />
 	</target>
 
@@ -185,7 +185,7 @@
 	</target>
 
 	<!-- compiles greql2 sources -->
-	<target name="greql2" depends="tgtools,algolib">
+	<target name="greql2" depends="tgtools">
 		<tgschema2java schemaFile="${greql2.schemafile}" sourcePath="${src.dir}" />
 		<javac fork="true" srcdir="${greql2.src}" destdir="${classes.dir}" memoryinitialsize="${minmemsize}" memorymaximumsize="${maxmemsize}" classpathref="classpath" debug="${debug}" source="${javac.targetVM}" target="${javac.targetVM}" includeantruntime="false">
 			<compilerarg line="-Xlint:unchecked" />

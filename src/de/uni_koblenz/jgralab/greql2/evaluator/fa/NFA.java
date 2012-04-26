@@ -521,7 +521,7 @@ public class NFA extends FiniteAutomaton {
 		endState.isFinal = true;
 		endState.number = 2;
 		nfa.finalStates.add(endState);
-		Set<TypedElementClass> types = new HashSet<TypedElementClass>();
+		Set<TypedElementClass<?, ?>> types = new HashSet<TypedElementClass<?, ?>>();
 		types.add(Greql2Schema.instance()
 				.getIncidenceClassesInTopologicalOrder().get(7));
 		TypeCollection typeColl = new TypeCollection(types, false);
