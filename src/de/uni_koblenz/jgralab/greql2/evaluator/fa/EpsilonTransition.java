@@ -130,14 +130,14 @@ public class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		return true;
+	public boolean accepts(GraphElement e, Incidence i) {
+		return false;
 	}
 
 	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
-		return inc.getThat();
+	public GraphElement getNextElement(
+			GraphElement elem, Incidence inc) {
+		return null; //inc.getThat();
 	}
 
 }

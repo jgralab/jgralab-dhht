@@ -38,7 +38,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator;
 /**
  * Modells the costs a evaluation of a subtree causes.
  * 
- * It's a 3-Tupol containing
+ * It's a 3-Tupel containing
  * 
  * <ul>
  * <li>the costs of evaluating this vertex itself once (ownEvaluationCosts),</li>

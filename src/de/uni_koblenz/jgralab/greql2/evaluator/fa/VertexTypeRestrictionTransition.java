@@ -41,7 +41,6 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
-import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This transition accepts a vertex type restriction. It is used to accept
@@ -137,14 +136,14 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 *            the current vertex
 	 * @return true if the transition can fire with e, false otherwise
 	 */
-	@Deprecated
-	public boolean accepts(Vertex v, Edge e) {
-		VertexClass vertexClass = v.getType();
-		if (!typeCollection.acceptsType(vertexClass)) {
-			return false;
-		}
-		return true;
-	}
+//	@Deprecated
+//	public boolean accepts(Vertex v, Edge e) {
+//		VertexClass vertexClass = v.getType();
+//		if (!typeCollection.acceptsType(vertexClass)) {
+//			return false;
+//		}
+//		return true;
+//	}
 
 	/**
 	 * returns the vertex of the datagraph which can be visited after this
@@ -179,7 +178,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+	public boolean accepts(GraphElement e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -40,8 +40,9 @@ public class NestedSubgraphDefinitionEvaluator extends
 			if (exprEdges.hasNext()) {
 				startEval = vertexEvalMarker.getMark(exprEdges.next()
 						.getAlpha());
-				GraphElement<?, ?, ?, ?> element = (GraphElement<?, ?, ?, ?>) startEval
-						.getResult();
+				Object x = startEval.getResult();
+				
+				GraphElement element = (GraphElement) x;
 				result = element.getSubordinateGraph();
 			}
 		}
