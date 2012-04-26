@@ -131,15 +131,13 @@ public class EpsilonTransition extends Transition {
 
 	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public GraphElement<?, ?, ?, ?> getNextElement(
 			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
-		// TODO Auto-generated method stub
-		return null;
+		return inc.getThat();
 	}
 
 }

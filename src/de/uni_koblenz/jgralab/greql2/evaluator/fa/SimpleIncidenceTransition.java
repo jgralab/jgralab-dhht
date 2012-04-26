@@ -39,6 +39,8 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.parser.GreqlLexer;
+import de.uni_koblenz.jgralab.greql2.parser.TokenTypes;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
@@ -187,7 +189,6 @@ public class SimpleIncidenceTransition extends Transition {
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		if (i == null) {
@@ -195,7 +196,8 @@ public class SimpleIncidenceTransition extends Transition {
 		}
 
 		boolean typeAccepted = false;
-		for (TypedElementClass incClass : typeCollection.getAllowedTypes()) {
+		for (TypedElementClass<?, ?> incClass : typeCollection
+				.getAllowedTypes()) {
 			if (i.getType() == (IncidenceClass) incClass) {
 				typeAccepted = true;
 				break;
@@ -205,21 +207,15 @@ public class SimpleIncidenceTransition extends Transition {
 			return false;
 		}
 
-		GraphElement<?, ?, ?, ?> testElement;
 		boolean vertex = false;
-		try {
-			testElement = (Vertex) e;
+		if (e instanceof Vertex) {
 			vertex = true;
-		} catch (ClassCastException e1) {
-			// The element was an edge
 		}
-		if (validDirection == IncDirection.OUT
-				&& !((vertex && i.getDirection() == Direction.VERTEX_TO_EDGE) || (!vertex && i
-						.getDirection() == Direction.EDGE_TO_VERTEX))) {
+
+		boolean outgoing = (vertex == (i.getDirection() == Direction.VERTEX_TO_EDGE));
+		if (validDirection == IncDirection.OUT && !outgoing) {
 			return false;
-		} else if (validDirection == IncDirection.IN
-				&& ((vertex && i.getDirection() == Direction.VERTEX_TO_EDGE) || (!vertex && i
-						.getDirection() == Direction.EDGE_TO_VERTEX))) {
+		} else if (validDirection == IncDirection.IN && outgoing) {
 			return false;
 		}
 
@@ -231,32 +227,32 @@ public class SimpleIncidenceTransition extends Transition {
 	 * transition has fired. This is the element at the end of the incidence
 	 */
 	@Override
-	public Vertex getNextElement(GraphElement<?, ?, ?, ?> e, Incidence i) {
+	public GraphElement<?, ?, ?, ?> getNextElement(GraphElement<?, ?, ?, ?> e,
+			Incidence i) {
 		return i.getThat();
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (TypedElementClass c : typeCollection.getAllowedTypes()) {
+		for (TypedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
 			b.append(delim);
 			b.append(c.getSimpleName());
 			delim = ",";
 		}
-		String symbol = "<+>";
+		String symbol = GreqlLexer.getTokenString(TokenTypes.IARROW);
 		if (validDirection == IncDirection.IN) {
-			symbol = "<+";
+			symbol = GreqlLexer.getTokenString(TokenTypes.ILARROW);
 		} else if (validDirection == IncDirection.OUT) {
-			symbol = "+>";
+			symbol = GreqlLexer.getTokenString(TokenTypes.IRARROW);
 		}
 		return symbol + "{" + b + "}";
 	}
 
 	@Override
 	public boolean consumesIncidence() {
-		return true;
+		return false;
 	}
 
 }

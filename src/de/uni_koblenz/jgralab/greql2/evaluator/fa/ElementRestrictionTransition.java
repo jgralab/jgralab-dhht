@@ -67,6 +67,11 @@ public class ElementRestrictionTransition extends Transition {
 		return accepts(e);
 	}
 
+	/**
+	 * Checks whether the given {@link GraphElement} is from one of the accepted types. Accepts the transition if it is, not if it isn't.
+	 * @param e The {@link GraphElement} to be "used" in this transition.
+	 * @return
+	 */
 	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
 		boolean typeAccepted = false;
 
