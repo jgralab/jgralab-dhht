@@ -7,6 +7,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
+
 public class ElementRestrictionTransition extends Transition {
 
 	private TypeCollection types = null;
@@ -63,8 +64,9 @@ public class ElementRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		return accepts(e);
+	public boolean accepts(GraphElement e, Incidence i) {
+		//return accepts(e);
+		return false;
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class ElementRestrictionTransition extends Transition {
 	 * @param e The {@link GraphElement} to be "used" in this transition.
 	 * @return
 	 */
-	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
+	public boolean accepts(GraphElement e) {
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
@@ -91,8 +93,8 @@ public class ElementRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+	public GraphElement getNextElement(
+			GraphElement elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

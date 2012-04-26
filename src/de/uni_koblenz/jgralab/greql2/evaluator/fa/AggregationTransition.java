@@ -47,6 +47,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.ThisEdgeEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.ThisEdge;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
+import de.uni_koblenz.jgralab.schema.BinaryEdgeClass;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
@@ -276,21 +277,21 @@ public class AggregationTransition extends Transition {
 		boolean acceptedByRole = false;
 
 		// checks if a role restriction is set and if e has the right role
-		// if (validEdgeRoles != null) {
-		// BinaryEdgeClass ec = (BinaryEdgeClass) e.getType();
-		// Set<String> roles = null;
-		// if (e.isNormal() == checkToEdgeRoles) {
-		// roles = ec.getToIncidenceClass().getAllRoles();
-		// } else {
-		// roles = ec.getFromIncidenceClass().getAllRoles();
-		// }
-		// for (String role : roles) {
-		// if (validEdgeRoles.contains(role)) {
-		// acceptedByRole = true;
-		// break;
-		// }
-		// }
-		// }
+		if (validEdgeRoles != null) {
+			BinaryEdgeClass ec = (BinaryEdgeClass) e.getType();
+			Set<String> roles = null;
+			// if (e.isNormal() == checkToEdgeRoles) {
+			// roles = ec.getToIncidenceClass().getAllRoles();
+			// } else {
+			// roles = ec.getFromIncidenceClass().getAllRoles();
+			// }
+			for (String role : roles) {
+				if (validEdgeRoles.contains(role)) {
+					acceptedByRole = true;
+					break;
+				}
+			}
+		}
 		if (rolesOnly) {
 			if (!acceptedByRole) {
 				return false;
@@ -323,9 +324,14 @@ public class AggregationTransition extends Transition {
 	 * transition has fired. This is the vertex at the end of the edge
 	 */
 	@Override
-	public Vertex getNextElement(GraphElement<?, ?, ?, ?> elem, Incidence inc) {
-		return (Vertex) ((elem instanceof Edge) ? inc.getVertex() : inc
-				.getEdge());
+	public GraphElement getNextElement(GraphElement elem, Incidence inc) {
+		if (elem instanceof Vertex) {
+			return (Vertex) inc.getVertex();
+		} else {
+			return (Edge) inc.getEdge();
+		}
+		//this statement causes javac to end up in heap space error
+//		return (Vertex) ((elem instanceof Edge) ? inc.getVertex() : inc.getEdge());
 	}
 
 	@Override
@@ -351,7 +357,7 @@ public class AggregationTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+	public boolean accepts(GraphElement e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}

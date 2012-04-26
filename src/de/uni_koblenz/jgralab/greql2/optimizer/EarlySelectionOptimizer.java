@@ -74,6 +74,7 @@ import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
 import de.uni_koblenz.jgralab.greql2.schema.Variable;
 import de.uni_koblenz.jgralab.schema.Attribute;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 /**
  * This {@link Optimizer} implements the transformation "Selection as early as
@@ -772,8 +773,9 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		while (origInc != null) {
 			subVertex = copySubgraph(((BinaryEdge) origInc.getEdge()).getAlpha(), graph,
 					variablesToBeCopied, copiedVarMap);
-			Class<? extends BinaryEdge> edgeClass = (Class<? extends BinaryEdge>) origInc.getEdge()
-					.getType().getM1Class();
+			EdgeClass ec = origInc.getEdge()
+					.getType();
+			Class<? extends BinaryEdge> edgeClass = (Class<? extends BinaryEdge>) ec.getM1Class();
 			graph.createEdge(edgeClass, subVertex, topVertex);
 			origInc = origInc.getNextIncidenceAtVertex(Direction.EDGE_TO_VERTEX);
 		}

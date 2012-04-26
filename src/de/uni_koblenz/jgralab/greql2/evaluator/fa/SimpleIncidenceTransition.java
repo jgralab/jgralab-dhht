@@ -190,7 +190,7 @@ public class SimpleIncidenceTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+	public boolean accepts(GraphElement e, Incidence i) {
 		if (i == null) {
 			return false;
 		}
@@ -227,9 +227,9 @@ public class SimpleIncidenceTransition extends Transition {
 	 * transition has fired. This is the element at the end of the incidence
 	 */
 	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(GraphElement<?, ?, ?, ?> e,
+	public GraphElement getNextElement(GraphElement e,
 			Incidence i) {
-		return i.getThat();
+		return null; //i.getThat();
 	}
 
 	@Override

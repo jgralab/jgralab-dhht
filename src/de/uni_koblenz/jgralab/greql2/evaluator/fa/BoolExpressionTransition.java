@@ -35,6 +35,7 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
@@ -172,14 +173,14 @@ public class BoolExpressionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+	public boolean accepts(GraphElement e, Incidence i) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+	public GraphElement getNextElement(
+			GraphElement elem, Incidence inc) {
 		// TODO Auto-generated method stub
 		return null;
 	}

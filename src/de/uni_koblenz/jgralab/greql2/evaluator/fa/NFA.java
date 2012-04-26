@@ -37,7 +37,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +45,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
-import de.uni_koblenz.jgralab.greql2.schema.Greql2Schema;
-import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * this class models a nondeterministic finite automaton. It created during
@@ -507,34 +503,35 @@ public class NFA extends FiniteAutomaton {
 	 * For testing purposes of CodeGenerator only!
 	 * @return
 	 */
-	public static NFA createSimpleIncidenceTransition_Db() {
-		NFA nfa = new NFA();
-		State startState = new State();
-		startState.number = 0;
-		nfa.stateList.add(startState);
-		nfa.initialState = startState;
-		State interState = new State();
-		nfa.stateList.add(interState);
-		interState.number = 1;
-		State endState = new State();
-		nfa.stateList.add(endState);
-		endState.isFinal = true;
-		endState.number = 2;
-		nfa.finalStates.add(endState);
-		Set<TypedElementClass<?, ?>> types = new HashSet<TypedElementClass<?, ?>>();
-		types.add(Greql2Schema.instance()
-				.getIncidenceClassesInTopologicalOrder().get(7));
-		TypeCollection typeColl = new TypeCollection(types, false);
-		Transition t = new SimpleIncidenceTransition_Db(startState, interState,
-				IncDirection.IN, typeColl);
-		nfa.transitionList.add(t);
-		t = new SimpleIncidenceTransition_Db(endState, interState,
-				IncDirection.IN, typeColl);
-		nfa.transitionList.add(t);
-		t = new AggregationIncidenceTransition_Db(interState, endState,
-				typeColl);
-		nfa.transitionList.add(t);
-		return nfa;
-	}
+
+//	public static NFA createSimpleIncidenceTransition_Db() {
+//		NFA nfa = new NFA();
+//		State startState = new State();
+//		startState.number = 0;
+//		nfa.stateList.add(startState);
+//		nfa.initialState = startState;
+//		State interState = new State();
+//		nfa.stateList.add(interState);
+//		interState.number = 1;
+//		State endState = new State();
+//		nfa.stateList.add(endState);
+//		endState.isFinal = true;
+//		endState.number = 2;
+//		nfa.finalStates.add(endState);
+//		Set<TypedElementClass> types = new HashSet<TypedElementClass>();
+//		types.add(Greql2Schema.instance()
+//				.getIncidenceClassesInTopologicalOrder().get(7));
+//		TypeCollection typeColl = new TypeCollection(types, false);
+//		Transition t = new SimpleIncidenceTransition_Db(startState, interState,
+//				IncDirection.IN, typeColl);
+//		nfa.transitionList.add(t);
+//		t = new SimpleIncidenceTransition_Db(endState, interState,
+//				IncDirection.IN, typeColl);
+//		nfa.transitionList.add(t);
+//		t = new AggregationIncidenceTransition_Db(interState, endState,
+//				typeColl);
+//		nfa.transitionList.add(t);
+//		return nfa;
+//	}
 
 }

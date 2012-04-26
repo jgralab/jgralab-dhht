@@ -44,7 +44,7 @@ import de.uni_koblenz.jgralab.greql2.schema.SimpleEdgePathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
- * Evaluates a SimpleEdgePathDescription, that is something link v -->{isExprOf}
+ * Evaluates a SimpleEdgePathDescription, that is something like v -->{isExprOf}
  * w. Creates a NFA which accepts the simplePath the vertex to evaluate
  * describes.
  * 
