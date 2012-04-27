@@ -84,7 +84,8 @@ public class ReachableVertices extends Function {
 				int size = state.outTransitions.size();
 				for (int i = 0; i < size; i++) {
 					Transition currentTransition = state.outTransitions.get(i);
-					Vertex nextVertex = (Vertex) currentTransition.getNextElement(vertex,inc);
+					Vertex nextVertex = (Vertex) currentTransition
+							.getNextElement(vertex, inc);
 					if (!markedElements[currentTransition.endState.number]
 							.contains(nextVertex)) {
 						if (currentTransition.accepts(vertex, inc)) {

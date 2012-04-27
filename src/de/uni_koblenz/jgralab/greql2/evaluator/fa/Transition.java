@@ -174,15 +174,15 @@ public abstract class Transition {
 	 * returns true if this transition accepts the given combination of {@link GraphElement}
 	 * and {@link Incidence}
 	 */
-	public abstract boolean accepts(GraphElement e, Incidence i);
+	public abstract boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i);
 
 	/**
 	 * returns the element (vertex or edge) of the datagraph which can be visited after this
 	 * transition has fired. This can be either the current element itself or the other one
 	 * at the incidence
 	 */
-	public abstract GraphElement getNextElement(
-			GraphElement elem, Incidence inc);
+	public abstract GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc);
 
 	/**
 	 * @return true if the transition consumes an edge (e.g. for a

@@ -135,9 +135,10 @@ public class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	public GraphElement getNextElement(
-			GraphElement elem, Incidence inc) {
-		return null; //inc.getThat();
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+		throw new UnsupportedOperationException(
+				"EpsilonTransition.getNextElement(...) has been called. That should not happen, there should be no epsilon-transitions in the DFA used for path search. Check the DFA-Constructor");
 	}
 
 }

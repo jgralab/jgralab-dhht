@@ -503,6 +503,7 @@ public class NFA extends FiniteAutomaton {
 	 * For testing purposes of CodeGenerator only!
 	 * @return
 	 */
+
 //	public static NFA createSimpleIncidenceTransition_Db() {
 //		NFA nfa = new NFA();
 //		State startState = new State();
