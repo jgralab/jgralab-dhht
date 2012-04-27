@@ -773,10 +773,9 @@ public class EarlySelectionOptimizer extends OptimizerBase {
 		while (origInc != null) {
 			subVertex = copySubgraph(((BinaryEdge) origInc.getEdge()).getAlpha(), graph,
 					variablesToBeCopied, copiedVarMap);
-			EdgeClass ec = origInc.getEdge()
-					.getType();
-			Class<? extends BinaryEdge> edgeClass = (Class<? extends BinaryEdge>) ec.getM1Class();
-			graph.createEdge(edgeClass, subVertex, topVertex);
+			EdgeClass ec = origInc.getEdge().getType();
+			Class<? extends Edge> edgeClass = (Class<? extends Edge>) ec.getM1Class();
+			graph.createEdge((Class<? extends BinaryEdge>) edgeClass, subVertex, topVertex);
 			origInc = origInc.getNextIncidenceAtVertex(Direction.EDGE_TO_VERTEX);
 		}
 

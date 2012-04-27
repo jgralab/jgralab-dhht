@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.schema;
 
+import de.uni_koblenz.jgralab.BinaryEdge;
+
 
 public interface BinaryEdgeClass extends EdgeClass {
 	
@@ -9,6 +11,8 @@ public interface BinaryEdgeClass extends EdgeClass {
 	public IncidenceClass getToIncidenceClass();
 	
 	public IncidenceClass getFromIncidenceClass();
+	
+
 	
 
 }
