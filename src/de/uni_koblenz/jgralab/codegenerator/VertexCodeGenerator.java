@@ -108,6 +108,8 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			}
 		} else {
 			for (IncidenceClass ic : vc.getAllIncidenceClasses()) {
+				if (vc.getSimpleName().equals("BinaryEdgeClass"))
+					System.out.println("Adding incidence class:" + ic.getSimpleName());
 				edgeClassSet.add(ic.getEdgeClass());
 			}
 		}
@@ -120,7 +122,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			s.setVariable("edgeClassQualifiedName", ec.getSchema().getPackagePrefix().concat("." + ec.getQualifiedName()));
 			s.setVariable("edgeClassUniqueName", ec.getUniqueName());
 			s.setVariable("incidenceClassQualifiedName", "Incidence");
-			boolean debug = vc.getSimpleName().equals("Definition") && ec.getSimpleName().equals("IsExprOf");
+			boolean debug = vc.getSimpleName().equals("BinaryEdgeClass") && ec.getSimpleName().equals("SpecializesEdgeClass");
 			Set<IncidenceClass> ics = new HashSet<IncidenceClass>();
 			if (debug)
 				System.out.println("Handling incidence classes");
@@ -140,7 +142,8 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 						//remove all subclasses of the current incidence class
 						if (debug)
 							System.out.println("Adding incidence class: " + ic.getSimpleName());
-						ics.removeAll(ic.getAllSubClasses());
+						if (!ic.isAbstract())
+							ics.removeAll(ic.getAllSubClasses());
 						ics.add(ic);
 					} else {
 						if (debug)
@@ -149,6 +152,10 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 				}
 			}
 			//remove all abstract classes with only one contained superclass
+			if (debug)
+			for (IncidenceClass ic : ics) {
+				System.out.println("Contained incidence class: " + ic.getSimpleName());
+			}
 			Set<IncidenceClass> subclassesToBeRemoved = new HashSet<IncidenceClass>();
 			Iterator<IncidenceClass> it = ics.iterator();
 			while (it.hasNext()) {
@@ -156,16 +163,19 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 				if (debug)
 					System.out.println("Testing possible abstract incidence class: " + possibleAbstractSuperClass.getSimpleName());
 				if (debug)
-					System.out.println("Abstract:  " + possibleAbstractSuperClass.isAbstract());
+					System.out.println("  Abstract:  " + possibleAbstractSuperClass.isAbstract());
 				if (!possibleAbstractSuperClass.isAbstract())
 					continue;
 				int numberOfContainedSubclasses = 0;
 				for (IncidenceClass directSubclass : possibleAbstractSuperClass.getDirectSubClasses()) {
-					if (ics.contains(directSubclass))
+					if (ics.contains(directSubclass)) {
+						if (debug)
+							System.out.println("  Contained Subclass: " + directSubclass.getSimpleName());
 						numberOfContainedSubclasses++;
+					}	
 				}
 				if (debug)
-					System.out.println("Contained Subclasses: " + numberOfContainedSubclasses);
+					System.out.println("  Contained Subclasses: " + numberOfContainedSubclasses);
 				if (numberOfContainedSubclasses <= 1) {
 					it.remove();
 				} else {
@@ -179,8 +189,9 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 			
 			if (ics.size() == 1) {
 				//set one and only possible incidence class name 
-				ics.iterator().hasNext();
-				IncidenceClass ic = ics.iterator().next();
+				it = ics.iterator();
+				it.hasNext();
+				IncidenceClass ic = it.next();
 				s.setVariable("incidenceClassQualifiedName", ic.getSchema().getPackagePrefix() + "." + ic.getQualifiedName());
 			}
 

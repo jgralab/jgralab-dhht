@@ -110,11 +110,11 @@ public class GraphValidator {
 		
 		int toMinAtVertex = to.getMinEdgesAtVertex();
 		int toMaxAtVertex = to.getMaxEdgesAtVertex();
-		Set<AttributedElement<?, ?>> badOutgoing = new HashSet<AttributedElement<?, ?>>();
+		Set<GraphElement> badOutgoing = new HashSet<GraphElement>();
 		for (Vertex v : graph.getVertices(to.getVertexClass())) {
 			int degree = v.getDegree(to);
 			if ((degree < toMinAtVertex) || (degree > toMaxAtVertex)) {
-				badOutgoing.add(v);
+				badOutgoing.add((GraphElement)v);
 			}
 		}
 		if (!badOutgoing.isEmpty()) {
@@ -126,7 +126,7 @@ public class GraphValidator {
 
 		int fromMin = from.getMinEdgesAtVertex();
 		int fromMax = from.getMaxVerticesAtEdge();
-		Set<AttributedElement<?, ?>> badIncoming = new HashSet<AttributedElement<?, ?>>();
+		Set<GraphElement> badIncoming = new HashSet<GraphElement>();
 		for (Vertex v : graph.getVertices(from.getVertexClass())) {
 			int degree = v.getDegree(from);
 			if ((degree < fromMin) || (degree > fromMax)) {
