@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -55,6 +56,33 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		rootBlock.setVariable("proxyClassName", "VertexProxy");
 		rootBlock.setVariable("graphElementClass", "Vertex");
 		rootBlock.setVariable("edgeOrVertex", "Vertex");
+	}
+	
+	@Override
+	protected CodeBlock createHeader() {
+		CodeList code = new CodeList();
+		CodeSnippet snippet = new CodeSnippet();
+		snippet.add("/**");
+		snippet.add(" * Incomming IncidenceClasses:");
+		code.addNoIndent(snippet);
+		for (IncidenceClass ic : aec.getIncidenceClasses()) {
+			if (ic.getDirection()==Direction.VERTEX_TO_EDGE)
+			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
+		}	
+		snippet = new CodeSnippet();
+		snippet.add("/**");
+		snippet.add(" * Outgoing IncidenceClasses:");
+		code.addNoIndent(snippet);
+		for (IncidenceClass ic : aec.getIncidenceClasses()) {
+			if (ic.getDirection()==Direction.EDGE_TO_VERTEX)
+			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
+		}	
+		
+		snippet = new CodeSnippet();
+		snippet.add(" */");
+		code.addNoIndent(snippet);
+		code.addNoIndent(super.createHeader());
+		return code;
 	}
 
 

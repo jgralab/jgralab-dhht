@@ -33,32 +33,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 	}
 
 	
-	@Override
-	protected CodeBlock createHeader() {
-		CodeList code = new CodeList();
-		CodeSnippet snippet = new CodeSnippet();
-		snippet.add("/**");
-		snippet.add(" * Incomming IncidenceClasses:");
-		code.addNoIndent(snippet);
-		for (IncidenceClass ic : aec.getIncidenceClasses()) {
-			if (ic.getDirection()==Direction.VERTEX_TO_EDGE)
-			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
-		}	
-		snippet = new CodeSnippet();
-		snippet.add("/**");
-		snippet.add(" * Outgoing IncidenceClasses:");
-		code.addNoIndent(snippet);
-		for (IncidenceClass ic : aec.getIncidenceClasses()) {
-			if (ic.getDirection()==Direction.EDGE_TO_VERTEX)
-			code.addNoIndent(createIncidenceClassCommentInHeader(ic));
-		}	
-		
-		snippet = new CodeSnippet();
-		snippet.add(" */");
-		code.addNoIndent(snippet);
-		code.addNoIndent(super.createHeader());
-		return code;
-	}
+
 	
 	
 	@Override
@@ -98,7 +73,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 	
 
 	
-	private CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
+	protected CodeSnippet createIncidenceClassCommentInHeader(IncidenceClass ic) {
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add(" *   Role: '#rolename#', ConnectedClass: '#gecName#");
 		snippet.setVariable("rolename", ic.getRolename());
