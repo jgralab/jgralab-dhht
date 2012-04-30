@@ -196,7 +196,7 @@ public class GraphFactoryImpl implements GraphFactory {
 			de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
-			Graph g = graphMap_DiskBasedStorage.get(graphClass).newInstance(
+			Graph g = graphMap_DistributedStorage.get(graphClass).newInstance(
 					uniqueGraphId, subgraphId, graphDatabase,
 					storingGraphDatabase);
 			return g;

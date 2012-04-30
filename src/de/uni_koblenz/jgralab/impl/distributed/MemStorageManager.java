@@ -4,9 +4,14 @@ package de.uni_koblenz.jgralab.impl.distributed;
 import java.rmi.RemoteException;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
+import de.uni_koblenz.jgralab.impl.distributed.EdgeImpl;
+import de.uni_koblenz.jgralab.impl.mem.FreeIndexList;
+import de.uni_koblenz.jgralab.impl.distributed.IncidenceImpl;
+import de.uni_koblenz.jgralab.impl.distributed.VertexImpl;
 
 /**
  * This class realizes the storage of vertices, edges and incidences on the
@@ -17,6 +22,13 @@ import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
  */
 public final class MemStorageManager implements RemoteStorageAccess {
 
+	
+	private static final double EXPAND_FACTOR = 1.5;
+
+	private static int INITIAL_ELEMENT_ARRAY_SIZE = 1000000;
+	
+	private static int INITIAL_INCIDENCE_ARRAY_SIZE = 3000000;
+	
 	/**
 	 * free index list for vertices
 	 */
@@ -53,6 +65,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
 		this.graphDatabase = database;
+		expandVertexArray(INITIAL_ELEMENT_ARRAY_SIZE);
+		expandEdgeArray(INITIAL_ELEMENT_ARRAY_SIZE);
+		expandIncidenceArray(INITIAL_INCIDENCE_ARRAY_SIZE);
 	}
 
 
@@ -80,6 +95,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 
 	public void storeVertex(
 			de.uni_koblenz.jgralab.impl.distributed.VertexImpl v) {
+		if (v.getLocalId() >= vertexArray.length)
+			expandVertexArray((int) (vertexArray.length * EXPAND_FACTOR));
 		vertexArray[v.getLocalId()] = v;
 	}
 
@@ -89,6 +106,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 
 	public void storeEdge(EdgeImpl e) {
+		if (e.getLocalId() >= edgeArray.length)
+			expandEdgeArray((int) (edgeArray.length * EXPAND_FACTOR));
 		edgeArray[e.getLocalId()] = e;
 	}
 	
@@ -99,6 +118,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	
 	
 	public void storeIncidence(IncidenceImpl i) {
+		if (i.getLocalId() >= incidenceArray.length)
+			expandIncidenceArray((int) (incidenceArray.length * EXPAND_FACTOR));
 		incidenceArray[i.getLocalId()] = i;
 	}
 
@@ -410,7 +431,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public void increaseIncidenceListVersionOfEdgeId(int edgeId)
 			throws RemoteException {
 		((EdgeImpl) getEdgeObject(edgeId)).increaseIncidenceListVersion();
-		
+
 	}
 
 
@@ -423,6 +444,89 @@ public final class MemStorageManager implements RemoteStorageAccess {
 
 
 
+	
+	/**
+	 * Changes the size of the edge array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the edge array
+	 */
+	protected void expandEdgeArray(int newSize) {
+		int eMax = 0;
+		if (edgeArray != null)
+			eMax = edgeArray.length;
+		if (newSize <= eMax) {
+			throw new GraphException("newSize must be > eSize: eSize=" + eMax
+					+ ", newSize=" + newSize);
+		}
+
+		EdgeImpl[] e = new EdgeImpl[newSize + 1];
+		if (edgeArray != null) {
+			System.arraycopy(edgeArray, 0, e, 0, edgeArray.length);
+		}
+		edgeArray = e;
+
+		if (freeEdgeList == null) {
+			freeEdgeList = new FreeIndexList(newSize);
+		} else {
+			freeEdgeList.expandBy(newSize - eMax);
+		}
+	}
+
+
+	/**
+	 * Changes the size of the incidence array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the incidence array
+	 */
+	protected void expandIncidenceArray(int newSize) {
+		int iMax = 0;
+		if (incidenceArray != null)
+			iMax = incidenceArray.length;
+		if (newSize <= iMax) {
+			throw new GraphException("newSize must > iSize: iSize=" + iMax
+					+ ", newSize=" + newSize);
+		}
+		IncidenceImpl[] expandedArray = new IncidenceImpl[newSize + 1];
+		if (incidenceArray != null) {
+			System.arraycopy(incidenceArray, 0, expandedArray, 0,
+					incidenceArray.length);
+		}
+		if (freeIncidenceList == null) {
+			freeIncidenceList = new FreeIndexList(newSize);
+		} else {
+			freeIncidenceList.expandBy(newSize - iMax);
+		}
+		incidenceArray = expandedArray;
+	}
+
+	/**
+	 * Changes the size of the vertex array of this graph to newSize.
+	 * 
+	 * @param newSize
+	 *            the new size of the vertex array
+	 */
+	protected void expandVertexArray(int newSize) {
+		int vMax = 0;
+		if (vertexArray != null)
+			vMax = vertexArray.length;
+		if (newSize <= vMax) {
+			throw new GraphException("newSize must > vSize: vSize=" + vMax
+					+ ", newSize=" + newSize);
+		}
+		VertexImpl[] expandedArray = new VertexImpl[newSize + 1];
+		if (vertexArray != null) {
+			System.arraycopy(vertexArray, 0, expandedArray, 0,
+					vertexArray.length);
+		}
+		if (freeVertexList == null) {
+			freeVertexList = new FreeIndexList(newSize);
+		} else {
+			freeVertexList.expandBy(newSize - vMax);
+		}
+		vertexArray = expandedArray;
+	}
 
 
 }

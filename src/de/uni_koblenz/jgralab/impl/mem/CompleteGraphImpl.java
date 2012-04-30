@@ -1559,7 +1559,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		if (freeVertexList == null) {
 			freeVertexList = new FreeIndexList(newSize);
 		} else {
-			freeVertexList.expandBy(newSize - vMax);
+			freeVertexList.expandBy(newSize - iMax);
 		}
 		vertexArray = expandedArray;
 		vMax = newSize;
