@@ -165,20 +165,20 @@ public abstract class VertexImpl extends
 
 	@Override
 	public final Incidence getFirstIncidence() {
-		return getFirstIncidence(graph.getTraversalContext());
+		return getFirstIncidence(getGraph().getTraversalContext());
 	}
 
 	@Override
 	public final Incidence getFirstIncidence(Direction direction) {
 		assert isValid();
-		return getFirstIncidence(graph.getTraversalContext(), direction);
+		return getFirstIncidence(getGraph().getTraversalContext(), direction);
 	}
 
 	@Override
 	public Incidence getFirstIncidence(boolean thisIncidence,
 			IncidenceType... incidentTypes) {
 		assert isValid();
-		return getFirstIncidence(graph.getTraversalContext(), thisIncidence,
+		return getFirstIncidence(getGraph().getTraversalContext(), thisIncidence,
 				incidentTypes);
 	}
 
@@ -338,25 +338,25 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Incidence getLastIncidence() {
-		return getLastIncidence(graph.getTraversalContext());
+		return getLastIncidence(getGraph().getTraversalContext());
 	}
 
 	@Override
 	public Vertex getPreviousVertex() {
-		return getPreviousVertex(graph.getTraversalContext());
+		return getPreviousVertex(getGraph().getTraversalContext());
 	}
 
 	@Override
 	public Vertex getNextVertex() {
 		assert isValid();
-		return getNextVertex(graph.getTraversalContext());
+		return getNextVertex(getGraph().getTraversalContext());
 	}
 
 	@Override
 	public <T extends Vertex> T getNextVertex(Class<T> vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(graph.getTraversalContext(), vertexClass, false);
+		return getNextVertex(getGraph().getTraversalContext(), vertexClass, false);
 	}
 
 	@Override
@@ -364,7 +364,7 @@ public abstract class VertexImpl extends
 			boolean noSubclasses) {
 		assert m1VertexClass != null;
 		assert isValid();
-		return getNextVertex(graph.getTraversalContext(), m1VertexClass,
+		return getNextVertex(getGraph().getTraversalContext(), m1VertexClass,
 				noSubclasses);
 	}
 
@@ -372,7 +372,7 @@ public abstract class VertexImpl extends
 	public Vertex getNextVertex(VertexClass vertexClass) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(graph.getTraversalContext(),
+		return getNextVertex(getGraph().getTraversalContext(),
 				vertexClass.getM1Class(), false);
 	}
 
@@ -380,7 +380,7 @@ public abstract class VertexImpl extends
 	public Vertex getNextVertex(VertexClass vertexClass, boolean noSubclasses) {
 		assert vertexClass != null;
 		assert isValid();
-		return getNextVertex(graph.getTraversalContext(),
+		return getNextVertex(getGraph().getTraversalContext(),
 				vertexClass.getM1Class(), noSubclasses);
 	}
 
@@ -577,7 +577,7 @@ public abstract class VertexImpl extends
 
 	@Override
 	public boolean isValid() {
-		return graph.containsVertex(this);
+		return getGraph().containsVertex(this);
 	}
 
 	@Override
@@ -630,26 +630,26 @@ public abstract class VertexImpl extends
 
 	@Override
 	public int getDegree() {
-		return getDegree(graph.getTraversalContext());
+		return getDegree(getGraph().getTraversalContext());
 	}
 
 	@Override
 	public int getDegree(Direction direction) {
-		return getDegree(graph.getTraversalContext(), direction);
+		return getDegree(getGraph().getTraversalContext(), direction);
 	}
 
 	@Override
 	public int getDegree(IncidenceClass ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, noSubClasses);
+		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
 	}
 
 	@Override
 	public int getDegree(Class<? extends Incidence> ic, boolean noSubClasses) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, noSubClasses);
+		return getDegree(getGraph().getTraversalContext(), ic, noSubClasses);
 	}
 
 
@@ -725,7 +725,7 @@ public abstract class VertexImpl extends
 	@Override
 	public void delete() {
 		assert isValid() : this + " is not valid!";
-		graph.deleteVertex(this);
+		getGraph().deleteVertex(this);
 	}
 
 	@Override
@@ -1023,7 +1023,7 @@ public abstract class VertexImpl extends
 
 	@Override
 	public List<? extends Vertex> getAdjacences(String role) {
-		return getAdjacences(graph.getTraversalContext(),
+		return getAdjacences(getGraph().getTraversalContext(),
 				getIncidenceClassForRolename(role));
 	}
 
@@ -1031,7 +1031,7 @@ public abstract class VertexImpl extends
 	public List<? extends Vertex> getAdjacences(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return getAdjacences(graph.getTraversalContext(), ic);
+		return getAdjacences(getGraph().getTraversalContext(), ic);
 	}
 
 	@Override
@@ -1085,7 +1085,7 @@ public abstract class VertexImpl extends
 
 		incidenceListModified();
 		((VertexImpl) other).incidenceListModified();
-		graph.edgeListModified();
+		graphDb.edgeListModified();
 		return e;
 	}
 

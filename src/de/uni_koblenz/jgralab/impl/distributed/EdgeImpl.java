@@ -93,7 +93,7 @@ public abstract class EdgeImpl extends
 
 		incidenceListModified();
 		((EdgeImpl) other).incidenceListModified();
-		graph.edgeListModified();
+		graphDb.edgeListModified();
 		return v;
 	}
 
@@ -170,7 +170,7 @@ public abstract class EdgeImpl extends
 	@Override
 	public final void delete() {
 		assert isValid() : this + " is not valid!";
-		graph.deleteEdge(this);
+		getGraph().deleteEdge(this);
 	}
 
 	@Override
@@ -812,7 +812,7 @@ public abstract class EdgeImpl extends
 
 	@Override
 	public final boolean isValid() {
-		return graph.containsEdge(this);
+		return getGraph().containsEdge(this);
 	}
 
 	@Override

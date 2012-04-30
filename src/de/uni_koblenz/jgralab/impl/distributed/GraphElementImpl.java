@@ -120,14 +120,14 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	/**
 	 * The {@link Graph} to which this {@link GraphElement} belongs.
 	 */
-	protected CompleteGraphImpl graph;
+//	protected CompleteGraphImpl graph;
 	
 
 	protected GraphDatabaseBaseImpl graphDb;
 	
 
 	/**
-	 * The subordinate graph nested in this graph‚
+	 * The subordinate graph nested in this graph 
 	 */
 	protected long subOrdinateGraphId;
 
@@ -225,17 +225,17 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 
 	@Override
 	public final Graph getGraph() {
-		return graph;
+		return graphDb.getTraversalContext();
 	}
 
 	@Override
 	public final GraphClass getGraphClass() {
-		return graph.getType();
+		return graphDb.getTraversalContext().getType();
 	}
 
 	@Override
 	public final Schema getSchema() {
-		return graph.getSchema();
+		return graphDb.getSchema();
 	}
 
 	/**
@@ -245,7 +245,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * graph, an edge or a vertex are treated as a change.
 	 */
 	public final void graphModified() {
-		graph.graphModified();
+		graphDb.graphModified();
 	}
 
 	@Override
@@ -333,7 +333,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	@Override
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDb.getTraversalContext(),
 				anIncidenceClass.getM1Class(), false);
 	}
 
@@ -341,7 +341,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final <T extends Incidence> T getFirstIncidence(
 			Class<T> anIncidenceClass) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+		return getFirstIncidence(graphDb.getTraversalContext(), anIncidenceClass,
 				 false);
 	}
 
@@ -350,14 +350,14 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final Incidence getFirstIncidence(IncidenceClass anIncidenceClass,
 			boolean noSubclasses) {
 		assert anIncidenceClass != null;
-		return getFirstIncidence(graph.getTraversalContext(),
+		return getFirstIncidence(graphDb.getTraversalContext(),
 				anIncidenceClass.getM1Class(), noSubclasses);
 	}
 
 	@Override
 	public final <T extends Incidence> T getFirstIncidence(
 			Class<T> anIncidenceClass, boolean noSubclasses) {
-		return getFirstIncidence(graph.getTraversalContext(), anIncidenceClass,
+		return getFirstIncidence(graphDb.getTraversalContext(), anIncidenceClass,
 				noSubclasses);
 	}
 
@@ -383,14 +383,14 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final int getDegree(IncidenceClass ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, false);
+		return getDegree(graphDb.getTraversalContext(), ic, false);
 	}
 
 	@Override
 	public final int getDegree(Class<? extends Incidence> ic) {
 		assert ic != null;
 		assert isValid();
-		return getDegree(graph.getTraversalContext(), ic, false);
+		return getDegree(graphDb.getTraversalContext(), ic, false);
 	}
 
 	@Override
@@ -601,11 +601,20 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	@Override
 	public final Graph getLocalGraph() {
 		return getGraph();
+		//return graphDb.getGraphObject(graphDb.getLocalPartialGraphId());
 	}
 
 	@Override
 	public final Graph getContainingGraph() {
-		return graph;
+//		if (sigmaId != 0) {
+//			//nested in a subordinate graph
+//			if (graphDb.getPartialGraphId(sigmaId) != graphDb.getPartialGraphId(id)) {
+//				//the subordinate graph is either distributed itself or also a partial one 
+//				return graphDb.getLocalGraph();
+//			}
+//		}
+//		return graphDb.;
+		return getGraph();
 	}
 
 }
