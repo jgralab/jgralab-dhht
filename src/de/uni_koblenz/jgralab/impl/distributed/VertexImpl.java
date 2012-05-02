@@ -47,6 +47,7 @@ import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
+import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -1196,25 +1197,34 @@ public abstract class VertexImpl extends
 
 	@Override
 	public Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect) {
-		return connect(incidenceClass.getM1Class(), elemToConnect);
+		return graphDb.getIncidenceObject(graphDb.connect(incidenceClass.getId(),  this.getGlobalId(), elemToConnect.getGlobalId()));
 	}
 
 	@Override
-	public final Incidence connect(IncidenceClass incidenceClass, Edge elemToConnect,
+	public final <T extends Incidence> T connect(IncidenceClass incidenceClass, Edge elemToConnect,
 			int incidenceId) {
-		return connect(incidenceClass.getM1Class(), elemToConnect, incidenceId);
+		return (T) graphDb.getIncidenceObject(graphDb.connect(incidenceClass.getId(),  this.getGlobalId(), elemToConnect.getGlobalId(), incidenceId));
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> incidenceClass,
 			Edge elemToConnect) {
-		return elemToConnect.connect(incidenceClass, this);
+		Schema schema = getSchema();
+		int classId = schema.getClassId(incidenceClass);
+		long globalEId = elemToConnect.getGlobalId();
+
+		return (T) graphDb.getIncidenceObject(graphDb.connect(classId,
+							this.getGlobalId(), globalEId));
 	}
 
 	public final <T extends Incidence> T connect(Class<T> incidenceClass,
-			Edge elemToConnect, int id) {
-		return getSchema().getGraphFactory().createIncidence_DistributedStorage(incidenceClass,
-				id, this.getGlobalId(), elemToConnect.getGlobalId(), graphDb);
+			Edge elemToConnect, int incId) {
+		Schema schema = getSchema();
+		int classId = schema.getClassId(incidenceClass);
+		long globalEId = elemToConnect.getGlobalId();
+
+		return (T) graphDb.getIncidenceObject(graphDb.connect(classId,
+							this.getGlobalId(), globalEId, incId));
 	}
 
 	@Override

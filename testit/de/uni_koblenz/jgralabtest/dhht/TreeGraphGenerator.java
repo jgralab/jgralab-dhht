@@ -9,15 +9,29 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedHyperedge;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_incInc;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimulatedIncidence_outInc;
 
 public class TreeGraphGenerator {
 
+	enum ImplementationVariant {
+		DISK,
+		DISTRIBUTED,
+		MEM
+	}
+	
 	protected DHHTTestGraph graph;
 
 	private int layers;
 	private int roots;
 	private int currentBranchingFactorIndex = 0;
-	private boolean diskBased;
+	private ImplementationVariant varianteToTest = ImplementationVariant.DISTRIBUTED;
 	private boolean useHyperedges;
 	private int createdVertices = 0;
 
@@ -51,25 +65,25 @@ public class TreeGraphGenerator {
 	int currentEdgeBranchingFactorIndex = 0;
 
 	public TreeGraphGenerator(int layers, int roots, int[] branchingFactors,
-			int additionalEdgeCount, boolean useHyperedges, boolean diskBased) {
+			int additionalEdgeCount, boolean useHyperedges, ImplementationVariant variantToTest) {
 		this.layers = layers;
 		this.roots = roots;
 		this.additionalEdgeCount = additionalEdgeCount;
 		this.branchingFactors = branchingFactors;
-		this.diskBased = diskBased;
+		this.varianteToTest = variantToTest;
 		this.useHyperedges = useHyperedges;
 		this.vertices = new ArrayList<SimpleVertex>();
 	}
 
 	public TreeGraphGenerator(int layers, int roots, int[] branchingFactors,
 			int[] firstLayerBranchingFactors, int additionalEdgeCount,
-			boolean useHyperedges, boolean diskBased) {
+			boolean useHyperedges, ImplementationVariant variantToTest) {
 		this.layers = layers;
 		this.roots = roots;
 		this.additionalEdgeCount = additionalEdgeCount;
 		this.branchingFactors = branchingFactors;
 		this.firstLayerBranchingFactors = firstLayerBranchingFactors;
-		this.diskBased = diskBased;
+		this.varianteToTest = variantToTest;
 		this.useHyperedges = useHyperedges;
 		this.vertices = new ArrayList<SimpleVertex>();
 	}
@@ -80,10 +94,16 @@ public class TreeGraphGenerator {
 	}
 
 	public DHHTTestGraph createGraph() {
-		if (diskBased) {
-			graph = DHHTTestSchema.instance().createDHHTTestGraphOnDisk();
-		} else {
-			graph = DHHTTestSchema.instance().createDHHTTestGraphInMem();
+		switch (varianteToTest) {
+			case DISK:
+				graph = DHHTTestSchema.instance().createDHHTTestGraph_DiskBasedStorage();
+				break;
+			case DISTRIBUTED:
+				graph = DHHTTestSchema.instance().createDHHTTestGraph_DistributedStorage();
+				break;
+			case MEM:
+				graph = DHHTTestSchema.instance().createDHHTTestGraph_InMemoryStorage();
+				break;
 		}
 
 		int vCount = 1;
@@ -265,7 +285,6 @@ public class TreeGraphGenerator {
 				}
 			}
 		}
-		System.out.println("Created " + createdVertices + " vertices");
 		return graph;
 	}
 

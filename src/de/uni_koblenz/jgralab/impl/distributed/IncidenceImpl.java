@@ -67,37 +67,41 @@ public abstract class IncidenceImpl implements Incidence {
 	 */
 	protected IncidenceImpl(long id, GraphDatabaseBaseImpl graphDb, long vId, long eId) {
 		this.id = (int) id;
+		this.graphDb = graphDb;
 		incidentEdgeId = eId;
 		incidentVertexId = vId;
-		Vertex v = graphDb.getVertexObject(vId);
-		Edge e = graphDb.getEdgeObject(eId);
+	}
+	
+	protected void initializeIncidence() {
+		Vertex v = graphDb.getVertexObject(incidentVertexId);
+		Edge e = graphDb.getEdgeObject(incidentEdgeId);
 		// add this incidence to the sequence of incidences of v
 		if (v.getFirstIncidence() == null) {
 			// v has no incidences
-			graphDb.setFirstIncidenceIdAtVertexId(vId, id);
-			graphDb.setLastIncidenceIdAtVertexId(vId, id);
+			graphDb.setFirstIncidenceIdAtVertexId(incidentVertexId, id);
+			graphDb.setLastIncidenceIdAtVertexId(incidentVertexId, id);
 		} else {
-			long lastIncId = graphDb.getLastIncidenceIdAtVertexId(vId);
+			long lastIncId = graphDb.getLastIncidenceIdAtVertexId(incidentVertexId);
 			graphDb.setNextIncidenceIdAtVertex(lastIncId, id);
 			graphDb.setPreviousIncidenceIdAtVertex(id, lastIncId);
-			graphDb.setLastIncidenceIdAtVertexId(vId, id);
+			graphDb.setLastIncidenceIdAtVertexId(incidentVertexId, id);
 		}
 
-		graphDb.incidenceListOfVertexModified(vId);
+		graphDb.incidenceListOfVertexModified(incidentVertexId);
 
 		// add this incidence to the sequence of incidences of e
 		if (e.getFirstIncidence() == null) {
 			// e has no incidences
-			graphDb.setFirstIncidenceIdAtEdgeId(eId, id);
-			graphDb.setLastIncidenceIdAtEdgeId(eId, id);
+			graphDb.setFirstIncidenceIdAtEdgeId(incidentEdgeId, id);
+			graphDb.setLastIncidenceIdAtEdgeId(incidentEdgeId, id);
 		} else {
-			long lastIncId = graphDb.getLastIncidenceIdAtEdgeId(eId);
+			long lastIncId = graphDb.getLastIncidenceIdAtEdgeId(incidentEdgeId);
 			graphDb.setNextIncidenceIdAtEdge(lastIncId, id);
 			graphDb.setPreviousIncidenceIdAtEdge(id, lastIncId);
-			graphDb.setLastIncidenceIdAtEdgeId(eId, id);
+			graphDb.setLastIncidenceIdAtEdgeId(incidentEdgeId, id);
 		}
 
-		graphDb.incidenceListOfEdgeModified(eId);
+		graphDb.incidenceListOfEdgeModified(incidentEdgeId);
 	}
 
 	/**

@@ -8,6 +8,7 @@ import de.uni_koblenz.jgralab.algolib.CountCentralAlgorithm;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
 import de.uni_koblenz.jgralab.algolib.universalsearch.MyCentralAlgorithm;
 import de.uni_koblenz.jgralab.impl.disk.DiskStorageManager;
+import de.uni_koblenz.jgralabtest.dhht.TreeGraphGenerator.ImplementationVariant;
 
 public class BGStorageTest {
 
@@ -147,14 +148,14 @@ public class BGStorageTest {
 	}
 
 	private enum Variant {
-		TREELIKE, CLIQUE, TREELIKEDISK, CLIQUEDISK, TREELIKEHY, CLIQUEHY, TREELIKEDISKHY, CLIQUEDISKHY, TREELIKENESTED, CLIQUENESTED, TREELIKENESTEDDISK, CLIQUENESTEDDISK, TREELIKEVIEW, CLIQUEVIEW, TREELIKEVIEWDISK, CLIQUEVIEWSDISK, TREELIKEDISTRIBUTED, CLIQUEDISTRIBUTED
+		TREELIKE, CLIQUE, TREELIKEDIST_LOCAL, CLIQUEDIST_LOCAL, TREELIKEDISK, CLIQUEDISK, TREELIKEHY, CLIQUEHY, TREELIKEDISKHY, CLIQUEDISKHY, TREELIKENESTED, CLIQUENESTED, TREELIKENESTEDDISK, CLIQUENESTEDDISK, TREELIKEVIEW, CLIQUEVIEW, TREELIKEVIEWDISK, CLIQUEVIEWSDISK, TREELIKEDISTRIBUTED, CLIQUEDISTRIBUTED
 	}
 
 	private Graph createGraph(Variant variant, String[] hostnames) {
 		int[] factors = { 2, 3, 4, 5 };
 		int[] firstLayerFactorsTree = { 4, 4, 4, 4 };
 		int firstLayerFactorClique = (int) (2289 * 0.75);
-		int addEdges = 1500000;
+		int addEdges = 0; //1500000;
 		int[] firstLayerFactorsClique = { firstLayerFactorClique,
 				firstLayerFactorClique, firstLayerFactorClique,
 				firstLayerFactorClique, firstLayerFactorClique };
@@ -162,40 +163,47 @@ public class BGStorageTest {
 		switch (variant) {
 		case TREELIKE:// Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 5, factors,
-					firstLayerFactorsTree, addEdges, false, false)
+					firstLayerFactorsTree, addEdges, false, ImplementationVariant.MEM)
 					.createGraph();
 		case TREELIKEDISK:// Tree-like graph, 1 root, 11 levels
 			return new TreeGraphGenerator(11, 5, factors,
-					firstLayerFactorsTree, addEdges, false, true).createGraph();
+					firstLayerFactorsTree, addEdges, false, ImplementationVariant.DISK).createGraph();
+		case TREELIKEDIST_LOCAL:// Tree-like graph, 1 root, 11 levels
+			return new TreeGraphGenerator(11, 5, factors,
+					firstLayerFactorsTree, addEdges, false, ImplementationVariant.DISTRIBUTED).createGraph();
 		case CLIQUE:
 			return new TreeGraphGenerator(6, 5, factors,
-					firstLayerFactorsClique, addEdges, false, false)
+					firstLayerFactorsClique, addEdges, false, ImplementationVariant.MEM)
+					.createGraph();
+		case CLIQUEDIST_LOCAL:
+			return new TreeGraphGenerator(6, 5, factors,
+					firstLayerFactorsClique, addEdges, false, ImplementationVariant.DISTRIBUTED)
 					.createGraph();
 		case CLIQUEDISK:
 			return new TreeGraphGenerator(6, 5, factors,
-					firstLayerFactorsClique, addEdges, false, true)
+					firstLayerFactorsClique, addEdges, false, ImplementationVariant.DISK)
 					.createGraph();
 		case TREELIKEHY:// Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTED:
 		case TREELIKEVIEW:
 			return new TreeGraphGenerator(11, 5, factors,
-					firstLayerFactorsTree, addEdges, true, false).createGraph();
+					firstLayerFactorsTree, addEdges, true, ImplementationVariant.MEM).createGraph();
 		case TREELIKEDISKHY:// Tree-like graph, 1 root, 11 levels
 		case TREELIKENESTEDDISK:
 		case TREELIKEVIEWDISK:
 			return new TreeGraphGenerator(10, 5, factors,
-					firstLayerFactorsTree, addEdges, true, true).createGraph();
+					firstLayerFactorsTree, addEdges, true, ImplementationVariant.DISK).createGraph();
 		case CLIQUEHY:
 		case CLIQUENESTED:
 		case CLIQUEVIEW:
 			return new TreeGraphGenerator(6, 5, factors,
-					firstLayerFactorsClique, addEdges, true, false)
+					firstLayerFactorsClique, addEdges, true, ImplementationVariant.MEM)
 					.createGraph();
 		case CLIQUEDISKHY:
 		case CLIQUENESTEDDISK:
 		case CLIQUEVIEWSDISK:
 			return new TreeGraphGenerator(6, 5, factors,
-					firstLayerFactorsClique, addEdges, true, true)
+					firstLayerFactorsClique, addEdges, true, ImplementationVariant.DISK)
 					.createGraph();
 		case TREELIKEDISTRIBUTED:// Tree-like graph, 1 root, 11 levels
 			genericSearch = false;
@@ -224,14 +232,14 @@ public class BGStorageTest {
 	public static void main(String[] args) {
 		BGStorageTest test = new BGStorageTest();
 
-		int cycles = 2;
+		int cycles = 1;
 
 		boolean distributed = true;
 		
 
 
 		if (distributed) {
-			Variant[] distributedVariants = { Variant.TREELIKE };
+			Variant[] distributedVariants = { Variant.TREELIKEDIST_LOCAL };
 			String[] hosts = { "141.26.70.230", "helena.uni-koblenz.de" };
 			for (Variant variant : distributedVariants) {
 				test.iterateTest(1, variant, hosts);

@@ -221,7 +221,7 @@ public class CompleteGraphDatabaseImpl extends GraphDatabaseBaseImpl implements
 	@Override
 	public Graph getTraversalContext() {
 		if (traversalContextMap == null) {
-			return null;
+			return getGraphObject(GraphDatabaseElementaryMethods.GLOBAL_GRAPH_ID);
 		}
 		Stack<Graph> stack = traversalContextMap.get(Thread.currentThread());
 		if (stack == null || stack.isEmpty()) {

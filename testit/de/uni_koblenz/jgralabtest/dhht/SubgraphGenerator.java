@@ -7,6 +7,10 @@ import de.uni_koblenz.jgralab.ImplementationType;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleVertex;
 
 
 public class SubgraphGenerator implements RemoteGraphGenerator {

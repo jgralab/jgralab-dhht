@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralabtest.dhht;
 
 import de.uni_koblenz.jgralab.impl.disk.GraphDatabaseElementaryMethods;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
 
 public class DistributedGraphGenerator extends TreeGraphGenerator  {
 
@@ -12,7 +13,7 @@ public class DistributedGraphGenerator extends TreeGraphGenerator  {
 			int[] branchingFactors, int[] firstLayerBranchingFactors,
 			int additionalEdgeCount, boolean useHyperedges, String[] remoteHosts) {
 		super(layers, roots, branchingFactors, firstLayerBranchingFactors,
-				additionalEdgeCount, useHyperedges, true);
+				additionalEdgeCount, useHyperedges, ImplementationVariant.DISTRIBUTED);
 		partialGraphs = new DHHTTestGraph[remoteHosts.length + 1];
 		this.remoteHosts = remoteHosts;
 	}

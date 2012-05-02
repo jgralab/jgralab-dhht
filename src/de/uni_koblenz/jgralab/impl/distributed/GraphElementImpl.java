@@ -205,7 +205,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 *            the id of the created incidence
 	 * @return
 	 */
-	public abstract Incidence connect(IncidenceClass incidenceClass, DualType elemToConnect,
+	public abstract <T extends Incidence> T connect(IncidenceClass incidenceClass, DualType elemToConnect,
 			int incidenceId);
 
 	
@@ -535,9 +535,10 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	@SuppressWarnings("rawtypes")
 	public final void setSigma(GraphElement newSigma) {
-		assert newSigma != null;
-	//	assert getType().getAllowedSigmaClasses().contains(newSigma.getType());
-		this.sigmaId = (newSigma instanceof Vertex) ? newSigma.getGlobalId() : -newSigma.getGlobalId();
+		if (newSigma == null)
+			this.sigmaId = 0;
+		else
+			this.sigmaId = (newSigma instanceof Vertex) ? newSigma.getGlobalId() : -newSigma.getGlobalId();
 	}
 
 	/**

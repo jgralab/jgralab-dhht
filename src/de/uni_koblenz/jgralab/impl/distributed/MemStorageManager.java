@@ -14,8 +14,9 @@ import de.uni_koblenz.jgralab.impl.distributed.IncidenceImpl;
 import de.uni_koblenz.jgralab.impl.distributed.VertexImpl;
 
 /**
- * This class realizes the storage of vertices, edges and incidences on the
- * disk. All methods may be used only with local objects and local ids.
+ * This class realizes the storage of vertices, edges and incidences 
+ * in memory in a distributed environment. All methods may be used
+ * only with local objects and local ids.
  * 
  * @author dbildh
  * 
@@ -59,12 +60,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * array of incidences
 	 */
 	private IncidenceImpl[] incidenceArray;
-
-	private GraphDatabaseBaseImpl graphDatabase;
 	
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
-		this.graphDatabase = database;
 		expandVertexArray(INITIAL_ELEMENT_ARRAY_SIZE);
 		expandEdgeArray(INITIAL_ELEMENT_ARRAY_SIZE);
 		expandIncidenceArray(INITIAL_INCIDENCE_ARRAY_SIZE);
@@ -85,12 +83,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public final Incidence getIncidenceObject(int id) {
 		return incidenceArray[id];
 	}
-
-
-//	private int getLocalId(long id) {
-//		return GraphDatabaseBaseImpl.convertToLocalId(id);
-//	}
-
 
 
 	public void storeVertex(

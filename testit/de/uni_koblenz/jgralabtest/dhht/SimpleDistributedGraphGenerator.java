@@ -6,6 +6,11 @@ import java.rmi.RemoteException;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.JGraLabServerImpl;
 import de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseElementaryMethods;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_start;
+import de.uni_koblenz.jgralabtest.dhht.schema.SimpleEdge_target;
 
 public class SimpleDistributedGraphGenerator {
 
@@ -37,7 +42,7 @@ public class SimpleDistributedGraphGenerator {
 
 	
 	public DHHTTestGraph createGraph() {
-		topGraph = DHHTTestSchema.instance().createDHHTTestGraphOnDisk();
+		topGraph = DHHTTestSchema.instance().createDHHTTestGraph_DistributedStorage();
 		for (int i=0; i<remoteHosts.length;i++) {
 			createPartialGraph(i+1);
 		}

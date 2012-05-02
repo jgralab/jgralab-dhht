@@ -1118,6 +1118,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	@Override
 	public long connect(int incidenceClassId, long vertexId, long edgeId,
 			long incId) {
+	//	System.out.println("Creating incidence");
 		IncidenceClass incClass = (IncidenceClass) schema
 				.getTypeForId(incidenceClassId);
 		Class<? extends Incidence> m1Class = incClass.getM1Class();
@@ -1136,11 +1137,12 @@ public abstract class GraphDatabaseBaseImpl extends
 				.createIncidence_DistributedStorage(m1Class, incId, vertexId,
 						edgeId, this);
 
+		inMemoryStorage.storeIncidence(newInc);
+		
 		// append created incidence to lambda sequences of vertex and edge
 		appendIncidenceToLambdaSeqOfVertex(vertexId, incId);
 		appendIncidenceToLambdaSeqOfEdge(edgeId, incId);
 
-		inMemoryStorage.storeIncidence(newInc);
 		if (!isLoading()) {
 			notifyIncidenceAdded(incId);
 		}

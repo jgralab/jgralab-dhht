@@ -1085,9 +1085,6 @@ public class GraphFactoryImpl implements GraphFactory {
 			Vertex vertex) {
 		try {
 			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();
-			System.out.println("Subordinate graph impl class: "
-					+ subordinateGraphForVertexMap_MemBasedStorage
-							.get(graphClass));
 			de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl) subordinateGraphForVertexMap_MemBasedStorage
 					.get(graphClass).newInstance(vertex);
 			return g;

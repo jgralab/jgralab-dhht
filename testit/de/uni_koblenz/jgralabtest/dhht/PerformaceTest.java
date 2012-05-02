@@ -5,6 +5,17 @@ import java.util.ArrayList;
 
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.algolib.CountHypergraphSearchAlgorithm;
+import de.uni_koblenz.jgralabtest.dhht.schema.Activity;
+import de.uni_koblenz.jgralabtest.dhht.schema.BusinessProcess;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestGraph;
+import de.uni_koblenz.jgralabtest.dhht.schema.DHHTTestSchema;
+import de.uni_koblenz.jgralabtest.dhht.schema.Feature;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_activity;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_feature;
+import de.uni_koblenz.jgralabtest.dhht.schema.FeatureTraceabilityLink_process;
+import de.uni_koblenz.jgralabtest.dhht.schema.TraceabilityLink_rule;
+import de.uni_koblenz.jgralabtest.dhht.schema.TransformationRule;
 
 public class PerformaceTest {
 	
@@ -25,7 +36,7 @@ public class PerformaceTest {
 	
 	private Graph createGraph()  throws RemoteException {
 		System.out.println("Creating graph...");
-		DHHTTestGraph graph = DHHTTestSchema.instance().createDHHTTestGraphInMem();
+		DHHTTestGraph graph = DHHTTestSchema.instance().createDHHTTestGraph_InMemoryStorage();
 		
 		long startTime = System.currentTimeMillis();
 		for (int i=0; i<activityCount;i++) {

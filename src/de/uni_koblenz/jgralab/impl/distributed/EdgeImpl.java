@@ -146,8 +146,7 @@ public abstract class EdgeImpl extends
 	@SuppressWarnings("unchecked")
 	public final <T extends Incidence> T connect(IncidenceClass incidenceClass,
 			Vertex elemToConnect, long incidenceId) {
-		return (T) getSchema().getGraphFactory().createIncidence_DistributedStorage(incidenceClass.getM1Class(),
-				incidenceId, elemToConnect.getGlobalId(), this.getGlobalId(), graphDb);
+		return (T) graphDb.getIncidenceObject(graphDb.connect(incidenceClass.getId(),  elemToConnect.getGlobalId(), this.getGlobalId()));
 	}
 
 	@Override
