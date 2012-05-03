@@ -46,6 +46,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
@@ -319,8 +320,30 @@ public class NFA extends FiniteAutomaton {
 	}
 
 	/**
-	 * Constructs a NFA which accepts the given SimpleEdgePathDescription. The
-	 * EdgeRestrictions (RoleId, TypeId) are modeled in the Transition.
+	 * Constructs an NFA which accepts the given {@link SimpleIncidencePathDescription}.
+	 * 
+	 * @param dir The direction of the incidence
+	 * @param types The valid 'types' of the incidence.
+	 * @return An NFA accepting the incidence
+	 */
+	public static NFA createSimpleIncidencePathDescriptionNFA(IncDirection dir,
+			TypeCollection types,
+			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
+		NFA nfa = new NFA();
+		nfa.transitionList.clear();
+		nfa.initialState.outTransitions.clear();
+		nfa.finalStates.get(0).inTransitions.clear();
+		SimpleIncidenceTransition t = new SimpleIncidenceTransition(
+				nfa.initialState, nfa.finalStates.get(0), dir, types);
+		nfa.transitionList.add(t);
+		nfa.updateStateAttributes();
+		return nfa;
+	}
+
+	/**
+	 * Constructs a NFA which accepts the given SimpleEdgePathDescription.
+	 * This is done via translation of the Edge into two (or more)
+	 * equivalent Incidences.
 	 */
 	public static NFA createSimpleEdgePathDescriptionNFA(
 			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
@@ -344,6 +367,7 @@ public class NFA extends FiniteAutomaton {
 			direction = IncDirection.OUT;
 		}
 
+		// Represent the edge as two incidences
 		SimpleIncidenceTransition t1 = null;
 		SimpleIncidenceTransition t2 = null;
 
@@ -354,6 +378,9 @@ public class NFA extends FiniteAutomaton {
 				direction);
 		nfa.transitionList.add(t2);
 
+		// A <-> (edge of any direction) is NOT equivalent to <+><+> (two
+		// incidences in any direction). So it has to be translated to two
+		// ways through the automaton (+>+> and <+<+)
 		if (any) {
 			State middleStateAlternative = new State();
 			nfa.stateList.add(middleStateAlternative);
