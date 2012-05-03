@@ -121,7 +121,7 @@ public class VertexTypeRestrictionTransition extends Transition {
 	 * returns a string which describes the edge
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		String desc = "VertexRestrictinTransition";
 		return desc;
 	}

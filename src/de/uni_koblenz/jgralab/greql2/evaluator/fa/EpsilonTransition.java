@@ -114,7 +114,7 @@ public class EpsilonTransition extends Transition {
 	 * returns a string which describes the edge
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		String desc = "EpsilonTransition";
 		return desc;
 	}
@@ -130,7 +130,7 @@ public class EpsilonTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement e, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		return false;
 	}
 

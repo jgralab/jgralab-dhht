@@ -115,7 +115,7 @@ public class IntermediateVertexTransition extends Transition {
 	 * returns a string which describes the edge
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		String desc = "IndermediateVertexTransition";
 		return desc;
 	}

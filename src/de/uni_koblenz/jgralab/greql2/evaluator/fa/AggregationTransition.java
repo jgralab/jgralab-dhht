@@ -82,7 +82,7 @@ public class AggregationTransition extends Transition {
 	 * returns a string which describes the edge
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		// String desc = "SimpleTransition";
 		String desc = "AggregationTransition (aggregateFrom:" + aggregateFrom;
 		if (typeCollection != null) {

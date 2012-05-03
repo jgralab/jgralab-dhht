@@ -67,12 +67,13 @@ public class SimpleIncidenceTransition extends Transition {
 	protected IncDirection validDirection;
 
 	/**
-	 * returns a string which describes the edge
+	 * returns a string which describes the incidence
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		// String desc = "SimpleTransition";
-		String desc = "SimpleTransition (Dir:" + validDirection.toString();
+		String desc = "SimpleIncidenceTransition (Dir:"
+				+ validDirection.toString();
 		if (typeCollection != null) {
 			desc = desc + "\n " + typeCollection.toString() + "\n ";
 		}
@@ -190,7 +191,7 @@ public class SimpleIncidenceTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement e, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		if (i == null) {
 			return false;
 		}
@@ -220,16 +221,6 @@ public class SimpleIncidenceTransition extends Transition {
 		}
 
 		return true;
-	}
-
-	/**
-	 * returns the element of the datagraph which can be visited after this
-	 * transition has fired. This is the element at the end of the incidence
-	 */
-	@Override
-	public GraphElement getNextElement(GraphElement e,
-			Incidence i) {
-		return null; //i.getThat();
 	}
 
 	@Override

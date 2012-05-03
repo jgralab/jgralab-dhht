@@ -7,7 +7,6 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
-
 public class ElementRestrictionTransition extends Transition {
 
 	private TypeCollection types = null;
@@ -19,15 +18,19 @@ public class ElementRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public String edgeString() {
-		// TODO Auto-generated method stub
-		return null;
+	public String incidenceString() {
+		StringBuilder desc = new StringBuilder(
+				"ElementRestrictionTransition (Types: ");
+		if (types != null) {
+			desc.append("\n " + types.toString() + "\n ");
+		}
+		desc.append(")");
+		return desc.toString();
 	}
 
 	@Override
 	public String prettyPrint() {
-		// TODO Auto-generated method stub
-		return null;
+		return "{" + types.toString() + "}";
 	}
 
 	@Override
@@ -37,8 +40,13 @@ public class ElementRestrictionTransition extends Transition {
 
 	@Override
 	public boolean equalSymbol(Transition t) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!(t instanceof ElementRestrictionTransition)) {
+			return false;
+		}
+		if (!(((ElementRestrictionTransition) t).types.equals(this.types))) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -64,9 +72,8 @@ public class ElementRestrictionTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement e, Incidence i) {
-		//return accepts(e);
-		return false;
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		return accepts(e);
 	}
 
 	/**
@@ -74,7 +81,7 @@ public class ElementRestrictionTransition extends Transition {
 	 * @param e The {@link GraphElement} to be "used" in this transition.
 	 * @return
 	 */
-	public boolean accepts(GraphElement e) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
@@ -92,11 +99,16 @@ public class ElementRestrictionTransition extends Transition {
 		return true;
 	}
 
+	/**
+	 * Since this transition only checks whether the element is allowed under
+	 * the restrictions of the specified path description the next element is
+	 * the given element. It has just been accepted and can be used for the
+	 * next step of the evaluation.
+	 */
 	@Override
-	public GraphElement getNextElement(
-			GraphElement elem, Incidence inc) {
-		// TODO Auto-generated method stub
-		return null;
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+		return elem;
 	}
 
 }

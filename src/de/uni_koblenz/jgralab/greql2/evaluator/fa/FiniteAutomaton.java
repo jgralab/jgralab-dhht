@@ -90,10 +90,10 @@ public abstract class FiniteAutomaton {
 				Transition currentTransition = transitionIter.next();
 				int stateNumber = stateList.indexOf(currentTransition.endState);
 				if (finalStates.contains(currentTransition.endState)) {
-					logger.info("      ----" + currentTransition.edgeString()
+					logger.info("      ----" + currentTransition.incidenceString()
 							+ "--->    [[" + stateNumber + "]]");
 				} else {
-					logger.info("      ----" + currentTransition.edgeString()
+					logger.info("      ----" + currentTransition.incidenceString()
 							+ "--->    [" + stateNumber + "]");
 				}
 			}
@@ -114,11 +114,11 @@ public abstract class FiniteAutomaton {
 				int stateNumber = currentTransition.endState.number;
 				if (finalStates.contains(currentTransition.endState)) {
 					System.out.println("      ----"
-							+ currentTransition.edgeString() + "--->    [["
+							+ currentTransition.incidenceString() + "--->    [["
 							+ stateNumber + "]]");
 				} else {
 					System.out.println("      ----"
-							+ currentTransition.edgeString() + "--->    ["
+							+ currentTransition.incidenceString() + "--->    ["
 							+ stateNumber + "]");
 				}
 			}

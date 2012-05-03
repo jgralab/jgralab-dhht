@@ -45,6 +45,7 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
+import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 /**
@@ -328,7 +329,42 @@ public class NFA extends FiniteAutomaton {
 		NFA nfa = new NFA();
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
+		State middleState = new State();
+		nfa.stateList.add(middleState);
 		nfa.finalStates.get(0).inTransitions.clear();
+
+		// Translate the direction to the one used by the incidences
+		IncDirection direction;
+		boolean any = false;
+		if (!(dir == Transition.AllowedEdgeDirection.ANY)) {
+			direction = dir == Transition.AllowedEdgeDirection.OUT ? IncDirection.OUT
+					: IncDirection.IN;
+		} else {
+			any = true;
+			direction = IncDirection.OUT;
+		}
+
+		SimpleIncidenceTransition t1 = null;
+		SimpleIncidenceTransition t2 = null;
+
+		t1 = new SimpleIncidenceTransition(nfa.initialState, middleState,
+				direction);
+		nfa.transitionList.add(t1);
+		t2 = new SimpleIncidenceTransition(middleState, nfa.finalStates.get(0),
+				direction);
+		nfa.transitionList.add(t2);
+
+		if (any) {
+			State middleStateAlternative = new State();
+			nfa.stateList.add(middleStateAlternative);
+			direction = IncDirection.IN;
+			SimpleIncidenceTransition t3 = new SimpleIncidenceTransition(
+					nfa.initialState, middleStateAlternative, direction);
+			nfa.transitionList.add(t3);
+			SimpleIncidenceTransition t4 = new SimpleIncidenceTransition(
+					middleStateAlternative, nfa.finalStates.get(0), direction);
+			nfa.transitionList.add(t4);
+		}
 		// SimpleTransition t = new SimpleTransition(nfa.initialState,
 		// nfa.finalStates.get(0), dir, typeCollection, roles,
 		// predicateEvaluator, marker);
@@ -504,34 +540,34 @@ public class NFA extends FiniteAutomaton {
 	 * @return
 	 */
 
-//	public static NFA createSimpleIncidenceTransition_Db() {
-//		NFA nfa = new NFA();
-//		State startState = new State();
-//		startState.number = 0;
-//		nfa.stateList.add(startState);
-//		nfa.initialState = startState;
-//		State interState = new State();
-//		nfa.stateList.add(interState);
-//		interState.number = 1;
-//		State endState = new State();
-//		nfa.stateList.add(endState);
-//		endState.isFinal = true;
-//		endState.number = 2;
-//		nfa.finalStates.add(endState);
-//		Set<TypedElementClass> types = new HashSet<TypedElementClass>();
-//		types.add(Greql2Schema.instance()
-//				.getIncidenceClassesInTopologicalOrder().get(7));
-//		TypeCollection typeColl = new TypeCollection(types, false);
-//		Transition t = new SimpleIncidenceTransition_Db(startState, interState,
-//				IncDirection.IN, typeColl);
-//		nfa.transitionList.add(t);
-//		t = new SimpleIncidenceTransition_Db(endState, interState,
-//				IncDirection.IN, typeColl);
-//		nfa.transitionList.add(t);
-//		t = new AggregationIncidenceTransition_Db(interState, endState,
-//				typeColl);
-//		nfa.transitionList.add(t);
-//		return nfa;
-//	}
+	// public static NFA createSimpleIncidenceTransition_Db() {
+	// NFA nfa = new NFA();
+	// State startState = new State();
+	// startState.number = 0;
+	// nfa.stateList.add(startState);
+	// nfa.initialState = startState;
+	// State interState = new State();
+	// nfa.stateList.add(interState);
+	// interState.number = 1;
+	// State endState = new State();
+	// nfa.stateList.add(endState);
+	// endState.isFinal = true;
+	// endState.number = 2;
+	// nfa.finalStates.add(endState);
+	// Set<TypedElementClass> types = new HashSet<TypedElementClass>();
+	// types.add(Greql2Schema.instance()
+	// .getIncidenceClassesInTopologicalOrder().get(7));
+	// TypeCollection typeColl = new TypeCollection(types, false);
+	// Transition t = new SimpleIncidenceTransition_Db(startState, interState,
+	// IncDirection.IN, typeColl);
+	// nfa.transitionList.add(t);
+	// t = new SimpleIncidenceTransition_Db(endState, interState,
+	// IncDirection.IN, typeColl);
+	// nfa.transitionList.add(t);
+	// t = new AggregationIncidenceTransition_Db(interState, endState,
+	// typeColl);
+	// nfa.transitionList.add(t);
+	// return nfa;
+	// }
 
 }
