@@ -40,7 +40,6 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
@@ -118,7 +117,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 			this.gc = gc;
 			this.dir = dir;
 			this.traversalContext = traversalContext;
-			incidenceListVersion = ((GraphElementImpl<?, ?, ?,?>) graphElement)
+			incidenceListVersion = ((GraphElement<?, ?, ?,?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
 		}
@@ -136,7 +135,7 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 		 * @throws ConcurrentModificationException
 		 */
 		protected void checkConcurrentModification() {
-			if (((GraphElementImpl<?, ?, ?,?>) graphElement)
+			if (((GraphElement<?, ?, ?,?>) graphElement)
 					.isIncidenceListModified(incidenceListVersion)) {
 				throw new ConcurrentModificationException(
 						"The incidence list of the GraphElement has been modified - the iterator is not longer valid");
