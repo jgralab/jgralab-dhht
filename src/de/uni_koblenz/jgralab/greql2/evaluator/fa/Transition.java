@@ -153,8 +153,8 @@ public abstract class Transition {
 	public abstract boolean equalSymbol(Transition t);
 
 	/**
-	 * reverses this transition, that means, the former end state gets the new
-	 * start state and vice versa,
+	 * reverses this transition, that means, the former end state becomes the new
+	 * start state and vice versa
 	 */
 	public void reverse() {
 		State s = startState;

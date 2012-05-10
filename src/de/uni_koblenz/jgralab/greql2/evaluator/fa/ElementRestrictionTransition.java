@@ -1,41 +1,35 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
-import de.uni_koblenz.jgralab.Edge;
+import java.util.List;
+
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 
 public class ElementRestrictionTransition extends Transition {
 
-	private TypeCollection types = null;
+	private VertexEvaluator evaluator = null;
 
 	protected ElementRestrictionTransition(Transition t, boolean addToStates,
-			TypeCollection types) {
+			VertexEvaluator eval) {
 		super(t, addToStates);
-		this.types = types;
+		evaluator = eval;
 	}
 
 	@Override
 	public String incidenceString() {
-		StringBuilder desc = new StringBuilder(
-				"ElementRestrictionTransition (Types: ");
-		if (types != null) {
-			desc.append("\n " + types.toString() + "\n ");
-		}
-		desc.append(")");
+		StringBuilder desc = new StringBuilder("ElementRestrictionTransition");
 		return desc.toString();
 	}
 
 	@Override
 	public String prettyPrint() {
-		return "{" + types.toString() + "}";
+		return "{ " + evaluator.getVertex().getType().toString() + " }";
 	}
 
 	@Override
 	public Transition copy(boolean addToStates) {
-		return new ElementRestrictionTransition(this, addToStates, types);
+		return new ElementRestrictionTransition(this, addToStates, evaluator);
 	}
 
 	@Override
@@ -43,7 +37,7 @@ public class ElementRestrictionTransition extends Transition {
 		if (!(t instanceof ElementRestrictionTransition)) {
 			return false;
 		}
-		if (!(((ElementRestrictionTransition) t).types.equals(this.types))) {
+		if (!(((ElementRestrictionTransition) t).evaluator == evaluator)) {
 			return false;
 		}
 		return true;
@@ -54,49 +48,35 @@ public class ElementRestrictionTransition extends Transition {
 		return false;
 	}
 
-	@Deprecated
-	public Vertex getNextVertex(Vertex v, Edge e) {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		return false;
 	}
 
-	@Deprecated
-	public boolean consumesEdge() {
-		// TODO Auto-generated method stub
-		return false;
+	/**
+	 * Checks whether the given {@link GraphElement} (e) is among the results
+	 * of the {@link VertexEvaluator} this Transition is restricted by.
+	 * 
+	 * @param e The GraphElement to be checked.
+	 * @return
+	 */
+	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
+		boolean acceptedElement = false;
+
+		List<GraphElement<?, ?, ?, ?>> evalResult = (List<GraphElement<?, ?, ?, ?>>) evaluator
+				.getResult();
+		for (GraphElement<?, ?, ?, ?> ge : evalResult) {
+			if (ge.equals(e)) {
+				acceptedElement = true;
+				break;
+			}
+		}
+		return acceptedElement;
 	}
 
 	@Override
 	public boolean consumesIncidence() {
 		return false;
-	}
-
-	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		return accepts(e);
-	}
-
-	/**
-	 * Checks whether the given {@link GraphElement} is from one of the accepted types. Accepts the transition if it is, not if it isn't.
-	 * @param e The {@link GraphElement} to be "used" in this transition.
-	 * @return
-	 */
-	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
-		boolean typeAccepted = false;
-
-		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
-			if (((TypedElementClass<?, ?>) e.getType()) == eClass) {
-				typeAccepted = true;
-				break;
-			}
-		}
-		if (!typeAccepted) {
-			return false;
-		}
-
-		// TODO jtheegarten: check for concrete elements defined as the
-		// restriction, but might be better as its own transition
-		return true;
 	}
 
 	/**
@@ -110,5 +90,4 @@ public class ElementRestrictionTransition extends Transition {
 			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
 		return elem;
 	}
-
 }

@@ -379,7 +379,7 @@ public class NFA extends FiniteAutomaton {
 		nfa.transitionList.add(t2);
 
 		// A <-> (edge of any direction) is NOT equivalent to <+><+> (two
-		// incidences in any direction). So it has to be translated to two
+		// incidences of any direction). So it has to be translated to two
 		// ways through the automaton (+>+> and <+<+)
 		if (any) {
 			State middleStateAlternative = new State();
