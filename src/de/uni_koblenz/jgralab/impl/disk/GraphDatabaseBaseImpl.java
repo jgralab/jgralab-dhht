@@ -1079,7 +1079,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * incidence's id to the next locally available incidence id
 	 * 
 	 * @param cls
-	 * @param vertex
+	 * @param element
 	 * @param edge
 	 */
 	@Override
@@ -1093,7 +1093,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * incidence's id to <code>id</code>
 	 * 
 	 * @param cls
-	 * @param vertex
+	 * @param element
 	 * @param edge
 	 * @param id
 	 */
