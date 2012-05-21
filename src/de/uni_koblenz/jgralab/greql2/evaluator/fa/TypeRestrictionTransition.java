@@ -5,6 +5,12 @@ import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
+/**
+ * Evaluates a TypeRestriction (curly brackets with a list
+ * of types EdgeTypes or VertexTypes).
+ * @author jtheegarten@uni-koblenz.de 2012, Diploma Thesis
+ *
+ */
 public class TypeRestrictionTransition extends RestrictionTransition {
 
 	private TypeCollection types = null;

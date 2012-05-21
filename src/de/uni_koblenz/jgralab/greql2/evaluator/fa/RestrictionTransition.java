@@ -6,6 +6,12 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 
+/**
+ * Superclass of the Transitions used to evaluate Type- and ElementRestrictions.
+ * 
+ * @author jtheegarten@uni-koblenz.de 2012, Diploma Thesis
+ */
+
 public abstract class RestrictionTransition extends Transition {
 
 	protected VertexEvaluator predicateEval = null;
@@ -37,6 +43,13 @@ public abstract class RestrictionTransition extends Transition {
 		return elem;
 	}
 
+	/**
+	 * The accepts-method does not need an incidence because it only checks
+	 * the element for compliance with the known list of types
+	 * (TypeRestrictionTransition) or Elements (ElementRestrictionTransition).
+	 * 
+	 * This method is just provided for compliance with the superclass.
+	 */
 	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		return accepts(e);
@@ -59,6 +72,12 @@ public abstract class RestrictionTransition extends Transition {
 		return false;
 	}
 
+	/**
+	 * Any Type- or ElementRestriction can have a boolean predicate attached.
+	 * Since those don't have to distinguish between both types of restrictions,
+	 * the predicate is evaluated here.
+	 * @return
+	 */
 	protected boolean acceptsPredicate() {
 		if (predicateEval == null) {
 			return true;

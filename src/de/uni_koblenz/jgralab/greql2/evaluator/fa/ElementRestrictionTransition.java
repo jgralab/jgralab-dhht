@@ -6,6 +6,12 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 
+/**
+ * Evaluates an ElementRestriction (curly brackets with an Expression,
+ * which evaluates to a list of elements).
+ * @author jtheegarten@uni-koblenz.de 2012, Diploma Thesis
+ *
+ */
 public class ElementRestrictionTransition extends RestrictionTransition {
 
 	protected VertexEvaluator evaluator = null;

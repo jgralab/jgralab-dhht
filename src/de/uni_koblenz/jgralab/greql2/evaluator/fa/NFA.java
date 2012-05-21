@@ -300,7 +300,7 @@ public class NFA extends FiniteAutomaton {
 
 	/**
 	 * Constructs a NFA which accepts the given EdgePathDescription The
-	 * EdgeRestrictions (RoleId, TypeId) are modeled in the Transition.
+	 * EdgeRestrictions (RoleId, TypeId) are modeled in (one of) the Transition(s).
 	 */
 	public static NFA createEdgePathDescriptionNFA(
 			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
