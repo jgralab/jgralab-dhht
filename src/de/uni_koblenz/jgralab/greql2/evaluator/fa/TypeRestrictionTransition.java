@@ -1,13 +1,11 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
-import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
-public class TypeRestrictionTransition extends Transition {
+public class TypeRestrictionTransition extends RestrictionTransition {
 
 	private TypeCollection types = null;
 
@@ -15,6 +13,13 @@ public class TypeRestrictionTransition extends Transition {
 			TypeCollection types) {
 		super(t, addToStates);
 		this.types = types;
+	}
+
+	public TypeRestrictionTransition(State start, State end,
+			TypeCollection types, VertexEvaluator predicateEval) {
+		super(start, end, predicateEval);
+		this.types = types;
+
 	}
 
 	@Override
@@ -46,32 +51,16 @@ public class TypeRestrictionTransition extends Transition {
 		if (!(((TypeRestrictionTransition) t).types.equals(this.types))) {
 			return false;
 		}
+		if (predicateEval != null) {
+			if (predicateEval != ((TypeRestrictionTransition) t).predicateEval) {
+				return false;
+			}
+		} else {
+			if (((TypeRestrictionTransition) t).predicateEval != null) {
+				return false;
+			}
+		}
 		return true;
-	}
-
-	@Override
-	public boolean isEpsilon() {
-		return false;
-	}
-
-	@Deprecated
-	public Vertex getNextVertex(Vertex v, Edge e) {
-		return null;
-	}
-
-	@Deprecated
-	public boolean consumesEdge() {
-		return false;
-	}
-
-	@Override
-	public boolean consumesIncidence() {
-		return false;
-	}
-
-	@Override
-	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		return accepts(e);
 	}
 
 	/**
@@ -79,7 +68,11 @@ public class TypeRestrictionTransition extends Transition {
 	 * @param e The {@link GraphElement} to be "used" in this transition.
 	 * @return
 	 */
+	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
+		if (!super.acceptsPredicate()) {
+			return false;
+		}
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
@@ -89,18 +82,6 @@ public class TypeRestrictionTransition extends Transition {
 			}
 		}
 		return typeAccepted;
-	}
-
-	/**
-	 * Since this transition only checks whether the element is allowed under
-	 * the restrictions of the specified path description the next element is
-	 * the given element. It has just been accepted and can be used for the
-	 * next step of the evaluation.
-	 */
-	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
-		return elem;
 	}
 
 }

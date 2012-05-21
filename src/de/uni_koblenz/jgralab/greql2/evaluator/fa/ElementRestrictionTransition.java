@@ -6,14 +6,20 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.evaluator.vertexeval.VertexEvaluator;
 
-public class ElementRestrictionTransition extends Transition {
+public class ElementRestrictionTransition extends RestrictionTransition {
 
-	private VertexEvaluator evaluator = null;
+	protected VertexEvaluator evaluator = null;
 
 	protected ElementRestrictionTransition(Transition t, boolean addToStates,
 			VertexEvaluator eval) {
 		super(t, addToStates);
 		evaluator = eval;
+	}
+
+	public ElementRestrictionTransition(State start, State end,
+			VertexEvaluator evaluator, VertexEvaluator predicateEval) {
+		super(start, end, predicateEval);
+		this.evaluator = evaluator;
 	}
 
 	@Override
@@ -40,17 +46,22 @@ public class ElementRestrictionTransition extends Transition {
 		if (!(((ElementRestrictionTransition) t).evaluator == evaluator)) {
 			return false;
 		}
+		if (predicateEval != null) {
+			if (predicateEval != ((ElementRestrictionTransition) t).predicateEval) {
+				return false;
+			}
+		} else {
+			if (((ElementRestrictionTransition) t).predicateEval != null) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 	@Override
-	public boolean isEpsilon() {
-		return false;
-	}
-
-	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
-		return false;
+		return accepts(e);
 	}
 
 	/**
@@ -60,9 +71,14 @@ public class ElementRestrictionTransition extends Transition {
 	 * @param e The GraphElement to be checked.
 	 * @return
 	 */
+	@Override
 	public boolean accepts(GraphElement<?, ?, ?, ?> e) {
+		if (!super.acceptsPredicate()) {
+			return false;
+		}
 		boolean acceptedElement = false;
 
+		@SuppressWarnings("unchecked")
 		List<GraphElement<?, ?, ?, ?>> evalResult = (List<GraphElement<?, ?, ?, ?>>) evaluator
 				.getResult();
 		for (GraphElement<?, ?, ?, ?> ge : evalResult) {
@@ -74,20 +90,4 @@ public class ElementRestrictionTransition extends Transition {
 		return acceptedElement;
 	}
 
-	@Override
-	public boolean consumesIncidence() {
-		return false;
-	}
-
-	/**
-	 * Since this transition only checks whether the element is allowed under
-	 * the restrictions of the specified path description the next element is
-	 * the given element. It has just been accepted and can be used for the
-	 * next step of the evaluation.
-	 */
-	@Override
-	public GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
-		return elem;
-	}
 }

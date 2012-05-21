@@ -310,11 +310,15 @@ public class NFA extends FiniteAutomaton {
 		NFA nfa = new NFA();
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
+		State middleState1 = new State();
+		nfa.stateList.add(middleState1);
+		State middleState2 = new State();
+		nfa.stateList.add(middleState2);
 		nfa.finalStates.get(0).inTransitions.clear();
-		// SimpleTransition t = new EdgeTransition(nfa.initialState,
-		// nfa.finalStates.get(0), dir, typeCollection, roles, edgeEval,
-		// predicateEvaluator, marker);
-		// nfa.transitionList.add(t);
+
+		translateEdgeToIncidences(dir, typeCollection, predicateEvaluator, nfa,
+				middleState1, middleState2, roles);
+
 		nfa.updateStateAttributes();
 		return nfa;
 	}
@@ -323,18 +327,17 @@ public class NFA extends FiniteAutomaton {
 	 * Constructs an NFA which accepts the given {@link SimpleIncidencePathDescription}.
 	 * 
 	 * @param dir The direction of the incidence
-	 * @param types The valid 'types' of the incidence.
+	 * @param roles The valid 'types' of the incidence.
 	 * @return An NFA accepting the incidence
 	 */
 	public static NFA createSimpleIncidencePathDescriptionNFA(IncDirection dir,
-			TypeCollection types,
-			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
+			Set<String> roles, ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
 		NFA nfa = new NFA();
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
 		nfa.finalStates.get(0).inTransitions.clear();
 		SimpleIncidenceTransition t = new SimpleIncidenceTransition(
-				nfa.initialState, nfa.finalStates.get(0), dir, types);
+				nfa.initialState, nfa.finalStates.get(0), dir, roles);
 		nfa.transitionList.add(t);
 		nfa.updateStateAttributes();
 		return nfa;
@@ -352,10 +355,26 @@ public class NFA extends FiniteAutomaton {
 		NFA nfa = new NFA();
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
-		State middleState = new State();
-		nfa.stateList.add(middleState);
+		State middleState1 = new State();
+		nfa.stateList.add(middleState1);
+		State middleState2 = new State();
+		nfa.stateList.add(middleState2);
 		nfa.finalStates.get(0).inTransitions.clear();
 
+		translateEdgeToIncidences(dir, typeCollection, predicateEvaluator, nfa,
+				middleState1, middleState2, roles);
+		// SimpleTransition t = new SimpleTransition(nfa.initialState,
+		// nfa.finalStates.get(0), dir, typeCollection, roles,
+		// predicateEvaluator, marker);
+		// nfa.transitionList.add(t);
+		nfa.updateStateAttributes();
+		return nfa;
+	}
+
+	private static void translateEdgeToIncidences(
+			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
+			VertexEvaluator predicateEvaluator, NFA nfa, State middleState1,
+			State middleState2, Set<String> roles) {
 		// Translate the direction to the one used by the incidences
 		IncDirection direction;
 		boolean any = false;
@@ -371,38 +390,63 @@ public class NFA extends FiniteAutomaton {
 		SimpleIncidenceTransition t1 = null;
 		SimpleIncidenceTransition t2 = null;
 
-		t1 = new SimpleIncidenceTransition(nfa.initialState, middleState,
-				direction);
+		// If the edge is restricted, handle the restrictions
+		Transition rt = null;
+
+		t1 = new SimpleIncidenceTransition(nfa.initialState, middleState1,
+				direction, roles);
 		nfa.transitionList.add(t1);
-		t2 = new SimpleIncidenceTransition(middleState, nfa.finalStates.get(0),
-				direction);
+
+		if (typeCollection != null) {
+			rt = new TypeRestrictionTransition(middleState1, middleState2,
+					typeCollection, predicateEvaluator);
+
+		} else {
+			// If the edge is not restricted, use an epsilon-Transition between
+			// both middle states.
+			rt = new EpsilonTransition(middleState1, middleState2);
+		}
+		nfa.transitionList.add(rt);
+
+		t2 = new SimpleIncidenceTransition(middleState2,
+				nfa.finalStates.get(0), direction, roles);
 		nfa.transitionList.add(t2);
 
 		// A <-> (edge of any direction) is NOT equivalent to <+><+> (two
 		// incidences of any direction). So it has to be translated to two
 		// ways through the automaton (+>+> and <+<+)
 		if (any) {
-			State middleStateAlternative = new State();
-			nfa.stateList.add(middleStateAlternative);
+			State middleStateAlternative1 = new State();
+			nfa.stateList.add(middleStateAlternative1);
+
+			State middleStateAlternative2 = new State();
+			nfa.stateList.add(middleStateAlternative2);
+
 			direction = IncDirection.IN;
 			SimpleIncidenceTransition t3 = new SimpleIncidenceTransition(
-					nfa.initialState, middleStateAlternative, direction);
+					nfa.initialState, middleStateAlternative1, direction);
 			nfa.transitionList.add(t3);
+
+			Transition rtAlt = null;
+			if (typeCollection != null) {
+				rtAlt = new TypeRestrictionTransition(middleStateAlternative1,
+						middleStateAlternative2, typeCollection,
+						predicateEvaluator);
+			} else {
+				rtAlt = new EpsilonTransition(middleStateAlternative1,
+						middleStateAlternative2);
+			}
+			nfa.transitionList.add(rtAlt);
+
 			SimpleIncidenceTransition t4 = new SimpleIncidenceTransition(
-					middleStateAlternative, nfa.finalStates.get(0), direction);
+					middleStateAlternative2, nfa.finalStates.get(0), direction);
 			nfa.transitionList.add(t4);
 		}
-		// SimpleTransition t = new SimpleTransition(nfa.initialState,
-		// nfa.finalStates.get(0), dir, typeCollection, roles,
-		// predicateEvaluator, marker);
-		// nfa.transitionList.add(t);
-		nfa.updateStateAttributes();
-		return nfa;
 	}
 
 	/**
 	 * Constructs a NFA which accepts the given AggregationPathDescription. The
-	 * EdgeRestrictions (RoleId, TypeId) are modeled in the Transition.
+	 * EdgeRestrictions (RoleId, TypeId) are modeled in the middle Transition.
 	 */
 	public static NFA createAggregationPathDescriptionNFA(
 			boolean aggregateFrom, TypeCollection typeCollection,

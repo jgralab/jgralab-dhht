@@ -35,6 +35,9 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
@@ -43,9 +46,6 @@ import de.uni_koblenz.jgralab.greql2.parser.GreqlLexer;
 import de.uni_koblenz.jgralab.greql2.parser.TokenTypes;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * This transition accepts a SimpleIncidencePathDescription. A SimpleIncidencePathDescription is
@@ -57,9 +57,9 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public class SimpleIncidenceTransition extends Transition {
 
 	/**
-	 * The collection of types that are accepted by this transition
+	 * The collection of incidence-types that are accepted by this transition
 	 */
-	protected TypeCollection typeCollection;
+	protected Set<String> roles;
 
 	/**
 	 * this transition may accept transitions in direction in, out or any
@@ -74,8 +74,8 @@ public class SimpleIncidenceTransition extends Transition {
 		// String desc = "SimpleTransition";
 		String desc = "SimpleIncidenceTransition (Dir:"
 				+ validDirection.toString();
-		if (typeCollection != null) {
-			desc = desc + "\n " + typeCollection.toString() + "\n ";
+		if (roles != null) {
+			desc = desc + "\n " + roles.toString() + "\n ";
 		}
 		desc += ")";
 		return desc;
@@ -94,7 +94,7 @@ public class SimpleIncidenceTransition extends Transition {
 			return false;
 		}
 		SimpleIncidenceTransition et = (SimpleIncidenceTransition) t;
-		if (!typeCollection.equals(et.typeCollection)) {
+		if (!roles.equals(et.roles)) {
 			return false;
 		}
 		if (!validDirection.equals(et.validDirection)) {
@@ -111,7 +111,7 @@ public class SimpleIncidenceTransition extends Transition {
 			boolean addToStates) {
 		super(t, addToStates);
 		validDirection = t.validDirection;
-		typeCollection = new TypeCollection(t.typeCollection);
+		roles = new HashSet<String>(t.roles);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class SimpleIncidenceTransition extends Transition {
 	public SimpleIncidenceTransition(State start, State end, IncDirection dir) {
 		super(start, end);
 		validDirection = dir;
-		typeCollection = new TypeCollection();
+		roles = new HashSet<String>();
 	}
 
 	/**
@@ -159,10 +159,10 @@ public class SimpleIncidenceTransition extends Transition {
 	 *            The types which restrict the possible transitions
 	 */
 	public SimpleIncidenceTransition(State start, State end, IncDirection dir,
-			TypeCollection typeCollection) {
+			Set<String> roles) {
 		super(start, end);
 		validDirection = dir;
-		this.typeCollection = typeCollection;
+		this.roles = roles;
 	}
 
 	/*
@@ -197,9 +197,8 @@ public class SimpleIncidenceTransition extends Transition {
 		}
 
 		boolean typeAccepted = false;
-		for (TypedElementClass<?, ?> incClass : typeCollection
-				.getAllowedTypes()) {
-			if (i.getType() == (IncidenceClass) incClass) {
+		for (String incClass : roles) {
+			if (i.getType().getRolename().equals(incClass)) {
 				typeAccepted = true;
 				break;
 			}
@@ -227,9 +226,9 @@ public class SimpleIncidenceTransition extends Transition {
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (TypedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
+		for (String c : roles) {
 			b.append(delim);
-			b.append(c.getSimpleName());
+			b.append(c);
 			delim = ",";
 		}
 		String symbol = GreqlLexer.getTokenString(TokenTypes.IARROW);
@@ -243,7 +242,7 @@ public class SimpleIncidenceTransition extends Transition {
 
 	@Override
 	public boolean consumesIncidence() {
-		return false;
+		return true;
 	}
 
 }
