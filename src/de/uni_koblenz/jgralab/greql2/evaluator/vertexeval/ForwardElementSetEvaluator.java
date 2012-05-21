@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableVertices;
+import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableElements;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ForwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
@@ -94,7 +94,7 @@ public class ForwardElementSetEvaluator extends PathSearchEvaluator {
 		}
 		Vertex startVertex = null;
 		startVertex = (Vertex) startEval.getResult();
-		return ReachableVertices.search(startVertex, searchAutomaton);
+		return ReachableElements.search(startVertex, searchAutomaton);
 	}
 
 	@Override

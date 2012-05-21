@@ -39,6 +39,7 @@ import java.util.HashSet;
 
 import org.pcollections.PSet;
 
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
@@ -46,52 +47,56 @@ import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.Transition;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
-import de.uni_koblenz.jgralab.greql2.types.pathsearch.VertexStateQueue;
+import de.uni_koblenz.jgralab.greql2.types.pathsearch.ElementStateQueue;
 
-public class ReachableVertices extends Function {
-	public ReachableVertices() {
+public class ReachableElements extends Function {
+	public ReachableElements() {
 		super(
-				"Returns all vertices that are reachable from the given vertex by a path matching the the given path description.",
+				"Returns all GraphElements that are reachable from the given element by a path matching the given path description.",
 				100, 10, 1.0, Category.GRAPH,
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
-	public PSet<Vertex> evaluate(Vertex v, DFA dfa) {
+	public PSet<GraphElement<?, ?, ?, ?>> evaluate(GraphElement<?, ?, ?, ?> v,
+			DFA dfa) {
 		return search(v, dfa);
 	}
 
-	public static PSet<Vertex> search(Vertex v, DFA dfa) {
-		PSet<Vertex> resultSet = JGraLab.set();
+	public static PSet<GraphElement<?, ?, ?, ?>> search(
+			GraphElement<?, ?, ?, ?> v, DFA dfa) {
+		PSet<GraphElement<?, ?, ?, ?>> resultSet = JGraLab.set();
 
 		@SuppressWarnings("unchecked")
-		HashSet<Vertex>[] markedElements = new HashSet[dfa.stateList.size()];
+		HashSet<GraphElement<?, ?, ?, ?>>[] markedElements = new HashSet[dfa.stateList
+				.size()];
 		// BitSet[] markedElements = new BitSet[dfa.stateList.size()];
 		for (State s : dfa.stateList) {
 			// markedElements[s.number] = new BitSet();
-			markedElements[s.number] = new HashSet<Vertex>(100);
+			markedElements[s.number] = new HashSet<GraphElement<?, ?, ?, ?>>(
+					100);
 		}
-		VertexStateQueue queue = new VertexStateQueue();
+		ElementStateQueue queue = new ElementStateQueue();
 		markedElements[dfa.initialState.number].add(v);
 		queue.put(v, dfa.initialState);
 		while (queue.hasNext()) {
-			Vertex vertex = queue.currentVertex;
+			GraphElement<?, ?, ?, ?> element = queue.currentElement;
 			State state = queue.currentState;
 			if (state.isFinal) {
-				resultSet = resultSet.plus(vertex);
+				resultSet = resultSet.plus(element);
 			}
-			for (Incidence inc = vertex.getFirstIncidence(); inc != null; inc = inc
-					.getNextIncidenceAtVertex()) {
+			for (Incidence inc = element.getFirstIncidence(); inc != null; inc = (v instanceof Vertex) ? inc
+					.getNextIncidenceAtVertex() : inc.getNextIncidenceAtEdge()) {
 				int size = state.outTransitions.size();
 				for (int i = 0; i < size; i++) {
 					Transition currentTransition = state.outTransitions.get(i);
-					Vertex nextVertex = (Vertex) currentTransition
-							.getNextElement(vertex, inc);
+					GraphElement<?, ?, ?, ?> nextElement = currentTransition
+							.getNextElement(element, inc);
 					if (!markedElements[currentTransition.endState.number]
-							.contains(nextVertex)) {
-						if (currentTransition.accepts(vertex, inc)) {
+							.contains(nextElement)) {
+						if (currentTransition.accepts(element, inc)) {
 							markedElements[currentTransition.endState.number]
-									.add(nextVertex);
-							queue.put(nextVertex, currentTransition.endState);
+									.add(nextElement);
+							queue.put(nextElement, currentTransition.endState);
 						}
 					}
 				}
