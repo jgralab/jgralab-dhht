@@ -316,8 +316,10 @@ public class NFA extends FiniteAutomaton {
 		nfa.stateList.add(middleState2);
 		nfa.finalStates.get(0).inTransitions.clear();
 
-		translateEdgeToIncidences(dir, typeCollection, predicateEvaluator, nfa,
-				middleState1, middleState2, roles);
+		// TODO evaluate edgeEval and translate --e-> fully to +> {e} +>
+		translateEdgeToIncidences(dir, typeCollection, edgeEval,
+				predicateEvaluator, nfa, middleState1, middleState2, roles,
+				false);
 
 		nfa.updateStateAttributes();
 		return nfa;
@@ -361,16 +363,18 @@ public class NFA extends FiniteAutomaton {
 		nfa.stateList.add(middleState2);
 		nfa.finalStates.get(0).inTransitions.clear();
 
-		translateEdgeToIncidences(dir, typeCollection, predicateEvaluator, nfa,
-				middleState1, middleState2, roles);
+		translateEdgeToIncidences(dir, typeCollection, null,
+				predicateEvaluator, nfa, middleState1, middleState2, roles,
+				false);
 		nfa.updateStateAttributes();
 		return nfa;
 	}
 
 	private static void translateEdgeToIncidences(
 			Transition.AllowedEdgeDirection dir, TypeCollection typeCollection,
-			VertexEvaluator predicateEvaluator, NFA nfa, State middleState1,
-			State middleState2, Set<String> roles) {
+			VertexEvaluator elementRestr, VertexEvaluator predicateEvaluator,
+			NFA nfa, State middleState1, State middleState2, Set<String> roles,
+			boolean aggregation) {
 		// Translate the direction to the one used by the incidences
 		IncDirection direction;
 		boolean any = false;
@@ -394,9 +398,16 @@ public class NFA extends FiniteAutomaton {
 		nfa.transitionList.add(t1);
 
 		if (typeCollection != null) {
+			if (elementRestr != null) {
+				throw new UnsupportedOperationException(
+						"Both Element- and TypeRestriction can not be handled at the same time.");
+			}
 			rt = new TypeRestrictionTransition(middleState1, middleState2,
 					typeCollection, predicateEvaluator);
 
+		} else if (elementRestr != null) {
+			rt = new ElementRestrictionTransition(middleState1, middleState2,
+					elementRestr, predicateEvaluator);
 		} else {
 			// If the edge is not restricted, use an epsilon-Transition between
 			// both middle states.
@@ -452,10 +463,15 @@ public class NFA extends FiniteAutomaton {
 		nfa.transitionList.clear();
 		nfa.initialState.outTransitions.clear();
 		nfa.finalStates.get(0).inTransitions.clear();
-		AggregationTransition t = new AggregationTransition(nfa.initialState,
-				nfa.finalStates.get(0), aggregateFrom, typeCollection, roles,
-				predicateEvaluator, marker);
-		nfa.transitionList.add(t);
+		State middleState1 = new State();
+		nfa.stateList.add(middleState1);
+		State middleState2 = new State();
+		nfa.stateList.add(middleState2);
+		translateEdgeToIncidences(
+				aggregateFrom ? Transition.AllowedEdgeDirection.OUT
+						: Transition.AllowedEdgeDirection.IN, typeCollection,
+				null, predicateEvaluator, nfa, middleState1, middleState2,
+				roles, true);
 		nfa.updateStateAttributes();
 		return nfa;
 	}
