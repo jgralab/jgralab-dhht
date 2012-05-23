@@ -1,10 +1,13 @@
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
+import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfSubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.VertexSubgraphDefinition;
+import de.uni_koblenz.jgralab.impl.mem.MarkerGraphImpl;
 
 /**
  * Evaluator-class for a {@link VertexSubgraphDefinition}, which defines a
@@ -24,8 +27,28 @@ public class VertexSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
-		// TODO Auto-generated method stub
-		return null;
+
+		// Get the type expression and evaluate it to a list of vertex types
+		IsTypeExprOfSubgraphDefinition typeExprEdge = vertex
+				.getIncidentEdges(IsTypeExprOfSubgraphDefinition.class)
+				.iterator().next();
+		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExprEdge
+				.getAlpha());
+
+		// Get the vertices of that typ
+		Iterable<Vertex> vertices = graph
+				.getVertices((de.uni_koblenz.jgralab.schema.VertexClass) exprEval
+						.getResult());
+
+		MarkerGraphImpl markerGraph = new MarkerGraphImpl(true,
+				graph.getGraphClass());
+
+		// Add all the vertices (and their incidences + that-Edges) to the
+		// markerGraph
+		for (Vertex vertex : vertices) {
+			markerGraph.addVertex(vertex);
+		}
+		return markerGraph;
 	}
 
 	@Override

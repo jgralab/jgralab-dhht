@@ -207,12 +207,12 @@ public class SimpleIncidenceTransition extends Transition {
 			return false;
 		}
 
-		boolean vertex = false;
+		boolean isVertex = false;
 		if (e instanceof Vertex) {
-			vertex = true;
+			isVertex = true;
 		}
 
-		boolean outgoing = (vertex == (i.getDirection() == Direction.VERTEX_TO_EDGE));
+		boolean outgoing = (isVertex == (i.getDirection() == Direction.VERTEX_TO_EDGE));
 		if (validDirection == IncDirection.OUT && !outgoing) {
 			return false;
 		} else if (validDirection == IncDirection.IN && outgoing) {

@@ -7,6 +7,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
 import de.uni_koblenz.jgralab.greql2.schema.EdgeSubgraphDefinition;
 import de.uni_koblenz.jgralab.greql2.schema.IsTypeExprOfSubgraphDefinition;
+import de.uni_koblenz.jgralab.impl.mem.MarkerGraphImpl;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 
 /**
@@ -26,19 +27,26 @@ public class EdgeSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
+
+		// Get the type expression and evaluate it to a list of edge types
 		IsTypeExprOfSubgraphDefinition typeExprEdge = vertex
 				.getIncidentEdges(IsTypeExprOfSubgraphDefinition.class)
 				.iterator().next();
 		VertexEvaluator exprEval = vertexEvalMarker.getMark(typeExprEdge
 				.getAlpha());
+
+		// Get the edges of that type
 		Iterable<Edge> edges = graph.getEdges((EdgeClass) exprEval.getResult());
-		// TODO: Uncomment code and create graph marker
-		// Graph markerGraph = graph.
-		// for (Edge edge : edges) {
-		// markerGraph.
-		// }
-		// Create a Graph from the edges
-		return null;
+
+		MarkerGraphImpl markerGraph = new MarkerGraphImpl(true,
+				graph.getGraphClass());
+
+		// Add all the edges (and their incidences + that-vertex) to the
+		// markerGraph
+		for (Edge edge : edges) {
+			markerGraph.addEdge(edge);
+		}
+		return markerGraph;
 	}
 
 	@Override

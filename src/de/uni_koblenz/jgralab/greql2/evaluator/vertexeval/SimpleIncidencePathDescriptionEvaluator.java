@@ -15,7 +15,8 @@ import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 
 /**
  * Evaluator-class for the {@link SimpleIncidencePathDescription}, which is a
- * single incidence-based path-description (->, <-> or <-).
+ * single incidence-based path-description (+>, <+> or <+). It might be restricted
+ * to a set of incidence "classes" via "{ Type1, Type2 }" after the arrow.
  * 
  * @author jtheegarten@uni-koblenz.de 2012, Diploma Thesis
  * 
@@ -32,10 +33,13 @@ public class SimpleIncidencePathDescriptionEvaluator extends
 	public Object evaluate() throws QuerySourceException {
 
 		SimpleIncidencePathDescription incVertex = (SimpleIncidencePathDescription) vertex;
+
+		// We need to get the restrictions
 		IncidenceRestriction restriction = incVertex
 				.getFirst_isIncRestrOf_omega().getEdge().getAlpha();
 		Set<String> roles = null;
 
+		// And translate them to a Set of Strings
 		if (restriction != null) {
 			roles = new HashSet<String>();
 			Iterator<IsIncTypeIdOf> incs = restriction.getIncidentEdges(
