@@ -3,7 +3,10 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
+import de.uni_koblenz.jgralab.schema.IncidenceType;
 
 public class AggregationIncidenceTransition extends SimpleIncidenceTransition {
 
@@ -57,4 +60,11 @@ public class AggregationIncidenceTransition extends SimpleIncidenceTransition {
 
 	}
 
+	@Override
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
+		if (i.getType().getIncidenceType() == IncidenceType.EDGE) {
+			return false;
+		}
+		return super.accepts(e, i);
+	}
 }

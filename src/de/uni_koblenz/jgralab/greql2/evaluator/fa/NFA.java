@@ -363,10 +363,6 @@ public class NFA extends FiniteAutomaton {
 
 		translateEdgeToIncidences(dir, typeCollection, predicateEvaluator, nfa,
 				middleState1, middleState2, roles);
-		// SimpleTransition t = new SimpleTransition(nfa.initialState,
-		// nfa.finalStates.get(0), dir, typeCollection, roles,
-		// predicateEvaluator, marker);
-		// nfa.transitionList.add(t);
 		nfa.updateStateAttributes();
 		return nfa;
 	}
@@ -509,8 +505,8 @@ public class NFA extends FiniteAutomaton {
 		State restrictedFinalState = new State();
 		nfa.stateList.add(restrictedFinalState);
 		nfa.finalStates.add(restrictedFinalState);
-		VertexTypeRestrictionTransition trans = new VertexTypeRestrictionTransition(
-				newEndState, restrictedFinalState, typeCollection);
+		TypeRestrictionTransition trans = new TypeRestrictionTransition(
+				newEndState, restrictedFinalState, typeCollection, null);
 		nfa.transitionList.add(trans);
 	}
 
@@ -579,8 +575,8 @@ public class NFA extends FiniteAutomaton {
 			TypeCollection typeCollection) {
 		State newInitialState = new State();
 		nfa.stateList.add(newInitialState);
-		VertexTypeRestrictionTransition trans = new VertexTypeRestrictionTransition(
-				newInitialState, nfa.initialState, typeCollection);
+		TypeRestrictionTransition trans = new TypeRestrictionTransition(
+				newInitialState, nfa.initialState, typeCollection, null);
 		nfa.transitionList.add(trans);
 		nfa.initialState = newInitialState;
 	}
