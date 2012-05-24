@@ -316,7 +316,6 @@ public class NFA extends FiniteAutomaton {
 		nfa.stateList.add(middleState2);
 		nfa.finalStates.get(0).inTransitions.clear();
 
-		// TODO evaluate edgeEval and translate --e-> fully to +> {e} +>
 		translateEdgeToIncidences(dir, typeCollection, edgeEval,
 				predicateEvaluator, nfa, middleState1, middleState2, roles,
 				false);

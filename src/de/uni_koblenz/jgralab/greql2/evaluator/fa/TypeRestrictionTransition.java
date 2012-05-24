@@ -79,6 +79,9 @@ public class TypeRestrictionTransition extends RestrictionTransition {
 		if (!super.acceptsPredicate()) {
 			return false;
 		}
+		if (types == null) {
+			return true;
+		}
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {
@@ -89,5 +92,4 @@ public class TypeRestrictionTransition extends RestrictionTransition {
 		}
 		return typeAccepted;
 	}
-
 }

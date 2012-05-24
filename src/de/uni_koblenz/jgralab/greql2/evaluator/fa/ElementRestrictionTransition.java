@@ -82,11 +82,17 @@ public class ElementRestrictionTransition extends RestrictionTransition {
 		if (!super.acceptsPredicate()) {
 			return false;
 		}
-		boolean acceptedElement = false;
 
 		@SuppressWarnings("unchecked")
 		List<GraphElement<?, ?, ?, ?>> evalResult = (List<GraphElement<?, ?, ?, ?>>) evaluator
 				.getResult();
+
+		if (evalResult == null) {
+			return true;
+		}
+
+		boolean acceptedElement = false;
+
 		for (GraphElement<?, ?, ?, ?> ge : evalResult) {
 			if (ge.equals(e)) {
 				acceptedElement = true;
