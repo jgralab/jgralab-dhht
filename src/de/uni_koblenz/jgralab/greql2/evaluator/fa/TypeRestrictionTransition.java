@@ -41,7 +41,9 @@ public class TypeRestrictionTransition extends RestrictionTransition {
 
 	@Override
 	public String prettyPrint() {
-		return "{" + types.toString() + "}";
+		return "{" + types != null ? types.toString() : "" + " "
+				+ predicateEval != null ? "@ " + predicateEval.toString() : ""
+				+ "}";
 	}
 
 	@Override
@@ -54,9 +56,15 @@ public class TypeRestrictionTransition extends RestrictionTransition {
 		if (!(t instanceof TypeRestrictionTransition)) {
 			return false;
 		}
-		if (!(((TypeRestrictionTransition) t).types.equals(this.types))) {
+		TypeRestrictionTransition trans = (TypeRestrictionTransition) t;
+		if (trans.types == null) {
+			if (this.types != null) {
+				return false;
+			}
+		} else if (!trans.types.equals(this.types)) {
 			return false;
 		}
+
 		if (predicateEval != null) {
 			if (predicateEval != ((TypeRestrictionTransition) t).predicateEval) {
 				return false;

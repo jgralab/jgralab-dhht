@@ -553,9 +553,9 @@ public class NFA extends FiniteAutomaton {
 		State restrictedFinalState = new State();
 		nfa.stateList.add(restrictedFinalState);
 		nfa.finalStates.add(restrictedFinalState);
-		BoolExpressionTransition trans = new BoolExpressionTransition(
-				newEndState, restrictedFinalState, boolEval, marker);
-		nfa.transitionList.add(trans);
+		TypeRestrictionTransition transition = new TypeRestrictionTransition(
+				newEndState, restrictedFinalState, null, boolEval);
+		nfa.transitionList.add(transition);
 	}
 
 	/**
@@ -571,9 +571,9 @@ public class NFA extends FiniteAutomaton {
 			ObjectGraphMarker<Vertex, VertexEvaluator> marker) {
 		State newInitialState = new State();
 		nfa.stateList.add(newInitialState);
-		BoolExpressionTransition trans = new BoolExpressionTransition(
-				newInitialState, nfa.initialState, boolEval, marker);
-		nfa.transitionList.add(trans);
+		TypeRestrictionTransition transition = new TypeRestrictionTransition(
+				newInitialState, nfa.initialState, null, boolEval);
+		nfa.transitionList.add(transition);
 		nfa.initialState = newInitialState;
 	}
 
