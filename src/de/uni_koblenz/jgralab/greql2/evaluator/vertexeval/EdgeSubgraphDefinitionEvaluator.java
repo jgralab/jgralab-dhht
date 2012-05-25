@@ -38,13 +38,12 @@ public class EdgeSubgraphDefinitionEvaluator extends
 		// Get the edges of that type
 		Iterable<Edge> edges = graph.getEdges((EdgeClass) exprEval.getResult());
 
-		MarkerGraphImpl markerGraph = new MarkerGraphImpl(true,
-				graph.getGraphClass());
+		MarkerGraphImpl markerGraph = new MarkerGraphImpl(graph);
 
 		// Add all the edges (and their incidences + that-vertex) to the
 		// markerGraph
 		for (Edge edge : edges) {
-			markerGraph.addEdge(edge);
+			markerGraph.addEdgeWithIncidences(edge);
 		}
 		return markerGraph;
 	}

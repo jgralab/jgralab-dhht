@@ -40,13 +40,12 @@ public class VertexSubgraphDefinitionEvaluator extends
 				.getVertices((de.uni_koblenz.jgralab.schema.VertexClass) exprEval
 						.getResult());
 
-		MarkerGraphImpl markerGraph = new MarkerGraphImpl(true,
-				graph.getGraphClass());
+		MarkerGraphImpl markerGraph = new MarkerGraphImpl(graph);
 
 		// Add all the vertices (and their incidences + that-Edges) to the
 		// markerGraph
 		for (Vertex vertex : vertices) {
-			markerGraph.addVertex(vertex);
+			markerGraph.addVertexWithIncidences(vertex);
 		}
 		return markerGraph;
 	}
