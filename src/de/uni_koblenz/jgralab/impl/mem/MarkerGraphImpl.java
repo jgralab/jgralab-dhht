@@ -33,6 +33,8 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class MarkerGraphImpl implements Graph {
 
+	private static final String MARKER_GRAPH_EXCEPTION = "The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph (available via getOriginalGraph()).";
+
 	/** The original graph. Only elements of that graph are accepted as elements of this MarkerGraph.
 	 * 
 	 */
@@ -59,7 +61,7 @@ public class MarkerGraphImpl implements Graph {
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -67,7 +69,7 @@ public class MarkerGraphImpl implements Graph {
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -75,35 +77,35 @@ public class MarkerGraphImpl implements Graph {
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public Object getAttribute(String name) throws NoSuchAttributeException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -119,31 +121,31 @@ public class MarkerGraphImpl implements Graph {
 	@Override
 	public Class<? extends Graph> getM1Class() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphClass getType() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphClass getGraphClass() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Schema getSchema() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int compareTo(Graph o) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
@@ -198,125 +200,125 @@ public class MarkerGraphImpl implements Graph {
 	@Override
 	public Graph getCompleteGraph() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getLocalPartialGraph() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public AttributedElement getParentGraphOrElement() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getParentGraph() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isPartOfGraph(Graph other) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getView(int kappa) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getViewedGraph() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public List<? extends Graph> getPartialGraphs() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Deprecated
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public String getUniqueGraphId() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getGlobalId() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int getLocalId() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int getPartialGraphId() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isLocalElementId(long id) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
@@ -419,193 +421,193 @@ public class MarkerGraphImpl implements Graph {
 	@Override
 	public void deleteVertex(Vertex v) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public Vertex getFirstVertex() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getLastVertex() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
 			boolean noSubclasses) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getLastEdge() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
 			boolean noSubclasses) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getVertex(long id) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getEdge(long id) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxVCount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxECount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxICount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getVCount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getECount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getICount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(VertexClass vertexclass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void sortEdges(Comparator<Edge> comp) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void defragment() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -613,7 +615,7 @@ public class MarkerGraphImpl implements Graph {
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -621,100 +623,100 @@ public class MarkerGraphImpl implements Graph {
 	public void removeGraphStructureChangedListener(
 			GraphStructureChangedListener listener) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void removeAllGraphStructureChangedListeners() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public int getGraphStructureChangedListenerCount() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isLoading() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isGraphModified(long previousVersion) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getGraphVersion() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getVertexListVersion() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getEdgeListVersion() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphFactory getGraphFactory() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public RemoteGraphDatabaseAccess getGraphDatabase() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T> PVector<T> createList() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T> PSet<T> createSet() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <K, V> PMap<K, V> createMap() {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Record createRecord(Class<? extends Record> recordDomain,
 			Map<String, Object> values) {
 		throw new UnsupportedOperationException(
-				"The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph.");
+				MARKER_GRAPH_EXCEPTION);
 	}
 
 }
