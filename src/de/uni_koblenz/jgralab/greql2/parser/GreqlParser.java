@@ -2375,6 +2375,9 @@ public class GreqlParser extends ParserHelper {
 			TypeId t = parseTypeId();
 			int length = getLength(offset);
 			list.add(new VertexPosition<TypeId>(t, length, offset));
+			if (lookAhead(0) == TokenTypes.COLON) {
+				fail("COLON found in TypeId");
+			}
 		} while (tryMatch(TokenTypes.COMMA));
 		return list;
 	}
