@@ -25,12 +25,20 @@ import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
+/**
+ * A MarkerGraph is used as a traversalcontext for VertexType- or EdgeType-induced subgraphs in the evaluation of {@link SubgraphDefinition}s.
+ * It may not be used for anything else, which is why all other methods throw {@link UnsupportedOperationException}s.
+ * 
+ * @author jtheegarten@uni-koblenz.de 2012, Diploma Thesis
+ *
+ */
 public class MarkerGraphImpl implements Graph {
 
 	private static final String MARKER_GRAPH_EXCEPTION = "The MarkerGraph should only be used as TraversalContext. Any operations have to be executed on the original graph (available via getOriginalGraph()).";
@@ -60,52 +68,45 @@ public class MarkerGraphImpl implements Graph {
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public String writeAttributeValueToString(String attributeName)
 			throws IOException, GraphIOException, NoSuchAttributeException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void writeAttributeValues(GraphIO io) throws IOException,
 			GraphIOException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public Object getAttribute(String name) throws NoSuchAttributeException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public void setAttribute(String name, Object data)
 			throws NoSuchAttributeException {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void initializeAttributesWithDefaultValues() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
@@ -120,32 +121,27 @@ public class MarkerGraphImpl implements Graph {
 
 	@Override
 	public Class<? extends Graph> getM1Class() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphClass getType() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphClass getGraphClass() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Schema getSchema() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int compareTo(Graph o) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
@@ -199,126 +195,106 @@ public class MarkerGraphImpl implements Graph {
 
 	@Override
 	public Graph getCompleteGraph() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getLocalPartialGraph() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public AttributedElement getParentGraphOrElement() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getParentGraph() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isPartOfGraph(Graph other) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getView(int kappa) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getViewedGraph() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph createPartialGraphInGraph(String hostnameOfPartialGraph) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public List<? extends Graph> getPartialGraphs() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Deprecated
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public String getUniqueGraphId() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getGlobalId() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int getLocalId() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public int getPartialGraphId() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isLocalElementId(long id) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
 			Vertex omega) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
 			Edge edge) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
@@ -420,303 +396,255 @@ public class MarkerGraphImpl implements Graph {
 
 	@Override
 	public void deleteVertex(Vertex v) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void deleteEdge(Edge e) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public Vertex getFirstVertex() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getLastVertex() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(VertexClass vertexClass, boolean noSubclasses) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
 			boolean noSubclasses) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getLastEdge() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(EdgeClass edgeClass, boolean noSubclasses) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
 			boolean noSubclasses) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Vertex getVertex(long id) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Edge getEdge(long id) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxVCount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxECount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getMaxICount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getVCount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getECount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getICount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(VertexClass vertexclass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Vertex> getVertices(Class<? extends Vertex> vertexClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(EdgeClass edgeClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Iterable<Edge> getEdges(Class<? extends Edge> edgeClass) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void sortEdges(Comparator<Edge> comp) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void defragment() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void removeGraphStructureChangedListener(
 			GraphStructureChangedListener listener) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public void removeAllGraphStructureChangedListeners() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 
 	}
 
 	@Override
 	public int getGraphStructureChangedListenerCount() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isLoading() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isGraphModified(long previousVersion) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getGraphVersion() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getVertexListVersion() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public long getEdgeListVersion() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public GraphFactory getGraphFactory() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public RemoteGraphDatabaseAccess getGraphDatabase() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T> PVector<T> createList() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <T> PSet<T> createSet() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public <K, V> PMap<K, V> createMap() {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 	@Override
 	public Record createRecord(Class<? extends Record> recordDomain,
 			Map<String, Object> values) {
-		throw new UnsupportedOperationException(
-				MARKER_GRAPH_EXCEPTION);
+		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
 	}
 
 }
