@@ -40,7 +40,7 @@ import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
+import de.uni_koblenz.jgralab.impl.distributed.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 
 /**
