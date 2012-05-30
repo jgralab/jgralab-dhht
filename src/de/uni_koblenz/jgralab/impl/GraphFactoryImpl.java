@@ -222,6 +222,23 @@ public class GraphFactoryImpl implements GraphFactory {
 					+ graphClass.getCanonicalName(), ex);
 		}
 	}
+	
+	@Override
+	public Graph createGraph_DiskBasedStoragev2(Class<? extends Graph> graphClass,
+			String uniqueGraphId, long subgraphId,
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) {
+		try {
+			//TODO change to DiskBasedStoragev2
+			Graph g = graphMap_DistributedStorage.get(graphClass).newInstance(
+					uniqueGraphId, subgraphId, graphDatabase,
+					storingGraphDatabase);
+			return g;
+		} catch (Exception ex) {
+			throw new SchemaClassAccessException("Cannot create graph of class "
+					+ graphClass.getCanonicalName(), ex);
+		}
+	}
 
 
 	@Override
@@ -261,6 +278,24 @@ public class GraphFactoryImpl implements GraphFactory {
 			long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase) {
 		try {
 			Edge e = edgeMap_DiskBasedStorage.get(edgeClass).newInstance(id,
+					graphDatabase);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public Edge createEdge_DiskBasedStoragev2(Class<? extends Edge> edgeClass,
+			long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase) {
+		try {
+			//TODO change to DiskBasedStoragev2
+			Edge e = edgeMap_DistributedStorage.get(edgeClass).newInstance(id,
 					graphDatabase);
 			return e;
 		} catch (Exception ex) {
@@ -314,6 +349,24 @@ public class GraphFactoryImpl implements GraphFactory {
 			RemoteGraphDatabaseAccess remoteDatabase) {
 		try {
 			Edge e = edgeProxyMap_DiskBasedStorage.get(edgeClass).newInstance(id,
+					graphDatabase, remoteDatabase);
+			return e;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException("Cannot create edge of class "
+					+ edgeClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public Edge createEdgeProxy_DiskBasedStoragev2(Class<? extends Edge> edgeClass, long id,
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess remoteDatabase) {
+		try { //TODO Diskv2
+			Edge e = edgeProxyMap_DistributedStorage.get(edgeClass).newInstance(id,
 					graphDatabase, remoteDatabase);
 			return e;
 		} catch (Exception ex) {
@@ -384,6 +437,27 @@ public class GraphFactoryImpl implements GraphFactory {
 							+ incidenceClass.getCanonicalName(), ex);
 		}
 	}
+	
+	@Override
+	public <T extends Incidence> T createIncidence_DiskBasedStoragev2(
+			Class<? extends T> incidenceClass, long incidenceId, long vertexId,
+			long edgeId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase) {
+		try {
+			@SuppressWarnings("unchecked")
+			//TODO diskv2
+			T i = (T) incidenceMap_DistributedStorage.get(incidenceClass)
+					.newInstance(incidenceId, graphDatabase, vertexId, edgeId);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException(
+					"Cannot create incidence of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
 
 
 	@Override
@@ -416,6 +490,28 @@ public class GraphFactoryImpl implements GraphFactory {
 		try {
 			@SuppressWarnings("unchecked")
 			T i = (T) incidenceProxyMap_DiskBasedStorage.get(incidenceClass).newInstance(
+					id, graphDatabase, remoteDatabase);
+			return i;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException(
+					"Cannot create incidence proxy of class "
+							+ incidenceClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public <T extends Incidence> T createIncidenceProxy_DiskBasedStoragev2(
+			Class<? extends T> incidenceClass, long id,
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess remoteDatabase) {
+		try {
+			@SuppressWarnings("unchecked")
+			//TODO diskv2
+			T i = (T) incidenceProxyMap_DistributedStorage.get(incidenceClass).newInstance(
 					id, graphDatabase, remoteDatabase);
 			return i;
 		} catch (Exception ex) {
@@ -504,6 +600,25 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
+	public Vertex createVertex_DiskBasedStoragev2(
+			Class<? extends Vertex> vertexClass, long id,
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl localGraphDatabase) {
+		try {
+			//TODO diskv2
+			Vertex v = vertexMap_DistributedStorage.get(vertexClass).newInstance(
+					id, localGraphDatabase);
+			return v;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException("Cannot create vertex of class "
+					+ vertexClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
 	public Vertex createVertexProxy_DistributedStorage(Class<? extends Vertex> vertexClass,
 			long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
@@ -528,6 +643,25 @@ public class GraphFactoryImpl implements GraphFactory {
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
 			Vertex v = vertexProxyMap_DiskBasedStorage.get(vertexClass).newInstance(id,
+					graphDatabase, storingGraphDatabase);
+			return v;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException("Cannot create vertex of class "
+					+ vertexClass.getCanonicalName(), ex);
+		}
+	}
+	
+	@Override
+	public Vertex createVertexProxy_DiskBasedStoragev2(Class<? extends Vertex> vertexClass,
+			long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
+			RemoteGraphDatabaseAccess storingGraphDatabase) {
+		try {
+			//TODO diskv2
+			Vertex v = vertexProxyMap_DistributedStorage.get(vertexClass).newInstance(id,
 					graphDatabase, storingGraphDatabase);
 			return v;
 		} catch (Exception ex) {
@@ -612,6 +746,26 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	@Override
+	public void setGraphImplementationClass_DiskBasedStoragev2(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.GraphBaseImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { String.class, long.class,
+						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				graphMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
 
 
 	@Override
@@ -644,6 +798,25 @@ public class GraphFactoryImpl implements GraphFactory {
 						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class, EdgeContainer.class };
 				edgeMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
+
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for edgeclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
+	public void setEdgeImplementationClass_DiskBasedStoragev2(
+			Class<? extends Edge> originalClass,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class };
+				//TODO diskv2
+				edgeMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
 
 			} catch (NoSuchMethodException ex) {
 				throw new SchemaClassAccessException(
@@ -706,6 +879,25 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	@Override
+	public void setEdgeProxyImplementationClass_DiskBasedStoragev2(
+			Class<? extends Edge> edgeM1Class,
+			Class<? extends Edge> implementationClass) {
+		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				edgeProxyMap_DistributedStorage.put(edgeM1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for edge proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
 
 	@Override
 	public void setVertexImplementationClass_InMemoryStorage(
@@ -737,6 +929,24 @@ public class GraphFactoryImpl implements GraphFactory {
 						de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class, VertexContainer.class };
 				vertexMapForDiskStorageReloading.put(originalClass,
 						implementationClass.getConstructor(paramsDisk));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for vertexclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
+	public void setVertexImplementationClass_DiskBasedStoragev2(
+			Class<? extends Vertex> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.VertexImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class };
+				//TODO diskv2
+				vertexMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new SchemaClassAccessException(
 						"Unable to locate default constructor for vertexclass"
@@ -789,6 +999,25 @@ public class GraphFactoryImpl implements GraphFactory {
 				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
 						RemoteGraphDatabaseAccess.class };
 				vertexProxyMap_DiskBasedStorage.put(vertexM1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for vertex proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
+	public void setVertexProxyImplementationClass_DiskBasedStoragev2(
+			Class<? extends Vertex> vertexM1Class,
+			Class<? extends Vertex> implementationClass) {
+		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				vertexProxyMap_DistributedStorage.put(vertexM1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new SchemaClassAccessException(
@@ -856,6 +1085,25 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
+	public void setIncidenceImplementationClass_DiskBasedStoragev2(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
+						long.class, long.class };
+				//TODO diskv2
+				incidenceMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for incidenceclass"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
 	public void setIncidenceProxyImplementationClass_DistributedStorage(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
@@ -892,6 +1140,25 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
+	public void setIncidenceProxyImplementationClass_DiskBasedStoragev2(
+			Class<? extends Incidence> originalClass,
+			Class<? extends Incidence> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				incidenceProxyMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for incidence proxy"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
 	public void setRecordImplementationClass_InMemoryStorage(Class<? extends Record> m1Class,
 			Class<? extends Record> implementationClass) {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
@@ -913,7 +1180,7 @@ public class GraphFactoryImpl implements GraphFactory {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
 				Class<?>[] params = { Graph.class };
-				recordMap_DiskBasedStorage.put(m1Class,
+				recordMap_DistributedStorage.put(m1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new SchemaClassAccessException(
@@ -929,6 +1196,23 @@ public class GraphFactoryImpl implements GraphFactory {
 			try {
 				Class<?>[] params = { Graph.class };
 				recordMap_DiskBasedStorage.put(m1Class,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for record"
+								+ implementationClass, ex);
+			}
+		}
+	}
+	
+	@Override
+	public void setRecordImplementationClass_DiskBasedStoragev2(Class<? extends Record> m1Class,
+			Class<? extends Record> implementationClass) {
+		if (isSuperclassOrEqual(m1Class, implementationClass)) {
+			try {
+				Class<?>[] params = { Graph.class };
+				//TODO diskv2
+				recordMap_DistributedStorage.put(m1Class,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {
 				throw new SchemaClassAccessException(
@@ -968,13 +1252,27 @@ public class GraphFactoryImpl implements GraphFactory {
 					+ recordDomain.getCanonicalName(), ex);
 		}
 	}
-	
 
-	
 	@SuppressWarnings("unchecked")
 	public <T extends Record> T createRecord_DiskBasedStorage(Class<T> recordDomain, Graph g) {
 		try {
 			T r = (T) recordMap_DiskBasedStorage.get(recordDomain).newInstance(g);
+			return r;
+		} catch (Exception ex) {
+			if (ex.getCause() instanceof GraphException) {
+				throw new GraphException(ex.getCause().getLocalizedMessage(),
+						ex);
+			}
+			throw new SchemaClassAccessException("Cannot create record of class "
+					+ recordDomain.getCanonicalName(), ex);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends Record> T createRecord_DiskBasedStoragev2(Class<T> recordDomain, Graph g) {
+		try {
+			//TODO diskv2
+			T r = (T) recordMap_DistributedStorage.get(recordDomain).newInstance(g);
 			return r;
 		} catch (Exception ex) {
 			if (ex.getCause() instanceof GraphException) {
@@ -1079,6 +1377,21 @@ public class GraphFactoryImpl implements GraphFactory {
 							+ viewGraph.getGraphClass().getQualifiedName(), ex);
 		}
 	}
+	
+	@Override
+	public de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl createViewGraph_DiskBasedStoragev2(
+			Graph viewGraph, int level) {
+		try {
+			Class<? extends Graph> graphClass = viewGraph.getM1Class();                                             //TODO diskv2
+			de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl g = (de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl) viewGraphMap_DistributedStorage
+					.get(graphClass).newInstance(viewGraph, level);
+			return g;
+		} catch (Exception ex) {
+			throw new SchemaClassAccessException(
+					"Cannot create view graph for graph of class "
+							+ viewGraph.getGraphClass().getQualifiedName(), ex);
+		}
+	}
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraphInVertex_InMemoryStorage(
@@ -1126,6 +1439,22 @@ public class GraphFactoryImpl implements GraphFactory {
 					ex);
 		}
 	}
+	
+	@Override
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInVertex_DiskBasedStoragev2(
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long vertexId) {
+		try {
+			Vertex vertex = graphDatabase.getVertexObject(vertexId);
+			Class<? extends Graph> graphClass = vertex.getGraph().getM1Class();                                               //TODO diskv2
+			de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl) subordinateGraphForVertexMap_DistributedStorage
+					.get(graphClass).newInstance(vertex);
+			return g;
+		} catch (Exception ex) {
+			throw new SchemaClassAccessException(
+					"Cannot create subordinate graph for vertex " + vertexId,
+					ex);
+		}
+	}
 
 	@Override
 	public de.uni_koblenz.jgralab.impl.mem.SubordinateGraphImpl createSubordinateGraphInEdge_InMemoryStorage(
@@ -1164,6 +1493,21 @@ public class GraphFactoryImpl implements GraphFactory {
 			Edge edge = graphDatabase.getEdgeObject(edgeId);
 			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();
 			de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl) subordinateGraphForEdgeMap_DiskBasedStorage
+					.get(graphClass).newInstance(edge);
+			return g;
+		} catch (Exception ex) {
+			throw new SchemaClassAccessException(
+					"Cannot create subordinate graph for edge " + edgeId, ex);
+		}
+	}
+	
+	@Override
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInEdge_DiskBasedStoragev2(
+			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long edgeId) {
+		try {
+			Edge edge = graphDatabase.getEdgeObject(edgeId);
+			Class<? extends Graph> graphClass = edge.getGraph().getM1Class();                                                     //TODO diskv2
+			de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl g = (de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl) subordinateGraphForEdgeMap_DistributedStorage
 					.get(graphClass).newInstance(edge);
 			return g;
 		} catch (Exception ex) {
@@ -1235,6 +1579,30 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
+	
+	@Override
+	public void setSubordinateGraphImplementationClass_DiskBasedStoragev2(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				subordinateGraphForVertexMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
+				Class<?>[] paramse = { long.class, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl.class,
+						RemoteGraphDatabaseAccess.class };
+				//TODO diskv2
+				subordinateGraphForEdgeMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(paramse));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
 
 	@Override
 	public void setViewGraphImplementationClass_InMemoryStorage(
@@ -1252,7 +1620,24 @@ public class GraphFactoryImpl implements GraphFactory {
 			}
 		}
 	}
-
+	
+	@Override
+	public void setViewGraphImplementationClass_DistributedStorage(
+			Class<? extends Graph> originalClass,
+			Class<? extends de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl> implementationClass) {
+		if (isSuperclassOrEqual(originalClass, implementationClass)) {
+			try {
+				Class<?>[] params = { originalClass, int.class };
+				viewGraphMap_DistributedStorage.put(originalClass,
+						implementationClass.getConstructor(params));
+			} catch (NoSuchMethodException ex) {
+				throw new SchemaClassAccessException(
+						"Unable to locate default constructor for graphclass "
+								+ implementationClass.getName(), ex);
+			}
+		}
+	}
+	
 	@Override
 	public void setViewGraphImplementationClass_DiskBasedStorage(
 			Class<? extends Graph> originalClass,
@@ -1271,12 +1656,13 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setViewGraphImplementationClass_DistributedStorage(
+	public void setViewGraphImplementationClass_DiskBasedStoragev2(
 			Class<? extends Graph> originalClass,
-			Class<? extends de.uni_koblenz.jgralab.impl.distributed.ViewGraphImpl> implementationClass) {
+			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
 			try {
 				Class<?>[] params = { originalClass, int.class };
+				//TODO diskv2
 				viewGraphMap_DistributedStorage.put(originalClass,
 						implementationClass.getConstructor(params));
 			} catch (NoSuchMethodException ex) {

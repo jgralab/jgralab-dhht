@@ -10,6 +10,14 @@ public interface JGraLabServer {
 	 * to the complete graph identified by their common uniqueGraphId
 	 * @param graphDatabase the graph database to be registered
 	 */
+	public void registerLocalDiskv2GraphDatabase( de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase);
+	
+	/**
+	 * Registers the GraphDatabase <code>graphDatabase</code> as local 
+	 * database responsible for the storage of all graphs belonging 
+	 * to the complete graph identified by their common uniqueGraphId
+	 * @param graphDatabase the graph database to be registered
+	 */
 	public void registerLocalDiskGraphDatabase( de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase);
 	
 	

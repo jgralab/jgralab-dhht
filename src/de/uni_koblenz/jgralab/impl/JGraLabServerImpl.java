@@ -103,6 +103,23 @@ public class JGraLabServerImpl implements RemoteJGraLabServer, JGraLabServer {
 		}
 		return db;
 	}
+	
+	@Override
+	public void registerLocalDiskv2GraphDatabase(de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl localDb) {
+		String uniqueId = localDb.getUniqueGraphId();
+		if (!localGraphDatabases.containsKey(uniqueId)) {
+			localGraphDatabases.put(uniqueId, localDb);
+			RemoteGraphDatabaseAccessWithInternalMethods stub;
+			try {
+				stub = (RemoteGraphDatabaseAccessWithInternalMethods) UnicastRemoteObject
+						.exportObject(localGraphDatabases.get(uniqueId), 0);
+				localStubs.put(uniqueId, stub);
+			} catch (RemoteException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
+	}
 
 	@Override
 	public void registerLocalDiskGraphDatabase(de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localDb) {
