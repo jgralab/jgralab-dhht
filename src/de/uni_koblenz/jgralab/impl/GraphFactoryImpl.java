@@ -224,7 +224,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public Graph createGraph_DiskBasedStoragev2(Class<? extends Graph> graphClass,
+	public Graph createGraph_Diskv2BasedStorage(Class<? extends Graph> graphClass,
 			String uniqueGraphId, long subgraphId,
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
@@ -291,10 +291,10 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public Edge createEdge_DiskBasedStoragev2(Class<? extends Edge> edgeClass,
+	public Edge createEdge_Diskv2BasedStorage(Class<? extends Edge> edgeClass,
 			long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase) {
 		try {
-			//TODO change to DiskBasedStoragev2
+			//TODO change to Diskv2
 			Edge e = edgeMap_DistributedStorage.get(edgeClass).newInstance(id,
 					graphDatabase);
 			return e;
@@ -362,7 +362,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public Edge createEdgeProxy_DiskBasedStoragev2(Class<? extends Edge> edgeClass, long id,
+	public Edge createEdgeProxy_Diskv2BasedStorage(Class<? extends Edge> edgeClass, long id,
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess remoteDatabase) {
 		try { //TODO Diskv2
@@ -439,7 +439,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public <T extends Incidence> T createIncidence_DiskBasedStoragev2(
+	public <T extends Incidence> T createIncidence_Diskv2BasedStorage(
 			Class<? extends T> incidenceClass, long incidenceId, long vertexId,
 			long edgeId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase) {
 		try {
@@ -504,7 +504,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public <T extends Incidence> T createIncidenceProxy_DiskBasedStoragev2(
+	public <T extends Incidence> T createIncidenceProxy_Diskv2BasedStorage(
 			Class<? extends T> incidenceClass, long id,
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess remoteDatabase) {
@@ -600,7 +600,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public Vertex createVertex_DiskBasedStoragev2(
+	public Vertex createVertex_Diskv2BasedStorage(
 			Class<? extends Vertex> vertexClass, long id,
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl localGraphDatabase) {
 		try {
@@ -656,7 +656,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public Vertex createVertexProxy_DiskBasedStoragev2(Class<? extends Vertex> vertexClass,
+	public Vertex createVertexProxy_Diskv2BasedStorage(Class<? extends Vertex> vertexClass,
 			long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase,
 			RemoteGraphDatabaseAccess storingGraphDatabase) {
 		try {
@@ -748,7 +748,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setGraphImplementationClass_DiskBasedStoragev2(
+	public void setGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> originalClass,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.GraphBaseImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -808,7 +808,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setEdgeImplementationClass_DiskBasedStoragev2(
+	public void setEdgeImplementationClass_Diskv2BasedStorage(
 			Class<? extends Edge> originalClass,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -881,7 +881,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setEdgeProxyImplementationClass_DiskBasedStoragev2(
+	public void setEdgeProxyImplementationClass_Diskv2BasedStorage(
 			Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass) {
 		if (isSuperclassOrEqual(edgeM1Class, implementationClass)) {
@@ -938,7 +938,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setVertexImplementationClass_DiskBasedStoragev2(
+	public void setVertexImplementationClass_Diskv2BasedStorage(
 			Class<? extends Vertex> originalClass,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.VertexImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -1009,7 +1009,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setVertexProxyImplementationClass_DiskBasedStoragev2(
+	public void setVertexProxyImplementationClass_Diskv2BasedStorage(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends Vertex> implementationClass) {
 		if (isSuperclassOrEqual(vertexM1Class, implementationClass)) {
@@ -1085,7 +1085,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setIncidenceImplementationClass_DiskBasedStoragev2(
+	public void setIncidenceImplementationClass_Diskv2BasedStorage(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -1140,7 +1140,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setIncidenceProxyImplementationClass_DiskBasedStoragev2(
+	public void setIncidenceProxyImplementationClass_Diskv2BasedStorage(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -1206,7 +1206,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setRecordImplementationClass_DiskBasedStoragev2(Class<? extends Record> m1Class,
+	public void setRecordImplementationClass_Diskv2BasedStorage(Class<? extends Record> m1Class,
 			Class<? extends Record> implementationClass) {
 		if (isSuperclassOrEqual(m1Class, implementationClass)) {
 			try {
@@ -1269,7 +1269,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Record> T createRecord_DiskBasedStoragev2(Class<T> recordDomain, Graph g) {
+	public <T extends Record> T createRecord_Diskv2BasedStorage(Class<T> recordDomain, Graph g) {
 		try {
 			//TODO diskv2
 			T r = (T) recordMap_DistributedStorage.get(recordDomain).newInstance(g);
@@ -1379,7 +1379,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl createViewGraph_DiskBasedStoragev2(
+	public de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl createViewGraph_Diskv2BasedStorage(
 			Graph viewGraph, int level) {
 		try {
 			Class<? extends Graph> graphClass = viewGraph.getM1Class();                                             //TODO diskv2
@@ -1441,7 +1441,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInVertex_DiskBasedStoragev2(
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInVertex_Diskv2BasedStorage(
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long vertexId) {
 		try {
 			Vertex vertex = graphDatabase.getVertexObject(vertexId);
@@ -1502,7 +1502,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInEdge_DiskBasedStoragev2(
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInEdge_Diskv2BasedStorage(
 			de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long edgeId) {
 		try {
 			Edge edge = graphDatabase.getEdgeObject(edgeId);
@@ -1581,7 +1581,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setSubordinateGraphImplementationClass_DiskBasedStoragev2(
+	public void setSubordinateGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> originalClass,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {
@@ -1656,7 +1656,7 @@ public class GraphFactoryImpl implements GraphFactory {
 	}
 	
 	@Override
-	public void setViewGraphImplementationClass_DiskBasedStoragev2(
+	public void setViewGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> originalClass,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl> implementationClass) {
 		if (isSuperclassOrEqual(originalClass, implementationClass)) {

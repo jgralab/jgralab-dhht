@@ -305,7 +305,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Vertex> m1Class = (Class<? extends Vertex>) schema
 				.getM1ClassForId(m1ClassId);
-		VertexImpl v = (VertexImpl) graphFactory.createVertex_DiskBasedStoragev2(
+		VertexImpl v = (VertexImpl) graphFactory.createVertex_Diskv2BasedStorage(
 				m1Class, vertexId, this);
 		inMemoryStorage.storeVertex(v);
 
@@ -688,7 +688,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		@SuppressWarnings("unchecked")
 		Class<? extends Edge> m1Class = (Class<? extends Edge>) schema
 				.getM1ClassForId(m1ClassId);
-		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_DiskBasedStoragev2(
+		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_Diskv2BasedStorage(
 				m1Class, edgeId, this);
 		inMemoryStorage.storeEdge(e);
 
@@ -1134,7 +1134,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		}
 		// call graph factory to create object
 		IncidenceImpl newInc = (IncidenceImpl) graphFactory
-				.createIncidence_DiskBasedStoragev2(m1Class, incId, vertexId,
+				.createIncidence_Diskv2BasedStorage(m1Class, incId, vertexId,
 						edgeId, this);
 
 		inMemoryStorage.storeIncidence(newInc);

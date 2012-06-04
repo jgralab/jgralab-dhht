@@ -74,7 +74,7 @@ public interface GraphFactory {
 	 * be an instance of a subclass of the specified graphClass.
 	 * @param graphDatabase 
 	 */
-	public Graph createGraph_DiskBasedStoragev2(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	public Graph createGraph_Diskv2BasedStorage(Class<? extends Graph> graphClass, String uniqueGraphId, long subgraphId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
 	
 	/**
 	 * creates a View-Graph object for the specified class. The returned object
@@ -118,7 +118,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl createViewGraph_DiskBasedStoragev2(Graph viewGraph, int level);
+	public de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl createViewGraph_Diskv2BasedStorage(Graph viewGraph, int level);
 
 	/**
 	 * creates a Subordinate-Graph object for the specified class. The returned
@@ -192,7 +192,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInVertex_DiskBasedStoragev2(de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long vertexId);
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInVertex_Diskv2BasedStorage(de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long vertexId);
 	
 
 	/**
@@ -203,7 +203,7 @@ public interface GraphFactory {
 	 * @return
 	 * @throws RemoteException 
 	 */
-	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInEdge_DiskBasedStoragev2(de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long edgeId);
+	public de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl createSubordinateGraphInEdge_Diskv2BasedStorage(de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, long edgeId);
 	
 	
 	/**
@@ -228,7 +228,7 @@ public interface GraphFactory {
 	 * creates a Vertex-object for the specified class. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertex_DiskBasedStoragev2(Class<? extends Vertex> vc, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl localGraphDatabase);
+	public Vertex createVertex_Diskv2BasedStorage(Class<? extends Vertex> vc, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl localGraphDatabase);
 
 	/**
 	 * creates a Vertex-proxy for the specified class, acting as local API for the 
@@ -249,7 +249,7 @@ public interface GraphFactory {
 	 * respective remote vertex identified by its global id. The returned object may
 	 * be an instance of a subclass of the specified vertexClass.
 	 */
-	public Vertex createVertexProxy_DiskBasedStoragev2(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
+	public Vertex createVertexProxy_Diskv2BasedStorage(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess storingGraphDatabase);
 	
 	
 	public Vertex reloadLocalVertex(Class<? extends Vertex> vertexClass, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl localGraphDatabase, de.uni_koblenz.jgralab.impl.disk.VertexContainer container);
@@ -279,7 +279,7 @@ public interface GraphFactory {
 	 * creates a Edge-object for the specified class. The returned object may be
 	 * an instance of a subclass of the specified edgeClass.
 	 */
-	public Edge createEdge_DiskBasedStoragev2(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase);
+	public Edge createEdge_Diskv2BasedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase);
 	
 	
 	/**
@@ -298,7 +298,7 @@ public interface GraphFactory {
 	 * creates an local proxy for the remote edge-object identified by its id <code>remoteEdgeId</code>. The returned object is 
 	 * an instance of the class defined by <code>setEdgeImplementationClass</code> for the interface defined by <code>edgeClass</code>
 	 */
-	public Edge createEdgeProxy_DiskBasedStoragev2(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public Edge createEdgeProxy_Diskv2BasedStorage(Class<? extends Edge> edgeClass, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 	
 	
 	/**
@@ -371,7 +371,7 @@ public interface GraphFactory {
 	 *            connected
 	 * @return {@link Incidence}
 	 */
-	public <T extends Incidence> T createIncidence_DiskBasedStoragev2(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase);
+	public <T extends Incidence> T createIncidence_Diskv2BasedStorage(Class<? extends T> ic, long incidenceId, long vertexId, long edgeId, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase);
 	
 	
 	public <T extends Incidence> T createIncidenceProxy_DistributedStorage(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.distributed.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
@@ -380,7 +380,7 @@ public interface GraphFactory {
 	public <T extends Incidence> T createIncidenceProxy_DiskBasedStorage(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.disk.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 	
 	
-	public <T extends Incidence> T createIncidenceProxy_DiskBasedStoragev2(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
+	public <T extends Incidence> T createIncidenceProxy_Diskv2BasedStorage(Class<? extends T> ic, long id, de.uni_koblenz.jgralab.impl.diskv2.GraphDatabaseBaseImpl graphDatabase, RemoteGraphDatabaseAccess remoteDatabase);
 
 
 
@@ -405,7 +405,7 @@ public interface GraphFactory {
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.GraphBaseImpl> implementationClass);
 	
-	public void setGraphImplementationClass_DiskBasedStoragev2(
+	public void setGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.GraphBaseImpl> implementationClass);
 	
@@ -422,7 +422,7 @@ public interface GraphFactory {
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.SubordinateGraphImpl> implementationClass);
 	
-	public void setSubordinateGraphImplementationClass_DiskBasedStoragev2(
+	public void setSubordinateGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.SubordinateGraphImpl> implementationClass);
 
@@ -438,7 +438,7 @@ public interface GraphFactory {
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.disk.ViewGraphImpl> implementationClass);
 	
-	public void setViewGraphImplementationClass_DiskBasedStoragev2(
+	public void setViewGraphImplementationClass_Diskv2BasedStorage(
 			Class<? extends Graph> graphM1Class,
 			Class<? extends de.uni_koblenz.jgralab.impl.diskv2.ViewGraphImpl> implementationClass);
 		
@@ -462,7 +462,7 @@ public interface GraphFactory {
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends  de.uni_koblenz.jgralab.impl.disk.VertexImpl> implementationClass);
 	
-	public void setVertexImplementationClass_DiskBasedStoragev2(
+	public void setVertexImplementationClass_Diskv2BasedStorage(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends  de.uni_koblenz.jgralab.impl.diskv2.VertexImpl> implementationClass);
 	
@@ -475,7 +475,7 @@ public interface GraphFactory {
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends  de.uni_koblenz.jgralab.Vertex> implementationClass);
 	
-	public void setVertexProxyImplementationClass_DiskBasedStoragev2(
+	public void setVertexProxyImplementationClass_Diskv2BasedStorage(
 			Class<? extends Vertex> vertexM1Class,
 			Class<? extends  de.uni_koblenz.jgralab.Vertex> implementationClass);
 	
@@ -490,7 +490,7 @@ public interface GraphFactory {
 	public void setEdgeImplementationClass_DiskBasedStorage(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
 	
-	public void setEdgeImplementationClass_DiskBasedStoragev2(Class<? extends Edge> edgeM1Class,
+	public void setEdgeImplementationClass_Diskv2BasedStorage(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
 	
 	public void setEdgeProxyImplementationClass_DistributedStorage(Class<? extends Edge> edgeM1Class,
@@ -499,7 +499,7 @@ public interface GraphFactory {
 	public void setEdgeProxyImplementationClass_DiskBasedStorage(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
 	
-	public void setEdgeProxyImplementationClass_DiskBasedStoragev2(Class<? extends Edge> edgeM1Class,
+	public void setEdgeProxyImplementationClass_Diskv2BasedStorage(Class<? extends Edge> edgeM1Class,
 			Class<? extends Edge> implementationClass);
 	
 	
@@ -518,7 +518,7 @@ public interface GraphFactory {
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass);
 	
-	public void setIncidenceImplementationClass_DiskBasedStoragev2(
+	public void setIncidenceImplementationClass_Diskv2BasedStorage(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass);
 
@@ -530,7 +530,7 @@ public interface GraphFactory {
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass);
 	
-	public void setIncidenceProxyImplementationClass_DiskBasedStoragev2(
+	public void setIncidenceProxyImplementationClass_Diskv2BasedStorage(
 			Class<? extends Incidence> originalClass,
 			Class<? extends Incidence> implementationClass);
 
@@ -554,7 +554,7 @@ public interface GraphFactory {
 	/**
 	 * Creates an record of class <code>recordDomain</code> in the graph g
 	 */
-	public <T extends Record> T createRecord_DiskBasedStoragev2(Class<T> recordDomain, Graph g);
+	public <T extends Record> T createRecord_Diskv2BasedStorage(Class<T> recordDomain, Graph g);
 
 	/**
 	 * Assigns an implementation class with transaction support for a
@@ -572,7 +572,7 @@ public interface GraphFactory {
 	public void setRecordImplementationClass_DiskBasedStorage(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
 	
-	public void setRecordImplementationClass_DiskBasedStoragev2(Class<? extends Record> record,
+	public void setRecordImplementationClass_Diskv2BasedStorage(Class<? extends Record> record,
 			Class<? extends Record> implementationClass);
 
 

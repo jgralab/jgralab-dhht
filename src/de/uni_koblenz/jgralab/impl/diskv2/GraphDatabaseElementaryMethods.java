@@ -458,7 +458,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 		if (g == null) {
 			int partialGraphId = getPartialGraphId(globalSubgraphId);
 			RemoteGraphDatabaseAccess storingDb = getGraphDatabase(partialGraphId);
-			g = graphFactory.createGraph_DiskBasedStoragev2(
+			g = graphFactory.createGraph_Diskv2BasedStorage(
 					getGraphType(globalSubgraphId), uniqueGraphId,
 					globalSubgraphId, (GraphDatabaseBaseImpl) this, storingDb);
 			subgraphObjects.put(globalSubgraphId, new SoftReference<Graph>(g));
@@ -501,7 +501,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Vertex> vc = getVertexType(id);
-			proxy = graphFactory.createVertexProxy_DiskBasedStoragev2(vc, id,
+			proxy = graphFactory.createVertexProxy_Diskv2BasedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Vertex>(proxy);
 			remoteVertices.put(id, ref);
@@ -530,7 +530,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Edge> ec = getEdgeType(id);
-			proxy = graphFactory.createEdgeProxy_DiskBasedStoragev2(ec, id,
+			proxy = graphFactory.createEdgeProxy_Diskv2BasedStorage(ec, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Edge>(proxy);
 			remoteEdges.put(id, ref);
@@ -558,7 +558,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 			// create new vertex proxy
 			RemoteGraphDatabaseAccess remoteDatabase = getGraphDatabase(partialGraphId);
 			Class<? extends Incidence> vc = getIncidenceType(id);
-			proxy = graphFactory.createIncidenceProxy_DiskBasedStoragev2(vc, id,
+			proxy = graphFactory.createIncidenceProxy_Diskv2BasedStorage(vc, id,
 					(GraphDatabaseBaseImpl) this, remoteDatabase);
 			ref = new WeakReference<Incidence>(proxy);
 			remoteIncidences.put(id, ref);
