@@ -63,7 +63,7 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("/**");
-		snippet.add(" * Incomming IncidenceClasses:");
+		snippet.add(" * Incoming IncidenceClasses:");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getIncidenceClasses()) {
 			if (ic.getDirection()==Direction.VERTEX_TO_EDGE)
@@ -94,6 +94,9 @@ public class VertexCodeGenerator extends GraphElementCodeGenerator<VertexClass> 
 		switch (currentCycle) {
 		case DISKPROXIES:
 			addImports("#jgDiskImplPackage#.VertexProxy");
+			break;
+		case DISKV2PROXIES:
+			addImports("#jgDiskv2ImplPackage#.VertexProxy");
 			break;
 		case DISTRIBUTEDPROXIES:
 			addImports("#jgDistributedImplPackage#.VertexProxy");

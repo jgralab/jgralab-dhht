@@ -68,11 +68,14 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			return createInMemoryConstructor();
 		case DISKBASED:	
 			return createDiskBasedConstructor();
+		case DISKV2BASED:	
+			return createDiskv2BasedConstructor();
 		case DISKPROXIES:	
 			addImports("#jgDiskImplPackage#.IncidenceProxy");
 			addImports("#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 			return createProxyConstructor();
+		case DISKV2PROXIES:
 		case DISTRIBUTEDPROXIES:	
 			addImports("#jgDistributedImplPackage#.IncidenceProxy");
 			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
@@ -132,6 +135,17 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, #jgDiskImplPackage#.IncidenceContainer container) {",
 			"\tsuper(globalId, localGraphDatabase, container);",
 			"}"));
+		return code;
+	}
+	
+	private CodeBlock createDiskv2BasedConstructor() {
+		CodeList code = new CodeList();
+		addImports("#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
+		code.addNoIndent(new CodeSnippet(
+						true,
+						"public #simpleClassName#Impl(long globalId, GraphDatabaseBaseImpl localGraphDatabase, long vertexId, long edgeId) {",
+						"\tsuper(globalId,localGraphDatabase, vertexId, edgeId);"));
+		code.addNoIndent(new CodeSnippet("}"));
 		return code;
 	}
 	

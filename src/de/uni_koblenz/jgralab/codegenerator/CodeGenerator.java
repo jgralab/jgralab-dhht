@@ -59,7 +59,7 @@ public abstract class CodeGenerator {
 	 */
 	protected enum GenerationCycle {
 		// FIXME The order here matters! CLASSONLY must be last!
-		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, DISTRIBUTEDPROXIES, DISKPROXIES, CLASSONLY;
+		ABSTRACT, MEMORYBASED, DISTRIBUTED, DISKBASED, DISKV2BASED, DISTRIBUTEDPROXIES, DISKPROXIES, DISKV2PROXIES, CLASSONLY;
 
 		protected static List<GenerationCycle> filter(
 				CodeGeneratorConfiguration config) {
@@ -68,8 +68,10 @@ public abstract class CodeGenerator {
 			out.add(MEMORYBASED);
 			out.add(DISTRIBUTED);
 			out.add(DISKBASED);
+			out.add(DISKV2BASED);
 			out.add(DISTRIBUTEDPROXIES);
 			out.add(DISKPROXIES);
+			out.add(DISKV2PROXIES);
 			out.add(CLASSONLY);
 			return out;
 		}
@@ -99,13 +101,21 @@ public abstract class CodeGenerator {
 			return this == DISKBASED;
 		}
 		
+		/**
+		 * 
+		 * @return
+		 */
+		protected boolean isDiskv2basedImpl() {
+			return this == DISKV2BASED;
+		}
+		
 		
 		/**
 		 * 
 		 * @return
 		 */
 		protected boolean isImplementationVariant() {
-			return this == DISKBASED || this == MEMORYBASED || this == DISTRIBUTED;
+			return this == DISKV2BASED || this == DISKBASED || this == MEMORYBASED || this == DISTRIBUTED;
 		}
 
 
@@ -114,7 +124,7 @@ public abstract class CodeGenerator {
 		 * @return
 		 */
 		protected boolean isProxies() {
-			return this == DISKPROXIES || this == DISTRIBUTEDPROXIES;
+			return this == DISKV2PROXIES || this == DISKPROXIES || this == DISTRIBUTEDPROXIES;
 		}
 		
 		/**
@@ -182,6 +192,7 @@ public abstract class CodeGenerator {
 		rootBlock.setVariable("jgPackage", "de.uni_koblenz.jgralab");
 		rootBlock.setVariable("jgImplPackage", "de.uni_koblenz.jgralab.impl");
 		rootBlock.setVariable("jgDiskImplPackage", "de.uni_koblenz.jgralab.impl.disk");
+		rootBlock.setVariable("jgDiskv2ImplPackage", "de.uni_koblenz.jgralab.impl.diskv2");
 		rootBlock.setVariable("jgDistributedImplPackage", "de.uni_koblenz.jgralab.impl.distributed");
 		rootBlock.setVariable("jgMemImplPackage", "de.uni_koblenz.jgralab.impl.mem");
 		rootBlock.setVariable("jgSchemaPackage","de.uni_koblenz.jgralab.schema");
@@ -193,11 +204,13 @@ public abstract class CodeGenerator {
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem." + packageName);
 			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed." + packageName);
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk." + packageName);
+			rootBlock.setVariable("schemaDiskv2ImplPackage", schemaRootPackageName + ".impl.diskv2." + packageName);
 		} else {
 			rootBlock.setVariable("schemaPackage", schemaRootPackageName);
 			rootBlock.setVariable("schemaMemImplPackage", schemaRootPackageName + ".impl.mem");
 			rootBlock.setVariable("schemaDistributedImplPackage", schemaRootPackageName + ".impl.distributed");
 			rootBlock.setVariable("schemaDiskImplPackage", schemaRootPackageName + ".impl.disk");
+			rootBlock.setVariable("schemaDiskv2ImplPackage", schemaRootPackageName + ".impl.diskv2");
 		}
 		rootBlock.setVariable("isClassOnly", "false");
 		rootBlock.setVariable("isImplementationClassOnly", "false");
@@ -296,9 +309,13 @@ public abstract class CodeGenerator {
 				case DISTRIBUTEDPROXIES:
 					schemaImplPackage = rootBlock.getVariable("schemaDistributedImplPackage");
 					break;
-				case DISKBASED:	
+				case DISKBASED:
 				case DISKPROXIES:
 					schemaImplPackage = rootBlock.getVariable("schemaDiskImplPackage");
+					break;
+				case DISKV2BASED:
+				case DISKV2PROXIES:
+					schemaImplPackage = rootBlock.getVariable("schemaDiskv2ImplPackage");
 					break;
 				default:
 					throw new RuntimeException("Unhandled case");
@@ -361,6 +378,11 @@ public abstract class CodeGenerator {
 			case DISKPROXIES:	
 				code.add("package #schemaDiskImplPackage#;");
 				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskImplPackage"));
+				break;
+			case DISKV2BASED:
+			case DISKV2PROXIES:	
+				code.add("package #schemaDiskv2ImplPackage#;");
+				rootBlock.setVariable("usedJgImplPackage", rootBlock.getVariable("jgDiskv2ImplPackage"));
 				break;
 			case CLASSONLY:
 				code.add("package #schemaPackage#;");
