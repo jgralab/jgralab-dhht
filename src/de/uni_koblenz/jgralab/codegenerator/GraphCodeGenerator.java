@@ -108,7 +108,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	
 	private CodeBlock createDiskv2BasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
-		addImports("#jgDiskImplv2Package#.GraphDatabaseBaseImpl");
+		addImports("#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
 		CodeSnippet code = new CodeSnippet(true);
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
 				 "",

@@ -50,7 +50,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISKV2BASED:
 		case DISKV2PROXIES:
-			code.setVariable("graphOrDatabase", "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
+			code.setVariable("graphOrDatabase", "#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
 			break;
 		case DISTRIBUTED:
 		case DISTRIBUTEDPROXIES:
