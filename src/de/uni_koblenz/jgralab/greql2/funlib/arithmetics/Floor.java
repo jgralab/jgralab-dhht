@@ -1,4 +1,4 @@
-package de.uni_koblenz.jgralab.greql2.funlib.artithmetics;
+package de.uni_koblenz.jgralab.greql2.funlib.arithmetics;
 
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
 
