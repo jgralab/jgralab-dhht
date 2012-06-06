@@ -68,7 +68,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		code.setVariable("graphFactory", currentCycle.isMembasedImpl() ? "graphFactory" : "getGraphFactory()");
-		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isProxies() ? "localGraphDatabase" : "this");
+		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskv2basedImpl() || currentCycle.isDiskbasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isProxies() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");

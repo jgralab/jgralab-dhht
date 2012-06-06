@@ -76,6 +76,10 @@ public class IncidenceCodeGenerator extends TypedElementCodeGenerator<IncidenceC
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
 			return createProxyConstructor();
 		case DISKV2PROXIES:
+			addImports("#jgDiskv2ImplPackage#.IncidenceProxy");
+			addImports("#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
+			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+			return createProxyConstructor();
 		case DISTRIBUTEDPROXIES:	
 			addImports("#jgDistributedImplPackage#.IncidenceProxy");
 			addImports("#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
