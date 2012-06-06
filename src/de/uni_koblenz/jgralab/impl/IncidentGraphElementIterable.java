@@ -118,7 +118,6 @@ public abstract class IncidentGraphElementIterable<G extends GraphElement<?, ?, 
 			this.gc = gc;
 			this.dir = dir;
 			this.traversalContext = traversalContext;
-			//FIXME Maybe error here
 			incidenceListVersion = ((GraphElement<?, ?, ?,?>) graphElement)
 					.getIncidenceListVersion();
 			current = graphElement.getFirstIncidence(dir);
