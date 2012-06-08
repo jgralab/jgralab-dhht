@@ -55,7 +55,7 @@ public class DHHTParserTest {
 	}
 
 	@Test
-	public void testSimpleIncidencePathDescription() {
+	public void testSimpleIncidencePathDescriptionForward() {
 		GreqlSyntaxGraph graph = parseQuery("using v: v +>");
 		SimpleIncidencePathDescription pathDescr = graph
 				.getFirstSimpleIncidencePathDescription();
@@ -63,25 +63,47 @@ public class DHHTParserTest {
 		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
 		assertNotNull(incDirection);
 		assertTrue(incDirection.get_dir() == IncDirection.OUT);
+	}
 
-		graph = parseQuery("using v: v <+");
-		pathDescr = graph.getFirstSimpleIncidencePathDescription();
+	@Test
+	public void testWrongSyntax() {
+		try {
+			GreqlSyntaxGraph graph = parseQuery("using v: v++>");
+		} catch (ParsingException e) {
+			assertTrue(e.getMessage().startsWith(
+					"Parsing error: Unrecognized token"));
+		}
+	}
+
+	@Test
+	public void testSimpleIncidencePathDescriptionBackward() {
+		GreqlSyntaxGraph graph = parseQuery("using v: v <+");
+		SimpleIncidencePathDescription pathDescr = graph
+				.getFirstSimpleIncidencePathDescription();
 		assertNotNull(pathDescr);
-		incDirection = graph.getFirstIncidenceDirection();
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
 		assertNotNull(incDirection);
 		assertTrue(incDirection.get_dir() == IncDirection.IN);
+	}
 
-		graph = parseQuery("using v: v <+>");
-		pathDescr = graph.getFirstSimpleIncidencePathDescription();
+	@Test
+	public void testSimpleIncidencePathDescriptionBoth() {
+		GreqlSyntaxGraph graph = parseQuery("using v: v <+>");
+		SimpleIncidencePathDescription pathDescr = graph
+				.getFirstSimpleIncidencePathDescription();
 		assertNotNull(pathDescr);
-		incDirection = graph.getFirstIncidenceDirection();
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
 		assertNotNull(incDirection);
 		assertTrue(incDirection.get_dir() == IncDirection.BOTH);
+	}
 
-		graph = parseQuery("using v: v <+{IncType1}");
-		pathDescr = graph.getFirstSimpleIncidencePathDescription();
+	@Test
+	public void testSimpleIncidencePathDescriptionWithIncRestriction() {
+		GreqlSyntaxGraph graph = parseQuery("using v: v <+{IncType1}");
+		SimpleIncidencePathDescription pathDescr = graph
+				.getFirstSimpleIncidencePathDescription();
 		assertNotNull(pathDescr);
-		incDirection = graph.getFirstIncidenceDirection();
+		IncidenceDirection incDirection = graph.getFirstIncidenceDirection();
 		assertNotNull(incDirection);
 		assertTrue(incDirection.get_dir() == IncDirection.IN);
 		IncidenceRestriction incRestriction = graph
@@ -92,7 +114,6 @@ public class DHHTParserTest {
 		TypeId typeId = graph.getFirstTypeId();
 		assertNotNull(typeId);
 		assertEquals("IncType1", typeId.get_name());
-
 	}
 
 	@Test(expected = ParsingException.class)
@@ -162,7 +183,7 @@ public class DHHTParserTest {
 	}
 
 	@Test
-	public void testSubgraphExpression() {
+	public void testSubgraphExpressionKappa() {
 		GreqlSyntaxGraph graph = parseQuery("using v: (kappa(1) : v +>)");
 		SubgraphExpression subExpr = graph.getFirstSubgraphExpression();
 		assertNotNull(subExpr);
@@ -175,36 +196,48 @@ public class DHHTParserTest {
 		assertNotNull(subDefOf);
 		assertEquals(subDefOf.getAlpha(), subDef);
 		assertEquals(subDefOf.getOmega(), subExpr);
+	}
 
-		graph = parseQuery("(local : true)");
-		subExpr = graph.getFirstSubgraphExpression();
+	@Test
+	public void testSubgraphExpressionLocal() {
+		GreqlSyntaxGraph graph = parseQuery("(local : true)");
+		SubgraphExpression subExpr = graph.getFirstSubgraphExpression();
 		assertNotNull(subExpr);
-		subDef = graph.getFirstSubgraphDefinition();
+		SubgraphDefinition subDef = graph.getFirstSubgraphDefinition();
 		assertNotNull(subDef);
 		assertTrue(subDef instanceof LocalSubgraphDefinition);
-		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		IsSubgraphDefinitionOf subDefOf = graph
+				.getFirstIsSubgraphDefinitionOf();
 		assertNotNull(subDefOf);
 		assertEquals(subDefOf.getAlpha(), subDef);
 		assertEquals(subDefOf.getOmega(), subExpr);
+	}
 
-		graph = parseQuery("(partial(2) : true)");
-		subExpr = graph.getFirstSubgraphExpression();
+	@Test
+	public void testSubgraphExpressionPartial() {
+		GreqlSyntaxGraph graph = parseQuery("(partial(2) : true)");
+		SubgraphExpression subExpr = graph.getFirstSubgraphExpression();
 		assertNotNull(subExpr);
-		subDef = graph.getFirstSubgraphDefinition();
+		SubgraphDefinition subDef = graph.getFirstSubgraphDefinition();
 		assertNotNull(subDef);
 		assertTrue(subDef instanceof PartialSubgraphDefinition);
-		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		IsSubgraphDefinitionOf subDefOf = graph
+				.getFirstIsSubgraphDefinitionOf();
 		assertNotNull(subDefOf);
 		assertEquals(subDefOf.getAlpha(), subDef);
 		assertEquals(subDefOf.getOmega(), subExpr);
+	}
 
-		graph = parseQuery("using v: (subgraph(v) : from e:E report e end)");
-		subExpr = graph.getFirstSubgraphExpression();
+	@Test
+	public void testSubgraphExpressionNested() {
+		GreqlSyntaxGraph graph = parseQuery("using v: (subgraph(v) : from e:E report e end)");
+		SubgraphExpression subExpr = graph.getFirstSubgraphExpression();
 		assertNotNull(subExpr);
-		subDef = graph.getFirstSubgraphDefinition();
+		SubgraphDefinition subDef = graph.getFirstSubgraphDefinition();
 		assertNotNull(subDef);
 		assertTrue(subDef instanceof NestedSubgraphDefinition);
-		subDefOf = graph.getFirstIsSubgraphDefinitionOf();
+		IsSubgraphDefinitionOf subDefOf = graph
+				.getFirstIsSubgraphDefinitionOf();
 		assertNotNull(subDefOf);
 		assertTrue(subDefOf.getAlpha() == subDef);
 		assertTrue(subDefOf.getOmega() == subExpr);
@@ -249,5 +282,7 @@ public class DHHTParserTest {
 		assertTrue(subDefOf.getAlpha() == subDef);
 		assertTrue(subDefOf.getOmega() == subExpr);
 		assertTrue(((KappaSubgraphDefinition) subDef).get_kappa() == 1);
+
+		// TODO jtheegarten: Test the pathdescription
 	}
 }
