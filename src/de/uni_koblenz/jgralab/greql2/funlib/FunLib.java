@@ -93,7 +93,14 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeSetSubgraph.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ElementSetSubgraph.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EndVertex.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetDirection.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetEdge.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidenceEdge.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidenceVertex.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetInIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOutIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetRole.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetValue.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Id.class);
