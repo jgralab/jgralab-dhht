@@ -344,7 +344,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 */
 	private void deleteVerticesInDeleteList() {
 		boolean edgeHasBeenDeleted = false;
-		while (deleteVertexList.isEmpty()) {
+		while (!deleteVertexList.isEmpty()) {
 			long vertexId = deleteVertexList.remove(0);
 			assert (vertexId != 0) && containsVertexId(vertexId);
 			notifyVertexDeleted(vertexId);
