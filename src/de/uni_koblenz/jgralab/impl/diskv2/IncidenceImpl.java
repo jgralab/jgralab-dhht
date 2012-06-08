@@ -1002,6 +1002,11 @@ public abstract class IncidenceImpl implements Incidence {
 	public int getLocalId() {
 		return id;
 	}
+	
+	@Override
+	public int hashCode() {
+		return getLocalId();
+	}
 
 	@Override
 	public void delete() {

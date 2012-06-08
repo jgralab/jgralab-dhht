@@ -257,6 +257,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final int getLocalId() {
 		return (int) id;
 	}
+	
+	@Override
+	public final int hashCode(){
+		return getLocalId();
+	}
 
 	/**
 	 * Sets {@link GraphElement#partialGraphId}.
