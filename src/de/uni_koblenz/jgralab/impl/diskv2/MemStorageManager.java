@@ -90,66 +90,65 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	//---- Methods to put, get and remove Graph elements and incidences from the cache ----
 
 	/**
-	 * Retrieves a Vertex from the cache
+	 * Retrieves a Vertex from the vertex cache
 	 * 
 	 * @param id the id of the Vertex to be retrieved
 	 * @return the Vertex with the given id
 	 */
 	public final Vertex getVertexObject(int id) {
-		int hash = vertexHashValue(id);
+		CacheEntry<VertexImpl> entry = (CacheEntry<VertexImpl>) getElement(vertexCache, id, vertexHashValue(id));
 		
-		//retrieve first vertex in the bucket
-		CacheEntry<VertexImpl> current = vertexCache[hash];
+		if (entry == null) return null;
 		
-		//search bucket for the requested vertex
-		while (current != null && !current.hasKey(id)){
-			current = current.getNext();
-		}
-		
-		if (current == null) return null;
-		return current.get();
+		return entry.get();
 	}
 
 	/**
-	 * Retrieves an Edge from the cache
+	 * Retrieves an Edge from the edge cache
 	 * 
 	 * @param id the id of the Edge to be retrieved
 	 * @return the Edge with the given id
 	 */
 	public final Edge getEdgeObject(int id) {
-		int hash = edgeHashValue(id);
+		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, edgeHashValue(id));
 		
-		//retrieve first edge in the bucket
-		CacheEntry<EdgeImpl> current = edgeCache[hash];
+		if (entry == null) return null;
 		
-		//search bucket for the requested edge
-		while (current != null && !current.hasKey(id)){
-			current = current.getNext();
-		}
-		
-		if (current == null) return null;
-		return current.get();
+		return entry.get();
 	}
 	
 	/**
-	 * Retrieves an Incidence from the cache
+	 * Retrieves an Incidence from the incidence cache
 	 * 
 	 * @param id the id of the Incidence to be retrieved
 	 * @return the Incidence with the given id
 	 */
 	public final Incidence getIncidenceObject(int id) {
-		int hash = incidenceHashValue(id);
+		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, incidenceHashValue(id));
 		
-		//retrieve first incidence in the bucket
-		CacheEntry<IncidenceImpl> current = incidenceCache[hash];
+		if (entry == null) return null;
 		
-		//search bucket for the requested incidence
-		while (current != null && !current.hasKey(id)){
+		return entry.get();
+	}
+	
+	/**
+	 * Fetches an CacheEntry specified by the given id from a cache.
+	 * 
+	 * @param cache - the cache to fetch an entry from
+	 * @param key - the key of the requested entry
+	 * @param hashValue - the hash value of the element referenced by the entry
+	 * @return the CacheEntry with the given key
+	 */
+	private CacheEntry getElement(CacheEntry[] cache, int key, int hashValue){
+		//retrieve first entry in the bucket
+		CacheEntry current = cache[hashValue];
+				
+		//search bucket for the requested entry
+		while (current != null && !current.hasKey(key)){
 			current = current.getNext();
 		}
 
-		if (current == null) return null;
-		return current.get();
+		return current;
 	}
 
 	/**
@@ -160,102 +159,64 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public void storeVertex(VertexImpl v) {
 		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
 		
-		putVertex(vEntry, vertexCache);
+		putElement(vEntry, vertexCache, vertexHashValue(v.hashCode()));
 		
 		vertexCacheEntries++;
 		testVertexLoadFactor();
 	}
 	
-	//helper method to avoid duplicate code
-	private void putVertex(CacheEntry<VertexImpl> vEntry, CacheEntry<VertexImpl>[] cache){
-		int hashValue = vertexHashValue(vEntry.getKey());
-		
-		//case 1: no collision
-		if (cache[hashValue] == null) {
-			cache[hashValue] = vEntry;
-			return;
-		}
-					
-		//collision detected
-		CacheEntry<VertexImpl> current = cache[hashValue];
-				
-		//find end of list of vertices in buckets
-		while(current.getNext() != null){
-			current = current.getNext();
-		}
-				
-		//append new element
-		current.setNext(vEntry);
-	}
-	
 	/**
-	 * Stores an Edge in the cache
+	 * Puts an Edge in the cache
 	 * 
 	 * @param e the Edge to be cached
 	 */
 	public void storeEdge(EdgeImpl e) {
 		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
 		
-		putEdge(eEntry, edgeCache);
+		putElement(eEntry, edgeCache, edgeHashValue(e.hashCode()));
 		
 		edgeCacheEntries++;
 		testEdgeLoadFactor();
 	}
 	
-	private void putEdge(CacheEntry<EdgeImpl> eEntry, CacheEntry<EdgeImpl>[] cache){
-		int hashValue = edgeHashValue(eEntry.getKey());
-		
-		//case 1: no collision
-		if (cache[hashValue] == null) {
-			cache[hashValue] = eEntry;
-			return;
-		}
-					
-		//collision detected
-		CacheEntry<EdgeImpl> current = cache[hashValue];
-				
-		//find end of list of vertices in buckets
-		while(current.getNext() != null){
-			current = current.getNext();
-		}
-				
-		//append new element
-		current.setNext(eEntry);
-	}
-	
 	/**
-	 * Stores an Incidence in the cache
+	 * Puts an Incidence in the cache
 	 * 
 	 * @param i the Incidence to be cached
 	 */
 	public void storeIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
 		
-		putIncidence(iEntry, incidenceCache);
+		putElement(iEntry, incidenceCache, incidenceHashValue(i.hashCode()));
 		
 		incidenceCacheEntries++;
 		testIncidenceLoadFactor();
 	}
 	
-	private void putIncidence(CacheEntry<IncidenceImpl> iEntry, CacheEntry<IncidenceImpl>[] cache){
-		int hashValue = incidenceHashValue(iEntry.getKey());
-		
-		//case 1: no collision
+	/**
+	 * Puts a CacheEntry into a cache
+	 * 
+	 * @param entry - the entry to be cached
+	 * @param cache - the cache to store the entry in
+	 * @param hashValue - the hash value of the element referenced by the entry
+	 */
+	private void putElement(CacheEntry entry, CacheEntry[] cache, int hashValue){
+		//case 1: no collision - put entry in bucket and return
 		if (cache[hashValue] == null) {
-			cache[hashValue] = iEntry;
+			cache[hashValue] = entry;
 			return;
 		}
 					
-		//collision detected
-		CacheEntry<IncidenceImpl> current = cache[hashValue];
+		//case 2: collision detected
+		CacheEntry current = cache[hashValue];
 				
-		//find end of list of vertices in buckets
+		//find the end of the chain of entries in this bucket
 		while(current.getNext() != null){
 			current = current.getNext();
 		}
 				
-		//append new element
-		current.setNext(iEntry);
+		//append new entry to the end of the chain
+		current.setNext(entry);
 	}
 
 	/**
@@ -263,35 +224,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param vertexId the id of the vertex to be deleted
 	 */
-	public void removeVertexFromStorage(int vertexId) {
-		int hashValue = vertexHashValue(vertexId);
-		
-		//retrieve first element in bucket
-		CacheEntry<VertexImpl> current = vertexCache[hashValue];
-		
-		//look for element to be deleted
-		while(!current.hasKey(vertexId)){
-			current = current.getNext();
-		}
-		
-		//delete element from cache
-		if (current.getPrev() == null){
-			//case 1: element is first element in the list
-			if (current.getNext() == null){
-				//case 1a: no collisions, simply delete the element
-				vertexCache[hashValue] = null;
-			} else {
-				//case 1b: element has successor, put its successor as first element
-				vertexCache[hashValue] = current.getNext();
-			}
-		} else {
-			//case 2: element is not first element in the list
-			current.getPrev().setNext(current.getNext());
-			if (!(current.getNext() == null)){
-				//if current has successor, adjust its pointer to its predecessor
-				current.getNext().setPrev(current.getPrev());
-			}
-		}
+	public void removeVertexFromStorage(int vertexId) {		
+		removeElement(vertexCache, vertexId, vertexHashValue(vertexId));
 		
 		vertexCacheEntries--;
 	}
@@ -302,74 +236,62 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param edgeId the id of the edge to be deleted
 	 */
 	public void removeEdgeFromStorage(int edgeId) {
-		int hashValue = edgeHashValue(edgeId);
-		
-		//retrieve first element in bucket
-		CacheEntry<EdgeImpl> current = edgeCache[hashValue];
-		
-		//look for element to be deleted
-		while(!current.hasKey(edgeId)){
-			current = current.getNext();
-		}
-		
-		//delete element from cache
-		if (current.getPrev() == null){
-			//case 1: element is first element in the list
-			if (current.getNext() == null){
-				//case 1a: no collisions, simply delete the element
-				edgeCache[hashValue] = null;
-			} else {
-				//case 1b: element has successor, put its successor as first element
-				edgeCache[hashValue] = current.getNext();
-			}
-		} else {
-			//case 2: element is not first element in the list
-			current.getPrev().setNext(current.getNext());
-			if (!(current.getNext() == null)){
-				//if current has successor, adjust its pointer to its predecessor
-				current.getNext().setPrev(current.getPrev());
-			}
-		}
+		removeElement(edgeCache, edgeId, edgeHashValue(edgeId));
 		
 		edgeCacheEntries--;
 	}
-
+	
 	/**
 	 * Removes an incidence from the cache
 	 * 
 	 * @param incidenceId the id of the incidence to be deleted
 	 */
 	public void removeIncidenceFromStorage(int incidenceId) {
-		int hashValue = incidenceHashValue(incidenceId);
+		removeElement(incidenceCache, incidenceId, incidenceHashValue(incidenceId));
 		
-		//retrieve first element in bucket
-		CacheEntry<IncidenceImpl> current = incidenceCache[hashValue];
-		
-		//look for element to be deleted
-		while(!current.hasKey(incidenceId)){
+		incidenceCacheEntries--;
+	}
+	
+	/**
+	 * Removes a CacheEntry from a cache
+	 * 
+	 * @param cache - the cache the entry is deleted from 
+	 * @param key - the key of the entry
+	 * @param hashValue - the hash value of the element referenced by the entry
+	 */
+	private void removeElement(CacheEntry[] cache, int key, int hashValue){
+		//retrieve first entry in bucket
+		CacheEntry current = cache[hashValue];
+				
+		//look for entry to be deleted
+		while(!current.hasKey(key)){
 			current = current.getNext();
 		}
 		
-		//delete element from cache
+		//delete entry from the cache
 		if (current.getPrev() == null){
-			//case 1: element is first element in the list
+			//case 1: entry is the first entry in the chain, or the only entry in the bucket
 			if (current.getNext() == null){
-				//case 1a: no collisions, simply delete the element
-				incidenceCache[hashValue] = null;
-			} else {
-				//case 1b: element has successor, put its successor as first element
-				incidenceCache[hashValue] = current.getNext();
-			}
-		} else {
-			//case 2: element is not first element in the list
-			current.getPrev().setNext(current.getNext());
-			if (!(current.getNext() == null)){
-				//if current has successor, adjust its pointer to its predecessor
-				current.getNext().setPrev(current.getPrev());
+				//case 1a: entry is the only entry in the bucket
+				cache[hashValue] = null;	
+			} 
+			else {
+				//case 1b: entry is the first entry in the chain
+				//put its successor as the first element in that bucket
+				cache[hashValue] = current.getNext();				
 			}
 		}
 		
-		incidenceCacheEntries--;
+		else {
+			//case 2: entry is neither the only entry in the bucket nor the first entry in the chain
+			//set "next" pointer of the entry's predecessor to point at its successor
+			current.getPrev().setNext(current.getNext());
+			if (!(current.getNext() == null)){
+				//case 2a: The entry that is deleted is not the last entry in the chain
+				//set "prev" pointer of the entry's successor to point at its predecessor
+				current.getNext().setPrev(current.getPrev());
+			}
+		}
 	}
 	
 	//---- Methods to access other attributes of cached graph elements and incidences ----
@@ -733,9 +655,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    		//rehash all the vertices on the stack
 	    		while(!vertexEntries.empty()){
 	    			current = vertexEntries.pop();
+	    			//erase pointers, because they are now invalid
 	    			current.setNext(null);
 	    			current.setPrev(null);
-	    			putVertex(current, newCache);
+	    			putElement(current, newCache, vertexHashValue(current.get().hashCode()));
 	    		}
 	    	}
 	    }
@@ -785,7 +708,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    			current = edgeEntries.pop();
 	    			current.setNext(null);
 	    			current.setPrev(null);
-	    			putEdge(current, newCache);
+	    			putElement(current, newCache, edgeHashValue(current.get().hashCode()));
 	    		}
 	    	}
 	    }
@@ -835,7 +758,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    			current = incidenceEntries.pop();
 	    			current.setNext(null);
 	    			current.setPrev(null);
-	    			putIncidence(current, newCache);
+	    			putElement(current, newCache, incidenceHashValue(current.get().hashCode()));
 	    		}
 	    	}
 	    }

@@ -38,8 +38,8 @@ public class CacheEntry<V>{
 		return this.key == key;
 	}
 	
-	public void setNext(CacheEntry<V> next){
-		this.next = next;
+	public void setNext(CacheEntry<V> entry){
+		this.next = entry;
 	}
 	
 	public CacheEntry<V> getNext(){
