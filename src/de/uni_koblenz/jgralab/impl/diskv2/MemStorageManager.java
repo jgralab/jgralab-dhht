@@ -262,14 +262,19 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	private void removeElement(CacheEntry[] cache, int key, int hashValue){
 		//retrieve first entry in bucket
 		CacheEntry current = cache[hashValue];
+		//keep track of predecessor because we only have a singly linked list
+		CacheEntry predecessor = null;
+		boolean isFirstEntry = true;
 				
 		//look for entry to be deleted
 		while(!current.hasKey(key)){
+			isFirstEntry = false;
+			predecessor = current;
 			current = current.getNext();
 		}
 		
 		//delete entry from the cache
-		if (current.getPrev() == null){
+		if (isFirstEntry){
 			//case 1: entry is the first entry in the chain, or the only entry in the bucket
 			if (current.getNext() == null){
 				//case 1a: entry is the only entry in the bucket
@@ -285,12 +290,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		else {
 			//case 2: entry is neither the only entry in the bucket nor the first entry in the chain
 			//set "next" pointer of the entry's predecessor to point at its successor
-			current.getPrev().setNext(current.getNext());
-			if (!(current.getNext() == null)){
-				//case 2a: The entry that is deleted is not the last entry in the chain
-				//set "prev" pointer of the entry's successor to point at its predecessor
-				current.getNext().setPrev(current.getPrev());
-			}
+			predecessor.setNext(current.getNext());
 		}
 	}
 	
@@ -655,9 +655,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    		//rehash all the vertices on the stack
 	    		while(!vertexEntries.empty()){
 	    			current = vertexEntries.pop();
-	    			//erase pointers, because they are now invalid
+	    			//erase pointer, because it is now invalid
 	    			current.setNext(null);
-	    			current.setPrev(null);
 	    			putElement(current, newCache, vertexHashValue(current.get().hashCode()));
 	    		}
 	    	}
@@ -707,7 +706,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    		while(!edgeEntries.empty()){
 	    			current = edgeEntries.pop();
 	    			current.setNext(null);
-	    			current.setPrev(null);
 	    			putElement(current, newCache, edgeHashValue(current.get().hashCode()));
 	    		}
 	    	}
@@ -757,7 +755,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    		while(!incidenceEntries.empty()){
 	    			current = incidenceEntries.pop();
 	    			current.setNext(null);
-	    			current.setPrev(null);
 	    			putElement(current, newCache, incidenceHashValue(current.get().hashCode()));
 	    		}
 	    	}
