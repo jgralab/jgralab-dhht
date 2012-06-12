@@ -79,6 +79,7 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.collections.Union.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.collections.Values.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Alpha.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ContainsElement.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Degree.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.DegreeFunction.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Depth.class);
@@ -102,6 +103,7 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidences.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidentElements.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetInIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetKappa.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetLastIncidenceAtEdge.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetLastIncidenceAtVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetNextIncidenceAtEdge.class);
@@ -109,9 +111,12 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOmega.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOmegaSeq.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOutIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetParentGraph.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetPartialGraphs.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetPreviousIncidenceAtEdge.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetPreviousIncidenceAtVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetRole.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetSigma.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetThat.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetTheseEdges.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetTheseVertices.class);
@@ -125,6 +130,7 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsIsolated.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsLoop.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsReachable.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.IsVisible.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Leaves.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Next.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.Omega.class);
