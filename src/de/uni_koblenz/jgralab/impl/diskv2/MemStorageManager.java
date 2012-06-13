@@ -21,9 +21,6 @@ import de.uni_koblenz.jgralab.impl.diskv2.VertexImpl;
  * 
  */
 public final class MemStorageManager implements RemoteStorageAccess {
-
-	//constant used by the hash function
-	private static final int S = (int) Math.floor((0.5*(Math.sqrt(5)) - 1) * Math.pow(2, 32));
 	
 	//maximum load factor of the caches. If load factor is exceeded, do a rehash
 	private static final double MAX_LOAD_FACTOR = 0.7;
@@ -31,19 +28,25 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	//maximum number of entries in the vertex, edge and incidence caches
 	//if these are exceeded by the amount of entries of the respective cache,
 	//the load factor of the respective cache has been exceeded
-	private long vertexCacheMaxEntries;
-	private long edgeCacheMaxEntries;
-	private long incidenceCacheMaxEntries;
+	private int vertexCacheMaxEntries;
+	private int edgeCacheMaxEntries;
+	private int incidenceCacheMaxEntries;
 	
 	//log(2) of the cache sizes
 	private int vertexCacheExp;
 	private int edgeCacheExp;
 	private int incidenceCacheExp;
 	
+	//these are used to efficiently compute the buckets
+	//with a logical and, instead of with modulo arithmetics
+	private int vertexMask;
+	private int edgeMask;
+	private int incidenceMask;
+	
 	//number of objects in the caches
-	private long vertexCacheEntries;
-	private long edgeCacheEntries;
-	private long incidenceCacheEntries;
+	private int vertexCacheEntries;
+	private int edgeCacheEntries;
+	private int incidenceCacheEntries;
 
 	/**
 	 * in-memory-cache for vertices
@@ -81,6 +84,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		edgeCache = new CacheEntry[edgeCacheSize];
 		incidenceCache = new CacheEntry[incidenceCacheSize];
 		
+		vertexMask = (int) (Math.pow(2, vertexCacheExp)) - 1;
+		edgeMask = (int) (Math.pow(2, edgeCacheExp)) - 1;
+		incidenceMask = (int) (Math.pow(2, incidenceCacheExp)) - 1;
+		
 		//initialize element counts
 		vertexCacheEntries = 0;
 		edgeCacheEntries = 0;
@@ -96,7 +103,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @return the Vertex with the given id
 	 */
 	public final Vertex getVertexObject(int id) {
-		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hashValue(id, vertexCacheExp));
+		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
 		
 		if (entry == null) return null;
 		
@@ -110,7 +117,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @return the Edge with the given id
 	 */
 	public final Edge getEdgeObject(int id) {
-		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hashValue(id, edgeCacheExp));
+		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
 		
 		if (entry == null) return null;
 		
@@ -124,7 +131,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @return the Incidence with the given id
 	 */
 	public final Incidence getIncidenceObject(int id) {
-		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hashValue(id, incidenceCacheExp));
+		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
 		if (entry == null) return null;
 		
@@ -136,12 +143,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param cache - the cache to fetch an entry from
 	 * @param key - the key of the requested entry
-	 * @param hashValue - the hash value of the element referenced by the entry
+	 * @param bucket - the bucket the element is in
 	 * @return the CacheEntry with the given key
 	 */
-	private <V> CacheEntry<V> getElement(CacheEntry<V>[] cache, int key, int hashValue){
+	private <V> CacheEntry<V> getElement(CacheEntry<V>[] cache, int key, int bucket){
 		//retrieve first entry in the bucket
-		CacheEntry<V> current = cache[hashValue];
+		CacheEntry<V> current = cache[bucket];
 				
 		//search bucket for the requested entry
 		while (current != null && !current.hasKey(key)){
@@ -156,10 +163,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param v the Vertex to be cached
 	 */
-	public void storeVertex(VertexImpl v) {
+	public void putVertex(VertexImpl v) {
 		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
 		
-		putElement(vEntry, vertexCache, hashValue(v.hashCode(), vertexCacheExp));
+		putElement(vEntry, vertexCache, hash(v.hashCode(), vertexMask));
 		
 		vertexCacheEntries++;
 		testVertexLoadFactor();
@@ -170,10 +177,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param e the Edge to be cached
 	 */
-	public void storeEdge(EdgeImpl e) {
+	public void putEdge(EdgeImpl e) {
 		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
 		
-		putElement(eEntry, edgeCache, hashValue(e.hashCode(), edgeCacheExp));
+		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
 		
 		edgeCacheEntries++;
 		testEdgeLoadFactor();
@@ -184,10 +191,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param i the Incidence to be cached
 	 */
-	public void storeIncidence(IncidenceImpl i) {
+	public void putIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
 		
-		putElement(iEntry, incidenceCache, hashValue(i.hashCode(), incidenceCacheExp));
+		putElement(iEntry, incidenceCache, hash(i.hashCode(), incidenceMask));
 		
 		incidenceCacheEntries++;
 		testIncidenceLoadFactor();
@@ -198,25 +205,19 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param entry - the entry to be cached
 	 * @param cache - the cache to store the entry in
-	 * @param hashValue - the hash value of the element referenced by the entry
+	 * @param bucket - the bucket in which to store the entry
 	 */
-	private <V> void putElement(CacheEntry<V> entry, CacheEntry<V>[] cache, int hashValue){
+	private <V> void putElement(CacheEntry<V> entry, CacheEntry<V>[] cache, int bucket){
 		//case 1: no collision - put entry in bucket and return
-		if (cache[hashValue] == null) {
-			cache[hashValue] = entry;
+		if (cache[bucket] == null) {
+			cache[bucket] = entry;
 			return;
 		}
 					
 		//case 2: collision detected
-		CacheEntry<V> current = cache[hashValue];
-				
-		//find the end of the chain of entries in this bucket
-		while(current.getNext() != null){
-			current = current.getNext();
-		}
-				
-		//append new entry to the end of the chain
-		current.setNext(entry);
+		//put new element at the start of the list
+		entry.setNext(cache[bucket]);
+		cache[bucket] = entry;
 	}
 
 	/**
@@ -224,8 +225,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param vertexId the id of the vertex to be deleted
 	 */
-	public void removeVertexFromStorage(int vertexId) {		
-		removeElement(vertexCache, vertexId, hashValue(vertexId, vertexCacheExp));
+	public void removeVertex(int vertexId) {		
+		removeElement(vertexCache, vertexId, hash(vertexId, vertexMask));
 		
 		vertexCacheEntries--;
 	}
@@ -235,8 +236,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param edgeId the id of the edge to be deleted
 	 */
-	public void removeEdgeFromStorage(int edgeId) {
-		removeElement(edgeCache, edgeId, hashValue(edgeId, edgeCacheExp));
+	public void removeEdge(int edgeId) {
+		removeElement(edgeCache, edgeId, hash(edgeId, edgeMask));
 		
 		edgeCacheEntries--;
 	}
@@ -246,8 +247,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param incidenceId the id of the incidence to be deleted
 	 */
-	public void removeIncidenceFromStorage(int incidenceId) {
-		removeElement(incidenceCache, incidenceId, hashValue(incidenceId, incidenceCacheExp));
+	public void removeIncidence(int incidenceId) {
+		removeElement(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
 		
 		incidenceCacheEntries--;
 	}
@@ -257,11 +258,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param cache - the cache the entry is deleted from 
 	 * @param key - the key of the entry
-	 * @param hashValue - the hash value of the element referenced by the entry
+	 * @param bucket - the bucket the entry is in
 	 */
-	private <V> void removeElement(CacheEntry<V>[] cache, int key, int hashValue){
+	private <V> void removeElement(CacheEntry<V>[] cache, int key, int bucket){
 		//retrieve first entry in bucket
-		CacheEntry<V> current = cache[hashValue];
+		CacheEntry<V> current = cache[bucket];
 		//keep track of predecessor because we only have a singly linked list
 		CacheEntry<V> predecessor = null;
 		boolean isFirstEntry = true;
@@ -278,12 +279,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 			//case 1: entry is the first entry in the chain, or the only entry in the bucket
 			if (current.getNext() == null){
 				//case 1a: entry is the only entry in the bucket
-				cache[hashValue] = null;	
+				cache[bucket] = null;	
 			} 
 			else {
 				//case 1b: entry is the first entry in the chain
 				//put its successor as the first element in that bucket
-				cache[hashValue] = current.getNext();				
+				cache[bucket] = current.getNext();				
 			}
 		}
 		
@@ -653,17 +654,19 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		//log(2) of cache size is smaller then the number of bits in an Integer
 		if (vertexCacheExp >= 31){
 			//remove size limit so we don't end up here after every put
-			vertexCacheMaxEntries = Long.MAX_VALUE;
+			vertexCacheMaxEntries = Integer.MAX_VALUE;
 			return;
 		}
 		
+		//adjust variables that hold information about the cache
 		vertexCacheExp++;
 		int vertexCacheSize = (int) Math.pow(2, vertexCacheExp);
 		vertexCacheMaxEntries *= 2;
+		vertexMask *= 2;
 		
 	    CacheEntry<VertexImpl>[] newCache = new CacheEntry[vertexCacheSize];
 	    
-	    vertexCache = moveCachedObjects(vertexCache, newCache, vertexCacheExp);
+	    vertexCache = moveCachedObjects(vertexCache, newCache, vertexMask);
 	}
 	
 	/**
@@ -671,37 +674,37 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 */
 	protected void rehashEdgeCache(){
 		if (edgeCacheExp >= 31){
-			edgeCacheMaxEntries = Long.MAX_VALUE;
+			edgeCacheMaxEntries = Integer.MAX_VALUE;
 			return;
 		}
 		
 		edgeCacheExp++;
 		int edgeCacheSize = (int) Math.pow(2, edgeCacheExp);
 		edgeCacheMaxEntries *= 2;
+		edgeMask *= 2;
 		
 	    CacheEntry<EdgeImpl>[] newCache = new CacheEntry[edgeCacheSize];
 	    
-	    edgeCache = moveCachedObjects(edgeCache, newCache, edgeCacheExp);
+	    edgeCache = moveCachedObjects(edgeCache, newCache, edgeMask);
 	}
 	
 	/**
 	 * Doubles the size of the incidence cache and rehashes all vertices
 	 */
 	protected void rehashIncidenceCache(){
-		//max allowed cache size is 2^31 because Multiplication Method requires that
-		//log(2) of cache size is smaller then the number of bits in an Integer
 		if (incidenceCacheExp >= 31){
-			incidenceCacheMaxEntries = Long.MAX_VALUE;
+			incidenceCacheMaxEntries = Integer.MAX_VALUE;
 			return;
 		}
 		
 		incidenceCacheExp++;
 		int incidenceCacheSize = (int) Math.pow(2, incidenceCacheExp);
 		incidenceCacheMaxEntries *= 2;
+		incidenceMask *= 2;
 		
 		CacheEntry<IncidenceImpl>[] newCache = new CacheEntry[incidenceCacheSize];
 	    
-	    incidenceCache = moveCachedObjects(incidenceCache, newCache, incidenceCacheExp);
+	    incidenceCache = moveCachedObjects(incidenceCache, newCache, incidenceMask);
 	}
 	
 	/**
@@ -709,16 +712,18 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 *  
 	 * @param oldCache - the old cache
 	 * @param newCache - the new, bigger cache
-	 * @param exp - log(2) of the new cache's size
+	 * @param mask - the mask corresponding to the new cache's size
 	 * @return the new cache
 	 */
-    private <V> CacheEntry<V>[] moveCachedObjects(CacheEntry<V>[] oldCache, CacheEntry<V>[] newCache, int exp){
+    private <V> CacheEntry<V>[] moveCachedObjects(CacheEntry<V>[] oldCache, CacheEntry<V>[] newCache, int mask){
+    	
+    	Stack<CacheEntry<V>> oldEntries = new Stack<CacheEntry<V>>();
+    	
     	for (int i = 0; i < oldCache.length; i++){
 	    	if (oldCache[i] != null){
 	    		
 	    		//Put vertices in current bucket on a stack
 	    		CacheEntry<V> current = oldCache[i];
-	    		Stack<CacheEntry<V>> oldEntries = new Stack<CacheEntry<V>>();
 	    		oldEntries.push(current);
 	    		
 	    		while (current.getNext() != null){
@@ -731,7 +736,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    			current = oldEntries.pop();
 	    			//erase pointer, because it is now invalid
 	    			current.setNext(null);
-	    			putElement(current, newCache, hashValue(current.get().hashCode(), exp));
+	    			putElement(current, newCache, hash(current.get().hashCode(), mask));
 	    		}
 	    	}
 	    }
@@ -742,11 +747,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	/**
 	 * Calculates the hash value for an object using Cormen's Multiplication Method
 	 * 
-	 * @param hashCode - the hashCode of the vertex to be cached
-	 * @param exp - log(2) of the size of the cache the object will be put into
+	 * @param hashCode - the hashCode of the object to be cached
+	 * @param mask - used to compute (hashCode modulo cacheSize)
 	 */
-	protected int hashValue(int hashCode, int exp){
-		int x = hashCode * S;
-		return x >>> (32 - exp);
+	protected int hash(int hashCode, int mask){
+		return hashCode & mask;
 	}
 }

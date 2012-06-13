@@ -307,7 +307,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				.getM1ClassForId(m1ClassId);
 		VertexImpl v = (VertexImpl) graphFactory.createVertex_Diskv2BasedStorage(
 				m1Class, vertexId, this);
-		inMemoryStorage.storeVertex(v);
+		inMemoryStorage.putVertex(v);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
@@ -453,7 +453,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setNextVertexId(vertexId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
 		try {
-			((MemStorageManager) getLocalStorage()).removeVertexFromStorage(convertToLocalId(vertexId));
+			((MemStorageManager) getLocalStorage()).removeVertex(convertToLocalId(vertexId));
 		} catch (RemoteException e) {
 			throw new RuntimeException(e);
 		}
@@ -690,7 +690,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				.getM1ClassForId(m1ClassId);
 		EdgeImpl e = (EdgeImpl) graphFactory.createEdge_Diskv2BasedStorage(
 				m1Class, edgeId, this);
-		inMemoryStorage.storeEdge(e);
+		inMemoryStorage.putEdge(e);
 
 		long toplevelSubgraphId = convertToGlobalId(1);
 
@@ -789,7 +789,7 @@ public abstract class GraphDatabaseBaseImpl extends
 		setNextEdgeId(edgeId, 0);
 		setVCount(toplevelGraphId, getVCount(toplevelGraphId) - 1);
 		try {
-			((MemStorageManager) getLocalStorage()).removeEdgeFromStorage(
+			((MemStorageManager) getLocalStorage()).removeEdge(
 					convertToLocalId(edgeId));
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
@@ -1137,7 +1137,7 @@ public abstract class GraphDatabaseBaseImpl extends
 				.createIncidence_Diskv2BasedStorage(m1Class, incId, vertexId,
 						edgeId, this);
 
-		inMemoryStorage.storeIncidence(newInc);
+		inMemoryStorage.putIncidence(newInc);
 		
 		// append created incidence to lambda sequences of vertex and edge
 		appendIncidenceToLambdaSeqOfVertex(vertexId, incId);
