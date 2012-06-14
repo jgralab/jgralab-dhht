@@ -348,7 +348,8 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private final String matchSimpleName() {
-		if (lookAhead(0) == TokenTypes.IDENTIFIER) {
+		if (lookAhead(0) == TokenTypes.IDENTIFIER
+				|| lookAhead(0) == TokenTypes.V || lookAhead(0) == TokenTypes.E) {
 			String name = lookAhead.getValue();
 			if (isValidSimpleName(name)) {
 				match();
@@ -524,7 +525,8 @@ public class GreqlParser extends ParserHelper {
 			Identifier ident = graph.createIdentifier();
 			offset = getCurrentOffset();
 			ident.set_name(matchIdentifier());
-			IsIdOfStoreClause isId = graph.createIsIdOfStoreClause(ident, rootExpr);
+			IsIdOfStoreClause isId = graph.createIsIdOfStoreClause(ident,
+					rootExpr);
 			isId.set_sourcePositions(createSourcePositionList(offset));
 		}
 		match(TokenTypes.EOF);
@@ -702,6 +704,7 @@ public class GreqlParser extends ParserHelper {
 						.createIsIdOfPartialGraphDefinition(id,
 								partialDefinition);
 			}
+			match(TokenTypes.RPAREN);
 		} else {
 			fail("Expected opening parenthesis, but found:");
 		}
@@ -733,6 +736,7 @@ public class GreqlParser extends ParserHelper {
 			} else {
 				fail("No identifier in nested-definition:");
 			}
+			match(TokenTypes.RPAREN);
 		} else {
 			fail("No opening parenthesis in nested-definition:");
 		}
@@ -1701,6 +1705,8 @@ public class GreqlParser extends ParserHelper {
 				dir = graph.createIncidenceDirection();
 				dir.set_dir(direction);
 			}
+			graph.createIsIncDirectionOf(dir, result);
+
 		}
 		// A LCURLY after an Incidence-arrow can be either an
 		// IncidenceRestriction (restriction of the incidence itself) or an
@@ -1712,6 +1718,7 @@ public class GreqlParser extends ParserHelper {
 			try {
 				match(TokenTypes.LCURLY);
 				parseTypeExpressionList();
+				match(TokenTypes.RCURLY);
 			} catch (ParsingException ex) {
 			}
 			if (predicateEnd()) {
@@ -1844,7 +1851,9 @@ public class GreqlParser extends ParserHelper {
 	}
 
 	private ElementRestriction parseTypeRestriction(RestrictionType rType) {
-		List<VertexPosition<TypeId>> typeList = parseTypeExpressionList();
+		List<VertexPosition<TypeId>> typeList = new ArrayList<VertexPosition<TypeId>>();
+
+		typeList = parseTypeExpressionList();
 		if (!inPredicateMode()) {
 			if (typeList != null && typeList.size() > 0) {
 				ElementTypeRestriction typeRestriction = graph
@@ -2360,11 +2369,15 @@ public class GreqlParser extends ParserHelper {
 
 	private final List<VertexPosition<TypeId>> parseTypeExpressionList() {
 		List<VertexPosition<TypeId>> list = new ArrayList<VertexPosition<TypeId>>();
+
 		do {
 			int offset = getCurrentOffset();
 			TypeId t = parseTypeId();
 			int length = getLength(offset);
 			list.add(new VertexPosition<TypeId>(t, length, offset));
+			if (lookAhead(0) == TokenTypes.COLON) {
+				fail("COLON found in TypeId");
+			}
 		} while (tryMatch(TokenTypes.COMMA));
 		return list;
 	}

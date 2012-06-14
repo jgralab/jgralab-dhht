@@ -107,13 +107,30 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 		case DISKBASED:
 		case DISKPROXIES:	
 			return createDiskBasedConstructor();
+		case DISKV2BASED:
+		case DISKV2PROXIES:	
+			return createDiskv2BasedConstructor();
 		case DISTRIBUTED:
 		case DISTRIBUTEDPROXIES:	
 			return createDistributedBasedConstructor();
 		default:
 			throw new RuntimeException("Unhandled case");
 		}
-	}	
+	}
+	
+	private CodeBlock createDiskv2BasedConstructor() {
+		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
+		addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("",
+				 "public #simpleImplClassName#(long globalSubgraphId, GraphDatabaseBaseImpl localGraphDatabase,	RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(globalSubgraphId, localGraphDatabase, storingGraphDatabase);",
+				 "}",
+				 "",
+				 "");	
+		return code;
+	}
 	
 	private CodeBlock createDiskBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
@@ -397,6 +414,15 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"\t}",
 					"}");
 			break;
+		case DISKV2BASED:
+			code.add("public #type# #isOrGet#_#name#()  {",
+					"\ttry {",
+					"\t\treturn (#typeCast#) localGraphDatabase.getGraphAttribute(\"#name#\");",
+					"\t} catch (java.rmi.RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
+					"}");
+			break;
 		case DISTRIBUTED:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					"\ttry {",
@@ -407,6 +433,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"}");
 			break;
 		case DISKPROXIES:
+		case DISKV2PROXIES:
 		case DISTRIBUTEDPROXIES:
 			break;
 		default: throw new RuntimeException("Unhandled case");	
@@ -439,6 +466,15 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"\t}",
 					"}");
 			break;
+		case DISKV2BASED:
+			code.add("public void set_#name#(#type# _#name#)  {",
+					"\ttry {",
+					"\t\tlocalGraphDatabase.setGraphAttribute(\"#name#\", _#name#);",
+					"\t} catch (java.rmi.RemoteException ex) {",
+					"\t\tthrow new RuntimeException(ex);",
+					"\t}",
+					"}");
+			break;
 		case DISTRIBUTED:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					"\ttry {",
@@ -449,6 +485,7 @@ public class SubordinateGraphCodeGenerator extends AttributedElementCodeGenerato
 					"}");
 			break;
 		case DISKPROXIES:
+		case DISKV2PROXIES:
 		case DISTRIBUTEDPROXIES:
 			break;
 		default: throw new RuntimeException("Unhandled case");	

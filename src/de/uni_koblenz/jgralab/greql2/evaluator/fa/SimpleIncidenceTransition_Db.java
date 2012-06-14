@@ -86,7 +86,7 @@ public class SimpleIncidenceTransition_Db extends Transition {
 	 * returns a string which describes the edge
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		return null;
 	}
 

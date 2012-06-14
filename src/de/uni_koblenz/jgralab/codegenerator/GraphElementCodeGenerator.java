@@ -48,6 +48,10 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		case DISKPROXIES:
 			code.setVariable("graphOrDatabase", "#jgDiskImplPackage#.GraphDatabaseBaseImpl");
 			break;
+		case DISKV2BASED:
+		case DISKV2PROXIES:
+			code.setVariable("graphOrDatabase", "#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
+			break;
 		case DISTRIBUTED:
 		case DISTRIBUTEDPROXIES:
 			code.setVariable("graphOrDatabase", "#jgDistributedImplPackage#.GraphDatabaseBaseImpl");
@@ -97,7 +101,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add(createReadAttributesMethod(aec.getAttributeList(), "attributeContainer."));
 			code.add(createReadAttributesFromStringMethod(aec.getAttributeList(), "attributeContainer."));
 		}	
-		if (currentCycle.isMembasedImpl() ||currentCycle.isDistributedImpl()) {
+		if (currentCycle.isMembasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isDiskv2basedImpl()) {
 			code.add(createGetIncidenceClassForRolenameMethod());
 			code.add(createWriteAttributesMethod(aec.getAttributeList(), ""));
 			code.add(createWriteAttributeToStringMethod(aec.getAttributeList(), ""));
@@ -164,6 +168,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add("public #type# #isOrGet#_#name#();");
 			break;
 		case MEMORYBASED:
+		case DISKV2BASED:
 		case DISTRIBUTED:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\treturn _#name#;",
@@ -179,6 +184,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISTRIBUTEDPROXIES:	
 		case DISKPROXIES:
+		case DISKV2PROXIES:
 			code.add(
 					"@SuppressWarnings(\"unchecked\")",
 					"public #type# #isOrGet#_#name#()  {",
@@ -206,6 +212,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISTRIBUTED:	
 		case MEMORYBASED:
+		case DISKV2BASED:
 			code.add("public void set_#name#(#type# new_#name#) {",
 					 "\t_#name# = new_#name#;", 
 					 "\tgraphModified();", "}");
@@ -220,6 +227,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISTRIBUTEDPROXIES:	
 		case DISKPROXIES:
+		case DISKV2PROXIES:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					 "\ttry {",
 					 "\t\tstoringGraphDatabase.set#edgeOrVertex#Attribute(elementId, \"#name#\", _#name#);",

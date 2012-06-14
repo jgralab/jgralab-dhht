@@ -38,7 +38,6 @@
 package de.uni_koblenz.jgralab.greql2.types.pathsearch;
 
 import de.uni_koblenz.jgralab.GraphElement;
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 
 public class ElementStateQueue {
@@ -47,13 +46,13 @@ public class ElementStateQueue {
 
 	public GraphElement currentElement = null;
 
-	public int currentState = 0;
+	public State currentState = null;
 
 	int size = initialSize;
 
 	GraphElement[] elements = null;
 
-	int[] states = null;
+	State[] states = null;
 
 	int last = 0;
 
@@ -61,11 +60,11 @@ public class ElementStateQueue {
 
 	public ElementStateQueue() {
 		elements = new GraphElement[initialSize];
-		states = new int[initialSize];
+		states = new State[initialSize];
 		size = initialSize;
 	}
 
-	public final void put(GraphElement e, int s) {
+	public final void put(GraphElement<?, ?, ?, ?> e, State s) {
 		if (last == first + size - 1) {
 			resize();
 		}
@@ -85,8 +84,8 @@ public class ElementStateQueue {
 	}
 
 	private final void resize() {
-		GraphElement[] newElements = new GraphElement[size * 2];
-		int[] newStates = new int[size * 2];
+		GraphElement<?, ?, ?, ?>[] newElements = new GraphElement[size * 2];
+		State[] newStates = new State[size * 2];
 
 		for (int i = 0; i < size; i++) {
 			newElements[i] = elements[(first + i) % size];

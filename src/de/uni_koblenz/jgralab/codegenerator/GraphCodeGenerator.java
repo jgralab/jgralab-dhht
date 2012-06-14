@@ -68,7 +68,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 	protected CodeList createBody() {
 		CodeList code = (CodeList) super.createBody();
 		code.setVariable("graphFactory", currentCycle.isMembasedImpl() ? "graphFactory" : "getGraphFactory()");
-		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskbasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isProxies() ? "localGraphDatabase" : "this");
+		code.setVariable("graphOrGraphDatabase", currentCycle.isDiskv2basedImpl() || currentCycle.isDiskbasedImpl() || currentCycle.isDistributedImpl() || currentCycle.isProxies() ? "localGraphDatabase" : "this");
 		if (currentCycle.isImplementationVariant()) {
 			addImports("#usedJgImplPackage#.#baseClassName#");
 			addImports("#jgImplPackage#.RemoteGraphDatabaseAccess");
@@ -95,6 +95,9 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 		case DISKBASED:
 		case DISKPROXIES:	
 			return createDiskBasedConstructor();
+		case DISKV2BASED:
+		case DISKV2PROXIES:	
+			return createDiskv2BasedConstructor();
 		case DISTRIBUTED:
 		case DISTRIBUTEDPROXIES:	
 			return createDistributedBasedConstructor();
@@ -102,6 +105,20 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			throw new RuntimeException("Unhandled case");
 		}
 	}	
+	
+	private CodeBlock createDiskv2BasedConstructor() {
+		addImports("#schemaPackageName#.#schemaName#");
+		addImports("#jgDiskv2ImplPackage#.GraphDatabaseBaseImpl");
+		CodeSnippet code = new CodeSnippet(true);
+		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
+				 "",
+				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
+				 "\tinitializeAttributesWithDefaultValues();",
+				 "}");
+	
+		return code;
+	}
 
 	private CodeBlock createDiskBasedConstructor() {
 		addImports("#schemaPackageName#.#schemaName#");
@@ -276,7 +293,18 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 					 "\t\t throw new RuntimeException(ex);",
 					 "\t}",
 					 "}");
+		} else if (currentCycle.isDiskv2basedImpl()) {
+			code.setVariable("ecKind", gec instanceof VertexClass ? "Vertex" : "Edge");
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
+					 "\ttry {",
+					 "\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.get#ecKind#Object(storingGraphDatabase.create#ecKind#(getSchema().getClassId(#ecJavaClassName#.class), #newActualParams#));",
+					 "\t\treturn new#ecType#;", 
+					 "\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\t throw new RuntimeException(ex);",
+					 "\t}",
+					 "}");
 		}
+		
 		code.setVariable("formalParams", (withId ? "int id" : ""));
 		code.setVariable("newActualParams", (withId ? "id" : "0"));
 		return code;
@@ -313,6 +341,17 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 					 "\t\t}",
 				 "}");
 		} else if  (currentCycle.isDiskbasedImpl()) {
+			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
+					"\t\ttry {",
+					 "\t\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
+					 "\t\t\talpha.connect(#alphaInc#.class, new#ecType#);",
+					 "\t\t\tomega.connect(#omegaInc#.class, new#ecType#);",
+					 "\t\t\treturn new#ecType#;",
+					 "\t\t} catch (java.rmi.RemoteException ex) {",
+					 "\t\t\tthrow new RuntimeException(ex);",
+					 "\t\t}",
+				 "}");
+		} else if  (currentCycle.isDiskv2basedImpl()) {
 			code.add("public #ecJavaClassName# create#ecCamelName#(#formalParams#) {",
 					"\t\ttry {",
 					 "\t\t\t#ecJavaClassName# new#ecType# = (#ecJavaClassName#) localGraphDatabase.getEdgeObject(storingGraphDatabase.createEdge(getSchema().getClassId(#ecJavaClassName#.class), 0));",
@@ -443,6 +482,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 					 "}");
 			break;
 		case DISKBASED:
+		case DISKV2BASED:
 		case DISTRIBUTED:
 			code.add("public #type# #isOrGet#_#name#()  {",
 					 "\ttry {",
@@ -474,6 +514,7 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 			break;
 		case DISTRIBUTED:
 		case DISKBASED:
+		case DISKV2BASED:
 			code.add("public void set_#name#(#type# _#name#)  {",
 					 "\ttry {",
 					 "\t\tstoringGraphDatabase.set#graphElementClass#Attribute(\"#name#\", _#name#);",

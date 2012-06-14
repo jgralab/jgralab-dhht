@@ -59,7 +59,7 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		CodeList code = new CodeList();
 		CodeSnippet snippet = new CodeSnippet();
 		snippet.add("/**");
-		snippet.add(" * Incomming IncidenceClasses:");
+		snippet.add(" * Incoming IncidenceClasses:");
 		code.addNoIndent(snippet);
 		for (IncidenceClass ic : aec.getIncidenceClasses()) {
 			if (ic.getDirection()==Direction.EDGE_TO_VERTEX)
@@ -86,6 +86,9 @@ public class EdgeCodeGenerator extends GraphElementCodeGenerator<EdgeClass> {
 		switch (currentCycle) {
 		case DISKPROXIES:
 			addImports("#jgDiskImplPackage#.EdgeProxy");
+			break;
+		case DISKV2PROXIES:
+			addImports("#jgDiskv2ImplPackage#.EdgeProxy");
 			break;
 		case DISTRIBUTEDPROXIES:
 			addImports("#jgDistributedImplPackage#.EdgeProxy");

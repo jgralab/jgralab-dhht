@@ -35,13 +35,13 @@
 
 package de.uni_koblenz.jgralab.greql2.types.pathsearch;
 
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 
 /**
- * This class modells a entry in the Queue which is used for regular pathsearch.
- * It contains a vertex which must be visited and a state in which the dfa is
- * when the vertex is visited
+ * This class models an entry in the Queue which is used for regular pathsearch.
+ * It contains a {@link GraphElement} which must be visited and a state in which the dfa is
+ * when the element is visited
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -49,17 +49,17 @@ import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 public class PathSearchQueueEntry {
 
 	/**
-	 * The vertex of the datagraph which should be visited
+	 * The element of the datagraph which should be visited
 	 */
-	public Vertex vertex;
+	public GraphElement<?, ?, ?, ?> element;
 
 	/**
 	 * the state of the dfa
 	 */
 	public State state;
 
-	public PathSearchQueueEntry(Vertex v, State s) {
-		vertex = v;
+	public PathSearchQueueEntry(GraphElement<?, ?, ?, ?> v, State s) {
+		element = v;
 		state = s;
 	}
 

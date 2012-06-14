@@ -37,6 +37,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
 
 /**
  * Is baseclass of all transitions. Has one start and one endstate.
@@ -118,9 +119,9 @@ public abstract class Transition {
 	}
 
 	/**
-	 * returns a string which describes the edge
+	 * returns a string which describes the incidence
 	 */
-	public abstract String edgeString();
+	public abstract String incidenceString();
 
 	/** a pretty-printed string for this tranistion */
 	public abstract String prettyPrint();
@@ -152,8 +153,8 @@ public abstract class Transition {
 	public abstract boolean equalSymbol(Transition t);
 
 	/**
-	 * reverses this transition, that means, the former end state gets the new
-	 * start state and vice versa,
+	 * reverses this transition, that means, the former end state becomes the new
+	 * start state and vice versa
 	 */
 	public void reverse() {
 		State s = startState;
@@ -181,8 +182,14 @@ public abstract class Transition {
 	 * transition has fired. This can be either the current element itself or the other one
 	 * at the incidence
 	 */
-	public abstract GraphElement<?, ?, ?, ?> getNextElement(
-			GraphElement<?, ?, ?, ?> elem, Incidence inc);
+	public GraphElement<?, ?, ?, ?> getNextElement(
+			GraphElement<?, ?, ?, ?> elem, Incidence inc) {
+		if (elem instanceof Vertex) {
+			return inc.getEdge();
+		} else {
+			return inc.getVertex();
+		}
+	}
 
 	/**
 	 * @return true if the transition consumes an edge (e.g. for a

@@ -83,7 +83,7 @@ public class GreqlLexer {
 					put(TokenTypes.V, "V");
 					put(TokenTypes.WHERE, "where");
 					put(TokenTypes.WITH, "with");
-					put(TokenTypes.NESTED, "nested");
+					put(TokenTypes.NESTED, "subgraph");
 					put(TokenTypes.LOCAL, "local");
 					put(TokenTypes.PARTIAL, "partial");
 					put(TokenTypes.KAPPA, "kappa");

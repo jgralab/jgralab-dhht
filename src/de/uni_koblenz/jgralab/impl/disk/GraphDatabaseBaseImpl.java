@@ -344,7 +344,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 */
 	private void deleteVerticesInDeleteList() {
 		boolean edgeHasBeenDeleted = false;
-		while (deleteVertexList.isEmpty()) {
+		while (!deleteVertexList.isEmpty()) {
 			long vertexId = deleteVertexList.remove(0);
 			assert (vertexId != 0) && containsVertexId(vertexId);
 			notifyVertexDeleted(vertexId);
@@ -1079,7 +1079,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * incidence's id to the next locally available incidence id
 	 * 
 	 * @param cls
-	 * @param vertex
+	 * @param element
 	 * @param edge
 	 */
 	@Override
@@ -1093,7 +1093,7 @@ public abstract class GraphDatabaseBaseImpl extends
 	 * incidence's id to <code>id</code>
 	 * 
 	 * @param cls
-	 * @param vertex
+	 * @param element
 	 * @param edge
 	 * @param id
 	 */

@@ -39,8 +39,8 @@ import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
-import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.graphmarker.BooleanGraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.GlobalBooleanGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
@@ -55,50 +55,52 @@ public class IsReachable extends Function {
 
 	public IsReachable() {
 		super(
-				"Returns true, iff there is a path from vertex given as first argument to vertex "
-						+ "given as second argument that matches the path description given as second argument. "
-						+ "Usually invoked like so: myVertex (--> | <>--)+ myOtherVertex.",
+				"Returns true, iff there is a path from element given as first argument to element "
+						+ "given as second argument that matches the path description given as third argument. "
+						+ "Usually invoked like so: myElement (--> | <>--)+ myOtherElement.",
 				50, 1, 0.01, Category.GRAPH,
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
-	public Boolean evaluate(Vertex u, Vertex v, DFA dfa) {
+	public Boolean evaluate(GraphElement<?, ?, ?, ?> u,
+			GraphElement<?, ?, ?, ?> v, DFA dfa) {
 		try {
-		if (u.getGraph() != v.getGraph()) {
-			throw new IllegalArgumentException(
-					"The vertices are in different graphs, but must be in the same graph.");
-		}
-		BooleanGraphMarker[] markers = new BooleanGraphMarker[dfa.stateList
-				.size()];
-		for (State s : dfa.stateList) {
-			markers[s.number] = new GlobalBooleanGraphMarker(u.getGraph());
-		}
-		Queue<PathSearchQueueEntry> queue = new LinkedList<PathSearchQueueEntry>();
-		PathSearchQueueEntry currentEntry = new PathSearchQueueEntry(u,
-				dfa.initialState);
-		markers[currentEntry.state.number].mark(currentEntry.vertex);
-		queue.add(currentEntry);
-		while (!queue.isEmpty()) {
-			currentEntry = queue.poll();
-			if ((currentEntry.vertex == v) && currentEntry.state.isFinal) {
-				return true;
+			if (u.getGraph() != v.getGraph()) {
+				throw new IllegalArgumentException(
+						"The elements are in different graphs, but must be in the same graph.");
 			}
-			for (Incidence inc : currentEntry.vertex.getIncidences()) {
-				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = null; //currentTransition.getNextElement(currentEntry.vertex, inc);
-					boolean isMarked = markers[currentTransition.endState.number]
-							.isMarked(nextVertex);
-					boolean transitionIsPossible = currentTransition.accepts(
-							currentEntry.vertex, inc);
-					if (!isMarked && transitionIsPossible) {
-						PathSearchQueueEntry nextEntry = new PathSearchQueueEntry(
-								nextVertex, currentTransition.endState);
-						markers[nextEntry.state.number].mark(nextVertex);
-						queue.add(nextEntry);
+			BooleanGraphMarker[] markers = new BooleanGraphMarker[dfa.stateList
+					.size()];
+			for (State s : dfa.stateList) {
+				markers[s.number] = new GlobalBooleanGraphMarker(u.getGraph());
+			}
+			Queue<PathSearchQueueEntry> queue = new LinkedList<PathSearchQueueEntry>();
+			PathSearchQueueEntry currentEntry = new PathSearchQueueEntry(u,
+					dfa.initialState);
+			markers[currentEntry.state.number].mark(currentEntry.element);
+			queue.add(currentEntry);
+			while (!queue.isEmpty()) {
+				currentEntry = queue.poll();
+				if ((currentEntry.element == v) && currentEntry.state.isFinal) {
+					return true;
+				}
+				for (Incidence inc : currentEntry.element.getIncidences()) {
+					for (Transition currentTransition : currentEntry.state.outTransitions) {
+						GraphElement<?, ?, ?, ?> nextElement = currentTransition
+								.getNextElement(currentEntry.element, inc);
+						boolean isMarked = markers[currentTransition.endState.number]
+								.isMarked(nextElement);
+						boolean transitionIsPossible = currentTransition
+								.accepts(currentEntry.element, inc);
+						if (!isMarked && transitionIsPossible) {
+							PathSearchQueueEntry nextEntry = new PathSearchQueueEntry(
+									nextElement, currentTransition.endState);
+							markers[nextEntry.state.number].mark(nextElement);
+							queue.add(nextEntry);
+						}
 					}
 				}
 			}
-		}
 		} catch (RemoteException ex) {
 			throw new RuntimeException(ex);
 		}

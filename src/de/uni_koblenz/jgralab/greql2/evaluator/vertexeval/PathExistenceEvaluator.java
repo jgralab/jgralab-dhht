@@ -35,7 +35,7 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
@@ -48,7 +48,7 @@ import de.uni_koblenz.jgralab.greql2.schema.PathExistence;
 
 /**
  * Evaluates a path existence, that's the question if there is a path of a
- * specific regular form form startVertex to targetVertex
+ * specific regular form form startElement to targetElement
  * 
  * @author ist@uni-koblenz.de
  * 
@@ -77,7 +77,8 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public Object evaluate() {
-		PathDescription p = (PathDescription) vertex.getFirst_isPathOf_GoesTo_PathExpression().getThat();
+		PathDescription p = (PathDescription) vertex
+				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
 		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 		Expression startExpression = (Expression) vertex
@@ -91,25 +92,25 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 		if (res == null) {
 			return null;
 		}
-		Vertex startVertex = (Vertex) res;
+		GraphElement<?, ?, ?, ?> startElement = (GraphElement<?, ?, ?, ?>) res;
 
 		Expression targetExpression = (Expression) vertex
 				.getFirst_isTargetExprOf_omega().getThat();
 		VertexEvaluator targetEval = vertexEvalMarker.getMark(targetExpression);
-		Vertex targetVertex = null;
+		GraphElement<?, ?, ?, ?> targetElement = null;
 		res = targetEval.getResult();
 		if (res == null) {
 			return null;
 		}
-		targetVertex = (Vertex) res;
+		targetElement = (GraphElement<?, ?, ?, ?>) res;
 
 		if (searchAutomaton == null) {
 			searchAutomaton = pathDescEval.getNFA().getDFA();
 			// searchAutomaton.printAscii();
 		}
 		Object[] arguments = new Object[3];
-		arguments[0] = startVertex;
-		arguments[1] = targetVertex;
+		arguments[0] = startElement;
+		arguments[1] = targetElement;
 		arguments[2] = searchAutomaton;
 		if (fi == null) {
 			fi = FunLib.getFunctionInfo("isReachable");
@@ -119,18 +120,21 @@ public class PathExistenceEvaluator extends PathSearchEvaluator {
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		Expression startExpression = (Expression) vertex.getFirst_isStartExprOf_omega().getThat();
+		Expression startExpression = (Expression) vertex
+				.getFirst_isStartExprOf_omega().getThat();
 		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
 				startExpression);
 		long startCosts = vertexEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);
-		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_omega().getThat();
+		Expression targetExpression = (Expression) vertex
+				.getFirst_isTargetExprOf_omega().getThat();
 		vertexEval = getVertexEvalMarker().getMark(targetExpression);
 		long targetCosts = vertexEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);
 		PathDescription p = (PathDescription) vertex
 				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
-		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(p);
+		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker()
+				.getMark(p);
 		long pathDescCosts = pathDescEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);
 		long searchCosts = Math.round(((pathDescCosts * searchFactor) / 2.0)

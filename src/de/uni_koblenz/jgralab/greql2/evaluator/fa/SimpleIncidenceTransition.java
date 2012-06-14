@@ -35,6 +35,9 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
@@ -43,9 +46,6 @@ import de.uni_koblenz.jgralab.greql2.parser.GreqlLexer;
 import de.uni_koblenz.jgralab.greql2.parser.TokenTypes;
 import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
-import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
-import de.uni_koblenz.jgralab.schema.IncidenceClass;
-import de.uni_koblenz.jgralab.schema.TypedElementClass;
 
 /**
  * This transition accepts a SimpleIncidencePathDescription. A SimpleIncidencePathDescription is
@@ -57,9 +57,9 @@ import de.uni_koblenz.jgralab.schema.TypedElementClass;
 public class SimpleIncidenceTransition extends Transition {
 
 	/**
-	 * The collection of types that are accepted by this transition
+	 * The collection of incidence-types that are accepted by this transition
 	 */
-	protected TypeCollection typeCollection;
+	protected Set<String> roles;
 
 	/**
 	 * this transition may accept transitions in direction in, out or any
@@ -67,14 +67,15 @@ public class SimpleIncidenceTransition extends Transition {
 	protected IncDirection validDirection;
 
 	/**
-	 * returns a string which describes the edge
+	 * returns a string which describes the incidence
 	 */
 	@Override
-	public String edgeString() {
+	public String incidenceString() {
 		// String desc = "SimpleTransition";
-		String desc = "SimpleTransition (Dir:" + validDirection.toString();
-		if (typeCollection != null) {
-			desc = desc + "\n " + typeCollection.toString() + "\n ";
+		String desc = "SimpleIncidenceTransition (Dir:"
+				+ validDirection.toString();
+		if (roles != null) {
+			desc = desc + "\n " + roles.toString() + "\n ";
 		}
 		desc += ")";
 		return desc;
@@ -93,7 +94,7 @@ public class SimpleIncidenceTransition extends Transition {
 			return false;
 		}
 		SimpleIncidenceTransition et = (SimpleIncidenceTransition) t;
-		if (!typeCollection.equals(et.typeCollection)) {
+		if (!roles.equals(et.roles)) {
 			return false;
 		}
 		if (!validDirection.equals(et.validDirection)) {
@@ -110,7 +111,7 @@ public class SimpleIncidenceTransition extends Transition {
 			boolean addToStates) {
 		super(t, addToStates);
 		validDirection = t.validDirection;
-		typeCollection = new TypeCollection(t.typeCollection);
+		roles = new HashSet<String>(t.roles);
 	}
 
 	/**
@@ -137,7 +138,7 @@ public class SimpleIncidenceTransition extends Transition {
 	public SimpleIncidenceTransition(State start, State end, IncDirection dir) {
 		super(start, end);
 		validDirection = dir;
-		typeCollection = new TypeCollection();
+		roles = new HashSet<String>();
 	}
 
 	/**
@@ -158,10 +159,10 @@ public class SimpleIncidenceTransition extends Transition {
 	 *            The types which restrict the possible transitions
 	 */
 	public SimpleIncidenceTransition(State start, State end, IncDirection dir,
-			TypeCollection typeCollection) {
+			Set<String> roles) {
 		super(start, end);
 		validDirection = dir;
-		this.typeCollection = typeCollection;
+		this.roles = roles;
 	}
 
 	/*
@@ -190,15 +191,14 @@ public class SimpleIncidenceTransition extends Transition {
 	}
 
 	@Override
-	public boolean accepts(GraphElement e, Incidence i) {
+	public boolean accepts(GraphElement<?, ?, ?, ?> e, Incidence i) {
 		if (i == null) {
 			return false;
 		}
 
 		boolean typeAccepted = false;
-		for (TypedElementClass<?, ?> incClass : typeCollection
-				.getAllowedTypes()) {
-			if (i.getType() == (IncidenceClass) incClass) {
+		for (String incClass : roles) {
+			if (i.getType().getRolename().equals(incClass)) {
 				typeAccepted = true;
 				break;
 			}
@@ -207,12 +207,12 @@ public class SimpleIncidenceTransition extends Transition {
 			return false;
 		}
 
-		boolean vertex = false;
+		boolean isVertex = false;
 		if (e instanceof Vertex) {
-			vertex = true;
+			isVertex = true;
 		}
 
-		boolean outgoing = (vertex == (i.getDirection() == Direction.VERTEX_TO_EDGE));
+		boolean outgoing = (isVertex == (i.getDirection() == Direction.VERTEX_TO_EDGE));
 		if (validDirection == IncDirection.OUT && !outgoing) {
 			return false;
 		} else if (validDirection == IncDirection.IN && outgoing) {
@@ -222,23 +222,13 @@ public class SimpleIncidenceTransition extends Transition {
 		return true;
 	}
 
-	/**
-	 * returns the element of the datagraph which can be visited after this
-	 * transition has fired. This is the element at the end of the incidence
-	 */
-	@Override
-	public GraphElement getNextElement(GraphElement e,
-			Incidence i) {
-		return null; //i.getThat();
-	}
-
 	@Override
 	public String prettyPrint() {
 		StringBuilder b = new StringBuilder();
 		String delim = "";
-		for (TypedElementClass<?, ?> c : typeCollection.getAllowedTypes()) {
+		for (String c : roles) {
 			b.append(delim);
-			b.append(c.getSimpleName());
+			b.append(c);
 			delim = ",";
 		}
 		String symbol = GreqlLexer.getTokenString(TokenTypes.IARROW);
@@ -252,7 +242,7 @@ public class SimpleIncidenceTransition extends Transition {
 
 	@Override
 	public boolean consumesIncidence() {
-		return false;
+		return true;
 	}
 
 }
