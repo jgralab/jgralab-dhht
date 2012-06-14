@@ -542,6 +542,7 @@ public class GraphIO {
 		String delim = " validsigma";
 		@SuppressWarnings("unchecked")
 		Iterable<GraphElementClass> iterable =  gec.getAllowedSigmaClasses();
+		if (iterable != null)
 		for (GraphElementClass sigmaClass : iterable) {
 			space();
 			write(delim);
@@ -2027,10 +2028,12 @@ public class GraphIO {
 		}
 
 		if (lookAhead.equals("validsigma")) {
+			match();
 			graphElementClassData.validSigmas = parseQualifiedNameList();
 		}
 
 		if (lookAhead.equals("validkappa")) {
+			match();
 			graphElementClassData.validKappa = parseMultiplicity();
 		}
 
