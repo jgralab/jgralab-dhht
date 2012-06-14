@@ -1151,6 +1151,10 @@ public class SchemaImpl implements Schema {
 			return getCreateMethod(graphClass.getSimpleName(),
 					graphClass.getSimpleName(),
 					GRAPHCLASS_CREATE_SIGNATURE_INMEMORY, implementationType);
+		case DISTRIBUTED:
+			return getCreateMethod(graphClass.getSimpleName(),
+					graphClass.getSimpleName(),
+					GRAPHCLASS_CREATE_SIGNATURE_DISTRIBUTED, implementationType);
 		case DISK:
 			return getCreateMethod(graphClass.getSimpleName(),
 					graphClass.getSimpleName(),

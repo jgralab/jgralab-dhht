@@ -115,6 +115,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
 				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #simpleClassName#Impl create#simpleClassName#(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\treturn new #simpleClassName#Impl(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "}");
 	
 		return code;
@@ -129,6 +133,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
 				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #simpleClassName#Impl create#simpleClassName#(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\treturn new #simpleClassName#Impl(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "}");
 	
 		return code;
@@ -143,6 +151,10 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "public #simpleClassName#Impl(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
 				 "\tsuper(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #simpleClassName#Impl create#simpleClassName#(java.lang.String id, long partialGraphId, GraphDatabaseBaseImpl localDatabase, RemoteGraphDatabaseAccess storingGraphDatabase) {",
+				 "\treturn new #simpleClassName#Impl(id, partialGraphId, localDatabase, storingGraphDatabase);",
 				 "}");
 	
 		return code;
@@ -156,12 +168,20 @@ public class GraphCodeGenerator extends AttributedElementCodeGenerator<GraphClas
 				 "public #simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
 				 "\tsuper(id, #schemaName#.instance().#schemaVariableName#, vMax, eMax);",
 				 "\tinitializeAttributesWithDefaultValues();",
+				 "}",
+				 "",
+				 "public static #simpleClassName#Impl create#simpleClassName#Impl(java.lang.String id, int vMax, int eMax) {",
+				 "\treturn new #simpleClassName#Impl(id, vMax, eMax);",
 				 "}\n\n");
 		code.add("/* Constructors and create methods with values for initial vertex and edge count */",
 				 "public #simpleClassName#Impl() {",
 				 "\tsuper(GraphFactoryImpl.generateUniqueGraphId(), #schemaName#.instance().#schemaVariableName#);",
 				 "\tinitializeAttributesWithDefaultValues();",
-				 "}");
+				 "}",
+				 "",
+				 "public static #simpleClassName#Impl create#simpleClassName#Impl() {",
+				 "\treturn new #simpleClassName#Impl();",
+				 "}\n\n");
 		return code;
 	}
 
