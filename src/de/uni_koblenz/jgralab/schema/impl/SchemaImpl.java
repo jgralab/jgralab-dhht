@@ -943,17 +943,26 @@ public class SchemaImpl implements Schema {
 		try {
 			m1Class = getGraphClassImpl(implementationType);
 			if (className.equals(graphClassName)) {
-				return getClass()
-						.getMethod(
-								"create"
-										+ CodeGenerator.camelCase(m1Class
-												.getSimpleName().substring(
-														0,
-														m1Class.getSimpleName()
-																.length() - 4))
-										+ (implementationType == ImplementationType.DISK ? "OnDisk"
-												: "InMem"), signature);
-				// -4 == -"Impl".length()
+				String implTypeString = null;
+				switch (implementationType) {
+				case DISK:
+					implTypeString = "DiskBasedStorage";
+					break;
+				case DISKV2:
+					implTypeString = "Diskv2BasedStorage";
+					break;
+				case DISTRIBUTED:
+					implTypeString = "DistributedStorage";
+					break;
+				case MEMORY:
+					implTypeString = "InMemoryStorage";
+					break;
+					default:
+						throw new RuntimeException("Unhandled case " + implementationType);
+				}
+				String gcName = m1Class.getSimpleName().substring(0, m1Class.getSimpleName().length()-4);
+				String methodName = "create" + gcName + "_" + implTypeString;
+				return getClass().getMethod(methodName, signature);
 			} else {
 				aec = graphClass.getVertexClass(className);
 				if (aec == null) {

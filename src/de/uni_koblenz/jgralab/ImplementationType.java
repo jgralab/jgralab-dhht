@@ -31,5 +31,5 @@
 package de.uni_koblenz.jgralab;
 
 public enum ImplementationType {
-	DISK, MEMORY, DISTRIBUTED;
+	DISK, MEMORY, DISTRIBUTED, DISKV2;
 }
