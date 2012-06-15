@@ -10,6 +10,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
 import de.uni_koblenz.jgralab.greql2.exception.QuerySourceException;
 import de.uni_koblenz.jgralab.greql2.schema.IncidenceRestriction;
+import de.uni_koblenz.jgralab.greql2.schema.IsIncRestrOf;
 import de.uni_koblenz.jgralab.greql2.schema.IsIncTypeIdOf;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 
@@ -35,13 +36,14 @@ public class SimpleIncidencePathDescriptionEvaluator extends
 		SimpleIncidencePathDescription incVertex = (SimpleIncidencePathDescription) vertex;
 
 		// We need to get the restrictions
-		IncidenceRestriction restriction = incVertex
-				.getFirst_isIncRestrOf_omega().getEdge().getAlpha();
-		Set<String> roles = null;
+		Iterator<IsIncRestrOf> restrictions = incVertex.getAlphaEdges(
+				IsIncRestrOf.class).iterator();
+		IncidenceRestriction restriction = restrictions.hasNext() ? restrictions
+				.next().getAlpha() : null;
+		Set<String> roles = new HashSet<String>();
 
 		// And translate them to a Set of Strings
 		if (restriction != null) {
-			roles = new HashSet<String>();
 			Iterator<IsIncTypeIdOf> incs = restriction.getIncidentEdges(
 					IsIncTypeIdOf.class).iterator();
 			while (incs != null && incs.hasNext()) {

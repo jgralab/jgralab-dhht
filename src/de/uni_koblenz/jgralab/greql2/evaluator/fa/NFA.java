@@ -37,6 +37,7 @@ package de.uni_koblenz.jgralab.greql2.evaluator.fa;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -374,6 +375,9 @@ public class NFA extends FiniteAutomaton {
 			VertexEvaluator elementRestr, VertexEvaluator predicateEvaluator,
 			NFA nfa, State middleState1, State middleState2, Set<String> roles,
 			boolean aggregation) {
+		if (roles == null) {
+			roles = new HashSet<String>();
+		}
 		// Translate the direction to the one used by the incidences
 		IncDirection direction;
 		boolean any = false;

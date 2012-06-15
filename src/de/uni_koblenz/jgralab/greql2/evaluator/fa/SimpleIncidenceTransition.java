@@ -203,7 +203,7 @@ public class SimpleIncidenceTransition extends Transition {
 				break;
 			}
 		}
-		if (!typeAccepted) {
+		if (!typeAccepted && roles.size() > 0) {
 			return false;
 		}
 
