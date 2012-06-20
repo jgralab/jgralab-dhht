@@ -27,7 +27,8 @@ public class KappaSubgraphDefinitionEvaluator extends
 			return null;
 		}
 		int kappa = ((KappaSubgraphDefinition) vertex).get_kappa();
-		return graph.getView(kappa);
+		result = graph.getView(kappa);
+		return result;
 	}
 
 	@Override

@@ -84,7 +84,7 @@ public class ReachableElements extends Function {
 			if (state.isFinal) {
 				resultSet = resultSet.plus(element);
 			}
-			for (Incidence inc = element.getFirstIncidence(); inc != null; inc = (v instanceof Vertex) ? inc
+			for (Incidence inc = element.getFirstIncidence(); inc != null; inc = (element instanceof Vertex) ? inc
 					.getNextIncidenceAtVertex() : inc.getNextIncidenceAtEdge()) {
 				int size = state.outTransitions.size();
 				for (int i = 0; i < size; i++) {

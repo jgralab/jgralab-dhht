@@ -111,6 +111,7 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOmega.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOmegaSeq.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetOutIncidences.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetParent.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetParentGraph.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetPartialGraphs.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetPreviousIncidenceAtEdge.class);

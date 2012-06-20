@@ -45,7 +45,7 @@ public class DHHTEvaluatorTest {
 
 	@Test
 	public void testSimpleQueryEvaluation() {
-		GreqlEvaluator eval = new GreqlEvaluator("getVertex(1) -->", graph,
+		GreqlEvaluator eval = new GreqlEvaluator("getVertex(1) +>+", graph,
 				null);
 		eval.startEvaluation();
 		Object result = eval.getResult();

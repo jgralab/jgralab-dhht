@@ -90,6 +90,10 @@ public class TypeRestrictionTransition extends RestrictionTransition {
 		if (types == null) {
 			return true;
 		}
+		if (types.getAllowedTypes().size() == 0
+				&& types.getForbiddenTypes().size() == 0) {
+			return true;
+		}
 		boolean typeAccepted = false;
 
 		for (TypedElementClass<?, ?> eClass : types.getAllowedTypes()) {

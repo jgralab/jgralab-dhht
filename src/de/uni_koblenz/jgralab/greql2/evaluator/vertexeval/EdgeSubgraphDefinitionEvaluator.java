@@ -45,7 +45,8 @@ public class EdgeSubgraphDefinitionEvaluator extends
 		for (Edge edge : edges) {
 			markerGraph.addEdgeWithIncidences(edge);
 		}
-		return markerGraph;
+		result = markerGraph;
+		return result;
 	}
 
 	@Override

@@ -47,7 +47,8 @@ public class VertexSubgraphDefinitionEvaluator extends
 		for (Vertex vertex : vertices) {
 			markerGraph.addVertexWithIncidences(vertex);
 		}
-		return markerGraph;
+		result = markerGraph;
+		return result;
 	}
 
 	@Override

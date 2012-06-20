@@ -16,7 +16,8 @@ public class LocalSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
-		return graph.getLocalPartialGraph();
+		result = graph.getLocalPartialGraph();
+		return result;
 	}
 
 	@Override

@@ -31,11 +31,11 @@ public class PartialSubgraphDefinitionEvaluator extends
 					.getAlphaEdges(IsIdOfPartialGraphDefinition.class)
 					.iterator();
 			if (partialIds.hasNext()) {
-				return graph.getPartialGraph(partialIds.next().getAlpha()
+				result = graph.getPartialGraph(partialIds.next().getAlpha()
 						.get_intValue());
 			}
 		}
-		return null;
+		return result;
 	}
 
 	@Override

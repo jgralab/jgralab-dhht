@@ -2,7 +2,6 @@ package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
 import java.util.Iterator;
 
-import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
@@ -31,7 +30,6 @@ public class NestedSubgraphDefinitionEvaluator extends
 
 	@Override
 	public Object evaluate() throws QuerySourceException {
-		Graph result = null;
 		if (vertex != null) {
 
 			Iterator<IsExprOfNestedSubgraphDefinition> exprEdges = vertex
@@ -41,7 +39,7 @@ public class NestedSubgraphDefinitionEvaluator extends
 				startEval = vertexEvalMarker.getMark(exprEdges.next()
 						.getAlpha());
 				Object x = startEval.getResult();
-				
+
 				GraphElement element = (GraphElement) x;
 				result = element.getSubordinateGraph();
 			}
