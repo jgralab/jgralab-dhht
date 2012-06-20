@@ -1,7 +1,11 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import de.uni_koblenz.jgralab.GraphElement;
 
 /**
  * This class is used to detect and store the attributes of generated vertex and edge
@@ -14,12 +18,6 @@ import java.lang.reflect.Method;
  *
  */
 public class GraphElementProfile {
-	
-	/**
-	 * Array holding the names of the generated attributes
-	 */
-	private String[] attrNames;
-	
 	/**
 	 * Array holding the type IDs of the generated attributes
 	 * Each ID corresponds to a type. The table is:
@@ -54,9 +52,9 @@ public class GraphElementProfile {
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
 	public GraphElementProfile(Class<?> cls){
-		detectAttributes(cls);
-		detectGetters(cls);
-		detectSetters(cls);
+		String[] attrNames = detectAttributes(cls);
+		detectGetters(cls, attrNames);
+		detectSetters(cls, attrNames);
 	}
 	
 	/**
@@ -65,7 +63,6 @@ public class GraphElementProfile {
 	 * @param length - The length of the arrays
 	 */
 	private void initArrays(int length){
-		attrNames = new String[length];
 		attrTypeIDs = new byte[length];
 		getters = new Method[length];
 		setters = new Method[length];
@@ -73,22 +70,24 @@ public class GraphElementProfile {
 	
 	/**
 	 * Uses the Java Reflection API to detect all generated attributes of a Vertex or Edge
-	 * class. The names of the attributes are stored in the array attrNames and their type IDs
-	 * are stored at the respective position in the array attrTypeIDs.
+	 * class. Their type IDs are stored in the array attrTypeIDs.
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	private void detectAttributes(Class<?> cls){
+	private String[] detectAttributes(Class<?> cls){
 		Field[] fields = cls.getDeclaredFields();
 		int numAttr = fields.length;
 		
 		initArrays(numAttr);
+		String[] attrNames = new String[numAttr];
 		
 		for (int i = 0; i < fields.length; i++){
 			Field current = fields[i];
 			attrNames[i] = current.getName();
 			attrTypeIDs[i] = getTypeID(current.getType());
 		}
+		
+		return attrNames;
 	}
 
 	/**
@@ -98,7 +97,7 @@ public class GraphElementProfile {
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	private void detectGetters(Class<?> cls){
+	private void detectGetters(Class<?> cls, String[] attrNames){
 		for (int i = 0; i < attrNames.length; i++){
 			String methodName;
 			if (attrTypeIDs[i] == 0){
@@ -126,7 +125,7 @@ public class GraphElementProfile {
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	private void detectSetters(Class<?> cls){
+	private void detectSetters(Class<?> cls, String[] attrNames){
 		for (int i = 0; i < attrNames.length; i++){
 			String methodName = "set" + attrNames[i];
 			Method m;
@@ -164,8 +163,10 @@ public class GraphElementProfile {
 		parameter[0] = Boolean.TYPE;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(Boolean)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
 		}
 	}
 	
@@ -176,8 +177,10 @@ public class GraphElementProfile {
 		parameter[0] = Integer.TYPE;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(Integer)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
 		}
 	}
 	
@@ -188,8 +191,10 @@ public class GraphElementProfile {
 		parameter[0] = Long.TYPE;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(Long)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
 		}
 	}
 	
@@ -200,8 +205,10 @@ public class GraphElementProfile {
 		parameter[0] = Double.TYPE;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(Double)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
 		}
 	}
 	
@@ -212,8 +219,10 @@ public class GraphElementProfile {
 		parameter[0] = String.class;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(String)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
 		}
 	}
 	
@@ -224,8 +233,256 @@ public class GraphElementProfile {
 		parameter[0] = java.util.List.class;
 		try {
 			return cls.getMethod(methodName, parameter);
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Unable to create Method: " + methodName + "(List)");
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException("Method " + methodName + " is not public");
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException("Unknown method " + methodName);
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type boolean. 
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetBoolean(GraphElement<?,?,?,?> ge, boolean argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type int.
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetInteger(GraphElement<?,?,?,?> ge, int argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type long. 
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetLong(GraphElement<?,?,?,?> ge, long argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type double.
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetDouble(GraphElement<?,?,?,?> ge, double argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type String. 
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetString(GraphElement<?,?,?,?> ge, String argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the set method for an attribute of type List.
+	 * 
+	 * @param ge - The GraphElement whose set method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param argument - The argument that is passed to the set method.
+	 * @param position - The position at which the set method invoked by this method is stored in the
+	 *                   array 'setters'. The type of this method's argument must be the same as the 
+	 *                   type of the argument passed to this method.
+	 */
+	public void invokeSetList(GraphElement<?,?,?,?> ge, List<?> argument, int position){
+		try {
+			setters[position].invoke(ge, argument);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + setters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + setters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type Boolean.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public boolean invokeGetBoolean(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (Boolean) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type Integer.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public int invokeGetInteger(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (Integer) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type Long.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public long invokeGetLong(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (Long) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type Double.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public double invokeGetDouble(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (Double) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type String.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public String invokeGetString(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (String) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
+		}
+	}
+	
+	/**
+	 * Method to invoke the get method for an attribute of type List.
+	 * 
+	 * @param ge - The GraphElement whose get method shall be invoked. Its class must be the same class
+	 *             that was passed to the Constructor of the GraphElementProfile object for which
+	 *             this method is called. 
+	 * @param position - The position at which the get method invoked by this method is stored in the
+	 *                   array 'getters'. The invoked method's return type must be the same as the 
+	 *                   return type of this method.
+	 */
+	public List<?> invokeGetList(GraphElement<?,?,?,?> ge, int position){
+		try {
+			return (List<?>) getters[position].invoke(ge, (Object[]) null);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Method " + getters[position].getName() + " is not public");
+		} catch (InvocationTargetException e) {
+			throw new IllegalArgumentException("Exception thrown by invoked method " + getters[position].getName());
 		}
 	}
 	
@@ -265,9 +522,8 @@ public class GraphElementProfile {
 	@Override
 	public String toString(){
 		String output = "";
-		for (int i = 0; i < attrNames.length; i++){
+		for (int i = 0; i < attrTypeIDs.length; i++){
 			output += getTypeName(attrTypeIDs[i]) + " ";
-			output += attrNames[i] + "\n";
 			output += "Getter: " + getters[i].getName() + "\n";
 			output += "Setter: " + setters[i].getName() + "\n\n";
 		}
