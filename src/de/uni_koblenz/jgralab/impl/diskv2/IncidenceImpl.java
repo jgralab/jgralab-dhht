@@ -38,6 +38,7 @@ import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -866,6 +867,11 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public Incidence getPreviousIncidenceAtVertex() {
 		return getPreviousIncidenceAtVertex(getGraph().getTraversalContext());
+	}
+	
+	@Override
+	public RemoteStorageAccess getStorage(){
+		return graphDb.getLocalStorage();
 	}
 
 	@Override

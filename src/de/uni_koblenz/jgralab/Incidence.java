@@ -31,6 +31,7 @@
 
 package de.uni_koblenz.jgralab;
 
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
 
@@ -591,7 +592,14 @@ public interface Incidence extends TypedElement<IncidenceClass, Incidence> {
 	 * @return {@link Iterable}&lt;{@link Vertex}&gt;
 	 */
 	public Iterable<Vertex> getTheseVertices(Graph traversalContext);
-
+	
+	/**
+	 * Returns the storage in which this incidence is stored.
+	 * 
+	 * @return {@link RemoteStorageAccess}
+	 */
+	public RemoteStorageAccess getStorage();
+	
 	/**
 	 * Returns the {@link Vertex} which is at the other end of a binary
 	 * {@link Edge}.

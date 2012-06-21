@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -616,6 +617,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 //		}
 //		return graphDb.;
 		return getGraph();
+	}
+	
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return graphDb.getLocalStorage();
 	}
 
 }

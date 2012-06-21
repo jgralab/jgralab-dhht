@@ -171,6 +171,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 		return localGraphDatabase.getGraphObject(GraphDatabaseBaseImpl
 				.getPartialGraphId(elementId));
 	}
+	
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return localGraphDatabase.getLocalStorage();
+	}
 
 //	 @Override
 //	 public final Graph getCompleteGraph() {

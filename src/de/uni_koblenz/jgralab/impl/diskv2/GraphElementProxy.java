@@ -452,6 +452,9 @@ public abstract class GraphElementProxy
 		return getKappa() >= kappa;
 	}
 
-
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return localGraphDatabase.getLocalStorage();
+	}
 
 }

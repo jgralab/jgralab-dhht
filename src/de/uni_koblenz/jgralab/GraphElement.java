@@ -34,6 +34,7 @@ package de.uni_koblenz.jgralab;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.impl.mem.GraphElementImpl;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
@@ -92,6 +93,13 @@ public interface GraphElement
 	 * @return
 	 */
 	public Graph getContainingGraph();
+	
+	/**
+	 * Returns the storage in which this element is stored.
+	 * 
+	 * @return {@link RemoteStorageAccess}
+	 */
+	public RemoteStorageAccess getStorage();
 
 	/**
 	 * Returns the {@link GraphElement} in which this {@link GraphElement} is

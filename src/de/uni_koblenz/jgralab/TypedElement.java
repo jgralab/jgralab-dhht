@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab;
 
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.TypedElementClass;

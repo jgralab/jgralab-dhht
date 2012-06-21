@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtEdge;
 import de.uni_koblenz.jgralab.impl.IncidentVertexIterable;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -1350,6 +1351,11 @@ public abstract class EdgeProxy extends
 	@Override
 	public AttributeContainer getAttributeContainer() {
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return localGraphDatabase.getLocalStorage();
 	}
 
 }

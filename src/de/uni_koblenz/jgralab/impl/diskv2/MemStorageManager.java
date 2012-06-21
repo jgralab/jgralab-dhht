@@ -25,6 +25,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	//maximum load factor of the caches. If load factor is exceeded, do a rehash
 	private static final double MAX_LOAD_FACTOR = 0.7;
 	
+	//the graph database
+	private GraphDatabaseBaseImpl graphdb;
+	
+	//the disk storage manager
+	private DiskStorageManager diskstore;
+	
 	//maximum number of entries in the vertex, edge and incidence caches
 	//if these are exceeded by the amount of entries of the respective cache,
 	//the load factor of the respective cache has been exceeded
@@ -64,7 +70,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	private CacheEntry<IncidenceImpl>[] incidenceCache;
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
-		//long memory = Runtime.getRuntime().freeMemory();
+		diskstore = new DiskStorageManager(database);
 		
 		//set log(2) of the cache sizes
 		vertexCacheExp = 21;

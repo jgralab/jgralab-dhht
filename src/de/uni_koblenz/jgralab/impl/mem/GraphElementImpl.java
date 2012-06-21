@@ -39,6 +39,7 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.Attribute;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.GraphElementClass;
@@ -538,6 +539,11 @@ public abstract class GraphElementImpl
 	@Override
 	public final Graph getContainingGraph() {
 		return graph;
+	}
+	
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return null;
 	}
 
 }

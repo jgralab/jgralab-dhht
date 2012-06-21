@@ -185,7 +185,7 @@ public abstract class GraphDatabaseElementaryMethods implements
 	protected final MemStorageManager inMemoryStorage;
 	
 	@Override
-	public RemoteStorageAccess getLocalStorage() throws RemoteException {
+	public RemoteStorageAccess getLocalStorage() {
 		return inMemoryStorage;
 	}
 	

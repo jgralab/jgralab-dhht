@@ -49,6 +49,7 @@ import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.IncidenceIterableAtVertex;
 import de.uni_koblenz.jgralab.impl.IncidentEdgeIterable;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.RemoteStorageAccess;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.IncidenceType;
@@ -1251,6 +1252,11 @@ public abstract class VertexProxy extends
 	public AttributeContainer getAttributeContainer() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public RemoteStorageAccess getStorage() {
+		return localGraphDatabase.getLocalStorage();
 	}
 
 }
