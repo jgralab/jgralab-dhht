@@ -44,7 +44,6 @@ import java.util.Set;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.GraphMarker;
 import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
@@ -90,8 +89,8 @@ public class PathSystem extends Function {
 	 * @return the marker created
 	 */
 	protected PathSystemMarkerEntry markVertex(
-			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker, Vertex v, State s,
-			Vertex parentVertex, Edge e, State ps, int d) {
+			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
+			Vertex v, State s, Vertex parentVertex, Edge e, State ps, int d) {
 		PathSystemMarkerEntry m = new PathSystemMarkerEntry(v, parentVertex, e,
 				s, ps, d);
 
@@ -106,7 +105,8 @@ public class PathSystem extends Function {
 	 * 
 	 * @return true if the vertex is marked, false otherwise
 	 */
-	protected boolean isMarked(ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
+	protected boolean isMarked(
+			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
 			Vertex v, State s) {
 		ObjectGraphMarker<Vertex, PathSystemMarkerEntry> currentMarker = marker[s.number];
 		try {
@@ -133,8 +133,8 @@ public class PathSystem extends Function {
 	 *             thrown
 	 */
 	private Set<PathSystemMarkerEntry> markVerticesOfPathSystem(
-			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker, Vertex startVertex,
-			DFA dfa) {
+			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
+			Vertex startVertex, DFA dfa) {
 		Set<PathSystemMarkerEntry> finalEntries = new HashSet<PathSystemMarkerEntry>();
 		Queue<PathSystemMarkerEntry> queue = new LinkedList<PathSystemMarkerEntry>();
 		PathSystemMarkerEntry currentEntry = markVertex(marker, startVertex,
@@ -153,7 +153,8 @@ public class PathSystem extends Function {
 
 			for (Incidence inc : currentVertex.getIncidences()) {
 				for (Transition currentTransition : currentEntry.state.outTransitions) {
-					Vertex nextVertex = null; //currentTransition.getNextElement(currentVertex, inc);
+					Vertex nextVertex = null; // currentTransition.getNextElement(currentVertex,
+												// inc);
 
 					if (!isMarked(marker, nextVertex,
 							currentTransition.endState)) {
@@ -186,8 +187,8 @@ public class PathSystem extends Function {
 	 * @return
 	 */
 	private de.uni_koblenz.jgralab.greql2.types.PathSystem createPathSystemFromMarkings(
-			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker, Vertex rootVertex,
-			Set<PathSystemMarkerEntry> leafEntries) {
+			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
+			Vertex rootVertex, Set<PathSystemMarkerEntry> leafEntries) {
 		de.uni_koblenz.jgralab.greql2.types.PathSystem pathSystem = new de.uni_koblenz.jgralab.greql2.types.PathSystem(
 				rootVertex.getGraph());
 		PathSystemMarkerEntry rootMarker = marker[0].getMark(rootVertex);
@@ -229,7 +230,8 @@ public class PathSystem extends Function {
 	 * @return the {@code PathSystemMarkerEntry} for {@code v} and {@code s}
 	 */
 	private PathSystemMarkerEntry getMarkerWithState(
-			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker, Vertex v, State s) {
+			ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker,
+			Vertex v, State s) {
 		if (v == null) {
 			return null;
 		}

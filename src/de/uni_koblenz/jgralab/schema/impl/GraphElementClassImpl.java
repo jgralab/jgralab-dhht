@@ -41,29 +41,22 @@ import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Package;
 import de.uni_koblenz.jgralab.schema.exception.SchemaException;
 
-public abstract class GraphElementClassImpl
-	<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, 
-	OwnType extends GraphElement<OwnTypeClass,OwnType,DualTypeClass,DualType>,
-	DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>,
-	DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
-	
-	extends AttributedElementClassImpl<OwnTypeClass, OwnType>
-	implements GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType> {
+public abstract class GraphElementClassImpl<OwnTypeClass extends GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType>, OwnType extends GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType>, DualTypeClass extends GraphElementClass<DualTypeClass, DualType, OwnTypeClass, OwnType>, DualType extends GraphElement<DualTypeClass, DualType, OwnTypeClass, OwnType>>
 
-	
-	
-	
+extends AttributedElementClassImpl<OwnTypeClass, OwnType> implements
+		GraphElementClass<OwnTypeClass, OwnType, DualTypeClass, DualType> {
+
 	protected GraphClass graphClass;
 
 	@SuppressWarnings("rawtypes")
 	protected Set<GraphElementClass> allowedSigmaClasses;
-	
+
 	protected int minKappa = 0;
-	
+
 	protected int maxKappa = Integer.MAX_VALUE;
-	
+
 	private Set<IncidenceClass> incidenceClasses = new HashSet<IncidenceClass>();
-	
+
 	/**
 	 * delegates its constructor to the generalized class
 	 * 
@@ -74,15 +67,15 @@ public abstract class GraphElementClassImpl
 			GraphClass graphClass) {
 		super(simpleName, pkg, graphClass.getSchema());
 		this.graphClass = graphClass;
-	//	allowedSigmaClasses = new HashSet<GraphElementClass<?, ?,?,?>>();
+		allowedSigmaClasses = new HashSet<GraphElementClass>();
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void addAllowedSigmaClass(GraphElementClass gec) {
 		allowedSigmaClasses.add(gec);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Set<GraphElementClass> getAllowedSigmaClasses() {
@@ -93,13 +86,11 @@ public abstract class GraphElementClassImpl
 	public GraphClass getGraphClass() {
 		return graphClass;
 	}
-	
 
 	@Override
 	public String toString() {
 		StringBuilder output = new StringBuilder(this.getClass()
-				.getSimpleName()
-				+ " '" + getQualifiedName() + "'");
+				.getSimpleName() + " '" + getQualifiedName() + "'");
 		if (isAbstract()) {
 			output.append(" (abstract)");
 		}
@@ -124,49 +115,51 @@ public abstract class GraphElementClassImpl
 		return output.toString();
 	}
 
-
+	@Override
 	public void addIncidenceClass(IncidenceClass incClass) {
-		if ((incClass.getRolename() != null) && (incClass.getRolename() != "") && hasIncidenceClass(incClass.getRolename()))
+		if ((incClass.getRolename() != null) && (incClass.getRolename() != "")
+				&& hasIncidenceClass(incClass.getRolename())) {
 			throwSchemaExceptionRolenameUsedTwice(incClass);
+		}
 		incidenceClasses.add(incClass);
 	}
-	
+
 	private void throwSchemaExceptionRolenameUsedTwice(IncidenceClass incidence) {
-		throw new SchemaException("The rolename "
-				+ incidence.getRolename()
+		throw new SchemaException("The rolename " + incidence.getRolename()
 				+ " is used twice at class " + getQualifiedName());
 	}
-	
-	
+
 	@Override
-	protected void  checkSpecialization(OwnTypeClass superclass) {
+	protected void checkSpecialization(OwnTypeClass superclass) {
 		super.checkSpecialization(superclass);
 		checkDuplicateRolenames(superclass);
 	}
-	
-	
+
 	private void checkDuplicateRolenames(OwnTypeClass other) {
 		if ((other == null) || (other.equals(""))) {
 			return;
 		}
-		checkDuplicatedRolenamesAgainstAllIncidenceClasses(other.getAllIncidenceClasses());
+		checkDuplicatedRolenamesAgainstAllIncidenceClasses(other
+				.getAllIncidenceClasses());
 	}
 
-	private void checkDuplicatedRolenamesAgainstAllIncidenceClasses(Set<IncidenceClass> incidences) {
+	private void checkDuplicatedRolenamesAgainstAllIncidenceClasses(
+			Set<IncidenceClass> incidences) {
 		for (IncidenceClass incidence : incidences) {
-			if (incidence.getRolename()!=null && !incidence.getRolename().equals("") && hasIncidenceClass(incidence.getRolename())) {
-				throw new SchemaException("Rolename " + incidence.getRolename() + " duplicate at class " + this.getQualifiedName());
+			if (incidence.getRolename() != null
+					&& !incidence.getRolename().equals("")
+					&& hasIncidenceClass(incidence.getRolename())) {
+				throw new SchemaException("Rolename " + incidence.getRolename()
+						+ " duplicate at class " + this.getQualifiedName());
 			}
 		}
 	}
 
-
-	
 	@Override
 	public Set<IncidenceClass> getIncidenceClasses() {
 		return incidenceClasses;
 	}
-	
+
 	@Override
 	public Set<IncidenceClass> getAllIncidenceClasses() {
 		Set<IncidenceClass> incClasses = new HashSet<IncidenceClass>();
@@ -177,70 +170,67 @@ public abstract class GraphElementClassImpl
 		return incClasses;
 	}
 
-	
-
 	@SuppressWarnings("rawtypes")
 	protected Set<IncidenceClass> getOwnAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : incidenceClasses) {
 			GraphElementClass ogc = ic.getOtherGraphElementClass(this);
-			//TODO
-//			for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
-//				if (ic != ic2) {
-//					adjacentIncidenceClasses.add(ic2);
-//				}
-//			}
+			// TODO
+			// for (IncidenceClass ic2 : ogc.getIncidenceClasses()) {
+			// if (ic != ic2) {
+			// adjacentIncidenceClasses.add(ic2);
+			// }
+			// }
 		}
 		return adjacentIncidenceClasses;
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	protected Set<IncidenceClass> getAllAdjacentIncidenceClasses() {
 		Set<IncidenceClass> adjacentIncidenceClasses = new HashSet<IncidenceClass>();
 		for (IncidenceClass ic : getAllIncidenceClasses()) {
 			GraphElementClass ogc = ic.getOtherGraphElementClass(this);
-			//TODO
-//			for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
-//				if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) && (!ic2.isSuperClassOf(ic))) { 
-//					adjacentIncidenceClasses.add(ic2);
-//				}
-//			}
+			// TODO
+			// for (IncidenceClass ic2 : ogc.getAllIncidenceClasses()) {
+			// if ((ic != ic2) && (!ic.isSuperClassOf(ic2)) &&
+			// (!ic2.isSuperClassOf(ic))) {
+			// adjacentIncidenceClasses.add(ic2);
+			// }
+			// }
 		}
 		return adjacentIncidenceClasses;
 	}
-	
-	
-	
-	
+
 	@Override
 	public boolean hasAdjacentIncidenceClass(String rolename) {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	
 
 	@Override
 	public boolean hasIncidenceClass(String rolename) {
 		for (IncidenceClass incClass : getAllIncidenceClasses()) {
-			if (incClass.getRolename().equals(rolename))
+			if (incClass.getRolename().equals(rolename)) {
 				return true;
+			}
 		}
 		return false;
 	}
 
-	
+	@Override
 	public void setAllowedKappaRange(int min, int max) {
 		minKappa = min;
 		maxKappa = max;
 	}
-	
+
+	@Override
 	public int getAllowedMinKappa() {
 		return minKappa;
 	}
-	
+
+	@Override
 	public int getAllowedMaxKappa() {
 		return maxKappa;
 	}
-	
+
 }

@@ -35,12 +35,13 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableElements;
+import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
+import de.uni_koblenz.jgralab.greql2.funlib.FunLib.FunctionInfo;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.ForwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
@@ -75,7 +76,8 @@ public class ForwardElementSetEvaluator extends PathSearchEvaluator {
 	private VertexEvaluator startEval = null;
 
 	private final void initialize() {
-		PathDescription p = (PathDescription) vertex.getFirst_isPathOf_GoesTo_PathExpression().getThat(); 
+		PathDescription p = (PathDescription) vertex
+				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
 		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) vertexEvalMarker
 				.getMark(p);
 
@@ -92,21 +94,29 @@ public class ForwardElementSetEvaluator extends PathSearchEvaluator {
 		if (!initialized) {
 			initialize();
 		}
-		Vertex startVertex = null;
-		startVertex = (Vertex) startEval.getResult();
-		return ReachableElements.search(startVertex, searchAutomaton);
+		GraphElement<?, ?, ?, ?> startElement = null;
+		startElement = (GraphElement<?, ?, ?, ?>) startEval.getResult();
+
+		Object[] arguments = new Object[2];
+		arguments[0] = startElement;
+		arguments[1] = searchAutomaton;
+		FunctionInfo fi = FunLib.getFunctionInfo("reachableElements");
+
+		return FunLib.apply(fi, arguments);
 	}
 
 	@Override
 	public VertexCosts calculateSubtreeEvaluationCosts(GraphSize graphSize) {
-		Expression targetExpression = (Expression) vertex.getFirst_isTargetExprOf_omega().getThat();
+		Expression targetExpression = (Expression) vertex
+				.getFirst_isTargetExprOf_omega().getThat();
 		VertexEvaluator vertexEval = getVertexEvalMarker().getMark(
 				targetExpression);
 		long targetCosts = vertexEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);
 		PathDescription p = (PathDescription) vertex
 				.getFirst_isPathOf_GoesTo_PathExpression().getThat();
-		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker().getMark(p);
+		PathDescriptionEvaluator pathDescEval = (PathDescriptionEvaluator) getVertexEvalMarker()
+				.getMark(p);
 		long pathDescCosts = pathDescEval
 				.getCurrentSubtreeEvaluationCosts(graphSize);
 		long searchCosts = Math.round(pathDescCosts * searchFactor

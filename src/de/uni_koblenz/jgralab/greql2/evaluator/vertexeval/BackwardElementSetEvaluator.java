@@ -35,15 +35,14 @@
 
 package de.uni_koblenz.jgralab.greql2.evaluator.vertexeval;
 
-import org.pcollections.PSet;
-
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.greql2.evaluator.GraphSize;
 import de.uni_koblenz.jgralab.greql2.evaluator.GreqlEvaluator;
 import de.uni_koblenz.jgralab.greql2.evaluator.VertexCosts;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
-import de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableElements;
+import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
+import de.uni_koblenz.jgralab.greql2.funlib.FunLib.FunctionInfo;
 import de.uni_koblenz.jgralab.greql2.schema.BackwardElementSet;
 import de.uni_koblenz.jgralab.greql2.schema.Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
@@ -93,14 +92,19 @@ public class BackwardElementSetEvaluator extends PathSearchEvaluator {
 	}
 
 	@Override
-	public PSet<GraphElement<?, ?, ?, ?>> evaluate() {
+	public Object evaluate() {
 		if (!initialized) {
 			initialize();
 		}
 		GraphElement<?, ?, ?, ?> targetElement = null;
 		targetElement = (GraphElement<?, ?, ?, ?>) targetEval.getResult();
 
-		return ReachableElements.search(targetElement, searchAutomaton);
+		Object[] arguments = new Object[2];
+		arguments[0] = targetElement;
+		arguments[1] = searchAutomaton;
+
+		FunctionInfo fi = FunLib.getFunctionInfo("reachableElements");
+		return FunLib.apply(fi, arguments);
 	}
 
 	@Override

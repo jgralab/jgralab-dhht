@@ -25,7 +25,7 @@ public class HyperPath {
 	public static HyperPath start(GraphElement e) {
 		if (e == null || !e.isValid()) {
 			throw new IllegalArgumentException(
-					"The vertex must be != null and valid");
+					"The element must be != null and valid");
 		}
 		PVector<GraphElement> es = JGraLab.vector();
 		PVector<Incidence> is = JGraLab.vector();

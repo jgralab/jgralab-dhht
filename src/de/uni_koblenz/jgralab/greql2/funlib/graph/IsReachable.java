@@ -36,8 +36,6 @@
 package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
@@ -47,7 +45,7 @@ import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.State;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.Transition;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
-import de.uni_koblenz.jgralab.greql2.types.pathsearch.PathSearchQueueEntry;
+import de.uni_koblenz.jgralab.greql2.types.pathsearch.ElementStateQueue;
 
 public class IsReachable extends Function {
 
@@ -62,6 +60,7 @@ public class IsReachable extends Function {
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Boolean evaluate(GraphElement<?, ?, ?, ?> u,
 			GraphElement<?, ?, ?, ?> v, DFA dfa) {
 		try {
@@ -74,29 +73,26 @@ public class IsReachable extends Function {
 			for (State s : dfa.stateList) {
 				markers[s.number] = new GlobalBooleanGraphMarker(u.getGraph());
 			}
-			Queue<PathSearchQueueEntry> queue = new LinkedList<PathSearchQueueEntry>();
-			PathSearchQueueEntry currentEntry = new PathSearchQueueEntry(u,
-					dfa.initialState);
-			markers[currentEntry.state.number].mark(currentEntry.element);
-			queue.add(currentEntry);
-			while (!queue.isEmpty()) {
-				currentEntry = queue.poll();
-				if ((currentEntry.element == v) && currentEntry.state.isFinal) {
+			ElementStateQueue queue = new ElementStateQueue();
+			markers[dfa.initialState.number].mark(u);
+			queue.put(u, dfa.initialState);
+			while (queue.hasNext()) {
+				GraphElement<?, ?, ?, ?> element = queue.currentElement;
+				if ((element == v) && queue.currentState.isFinal) {
 					return true;
 				}
-				for (Incidence inc : currentEntry.element.getIncidences()) {
-					for (Transition currentTransition : currentEntry.state.outTransitions) {
+				for (Incidence inc : element.getIncidences()) {
+					for (Transition currentTransition : queue.currentState.outTransitions) {
 						GraphElement<?, ?, ?, ?> nextElement = currentTransition
-								.getNextElement(currentEntry.element, inc);
+								.getNextElement(element, inc);
 						boolean isMarked = markers[currentTransition.endState.number]
 								.isMarked(nextElement);
 						boolean transitionIsPossible = currentTransition
-								.accepts(currentEntry.element, inc);
+								.accepts(element, inc);
 						if (!isMarked && transitionIsPossible) {
-							PathSearchQueueEntry nextEntry = new PathSearchQueueEntry(
-									nextElement, currentTransition.endState);
-							markers[nextEntry.state.number].mark(nextElement);
-							queue.add(nextEntry);
+							markers[currentTransition.endState.number]
+									.mark(nextElement);
+							queue.put(nextElement, currentTransition.endState);
 						}
 					}
 				}

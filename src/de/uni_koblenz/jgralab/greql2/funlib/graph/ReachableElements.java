@@ -59,11 +59,6 @@ public class ReachableElements extends Function {
 
 	public PSet<GraphElement<?, ?, ?, ?>> evaluate(GraphElement<?, ?, ?, ?> v,
 			DFA dfa) {
-		return search(v, dfa);
-	}
-
-	public static PSet<GraphElement<?, ?, ?, ?>> search(
-			GraphElement<?, ?, ?, ?> v, DFA dfa) {
 		PSet<GraphElement<?, ?, ?, ?>> resultSet = JGraLab.set();
 
 		@SuppressWarnings("unchecked")
