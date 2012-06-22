@@ -204,6 +204,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		incidenceCacheEntries++;
 		testIncidenceLoadFactor();
+		
+		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker();
+		
+		iTracker.fill(i);
 	}
 	
 	/**
@@ -299,6 +303,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 			//set "next" pointer of the entry's predecessor to point at its successor
 			predecessor.setNext(current.getNext());
 		}
+	}
+	
+	public IncidenceTracker getIncidenceTracker(int incidenceId){
+		CacheEntry<IncidenceImpl> i = getElement
+				(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
+		return i.getOrCreateIncidenceTracker();
 	}
 	
 	//---- Methods to access other attributes of cached graph elements and incidences ----

@@ -18,9 +18,20 @@ public class CacheEntry<V>{
 	//in case of a collision, this points to the next entry in the same bucket
 	private CacheEntry<V> next;
 	
+	//Tracks the changed attributes of the referenced object
+	private Tracker tracker;
+	
 	public CacheEntry(V value){
 		this.value = value;
 		key = value.hashCode();
+	}
+	
+	public IncidenceTracker getOrCreateIncidenceTracker(){
+		if (tracker == null){
+			tracker = new IncidenceTracker();
+		}
+		
+		return (IncidenceTracker) tracker;
 	}
 	
 	public V get(){
