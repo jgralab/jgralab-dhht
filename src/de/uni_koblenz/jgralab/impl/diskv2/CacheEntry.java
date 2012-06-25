@@ -1,5 +1,7 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
+import java.util.Queue;
+
 /**
  * Entry that can be stored in the MemStorageManager's cache.
  * 
@@ -34,8 +36,18 @@ public class CacheEntry<V>{
 		return (IncidenceTracker) tracker;
 	}
 	
+	public Tracker getTracker(){
+		return tracker;
+	}
+	
 	public V get(){
 		return value;
+	}
+	
+	//TODO: Temporary method for testing, delete this eventually
+	public <V> void delete(Queue<CacheEntry<V>> queue){
+		queue.add((CacheEntry<V>) this);
+		value = null;
 	}
 	
 	public int getKey(){

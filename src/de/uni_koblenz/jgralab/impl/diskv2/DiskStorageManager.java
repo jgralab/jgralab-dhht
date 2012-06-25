@@ -14,6 +14,22 @@ public class DiskStorageManager {
 		this.graphdb = graphdb;
 	}
 	
+	/**
+	 * Writes an Incidence to the disk if it has been newly created, or if it has
+	 * been changed since the last time it was loaded from the disk.
+	 * 
+	 * @param incidenceRef - The Reference to the Incidence that is written out.
+	 */
+	public void writeIncidenceToDisk(CacheEntry<IncidenceImpl> incidenceRef){
+		Tracker tracker = incidenceRef.getTracker();
+		if (tracker == null) {
+			return;
+		}
+		
+		IncidenceTracker iTracker = (IncidenceTracker) tracker;
+		
+	}
+	
 	public GraphElementProfile getGraphElementProfile(GraphElement<?,?,?,?> ge){
 		String className = ge.getClass().getName();
 		GraphElementProfile profile = profiles.get(className);
