@@ -63,7 +63,7 @@ public abstract class FileAccess {
 		
 		files.put(filename, fileAccess);
 		
-		addShutdownHook();
+		fileAccess.addShutdownHook();
 		
 		return fileAccess;
 	}
@@ -103,16 +103,18 @@ public abstract class FileAccess {
 		return (os.indexOf("win") >= 0);
 	}
 	
-	private static void addShutdownHook() {
+	/**
+	 * Code that is executed when the VMU exits
+	 */
+	private void addShutdownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 		    public void run() {
-		        for (FileAccess f: files.values()){
-		        	try {
-						f.channel.close();
-					} catch (IOException e) {
-						throw new RuntimeException("Unable to close FileChannel");
-					}
-		        }
+		    	//close file channel so Java can delete the file.
+		        try {
+					channel.close();
+				} catch (IOException e) {
+					throw new RuntimeException("Unable to close FileChannel");
+				}
 		    }
 		});
 	}

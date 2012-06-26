@@ -99,7 +99,7 @@ public class FileAccessDefault extends FileAccess{
 	 * the byte at which the read or write operation is started) is in the middle
 	 * of the area that is mapped to the memory during this method call. 
 	 * An exception to this rule occurs if the condition "index < FILE_AREA/2" is met.
-	 * In this case, the first FILE_ARE bytes of the file are mapped to the memory.
+	 * In this case, the first FILE_AREA bytes of the file are mapped to the memory.
 	 * 
 	 * @param bufSize
 	 *        The amount of bytes that are read or written in the next operation

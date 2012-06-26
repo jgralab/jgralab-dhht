@@ -151,7 +151,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 	
 	/**
-	 * Retrieves an Incidence from the incidence cache
+	 * Retrieves an Incidence from the incidence cache. If it isn't
+	 * found in the cache, it loads the requested incidence from the 
+	 * disk, puts it back in the cache and then returns it.
 	 * 
 	 * @param id the id of the Incidence to be retrieved
 	 * @return the Incidence with the given id
@@ -159,7 +161,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public final Incidence getIncidenceObject(int id) {
 		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
-		if (entry == null) return null;
+		if (entry == null){
+			CacheEntry<IncidenceImpl> incRef = diskStorage.readIncidenceFromDisk(id);
+			if (incRef == null){
+				return null;
+			}
+			putElement(incRef, incidenceCache, hash(id, incidenceMask));
+			return incRef.get();
+		}
 		
 		return entry.get();
 	}
@@ -220,14 +229,15 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public void putIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
 		
+		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker();
+		iTracker.fill(i);
+		
+		//diskStorage.writeIncidenceToDisk(iEntry);
+		
 		putElement(iEntry, incidenceCache, hash(i.hashCode(), incidenceMask));
 		
 		incidenceCacheEntries++;
 		testIncidenceLoadFactor();
-		
-		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker();
-		
-		iTracker.fill(i);
 	}
 	
 	/**
@@ -663,12 +673,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<IncidenceImpl> current = incidenceQueue.poll();
 		
 		while(current != null){
-			System.out.println("Removing CacheEntry for incidence #" + current.getKey());
+			diskStorage.writeIncidenceToDisk(current);
 			removeElement(incidenceCache, current.getKey(), 
 					hash(current.getKey(), incidenceMask));
 			current = incidenceQueue.poll();
-			
-			diskStorage.writeIncidenceToDisk(current);
 		}
 	}
 	

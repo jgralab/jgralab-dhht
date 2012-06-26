@@ -1,5 +1,9 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
+import java.util.HashMap;
+
+import de.uni_koblenz.jgralab.schema.IncidenceClass;
+
 /**
  * Tracks the changed attributes of an Incidence.
  * 
@@ -12,7 +16,7 @@ public class IncidenceTracker extends Tracker{
 	 * Create a new tracker with a ByteBuffer size of 48 Bytes.
 	 */
 	public IncidenceTracker(){
-		super(48);
+		super(52);
 	}
 	
 	/**
@@ -21,11 +25,14 @@ public class IncidenceTracker extends Tracker{
 	 * @param inc - The Incidence to be tracked
 	 */
 	public void fill(IncidenceImpl inc){
-		putAttribute(inc.getNextIncidenceIdAtEdge(), 0);
-		putAttribute(inc.getNextIncidenceIdAtVertex(), 8);
-		putAttribute(inc.getPreviousIncidenceIdAtEdge(), 16);
-		putAttribute(inc.getPreviousIncidenceIdAtVertex(), 24);
-		putAttribute(inc.getIncidentEdgeId(), 32);
-		putAttribute(inc.getIncidentVertexId(), 40);
+		int typeId = inc.getType().getId();
+		attributes.putInt(0, (typeId + 1));
+		
+		putAttribute(inc.getNextIncidenceIdAtEdge(), 4);
+		putAttribute(inc.getNextIncidenceIdAtVertex(), 12);
+		putAttribute(inc.getPreviousIncidenceIdAtEdge(), 20);
+		putAttribute(inc.getPreviousIncidenceIdAtVertex(), 28);
+		putAttribute(inc.getIncidentEdgeId(), 36);
+		putAttribute(inc.getIncidentVertexId(), 44);
 	}
 }

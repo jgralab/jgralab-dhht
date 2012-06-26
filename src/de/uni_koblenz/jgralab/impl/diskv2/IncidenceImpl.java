@@ -122,7 +122,11 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtVertex(long nextIncidenceId) {
 		this.nextIncidenceIdAtVertex = nextIncidenceId;
-		getTracker().putAttribute(nextIncidenceId, 8);
+		getTracker().putAttribute(nextIncidenceId, 12);
+	}
+	
+	public void restoreNextIncidenceIdAtVertex(long nextIncidenceId) {
+		this.nextIncidenceIdAtVertex = nextIncidenceId;
 	}
 
 	public long getNextIncidenceIdAtVertex() {
@@ -137,7 +141,11 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setPreviousIncidenceIdAtVertex(long previousIncidenceId) {
 		this.previousIncidenceIdAtVertex = previousIncidenceId;
-		getTracker().putAttribute(previousIncidenceId, 24);
+		getTracker().putAttribute(previousIncidenceId, 28);
+	}
+	
+	public void restorePreviousIncidenceIdAtVertex(long previousIncidenceId) {
+		this.previousIncidenceIdAtVertex = previousIncidenceId;
 	}
 	
 	public long getPreviousIncidenceIdAtVertex() {
@@ -161,7 +169,11 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtEdge(long nextIncidenceId) {
 		this.nextIncidenceIdAtEdge = nextIncidenceId;
-		getTracker().putAttribute(nextIncidenceId, 0);
+		getTracker().putAttribute(nextIncidenceId, 4);
+	}
+	
+	public void restoreNextIncidenceIdAtEdge(long nextIncidenceId) {
+		this.nextIncidenceIdAtEdge = nextIncidenceId;
 	}
 	
 	public long getNextIncidenceIdAtEdge() {
@@ -178,7 +190,11 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public void setPreviousIncidenceIdAtEdge(long previousIncidenceId) {
 		this.previousIncidenceIdAtEdge = previousIncidenceId;
-		getTracker().putAttribute(previousIncidenceId, 16);
+		getTracker().putAttribute(previousIncidenceId, 20);
+	}
+	
+	public void restorePreviousIncidenceIdAtEdge(long previousIncidenceId) {
+		this.previousIncidenceIdAtEdge = previousIncidenceId;
 	}
 	
 	public long getPreviousIncidenceIdAtEdge() {
@@ -192,7 +208,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setIncidentVertexId(long vertexId) {
 		this.incidentVertexId = vertexId;
-		getTracker().putAttribute(vertexId, 40);
+		getTracker().putAttribute(vertexId, 44);
 	}
 
 	public void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
@@ -210,7 +226,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setIncidentEdgeId(long edgeId) {
 		this.incidentEdgeId = edgeId;
-		getTracker().putAttribute(edgeId, 32);
+		getTracker().putAttribute(edgeId, 36);
 	}
 
 	public void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
