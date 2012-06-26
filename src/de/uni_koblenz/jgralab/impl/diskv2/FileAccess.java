@@ -1,13 +1,8 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.HashMap;
 
 /**
@@ -18,71 +13,30 @@ import java.util.HashMap;
  * to write the contents of a ByteBuffer into this file, or to read a number of 
  * bytes from this file, which are then returned in a byte buffer.
  * 
- * Internally, it uses a MappedByteBuffer for increased efficiency.
+ * Internally, it uses a MappedByteBuffer for increased efficiency if the operating
+ * system isn't Windows. If Windows is used, it sticks with a FileChannel because a
+ * bug in Java makes it impossible for files to be deleted if it has been 
+ * accessed via a MappedByteBuffer at any point.
  *  
  * @author aheld
  *
  */
-public class FileAccess {
+public abstract class FileAccess {
 	
 	/**
 	 * A map in which accesses to files are stored.
 	 */
-	public static HashMap<String, FileAccess> files = new HashMap<String, FileAccess>();
+	private static HashMap<String, FileAccess> files = new HashMap<String, FileAccess>();
 	
 	/**
-	 * The size of the area of the file that is mapped into memory, in bytes.
+	 * Checks if the used OS is windows
 	 */
-	public static final int FILE_AREA = 1024;
+	private static boolean windows = isWindows();
 	
 	/**
 	 * The FileChannel used to access the file.
 	 */
-	private FileChannel channel;
-
-	/**
-	 * The part of the file that is mapped into memory.
-	 */
-	private MappedByteBuffer accessWindow;
-	
-	/**
-	 * Denotes the first byte of the access window.
-	 */
-	private long firstByte;
-	
-	/**
-	 * Denotes the last byte of the access window.
-	 */
-	private long lastByte;
-	
-	// --------------------------[(a)-----------------(b)]------------
-	// 
-	// The hyphens represent the entire file. The area between [ and ] is 
-	// the part of the file mapped into memory. Then, (a) is the first byte, 
-	// whereas (b) is the last byte of the area mapped into memory.
-	
-	/**
-	 * Creates a FileAccess to a specific file.
-	 * 
-	 * @param filename
-	 *        The name of the file the constructed object provides access to.
-	 */
-	private FileAccess(String filename){
-		File file = new File(filename + ".dst");
-		file.deleteOnExit(); //FIXME: Does not work
-		try {
-			RandomAccessFile ramFile = new RandomAccessFile(file, "rw");
-			FileChannel fileChannel = ramFile.getChannel();
-			this.channel = fileChannel;
-			//use invalid values to force a remapping at the first read or write operation
-			firstByte = lastByte = -1;
-			files.put(filename, this);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Error: Could not create file " + filename + ".dst");
-		} catch (IOException e) {
-			throw new RuntimeException("Error: Could not map file " + filename + ".dst");
-		}
-	}
+	protected FileChannel channel;
 	
 	/**
 	 * Factory method that provides a FileAccess object for a specific file.
@@ -98,7 +52,20 @@ public class FileAccess {
 		
 		if (file != null) return file;
 		
-		return new FileAccess(filename);
+		FileAccess fileAccess;
+		
+		if (windows){
+			fileAccess = new FileAccessForWindows(filename);
+		}
+		else {
+			fileAccess = new FileAccessDefault(filename);
+		}
+		
+		files.put(filename, fileAccess);
+		
+		addShutdownHook();
+		
+		return fileAccess;
 	}
 	
 	/**
@@ -110,14 +77,7 @@ public class FileAccess {
 	 * @param index
 	 *        The position in the file to which the content is written, in bytes
 	 */
-	public void write(ByteBuffer content, long index){
-		checkAccessWindow(content.capacity(), index);
-	
-		content.position(0);
-		accessWindow.position((int) (index - firstByte));
-		
-		accessWindow.put(content);
-	}
+	public abstract void write(ByteBuffer content, long index);
 	
 	/**
 	 * Read the content of a file from a given position.
@@ -129,60 +89,31 @@ public class FileAccess {
 	 * @return
 	 *        A byte buffer containing the requested bytes
 	 */
-	public ByteBuffer read(int numBytes, long index){
-		checkAccessWindow(numBytes, index);
-		
-		byte[] readBytes = new byte[numBytes];
-		
-		accessWindow.position((int) (index - firstByte));
-		accessWindow.get(readBytes);
-		
-		return ByteBuffer.wrap(readBytes);
-	}
+	public abstract ByteBuffer read(int numBytes, long index);
 	
 	/**
-	 * Checks if the current read or write operation fits into the access window,
-	 * i.e. if the part of the file that the operation wants to access is currently
-	 * in the memory.
+	 * Method that returns true if the used operating system is windows
 	 * 
-	 * If it is, this method does nothing.
-	 * If it isn't, the changes made to the part of the file that was mapped to the
-	 * memory when this method was called are forced out to the disk. After that, a new
-	 * part of the file is mapped into memory. The area that is mapped into memory is 
-	 * chosen in such a way that the start position of the read or write operation (i.e.
-	 * the byte at which the read or write operation is started) is in the middle
-	 * of the area that is mapped to the memory during this method call. 
-	 * An exception to this rule occurs if the condition "index < FILE_AREA/2" is met.
-	 * In this case, the first FILE_ARE bytes of the file are mapped to the memory.
+	 * @return true if the OS is Windows, false otherwise 
 	 * 
-	 * @param bufSize
-	 *        The amount of bytes that are read or written in the next operation
-	 * @param index
-	 *        The starting position of the next read or write operation
+	 * @author mkyong
 	 */
-	private void checkAccessWindow(int bufSize, long index){
-		if (index < firstByte | index + bufSize > lastByte){
-			
-			if (index < 512){
-				firstByte = 0;
-				lastByte = FILE_AREA;
-			}
-			else {
-				firstByte = index - 512;
-				lastByte = index + 512;
-			}
-			
-			try {
-				if (accessWindow != null) accessWindow.force();
-				accessWindow = channel.map(MapMode.READ_WRITE, firstByte, FILE_AREA);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
+	public static boolean isWindows() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return (os.indexOf("win") >= 0);
 	}
 	
-	@Override
-	public String toString(){
-		return "Mapping from " + Long.toString(firstByte) + " to " + Long.toString(lastByte);
+	private static void addShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+		    public void run() {
+		        for (FileAccess f: files.values()){
+		        	try {
+						f.channel.close();
+					} catch (IOException e) {
+						throw new RuntimeException("Unable to close FileChannel");
+					}
+		        }
+		    }
+		});
 	}
 }
