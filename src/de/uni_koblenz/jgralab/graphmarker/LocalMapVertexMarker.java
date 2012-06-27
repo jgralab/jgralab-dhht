@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab.graphmarker;
 
-
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.Vertex;

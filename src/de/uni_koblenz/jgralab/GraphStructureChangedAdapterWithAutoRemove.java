@@ -30,7 +30,6 @@
  */
 package de.uni_koblenz.jgralab;
 
-
 /**
  * This class provides an adapter for the
  * <code>GraphStructureChangedListener</code>.

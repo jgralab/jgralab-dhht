@@ -93,6 +93,26 @@ public class HyperPath {
 		return elements;
 	}
 
+	public PVector<Edge> getEdgeTrace() {
+		PVector<Edge> resultVector = JGraLab.vector();
+		for (GraphElement<?, ?, ?, ?> elem : elements) {
+			if (elem instanceof Edge) {
+				resultVector = resultVector.plus((Edge) elem);
+			}
+		}
+		return resultVector;
+	}
+
+	public PVector<Vertex> getVertexTrace() {
+		PVector<Vertex> resultVector = JGraLab.vector();
+		for (GraphElement<?, ?, ?, ?> elem : elements) {
+			if (elem instanceof Vertex) {
+				resultVector = resultVector.plus((Vertex) elem);
+			}
+		}
+		return resultVector;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof HyperPath)) {

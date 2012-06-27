@@ -71,8 +71,7 @@ public abstract class ViewGraphImpl implements Graph,
 	 * @param lowestVisibleKappaLevel
 	 *            the loweset kappa level of visible elements
 	 */
-	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel)
-			 {
+	public ViewGraphImpl(Graph viewedGraph, int lowestVisibleKappaLevel) {
 		this.lowestVisibleKappaLevel = lowestVisibleKappaLevel;
 		this.viewedGraph = viewedGraph;
 		eCount = viewedGraph.getECount();
@@ -81,29 +80,27 @@ public abstract class ViewGraphImpl implements Graph,
 		viewedGraph.addGraphStructureChangedListener(this);
 	}
 
-	
 	@Override
 	public int compareTo(Graph arg0) {
-			if (viewedGraph == arg0 || getCompleteGraph() == arg0) {
-				// each graph is smaller than the complete graph
-				return -1;
-			} else if (arg0.getViewedGraph() != arg0) {
-				// this is a ViewGraphImpl
-				// the ViewGraphImpl with smaller lowestVisibleKappaLevel is
-				// greater
-				return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
-						- lowestVisibleKappaLevel;
-			} else {
-				// arg0 is a subordinate graph or a partial graph
-				return viewedGraph.compareTo(arg0);
-			}
+		if (viewedGraph == arg0 || getCompleteGraph() == arg0) {
+			// each graph is smaller than the complete graph
+			return -1;
+		} else if (arg0.getViewedGraph() != arg0) {
+			// this is a ViewGraphImpl
+			// the ViewGraphImpl with smaller lowestVisibleKappaLevel is
+			// greater
+			return ((ViewGraphImpl) arg0).lowestVisibleKappaLevel
+					- lowestVisibleKappaLevel;
+		} else {
+			// arg0 is a subordinate graph or a partial graph
+			return viewedGraph.compareTo(arg0);
+		}
 	}
-	
+
 	// ============================================================================
 	// Methods to access schema
 	// ============================================================================
 
-	
 	@Override
 	public Class<? extends Graph> getM1Class() {
 		return viewedGraph.getM1Class();
@@ -123,28 +120,27 @@ public abstract class ViewGraphImpl implements Graph,
 	public Schema getSchema() {
 		return viewedGraph.getSchema();
 	}
-	
-	
+
 	// ============================================================================
-	// Methods to manage the current traversal context 
+	// Methods to manage the current traversal context
 	// ============================================================================
-	
+
 	@Override
 	public Graph getTraversalContext() {
-		return ((GraphDatabaseBaseImpl)getGraphDatabase()).getTraversalContext();
+		return ((GraphDatabaseBaseImpl) getGraphDatabase())
+				.getTraversalContext();
 	}
 
 	@Override
 	public void useAsTraversalContext() {
-		 ((GraphDatabaseBaseImpl)getGraphDatabase()).setTraversalContext(this);
+		((GraphDatabaseBaseImpl) getGraphDatabase()).setTraversalContext(this);
 	}
 
 	@Override
 	public void releaseTraversalContext() {
-		 ((GraphDatabaseBaseImpl)getGraphDatabase()).releaseTraversalContext();
+		((GraphDatabaseBaseImpl) getGraphDatabase()).releaseTraversalContext();
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access hierarchy and distribution
 	//
@@ -154,24 +150,22 @@ public abstract class ViewGraphImpl implements Graph,
 	// - Distribution
 	// - Graph IDs
 	// ============================================================================
-	
-	
+
 	@Override
 	public Graph getCompleteGraph() {
 		return viewedGraph.getCompleteGraph();
 	}
-	
+
 	@Override
 	public Graph getGraph() {
 		return getCompleteGraph();
 	}
-	
+
 	@Override
 	public Graph getLocalPartialGraph() {
 		return viewedGraph.getLocalPartialGraph();
 	}
-	
-	
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public AttributedElement getParentGraphOrElement() {
@@ -183,18 +177,16 @@ public abstract class ViewGraphImpl implements Graph,
 		return a;
 	}
 
-
 	@Override
 	public Graph getParentGraph() {
-		return getViewedGraph().getParentGraph().getView(lowestVisibleKappaLevel);
+		return getViewedGraph().getParentGraph().getView(
+				lowestVisibleKappaLevel);
 	}
-
 
 	@Override
 	public boolean isPartOfGraph(Graph other) {
 		return viewedGraph.isPartOfGraph(other);
 	}
-
 
 	/**
 	 * Returns a new view on this view, implemented and not delegated to avoid
@@ -205,106 +197,89 @@ public abstract class ViewGraphImpl implements Graph,
 		if (level < lowestVisibleKappaLevel) {
 			level = lowestVisibleKappaLevel;
 		}
-		return ((GraphBaseImpl) viewedGraph).getGraphFactory().createViewGraph_InMemoryStorage(
-				this, level);
+		return ((GraphBaseImpl) viewedGraph).getGraphFactory()
+				.createViewGraph_InMemoryStorage(this, level);
 	}
-	
-	
+
 	@Override
 	public Graph getViewedGraph() {
 		return viewedGraph;
 	}
-	
-	
+
 	@Override
 	public Graph createPartialGraphInGraph(String hostname) {
 		return viewedGraph.createPartialGraphInGraph(hostname);
 	}
-	
-	
+
 	@Override
 	public List<? extends Graph> getPartialGraphs() {
 		return viewedGraph.getPartialGraphs();
 	}
 
-	
 	@Override
 	public Graph getPartialGraph(int partialGraphId) {
 		return viewedGraph.getPartialGraph(partialGraphId);
 	}
-	
-	
+
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
 		throw new UnsupportedOperationException();
 	}
-	
-	
+
 	// ============================================================================
 	// Methods to access ids
 	// ============================================================================
 
-	
-	
-	
 	@Override
 	public String getUniqueGraphId() {
 		return viewedGraph.getUniqueGraphId();
 	}
 
-	
 	@Override
 	public long getGlobalId() {
 		return viewedGraph.getGlobalId();
 	}
 
-	
 	@Override
 	public int getLocalId() {
 		return viewedGraph.getLocalId();
 	}
-	
-	
+
 	@Override
 	public int getPartialGraphId() {
 		return viewedGraph.getPartialGraphId();
 	}
 
-	
 	@Override
 	public boolean isLocalElementId(long id) {
 		return viewedGraph.isLocalElementId(id);
 	}
-	
 
 	// ============================================================================
 	// Methods to access vertices and edges of the graph
 	// ============================================================================
-
 
 	@Override
 	public <T extends Vertex> T createVertex(Class<T> cls) {
 		return viewedGraph.createVertex(cls);
 	}
 
-	
 	@Override
 	public <T extends Edge> T createEdge(Class<T> cls) {
 		return viewedGraph.createEdge(cls);
 	}
 
-
 	@Override
-	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha, Vertex omega) {
+	public <T extends BinaryEdge> T createEdge(Class<T> cls, Vertex alpha,
+			Vertex omega) {
 		return viewedGraph.createEdge(cls, alpha, omega);
 	}
-	
 
 	@Override
-	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,	Edge edge) {
+	public <T extends Incidence> T connect(Class<T> cls, Vertex vertex,
+			Edge edge) {
 		return viewedGraph.connect(cls, vertex, edge);
 	}
-
 
 	@Override
 	public boolean containsVertex(Vertex v) {
@@ -312,23 +287,21 @@ public abstract class ViewGraphImpl implements Graph,
 				&& viewedGraph.containsVertex(v);
 	}
 
-	
 	@Override
 	public boolean containsEdge(Edge e) {
 		return e.isVisible(lowestVisibleKappaLevel)
 				&& viewedGraph.containsEdge(e);
 	}
-	
-	
+
 	@Override
-	public boolean containsElement(@SuppressWarnings("rawtypes") GraphElement elem) {
+	public boolean containsElement(
+			@SuppressWarnings("rawtypes") GraphElement elem) {
 		if (elem.getKappa() > this.lowestVisibleKappaLevel) {
 			return viewedGraph.containsElement(elem);
 		} else {
 			return false;
 		}
 	}
-
 
 	@Override
 	public void deleteVertex(Vertex v) {
@@ -338,11 +311,11 @@ public abstract class ViewGraphImpl implements Graph,
 			throw new GraphException(
 					"The view with lowest visible kappa value "
 							+ lowestVisibleKappaLevel
-							+ " does not contain vertex " + v.getGlobalId() + ".");
+							+ " does not contain vertex " + v.getGlobalId()
+							+ ".");
 		}
 	}
 
-	
 	@Override
 	public void deleteEdge(Edge e) {
 		if (containsEdge(e)) {
@@ -355,8 +328,6 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
-	
-	
 	@Override
 	public Vertex getFirstVertex() {
 		Vertex v = viewedGraph.getFirstVertex();
@@ -388,7 +359,8 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass, boolean noSubclasses) {
+	public Vertex getFirstVertex(Class<? extends Vertex> vertexClass,
+			boolean noSubclasses) {
 		assert vertexClass != null;
 		Vertex firstVertex = getFirstVertex();
 		if (firstVertex == null) {
@@ -434,7 +406,8 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public Edge getFirstEdge(Class<? extends Edge> edgeClass, boolean noSubclasses) {
+	public Edge getFirstEdge(Class<? extends Edge> edgeClass,
+			boolean noSubclasses) {
 		assert edgeClass != null;
 		Edge currentEdge = getFirstEdge();
 		while (currentEdge != null) {
@@ -481,7 +454,7 @@ public abstract class ViewGraphImpl implements Graph,
 	public long getMaxECount() {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public long getMaxICount() {
 		throw new UnsupportedOperationException();
@@ -491,31 +464,28 @@ public abstract class ViewGraphImpl implements Graph,
 	public long getVCount() {
 		return vCount;
 	}
-	
-//	protected void setVCount(int vCount) {
-//		this.vCount = vCount;
-//	}
+
+	// protected void setVCount(int vCount) {
+	// this.vCount = vCount;
+	// }
 
 	@Override
 	public long getECount() {
 		return eCount;
 	}
-	
-//	protected void setECount(int eCount) {
-//		this.eCount = eCount;
-//	}
 
-	
+	// protected void setECount(int eCount) {
+	// this.eCount = eCount;
+	// }
+
 	@Override
 	public long getICount() {
 		return iCount;
 	}
 
-	
-//	protected void setICount(int iCount) {
-//		this.iCount = iCount;
-//	}
-
+	// protected void setICount(int iCount) {
+	// this.iCount = iCount;
+	// }
 
 	@Override
 	public Iterable<Vertex> getVertices() {
@@ -532,8 +502,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return new VertexIterable<Vertex>(this, vertexClass);
 	}
 
-
-	
 	@Override
 	public Iterable<Edge> getEdges() {
 		return new EdgeIterable<Edge>(this);
@@ -549,7 +517,6 @@ public abstract class ViewGraphImpl implements Graph,
 		return new EdgeIterable<Edge>(this, edgeClass);
 	}
 
-
 	@Override
 	public void sortVertices(Comparator<Vertex> comp) {
 		viewedGraph.sortVertices(comp);
@@ -559,19 +526,16 @@ public abstract class ViewGraphImpl implements Graph,
 	public void sortEdges(Comparator<Edge> comp) {
 		viewedGraph.sortEdges(comp);
 	}
-	
 
 	@Override
 	public void defragment() {
 		throw new UnsupportedOperationException();
 	}
 
-	
 	// ============================================================================
 	// Methods to handle graph listeners
 	// ============================================================================
-	
-	
+
 	@Override
 	public void addGraphStructureChangedListener(
 			GraphStructureChangedListener newListener) {
@@ -585,8 +549,7 @@ public abstract class ViewGraphImpl implements Graph,
 	}
 
 	@Override
-	public void removeAllGraphStructureChangedListeners()
-			 {
+	public void removeAllGraphStructureChangedListeners() {
 		viewedGraph.removeAllGraphStructureChangedListeners();
 	}
 
@@ -594,62 +557,51 @@ public abstract class ViewGraphImpl implements Graph,
 	public int getGraphStructureChangedListenerCount() {
 		return viewedGraph.getGraphStructureChangedListenerCount();
 	}
-	
-	
-	
+
 	// ============================================================================
 	// Methods to access graph state and version (loading etc.)
 	// ============================================================================
-	
-	
+
 	@Override
 	public boolean isLoading() {
 		return viewedGraph.isLoading();
 	}
-	
-	
-//	@Override
-//	public void setLoading(boolean b) {
-//		viewedGraph.setLoading(b);
-//	}
-	
-	
+
+	// @Override
+	// public void setLoading(boolean b) {
+	// viewedGraph.setLoading(b);
+	// }
+
 	@Override
 	public boolean isGraphModified(long previousVersion) {
 		return viewedGraph.isGraphModified(previousVersion);
 	}
 
-	
 	@Override
 	public long getGraphVersion() {
 		return viewedGraph.getGraphVersion();
 	}
-	
 
 	@Override
 	public boolean isVertexListModified(long previousVersion) {
 		return viewedGraph.isVertexListModified(previousVersion);
 	}
 
-	
 	@Override
 	public long getVertexListVersion() {
 		return viewedGraph.getVertexListVersion();
 	}
 
-	
 	@Override
 	public boolean isEdgeListModified(long edgeListVersion) {
 		return viewedGraph.isEdgeListModified(edgeListVersion);
 	}
 
-	
 	@Override
 	public long getEdgeListVersion() {
 		return viewedGraph.getEdgeListVersion();
 	}
-	
-	
+
 	@Override
 	public GraphFactory getGraphFactory() {
 		return viewedGraph.getGraphFactory();
@@ -660,11 +612,9 @@ public abstract class ViewGraphImpl implements Graph,
 		return viewedGraph.getGraphDatabase();
 	}
 
-	
 	// ============================================================================
 	// Methods to create complex values such as lists and maps
 	// ============================================================================
-
 
 	@Override
 	public <T> PVector<T> createList() {
@@ -675,17 +625,15 @@ public abstract class ViewGraphImpl implements Graph,
 	public <T> PSet<T> createSet() {
 		return viewedGraph.createSet();
 	}
+
 	@Override
 	public <K, V> PMap<K, V> createMap() {
 		return viewedGraph.createMap();
 	}
 
-	
-	
 	// ============================================================================
 	// Methods of SubordinateGraph as GraphListener on the complete graph
 	// ============================================================================
-	
 
 	@Override
 	public void vertexAdded(Vertex v) {
@@ -741,16 +689,10 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
-	
-	
-	
 	// ============================================================================
 	// Methods which are created by the code generator for the complete graph
 	// ============================================================================
 
-	
-	
-	
 	@Override
 	public void readAttributeValueFromString(String attributeName, String value)
 			throws GraphIOException, NoSuchAttributeException {
@@ -802,5 +744,4 @@ public abstract class ViewGraphImpl implements Graph,
 		}
 	}
 
-	
 }

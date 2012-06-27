@@ -4,7 +4,7 @@ import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
-import de.uni_koblenz.jgralab.greql2.types.Path;
+import de.uni_koblenz.jgralab.greql2.types.HyperPath;
 
 public class EdgeTrace extends Function {
 
@@ -13,7 +13,7 @@ public class EdgeTrace extends Function {
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
-	public PVector<Edge> evaluate(Path p) {
+	public PVector<Edge> evaluate(HyperPath p) {
 		return p.getEdgeTrace();
 	}
 }

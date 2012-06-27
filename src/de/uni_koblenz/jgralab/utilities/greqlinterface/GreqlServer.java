@@ -127,7 +127,8 @@ public class GreqlServer extends Thread {
 						println("Loading " + graphFile + ".", PrintTarget.BOTH,
 								true);
 						g = GraphIO.loadGraphFromFile(graphFile, null,
-								new ConsoleProgressFunction("Loading"), ImplementationType.MEMORY);
+								new ConsoleProgressFunction("Loading"),
+								ImplementationType.MEMORY);
 						dataGraphs.put(graphFile, g);
 					}
 					eval.setDatagraph(g);
@@ -166,8 +167,9 @@ public class GreqlServer extends Thread {
 		for (Edge e : g.getEdges()) {
 			boolean incVerticesMarked = true;
 			for (Vertex v : e.getIncidentVertices()) {
-				if (!marker.isMarked(v))
+				if (!marker.isMarked(v)) {
 					incVerticesMarked = false;
+				}
 			}
 			if (incVerticesMarked) {
 				marker.mark(e);

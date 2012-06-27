@@ -48,6 +48,7 @@ import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
@@ -62,23 +63,23 @@ public class PathSystem {
 	private final HashMap<PathSystemKey, PathSystemEntry> keyToEntryMap;
 
 	/**
-	 * This HashMap stores references from a vertex which is a leaf is the path
-	 * system to the first occurence of this vertex as a leaf in the above
+	 * This HashMap stores references from an element which is a leaf is the path
+	 * system to the first occurence of this element as a leaf in the above
 	 * HashMap<PathSystemKey, PathSystemEntry> keyToEntryMap
 	 */
-	private final HashMap<Vertex, PathSystemKey> leafVertexToLeafKeyMap;
+	private final HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey> leafElementToLeafKeyMap;
 
 	/**
 	 * This HashMap stores references from a vertex in the path system to the
 	 * first occurence of this vertex in the above HashMap<PathSystemKey,
 	 * PathSystemEntry> keyToEntryMap
 	 */
-	private final HashMap<Vertex, PathSystemKey> vertexToFirstKeyMap;
+	private final HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey> elementToFirstKeyMap;
 
 	/**
 	 * This is the rootvertex of the pathsystem
 	 */
-	private Vertex rootVertex;
+	private GraphElement<?, ?, ?, ?> rootElement;
 
 	/**
 	 * stores if the pathsystem is finished
@@ -95,8 +96,8 @@ public class PathSystem {
 	/**
 	 * returns the rootVertex of this pathSystem
 	 */
-	public Vertex getRootVertex() {
-		return rootVertex;
+	public GraphElement<?, ?, ?, ?> getRootVertex() {
+		return rootElement;
 	}
 
 	/**
@@ -146,8 +147,8 @@ public class PathSystem {
 	public PathSystem(Graph graph) {
 		datagraph = graph;
 		keyToEntryMap = new HashMap<PathSystemKey, PathSystemEntry>();
-		leafVertexToLeafKeyMap = new HashMap<Vertex, PathSystemKey>();
-		vertexToFirstKeyMap = new HashMap<Vertex, PathSystemKey>();
+		leafElementToLeafKeyMap = new HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey>();
+		elementToFirstKeyMap = new HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey>();
 	}
 
 	private final Queue<PathSystemEntry> entriesWithoutParentEdge = new LinkedList<PathSystemEntry>();
@@ -163,99 +164,100 @@ public class PathSystem {
 		while (!entriesWithoutParentEdge.isEmpty()) {
 			PathSystemEntry te = entriesWithoutParentEdge.poll();
 			PathSystemEntry pe = null;
-			if (te.getParentVertex() != null) {
-				pe = keyToEntryMap.get(new PathSystemKey(te.getParentVertex(),
+			if (te.getParentElement() != null) {
+				pe = keyToEntryMap.get(new PathSystemKey(te.getParentElement(),
 						te.getParentStateNumber()));
 			} else {
-				PathSystemKey key = new PathSystemKey(rootVertex,
+				PathSystemKey key = new PathSystemKey(rootElement,
 						te.getParentStateNumber());
 				pe = keyToEntryMap.get(key);
 			}
 			// if pe is null, te is the entry of the root vertex
 			if (pe != null) {
-				te.setParentEdge(pe.getParentEdge());
+				te.setParentIncidence(pe.getParentIncidence());
 				te.setDistanceToRoot(pe.getDistanceToRoot());
 				te.setParentStateNumber(pe.getParentStateNumber());
-				te.setParentVertex(pe.getParentVertex());
+				te.setParentElement(pe.getParentElement());
 			}
 		}
 	}
 
 	/**
-	 * adds a vertex of the PathSystem which is described by the parameters to
+	 * adds an element of the PathSystem which is described by the parameters to
 	 * the PathSystem
 	 * 
-	 * @param vertex
-	 *            the vertex to add
+	 * @param element
+	 *            the element to add
 	 * @param stateNumber
-	 *            the number of the DFAState the DFA was in when this vertex was
+	 *            the number of the DFAState the DFA was in when this element was
 	 *            visited
 	 * @param finalState
-	 *            true if the rootvertex is visited by the dfa in a final state
+	 *            true if the rootelement is visited by the dfa in a final state
 	 */
-	public void setRootVertex(Vertex vertex, int stateNumber, boolean finalState) {
+	public void setRootElement(GraphElement<?, ?, ?, ?> element,
+			int stateNumber, boolean finalState) {
 		assertUnfinished();
-		PathSystemKey key = new PathSystemKey(vertex, stateNumber);
+		PathSystemKey key = new PathSystemKey(element, stateNumber);
 		PathSystemEntry entry = new PathSystemEntry(null, null, -1, 0,
 				finalState);
 		keyToEntryMap.put(key, entry);
-		if (finalState && !leafVertexToLeafKeyMap.containsKey(vertex)) {
-			leafVertexToLeafKeyMap.put(vertex, key);
+		if (finalState && !leafElementToLeafKeyMap.containsKey(element)) {
+			leafElementToLeafKeyMap.put(element, key);
 		}
-		vertexToFirstKeyMap.put(vertex, key);
+		elementToFirstKeyMap.put(element, key);
 		leafKeys = null;
-		rootVertex = vertex;
+		rootElement = element;
 	}
 
 	/**
-	 * adds a vertex of the PathSystem which is described by the parameters to
+	 * adds an element of the PathSystem which is described by the parameters to
 	 * the PathSystem
 	 * 
-	 * @param vertex
-	 *            the vertex to add
+	 * @param element
+	 *            the element to add
 	 * @param stateNumber
-	 *            the number of the DFAState the DFA was in when this vertex was
+	 *            the number of the DFAState the DFA was in when this element was
 	 *            visited
-	 * @param parentEdge
-	 *            the edge which leads from vertex to parentVertex
-	 * @param parentVertex
-	 *            the parentVertex of the vertex in the PathSystem
+	 * @param parentIncidence
+	 *            the incidence which leads from element to parentElement
+	 * @param parentElement
+	 *            the parentElement of the element in the PathSystem
 	 * @param parentStateNumber
 	 *            the number of the DFAState the DFA was in when the
-	 *            parentVertex was visited
+	 *            parentElement was visited
 	 * @param distance
-	 *            the distance to the rootvertex of the PathSystem
+	 *            the distance to the rootElement of the PathSystem
 	 */
-	public void addVertex(Vertex vertex, int stateNumber, Edge parentEdge,
-			Vertex parentVertex, int parentStateNumber, int distance,
-			boolean finalState) {
+	public void addElement(GraphElement<?, ?, ?, ?> element, int stateNumber,
+			Incidence parentIncidence, GraphElement<?, ?, ?, ?> parentElement,
+			int parentStateNumber, int distance, boolean finalState) {
 		assertUnfinished();
-		PathSystemKey key = new PathSystemKey(vertex, stateNumber);
+		PathSystemKey key = new PathSystemKey(element, stateNumber);
 		PathSystemEntry entry = keyToEntryMap.get(key);
 		if ((entry == null)
 				|| ((entry.getDistanceToRoot() > distance) && (!entry
 						.getStateIsFinal() || finalState))) {
-			entry = new PathSystemEntry(parentVertex, parentEdge,
+			entry = new PathSystemEntry(parentElement, parentIncidence,
 					parentStateNumber, distance, finalState);
 			keyToEntryMap.put(key, entry);
 			// add vertex to leaves
 			if (finalState) {
-				PathSystemKey existingLeafkey = leafVertexToLeafKeyMap
-						.get(vertex);
+				PathSystemKey existingLeafkey = leafElementToLeafKeyMap
+						.get(element);
 				if ((existingLeafkey == null)
 						|| (keyToEntryMap.get(existingLeafkey)
 								.getDistanceToRoot() > distance)) {
-					leafVertexToLeafKeyMap.put(vertex, key);
+					leafElementToLeafKeyMap.put(element, key);
 				}
 			}
-			if (parentEdge != null) {
-				PathSystemKey firstKey = vertexToFirstKeyMap.get(vertex);
+			if (parentIncidence != null) {
+				PathSystemKey firstKey = elementToFirstKeyMap.get(element);
 				if ((firstKey == null)
 						|| (keyToEntryMap.get(firstKey).getDistanceToRoot() > distance)) {
-					vertexToFirstKeyMap.put(vertex, key);
+					elementToFirstKeyMap.put(element, key);
 				}
 			} else {
-				if (!(vertex == rootVertex && distance == 0)) {
+				if (!(element == rootElement && distance == 0)) {
 					entriesWithoutParentEdge.add(entry);
 				}
 			}
@@ -263,90 +265,92 @@ public class PathSystem {
 	}
 
 	/**
-	 * Calculates the set of children the given vertex has in this PathSystem.
-	 * If the given vertex exists more than one times in this slice, the first
+	 * Calculates the set of children the given element has in this PathSystem.
+	 * If the given element exists more than one times in this slice, the first
 	 * occurrence if used.
 	 */
-	public PSet<Vertex> children(Vertex vertex) {
-		PathSystemKey key = vertexToFirstKeyMap.get(vertex);
+	public PSet<GraphElement<?, ?, ?, ?>> children(
+			GraphElement<?, ?, ?, ?> element) {
+		PathSystemKey key = elementToFirstKeyMap.get(element);
 		return children(key);
 	}
 
 	/**
 	 * Calculates the set of child the given key has in this PathSystem
 	 */
-	public PSet<Vertex> children(PathSystemKey key) {
+	public PSet<GraphElement<?, ?, ?, ?>> children(PathSystemKey key) {
 		assertFinished();
 
-		PSet<Vertex> returnSet = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> returnSet = JGraLab.set();
 		for (Map.Entry<PathSystemKey, PathSystemEntry> mapEntry : keyToEntryMap
 				.entrySet()) {
 			PathSystemEntry thisEntry = mapEntry.getValue();
-			if ((thisEntry.getParentVertex() == key.getVertex())
+			if ((thisEntry.getParentElement() == key.getElement())
 					&& (thisEntry.getParentStateNumber() == key
 							.getStateNumber())) {
-				returnSet = returnSet.plus(mapEntry.getKey().getVertex());
+				returnSet = returnSet.plus(mapEntry.getKey().getElement());
 			}
 		}
 		return returnSet;
 	}
 
 	/**
-	 * Calculates the set of siblings of the given vertex in this PathSystem. If
-	 * the given vertex exists more than one times in this pathsystem, the first
+	 * Calculates the set of siblings of the given element in this PathSystem. If
+	 * the given element exists more than one times in this pathsystem, the first
 	 * occurence if used.
 	 */
-	public PSet<Vertex> siblings(Vertex vertex) {
-		PathSystemKey key = vertexToFirstKeyMap.get(vertex);
+	public PSet<GraphElement<?, ?, ?, ?>> siblings(
+			GraphElement<?, ?, ?, ?> element) {
+		PathSystemKey key = elementToFirstKeyMap.get(element);
 		return siblings(key);
 	}
 
 	/**
 	 * Calculates the set of children the given key has in this PathSystem
 	 */
-	public PSet<Vertex> siblings(PathSystemKey key) {
+	public PSet<GraphElement<?, ?, ?, ?>> siblings(PathSystemKey key) {
 		assertFinished();
 		PathSystemEntry entry = keyToEntryMap.get(key);
 		if (entry == null) {
 			return null;
 		}
-		PSet<Vertex> returnSet = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> returnSet = JGraLab.set();
 		for (Map.Entry<PathSystemKey, PathSystemEntry> mapEntry : keyToEntryMap
 				.entrySet()) {
 			PathSystemEntry value = mapEntry.getValue();
 
-			if ((value.getParentVertex() == entry.getParentVertex())
+			if ((value.getParentElement() == entry.getParentElement())
 					&& (value.getParentStateNumber() == entry
 							.getParentStateNumber())
-					&& (mapEntry.getKey().getVertex() != key.getVertex())) {
-				returnSet = returnSet.plus(mapEntry.getKey().getVertex());
+					&& (mapEntry.getKey().getElement() != key.getElement())) {
+				returnSet = returnSet.plus(mapEntry.getKey().getElement());
 			}
 		}
 		return returnSet;
 	}
 
 	/**
-	 * Calculates the parent vertex of the given vertex in this PathSystem. If
-	 * the given vertex exists more than one times in this pathsystem, the first
-	 * occurrence if used. If the given vertex is not part of this pathsystem, a
+	 * Calculates the parent element of the given element in this PathSystem. If
+	 * the given element exists more than one times in this pathsystem, the first
+	 * occurrence if used. If the given element is not part of this pathsystem, a
 	 * invalid JValue will be returned
 	 */
-	public Vertex parent(Vertex vertex) {
-		PathSystemKey key = vertexToFirstKeyMap.get(vertex);
+	public GraphElement<?, ?, ?, ?> parent(GraphElement<?, ?, ?, ?> element) {
+		PathSystemKey key = elementToFirstKeyMap.get(element);
 		return parent(key);
 	}
 
 	/**
-	 * Calculates the parent vertex of the given key in this PathSystem.
+	 * Calculates the parent element of the given key in this PathSystem.
 	 */
-	public Vertex parent(PathSystemKey key) {
+	public GraphElement<?, ?, ?, ?> parent(PathSystemKey key) {
 		assertFinished();
 
 		if (key == null) {
 			return null;
 		}
 		PathSystemEntry entry = keyToEntryMap.get(key);
-		return entry.getParentVertex();
+		return entry.getParentElement();
 	}
 
 	/**
@@ -359,10 +363,7 @@ public class PathSystem {
 		assertFinished();
 		for (Map.Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
 				.entrySet()) {
-			if (entry.getValue().getParentEdge() == elem) {
-				return true;
-			}
-			if (entry.getKey().getVertex() == elem) {
+			if (entry.getKey().getElement() == elem) {
 				return true;
 			}
 		}
@@ -370,80 +371,80 @@ public class PathSystem {
 	}
 
 	/**
-	 * Calculates the number of incoming or outgoing edges of the given vertex
+	 * Calculates the number of incoming or outgoing incidences of the given element
 	 * which are part of this PathSystem
 	 * 
-	 * @param vertex
-	 *            the vertex for which the number of edges gets counted
+	 * @param element
+	 *            the element for which the number of incidences gets counted
 	 * @param direction
-	 *            direction of edges to be counted
+	 *            direction of elements to be counted
 	 * @param typeCol
 	 *            the JValueTypeCollection which toggles whether a type is
 	 *            accepted or not
-	 * @return the number of edges with the given orientation connected to the
-	 *         given vertex or -1 if the given vertex is not part of this
+	 * @return the number of incidences with the given orientation connected to the
+	 *         given element or -1 if the given element is not part of this
 	 *         PathSystem
 	 */
-	public int degree(Vertex vertex, EdgeDirection direction,
-			TypeCollection typeCol) {
+	public int degree(GraphElement<?, ?, ?, ?> element,
+			EdgeDirection direction, TypeCollection typeCol) {
 		assertFinished();
 
-		if (vertex == null) {
+		if (element == null) {
 			return -1;
 		}
 		int degree = 0;
-//		boolean countIncomingEdges = direction == EdgeDirection.IN
-//				|| direction == EdgeDirection.INOUT;
-//		boolean countOutgoingEdges = direction == EdgeDirection.OUT
-//				|| direction == EdgeDirection.INOUT;
+		// boolean countIncomingEdges = direction == EdgeDirection.IN
+		// || direction == EdgeDirection.INOUT;
+		// boolean countOutgoingEdges = direction == EdgeDirection.OUT
+		// || direction == EdgeDirection.INOUT;
 
-//		for (Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
-//				.entrySet()) {
-//			if (isAcceptedByTypeCollection(typeCol, entry)) {
-//				if (countOutgoingEdges && isOutgoingEdge(entry, vertex)) {
-//					degree++;
-//				}
-//				if (countIncomingEdges && isIncommingEdge(entry, vertex)) {
-//					degree++;
-//				}
-//			}
-//		}
+		// for (Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
+		// .entrySet()) {
+		// if (isAcceptedByTypeCollection(typeCol, entry)) {
+		// if (countOutgoingEdges && isOutgoingEdge(entry, vertex)) {
+		// degree++;
+		// }
+		// if (countIncomingEdges && isIncommingEdge(entry, vertex)) {
+		// degree++;
+		// }
+		// }
+		// }
 		return degree;
 	}
 
 	public boolean isAcceptedByTypeCollection(TypeCollection typeCollection,
 			Entry<PathSystemKey, PathSystemEntry> entry) {
 		return typeCollection == null
-				|| typeCollection.acceptsType(entry.getValue().getParentEdge()
-						.getType());
+				|| typeCollection.acceptsType(entry.getValue()
+						.getParentIncidence().getType());
 	}
 
 	public boolean isOutgoingEdge(Entry<PathSystemKey, PathSystemEntry> entry,
-			Vertex vertex) {
-		return entry.getValue().getParentVertex() == vertex;
+			GraphElement<?, ?, ?, ?> element) {
+		return entry.getValue().getParentElement() == element;
 	}
 
 	public boolean isIncommingEdge(Entry<PathSystemKey, PathSystemEntry> entry,
-			Vertex vertex) {
-		return entry.getKey().getVertex() == vertex;
+			GraphElement<?, ?, ?, ?> element) {
+		return entry.getKey().getElement() == element;
 	}
 
 	/**
-	 * Calculates the number of incomming and outgoing edges of the given vertex
+	 * Calculates the number of incomming and outgoing incidences of the given element
 	 * which are part of this PathSystem
 	 * 
-	 * @param vertex
-	 *            the vertex for which the number of edges gets counted
+	 * @param element
+	 *            the element for which the number of incidences gets counted
 	 * @param typeCol
 	 *            the JValueTypeCollection which toggles wether a type is
 	 *            accepted or not
-	 * @return the number of edges connected to the given vertex or -1 if the
-	 *         given vertex is not part of this pathsystem
+	 * @return the number of incidences connected to the given element or -1 if the
+	 *         given element is not part of this pathsystem
 	 */
-	public int degree(Vertex vertex, TypeCollection typeCol) {
+	public int degree(GraphElement<?, ?, ?, ?> element, TypeCollection typeCol) {
 		assertFinished();
 
-		if (vertex == null) {
+		if (element == null) {
 			return -1;
 		}
 		int degree = 0;
@@ -451,14 +452,13 @@ public class PathSystem {
 				.entrySet()) {
 			PathSystemEntry pe = entry.getValue();
 			if ((typeCol == null)
-					|| typeCol.acceptsType(pe.getParentEdge()
-							.getType())) {
-				if (pe.getParentVertex() == vertex) {
+					|| typeCol.acceptsType(pe.getParentIncidence().getType())) {
+				if (pe.getParentElement() == element) {
 					degree++;
 				}
 				// cannot transform two if statements to one if with an or,
 				// because an edge may be a loop
-				if (entry.getKey().getVertex() == vertex) {
+				if (entry.getKey().getElement() == element) {
 					degree++;
 				}
 			}
@@ -467,114 +467,117 @@ public class PathSystem {
 	}
 
 	/**
-	 * Calculates the set of incomming or outgoing edges of the given vertex,
+	 * Calculates the set of incoming or outgoing incidences of the given element,
 	 * which are also part of this pathsystem
 	 * 
-	 * @param vertex
-	 *            the vertex for which the edgeset will be created
+	 * @param element 
+	 *            the element for which the edgeset will be created
 	 * @param direction
-	 *            direction of edges to be returned
-	 * @return a set of edges with the given orientation connected to the given
-	 *         vertex or an empty set, if the vertex is not part of this
+	 *            direction of incidences to be returned
+	 * @return a set of incidences with the given orientation connected to the given
+	 *         element or an empty set, if the element is not part of this
 	 *         pathsystem
 	 */
-	public PSet<Edge> edgesConnected(Vertex vertex, Direction direction) {
+	public PSet<Incidence> edgesConnected(GraphElement<?, ?, ?, ?> element,
+			Direction direction) {
 		assertFinished();
-		if (vertex == null) {
+		if (element == null) {
 			return null;
 		}
-		PSet<Edge> resultSet = JGraLab.set();
+		PSet<Incidence> resultSet = JGraLab.set();
 		for (Map.Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
 				.entrySet()) {
 
 			// TODO reduce switch case
-			if (entry.getKey().getVertex() == vertex) {
-				Edge edge = entry.getValue().getParentEdge();
-				if (edge == null) {
+			if (entry.getKey().getElement() == element) {
+				Incidence inc = entry.getValue().getParentIncidence();
+				if (inc == null) {
 					continue;
 				}
-//				switch (direction) {
-//				case EDGE_TO_VERTEX:
-//					if (edge.isNormal()) {
-//						addEdgeToResult(resultSet, edge, vertex);
-//					}
-//					break;
-//				case VERTEX_TO_EDGE:
-//					if (!edge.isNormal()) {
-//						addEdgeToResult(resultSet, edge, vertex);
-//					}
-//					break;
-//				case BOTH:
-//					addEdgeToResult(resultSet, edge, vertex);
-//					break;
-//				default:
-//					throw new RuntimeException(
-//							"FIXME: Incomplete switch statement in JValuePathSystem");
-//				}
-			} else if (entry.getValue().getParentVertex() == vertex) {
-				Edge edge = entry.getValue().getParentEdge();
-				if (edge == null) {
+				// switch (direction) {
+				// case EDGE_TO_VERTEX:
+				// if (edge.isNormal()) {
+				// addEdgeToResult(resultSet, edge, vertex);
+				// }
+				// break;
+				// case VERTEX_TO_EDGE:
+				// if (!edge.isNormal()) {
+				// addEdgeToResult(resultSet, edge, vertex);
+				// }
+				// break;
+				// case BOTH:
+				// addEdgeToResult(resultSet, edge, vertex);
+				// break;
+				// default:
+				// throw new RuntimeException(
+				// "FIXME: Incomplete switch statement in JValuePathSystem");
+				// }
+			} else if (entry.getValue().getParentElement() == element) {
+				Incidence inc = entry.getValue().getParentIncidence();
+				if (inc == null) {
 					continue;
 				}
-//				switch (direction) {
-//				case IN:
-//					if (!edge.isNormal()) {
-//						resultSet = addEdgeToResult(resultSet, edge, vertex);
-//					}
-//					break;
-//				case OUT:
-//					if (edge.isNormal()) {
-//						resultSet = addEdgeToResult(resultSet, edge, vertex);
-//					}
-//					break;
-//				case INOUT:
-//					resultSet = addEdgeToResult(resultSet, edge, vertex);
-//					break;
-//				default:
-//					throw new RuntimeException(
-//							"FIXME: Incomplete switch statement in JValuePathSystem");
-//				}
+				// switch (direction) {
+				// case IN:
+				// if (!edge.isNormal()) {
+				// resultSet = addEdgeToResult(resultSet, edge, vertex);
+				// }
+				// break;
+				// case OUT:
+				// if (edge.isNormal()) {
+				// resultSet = addEdgeToResult(resultSet, edge, vertex);
+				// }
+				// break;
+				// case INOUT:
+				// resultSet = addEdgeToResult(resultSet, edge, vertex);
+				// break;
+				// default:
+				// throw new RuntimeException(
+				// "FIXME: Incomplete switch statement in JValuePathSystem");
+				// }
 			}
 		}
 		return null;
-		//return resultSet;
+		// return resultSet;
 	}
 
-	private PSet<Edge> addEdgeToResult(PSet<Edge> resultSet, Edge edge,
-			Vertex context) {
-//		if (context == edge.getAlpha()) {
-//			return resultSet.plus(edge.getNormalEdge());
-//		} else if (context == edge.getOmega()) {
-//			return resultSet.plus(edge.getNormalEdge().getReversedEdge());
-//		} else {
-//			return resultSet;
-//		}
+	private PSet<Incidence> addIncidenceToResult(PSet<Incidence> resultSet,
+			Incidence incidence, GraphElement<?, ?, ?, ?> element) {
+		// if (context == edge.getAlpha()) {
+		// return resultSet.plus(edge.getNormalEdge());
+		// } else if (context == edge.getOmega()) {
+		// return resultSet.plus(edge.getNormalEdge().getReversedEdge());
+		// } else {
+		// return resultSet;
+		// }
 		return null;
 	}
 
 	/**
-	 * Calculates the set of edges which are connected to the given vertex, and
+	 * Calculates the set of incidences which are connected to the given element, and
 	 * which are also part of this pathsystem
 	 * 
-	 * @param vertex
-	 *            the vertex for which the edgeset will be created
-	 * @return a set of edges connected to the given vertex or an empty set, if
-	 *         the vertex is not part of this pathsystem
+	 * @param element
+	 *            the element for which the edgeset will be created
+	 * @return a set of incidences connected to the given element or an empty set, if
+	 *         the element is not part of this pathsystem
 	 */
-	public PSet<Edge> edgesConnected(Vertex vertex) {
+	public PSet<Incidence> edgesConnected(GraphElement<?, ?, ?, ?> element) {
 		assertFinished();
-		if (vertex == null) {
+		if (element == null) {
 			return null;
 		}
-		PSet<Edge> resultSet = JGraLab.set();
+		PSet<Incidence> resultSet = JGraLab.set();
 
 		for (Map.Entry<PathSystemKey, PathSystemEntry> entry : keyToEntryMap
 				.entrySet()) {
-			if (entry.getValue().getParentVertex() == vertex) {
-				resultSet = resultSet.plus(entry.getValue().getParentEdge());
+			if (entry.getValue().getParentElement() == element) {
+				resultSet = resultSet.plus(entry.getValue()
+						.getParentIncidence());
 			}
-			if (entry.getKey().getVertex() == vertex) {
-				resultSet = resultSet.plus(entry.getValue().getParentEdge());
+			if (entry.getKey().getElement() == element) {
+				resultSet = resultSet.plus(entry.getValue()
+						.getParentIncidence());
 			}
 		}
 		return resultSet;
@@ -582,23 +585,23 @@ public class PathSystem {
 
 	/**
 	 * Calculates the set of leaves in this PathSystem. Costs: O(n) where n is
-	 * the number of vertices in the path system. The created set is stored as
+	 * the number of elements in the path system. The created set is stored as
 	 * private field <code>leaves</code>, so the creating has to be done only
 	 * once.
 	 */
-	public PSet<Vertex> getLeaves() {
+	public PSet<GraphElement<?, ?, ?, ?>> getLeaves() {
 		assertFinished();
 
-		PSet<Vertex> leaves = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> leaves = JGraLab.set();
 		// create the set of leaves out of the key set
 		for (PathSystemKey key : leafKeys) {
-			leaves = leaves.plus(key.getVertex());
+			leaves = leaves.plus(key.getElement());
 		}
 		return leaves;
 	}
 
 	/**
-	 * create the set of leave keys
+	 * create the set of leaf keys
 	 */
 	private void createLeafKeys() {
 		assertUnfinished();
@@ -616,53 +619,53 @@ public class PathSystem {
 	}
 
 	/**
-	 * Extract the path which starts with the root vertex and ends with the
-	 * given vertex from the PathSystem. If the given vertex exists more than
-	 * one times in this pathsystem, the first occurrence if used. If the given
-	 * vertex is not part of this pathsystem, null will be returned
+	 * Extract the path which starts with the root element and ends with the
+	 * given element from the PathSystem. If the given element exists more than
+	 * one time in this pathsystem, the first occurrence is used. If the given
+	 * element is not part of this pathsystem, null will be returned
 	 * 
-	 * @param vertex
-	 * @return a Path from rootVertex to given vertex
+	 * @param GraphElement<?, ?, ?, ?>
+	 * @return a HyperPath from rootElement to given element
 	 */
-	public Path extractPath(Vertex vertex) {
+	public HyperPath extractPath(GraphElement<?, ?, ?, ?> element) {
 		assertFinished();
-		PathSystemKey key = leafVertexToLeafKeyMap.get(vertex);
+		PathSystemKey key = leafElementToLeafKeyMap.get(element);
 		return extractPath(key);
 	}
 
 	/**
-	 * Extract the path which starts with the root vertex and ends with the
-	 * given vertex from the PathSystem.
+	 * Extract the path which starts with the root element and ends with the
+	 * given element from the PathSystem.
 	 * 
 	 * @param key
-	 *            the pair (Vertex, Statenumber) which is the target of the path
-	 * @return a Path from rootVertex to given vertex
+	 *            the pair (GraphElement, Statenumber) which is the target of the path
+	 * @return a Path from rootElement to given element
 	 */
-	public Path extractPath(PathSystemKey key) {
+	public HyperPath extractPath(PathSystemKey key) {
 		assertFinished();
-		Path path = Path.start(key.getVertex());
-//		while (key != null) {
-//			PathSystemEntry entry = keyToEntryMap.get(key);
-//			if (entry.getParentEdge() != null) {
-//				path = path.append(entry.getParentEdge().getReversedEdge());
-//				key = new PathSystemKey(entry.getParentVertex(),
-//						entry.getParentStateNumber());
-//			} else {
-//				key = null;
-//			}
-//		}
+		HyperPath path = HyperPath.start(key.getElement());
+		// while (key != null) {
+		// PathSystemEntry entry = keyToEntryMap.get(key);
+		// if (entry.getParentEdge() != null) {
+		// path = path.append(entry.getParentEdge().getReversedEdge());
+		// key = new PathSystemKey(entry.getParentVertex(),
+		// entry.getParentStateNumber());
+		// } else {
+		// key = null;
+		// }
+		// }
 		return path.reverse();
 	}
 
 	/**
 	 * Extract the set of paths which are part of this path system. These paths
-	 * start with the root vertex and ends with a leave.
+	 * start with the root element and end with a leaf.
 	 * 
-	 * @return a set of Paths from rootVertex to leaves
+	 * @return a set of HyperPaths from rootElement to leaves
 	 */
-	public PSet<Path> extractPaths() {
+	public PSet<HyperPath> extractPaths() {
 		assertFinished();
-		PSet<Path> pathSet = JGraLab.set();
+		PSet<HyperPath> pathSet = JGraLab.set();
 		for (PathSystemKey leaf : leafKeys) {
 			pathSet = pathSet.plus(extractPath(leaf));
 		}
@@ -670,15 +673,15 @@ public class PathSystem {
 	}
 
 	/**
-	 * Extracts all paths which length equal to <code>len</code>
+	 * Extracts all paths with lengths equal to <code>len</code>
 	 * 
 	 * @return a set of Paths from rootVertex to leaves
 	 */
-	public PSet<Path> extractPaths(int len) {
+	public PSet<HyperPath> extractPaths(int len) {
 		assertFinished();
-		PSet<Path> pathSet = JGraLab.set();
+		PSet<HyperPath> pathSet = JGraLab.set();
 		for (PathSystemKey leaf : leafKeys) {
-			Path path = extractPath(leaf);
+			HyperPath path = extractPath(leaf);
 			if (path.getLength() == len) {
 				pathSet = pathSet.plus(path);
 			}
@@ -687,7 +690,7 @@ public class PathSystem {
 	}
 
 	/**
-	 * calculate the number of vertices this pathsystem has. If a vertex is part
+	 * calculate the number of element this pathsystem has. If a element is part
 	 * of this PathSystem n times, it is counted n times
 	 */
 	public int getWeight() {
@@ -712,23 +715,23 @@ public class PathSystem {
 	}
 
 	/**
-	 * Calculates the distance between the root vertex of this path system and
-	 * the given vertex If the given vertices is part of the pathsystem more
+	 * Calculates the distance between the root element of this path system and
+	 * the given element. If the given element is part of the pathsystem more
 	 * than one times, the first occurence is used
 	 * 
-	 * @return the distance or -1 if the given vertex is not part of this path
+	 * @return the distance or -1 if the given element is not part of this path
 	 *         system
 	 */
-	public int distance(Vertex vertex) {
-		PathSystemKey key = vertexToFirstKeyMap.get(vertex);
+	public int distance(GraphElement<?, ?, ?, ?> element) {
+		PathSystemKey key = elementToFirstKeyMap.get(element);
 		return distance(key);
 	}
 
 	/**
-	 * Calculates the distance between the root vertex of this path system and
+	 * Calculates the distance between the root element of this path system and
 	 * the given key
 	 * 
-	 * @return the distance or -1 if the given vertex is not part of this path
+	 * @return the distance or -1 if the given element is not part of this path
 	 *         system.
 	 */
 	private int distance(PathSystemKey key) {
@@ -743,7 +746,7 @@ public class PathSystem {
 
 	/**
 	 * Calculates the shortest distance between a leaf of this pathsystem and
-	 * the root vertex, this is the length of the shortest path in this
+	 * the root element, this is the length of the shortest path in this
 	 * pathsystem
 	 */
 	public int minPathLength() {
@@ -761,7 +764,7 @@ public class PathSystem {
 
 	/**
 	 * Calculates the longest distance between a leaf of this pathsystem and the
-	 * root vertex, this is the length of the longest path in this pathsystem
+	 * root element, this is the length of the longest path in this pathsystem
 	 */
 	public int maxPathLength() {
 		assertFinished();
@@ -785,15 +788,15 @@ public class PathSystem {
 	 *         returned
 	 */
 	public boolean isNeighbour(Vertex v1, Vertex v2) {
-		PathSystemKey key1 = vertexToFirstKeyMap.get(v1);
-		PathSystemKey key2 = vertexToFirstKeyMap.get(v2);
+		PathSystemKey key1 = elementToFirstKeyMap.get(v1);
+		PathSystemKey key2 = elementToFirstKeyMap.get(v2);
 		return isNeighbour(key1, key2);
 	}
 
 	/**
 	 * @return true if the given first key is a neighbour of the given second
 	 *         key, that means, if there is a edge in the pathtree from
-	 *         key1.vertex to key2.vertex and the states matches. If one of the
+	 *         key1.element to key2.element and the states matches. If one of the
 	 *         keys is not part of this pathsystem, false is returned
 	 */
 	public boolean isNeighbour(PathSystemKey key1, PathSystemKey key2) {
@@ -804,11 +807,11 @@ public class PathSystem {
 		}
 		PathSystemEntry entry1 = keyToEntryMap.get(key1);
 		PathSystemEntry entry2 = keyToEntryMap.get(key2);
-		if ((entry1.getParentVertex() == key2.getVertex())
+		if ((entry1.getParentElement() == key2.getElement())
 				&& (entry1.getParentStateNumber() == key2.getStateNumber())) {
 			return true;
 		}
-		if ((entry2.getParentVertex() == key1.getVertex())
+		if ((entry2.getParentElement() == key1.getElement())
 				&& (entry2.getParentStateNumber() == key1.getStateNumber())) {
 			return true;
 		}
@@ -816,22 +819,22 @@ public class PathSystem {
 	}
 
 	/**
-	 * @return true if the given first vertex is a brother of the given second
-	 *         vertex, that means, if they have the same father. If one or both
-	 *         of the given vertices are part of the pathsystem more than one
-	 *         times, the first occurence is used. If one of the vertices is not
+	 * @return true if the given first element is a brother of the given second
+	 *         element. That means they have the same father. If one or both
+	 *         of the given element are part of the pathsystem more than one
+	 *         time, the first occurence is used. If one of the elements is not
 	 *         part of this pathsystem, false is returned
 	 */
 	public boolean isSibling(Vertex v1, Vertex v2) {
-		PathSystemKey key1 = vertexToFirstKeyMap.get(v1);
-		PathSystemKey key2 = vertexToFirstKeyMap.get(v2);
+		PathSystemKey key1 = elementToFirstKeyMap.get(v1);
+		PathSystemKey key2 = elementToFirstKeyMap.get(v2);
 		return isSibling(key1, key2);
 	}
 
 	/**
 	 * @return true if the given first key is a brother of the given second key,
 	 *         that means, if thy have the same father in the pathtree from
-	 *         key1.vertex to key2.vertex and the states matches. If one of the
+	 *         key1.element to key2.element and the states matches. If one of the
 	 *         keys is not part of this pathsystem, false is returned
 	 */
 	public boolean isSibling(PathSystemKey key1, PathSystemKey key2) {
@@ -842,7 +845,7 @@ public class PathSystem {
 		}
 		PathSystemEntry entry1 = keyToEntryMap.get(key1);
 		PathSystemEntry entry2 = keyToEntryMap.get(key2);
-		if ((entry1.getParentVertex() == entry2.getParentVertex())
+		if ((entry1.getParentElement() == entry2.getParentElement())
 				&& (entry1.getParentStateNumber() == entry2
 						.getParentStateNumber())) {
 			return true;
@@ -858,8 +861,8 @@ public class PathSystem {
 		if (FunLib.getLogger() == null) {
 			return;
 		}
-		PSet<Path> pathSet = extractPaths();
-		for (Path path : pathSet) {
+		PSet<HyperPath> pathSet = extractPaths();
+		for (HyperPath path : pathSet) {
 			FunLib.getLogger().info(path.toString());
 		}
 	}
@@ -870,8 +873,8 @@ public class PathSystem {
 	@Override
 	public String toString() {
 		StringBuilder returnString = new StringBuilder("PathSystem:\n");
-		PSet<Path> pathSet = extractPaths();
-		for (Path path : pathSet) {
+		PSet<HyperPath> pathSet = extractPaths();
+		for (HyperPath path : pathSet) {
 			returnString.append(path.toString());
 			returnString.append('\n');
 		}
@@ -897,7 +900,7 @@ public class PathSystem {
 	}
 
 	/**
-	 * prints the <vertex, key map
+	 * prints the <element, key> map
 	 */
 	public void printKeyMap() {
 		assertFinished();
@@ -905,10 +908,10 @@ public class PathSystem {
 			return;
 		}
 		FunLib.getLogger().info("<Vertex, FirstKey> Set of PathSystem is:");
-		for (Map.Entry<Vertex, PathSystemKey> entry : vertexToFirstKeyMap
+		for (Map.Entry<GraphElement<?, ?, ?, ?>, PathSystemKey> entry : elementToFirstKeyMap
 				.entrySet()) {
 			PathSystemKey thisKey = entry.getValue();
-			Vertex vertex = entry.getKey();
+			GraphElement<?, ?, ?, ?> vertex = entry.getKey();
 			FunLib.getLogger().info(vertex + " maps to " + thisKey.toString());
 		}
 	}
@@ -927,23 +930,45 @@ public class PathSystem {
 		}
 	}
 
+	public PSet<GraphElement<?, ?, ?, ?>> getElements() {
+		assertFinished();
+		PSet<GraphElement<?, ?, ?, ?>> returnSet = JGraLab.set();
+		for (PathSystemKey key : keyToEntryMap.keySet()) {
+			returnSet = returnSet.plus(key.getElement());
+		}
+		return returnSet;
+	}
+
 	public PSet<Vertex> getVertices() {
 		assertFinished();
 		PSet<Vertex> returnSet = JGraLab.set();
 		for (PathSystemKey key : keyToEntryMap.keySet()) {
-			returnSet = returnSet.plus(key.getVertex());
+			if (key.getElement() instanceof Vertex) {
+				returnSet = returnSet.plus((Vertex) key.getElement());
+			}
 		}
 		return returnSet;
 	}
 
 	public PSet<Edge> getEdges() {
 		assertFinished();
-		PSet<Edge> resultSet = JGraLab.set();
+		PSet<Edge> returnSet = JGraLab.set();
+		for (PathSystemKey key : keyToEntryMap.keySet()) {
+			if (key.getElement() instanceof Edge) {
+				returnSet = returnSet.plus((Edge) key.getElement());
+			}
+		}
+		return returnSet;
+	}
+
+	public PSet<Incidence> getIncidences() {
+		assertFinished();
+		PSet<Incidence> resultSet = JGraLab.set();
 		for (Map.Entry<PathSystemKey, PathSystemEntry> mapEntry : keyToEntryMap
 				.entrySet()) {
 			PathSystemEntry thisEntry = mapEntry.getValue();
-			if (thisEntry.getParentEdge() != null) {
-				resultSet = resultSet.plus(thisEntry.getParentEdge());
+			if (thisEntry.getParentIncidence() != null) {
+				resultSet = resultSet.plus(thisEntry.getParentIncidence());
 			}
 		}
 		return resultSet;

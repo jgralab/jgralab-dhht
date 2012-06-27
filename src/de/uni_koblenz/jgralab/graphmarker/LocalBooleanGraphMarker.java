@@ -50,7 +50,8 @@ import de.uni_koblenz.jgralab.Vertex;
 
 @SuppressWarnings("rawtypes")
 public class LocalBooleanGraphMarker extends
-		AbstractGraphMarker<AttributedElement> implements BooleanGraphMarker<AttributedElement> {
+		AbstractGraphMarker<AttributedElement> implements
+		BooleanGraphMarker<AttributedElement> {
 
 	private final HashSet<AttributedElement> markedElements;
 
@@ -85,8 +86,9 @@ public class LocalBooleanGraphMarker extends
 	 * @return true if the element has been marked successfull, false if this
 	 *         element is already marked by this GraphMarker
 	 */
+	@Override
 	public final boolean mark(AttributedElement elem) {
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?, ?>) elem)
 				.getGraph() == graph));
 
 		return markedElements.add(elem);

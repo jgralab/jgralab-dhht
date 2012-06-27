@@ -35,19 +35,19 @@
 
 package de.uni_koblenz.jgralab.greql2.types;
 
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
 
 /**
  * This is the key of the hashmap which stores the references to the parent
- * vertices. This class is _not_ a JValue
+ * elements. This class is _not_ a JValue
  */
 public class PathSystemKey {
-	private Vertex vertex;
+	private GraphElement<?, ?, ?, ?> element;
 	private int stateNumber;
 
 	@Override
 	public int hashCode() {
-		return vertex.hashCode() + stateNumber;
+		return element.hashCode() + stateNumber;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class PathSystemKey {
 			return false;
 		}
 		PathSystemKey foreignKey = (PathSystemKey) o;
-		return foreignKey.vertex == vertex
+		return foreignKey.element == element
 				&& foreignKey.stateNumber == stateNumber;
 	}
 
@@ -66,8 +66,8 @@ public class PathSystemKey {
 	 * @param v
 	 * @param s
 	 */
-	public PathSystemKey(Vertex v, int s) {
-		vertex = v;
+	public PathSystemKey(GraphElement<?, ?, ?, ?> v, int s) {
+		element = v;
 		stateNumber = s;
 	}
 
@@ -76,12 +76,12 @@ public class PathSystemKey {
 	 */
 	@Override
 	public String toString() {
-		//return "(V: " + vertex.getId() + ", S: " + stateNumber + ")";
+		// return "(V: " + vertex.getId() + ", S: " + stateNumber + ")";
 		return "";
 	}
 
-	public Vertex getVertex() {
-		return vertex;
+	public GraphElement<?, ?, ?, ?> getElement() {
+		return element;
 	}
 
 	public int getStateNumber() {

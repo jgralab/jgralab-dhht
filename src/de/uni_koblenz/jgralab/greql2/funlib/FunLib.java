@@ -92,12 +92,14 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeTrace.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeTypeSubgraph.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EdgeSetSubgraph.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EndElement.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ElementSetSubgraph.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.EndVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetAlpha.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetAlphaSeq.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetDirection.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetEdge.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetElements.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetFirstIncidenceAtEdge.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetFirstIncidenceAtVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.GetIncidences.class);
@@ -139,6 +141,7 @@ public class FunLib {
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathLength.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.PathSystem.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.ReachableElements.class);
+		register(de.uni_koblenz.jgralab.greql2.funlib.graph.StartElement.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.StartVertex.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.This.class);
 		register(de.uni_koblenz.jgralab.greql2.funlib.graph.That.class);

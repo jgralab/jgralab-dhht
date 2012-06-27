@@ -4,7 +4,7 @@ import org.pcollections.PVector;
 
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
-import de.uni_koblenz.jgralab.greql2.types.Path;
+import de.uni_koblenz.jgralab.greql2.types.HyperPath;
 
 public class VertexTrace extends Function {
 
@@ -13,7 +13,7 @@ public class VertexTrace extends Function {
 				Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
-	public PVector<Vertex> evaluate(Path p) {
+	public PVector<Vertex> evaluate(HyperPath p) {
 		return p.getVertexTrace();
 	}
 }

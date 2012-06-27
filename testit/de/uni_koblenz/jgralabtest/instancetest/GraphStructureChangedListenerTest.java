@@ -83,7 +83,7 @@ public class GraphStructureChangedListenerTest extends InstanceTest {
 		}
 
 		@Override
-		public void vertexDeleted(Vertex v) {
+		public void elementDeleted(Vertex v) {
 			trigger();
 			assertTrue("The given vertex is not valid, but it should be.", v
 					.isValid()

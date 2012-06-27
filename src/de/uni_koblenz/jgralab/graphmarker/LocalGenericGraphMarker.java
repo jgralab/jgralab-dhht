@@ -51,7 +51,8 @@ import de.uni_koblenz.jgralab.Vertex;
  * @author ist@uni-koblenz.de
  * 
  */
-public class LocalGenericGraphMarker<O> extends LocalMapGraphMarker<GraphElement<?, ?, ?,?>, O> {
+public class LocalGenericGraphMarker<O> extends
+		LocalMapGraphMarker<GraphElement<?, ?, ?, ?>, O> {
 
 	public LocalGenericGraphMarker(Graph g) {
 		super(g);

@@ -68,11 +68,11 @@ public class LocalDirectedGraphMarker<O> extends
 	 *         the given element is not marked in this marking.
 	 */
 	@Override
-	public O getMark(AttributedElement<?, ?> elem)  {
+	public O getMark(AttributedElement<?, ?> elem) {
 		if (elem == null) {
 			return null;
 		}
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.get(elem);
 	}
@@ -89,7 +89,7 @@ public class LocalDirectedGraphMarker<O> extends
 	 */
 	@Override
 	public O mark(AttributedElement<?, ?> elem, O value) {
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 
 		return tempAttributeMap.put(elem, value);
@@ -103,14 +103,14 @@ public class LocalDirectedGraphMarker<O> extends
 
 	@Override
 	public boolean isMarked(AttributedElement<?, ?> elem) {
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.containsKey(elem);
 	}
 
 	@Override
 	public boolean removeMark(AttributedElement<?, ?> elem) {
-		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?,?>) elem)
+		assert ((elem instanceof GraphElement && ((GraphElement<?, ?, ?, ?>) elem)
 				.getGraph() == graph) || elem == graph);
 		return tempAttributeMap.remove(elem) != null;
 	}

@@ -45,22 +45,22 @@ public class LocalBitSetEdgeMarker extends LocalBitSetGraphMarker<Edge> {
 	}
 
 	@Override
-	public void edgeDeleted(Edge e)  {
+	public void edgeDeleted(Edge e) {
 		removeMark(e);
 	}
 
 	@Override
-	public void vertexDeleted(Vertex v)  {
+	public void vertexDeleted(Vertex v) {
 		// do nothing
 	}
 
 	@Override
-	public boolean mark(Edge edge)  {
+	public boolean mark(Edge edge) {
 		return super.mark(edge);
 	}
 
 	@Override
-	public boolean isMarked(Edge edge)  {
+	public boolean isMarked(Edge edge) {
 		return super.isMarked(edge);
 	}
 
@@ -95,7 +95,7 @@ public class LocalBitSetEdgeMarker extends LocalBitSetGraphMarker<Edge> {
 							throw new ConcurrentModificationException(
 									MODIFIED_ERROR_MESSAGE);
 						}
-						
+
 						Edge next = graph.getEdge(index++);
 						moveIndex();
 						return next;

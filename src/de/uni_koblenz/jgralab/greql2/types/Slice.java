@@ -51,6 +51,7 @@ import org.pcollections.PSet;
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.JGraLab;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
@@ -58,22 +59,22 @@ import de.uni_koblenz.jgralab.greql2.funlib.FunLib;
 public class Slice {
 
 	/**
-	 * This HashMap stores references from a tuple (Vertex,State) to a list of
-	 * tuples(ParentVertex, ParentEdge, ParentState, DistanceToRoot)
+	 * This HashMap stores references from a tuple (Element,State) to a list of
+	 * tuples(ParentElement, ParentIncidence, ParentState, DistanceToRoot)
 	 */
 	private HashMap<PathSystemKey, List<PathSystemEntry>> keyToEntryMap;
 
 	/**
-	 * This HashMap stores references from a vertex to the first occurence of
-	 * this vertex in the above HashMap<PathSystemKey, PathSystemEntry>
+	 * This HashMap stores references from an element to the first occurence of
+	 * this element in the above HashMap<PathSystemKey, PathSystemEntry>
 	 * keyToEntryMap
 	 */
-	private HashMap<Vertex, PathSystemKey> vertexToFirstKeyMap;
+	private HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey> elementToFirstKeyMap;
 
 	/**
-	 * This is the rootvertex of the slice
+	 * This is the rootElement of the slice
 	 */
-	private PSet<Vertex> sliCritVertices;
+	private PSet<GraphElement<?, ?, ?, ?>> sliCritElements;
 
 	/**
 	 * this set stores the keys of the leaves of this slice. It is created the
@@ -83,10 +84,10 @@ public class Slice {
 	private ArrayList<PathSystemKey> leafKeys = null;
 
 	/**
-	 * returns the slicing criterion vertices of this slice
+	 * returns the slicing criterion elements of this slice
 	 */
-	public PSet<Vertex> getSlicingCriterionVertices() {
-		return sliCritVertices;
+	public PSet<GraphElement<?, ?, ?, ?>> getSlicingCriterionElements() {
+		return sliCritElements;
 	}
 
 	/**
@@ -118,38 +119,38 @@ public class Slice {
 	}
 
 	/**
-	 * creates a new JValueSlice with the given rootVertex in the given
+	 * creates a new JValueSlice with the given rootElement in the given
 	 * datagraph
 	 */
 	public Slice(Graph graph) {
 		datagraph = graph;
 		keyToEntryMap = new HashMap<PathSystemKey, List<PathSystemEntry>>();
-		vertexToFirstKeyMap = new HashMap<Vertex, PathSystemKey>();
-		sliCritVertices = JGraLab.set();
+		elementToFirstKeyMap = new HashMap<GraphElement<?, ?, ?, ?>, PathSystemKey>();
+		sliCritElements = JGraLab.set();
 
 	}
 
-	private Queue<PathSystemEntry> entriesWithoutParentEdge = new LinkedList<PathSystemEntry>();
+	private Queue<PathSystemEntry> entriesWithoutParentIncidence = new LinkedList<PathSystemEntry>();
 
 	boolean isCleared = true;
 
 	public void clearPathSystem() {
 		if (!isCleared) {
-			while (!entriesWithoutParentEdge.isEmpty()) {
-				PathSystemEntry te = entriesWithoutParentEdge.poll();
-				Vertex p = te.getParentVertex();
+			while (!entriesWithoutParentIncidence.isEmpty()) {
+				PathSystemEntry te = entriesWithoutParentIncidence.poll();
+				GraphElement<?, ?, ?, ?> p = te.getParentElement();
 				if (p == null) {
-					// root vertex
+					// root element
 				} else {
 					List<PathSystemEntry> pel = keyToEntryMap
 							.get(new PathSystemKey(p, te.getParentStateNumber()));
 					PathSystemEntry pe = pel.get(0);
-					te.setParentEdge(pe.getParentEdge());
+					te.setParentIncidence(pe.getParentIncidence());
 					te.setDistanceToRoot(pe.getDistanceToRoot());
 					te.setParentStateNumber(pe.getParentStateNumber());
-					te.setParentVertex(pe.getParentVertex());
-					if (te.getParentEdge() == null) {
-						entriesWithoutParentEdge.add(te);
+					te.setParentElement(pe.getParentElement());
+					if (te.getParentIncidence() == null) {
+						entriesWithoutParentIncidence.add(te);
 					}
 				}
 			}
@@ -158,95 +159,97 @@ public class Slice {
 	}
 
 	/**
-	 * adds a vertex of the slice which is described by the parameters to the
+	 * adds an element of the slice which is described by the parameters to the
 	 * slicing criterion
 	 * 
-	 * @param vertex
-	 *            the vertex to add
+	 * @param element
+	 *            the element to add
 	 * @param stateNumber
-	 *            the number of the DFAState the DFA was in when this vertex was
+	 *            the number of the DFAState the DFA was in when this element was
 	 *            visited
 	 * @param finalState
-	 *            true if the vertex is visited by the dfa in a final state
+	 *            true if the element is visited by the dfa in a final state
 	 */
-	public void addSlicingCriterionVertex(Vertex vertex, int stateNumber,
-			boolean finalState) {
+	public void addSlicingCriterionElement(GraphElement<?, ?, ?, ?> element,
+			int stateNumber, boolean finalState) {
 		// System.out.println("Adding vertex " + vertex +
 		// " as slicing criterion");
-		PathSystemKey key = new PathSystemKey(vertex, stateNumber);
+		PathSystemKey key = new PathSystemKey(element, stateNumber);
 		PathSystemEntry entry = new PathSystemEntry(null, null, -1, 0,
 				finalState);
 		List<PathSystemEntry> entryList = new ArrayList<PathSystemEntry>();
 		entryList.add(entry);
 		keyToEntryMap.put(key, entryList);
-		if (!vertexToFirstKeyMap.containsKey(vertex)) {
-			vertexToFirstKeyMap.put(vertex, key);
+		if (!elementToFirstKeyMap.containsKey(element)) {
+			elementToFirstKeyMap.put(element, key);
 		}
 		leafKeys = null;
-		sliCritVertices = sliCritVertices.plus(vertex);
+		sliCritElements = sliCritElements.plus(element);
 	}
 
 	/**
-	 * adds a vertex of the slice which is described by the parameters to the
+	 * adds an element of the slice which is described by the parameters to the
 	 * slice
 	 * 
-	 * @param vertex
-	 *            the vertex to add
+	 * @param element
+	 *            the element to add
 	 * @param stateNumber
-	 *            the number of the DFAState the DFA was in when this vertex was
+	 *            the number of the DFAState the DFA was in when this element was
 	 *            visited
-	 * @param parentEdge
-	 *            the edge which leads from vertex to parentVertex
-	 * @param parentVertex
-	 *            the parentVertex of the vertex in the slice
+	 * @param parentIncidence
+	 *            the incidence which leads from element to parentElement
+	 * @param parentElement
+	 *            the parentElement of the element in the slice
 	 * @param parentStateNumber
 	 *            the number of the DFAState the DFA was in when the
-	 *            parentVertex was visited
+	 *            parentElement was visited
 	 */
-	public void addVertex(Vertex vertex, int stateNumber, Edge parentEdge,
-			Vertex parentVertex, int parentStateNumber, boolean finalState) {
-		PathSystemKey key = new PathSystemKey(vertex, stateNumber);
+	public void addElement(GraphElement<?, ?, ?, ?> element, int stateNumber,
+			Incidence parentIncidence, GraphElement<?, ?, ?, ?> parentElement,
+			int parentStateNumber, boolean finalState) {
+		PathSystemKey key = new PathSystemKey(element, stateNumber);
 		List<PathSystemEntry> entryList = keyToEntryMap.get(key);
 		if (entryList == null) {
 			entryList = new ArrayList<PathSystemEntry>();
 			keyToEntryMap.put(key, entryList);
-			if (!vertexToFirstKeyMap.containsKey(vertex)) {
-				vertexToFirstKeyMap.put(vertex, key);
+			if (!elementToFirstKeyMap.containsKey(element)) {
+				elementToFirstKeyMap.put(element, key);
 			}
 			leafKeys = null;
 		}
-		PathSystemEntry entry = new PathSystemEntry(parentVertex, parentEdge,
-				parentStateNumber, 0, finalState);
+		PathSystemEntry entry = new PathSystemEntry(parentElement,
+				parentIncidence, parentStateNumber, 0, finalState);
 		if (!entryList.contains(entry)) {
 			entryList.add(entry);
 		}
-		if (parentEdge == null) {
-			entriesWithoutParentEdge.add(entry);
+		if (parentIncidence == null) {
+			entriesWithoutParentIncidence.add(entry);
 			isCleared = false;
 		}
 	}
 
 	/**
-	 * Calculates the parent vertices of the given vertex in this slice. If the
-	 * given vertex exists more than one times in this slice, the first
-	 * occurrence is used. If the given vertex is not part of this slice, an
+	 * Calculates the parent elements of the given element in this slice. If the
+	 * given element exists more than one time in this slice, the first
+	 * occurrence is used. If the given element is not part of this slice, an
 	 * invalid JValue will be returned
 	 */
-	public PSet<Vertex> parents(Vertex vertex) {
+	public PSet<GraphElement<?, ?, ?, ?>> parents(
+			GraphElement<?, ?, ?, ?> element) {
 		clearPathSystem();
-		PathSystemKey key = vertexToFirstKeyMap.get(vertex);
+		PathSystemKey key = elementToFirstKeyMap.get(element);
 		return parents(key);
 	}
 
 	/**
-	 * Calculates the parent vertices of the given key in this slice.
+	 * Calculates the parent elements of the given key in this slice.
 	 */
-	public PSet<Vertex> parents(PathSystemKey key) {
+	public PSet<GraphElement<?, ?, ?, ?>> parents(PathSystemKey key) {
 		clearPathSystem();
-		PSet<Vertex> resultSet = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> resultSet = JGraLab.set();
 
 		for (PathSystemEntry entry : keyToEntryMap.get(key)) {
-			resultSet = resultSet.plus(entry.getParentVertex());
+			resultSet = resultSet.plus(entry.getParentElement());
 		}
 
 		return resultSet;
@@ -255,14 +258,14 @@ public class Slice {
 	/**
 	 * Calculates the set of edges nodes in this slice.
 	 */
-	public PSet<Edge> getEdges() {
+	public PSet<Incidence> getIncidences() {
 		clearPathSystem();
-		PSet<Edge> resultSet = JGraLab.set();
+		PSet<Incidence> resultSet = JGraLab.set();
 		for (Map.Entry<PathSystemKey, List<PathSystemEntry>> mapEntry : keyToEntryMap
 				.entrySet()) {
 			for (PathSystemEntry thisEntry : mapEntry.getValue()) {
-				if (thisEntry.getParentEdge() != null) {
-					resultSet = resultSet.plus(thisEntry.getParentEdge());
+				if (thisEntry.getParentIncidence() != null) {
+					resultSet = resultSet.plus(thisEntry.getParentIncidence());
 				}
 			}
 		}
@@ -273,14 +276,14 @@ public class Slice {
 		for (Entry<PathSystemKey, List<PathSystemEntry>> e : keyToEntryMap
 				.entrySet()) {
 
-			if (e.getKey().getVertex() == elem) {
+			if (e.getKey().getElement() == elem) {
 				return true;
 			}
 			if (!(elem instanceof Edge)) {
 				continue;
 			}
 			for (PathSystemEntry pse : e.getValue()) {
-				if (pse.getParentEdge() == elem) {
+				if (pse.getParentIncidence() == elem) {
 					return true;
 				}
 				// TODO: Don't we need to check parentVertex, too?? Or is that
@@ -293,30 +296,52 @@ public class Slice {
 	/**
 	 * Calculates the set of nodes which are part of this slice.
 	 */
-	public PSet<Vertex> getVertices() {
+	public PSet<GraphElement<?, ?, ?, ?>> getElements() {
 		clearPathSystem();
-		PSet<Vertex> resultSet = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> resultSet = JGraLab.set();
 		for (PathSystemKey mapKey : keyToEntryMap.keySet()) {
-			resultSet = resultSet.plus(mapKey.getVertex());
+			resultSet = resultSet.plus(mapKey.getElement());
 		}
 
 		return resultSet;
 	}
 
+	public PSet<Edge> getEdges() {
+		clearPathSystem();
+		PSet<Edge> resultSet = JGraLab.set();
+		for (PathSystemKey mapKey : keyToEntryMap.keySet()) {
+			if (mapKey.getElement() instanceof Edge) {
+				resultSet = resultSet.plus((Edge) mapKey.getElement());
+			}
+		}
+		return resultSet;
+	}
+
+	public PSet<Vertex> getVertices() {
+		clearPathSystem();
+		PSet<Vertex> resultSet = JGraLab.set();
+		for (PathSystemKey mapKey : keyToEntryMap.keySet()) {
+			if (mapKey.getElement() instanceof Vertex) {
+				resultSet = resultSet.plus((Vertex) mapKey.getElement());
+			}
+		}
+		return resultSet;
+	}
+
 	/**
 	 * Calculates the set of leaves in this slice. Costs: O(n²) where n is the
-	 * number of vertices in the slice. The created set is stored as private
+	 * number of elements in the slice. The created set is stored as private
 	 * field <code>leaves</code>, so the creation has to be done only once.
 	 */
-	public PSet<Vertex> getLeaves() {
+	public PSet<GraphElement<?, ?, ?, ?>> getLeaves() {
 		clearPathSystem();
-		PSet<Vertex> leaves = JGraLab.set();
+		PSet<GraphElement<?, ?, ?, ?>> leaves = JGraLab.set();
 		if (leafKeys == null) {
 			createLeafKeys();
 		}
 		// create the set of leaves out of the key set
 		for (PathSystemKey key : leafKeys) {
-			leaves = leaves.plus(key.getVertex());
+			leaves = leaves.plus(key.getElement());
 		}
 		return leaves;
 	}
@@ -345,7 +370,7 @@ public class Slice {
 	}
 
 	/**
-	 * calculate the number of vertices this slice has. If a vertex is part of
+	 * calculate the number of elements this slice has. If an element is part of
 	 * this slice n times, it is counted n times
 	 */
 	public int weight() {
@@ -354,23 +379,24 @@ public class Slice {
 	}
 
 	/**
-	 * @return true if the given first vertex is a neighbour of the given second
-	 *         vertex, that means, if there is a edge from v1 to v2. If one or
-	 *         both of the given vertices are part of the slice more than once,
-	 *         the first occurence is used. If one of the vertices is not part
+	 * @return true if the given first element is a neighbour of the given second
+	 *         element. That means there is an incidence from e1 to e2. If one or
+	 *         both of the given elements are part of the slice more than once,
+	 *         the first occurence is used. If one of the elements is not part
 	 *         of this slice, false is returned
 	 */
-	public boolean isNeighbour(Vertex v1, Vertex v2) {
+	public boolean isNeighbour(GraphElement<?, ?, ?, ?> e1,
+			GraphElement<?, ?, ?, ?> e2) {
 		clearPathSystem();
-		PathSystemKey key1 = vertexToFirstKeyMap.get(v1);
-		PathSystemKey key2 = vertexToFirstKeyMap.get(v2);
+		PathSystemKey key1 = elementToFirstKeyMap.get(e1);
+		PathSystemKey key2 = elementToFirstKeyMap.get(e2);
 		return isNeighbour(key1, key2);
 	}
 
 	/**
 	 * @return true if the given first key is a neighbour of the given second
-	 *         key, that means, if there is a edge from key1.vertex to
-	 *         key2.vertex and the states matches. If one of the keys is not
+	 *         key, that means, if there is an incidence from key1.element to
+	 *         key2.element and the states match. If one of the keys is not
 	 *         part of this slice, false is returned
 	 */
 	public boolean isNeighbour(PathSystemKey key1, PathSystemKey key2) {
@@ -380,12 +406,12 @@ public class Slice {
 		}
 		for (PathSystemEntry entry1 : keyToEntryMap.get(key1)) {
 			for (PathSystemEntry entry2 : keyToEntryMap.get(key2)) {
-				if ((entry1.getParentVertex() == key2.getVertex())
+				if ((entry1.getParentElement() == key2.getElement())
 						&& (entry1.getParentStateNumber() == key2
 								.getStateNumber())) {
 					return true;
 				}
-				if ((entry2.getParentVertex() == key1.getVertex())
+				if ((entry2.getParentElement() == key1.getElement())
 						&& (entry2.getParentStateNumber() == key1
 								.getStateNumber())) {
 					return true;
@@ -416,20 +442,21 @@ public class Slice {
 	}
 
 	/**
-	 * Prints the <vertex, key map>.
+	 * Prints the <element, key map>.
 	 */
 	public void printKeyMap() {
 		clearPathSystem();
 		if (FunLib.getLogger() == null) {
 			return;
 		}
-		Iterator<Map.Entry<Vertex, PathSystemKey>> iter = vertexToFirstKeyMap
+		Iterator<Map.Entry<GraphElement<?, ?, ?, ?>, PathSystemKey>> iter = elementToFirstKeyMap
 				.entrySet().iterator();
 		FunLib.getLogger().info("<Vertex, FirstKey> set of slice is:");
 		while (iter.hasNext()) {
-			Map.Entry<Vertex, PathSystemKey> mapEntry = iter.next();
+			Map.Entry<GraphElement<?, ?, ?, ?>, PathSystemKey> mapEntry = iter
+					.next();
 			PathSystemKey thisKey = mapEntry.getValue();
-			Vertex vertex = mapEntry.getKey();
+			GraphElement<?, ?, ?, ?> vertex = mapEntry.getKey();
 			FunLib.getLogger().info(vertex + " maps to " + thisKey.toString());
 		}
 	}
@@ -440,36 +467,36 @@ public class Slice {
 	@Override
 	public String toString() {
 		clearPathSystem();
-		Set<Vertex> vset = new HashSet<Vertex>();
-		vset.addAll(vertexToFirstKeyMap.keySet());
-		Set<Edge> eset = new HashSet<Edge>();
+		Set<GraphElement<?, ?, ?, ?>> eset = new HashSet<GraphElement<?, ?, ?, ?>>();
+		eset.addAll(elementToFirstKeyMap.keySet());
+		Set<Incidence> iset = new HashSet<Incidence>();
 		for (List<PathSystemEntry> pl : keyToEntryMap.values()) {
 			for (PathSystemEntry pe : pl) {
-				eset.add(pe.getParentEdge());
+				iset.add(pe.getParentIncidence());
 			}
 		}
 
 		StringBuffer returnString = new StringBuffer("Slice: ");
 		returnString.append("Vertices: ");
 		boolean first = true;
-		for (Vertex v : vset) {
+		for (GraphElement<?, ?, ?, ?> e : eset) {
 			if (first) {
 				first = false;
-				returnString.append(v);
+				returnString.append(e);
 			} else {
 				returnString.append(", ");
-				returnString.append(v);
+				returnString.append(e);
 			}
 		}
 		returnString.append(", Edges: ");
 		first = true;
-		for (Edge e : eset) {
+		for (Incidence i : iset) {
 			if (first) {
 				first = false;
-				returnString.append(e);
+				returnString.append(i);
 			} else {
 				returnString.append(", ");
-				returnString.append(e);
+				returnString.append(i);
 			}
 		}
 		return returnString.toString();

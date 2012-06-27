@@ -2,10 +2,11 @@ package de.uni_koblenz.jgralab.greql2.funlib.graph;
 
 import de.uni_koblenz.jgralab.Direction;
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.greql2.funlib.Function;
-import de.uni_koblenz.jgralab.greql2.types.Path;
+import de.uni_koblenz.jgralab.greql2.types.HyperPath;
 import de.uni_koblenz.jgralab.greql2.types.TypeCollection;
 
 public abstract class DegreeFunction extends Function {
@@ -23,7 +24,7 @@ public abstract class DegreeFunction extends Function {
 
 	public Integer evaluate(Vertex v, TypeCollection c) {
 		int degree = 0;
-		for (Incidence i = v.getFirstIncidence(); i != null; i=i
+		for (Incidence i = v.getFirstIncidence(); i != null; i = i
 				.getNextIncidenceAtVertex()) {
 			if (c.acceptsType(i.getEdge().getType())) {
 				switch (direction) {
@@ -41,14 +42,14 @@ public abstract class DegreeFunction extends Function {
 		}
 		return degree;
 	}
-	
+
 	public Integer evaluate(Edge e) {
 		return e.getDegree(direction);
 	}
 
 	public Integer evaluate(Edge e, TypeCollection c) {
 		int degree = 0;
-		for (Incidence i = e.getFirstIncidence(); i != null; i=i
+		for (Incidence i = e.getFirstIncidence(); i != null; i = i
 				.getNextIncidenceAtEdge()) {
 			if (c.acceptsType(i.getVertex().getType())) {
 				switch (direction) {
@@ -67,7 +68,7 @@ public abstract class DegreeFunction extends Function {
 		return degree;
 	}
 
-	public Integer evaluate(Vertex v, Path p) {
+	public Integer evaluate(GraphElement<?, ?, ?, ?> v, HyperPath p) {
 		return p.degree(v, direction);
 	}
 

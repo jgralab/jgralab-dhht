@@ -42,9 +42,9 @@ import java.util.Queue;
 import java.util.Set;
 
 import de.uni_koblenz.jgralab.Edge;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
-import de.uni_koblenz.jgralab.graphmarker.LocalMapVertexMarker;
 import de.uni_koblenz.jgralab.graphmarker.ObjectGraphMarker;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.DFA;
 import de.uni_koblenz.jgralab.greql2.evaluator.fa.NFA;
@@ -55,31 +55,33 @@ import de.uni_koblenz.jgralab.greql2.types.pathsearch.PathSystemMarkerEntry;
 
 public class PathSystem extends Function {
 
+	// TODO: Rework with Hyperpaths!
 	public PathSystem() {
 		super(
-				"Returns a path system with the given root vertex, which is structured according to the given path description.",
+				"Returns a path system with the given root element, which is structured according to the given path description.",
 				1000, 1, 1.0, Category.PATHS_AND_PATHSYSTEMS_AND_SLICES);
 	}
 
 	public de.uni_koblenz.jgralab.greql2.types.PathSystem evaluate(
-			Vertex startVertex, NFA nfa) {
-		return evaluate(startVertex, nfa.getDFA());
+			GraphElement<?, ?, ?, ?> startElement, NFA nfa) {
+		return evaluate(startElement, nfa.getDFA());
 	}
 
 	public de.uni_koblenz.jgralab.greql2.types.PathSystem evaluate(
-			Vertex startVertex, DFA dfa) {
+			GraphElement<?, ?, ?, ?> startElement, DFA dfa) {
 
 		@SuppressWarnings("unchecked")
-		ObjectGraphMarker<Vertex, PathSystemMarkerEntry>[] marker = new ObjectGraphMarker[dfa.stateList
+		ObjectGraphMarker<GraphElement<?, ?, ?, ?>, PathSystemMarkerEntry>[] marker = new ObjectGraphMarker[dfa.stateList
 				.size()];
-		for (int i = 0; i < dfa.stateList.size(); i++) {
-			marker[i] = new LocalMapVertexMarker<PathSystemMarkerEntry>(
-					startVertex.getGraph());
-		}
-		Set<PathSystemMarkerEntry> leaves = markVerticesOfPathSystem(marker,
-				startVertex, dfa);
-		de.uni_koblenz.jgralab.greql2.types.PathSystem resultPathSystem = createPathSystemFromMarkings(
-				marker, startVertex, leaves);
+		// for (int i = 0; i < dfa.stateList.size(); i++) {
+		// marker[i] = new LocalMapVertexMarker<PathSystemMarkerEntry>(
+		// startElement.getGraph());
+		// }
+		Set<PathSystemMarkerEntry> leaves = null; // markVerticesOfPathSystem(marker,
+													// startElement, dfa);
+		de.uni_koblenz.jgralab.greql2.types.PathSystem resultPathSystem = null; // createPathSystemFromMarkings(marker,
+																				// startElement,
+																				// leaves);
 		return resultPathSystem;
 	}
 
@@ -192,7 +194,7 @@ public class PathSystem extends Function {
 		de.uni_koblenz.jgralab.greql2.types.PathSystem pathSystem = new de.uni_koblenz.jgralab.greql2.types.PathSystem(
 				rootVertex.getGraph());
 		PathSystemMarkerEntry rootMarker = marker[0].getMark(rootVertex);
-		pathSystem.setRootVertex(rootVertex, rootMarker.state.number,
+		pathSystem.setRootElement(rootVertex, rootMarker.state.number,
 				rootMarker.state.isFinal);
 
 		for (PathSystemMarkerEntry currentMarker : leafEntries) {
@@ -204,11 +206,12 @@ public class PathSystem extends Function {
 				if (currentMarker.parentState != null) {
 					parentStateNumber = currentMarker.parentState.number;
 				}
-				pathSystem.addVertex(currentVertex, currentMarker.state.number,
-						currentMarker.edgeToParentVertex,
-						currentMarker.parentVertex, parentStateNumber,
-						currentMarker.distanceToRoot,
-						currentMarker.state.isFinal);
+				// pathSystem.addElement(currentVertex,
+				// currentMarker.state.number,
+				// currentMarker.edgeToParentVertex,
+				// currentMarker.parentVertex, parentStateNumber,
+				// currentMarker.distanceToRoot,
+				// currentMarker.state.isFinal);
 				currentVertex = currentMarker.parentVertex;
 				currentMarker = getMarkerWithState(marker, currentVertex,
 						currentMarker.parentState);

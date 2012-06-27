@@ -35,24 +35,24 @@
 
 package de.uni_koblenz.jgralab.greql2.types;
 
-import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.Incidence;
 
 /**
  * This is the entry of the hashmap which stores the references to the parent
- * vertices. It is _not_ a JValue
+ * elements. It is _not_ a JValue
  */
 public class PathSystemEntry {
 
 	/**
 	 * the parent vertex
 	 */
-	private Vertex parentVertex;
+	private GraphElement<?, ?, ?, ?> parentElement;
 
 	/**
 	 * the edge from the vertex to the parentVertex
 	 */
-	private Edge parentEdge;
+	private Incidence parentIncidence;
 
 	/**
 	 * the number of the DFAState in which the parentvertex was visited
@@ -64,12 +64,12 @@ public class PathSystemEntry {
 	 */
 	private int distanceToRoot;
 
-	public void setParentVertex(Vertex parentVertex) {
-		this.parentVertex = parentVertex;
+	public void setParentElement(GraphElement<?, ?, ?, ?> parentElement) {
+		this.parentElement = parentElement;
 	}
 
-	public void setParentEdge(Edge parentEdge) {
-		this.parentEdge = parentEdge;
+	public void setParentIncidence(Incidence parentIncidence) {
+		this.parentIncidence = parentIncidence;
 	}
 
 	public void setParentStateNumber(int parentStateNumber) {
@@ -95,45 +95,46 @@ public class PathSystemEntry {
 	 */
 	@Override
 	public String toString() {
-//		if (getParentVertex() != null) {
-//			return "(V: " + getParentVertex().getId() + ", S: "
-//					+ getParentStateNumber() + ", E: "
-//					+ getParentEdge().getId() + " ,D: " + getDistanceToRoot()
-//					+ ")";
-//		} else {
-//			return "(RootVertex Distance: " + getDistanceToRoot() + ")";
-//		}
+		// if (getParentVertex() != null) {
+		// return "(V: " + getParentVertex().getId() + ", S: "
+		// + getParentStateNumber() + ", E: "
+		// + getParentEdge().getId() + " ,D: " + getDistanceToRoot()
+		// + ")";
+		// } else {
+		// return "(RootVertex Distance: " + getDistanceToRoot() + ")";
+		// }
 		return "";
 	}
 
 	/**
 	 * Creates a new pathSystemEntry
 	 * 
-	 * @param parentVertex
-	 *            The parent Vertex
-	 * @param parentEdge
-	 *            The edge to the parent vertex
+	 * @param parentElement
+	 *            The parent element
+	 * @param parentIncidence
+	 *            The incidence to the parent element
 	 * @param parentNumber
-	 *            the number of the DFAState in which the parentvertex was
+	 *            the number of the DFAState in which the parentElement was
 	 *            visited
 	 * @param distance
-	 *            the distance to the root vertex
+	 *            the distance to the root element
 	 */
-	public PathSystemEntry(Vertex parentVertex, Edge parentEdge,
-			int parentNumber, int distance, boolean finalState) {
-		this.parentVertex = parentVertex;
-		this.parentEdge = parentEdge;
+	public PathSystemEntry(GraphElement<?, ?, ?, ?> parentElement,
+			Incidence parentIncidence, int parentNumber, int distance,
+			boolean finalState) {
+		this.parentElement = parentElement;
+		this.parentIncidence = parentIncidence;
 		this.parentStateNumber = parentNumber;
 		this.distanceToRoot = distance;
 		this.stateIsFinal = finalState;
 	}
 
-	public Vertex getParentVertex() {
-		return parentVertex;
+	public GraphElement<?, ?, ?, ?> getParentElement() {
+		return parentElement;
 	}
 
-	public Edge getParentEdge() {
-		return parentEdge;
+	public Incidence getParentIncidence() {
+		return parentIncidence;
 	}
 
 	public int getParentStateNumber() {

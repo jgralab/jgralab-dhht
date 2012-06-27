@@ -19,5 +19,4 @@ public class EndVertex extends Function {
 	public Vertex evaluate(Path p) {
 		return p.getEndVertex();
 	}
-
 }
