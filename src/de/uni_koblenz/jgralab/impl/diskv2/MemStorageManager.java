@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 
 
 import java.rmi.RemoteException;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Stack;
 
 import de.uni_koblenz.jgralab.Edge;
@@ -29,7 +31,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	private GraphDatabaseBaseImpl graphdb;
 	
 	//the disk storage manager
-	private DiskStorageManager diskstore;
+	private DiskStorageManager diskStorage;
 	
 	//maximum number of entries in the vertex, edge and incidence caches
 	//if these are exceeded by the amount of entries of the respective cache,
@@ -69,8 +71,26 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 */
 	private CacheEntry<IncidenceImpl>[] incidenceCache;
 	
+	/**
+	 * The queue in which references to Incidence objects are put after
+	 * the garbage collector automatically deletes the referenced 
+	 * Incidence object
+	 */
+	//TODO: Change to a ReferenceQueue
+	private Queue<CacheEntry<IncidenceImpl>> incidenceQueue 
+		= new LinkedList<CacheEntry<IncidenceImpl>>();
+	
+	//TODO: Temporary method for testing, delete this eventually
+	public void nullIncidenceReference(int incidenceId){
+		CacheEntry<IncidenceImpl> iRef = getElement(incidenceCache, incidenceId, 
+				hash(incidenceId, incidenceMask));
+		iRef.delete(incidenceQueue);
+		
+		cleanupIncidenceCache();
+	}
+	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
-		diskstore = new DiskStorageManager(database);
+		diskStorage = new DiskStorageManager(database);
 		
 		//set log(2) of the cache sizes
 		vertexCacheExp = 21;
@@ -131,7 +151,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 	
 	/**
-	 * Retrieves an Incidence from the incidence cache
+	 * Retrieves an Incidence from the incidence cache. If it isn't
+	 * found in the cache, it loads the requested incidence from the 
+	 * disk, puts it back in the cache and then returns it.
 	 * 
 	 * @param id the id of the Incidence to be retrieved
 	 * @return the Incidence with the given id
@@ -139,7 +161,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public final Incidence getIncidenceObject(int id) {
 		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
-		if (entry == null) return null;
+		if (entry == null){
+			CacheEntry<IncidenceImpl> incRef = diskStorage.readIncidenceFromDisk(id);
+			if (incRef == null){
+				return null;
+			}
+			putElement(incRef, incidenceCache, hash(id, incidenceMask));
+			return incRef.get();
+		}
 		
 		return entry.get();
 	}
@@ -199,6 +228,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 */
 	public void putIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
+		
+		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker();
+		iTracker.fill(i);
+		
+		//diskStorage.writeIncidenceToDisk(iEntry);
 		
 		putElement(iEntry, incidenceCache, hash(i.hashCode(), incidenceMask));
 		
@@ -299,6 +333,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 			//set "next" pointer of the entry's predecessor to point at its successor
 			predecessor.setNext(current.getNext());
 		}
+	}
+	
+	public IncidenceTracker getIncidenceTracker(int incidenceId){
+		CacheEntry<IncidenceImpl> i = getElement
+				(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
+		return i.getOrCreateIncidenceTracker();
 	}
 	
 	//---- Methods to access other attributes of cached graph elements and incidences ----
@@ -621,6 +661,24 @@ public final class MemStorageManager implements RemoteStorageAccess {
 
 
 	// ---- Methods to manage the cache ----
+	
+	/**
+	 * Checks if any incidence objects have been deleted by the garbage collector.
+	 * If so, the attributes of these incidences are written to the disk (only if
+	 * the incidence hasn't been written to the disk before or if one of its attributes
+	 * was changed after the last time when it has been loaded from the disk) and
+	 * the CacheEntry that referenced the deleted object is removed from the cache.
+	 */
+	private void cleanupIncidenceCache(){
+		CacheEntry<IncidenceImpl> current = incidenceQueue.poll();
+		
+		while(current != null){
+			diskStorage.writeIncidenceToDisk(current);
+			removeElement(incidenceCache, current.getKey(), 
+					hash(current.getKey(), incidenceMask));
+			current = incidenceQueue.poll();
+		}
+	}
 	
 	/**
 	 * Tests the load factor of the vertex cache an does a rehashing if it exceeds 

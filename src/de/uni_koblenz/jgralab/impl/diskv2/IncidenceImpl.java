@@ -122,6 +122,11 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtVertex(long nextIncidenceId) {
 		this.nextIncidenceIdAtVertex = nextIncidenceId;
+		getTracker().putAttribute(nextIncidenceId, 12);
+	}
+	
+	public void restoreNextIncidenceIdAtVertex(long nextIncidenceId) {
+		this.nextIncidenceIdAtVertex = nextIncidenceId;
 	}
 
 	public long getNextIncidenceIdAtVertex() {
@@ -135,6 +140,11 @@ public abstract class IncidenceImpl implements Incidence {
 	private long previousIncidenceIdAtVertex;
 	
 	public void setPreviousIncidenceIdAtVertex(long previousIncidenceId) {
+		this.previousIncidenceIdAtVertex = previousIncidenceId;
+		getTracker().putAttribute(previousIncidenceId, 28);
+	}
+	
+	public void restorePreviousIncidenceIdAtVertex(long previousIncidenceId) {
 		this.previousIncidenceIdAtVertex = previousIncidenceId;
 	}
 	
@@ -159,6 +169,11 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtEdge(long nextIncidenceId) {
 		this.nextIncidenceIdAtEdge = nextIncidenceId;
+		getTracker().putAttribute(nextIncidenceId, 4);
+	}
+	
+	public void restoreNextIncidenceIdAtEdge(long nextIncidenceId) {
+		this.nextIncidenceIdAtEdge = nextIncidenceId;
 	}
 	
 	public long getNextIncidenceIdAtEdge() {
@@ -175,6 +190,11 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public void setPreviousIncidenceIdAtEdge(long previousIncidenceId) {
 		this.previousIncidenceIdAtEdge = previousIncidenceId;
+		getTracker().putAttribute(previousIncidenceId, 20);
+	}
+	
+	public void restorePreviousIncidenceIdAtEdge(long previousIncidenceId) {
+		this.previousIncidenceIdAtEdge = previousIncidenceId;
 	}
 	
 	public long getPreviousIncidenceIdAtEdge() {
@@ -183,28 +203,38 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	
 	public void setIncidentVertex(VertexImpl incidentVertex) {
-		this.incidentVertexId = incidentVertex.getGlobalId();
+		setIncidentVertexId(incidentVertex.getGlobalId());
+	}
+	
+	public void setIncidentVertexId(long vertexId) {
+		this.incidentVertexId = vertexId;
+		getTracker().putAttribute(vertexId, 44);
 	}
 
 	public void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
-		this.nextIncidenceIdAtVertex = nextIncidenceAtVertex.getGlobalId();
+		setNextIncidenceIdAtVertex(nextIncidenceAtVertex.getGlobalId());
 	}
 
 	public void setPreviousIncidenceAtVertex(
 			IncidenceImpl previousIncidenceAtVertex) {
-		this.previousIncidenceIdAtVertex = previousIncidenceAtVertex.getGlobalId();
+		setPreviousIncidenceIdAtVertex(previousIncidenceAtVertex.getGlobalId());
 	}
 
 	public void setIncidentEdge(EdgeImpl edgeImpl) {
-		this.incidentEdgeId = edgeImpl.getGlobalId();
+		setIncidentEdgeId(edgeImpl.getGlobalId());
+	}
+	
+	public void setIncidentEdgeId(long edgeId) {
+		this.incidentEdgeId = edgeId;
+		getTracker().putAttribute(edgeId, 36);
 	}
 
 	public void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {
-		this.nextIncidenceIdAtEdge = nextIncidenceAtEdge.getGlobalId();
+		setNextIncidenceIdAtEdge(nextIncidenceAtEdge.getGlobalId());
 	}
 
 	public void setPreviousIncidenceAtEdge(IncidenceImpl previousIncidenceAtEdge) {
-		this.previousIncidenceIdAtEdge = previousIncidenceAtEdge.getGlobalId();
+		setPreviousIncidenceIdAtEdge(previousIncidenceAtEdge.getGlobalId());
 	}
 
 	@Override
@@ -1012,6 +1042,12 @@ public abstract class IncidenceImpl implements Incidence {
 	@Override
 	public int hashCode() {
 		return getLocalId();
+	}
+	
+	public IncidenceTracker getTracker(){
+		MemStorageManager storage = (MemStorageManager) getStorage();
+		IncidenceTracker tracker = storage.getIncidenceTracker(getLocalId());
+		return tracker;
 	}
 
 	@Override
