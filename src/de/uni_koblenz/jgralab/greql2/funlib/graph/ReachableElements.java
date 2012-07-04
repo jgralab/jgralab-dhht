@@ -64,9 +64,7 @@ public class ReachableElements extends Function {
 		@SuppressWarnings("unchecked")
 		HashSet<GraphElement<?, ?, ?, ?>>[] markedElements = new HashSet[dfa.stateList
 				.size()];
-		// BitSet[] markedElements = new BitSet[dfa.stateList.size()];
 		for (State s : dfa.stateList) {
-			// markedElements[s.number] = new BitSet();
 			markedElements[s.number] = new HashSet<GraphElement<?, ?, ?, ?>>(
 					100);
 		}

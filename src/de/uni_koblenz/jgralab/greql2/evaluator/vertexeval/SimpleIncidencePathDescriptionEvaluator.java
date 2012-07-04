@@ -35,19 +35,22 @@ public class SimpleIncidencePathDescriptionEvaluator extends
 
 		SimpleIncidencePathDescription incVertex = (SimpleIncidencePathDescription) vertex;
 
-		// We need to get the restrictions
+		// We need to get the restrictions and translate them to a Set of
+		// Strings
+
 		Iterator<IsIncRestrOf> restrictions = incVertex.getAlphaEdges(
 				IsIncRestrOf.class).iterator();
-		IncidenceRestriction restriction = restrictions.hasNext() ? restrictions
-				.next().getAlpha() : null;
 		Set<String> roles = new HashSet<String>();
+		while (restrictions.hasNext()) {
+			IncidenceRestriction restriction = restrictions.next().getAlpha();
 
-		// And translate them to a Set of Strings
-		if (restriction != null) {
-			Iterator<IsIncTypeIdOf> incs = restriction.getIncidentEdges(
-					IsIncTypeIdOf.class).iterator();
-			while (incs != null && incs.hasNext()) {
-				roles.add(incs.next().getAlpha().get_name());
+			if (restriction != null) {
+				Iterator<IsIncTypeIdOf> incs = restriction.getIncidentEdges(
+						IsIncTypeIdOf.class).iterator();
+				while (incs != null && incs.hasNext()) {
+					String role = incs.next().getAlpha().get_name();
+					roles.add(role);
+				}
 			}
 		}
 

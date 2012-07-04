@@ -35,11 +35,12 @@ public class HyperPath {
 	public HyperPath reverse() {
 		PVector<GraphElement> es = JGraLab.vector();
 		PVector<Incidence> is = JGraLab.vector();
+		// Reverse order of the elements
 		for (int i = es.size() - 1; i >= 0; --i) {
 			es = es.plus(elements.get(i));
 		}
+		// Reverse order of the incidences
 		for (int i = is.size() - 1; i >= 0; --i) {
-			// TODO jtheegarten Create new incidence with reversed direction
 			is = is.plus(incidences.get(i));
 		}
 		return new HyperPath(es, is);

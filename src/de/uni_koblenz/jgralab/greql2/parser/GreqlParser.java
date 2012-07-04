@@ -1717,13 +1717,13 @@ public class GreqlParser extends ParserHelper {
 			predicateStart();
 			try {
 				match(TokenTypes.LCURLY);
-				parseTypeExpressionList();
+				parseRoleList();
 				match(TokenTypes.RCURLY);
 			} catch (ParsingException ex) {
 			}
 			if (predicateEnd()) {
 				match(TokenTypes.LCURLY);
-				List<VertexPosition<TypeId>> restr = parseTypeExpressionList();
+				List<VertexPosition<TypeId>> restr = parseRoleList();
 				match(TokenTypes.RCURLY);
 				if (!inPredicateMode()) {
 					for (VertexPosition<TypeId> restriction : restr) {
@@ -1739,6 +1739,47 @@ public class GreqlParser extends ParserHelper {
 			}
 		}
 		return result;
+	}
+
+	private List<VertexPosition<TypeId>> parseRoleList() {
+		List<VertexPosition<TypeId>> list = new ArrayList<VertexPosition<TypeId>>();
+
+		do {
+			int offset = getCurrentOffset();
+			TypeId t = parseRoleName();
+			int length = getLength(offset);
+			list.add(new VertexPosition<TypeId>(t, length, offset));
+			if (lookAhead(0) == TokenTypes.COLON) {
+				fail("COLON found in TypeId");
+			}
+		} while (tryMatch(TokenTypes.COMMA));
+		return list;
+	}
+
+	private TypeId parseRoleName() {
+		TypeId type = null;
+		if (!inPredicateMode()) {
+			type = graph.createTypeId();
+		}
+
+		String s = matchRoleName();
+		if (!inPredicateMode()) {
+			type.set_name(s);
+		}
+
+		return type;
+	}
+
+	private String matchRoleName() {
+		if (lookAhead(0) == TokenTypes.IDENTIFIER) {
+			String name = lookAhead.getValue();
+			if (isValidIdentifier(name)) {
+				match();
+				return name;
+			}
+		}
+		fail("expected role name, but found");
+		return null;
 	}
 
 	/**

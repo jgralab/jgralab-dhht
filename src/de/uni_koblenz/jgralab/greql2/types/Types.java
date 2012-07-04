@@ -31,7 +31,7 @@ public class Types {
 			TypeCollection.class, Enum.class, Record.class, Table.class,
 			Tuple.class, PVector.class, PSet.class, POrderedSet.class,
 			PCollection.class, PMap.class, AttributedElementClass.class,
-			FiniteAutomaton.class, Undefined.class };
+			FiniteAutomaton.class, HyperPath.class, Undefined.class };
 
 	private static final HashMap<Class<?>, String> typeNames;
 	private static final HashSet<Class<?>> types;

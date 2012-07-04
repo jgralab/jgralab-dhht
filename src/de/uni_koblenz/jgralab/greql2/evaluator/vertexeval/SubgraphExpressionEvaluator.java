@@ -119,7 +119,8 @@ public class SubgraphExpressionEvaluator extends
 		long iteratedCosts = ownCosts * getVariableCombinations(graphSize);
 		long subtree = subgraphDefinitionEval
 				.getCurrentSubtreeEvaluationCosts(graphSize)
-				+ constrainedExpressionEval.getCurrentSubtreeEvaluationCosts(graphSize)
+				+ constrainedExpressionEval
+						.getCurrentSubtreeEvaluationCosts(graphSize)
 				+ iteratedCosts;
 
 		return new VertexCosts(ownCosts, iteratedCosts, subtree);
@@ -128,6 +129,11 @@ public class SubgraphExpressionEvaluator extends
 	public SubgraphExpressionEvaluator(SubgraphExpression vertex,
 			GreqlEvaluator eval) {
 		super(eval);
+		SubgraphDefinition subDef = vertex
+				.getFirst_isSubgraphDefinitionOf_omega().getEdge()
+				.getFirst_subgraphDefinition().getVertex();
+		subgraphDefinitionEval = (SubgraphDefinitionEvaluator) vertexEvalMarker
+				.getMark(subDef);
 		this.vertex = vertex;
 	}
 
