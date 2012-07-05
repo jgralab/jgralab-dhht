@@ -1,12 +1,15 @@
 package de.uni_koblenz.jgralabtest.greql2;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.pcollections.ArrayPSet;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.Graph;
+import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphIO;
 import de.uni_koblenz.jgralab.GraphIOException;
 import de.uni_koblenz.jgralab.Vertex;
@@ -37,10 +40,10 @@ public class DHHTEvaluatorTest {
 	private static Edge[] edges = new Edge[2];
 
 	@BeforeClass
-	public static void setUpClass() {
+	public static void createGraph() {
 		try {
 			Schema schema = GraphIO
-					.loadSchemaFromFile("C:\\Users\\Jon\\git\\jgralab-dhht\\testit\\testschemas\\dhhttestschema2.tg");
+					.loadSchemaFromFile("C:\\Users\\Jon\\git\\jgralab-dhht\\testit\\testschemas\\dhhttestschema2.dhhtg");
 			// schema.compile(CodeGeneratorConfiguration.FULL);
 			schema.commit(CodeGeneratorConfiguration.FULL);
 			graph = DHHTTestGraphImpl.createDHHTTestGraphImpl(
@@ -91,13 +94,16 @@ public class DHHTEvaluatorTest {
 	}
 
 	@Test
-	public void testSimpleQueryEvaluation() {
+	public void testTextExampleEvaluation() {
 		GreqlEvaluator eval = new GreqlEvaluator(
 				"(kappa(1) : getVertex(1) -->{EdgeType2}  --> +>{incidence1, incidence2}+ [<+>{incidence3}])",
 				graph, null);
 		eval.startEvaluation();
 		Object result = eval.getResult();
 		assertNotNull(result);
-		System.out.println(result);
+		ArrayPSet<GraphElement<?, ?, ?, ?>> resultList = (ArrayPSet<GraphElement<?, ?, ?, ?>>) result;
+		assertTrue(resultList.contains(vertices[4]));
+		assertTrue(resultList.contains(edges[0]));
+		assertTrue(resultList.size() == 2);
 	}
 }
