@@ -3,6 +3,9 @@ package de.uni_koblenz.jgralabtest.greql2;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pcollections.ArrayPSet;
@@ -105,5 +108,84 @@ public class DHHTEvaluatorTest {
 		assertTrue(resultList.contains(vertices[4]));
 		assertTrue(resultList.contains(edges[0]));
 		assertTrue(resultList.size() == 2);
+	}
+
+	@Test
+	public void testSimpleIncidenceEvaluation() {
+		GreqlEvaluator eval = new GreqlEvaluator("getEdge(1) +>", graph, null);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		assertNotNull(result);
+		ArrayPSet<GraphElement<?, ?, ?, ?>> resultList = (ArrayPSet<GraphElement<?, ?, ?, ?>>) result;
+		assertTrue(resultList.size() == 4);
+		assertTrue(resultList.contains(vertices[2]));
+		assertTrue(resultList.contains(vertices[3]));
+		assertTrue(resultList.contains(vertices[4]));
+		assertTrue(resultList.contains(vertices[5]));
+	}
+
+	@Test
+	public void testSimpleIncidencePlusEvaluation() {
+		GreqlEvaluator eval = new GreqlEvaluator(
+				"(kappa(1) : getVertex(4) +>+)", graph, null);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		assertNotNull(result);
+		ArrayPSet<GraphElement<?, ?, ?, ?>> resultList = (ArrayPSet<GraphElement<?, ?, ?, ?>>) result;
+		assertTrue(resultList.size() == 4);
+		assertTrue(resultList.contains(edges[0]));
+		assertTrue(resultList.contains(vertices[3]));
+		assertTrue(resultList.contains(vertices[4]));
+		assertTrue(resultList.contains(vertices[2]));
+		assertTrue(!resultList.contains(vertices[5]));
+	}
+
+	@Test
+	public void testLocalSubgraphExpression() {
+		GreqlEvaluator eval = new GreqlEvaluator("(local : getVertex(3) -->)",
+				graph, null);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		ArrayPSet<GraphElement<?, ?, ?, ?>> resultList = (ArrayPSet<GraphElement<?, ?, ?, ?>>) result;
+		assertTrue(resultList.size() == 4);
+		assertTrue(resultList.contains(vertices[2]));
+		assertTrue(resultList.contains(vertices[3]));
+		assertTrue(resultList.contains(vertices[4]));
+		assertTrue(resultList.contains(vertices[5]));
+	}
+
+	@Test
+	public void testNestedSubgraphExpression() {
+		GreqlEvaluator eval = new GreqlEvaluator(
+				"(subgraph(getVertex(2)) : getEdge(1) +> <+>)", graph, null);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		ArrayPSet<GraphElement<?, ?, ?, ?>> resultList = (ArrayPSet<GraphElement<?, ?, ?, ?>>) result;
+		assertTrue(resultList.size() == 1);
+		assertTrue(resultList.contains(edges[0]));
+	}
+
+	@Test
+	public void testIsReachable1() {
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("v1", vertices[0]);
+		variables.put("v2", vertices[5]);
+		GreqlEvaluator eval = new GreqlEvaluator(
+				"getVertex(1) +>+ getVertex(2)", graph, variables);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		assertTrue(!((Boolean) result));
+	}
+
+	@Test
+	public void testIsReachable2() {
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("v1", vertices[0]);
+		variables.put("v2", vertices[5]);
+		GreqlEvaluator eval = new GreqlEvaluator(
+				"getVertex(1) +>+ getVertex(6)", graph, variables);
+		eval.startEvaluation();
+		Object result = eval.getResult();
+		assertTrue((Boolean) result);
 	}
 }

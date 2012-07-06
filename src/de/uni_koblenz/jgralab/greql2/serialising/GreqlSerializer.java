@@ -69,6 +69,8 @@ import de.uni_koblenz.jgralab.greql2.schema.Greql2Expression;
 import de.uni_koblenz.jgralab.greql2.schema.Greql2Vertex;
 import de.uni_koblenz.jgralab.greql2.schema.GreqlSyntaxGraph;
 import de.uni_koblenz.jgralab.greql2.schema.Identifier;
+import de.uni_koblenz.jgralab.greql2.schema.IncDirection;
+import de.uni_koblenz.jgralab.greql2.schema.IncidenceDirection;
 import de.uni_koblenz.jgralab.greql2.schema.IntLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.IntermediateVertexPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.IsDeclaredVarOf_isDeclaredVarOf_omega;
@@ -95,6 +97,8 @@ import de.uni_koblenz.jgralab.greql2.schema.SequentialPathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.SetComprehension;
 import de.uni_koblenz.jgralab.greql2.schema.SetConstruction;
 import de.uni_koblenz.jgralab.greql2.schema.SimpleDeclaration;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleEdgePathDescription;
+import de.uni_koblenz.jgralab.greql2.schema.SimpleIncidencePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.SimplePathDescription;
 import de.uni_koblenz.jgralab.greql2.schema.StringLiteral;
 import de.uni_koblenz.jgralab.greql2.schema.SubgraphDefinition;
@@ -588,6 +592,35 @@ public class GreqlSerializer {
 	}
 
 	private void serializeSimplePathDescription(SimplePathDescription exp) {
+		if (exp instanceof SimpleEdgePathDescription) {
+			serializeSimpleEdgePathDescirption((SimpleEdgePathDescription) exp);
+		} else if (exp instanceof SimpleIncidencePathDescription) {
+			serializeSimpleIncidencePathDescription((SimpleIncidencePathDescription) exp);
+		}
+	}
+
+	private void serializeSimpleIncidencePathDescription(
+			SimpleIncidencePathDescription exp) {
+		IncDirection dir = ((IncidenceDirection) exp
+				.getFirst_isIncDirOf_omega().getThat()).get_dir();
+		switch (dir) {
+		case IN: {
+			sb.append("<+");
+			break;
+		}
+		case OUT: {
+			sb.append("+>");
+			break;
+		}
+		case BOTH: {
+			sb.append("<+>");
+			break;
+		}
+		}
+	}
+
+	private void serializeSimpleEdgePathDescirption(
+			SimpleEdgePathDescription exp) {
 		String dir = ((EdgeDirection) exp.getFirst_isEdgeDirOf_omega()
 				.getThat()).get_dirValue();
 		if (dir.equals("out")) {

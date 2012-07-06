@@ -726,7 +726,7 @@ public class GreqlParser extends ParserHelper {
 		if (tryMatch(TokenTypes.LPAREN)) {
 
 			if (lookAhead(0) == TokenTypes.IDENTIFIER) {
-				Identifier id = parseIdentifier();
+				Expression id = parseExpression();
 				if (!inPredicateMode()) {
 					nestedDefinition = graph.createNestedSubgraphDefinition();
 					IsExprOfNestedSubgraphDefinition idOf = graph
