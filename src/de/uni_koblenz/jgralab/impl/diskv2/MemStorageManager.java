@@ -229,11 +229,12 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public void putIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
 		
-		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker();
-		iTracker.fill(i);
+		//this method isn't called when incidences are read from the disk
+		//so we know that the incidence has been newly created
+		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker(i);
 		
 		//diskStorage.writeIncidenceToDisk(iEntry);
-		
+		/** Only one of the lines above and below this comment may be executed */
 		putElement(iEntry, incidenceCache, hash(i.hashCode(), incidenceMask));
 		
 		incidenceCacheEntries++;
@@ -336,9 +337,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	}
 	
 	public IncidenceTracker getIncidenceTracker(int incidenceId){
-		CacheEntry<IncidenceImpl> i = getElement
+		CacheEntry<IncidenceImpl> iEntry = getElement
 				(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
-		return i.getOrCreateIncidenceTracker();
+		return iEntry.getOrCreateIncidenceTracker(iEntry.get());
 	}
 	
 	//---- Methods to access other attributes of cached graph elements and incidences ----

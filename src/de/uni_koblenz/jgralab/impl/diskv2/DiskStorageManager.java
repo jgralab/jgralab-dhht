@@ -11,6 +11,9 @@ import de.uni_koblenz.jgralab.schema.Schema;
 
 public class DiskStorageManager {
 	
+	//TODO: For debugging purposes
+	boolean LOG = true;
+		
 	private HashMap<String, GraphElementProfile> profiles;
 	
 	private GraphDatabaseBaseImpl graphdb;
@@ -27,16 +30,19 @@ public class DiskStorageManager {
 	 * @param incidenceRef - The Reference to the Incidence that is written out.
 	 */
 	public void writeIncidenceToDisk(CacheEntry<IncidenceImpl> incidenceRef){
+		if (LOG) System.out.print("Request to externalize Incidence #" + incidenceRef.getKey() + " - ");
 		Tracker tracker = incidenceRef.getTracker();
 		
 		if (tracker == null) {
+			if (LOG) System.out.println("Nothing to do");
 			//incidence is neither new nor has it been changed since its last reload
 			return;
 		}
 		
-		ByteBuffer attributes = tracker.getAttributes();
+		if (LOG) System.out.println("Writing it to the disk");
+		ByteBuffer attributes = tracker.getVariables();
 		
-		FileAccess file = FileAccess.getFileAccess("incidences");
+		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
 		file.write(attributes, incidenceRef.getKey() * 52);
 	}
 	
@@ -49,7 +55,9 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored incidence
 	 */
 	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){
-		FileAccess file = FileAccess.getFileAccess("incidences");
+		if (LOG) System.out.println("Request to read Incidence #" + key);
+		
+		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
 		ByteBuffer buf = file.read(52, key * 52);
 		
 		buf.position(0);

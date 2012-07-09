@@ -122,7 +122,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtVertex(long nextIncidenceId) {
 		this.nextIncidenceIdAtVertex = nextIncidenceId;
-		getTracker().putAttribute(nextIncidenceId, 12);
+		getTracker().putVariable(nextIncidenceId, 12);
 	}
 	
 	public void restoreNextIncidenceIdAtVertex(long nextIncidenceId) {
@@ -141,7 +141,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setPreviousIncidenceIdAtVertex(long previousIncidenceId) {
 		this.previousIncidenceIdAtVertex = previousIncidenceId;
-		getTracker().putAttribute(previousIncidenceId, 28);
+		getTracker().putVariable(previousIncidenceId, 28);
 	}
 	
 	public void restorePreviousIncidenceIdAtVertex(long previousIncidenceId) {
@@ -169,7 +169,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setNextIncidenceIdAtEdge(long nextIncidenceId) {
 		this.nextIncidenceIdAtEdge = nextIncidenceId;
-		getTracker().putAttribute(nextIncidenceId, 4);
+		getTracker().putVariable(nextIncidenceId, 4);
 	}
 	
 	public void restoreNextIncidenceIdAtEdge(long nextIncidenceId) {
@@ -190,7 +190,7 @@ public abstract class IncidenceImpl implements Incidence {
 
 	public void setPreviousIncidenceIdAtEdge(long previousIncidenceId) {
 		this.previousIncidenceIdAtEdge = previousIncidenceId;
-		getTracker().putAttribute(previousIncidenceId, 20);
+		getTracker().putVariable(previousIncidenceId, 20);
 	}
 	
 	public void restorePreviousIncidenceIdAtEdge(long previousIncidenceId) {
@@ -208,7 +208,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setIncidentVertexId(long vertexId) {
 		this.incidentVertexId = vertexId;
-		getTracker().putAttribute(vertexId, 44);
+		getTracker().putVariable(vertexId, 44);
 	}
 
 	public void setNextIncidenceAtVertex(IncidenceImpl nextIncidenceAtVertex) {
@@ -226,7 +226,7 @@ public abstract class IncidenceImpl implements Incidence {
 	
 	public void setIncidentEdgeId(long edgeId) {
 		this.incidentEdgeId = edgeId;
-		getTracker().putAttribute(edgeId, 36);
+		getTracker().putVariable(edgeId, 36);
 	}
 
 	public void setNextIncidenceAtEdge(IncidenceImpl nextIncidenceAtEdge) {

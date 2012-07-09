@@ -28,9 +28,11 @@ public class CacheEntry<V>{
 		key = value.hashCode();
 	}
 	
-	public IncidenceTracker getOrCreateIncidenceTracker(){
+	public IncidenceTracker getOrCreateIncidenceTracker(IncidenceImpl inc){
 		if (tracker == null){
-			tracker = new IncidenceTracker();
+			IncidenceTracker incTracker = new IncidenceTracker();
+			incTracker.fill(inc);
+			this.tracker = incTracker;
 		}
 		
 		return (IncidenceTracker) tracker;
@@ -45,8 +47,8 @@ public class CacheEntry<V>{
 	}
 	
 	//TODO: Temporary method for testing, delete this eventually
-	public <V> void delete(Queue<CacheEntry<V>> queue){
-		queue.add((CacheEntry<V>) this);
+	public void delete(Queue<CacheEntry<V>> queue){
+		queue.add(this);
 		value = null;
 	}
 	

@@ -34,16 +34,19 @@ public abstract class Tracker {
 	 * 44 - incidentVertexId
 	 * 
 	 * For a GraphElement, the indexes are:
-	 *  0 - nextElementId
-	 *  8 - previousElementId
-	 * 16 - firstIncidenceId
-	 * 24 - lastIncidenceId
-	 * 32 - incidenceListVersion
-	 * 40 - SigmaId
-	 * 48 - subOrdianteGraphId
-	 * 56 - kappa
+	 *  0 - VertexClassId or EdgeClassId
+	 *  4 - nextElementId
+	 * 12  - previousElementId
+	 * 20 - firstIncidenceId
+	 * 28 - lastIncidenceId
+	 * 36 - incidenceListVersion
+	 * 44 - SigmaId
+	 * 52 - subOrdianteGraphId
+	 * 60 - kappa
+	 * 
+	 * Generated attributes start at the 64th bit.
 	 */
-	protected ByteBuffer attributes;
+	protected ByteBuffer variables;
 	
 	/**
 	 * Creates a new Tracker.
@@ -51,7 +54,7 @@ public abstract class Tracker {
 	 * @param size - The accumulated size of all the attributes that are be tracked.
 	 */
 	protected Tracker(int size){
-		attributes = ByteBuffer.allocate(size);
+		variables = ByteBuffer.allocate(size);
 	}
 	
 	/**
@@ -60,14 +63,14 @@ public abstract class Tracker {
 	 * @param attribute - the attribute to be tracked
 	 * @param index - the position at which the tracked attribute is stored
 	 */
-	public void putAttribute(long attribute, int index){
-		attributes.putLong(index, attribute);
+	public void putVariable(long attribute, int index){
+		variables.putLong(index, attribute);
 	}
 	
 	/**
 	 * Method to access the ByteBuffer.
 	 */
-	public ByteBuffer getAttributes(){
-		return attributes;
+	public ByteBuffer getVariables(){
+		return variables;
 	}
 }

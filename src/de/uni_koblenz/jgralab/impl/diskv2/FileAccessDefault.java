@@ -26,7 +26,7 @@ public class FileAccessDefault extends FileAccess{
 	/**
 	 * The size of the area of the file that is mapped into memory, in bytes.
 	 */
-	private static final int FILE_AREA = 1024;
+	private static final int FILE_AREA = 1048576;
 	
 	/**
 	 * Denotes the first byte of the access window.

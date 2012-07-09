@@ -26,13 +26,13 @@ public class IncidenceTracker extends Tracker{
 	 */
 	public void fill(IncidenceImpl inc){
 		int typeId = inc.getType().getId();
-		attributes.putInt(0, (typeId + 1));
+		variables.putInt(0, (typeId + 1));
 		
-		putAttribute(inc.getNextIncidenceIdAtEdge(), 4);
-		putAttribute(inc.getNextIncidenceIdAtVertex(), 12);
-		putAttribute(inc.getPreviousIncidenceIdAtEdge(), 20);
-		putAttribute(inc.getPreviousIncidenceIdAtVertex(), 28);
-		putAttribute(inc.getIncidentEdgeId(), 36);
-		putAttribute(inc.getIncidentVertexId(), 44);
+		putVariable(inc.getNextIncidenceIdAtEdge(), 4);
+		putVariable(inc.getNextIncidenceIdAtVertex(), 12);
+		putVariable(inc.getPreviousIncidenceIdAtEdge(), 20);
+		putVariable(inc.getPreviousIncidenceIdAtVertex(), 28);
+		putVariable(inc.getIncidentEdgeId(), 36);
+		putVariable(inc.getIncidentVertexId(), 44);
 	}
 }

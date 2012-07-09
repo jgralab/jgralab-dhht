@@ -47,7 +47,7 @@ public abstract class FileAccess {
 	 *        The name of the file to access. The suffix ".dst" is added internally. 
 	 * @return An access to the named file. 
 	 */
-	public static FileAccess getFileAccess(String filename){
+	public static FileAccess getOrCreateFileAccess(String filename){
 		FileAccess file = files.get(filename);
 		
 		if (file != null) return file;
