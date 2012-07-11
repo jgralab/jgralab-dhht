@@ -13,14 +13,15 @@ import java.nio.ByteBuffer;
 public abstract class Tracker {
 
 	/**
-	 * A buffer used to track the attributes of a graph object. This is used to 
-	 * track the attributes that are the same for every Incidence or every 
-	 * GraphElement, i.e. the attributes that are not declared in the generated code.
+	 * A buffer used to track the variables of a GraphElement or Incidence
+	 * It is used to track the attributes that are the same for every Incidence or
+	 * every GraphElement, i.e. the variables that are not declared in the 
+	 * generated code. The ClassId of each object is also stored here.
 	 * 
 	 * If the tracked object is an Incidence, this Buffer holds six values of type
-	 * long and its size is 48 Bytes. If the tracked object is a GraphElement, it holds
+	 * long and its size is 52 Bytes. If the tracked object is a GraphElement, it holds
 	 * seven values of type long and one value of type int, which means its size 
-	 * is 60 Bytes.
+	 * is 64 Bytes.
 	 * 
 	 * Every index in the buffer is reserved for a specific attribute.
 	 * 
@@ -36,15 +37,13 @@ public abstract class Tracker {
 	 * For a GraphElement, the indexes are:
 	 *  0 - VertexClassId or EdgeClassId
 	 *  4 - nextElementId
-	 * 12  - previousElementId
+	 * 12 - previousElementId
 	 * 20 - firstIncidenceId
 	 * 28 - lastIncidenceId
 	 * 36 - incidenceListVersion
 	 * 44 - SigmaId
 	 * 52 - subOrdianteGraphId
 	 * 60 - kappa
-	 * 
-	 * Generated attributes start at the 64th bit.
 	 */
 	protected ByteBuffer variables;
 	
@@ -63,14 +62,12 @@ public abstract class Tracker {
 	 * @param attribute - the attribute to be tracked
 	 * @param index - the position at which the tracked attribute is stored
 	 */
-	public void putVariable(long attribute, int index){
+	public void putVariable(int index, long attribute){
 		variables.putLong(index, attribute);
 	}
 	
 	/**
 	 * Method to access the ByteBuffer.
 	 */
-	public ByteBuffer getVariables(){
-		return variables;
-	}
+	public abstract ByteBuffer getVariables();
 }

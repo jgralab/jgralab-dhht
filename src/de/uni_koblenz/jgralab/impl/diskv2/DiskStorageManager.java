@@ -6,21 +6,82 @@ import java.util.HashMap;
 import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
+import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class DiskStorageManager {
 	
-	//TODO: For debugging purposes
+	//TODO: For testing purposes, delete eventually
 	boolean LOG = true;
-		
-	private HashMap<String, GraphElementProfile> profiles;
+	int deletedVertices;
+	int restoredVertices;
+	int deletedEdges;
+	int restoredEdges;
+	int deletedIncidences;
+	int restoredIncidences;
 	
 	private GraphDatabaseBaseImpl graphdb;
 	
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
-		profiles = new HashMap<String, GraphElementProfile>();
 		this.graphdb = graphdb;
+		
+		//TODO: For testing purposes, delete eventually
+		deletedVertices = 0;
+		restoredVertices = 0;
+		deletedEdges = 0;
+		restoredEdges = 0;
+		deletedIncidences = 0;
+		restoredIncidences = 0;
+	}
+	
+	//TODO: testing
+	public void printStats(){
+		System.out.println("Deleted  Incidences: " + deletedIncidences);
+		System.out.println("Restored Incidences: " + restoredIncidences);
+	}
+	
+	/**
+	 * Writes a Graph Element to the disk if it has been newly created, or if it has
+	 * been changed since the last time it was loaded from the disk.
+	 * 
+	 * @param geRef - The Reference to the GraphElement that is written out.
+	 */
+	public void writeVertexToDisk(CacheEntry<VertexImpl> vRef){
+		Tracker tracker = vRef.getTracker();
+		if (LOG) deletedVertices++;
+		
+		if (tracker == null) {
+			//incidence is neither new nor has it been changed since its last reload
+			return;
+		}
+
+		ByteBuffer attributes = tracker.getVariables();
+		
+		FileAccess file = FileAccess.getOrCreateFileAccess("vertices");
+		file.write(attributes, vRef.getKey() * 101);
+	}
+	
+	/**
+	 * Reads a vertex from the disk and restores it.
+	 *  
+	 * @param key
+	 *        The local id of the vertex
+	 * @return
+	 *        A soft reference to the restored vertex
+	 */
+	public CacheEntry<VertexImpl> readVertexFromDisk(int key){
+		if (LOG) restoredVertices++;
+		
+		FileAccess file = FileAccess.getOrCreateFileAccess("vertices");
+		ByteBuffer buf = file.read(101, key * 101);
+		
+		buf.position(0);
+		
+		VertexImpl ver = restoreVertex(buf, key);
+		
+		return new CacheEntry<VertexImpl>(ver);
 	}
 	
 	/**
@@ -30,16 +91,14 @@ public class DiskStorageManager {
 	 * @param incidenceRef - The Reference to the Incidence that is written out.
 	 */
 	public void writeIncidenceToDisk(CacheEntry<IncidenceImpl> incidenceRef){
-		if (LOG) System.out.print("Request to externalize Incidence #" + incidenceRef.getKey() + " - ");
 		Tracker tracker = incidenceRef.getTracker();
+		if (LOG) deletedIncidences++;
 		
 		if (tracker == null) {
-			if (LOG) System.out.println("Nothing to do");
 			//incidence is neither new nor has it been changed since its last reload
 			return;
 		}
-		
-		if (LOG) System.out.println("Writing it to the disk");
+
 		ByteBuffer attributes = tracker.getVariables();
 		
 		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
@@ -55,7 +114,7 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored incidence
 	 */
 	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){
-		if (LOG) System.out.println("Request to read Incidence #" + key);
+		if (LOG) restoredIncidences++;
 		
 		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
 		ByteBuffer buf = file.read(52, key * 52);
@@ -68,10 +127,48 @@ public class DiskStorageManager {
 	}
 	
 	/**
+	 * Restores a Vertex using the data provided by a ByteBuffer.
+	 * 
+	 * @param buf
+	 *        The ByteBuffer holding the Vertex' variables
+	 * @param key
+	 *        The Vertex' id
+	 * @return
+	 *        The restored Vertex
+	 */
+	public VertexImpl restoreVertex(ByteBuffer buf, int key){
+		int typeId = buf.getInt(0) - 1;
+		
+		Schema schema = graphdb.getSchema();
+		
+		VertexClass verClass = (VertexClass) schema
+				.getTypeForId(typeId);
+		Class<? extends Vertex> m1Class = verClass.getM1Class();
+		
+		long longId = graphdb.convertToGlobalId(key);
+		
+		GraphFactory factory = graphdb.getGraphFactory();
+		
+		VertexImpl ver = (VertexImpl) factory
+				.createVertex_Diskv2BasedStorage(m1Class, longId, graphdb);
+		
+		ver.restoreNextElementId(buf.getLong(4));
+		ver.restorePreviousElementId(buf.getLong(12));
+		ver.restoreFirstIncidenceId(buf.getLong(20));
+		ver.restoreLastIncidenceId(buf.getLong(28));
+		ver.restoreIncidenceListVersion(buf.getLong(36));
+		ver.restoreSigmaId(buf.getLong(44));
+		ver.restoreSubOrdianteGraphId(buf.getLong(52));
+		ver.restoreKappa(buf.getInt(60));
+
+		return ver;
+	}
+	
+	/**
 	 * Restores an Incidence using the data provided by a ByteBuffer.
 	 * 
 	 * @param buf
-	 *        The ByteBuffer holding the Incidence's attributes
+	 *        The ByteBuffer holding the Incidence's variables
 	 * @param key
 	 *        The Incidence's id
 	 * @return
@@ -102,18 +199,6 @@ public class DiskStorageManager {
 		inc.restorePreviousIncidenceIdAtVertex(buf.getLong(28));
 
 		return inc;
-	}
-	
-	public GraphElementProfile getGraphElementProfile(GraphElement<?,?,?,?> ge){
-		String className = ge.getClass().getName();
-		GraphElementProfile profile = profiles.get(className);
-		
-		if (profile == null){
-			profile = new GraphElementProfile(ge.getClass());
-			profiles.put(className, profile);
-		}
-		
-		return profile;
 	}
 
 }

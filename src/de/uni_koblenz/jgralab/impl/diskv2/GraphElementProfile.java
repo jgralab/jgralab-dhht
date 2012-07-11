@@ -3,6 +3,8 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.GraphElement;
@@ -18,6 +20,20 @@ import de.uni_koblenz.jgralab.GraphElement;
  *
  */
 public class GraphElementProfile {
+	
+	private static HashMap<Class<?>, GraphElementProfile> profiles
+		= new HashMap<Class<?>, GraphElementProfile>();
+	
+	/**
+	 * The size that the profiled GraphElement needs on the disk.
+	 * This includes variables, like kappa and firstIncidenceId,
+	 * as well as all generated attributes that are of primitive types.
+	 * 
+	 * For Strings and Lists, 8 Bytes are needed to store the position
+	 * where the actual String or List can be found.
+	 */
+	private int size;
+	
 	/**
 	 * Array holding the type IDs of the generated attributes
 	 * Each ID corresponds to a type. The table is:
@@ -29,6 +45,11 @@ public class GraphElementProfile {
 	 * 5 -> List
 	 */
 	private byte[] attrTypeIDs;
+	
+	/**
+	 * Hold the indexes at which the Attributes must be saved in the Tracker
+	 */
+	private int[] indexes;
 	
 	/**
 	 * Array holding the get methods for every generated attribute
@@ -51,10 +72,78 @@ public class GraphElementProfile {
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	public GraphElementProfile(Class<?> cls){
+	private GraphElementProfile(Class<?> cls){
 		String[] attrNames = detectAttributes(cls);
 		detectGetters(cls, attrNames);
 		detectSetters(cls, attrNames);
+		detectIndexes();
+	}
+	
+	public static GraphElementProfile getOrCreateProfile(GraphElement<?,?,?,?> ge){
+		Class<?> cls = ge.getClass();
+		GraphElementProfile profile = profiles.get(cls);
+		
+		if (profile == null){
+			profile = new GraphElementProfile(cls);
+			profiles.put(cls, profile);
+		}
+		
+		return profile;
+	}
+	
+	/**
+	 * Returns a byte array containing the primitive attributes of a GraphElement
+	 * as well as information where its Strings and Lists are stored.
+	 * 
+	 * @param ge - The GraphElement whose attributes are written to the buffer
+	 * 
+	 * @return - A byte array containing the given GraphElement's attributes
+	 */
+	public ByteBuffer getAttributesForElement(GraphElement<?,?,?,?> ge){
+		ByteBuffer buf = ByteBuffer.allocate(size);
+		for (int i = 0; i < attrTypeIDs.length; i++){
+			switch (attrTypeIDs[i]){
+				case 0: 
+					if (invokeGetBoolean(ge, i))
+						buf.put((byte) 1);
+					else buf.put((byte) 0);
+					break;
+				case 1:
+					buf.putInt(invokeGetInteger(ge, i));
+					break;
+				case 2:
+					buf.putLong(invokeGetLong(ge, i));
+					break;
+				case 3:
+					buf.putDouble(invokeGetDouble(ge, i));
+					break;
+			}
+		}
+		
+		return buf;
+	}
+	
+	public void restoreAttributesOfElement(GraphElement<?,?,?,?> ge, ByteBuffer buf){
+		buf.position(0);
+		
+		for (int i = 0; i < attrTypeIDs.length; i++){
+			switch (attrTypeIDs[i]){
+				case 0: 
+					if (buf.get() == 1)
+						invokeSetBoolean(ge, true, i);
+					else invokeSetBoolean(ge, false, i);
+					break;
+				case 1:
+					invokeSetInteger(ge, buf.getInt(), i);
+					break;
+				case 2:
+					invokeSetLong(ge, buf.getLong(), i);
+					break;
+				case 3:
+					invokeSetDouble(ge, buf.getDouble(), i);
+					break;
+			}
+		}
 	}
 	
 	/**
@@ -64,6 +153,7 @@ public class GraphElementProfile {
 	 */
 	private void initArrays(int length){
 		attrTypeIDs = new byte[length];
+		indexes = new int[length];
 		getters = new Method[length];
 		setters = new Method[length];
 	}
@@ -156,6 +246,24 @@ public class GraphElementProfile {
 		}
 	}
 	
+	/**
+	 * Detects the indexes at which the attributes need to be stored in the
+	 * Tracker.
+	 */
+	private void detectIndexes(){
+		int currentIndex = 0;
+		for (int i = 0; i < attrTypeIDs.length; i++){
+			indexes[i] = currentIndex;
+			currentIndex++;
+			if (attrTypeIDs[i] > 0){
+				currentIndex += 3;
+				if (attrTypeIDs[i] > 1){
+					currentIndex += 4;
+				}
+			}
+		}
+		size = currentIndex;
+	}
 	/**
 	 * Helper method to obtain a set method for an attribute of type boolean.
 	 */
@@ -251,7 +359,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetBoolean(GraphElement<?,?,?,?> ge, boolean argument, int position){
+	private void invokeSetBoolean(GraphElement<?,?,?,?> ge, boolean argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -272,7 +380,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetInteger(GraphElement<?,?,?,?> ge, int argument, int position){
+	private void invokeSetInteger(GraphElement<?,?,?,?> ge, int argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -293,7 +401,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetLong(GraphElement<?,?,?,?> ge, long argument, int position){
+	private void invokeSetLong(GraphElement<?,?,?,?> ge, long argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -314,7 +422,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetDouble(GraphElement<?,?,?,?> ge, double argument, int position){
+	private void invokeSetDouble(GraphElement<?,?,?,?> ge, double argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -335,7 +443,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetString(GraphElement<?,?,?,?> ge, String argument, int position){
+	private void invokeSetString(GraphElement<?,?,?,?> ge, String argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -356,7 +464,7 @@ public class GraphElementProfile {
 	 *                   array 'setters'. The type of this method's argument must be the same as the 
 	 *                   type of the argument passed to this method.
 	 */
-	public void invokeSetList(GraphElement<?,?,?,?> ge, List<?> argument, int position){
+	private void invokeSetList(GraphElement<?,?,?,?> ge, List<?> argument, int position){
 		try {
 			setters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
@@ -376,7 +484,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public boolean invokeGetBoolean(GraphElement<?,?,?,?> ge, int position){
+	private boolean invokeGetBoolean(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (Boolean) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -396,7 +504,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public int invokeGetInteger(GraphElement<?,?,?,?> ge, int position){
+	private int invokeGetInteger(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (Integer) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -416,7 +524,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public long invokeGetLong(GraphElement<?,?,?,?> ge, int position){
+	private long invokeGetLong(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (Long) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -436,7 +544,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public double invokeGetDouble(GraphElement<?,?,?,?> ge, int position){
+	private double invokeGetDouble(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (Double) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -456,7 +564,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public String invokeGetString(GraphElement<?,?,?,?> ge, int position){
+	private String invokeGetString(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (String) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -476,7 +584,7 @@ public class GraphElementProfile {
 	 *                   array 'getters'. The invoked method's return type must be the same as the 
 	 *                   return type of this method.
 	 */
-	public List<?> invokeGetList(GraphElement<?,?,?,?> ge, int position){
+	private List<?> invokeGetList(GraphElement<?,?,?,?> ge, int position){
 		try {
 			return (List<?>) getters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
@@ -504,7 +612,8 @@ public class GraphElementProfile {
 	}
 	
 	/**
-	 * Helper method to returns the name of a type for a given type ID. Used to
+	 * Helper method to return the name of the
+	 *  type for a given type ID. Used to
 	 * output a profile in a human-readable form.
 	 */
 	private String getTypeName(byte typeID){
@@ -521,11 +630,12 @@ public class GraphElementProfile {
 	
 	@Override
 	public String toString(){
-		String output = "";
+		String output = "Size: " + Integer.toString(size) + "Bytes\n";
 		for (int i = 0; i < attrTypeIDs.length; i++){
-			output += getTypeName(attrTypeIDs[i]) + " ";
+			output += "Type:   " + getTypeName(attrTypeIDs[i]) + "\n";
 			output += "Getter: " + getters[i].getName() + "\n";
-			output += "Setter: " + setters[i].getName() + "\n\n";
+			output += "Setter: " + setters[i].getName() + "\n";
+			output += "Index : " + Integer.toString(indexes[i]) + "\n\n";
 		}
 		return output;
 	}

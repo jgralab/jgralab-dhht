@@ -74,6 +74,33 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * The id of this {@link GraphElement}.
 	 */
 	protected long id;
+	
+	/**
+	 * Get the Tracker for this GraphElement
+	 * 
+	 * @return The Tracker that tracks this GraphElement
+	 */
+	public GraphElementTracker getTracker(){
+		MemStorageManager storage = (MemStorageManager) getStorage();
+		//FIXME: workaround, using "this instanceof Vertex" in the if clause causes the build to fail
+		GraphElement ge = (GraphElement) this;
+		if(ge instanceof Vertex){
+			System.out.print("eat ");
+			return storage.getVertexTracker(getLocalId());
+		}
+		System.out.print("pizza!");
+		return storage.getEdgeTracker(getLocalId());
+	}
+	
+	/**
+	 * Called whenever an attribute of this GraphElement changed so the
+	 * new attribute value is stored in the Tracker.
+	 */
+	public void attributeChanged() {
+		getTracker();
+	}
+	
+	
 
 	/**
 	 * Holds the version of the {@link Incidence} structure, for every
@@ -86,6 +113,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	
 	public void increaseIncidenceListVersion() {
 		incidenceListVersion++;
+		getTracker().putVariable(36, incidenceListVersion);
 	}
 	
 	protected long firstIncidenceId;
@@ -94,6 +122,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	
 	public void setFirstIncidenceId(long incidenceId) {
 		this.firstIncidenceId = incidenceId;
+		getTracker().putVariable(20, incidenceId);
+	}
+	
+	public void restoreFirstIncidenceId(long incidenceId) {
+		this.firstIncidenceId = incidenceId;
 	}
 	
 	public long getFirstIncidenceId() {
@@ -101,6 +134,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	}
 	
 	public void setLastIncidenceId(long incidenceId) {
+		this.lastIncidenceId = incidenceId;
+		getTracker().putVariable(28, incidenceId);
+	}
+	
+	public void restoreLastIncidenceId(long incidenceId) {
 		this.lastIncidenceId = incidenceId;
 	}
 	
@@ -131,11 +169,23 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * The subordinate graph nested in this graph 
 	 */
 	protected long subOrdinateGraphId;
-
+	
+	public long getSubOrdinateGraphId(){
+		return subOrdinateGraphId;
+	}
+	
+	public final void restoreSubOrdianteGraphId(long graphId){
+		this.subOrdinateGraphId = graphId;
+	}
 	
 	protected long nextElementId;
 	
 	public void setNextElementId(long nextElemId) {
+		this.nextElementId = nextElemId;
+		getTracker().putVariable(4, nextElementId);
+	}
+	
+	public void restoreNextElementId(long nextElemId) {
 		this.nextElementId = nextElemId;
 	}
 	
@@ -146,6 +196,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	protected long previousElementId;
 	
 	public void setPreviousElementId(long previousElemId) {
+		this.previousElementId = previousElemId;
+		getTracker().putVariable(12, previousElementId);
+	}
+	
+	public void restorePreviousElementId(long previousElemId) {
 		this.previousElementId = previousElemId;
 	}
 	
@@ -186,6 +241,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	}
 	
 	public void setSigmaId(long newSigmaId) {
+		sigmaId = newSigmaId;
+		getTracker().putVariable(44, newSigmaId);
+	}
+	
+	public void restoreSigmaId(long newSigmaId) {
 		sigmaId = newSigmaId;
 	}
 
@@ -324,6 +384,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 *            long
 	 */
 	protected final void setIncidenceListVersion(long incidenceListVersion) {
+		this.incidenceListVersion = incidenceListVersion;
+		getTracker().putVariable(36, incidenceListVersion);
+	}
+	
+	protected final void restoreIncidenceListVersion(long incidenceListVersion) {
 		this.incidenceListVersion = incidenceListVersion;
 	}
 
@@ -541,10 +606,12 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	@SuppressWarnings("rawtypes")
 	public final void setSigma(GraphElement newSigma) {
+		long newSigmaId;
 		if (newSigma == null)
-			this.sigmaId = 0;
+			newSigmaId = 0;
 		else
-			this.sigmaId = (newSigma instanceof Vertex) ? newSigma.getGlobalId() : -newSigma.getGlobalId();
+			newSigmaId = (newSigma instanceof Vertex) ? newSigma.getGlobalId() : -newSigma.getGlobalId();
+		setSigmaId(newSigmaId);
 	}
 
 	/**
@@ -558,6 +625,11 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public final void setKappa(int kappa) {
 		assert getType().getAllowedMaxKappa() >= kappa
 				&& getType().getAllowedMinKappa() <= kappa;
+		this.kappa = kappa;
+		getTracker().putKappa(kappa);
+	}
+	
+	public final void restoreKappa(int kappa){
 		this.kappa = kappa;
 	}
 

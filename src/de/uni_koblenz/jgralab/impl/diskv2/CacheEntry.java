@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.util.Queue;
 
+import de.uni_koblenz.jgralab.GraphElement;
+
 /**
  * Entry that can be stored in the MemStorageManager's cache.
  * 
@@ -36,6 +38,16 @@ public class CacheEntry<V>{
 		}
 		
 		return (IncidenceTracker) tracker;
+	}
+	
+	public GraphElementTracker getOrCreateGETracker(GraphElementImpl<?,?,?,?> ge){
+		if (tracker == null){
+			GraphElementTracker geTracker = new GraphElementTracker();
+			geTracker.fill(ge);
+			this.tracker = geTracker;
+		}
+		
+		return (GraphElementTracker) tracker;
 	}
 	
 	public Tracker getTracker(){

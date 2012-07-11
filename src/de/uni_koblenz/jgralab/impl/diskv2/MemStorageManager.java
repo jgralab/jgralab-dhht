@@ -77,10 +77,32 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * Incidence object
 	 */
 	//TODO: Change to a ReferenceQueue
-	private Queue<CacheEntry<IncidenceImpl>> incidenceQueue 
-		= new LinkedList<CacheEntry<IncidenceImpl>>();
+	private Queue<CacheEntry<VertexImpl>> vertexQueue 
+		= new LinkedList<CacheEntry<VertexImpl>>();
 	
-	//TODO: Temporary method for testing, delete this eventually
+	private Queue<CacheEntry<EdgeImpl>> edgeQueue 
+	= new LinkedList<CacheEntry<EdgeImpl>>();
+	
+	private Queue<CacheEntry<IncidenceImpl>> incidenceQueue 
+	= new LinkedList<CacheEntry<IncidenceImpl>>();
+	
+	//TODO: Temporary methods for testing, delete this eventually
+	public void nullVertexReference(int vertexId){
+		CacheEntry<VertexImpl> vRef = getElement(vertexCache, vertexId, 
+				hash(vertexId, vertexMask));
+		vRef.delete(vertexQueue);
+		
+		cleanupVertexCache();
+	}
+	
+	public void nullEdgeReference(int edgeId){
+		CacheEntry<EdgeImpl> eRef = getElement(edgeCache, edgeId, 
+				hash(edgeId, edgeMask));
+		eRef.delete(edgeQueue);
+		
+		cleanupEdgeCache();
+	}
+	
 	public void nullIncidenceReference(int incidenceId){
 		CacheEntry<IncidenceImpl> iRef = getElement(incidenceCache, incidenceId, 
 				hash(incidenceId, incidenceMask));
@@ -88,6 +110,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		cleanupIncidenceCache();
 	}
+	
+	public void printStats(){
+		diskStorage.printStats();
+	}
+	//TODO: End of block to be deleted
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
 		diskStorage = new DiskStorageManager(database);
@@ -131,7 +158,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public final Vertex getVertexObject(int id) {
 		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
 		
-		if (entry == null) return null;
+		if (entry == null){
+			CacheEntry<VertexImpl> vRef = diskStorage.readVertexFromDisk(id);
+			if (vRef == null){
+				return null;
+			}
+			putElement(vRef, vertexCache, hash(id, vertexMask));
+			return vRef.get();
+		}
 		
 		return entry.get();
 	}
@@ -340,6 +374,18 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<IncidenceImpl> iEntry = getElement
 				(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
 		return iEntry.getOrCreateIncidenceTracker(iEntry.get());
+	}
+	
+	public GraphElementTracker getVertexTracker(int vertexId){
+		CacheEntry<VertexImpl> vEntry = getElement
+				(vertexCache, vertexId, hash(vertexId, vertexMask));
+		return vEntry.getOrCreateGETracker(vEntry.get());
+	}
+	
+	public GraphElementTracker getEdgeTracker(int edgeId){
+		CacheEntry<EdgeImpl> eEntry = getElement
+				(edgeCache, edgeId, hash(edgeId, edgeMask));
+		return eEntry.getOrCreateGETracker(eEntry.get());
 	}
 	
 	//---- Methods to access other attributes of cached graph elements and incidences ----
@@ -664,10 +710,46 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	// ---- Methods to manage the cache ----
 	
 	/**
+	 * Checks if any vertex objects have been deleted by the garbage collector.
+	 * If so, the states of these vertices are written to the disk (only if
+	 * the vertex hasn't been written to the disk before or if its state
+	 * was changed after the last time it has been loaded from the disk) and
+	 * the CacheEntry that referenced the deleted object is removed from the cache.
+	 */
+	private void cleanupVertexCache(){
+		CacheEntry<VertexImpl> current = vertexQueue.poll();
+		
+		while(current != null){
+			diskStorage.writeVertexToDisk(current);
+			removeElement(vertexCache, current.getKey(), 
+					hash(current.getKey(), vertexMask));
+			current = vertexQueue.poll();
+		}
+	}
+	
+	/**
+	 * Checks if any edge objects have been deleted by the garbage collector.
+	 * If so, the states of these edges are written to the disk (only if
+	 * the edge hasn't been written to the disk before or if ist state
+	 * was changed after the last time it has been loaded from the disk) and
+	 * the CacheEntry that referenced the deleted object is removed from the cache.
+	 */
+	private void cleanupEdgeCache(){
+		CacheEntry<EdgeImpl> current = edgeQueue.poll();
+		
+		while(current != null){
+			//diskStorage.writeGraphElementToDisk(current);
+			removeElement(edgeCache, current.getKey(), 
+					hash(current.getKey(), edgeMask));
+			current = edgeQueue.poll();
+		}
+	}
+	
+	/**
 	 * Checks if any incidence objects have been deleted by the garbage collector.
 	 * If so, the attributes of these incidences are written to the disk (only if
 	 * the incidence hasn't been written to the disk before or if one of its attributes
-	 * was changed after the last time when it has been loaded from the disk) and
+	 * was changed after the last time it has been loaded from the disk) and
 	 * the CacheEntry that referenced the deleted object is removed from the cache.
 	 */
 	private void cleanupIncidenceCache(){
