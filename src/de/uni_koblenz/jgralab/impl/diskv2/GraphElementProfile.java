@@ -25,6 +25,16 @@ public class GraphElementProfile {
 		= new HashMap<Class<?>, GraphElementProfile>();
 	
 	/**
+	 * An array containing the sizes (in Bytes) that each GraphElement
+	 * needs on the disk.
+	 */
+	private static int[] byteSizes = new int[1024];
+	
+	public static int getSize(int typeID){
+		return byteSizes[typeID];
+	}
+	
+	/**
 	 * The size that the profiled GraphElement needs on the disk.
 	 * This includes variables, like kappa and firstIncidenceId,
 	 * as well as all generated attributes that are of primitive types.
@@ -49,7 +59,7 @@ public class GraphElementProfile {
 	/**
 	 * Hold the indexes at which the Attributes must be saved in the Tracker
 	 */
-	private int[] indexes;
+	//private int[] indexes;
 	
 	/**
 	 * Array holding the get methods for every generated attribute
@@ -89,6 +99,10 @@ public class GraphElementProfile {
 		}
 		
 		return profile;
+	}
+	
+	public int getSize(){
+		return size;
 	}
 	
 	/**
@@ -151,7 +165,6 @@ public class GraphElementProfile {
 	 */
 	private void initArrays(int length){
 		attrTypeIDs = new byte[length];
-		indexes = new int[length];
 		getters = new Method[length];
 		setters = new Method[length];
 	}
@@ -251,7 +264,6 @@ public class GraphElementProfile {
 	private void detectIndexes(){
 		int currentIndex = 0;
 		for (int i = 0; i < attrTypeIDs.length; i++){
-			indexes[i] = currentIndex;
 			currentIndex++;
 			if (attrTypeIDs[i] > 0){
 				currentIndex += 3;
@@ -633,7 +645,6 @@ public class GraphElementProfile {
 			output += "Type:   " + getTypeName(attrTypeIDs[i]) + "\n";
 			output += "Getter: " + getters[i].getName() + "\n";
 			output += "Setter: " + setters[i].getName() + "\n";
-			output += "Index : " + Integer.toString(indexes[i]) + "\n\n";
 		}
 		return output;
 	}

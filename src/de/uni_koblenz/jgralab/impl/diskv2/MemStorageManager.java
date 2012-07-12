@@ -180,7 +180,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public final Edge getEdgeObject(int id) {
 		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
 		
-		if (entry == null) return null;
+		if (entry == null){
+			CacheEntry<EdgeImpl> eRef = diskStorage.readEdgeFromDisk(id);
+			if (eRef == null){
+				return null;
+			}
+			putElement(eRef, edgeCache, hash(id, edgeMask));
+			return eRef.get();
+		}
 		
 		return entry.get();
 	}
@@ -255,8 +262,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 */
 	public void putEdge(EdgeImpl e) {
 		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
-		
 		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
+		
+		eEntry.getOrCreateGETracker(e);
+		
+		FileAccess dict = FileAccess.getOrCreateFileAccess("edgeDict");
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		buf.putInt(e.getType().getId());
+		dict.write(buf, e.getLocalId() * 4);
 		
 		edgeCacheEntries++;
 		testEdgeLoadFactor();
@@ -391,6 +404,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public GraphElementTracker getEdgeTracker(int edgeId){
 		CacheEntry<EdgeImpl> eEntry = getElement
 				(edgeCache, edgeId, hash(edgeId, edgeMask));
+		if (eEntry == null) return null;
 		return eEntry.getOrCreateGETracker(eEntry.get());
 	}
 	
@@ -744,7 +758,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> current = edgeQueue.poll();
 		
 		while(current != null){
-			//diskStorage.writeGraphElementToDisk(current);
+			diskStorage.writeEdgeToDisk(current);
 			removeElement(edgeCache, current.getKey(), 
 					hash(current.getKey(), edgeMask));
 			current = edgeQueue.poll();
