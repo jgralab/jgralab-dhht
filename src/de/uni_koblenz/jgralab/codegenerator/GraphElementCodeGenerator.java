@@ -212,10 +212,17 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			break;
 		case DISTRIBUTED:	
 		case MEMORYBASED:
+			code.add("public void set_#name#(#type# new_#name#) {",
+					 "\t_#name# = new_#name#;", 
+					 "\tgraphModified();",
+					 "}");
+			break;
 		case DISKV2BASED:
 			code.add("public void set_#name#(#type# new_#name#) {",
 					 "\t_#name# = new_#name#;", 
-					 "\tgraphModified();", "}");
+					 "\tgraphModified();",
+					 "\tattributeChanged();",
+					 "}");
 			break;
 		case DISKBASED:
 			code.add("public void set_#name#(#type# _#name#) {",

@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
 
+import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -234,8 +235,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 */
 	public void putVertex(VertexImpl v) {
 		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
-		
 		putElement(vEntry, vertexCache, hash(v.hashCode(), vertexMask));
+		
+		vEntry.getOrCreateGETracker(v);
+		
+		FileAccess dict = FileAccess.getOrCreateFileAccess("vertexDict");
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		buf.putInt(v.getType().getId());
+		dict.write(buf, v.getLocalId() * 4);
 		
 		vertexCacheEntries++;
 		testVertexLoadFactor();
@@ -265,10 +272,8 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		//this method isn't called when incidences are read from the disk
 		//so we know that the incidence has been newly created
-		IncidenceTracker iTracker = iEntry.getOrCreateIncidenceTracker(i);
+		iEntry.getOrCreateIncidenceTracker(i);
 		
-		//diskStorage.writeIncidenceToDisk(iEntry);
-		/** Only one of the lines above and below this comment may be executed */
 		putElement(iEntry, incidenceCache, hash(i.hashCode(), incidenceMask));
 		
 		incidenceCacheEntries++;
@@ -379,6 +384,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public GraphElementTracker getVertexTracker(int vertexId){
 		CacheEntry<VertexImpl> vEntry = getElement
 				(vertexCache, vertexId, hash(vertexId, vertexMask));
+		if (vEntry == null) return null;
 		return vEntry.getOrCreateGETracker(vEntry.get());
 	}
 	

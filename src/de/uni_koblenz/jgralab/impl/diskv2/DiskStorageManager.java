@@ -136,7 +136,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        The restored Vertex
 	 */
-	public VertexImpl restoreVertex(ByteBuffer buf, int key){
+	private VertexImpl restoreVertex(ByteBuffer buf, int key){
 		int typeId = buf.getInt(0) - 1;
 		
 		Schema schema = graphdb.getSchema();
@@ -160,6 +160,11 @@ public class DiskStorageManager {
 		ver.restoreSigmaId(buf.getLong(44));
 		ver.restoreSubOrdianteGraphId(buf.getLong(52));
 		ver.restoreKappa(buf.getInt(60));
+		
+		buf.position(64);
+		GraphElementProfile prof = GraphElementProfile
+				.getOrCreateProfile(ver); 
+		prof.restoreAttributesOfElement(ver, buf);
 
 		return ver;
 	}
@@ -174,7 +179,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        The restored Incidence
 	 */
-	public IncidenceImpl restoreIncidence(ByteBuffer buf, int key){
+	private IncidenceImpl restoreIncidence(ByteBuffer buf, int key){
 		int typeId = buf.getInt(0) - 1;
 		
 		Schema schema = graphdb.getSchema();

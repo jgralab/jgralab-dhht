@@ -124,8 +124,6 @@ public class GraphElementProfile {
 	}
 	
 	public void restoreAttributesOfElement(GraphElement<?,?,?,?> ge, ByteBuffer buf){
-		buf.position(0);
-		
 		for (int i = 0; i < attrTypeIDs.length; i++){
 			switch (attrTypeIDs[i]){
 				case 0: 

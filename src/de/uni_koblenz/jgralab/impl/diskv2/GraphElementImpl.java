@@ -82,13 +82,12 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 */
 	public GraphElementTracker getTracker(){
 		MemStorageManager storage = (MemStorageManager) getStorage();
-		//FIXME: workaround, using "this instanceof Vertex" in the if clause causes the build to fail
+		//FIXME: workaround, using "this instanceof Vertex" in the if clause 
+		//causes the build to fail
 		GraphElement ge = (GraphElement) this;
 		if(ge instanceof Vertex){
-			System.out.print("eat ");
 			return storage.getVertexTracker(getLocalId());
 		}
-		System.out.print("pizza!");
 		return storage.getEdgeTracker(getLocalId());
 	}
 	
@@ -97,10 +96,10 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * new attribute value is stored in the Tracker.
 	 */
 	public void attributeChanged() {
-		getTracker();
+		GraphElementTracker tracker = getTracker();
+		if (tracker != null)
+			tracker.storeAttributes(this);
 	}
-	
-	
 
 	/**
 	 * Holds the version of the {@link Incidence} structure, for every
