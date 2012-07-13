@@ -70,7 +70,15 @@ public abstract class VertexImpl extends
 				|| traversalContext.containsVertex(nextVertex)) {
 			return nextVertex;
 		} else {
-			return nextVertex.getNextVertex(traversalContext);
+			//TODO: For debug, remove try/catch-block and catch clause
+			try{
+				return nextVertex.getNextVertex(traversalContext);
+			} catch (NullPointerException e){
+				System.out.println((int) nextElementId);
+				System.out.println(nextVertex == null);
+				System.exit(0);
+				return null;
+			}
 		}
 	}
 

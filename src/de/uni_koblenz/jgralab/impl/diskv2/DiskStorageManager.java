@@ -71,7 +71,6 @@ public class DiskStorageManager {
 			//incidence is neither new nor has it been changed since its last reload
 			return;
 		}
-
 		ByteBuffer attributes = tracker.getVariables();
 		
 		int typeID = attributes.getInt(0) - 1;

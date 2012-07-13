@@ -91,25 +91,22 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public void nullVertexReference(int vertexId){
 		CacheEntry<VertexImpl> vRef = getElement(vertexCache, vertexId, 
 				hash(vertexId, vertexMask));
+		if (vRef == null) return;
 		vRef.delete(vertexQueue);
-		
-		cleanupVertexCache();
 	}
 	
 	public void nullEdgeReference(int edgeId){
 		CacheEntry<EdgeImpl> eRef = getElement(edgeCache, edgeId, 
 				hash(edgeId, edgeMask));
+		if (eRef == null) return;
 		eRef.delete(edgeQueue);
-		
-		cleanupEdgeCache();
 	}
 	
 	public void nullIncidenceReference(int incidenceId){
 		CacheEntry<IncidenceImpl> iRef = getElement(incidenceCache, incidenceId, 
 				hash(incidenceId, incidenceMask));
+		if (iRef == null) return;
 		iRef.delete(incidenceQueue);
-		
-		cleanupIncidenceCache();
 	}
 	
 	public void printStats(){
@@ -156,7 +153,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param id the id of the Vertex to be retrieved
 	 * @return the Vertex with the given id
 	 */
-	public final Vertex getVertexObject(int id) {
+	public synchronized final Vertex getVertexObject(int id) {
+		cleanupVertexCache();
+		
 		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
 		
 		if (entry == null){
@@ -177,7 +176,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param id the id of the Edge to be retrieved
 	 * @return the Edge with the given id
 	 */
-	public final Edge getEdgeObject(int id) {
+	public synchronized final Edge getEdgeObject(int id) {
+		cleanupEdgeCache();
+		
 		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
 		
 		if (entry == null){
@@ -200,7 +201,9 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param id the id of the Incidence to be retrieved
 	 * @return the Incidence with the given id
 	 */
-	public final Incidence getIncidenceObject(int id) {
+	public synchronized final Incidence getIncidenceObject(int id) {
+		cleanupIncidenceCache();
+		
 		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
 		if (entry == null){
