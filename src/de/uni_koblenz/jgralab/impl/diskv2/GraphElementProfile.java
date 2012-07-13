@@ -7,7 +7,13 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 
+import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
+import de.uni_koblenz.jgralab.GraphFactory;
+import de.uni_koblenz.jgralab.Vertex;
+import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.Schema;
+import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This class is used to detect and store the attributes of generated vertex and edge
@@ -21,19 +27,8 @@ import de.uni_koblenz.jgralab.GraphElement;
  */
 public class GraphElementProfile {
 	
-	private static HashMap<Class<?>, GraphElementProfile> profiles
-		= new HashMap<Class<?>, GraphElementProfile>();
-	
-	/**
-	 * An array containing the sizes (in Bytes) that each GraphElement
-	 * needs on the disk.
-	 */
-	private static int[] byteSizes = new int[1024];
-	
-	public static int getSize(int typeID){
-		return byteSizes[typeID];
-	}
-	
+	private static GraphElementProfile[] profiles;
+		
 	/**
 	 * The size that the profiled GraphElement needs on the disk.
 	 * This includes variables, like kappa and firstIncidenceId,
@@ -57,11 +52,6 @@ public class GraphElementProfile {
 	private byte[] attrTypeIDs;
 	
 	/**
-	 * Hold the indexes at which the Attributes must be saved in the Tracker
-	 */
-	//private int[] indexes;
-	
-	/**
 	 * Array holding the get methods for every generated attribute
 	 */
 	private Method[] getters;
@@ -82,23 +72,35 @@ public class GraphElementProfile {
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	private GraphElementProfile(Class<?> cls){
+	public GraphElementProfile(Class<?> cls, int typeId){
 		String[] attrNames = detectAttributes(cls);
 		detectGetters(cls, attrNames);
 		detectSetters(cls, attrNames);
-		detectIndexes();
+		detectSize();
 	}
 	
-	public static GraphElementProfile getOrCreateProfile(GraphElement<?,?,?,?> ge){
-		Class<?> cls = ge.getClass();
-		GraphElementProfile profile = profiles.get(cls);
-		
-		if (profile == null){
-			profile = new GraphElementProfile(cls);
-			profiles.put(cls, profile);
-		}
-		
-		return profile;
+	public static void createProfile(VertexClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
+		Class<? extends Vertex> m1Class = cls.getM1Class();
+		GraphFactory factory = graphdb.getGraphFactory();
+		Vertex dummy = factory.createVertex_Diskv2BasedStorage(m1Class, 0, graphdb);
+		GraphElementProfile profile = new GraphElementProfile(dummy.getClass(), typeId);
+		profiles[typeId] = profile;
+	}
+	
+	public static void createProfile(EdgeClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
+		Class<? extends Edge> m1Class = cls.getM1Class();
+		GraphFactory factory = graphdb.getGraphFactory();
+		Edge dummy = factory.createEdge_Diskv2BasedStorage(m1Class, 0, graphdb);
+		GraphElementProfile profile = new GraphElementProfile(dummy.getClass(), typeId);
+		profiles[typeId] = profile;
+	}
+	
+	public static GraphElementProfile getProfile(int typeId){
+		return profiles[typeId];
+	}
+	
+	public static void setup(int size){
+		profiles = new GraphElementProfile[size];
 	}
 	
 	public int getSize(){
@@ -261,8 +263,8 @@ public class GraphElementProfile {
 	 * Detects the indexes at which the attributes need to be stored in the
 	 * Tracker.
 	 */
-	private void detectIndexes(){
-		int currentIndex = 0;
+	private void detectSize(){
+		int currentIndex = 64;
 		for (int i = 0; i < attrTypeIDs.length; i++){
 			currentIndex++;
 			if (attrTypeIDs[i] > 0){

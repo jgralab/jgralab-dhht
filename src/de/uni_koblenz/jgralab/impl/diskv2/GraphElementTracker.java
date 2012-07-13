@@ -47,7 +47,8 @@ public class GraphElementTracker extends Tracker{
 	 * @param ge - The GraphElement to be tracked
 	 */
 	public void storeAttributes(GraphElementImpl<?,?,?,?> ge){
-		GraphElementProfile profile = GraphElementProfile.getOrCreateProfile(ge);
+		int typeId = ge.getType().getId();
+		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		attributes = profile.getAttributesForElement(ge);
 	}
 	

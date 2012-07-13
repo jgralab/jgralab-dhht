@@ -2,6 +2,7 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 
 import de.uni_koblenz.jgralab.Edge;
 import de.uni_koblenz.jgralab.GraphElement;
@@ -30,13 +31,12 @@ public class DiskStorageManager {
 	private FileAccess vertexDict;
 	private FileAccess edgeDict;
 	
-	private int[] byteSizes;
-	
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
 		this.graphdb = graphdb;
 		this.vertexDict = FileAccess.getOrCreateFileAccess("vertexDict");
 		this.edgeDict = FileAccess.getOrCreateFileAccess("edgeDict");
-		byteSizes = new int[1024];
+
+		setupProfiles();
 		
 		//TODO: For testing purposes, delete eventually
 		deletedVertices = 0;
@@ -45,6 +45,31 @@ public class DiskStorageManager {
 		restoredEdges = 0;
 		deletedIncidences = 0;
 		restoredIncidences = 0;
+	}
+	
+	private void setupProfiles(){
+		Schema s = graphdb.getSchema();
+		
+		GraphElementProfile.setup(s.getNumberOfTypedElementClasses());
+		
+		List<VertexClass> vClasses = s.getVertexClassesInTopologicalOrder();
+		List<EdgeClass> eClasses = s.getEdgeClassesInTopologicalOrder();
+		
+		for (VertexClass vClass: vClasses){
+			if (!vClass.isAbstract()){
+				Class<?> cls = vClass.getM1Class();
+				int typeId = vClass.getId();
+				GraphElementProfile.createProfile(vClass, typeId, graphdb);
+			}
+		}
+		
+		for (EdgeClass eClass: eClasses){
+			if (!eClass.isAbstract()){
+				Class<?> cls = eClass.getM1Class();
+				int typeId = eClass.getId();
+				GraphElementProfile.createProfile(eClass, typeId, graphdb);
+			}
+		}
 	}
 	
 	//TODO: testing
@@ -77,10 +102,7 @@ public class DiskStorageManager {
 		String fileName = typeID + "_vertices";
 		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
 		
-		if (byteSizes[typeID] == 0){
-			detectByteSizeVertex(typeID);
-		}
-		int byteSize = byteSizes[typeID] + 64;
+		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
 		
 		file.write(attributes, vRef.getKey() * byteSize);
 	}
@@ -99,7 +121,7 @@ public class DiskStorageManager {
 		int typeID = vertexDict.read(4, key*4).getInt(0);
 		String fileName = typeID + "_vertices";
 		
-		int byteSize = byteSizes[typeID] + 64;
+		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
 		
 		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
 		ByteBuffer buf = file.read(byteSize, key * byteSize);
@@ -132,10 +154,7 @@ public class DiskStorageManager {
 		String fileName = typeID + "_edges";
 		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
 		
-		if (byteSizes[typeID] == 0){
-			detectByteSizeEdge(typeID);
-		}
-		int byteSize = byteSizes[typeID] + 64;
+		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
 		
 		file.write(attributes, eRef.getKey() * byteSize);
 	}
@@ -154,7 +173,7 @@ public class DiskStorageManager {
 		int typeID = edgeDict.read(4, key*4).getInt(0);
 		String fileName = typeID + "_edges";
 		
-		int byteSize = byteSizes[typeID] + 64;
+		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
 		
 		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
 		ByteBuffer buf = file.read(byteSize, key * byteSize);
@@ -244,8 +263,7 @@ public class DiskStorageManager {
 		ver.restoreKappa(buf.getInt(60));
 		
 		buf.position(64);
-		GraphElementProfile prof = GraphElementProfile
-				.getOrCreateProfile(ver); 
+		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
 		prof.restoreAttributesOfElement(ver, buf);
 
 		return ver;
@@ -287,8 +305,7 @@ public class DiskStorageManager {
 		edge.restoreKappa(buf.getInt(60));
 		
 		buf.position(64);
-		GraphElementProfile prof = GraphElementProfile
-				.getOrCreateProfile(edge); 
+		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
 		prof.restoreAttributesOfElement(edge, buf);
 
 		return edge;
@@ -330,44 +347,4 @@ public class DiskStorageManager {
 
 		return inc;
 	}
-	
-	//Helper method to detect the size of a vertex from its typeID.
-	//TODO: This method is a kludge
-	private void detectByteSizeVertex(int typeID){
-		Schema schema = graphdb.getSchema();
-		
-		VertexClass verClass = (VertexClass) schema
-				.getTypeForId(typeID);
-		Class<? extends Vertex> m1Class = verClass.getM1Class();
-		
-		GraphFactory factory = graphdb.getGraphFactory();
-		
-		VertexImpl ver = (VertexImpl) factory
-				.createVertex_Diskv2BasedStorage(m1Class, 1, graphdb);
-		GraphElementProfile prof = 
-				GraphElementProfile.getOrCreateProfile(ver);
-		int byteSize = prof.getSize();
-		
-		byteSizes[typeID] = byteSize;
-	}
-	
-	//TODO: This method is a kludge
-	private void detectByteSizeEdge(int typeID){
-		Schema schema = graphdb.getSchema();
-		
-		EdgeClass edgeClass = (EdgeClass) schema
-				.getTypeForId(typeID);
-		Class<? extends Edge> m1Class = edgeClass.getM1Class();
-		
-		GraphFactory factory = graphdb.getGraphFactory();
-		
-		EdgeImpl edge = (EdgeImpl) factory
-			.createEdge_Diskv2BasedStorage(m1Class, 1, graphdb);
-		GraphElementProfile prof = 
-			GraphElementProfile.getOrCreateProfile(edge);
-		int byteSize = prof.getSize();
-		
-		byteSizes[typeID] = byteSize;
-	}
-
 }

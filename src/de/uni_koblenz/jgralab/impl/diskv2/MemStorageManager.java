@@ -28,9 +28,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	//maximum load factor of the caches. If load factor is exceeded, do a rehash
 	private static final double MAX_LOAD_FACTOR = 0.7;
 	
-	//the graph database
-	private GraphDatabaseBaseImpl graphdb;
-	
 	//the disk storage manager
 	private DiskStorageManager diskStorage;
 	
