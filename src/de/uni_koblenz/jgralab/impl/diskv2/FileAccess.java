@@ -52,6 +52,8 @@ public abstract class FileAccess {
 			fileAccess = new FileAccessDefault(filename);
 		}
 		
+		//add a shutdown hook so the Channel is closed during shutdown, 
+		//or else we cannot delete the file
 		fileAccess.addShutdownHook();
 		
 		return fileAccess;

@@ -19,7 +19,7 @@ public class GraphElementTracker extends Tracker{
 	}
 	
 	/**
-	 * Stores the non-generated variables of a GraphElement in the ByteBuffer.
+	 * Stores the variables of a GraphElement in the ByteBuffer.
 	 * 
 	 * @param ge - The GraphElement to be tracked
 	 */
@@ -35,6 +35,7 @@ public class GraphElementTracker extends Tracker{
 		putVariable(44, ge.getSigmaId());
 		putVariable(52, ge.getSubOrdinateGraphId());
 		putKappa(ge.getKappa());
+		storeAttributes(ge);
 	}
 	
 	public void putKappa(int kappa){

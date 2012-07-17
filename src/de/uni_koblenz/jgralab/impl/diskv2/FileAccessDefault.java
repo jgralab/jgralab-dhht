@@ -110,15 +110,20 @@ public class FileAccessDefault extends FileAccess{
 		if (index < firstByte | index + bufSize > lastByte){
 			
 			if (index < 512){
+				//case 1: index < FILE_AREA/2
+				//map the first FILE_AREA bytes
 				firstByte = 0;
 				lastByte = FILE_AREA;
 			}
 			else {
+				//case 2: index > FILE_AREA/2
+				//map from index - FILE_AREA/2 to index + FILE_AREA/2
 				firstByte = index - 512;
 				lastByte = index + 512;
 			}
 			
 			try {
+				//write the pending changes to the disk and map the new area
 				if (accessWindow != null) accessWindow.force();
 				accessWindow = channel.map(MapMode.READ_WRITE, firstByte, FILE_AREA);
 			} catch (IOException e) {

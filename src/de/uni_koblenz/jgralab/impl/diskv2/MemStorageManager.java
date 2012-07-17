@@ -25,31 +25,43 @@ import de.uni_koblenz.jgralab.impl.diskv2.VertexImpl;
  */
 public final class MemStorageManager implements RemoteStorageAccess {
 	
-	//maximum load factor of the caches. If load factor is exceeded, do a rehash
+	/**
+	 * maximum load factor of the caches. If load factor is exceeded, do a rehash
+	 */
 	private static final double MAX_LOAD_FACTOR = 0.7;
 	
-	//the disk storage manager
+	/**
+	 * the disk storage manager
+	 */
 	private DiskStorageManager diskStorage;
 	
-	//maximum number of entries in the vertex, edge and incidence caches
-	//if these are exceeded by the amount of entries of the respective cache,
-	//the load factor of the respective cache has been exceeded
+	/**
+	 * maximum number of entries in the vertex, edge and incidence caches
+	 * if these are exceeded by the amount of entries of the respective cache,
+	 * the load factor of the respective cache has been exceeded
+	 */ 
 	private int vertexCacheMaxEntries;
 	private int edgeCacheMaxEntries;
 	private int incidenceCacheMaxEntries;
 	
-	//log(2) of the cache sizes
+	/**
+	 * log(2) of the cache sizes
+	 */
 	private int vertexCacheExp;
 	private int edgeCacheExp;
 	private int incidenceCacheExp;
 	
-	//these are used to efficiently compute the buckets
-	//with a logical and, instead of with modulo arithmetics
+	/**
+	 * these are used to efficiently compute the buckets
+	 * with a logical and, instead of with modulo arithmetics
+	 */
 	private int vertexMask;
 	private int edgeMask;
 	private int incidenceMask;
 	
-	//number of objects in the caches
+	/**
+	 * number of objects in the caches
+	 */
 	private int vertexCacheEntries;
 	private int edgeCacheEntries;
 	private int incidenceCacheEntries;

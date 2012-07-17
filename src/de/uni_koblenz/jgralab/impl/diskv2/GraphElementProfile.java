@@ -17,9 +17,9 @@ import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
  * This class is used to detect and store the attributes of generated vertex and edge
- * classes. It stores the names and type of every generated attribute and offers 
+ * classes. It stores the type of every generated attribute and offers 
  * ways to invoke the get- and set-methods for every attribute.
- * It is implied that every profile corresponds to exactly one vertex or edge class.
+ * For every non-abstract vertex and edge class, there must be exactly one profile.
  * A profile is valid for all Edges and Vertices of the same class. 
  *  
  * @author aheld
@@ -35,7 +35,8 @@ public class GraphElementProfile {
 	 * as well as all generated attributes that are of primitive types.
 	 * 
 	 * For Strings and Lists, 8 Bytes are needed to store the position
-	 * where the actual String or List can be found.
+	 * where the actual String or List can be found. These are also
+	 * added to the size.
 	 */
 	private int size;
 	
@@ -61,10 +62,10 @@ public class GraphElementProfile {
 	 */
 	private Method[] setters;
 	
-	//constraints for the four arrays listed above:
+	//constraints for the three arrays listed above:
 	//- all four arrays must have the same length.
 	//- attrTypeIDs[n], getters[n] and setters[n] refer to the type, the get method and the
-	//  set method for the attribute named at attrNames[n], respectively.
+	//  set method for the same attribute.
 	
 	/**
 	 * Creates a new profile for a given class, which must be a subclass of
@@ -72,13 +73,24 @@ public class GraphElementProfile {
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
-	public GraphElementProfile(Class<?> cls, int typeId){
+	public GraphElementProfile(Class<? extends GraphElement<?,?,?,?>> cls, int typeId){
 		String[] attrNames = detectAttributes(cls);
 		detectGetters(cls, attrNames);
 		detectSetters(cls, attrNames);
 		detectSize();
 	}
 	
+	/**
+	 * Creates a new profile for the given vertex class.
+	 * 
+	 * @param cls
+	 * 		The vertex class to be profiled
+	 * @param typeId
+	 * 		The internal ID of the given vertex class
+	 * @param graphdb
+	 * 		The GraphDatabase that we work with
+	 */
+	//TODO: Find a better way to implement this
 	public static void createProfile(VertexClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
 		Class<? extends Vertex> m1Class = cls.getM1Class();
 		GraphFactory factory = graphdb.getGraphFactory();
@@ -87,6 +99,17 @@ public class GraphElementProfile {
 		profiles[typeId] = profile;
 	}
 	
+	/**
+	 * Creates a new profile for the given edge class.
+	 * 
+	 * @param cls
+	 * 		The edge class to be profiled
+	 * @param typeId
+	 * 		The internal ID of the given edge class
+	 * @param graphdb
+	 * 		The GraphDatabase that we work with
+	 */
+	//TODO: Find a better way to implement this
 	public static void createProfile(EdgeClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
 		Class<? extends Edge> m1Class = cls.getM1Class();
 		GraphFactory factory = graphdb.getGraphFactory();
@@ -95,42 +118,66 @@ public class GraphElementProfile {
 		profiles[typeId] = profile;
 	}
 	
+	/**
+	 * Get a profile for the vertex or edge class which has the given internal ID.
+	 * 
+	 * @param typeId
+	 * 		The internal ID of the vertex or edge class
+	 * @return
+	 * 		A profile for the specified vertex or edge class
+	 */
 	public static GraphElementProfile getProfile(int typeId){
 		return profiles[typeId];
 	}
 	
+	/**
+	 * Instantiates the Array that stores all profiles.
+	 * 
+	 * @param size
+	 * 		The maximum amount of profiles we will need to store
+	 */
 	public static void setup(int size){
 		profiles = new GraphElementProfile[size];
 	}
 	
+	/**
+	 * Returns the size of the vertex or edge class
+	 * @return
+	 * 		How many bytes an object of the given class needs on the disk 
+	 */
 	public int getSize(){
 		return size;
 	}
 	
 	/**
-	 * Returns a byte array containing the primitive attributes of a GraphElement
+	 * Returns a ByteBuffer containing the primitive attributes of a GraphElement
 	 * as well as information where its Strings and Lists are stored.
 	 * 
-	 * @param ge - The GraphElement whose attributes are written to the buffer
+	 * @param ge 
+	 * 		The GraphElement whose attributes are written to the buffer
 	 * 
-	 * @return - A byte array containing the given GraphElement's attributes
+	 * @return 
+	 * 		A byte array containing the given GraphElement's attributes
 	 */
 	public ByteBuffer getAttributesForElement(GraphElement<?,?,?,?> ge){
+		//make enough room to store all attributes
 		ByteBuffer buf = ByteBuffer.allocate(size);
+		
+		//iterate over every attribute
 		for (int i = 0; i < attrTypeIDs.length; i++){
 			switch (attrTypeIDs[i]){
-				case 0: 
+				case 0: //attribute is a Boolean, invoke its get method and store it
 					if (invokeGetBoolean(ge, i))
 						buf.put((byte) 1);
 					else buf.put((byte) 0);
 					break;
-				case 1:
+				case 1: //attribute is an Integer, invoke its get method and store it
 					buf.putInt(invokeGetInteger(ge, i));
 					break;
-				case 2:
+				case 2: //attribute is a Long, invoke its get method and store it
 					buf.putLong(invokeGetLong(ge, i));
 					break;
-				case 3:
+				case 3: //attribute is an Double, invoke its get method and store it
 					buf.putDouble(invokeGetDouble(ge, i));
 					break;
 			}
@@ -141,19 +188,21 @@ public class GraphElementProfile {
 	
 	public void restoreAttributesOfElement(GraphElement<?,?,?,?> ge, ByteBuffer buf){
 		for (int i = 0; i < attrTypeIDs.length; i++){
+			
+			//iterate over every attribute
 			switch (attrTypeIDs[i]){
-				case 0: 
+				case 0: //attribute is a Boolean, invoke its set method and restore it
 					if (buf.get() == 1)
 						invokeSetBoolean(ge, true, i);
 					else invokeSetBoolean(ge, false, i);
 					break;
-				case 1:
+				case 1: //attribute is an Integer, invoke its set method and restore it
 					invokeSetInteger(ge, buf.getInt(), i);
 					break;
-				case 2:
+				case 2: //attribute is a Long, invoke its set method and restore it
 					invokeSetLong(ge, buf.getLong(), i);
 					break;
-				case 3:
+				case 3: //attribute is an Double, invoke its set method and restore it
 					invokeSetDouble(ge, buf.getDouble(), i);
 					break;
 			}
@@ -172,24 +221,29 @@ public class GraphElementProfile {
 	}
 	
 	/**
-	 * Uses the Java Reflection API to detect all generated attributes of a Vertex or Edge
-	 * class. Their type IDs are stored in the array attrTypeIDs.
+	 * Uses the Java Reflection API to detect all generated attributes of a Vertex
+	 * or Edge class. Their type IDs are stored in the array attrTypeIDs.
 	 * 
 	 * @param cls - The Edge or Vertex class to be profiled
 	 */
 	private String[] detectAttributes(Class<?> cls){
+		//get an array containg all fields of this class, i.e. all attributes of 
+		//the vertex or edge class
 		Field[] fields = cls.getDeclaredFields();
 		int numAttr = fields.length;
 		
 		initArrays(numAttr);
 		String[] attrNames = new String[numAttr];
 		
+		//write the names and types of each attribute in arrays 
 		for (int i = 0; i < fields.length; i++){
 			Field current = fields[i];
 			attrNames[i] = current.getName();
 			attrTypeIDs[i] = getTypeID(current.getType());
 		}
 		
+		//return the array containing the names so we can use it to find the getters
+		//and setters
 		return attrNames;
 	}
 
@@ -203,14 +257,15 @@ public class GraphElementProfile {
 	private void detectGetters(Class<?> cls, String[] attrNames){
 		for (int i = 0; i < attrNames.length; i++){
 			String methodName;
-			if (attrTypeIDs[i] == 0){
+			if (attrTypeIDs[i] == 0){ //case 1: Boolean, method name starts with 'is'
 				methodName = "is" + attrNames[i];
 			}
-			else {
+			else { //case 2: not Boolean, method name starts with 'get'
 				methodName = "get" + attrNames[i];
 			}
 			Method m;
 			try {
+				//fetch the get method and store it in the array
 				m = cls.getMethod(methodName, (Class<?>[]) null);
 				getters[i] = m;
 			} catch (SecurityException e) {
@@ -264,18 +319,20 @@ public class GraphElementProfile {
 	 * Tracker.
 	 */
 	private void detectSize(){
-		int currentIndex = 64;
+		int currentIndex = 64; //64 bytes for non-generated variables and the type ID
 		for (int i = 0; i < attrTypeIDs.length; i++){
-			currentIndex++;
+			currentIndex++; //we need at least one byte
 			if (attrTypeIDs[i] > 0){
-				currentIndex += 3;
+				currentIndex += 3; //attribute is not a Boolean, we need three more bytes
 				if (attrTypeIDs[i] > 1){
-					currentIndex += 4;
+					currentIndex += 4; //attribute is not an Integer, either
+					                   //so we need four more bytes
 				}
 			}
 		}
 		size = currentIndex;
 	}
+	
 	/**
 	 * Helper method to obtain a set method for an attribute of type boolean.
 	 */
