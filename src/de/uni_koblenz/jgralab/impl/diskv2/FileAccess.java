@@ -22,12 +22,7 @@ import java.util.HashMap;
  *
  */
 public abstract class FileAccess {
-	
-	/**
-	 * A map in which accesses to files are stored.
-	 */
-	private static HashMap<String, FileAccess> files = new HashMap<String, FileAccess>();
-	
+		
 	/**
 	 * Checks if the used OS is windows
 	 */
@@ -47,11 +42,7 @@ public abstract class FileAccess {
 	 *        The name of the file to access. The suffix ".dst" is added internally. 
 	 * @return An access to the named file. 
 	 */
-	public static FileAccess getOrCreateFileAccess(String filename){
-		FileAccess file = files.get(filename);
-		
-		if (file != null) return file;
-		
+	public static FileAccess createFileAccess(String filename){	
 		FileAccess fileAccess;
 		
 		if (windows){
@@ -60,8 +51,6 @@ public abstract class FileAccess {
 		else {
 			fileAccess = new FileAccessDefault(filename);
 		}
-		
-		files.put(filename, fileAccess);
 		
 		fileAccess.addShutdownHook();
 		

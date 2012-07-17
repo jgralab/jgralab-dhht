@@ -28,15 +28,12 @@ public class DiskStorageManager {
 	private GraphDatabaseBaseImpl graphdb;
 	
 	//TODO: Make an array, so we can ditch getOrCreateFileAccess
-	private FileAccess vertexDict;
-	private FileAccess edgeDict;
+	private FileAccess[] files;
 	
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
 		this.graphdb = graphdb;
-		this.vertexDict = FileAccess.getOrCreateFileAccess("vertexDict");
-		this.edgeDict = FileAccess.getOrCreateFileAccess("edgeDict");
 
-		setupProfiles();
+		setupFilesAndProfiles();
 		
 		//TODO: For testing purposes, delete eventually
 		deletedVertices = 0;
@@ -47,27 +44,33 @@ public class DiskStorageManager {
 		restoredIncidences = 0;
 	}
 	
-	private void setupProfiles(){
+	private void setupFilesAndProfiles(){
 		Schema s = graphdb.getSchema();
 		
-		GraphElementProfile.setup(s.getNumberOfTypedElementClasses());
+		int amountOfClasses = s.getNumberOfTypedElementClasses();
+		GraphElementProfile.setup(amountOfClasses);
+		files = new FileAccess[amountOfClasses + 3];
 		
 		List<VertexClass> vClasses = s.getVertexClassesInTopologicalOrder();
 		List<EdgeClass> eClasses = s.getEdgeClassesInTopologicalOrder();
 		
+		files[amountOfClasses] = FileAccess.createFileAccess("incidences");
+		files[amountOfClasses + 1] = FileAccess.createFileAccess("vertexDict");
+		files[amountOfClasses + 2] = FileAccess.createFileAccess("edgeDict");
+		
 		for (VertexClass vClass: vClasses){
 			if (!vClass.isAbstract()){
-				Class<?> cls = vClass.getM1Class();
 				int typeId = vClass.getId();
 				GraphElementProfile.createProfile(vClass, typeId, graphdb);
+				files[typeId] = FileAccess.createFileAccess(typeId + "_vertices");
 			}
 		}
 		
 		for (EdgeClass eClass: eClasses){
 			if (!eClass.isAbstract()){
-				Class<?> cls = eClass.getM1Class();
 				int typeId = eClass.getId();
 				GraphElementProfile.createProfile(eClass, typeId, graphdb);
+				files[typeId] = FileAccess.createFileAccess(typeId + "_edges");
 			}
 		}
 	}
@@ -98,11 +101,10 @@ public class DiskStorageManager {
 		}
 		ByteBuffer attributes = tracker.getVariables();
 		
-		int typeID = attributes.getInt(0) - 1;
-		String fileName = typeID + "_vertices";
-		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
+		int typeId = attributes.getInt(0) - 1;
+		FileAccess file = files[typeId];
 		
-		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
+		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
 		file.write(attributes, vRef.getKey() * byteSize);
 	}
@@ -118,12 +120,11 @@ public class DiskStorageManager {
 	public CacheEntry<VertexImpl> readVertexFromDisk(int key){
 		if (LOG) restoredVertices++;
 		
-		int typeID = vertexDict.read(4, key*4).getInt(0);
-		String fileName = typeID + "_vertices";
+		int typeId = getVertexDict().read(4, key*4).getInt(0);
 		
-		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
+		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
-		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
+		FileAccess file = files[typeId];
 		ByteBuffer buf = file.read(byteSize, key * byteSize);
 		
 		buf.position(0);
@@ -150,11 +151,10 @@ public class DiskStorageManager {
 
 		ByteBuffer attributes = tracker.getVariables();
 		
-		int typeID = attributes.getInt(0) - 1;
-		String fileName = typeID + "_edges";
-		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
+		int typeId = attributes.getInt(0) - 1;
+		FileAccess file = files[typeId];
 		
-		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
+		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
 		file.write(attributes, eRef.getKey() * byteSize);
 	}
@@ -170,12 +170,11 @@ public class DiskStorageManager {
 	public CacheEntry<EdgeImpl> readEdgeFromDisk(int key){
 		if (LOG) restoredEdges++;
 		
-		int typeID = edgeDict.read(4, key*4).getInt(0);
-		String fileName = typeID + "_edges";
+		int typeId = getEdgeDict().read(4, key*4).getInt(0);
 		
-		int byteSize = GraphElementProfile.getProfile(typeID).getSize();
+		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
-		FileAccess file = FileAccess.getOrCreateFileAccess(fileName);
+		FileAccess file = files[typeId];
 		ByteBuffer buf = file.read(byteSize, key * byteSize);
 		
 		buf.position(0);
@@ -202,7 +201,7 @@ public class DiskStorageManager {
 
 		ByteBuffer attributes = tracker.getVariables();
 		
-		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
+		FileAccess file = files[files.length - 3];
 		file.write(attributes, incidenceRef.getKey() * 52);
 	}
 	
@@ -217,7 +216,7 @@ public class DiskStorageManager {
 	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){
 		if (LOG) restoredIncidences++;
 		
-		FileAccess file = FileAccess.getOrCreateFileAccess("incidences");
+		FileAccess file = files[files.length - 3];
 		ByteBuffer buf = file.read(52, key * 52);
 		
 		buf.position(0);
@@ -346,5 +345,13 @@ public class DiskStorageManager {
 		inc.restorePreviousIncidenceIdAtVertex(buf.getLong(28));
 
 		return inc;
+	}
+	
+	public FileAccess getVertexDict(){
+		return files[files.length - 2];
+	}
+	
+	public FileAccess getEdgeDict(){
+		return files[files.length - 1];
 	}
 }

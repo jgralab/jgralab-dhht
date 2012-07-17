@@ -57,17 +57,17 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	/**
 	 * in-memory-cache for vertices
 	 */
-	private CacheEntry<VertexImpl>[] vertexCache;
+	private volatile CacheEntry<VertexImpl>[] vertexCache;
 
 	/**
 	 * in-memory-cache for edges
 	 */
-	private CacheEntry<EdgeImpl>[] edgeCache;
+	private volatile CacheEntry<EdgeImpl>[] edgeCache;
 
 	/**
 	 * in-memory-cache for incidences
 	 */
-	private CacheEntry<IncidenceImpl>[] incidenceCache;
+	private volatile CacheEntry<IncidenceImpl>[] incidenceCache;
 	
 	/**
 	 * The queue in which references to Incidence objects are put after
@@ -85,21 +85,21 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	= new LinkedList<CacheEntry<IncidenceImpl>>();
 	
 	//TODO: Temporary methods for testing, delete this eventually
-	public void nullVertexReference(int vertexId){
+	public synchronized void nullVertexReference(int vertexId){
 		CacheEntry<VertexImpl> vRef = getElement(vertexCache, vertexId, 
 				hash(vertexId, vertexMask));
 		if (vRef == null) return;
 		vRef.delete(vertexQueue);
 	}
 	
-	public void nullEdgeReference(int edgeId){
+	public synchronized void nullEdgeReference(int edgeId){
 		CacheEntry<EdgeImpl> eRef = getElement(edgeCache, edgeId, 
 				hash(edgeId, edgeMask));
 		if (eRef == null) return;
 		eRef.delete(edgeQueue);
 	}
 	
-	public void nullIncidenceReference(int incidenceId){
+	public synchronized void nullIncidenceReference(int incidenceId){
 		CacheEntry<IncidenceImpl> iRef = getElement(incidenceCache, incidenceId, 
 				hash(incidenceId, incidenceMask));
 		if (iRef == null) return;
@@ -246,7 +246,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		vEntry.getOrCreateGETracker(v);
 		
-		FileAccess dict = FileAccess.getOrCreateFileAccess("vertexDict");
+		FileAccess dict = diskStorage.getVertexDict();
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(v.getType().getId());
 		dict.write(buf, v.getLocalId() * 4);
@@ -266,7 +266,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		eEntry.getOrCreateGETracker(e);
 		
-		FileAccess dict = FileAccess.getOrCreateFileAccess("edgeDict");
+		FileAccess dict = diskStorage.getEdgeDict();
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(e.getType().getId());
 		dict.write(buf, e.getLocalId() * 4);
