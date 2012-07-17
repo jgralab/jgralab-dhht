@@ -10,6 +10,7 @@ import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
+import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -18,10 +19,8 @@ public class DiskStorageManager {
 	
 	//TODO: For testing purposes, delete eventually
 	boolean LOG = true;
-	int deletedVertices;
-	int restoredVertices;
-	int deletedEdges;
-	int restoredEdges;
+	int deletedGEs;
+	int restoredGEs;
 	int deletedIncidences;
 	int restoredIncidences;
 	
@@ -36,10 +35,8 @@ public class DiskStorageManager {
 		setupFilesAndProfiles();
 		
 		//TODO: For testing purposes, delete eventually
-		deletedVertices = 0;
-		restoredVertices = 0;
-		deletedEdges = 0;
-		restoredEdges = 0;
+		deletedGEs = 0;
+		restoredGEs = 0;
 		deletedIncidences = 0;
 		restoredIncidences = 0;
 	}
@@ -77,10 +74,8 @@ public class DiskStorageManager {
 	
 	//TODO: testing
 	public void printStats(){
-		System.out.println("Deleted  Vertices  : " + deletedVertices);
-		System.out.println("Restored Vertices  : " + restoredVertices);
-		System.out.println("Deleted  Edges     : " + deletedEdges);
-		System.out.println("Restored Edges     : " + restoredEdges);
+		System.out.println("Deleted  Elements  : " + deletedGEs);
+		System.out.println("Restored Elements  : " + restoredGEs);
 		System.out.println("Deleted  Incidences: " + deletedIncidences);
 		System.out.println("Restored Incidences: " + restoredIncidences);
 	}
@@ -91,9 +86,9 @@ public class DiskStorageManager {
 	 * 
 	 * @param geRef - The Reference to the GraphElement that is written out.
 	 */
-	public void writeVertexToDisk(CacheEntry<VertexImpl> vRef){
+	public void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> vRef){
 		Tracker tracker = vRef.getTracker();
-		if (LOG) deletedVertices++;
+		if (LOG) deletedGEs++;
 		
 		if (tracker == null) {
 			//incidence is neither new nor has it been changed since its last reload
@@ -118,45 +113,13 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored vertex
 	 */
 	public CacheEntry<VertexImpl> readVertexFromDisk(int key){
-		if (LOG) restoredVertices++;
-		
 		int typeId = getVertexDict().read(4, key*4).getInt(0);
 		
-		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
-		
-		FileAccess file = files[typeId];
-		ByteBuffer buf = file.read(byteSize, key * byteSize);
-		
-		buf.position(0);
+		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
 		
 		VertexImpl ver = restoreVertex(buf, key);
 		
 		return new CacheEntry<VertexImpl>(ver);
-	}
-	
-	/**
-	 * Writes a Graph Element to the disk if it has been newly created, or if it has
-	 * been changed since the last time it was loaded from the disk.
-	 * 
-	 * @param geRef - The Reference to the GraphElement that is written out.
-	 */
-	public void writeEdgeToDisk(CacheEntry<EdgeImpl> eRef){
-		Tracker tracker = eRef.getTracker();
-		if (LOG) deletedEdges++;
-		
-		if (tracker == null) {
-			//incidence is neither new nor has it been changed since its last reload
-			return;
-		}
-
-		ByteBuffer attributes = tracker.getVariables();
-		
-		int typeId = attributes.getInt(0) - 1;
-		FileAccess file = files[typeId];
-		
-		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
-		
-		file.write(attributes, eRef.getKey() * byteSize);
 	}
 	
 	/**
@@ -168,9 +131,21 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored vertex
 	 */
 	public CacheEntry<EdgeImpl> readEdgeFromDisk(int key){
-		if (LOG) restoredEdges++;
-		
 		int typeId = getEdgeDict().read(4, key*4).getInt(0);
+		
+		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
+		
+		EdgeImpl edge = restoreEdge(buf, key);
+		
+		return new CacheEntry<EdgeImpl>(edge);
+	}
+	
+	/**
+	 * Helper method to avoid duplicate code in readVertexFromDisk 
+	 * and readEdgeFromDisk
+	 */
+	private ByteBuffer readGraphElementFromDisk(int key, int typeId){
+		if (LOG) restoredGEs++;
 		
 		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
@@ -179,9 +154,7 @@ public class DiskStorageManager {
 		
 		buf.position(0);
 		
-		EdgeImpl edge = restoreEdge(buf, key);
-		
-		return new CacheEntry<EdgeImpl>(edge);
+		return buf;
 	}
 	
 	/**
@@ -225,7 +198,7 @@ public class DiskStorageManager {
 		
 		return new CacheEntry<IncidenceImpl>(inc);
 	}
-	
+
 	/**
 	 * Restores a Vertex using the data provided by a ByteBuffer.
 	 * 
@@ -252,20 +225,7 @@ public class DiskStorageManager {
 		VertexImpl ver = (VertexImpl) factory
 				.createVertex_Diskv2BasedStorage(m1Class, longId, graphdb);
 		
-		ver.restoreNextElementId(buf.getLong(4));
-		ver.restorePreviousElementId(buf.getLong(12));
-		ver.restoreFirstIncidenceId(buf.getLong(20));
-		ver.restoreLastIncidenceId(buf.getLong(28));
-		ver.restoreIncidenceListVersion(buf.getLong(36));
-		ver.restoreSigmaId(buf.getLong(44));
-		ver.restoreSubOrdianteGraphId(buf.getLong(52));
-		ver.restoreKappa(buf.getInt(60));
-		
-		buf.position(64);
-		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
-		prof.restoreAttributesOfElement(ver, buf);
-
-		return ver;
+		return (VertexImpl) restoreGraphElement(ver, buf, typeId);
 	}
 	
 	/**
@@ -294,20 +254,27 @@ public class DiskStorageManager {
 		EdgeImpl edge = (EdgeImpl) factory
 				.createEdge_Diskv2BasedStorage(m1Class, longId, graphdb);
 		
-		edge.restoreNextElementId(buf.getLong(4));
-		edge.restorePreviousElementId(buf.getLong(12));
-		edge.restoreFirstIncidenceId(buf.getLong(20));
-		edge.restoreLastIncidenceId(buf.getLong(28));
-		edge.restoreIncidenceListVersion(buf.getLong(36));
-		edge.restoreSigmaId(buf.getLong(44));
-		edge.restoreSubOrdianteGraphId(buf.getLong(52));
-		edge.restoreKappa(buf.getInt(60));
+		return (EdgeImpl) restoreGraphElement(edge, buf, typeId);
+	}
+	
+	/**
+	 * Helper method to avoid duplicate code in restoreVertex and restoreEdge
+	 */
+	private GraphElementImpl<?,?,?,?> restoreGraphElement(GraphElementImpl<?,?,?,?> ge, ByteBuffer buf, int typeId){
+		ge.restoreNextElementId(buf.getLong(4));
+		ge.restorePreviousElementId(buf.getLong(12));
+		ge.restoreFirstIncidenceId(buf.getLong(20));
+		ge.restoreLastIncidenceId(buf.getLong(28));
+		ge.restoreIncidenceListVersion(buf.getLong(36));
+		ge.restoreSigmaId(buf.getLong(44));
+		ge.restoreSubOrdianteGraphId(buf.getLong(52));
+		ge.restoreKappa(buf.getInt(60));
 		
 		buf.position(64);
 		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
-		prof.restoreAttributesOfElement(edge, buf);
+		prof.restoreAttributesOfElement(ge, buf);
 
-		return edge;
+		return ge;
 	}
 	
 	/**

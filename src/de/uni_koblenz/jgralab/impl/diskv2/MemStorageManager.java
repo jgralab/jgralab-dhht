@@ -740,7 +740,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<VertexImpl> current = vertexQueue.poll();
 		
 		while(current != null){
-			diskStorage.writeVertexToDisk(current);
+			diskStorage.writeGraphElementToDisk(current);
 			removeElement(vertexCache, current.getKey(), 
 					hash(current.getKey(), vertexMask));
 			current = vertexQueue.poll();
@@ -758,7 +758,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> current = edgeQueue.poll();
 		
 		while(current != null){
-			diskStorage.writeEdgeToDisk(current);
+			diskStorage.writeGraphElementToDisk(current);
 			removeElement(edgeCache, current.getKey(), 
 					hash(current.getKey(), edgeMask));
 			current = edgeQueue.poll();
