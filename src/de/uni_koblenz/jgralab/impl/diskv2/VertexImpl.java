@@ -117,6 +117,11 @@ public abstract class VertexImpl extends
 			return lastIncidence.getPreviousIncidenceAtVertex(traversalContext);
 		}
 	}
+	
+	@Override
+	public GraphElementTracker getTracker(){
+		return ((MemStorageManager) getStorage()).getVertexTracker(getLocalId());
+	}
 
 	/**
 	 * Puts <code>nextVertex</code> after this {@link Vertex} in the sequence of

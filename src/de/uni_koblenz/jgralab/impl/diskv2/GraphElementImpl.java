@@ -80,16 +80,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * 
 	 * @return The Tracker that tracks this GraphElement
 	 */
-	public GraphElementTracker getTracker(){
-		MemStorageManager storage = (MemStorageManager) getStorage();
-		//FIXME: workaround, using "this instanceof Vertex" in the if clause 
-		//causes the build to fail
-		GraphElement ge = (GraphElement) this;
-		if(ge instanceof Vertex){
-			return storage.getVertexTracker(getLocalId());
-		}
-		return storage.getEdgeTracker(getLocalId());
-	}
+	public abstract GraphElementTracker getTracker();
 	
 	/**
 	 * Called whenever an attribute of this GraphElement changed so the

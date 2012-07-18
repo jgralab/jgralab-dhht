@@ -74,6 +74,11 @@ public abstract class EdgeImpl extends
 	}
 	
 	@Override
+	public GraphElementTracker getTracker(){
+		return ((MemStorageManager) getStorage()).getEdgeTracker(getLocalId());
+	}
+	
+	@Override
 	public final Vertex addAdjacence(IncidenceClass incidentIc,
 			IncidenceClass adjacentIc, Edge other) {
 		assert incidentIc != null;

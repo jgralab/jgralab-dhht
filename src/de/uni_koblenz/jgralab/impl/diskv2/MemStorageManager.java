@@ -252,7 +252,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param v the Vertex to be cached
 	 */
-	public void putVertex(VertexImpl v) {
+	public synchronized void putVertex(VertexImpl v) {
 		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
 		putElement(vEntry, vertexCache, hash(v.hashCode(), vertexMask));
 		
@@ -272,7 +272,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param e the Edge to be cached
 	 */
-	public void putEdge(EdgeImpl e) {
+	public synchronized void putEdge(EdgeImpl e) {
 		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
 		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
 		
@@ -292,7 +292,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * 
 	 * @param i the Incidence to be cached
 	 */
-	public void putIncidence(IncidenceImpl i) {
+	public synchronized void putIncidence(IncidenceImpl i) {
 		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
 		
 		//this method isn't called when incidences are read from the disk
