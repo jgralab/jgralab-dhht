@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -13,7 +12,6 @@ import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 /**
@@ -182,8 +180,7 @@ public class GraphElementProfile {
 	}
 	
 	/**
-	 * Returns a ByteBuffer containing the primitive attributes of a GraphElement
-	 * as well as information where its Strings and Lists are stored.
+	 * Returns a ByteBuffer containing the primitive attributes of a GraphElement.
 	 * 
 	 * @param ge 
 	 * 		The GraphElement whose attributes are written to the buffer
@@ -218,6 +215,15 @@ public class GraphElementProfile {
 		return buf;
 	}
 	
+	/**
+	 * Writes the primitive attributes of a GraphElement.
+	 * 
+	 * @param ge
+	 *      The GraphElement whose attributes are overwritten
+	 *      
+	 * @param buf
+	 *      A ByteBuffer containing the values of the attributes
+	 */
 	public void restoreAttributesOfElement(GraphElement<?,?,?,?> ge, ByteBuffer buf){
 		for (int i = 0; i < attrTypeIDs.length; i++){
 			
@@ -238,6 +244,70 @@ public class GraphElementProfile {
 					invokeSetDouble(ge, buf.getDouble(), i);
 					break;
 			}
+		}
+	}
+	
+	/**
+	 * Returns an Array containing the String attributes of a GraphElement.
+	 * 
+	 * @param ge 
+	 * 		The GraphElement whose Strings are written to the Array
+	 * 
+	 * @return 
+	 * 		An Array containing the given GraphElement's Strings
+	 */
+	public String[] getStringsForElement(GraphElement<?,?,?,?> ge){
+		String[] strings = new String[stringGetters.length];
+		for(int i = 0; i < stringGetters.length; i++){
+			strings[i] = invokeGetString(ge, i);
+		}
+		return strings;
+	}
+	
+	/**
+	 * Writes the String attributes of a GraphElement.
+	 * 
+	 * @param ge
+	 *      The GraphElement whose Strings are overwritten
+	 *      
+	 * @param buf
+	 *      An Array containing the Strings
+	 */
+	public void setStringsOfElement(GraphElement<?,?,?,?> ge, String[] strings){
+		for(int i = 0; i < strings.length; i++){
+			invokeSetString(ge, strings[i], i);
+		}
+	}
+	
+	/**
+	 * Returns an Array containing the List attributes of a GraphElement.
+	 * 
+	 * @param ge 
+	 * 		The GraphElement whose Lists are written to the Array
+	 * 
+	 * @return 
+	 * 		An Array containing the given GraphElement's Lists
+	 */
+	public List[] getListsForElement(GraphElement<?,?,?,?> ge){
+		List[] lists = new List[listGetters.length];
+		for(int i = 0; i < listGetters.length; i++){
+			lists[i] = invokeGetList(ge, i);
+		}
+		return lists;
+	}
+	
+	/**
+	 * Writes the List attributes of a GraphElement.
+	 * 
+	 * @param ge
+	 *      The GraphElement whose Lists are overwritten
+	 *      
+	 * @param buf
+	 *      An Array containing the Lists
+	 */
+	public void setListsOfElement(GraphElement<?,?,?,?> ge, List[] lists){
+		for(int i = 0; i < lists.length; i++){
+			invokeSetList(ge, lists[i], i);
 		}
 	}
 	
@@ -413,27 +483,6 @@ public class GraphElementProfile {
 		
 		size += 64;
 	}
-	
-	/*private void detectStringGettersAndSetters(Class<?> cls, Stack<Field> strings){
-		String methodName;
-		Method m = null;
-		int index = 0;
-		
-		for (Field f: strings){
-			methodName = "get" + f.getName();
-			
-			try {
-				//fetch the get method and store it in the array
-				m = cls.getMethod(methodName, (Class<?>[]) null);
-				attrGetters[index] = m;
-				index++;
-			} catch (SecurityException e) {
-				throw new IllegalArgumentException("Method " + methodName + " is not public");
-			} catch (NoSuchMethodException e) {
-				throw new IllegalArgumentException("Unknown method " + methodName);
-			}
-		}
-	}*/
 	
 	/**
 	 * Helper method to obtain a set method for an attribute of type boolean.
@@ -616,7 +665,7 @@ public class GraphElementProfile {
 	 */
 	private void invokeSetString(GraphElement<?,?,?,?> ge, String argument, int position){
 		try {
-			attrSetters[position].invoke(ge, argument);
+			stringSetters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("Method " + attrSetters[position].getName() + " is not public");
 		} catch (InvocationTargetException e) {
@@ -637,7 +686,7 @@ public class GraphElementProfile {
 	 */
 	private void invokeSetList(GraphElement<?,?,?,?> ge, List<?> argument, int position){
 		try {
-			attrSetters[position].invoke(ge, argument);
+			listSetters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("Method " + attrSetters[position].getName() + " is not public");
 		} catch (InvocationTargetException e) {
@@ -737,7 +786,7 @@ public class GraphElementProfile {
 	 */
 	private String invokeGetString(GraphElement<?,?,?,?> ge, int position){
 		try {
-			return (String) attrGetters[position].invoke(ge, (Object[]) null);
+			return (String) stringGetters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("Method " + attrGetters[position].getName() + " is not public");
 		} catch (InvocationTargetException e) {
@@ -757,7 +806,7 @@ public class GraphElementProfile {
 	 */
 	private List<?> invokeGetList(GraphElement<?,?,?,?> ge, int position){
 		try {
-			return (List<?>) attrGetters[position].invoke(ge, (Object[]) null);
+			return (List<?>) listGetters[position].invoke(ge, (Object[]) null);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("Method " + attrGetters[position].getName() + " is not public");
 		} catch (InvocationTargetException e) {
