@@ -1,16 +1,18 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.List;
 
 import de.uni_koblenz.jgralab.Edge;
-import de.uni_koblenz.jgralab.GraphElement;
 import de.uni_koblenz.jgralab.GraphFactory;
 import de.uni_koblenz.jgralab.Incidence;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
-import de.uni_koblenz.jgralab.schema.GraphElementClass;
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
@@ -35,6 +37,17 @@ public class DiskStorageManager {
 	 * FileAccess objects to all the files used by this manager
 	 */
 	private FileAccess[] files;
+	
+	private FileAccess incidences;
+	
+	private FileAccess vertexDict;
+	private FileAccess edgeDict;
+	
+	private FileAccess strings;
+	private FileAccess lists;
+	
+	private long stringsPointer;
+	private long listsPointer;
 	
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
 		this.graphdb = graphdb;
@@ -62,16 +75,21 @@ public class DiskStorageManager {
 		//tell GraphElementProfile to instantiate the Array in which profiles are stored
 		GraphElementProfile.setup(amountOfClasses);
 		//make room for FileAccess objects, plus three more for incidences and the two dicts
-		files = new FileAccess[amountOfClasses + 3];
+		files = new FileAccess[amountOfClasses];
 		
 		//get lists of all vertex and edge classes
 		List<VertexClass> vClasses = s.getVertexClassesInTopologicalOrder();
 		List<EdgeClass> eClasses = s.getEdgeClassesInTopologicalOrder();
 		
-		//make FileAccess objects for incidences and the two dicts
-		files[amountOfClasses] = FileAccess.createFileAccess("incidences");
-		files[amountOfClasses + 1] = FileAccess.createFileAccess("vertexDict");
-		files[amountOfClasses + 2] = FileAccess.createFileAccess("edgeDict");
+		//make FileAccess objects for incidences, the two dicts, strings and lists
+		incidences = FileAccess.createFileAccess("incidences");
+		vertexDict = FileAccess.createFileAccess("vertexDict");
+		edgeDict = FileAccess.createFileAccess("edgeDict");
+		strings = FileAccess.createFileAccess("strings");
+		lists = FileAccess.createFileAccess("lists");
+		
+		stringsPointer = 0;
+		listsPointer = 0;
 		
 		//create a profile and a FileAccess for all non-abstract vertex classes
 		for (VertexClass vClass: vClasses){
@@ -141,7 +159,7 @@ public class DiskStorageManager {
 	 */
 	public CacheEntry<VertexImpl> readVertexFromDisk(int key){
 		//determine which vertex class we have to use
-		int typeId = getVertexDict().read(4, key*4).getInt(0);
+		int typeId = vertexDict.read(4, key*4).getInt(0);
 		
 		//read the data from the disk
 		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
@@ -163,7 +181,7 @@ public class DiskStorageManager {
 	 */
 	public CacheEntry<EdgeImpl> readEdgeFromDisk(int key){
 		//determine which edge class we have to use
-		int typeId = getEdgeDict().read(4, key*4).getInt(0);
+		int typeId = edgeDict.read(4, key*4).getInt(0);
 		
 		//read the data from the disk
 		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
@@ -211,11 +229,8 @@ public class DiskStorageManager {
 
 		ByteBuffer attributes = tracker.getVariables();
 		
-		//get the file in which incidences are stored
-		FileAccess file = files[files.length - 3];
-		
 		//incidences always need 52 bytes because they have no attributes
-		file.write(attributes, incidenceRef.getKey() * 52);
+		incidences.write(attributes, incidenceRef.getKey() * 52);
 	}
 	
 	/**
@@ -230,8 +245,7 @@ public class DiskStorageManager {
 		if (LOG) restoredIncidences++;
 		
 		//read 52 bytes from the file which stores the Incidences
-		FileAccess file = files[files.length - 3];
-		ByteBuffer buf = file.read(52, key * 52);
+		ByteBuffer buf = incidences.read(52, key * 52);
 		
 		buf.position(0);
 		
@@ -240,6 +254,58 @@ public class DiskStorageManager {
 		
 		//return a CacheEntry for that new incidence so we can put it back in the cache
 		return new CacheEntry<IncidenceImpl>(inc);
+	}
+	
+	public long writeStringToDisk(String s){
+		long currentPosition = stringsPointer;
+		
+		byte[] bytes = s.getBytes();
+		int length = bytes.length;
+		
+		ByteBuffer buf = ByteBuffer.allocate(4 + length);
+		buf.putInt(length);
+		buf.put(bytes);
+		
+		strings.write(buf, stringsPointer);
+		
+		stringsPointer += (4 + length);
+		
+		return currentPosition;
+	}
+	
+	public String readStringFromDisk(long position){
+		ByteBuffer buf = strings.read(4, position);
+		int length = buf.getInt(0);
+		
+		String res = new String(strings.read(length, position + 4).array());
+		
+		return res;
+	}
+	
+	public long writeListToDisk(List<?> l){
+		long currentPosition = listsPointer;
+		
+		byte[] bytes = serializeList(l);
+		int length = bytes.length;
+		
+		ByteBuffer buf = ByteBuffer.allocate(4 + length);
+		buf.putInt(length);
+		buf.put(bytes);
+		
+		lists.write(buf, listsPointer);
+		
+		listsPointer += (4 + length);
+		
+		return currentPosition;
+	}
+	
+	public List readListFromDisk(long position){
+		ByteBuffer buf = lists.read(4, position);
+		int length = buf.getInt(0);
+		
+		byte[] readBytes = lists.read(length, position + 4).array();
+		
+		return restoreList(readBytes);
 	}
 
 	/**
@@ -371,16 +437,48 @@ public class DiskStorageManager {
 	}
 	
 	/**
+	 * Converts a List to a ByteArray using the Java Serialization API.
+	 * 
+	 * @param l
+	 * 		The List to be serialized
+	 * 
+	 * @return
+	 * 		The List as a ByteArray
+	 */
+	public byte[] serializeList(List<?> l){
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		try {
+			ObjectOutputStream objStream = new ObjectOutputStream(outStream);
+			objStream.writeObject(l);
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to serialize list");
+		}
+		return outStream.toByteArray();
+	}
+	
+	public List restoreList(byte[] readBytes){
+		ByteArrayInputStream inStream = new ByteArrayInputStream(readBytes);
+		try {
+			ObjectInputStream objReader = new ObjectInputStream(inStream);
+			return (List) objReader.readObject();
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to create ObjectInputStream");
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("Unable to restore list");
+		}
+	}
+	
+	/**
 	 * Gets a file in which the vertex type ID for every vertex is stored
 	 */
 	public FileAccess getVertexDict(){
-		return files[files.length - 2];
+		return vertexDict;
 	}
 	
 	/**
 	 * Gets a file in which the edge type ID for every edge is stored
 	 */
 	public FileAccess getEdgeDict(){
-		return files[files.length - 1];
+		return edgeDict;
 	}
 }

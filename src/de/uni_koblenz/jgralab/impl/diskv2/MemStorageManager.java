@@ -118,6 +118,10 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		iRef.delete(incidenceQueue);
 	}
 	
+	public DiskStorageManager getDiskStorage(){
+		return diskStorage;
+	}
+	
 	public void printStats(){
 		diskStorage.printStats();
 	}
