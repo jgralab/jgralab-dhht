@@ -35,6 +35,9 @@ public class GraphElementProfile {
 	 */
 	private int size;
 	
+	private int startOfStrings;
+	private int startOfLists;
+	
 	/**
 	 * Array holding the type IDs of the generated primitive attributes
 	 * Each ID corresponds to a type. The table is:
@@ -157,6 +160,14 @@ public class GraphElementProfile {
 	 */
 	public int getSize(){
 		return size;
+	}
+	
+	public int getStartOfStrings(){
+		return startOfStrings;
+	}
+	
+	public int getStartOfLists(){
+		return startOfLists;
 	}
 	
 	/**
@@ -481,7 +492,9 @@ public class GraphElementProfile {
 			}
 		}
 		
-		size += 64;
+		startOfStrings = size + 64;
+		startOfLists = startOfStrings + stringGetters.length * 8;
+		size = startOfLists + listGetters.length * 8;
 	}
 	
 	/**
@@ -850,7 +863,9 @@ public class GraphElementProfile {
 	
 	@Override
 	public String toString(){
-		String output = "Size: " + Integer.toString(size) + "Bytes\n\n";
+		String output = "Size: " + Integer.toString(size) + " Bytes\n";
+		output += "startOfStrings: " + Integer.toString(startOfStrings) + "\n";
+		output += "startOfLists: " + Integer.toString(startOfLists) + "\n\n";
 		output += ("Primitives:\n");
 		for (int i = 0; i < attrTypeIDs.length; i++){
 			output += "Type:   " + getTypeName(attrTypeIDs[i]) + "\n";

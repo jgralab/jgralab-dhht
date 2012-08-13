@@ -136,17 +136,45 @@ public class DiskStorageManager {
 		}
 		if (LOG) writtenGEs++;
 		ByteBuffer attributes = tracker.getVariables();
+		String[] strings = tracker.getStrings();
+		List[] lists = tracker.getLists();
 		
 		//detect the type of the vertex or edge we want to write out
 		int typeId = attributes.getInt(0) - 1;
 		
+		//fetch the profile of this type
+		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
+		
 		//get access to the file in which elements of this type are stored
 		FileAccess file = files[typeId];
 		
-		//determine the size of the element we want to store, pun intended
-		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
+		//determine the size of the element we want to store
+		int byteSize = profile.getSize();
 		
-		file.write(attributes, vRef.getKey() * byteSize);
+		//write the primitive attributes to a file
+		file.write(attributes, byteSize * vRef.getKey());
+		
+		//write all Strings to a file, and store their location on the disk
+		int numElems = profile.getNumStrings();
+		ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
+		
+		for (int i = 0; i < numElems; i++){
+			long location = writeStringToDisk(strings[i]);
+			locations.putLong(location);
+		}
+		
+		locations.position(0);
+		file.write(locations, profile.getStartOfStrings());
+		
+		//write all Lists to a file, and store their location on the disk
+		numElems = profile.getNumLists();
+		locations = ByteBuffer.allocate(numElems * 8);
+				
+		for (int i = 0; i < numElems; i++){
+			locations.putLong(writeListToDisk(lists[i]));
+		}
+
+		file.write(locations, profile.getStartOfLists());
 	}
 	
 	/**
@@ -269,7 +297,7 @@ public class DiskStorageManager {
 		strings.write(buf, stringsPointer);
 		
 		stringsPointer += (4 + length);
-		
+
 		return currentPosition;
 	}
 	
@@ -278,7 +306,7 @@ public class DiskStorageManager {
 		int length = buf.getInt(0);
 		
 		String res = new String(strings.read(length, position + 4).array());
-		
+
 		return res;
 	}
 	
@@ -388,9 +416,34 @@ public class DiskStorageManager {
 		ge.restoreKappa(buf.getInt(60));
 		
 		//restore the generated attributes of this GraphElement
-		buf.position(64);
+		buf.position(64); //TODO: why?
 		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
 		prof.restoreAttributesOfElement(ge, buf);
+		
+		//restore the Strings of this GraphElement
+		long position;
+		buf.position(prof.getStartOfStrings());
+		
+		int numElems = prof.getNumStrings();
+		String[] strings = new String[numElems];
+		
+		for (int i = 0; i < numElems; i++){
+			position = buf.getLong();
+			strings[i] = readStringFromDisk(position);
+		}
+		
+		prof.setStringsOfElement(ge, strings);
+		
+		//restore the Lists of this GraphElement
+		numElems = prof.getNumLists();
+		List[] lists = new List[numElems];
+				
+		for (int i = 0; i < numElems; i++){
+			position = buf.getLong();
+			lists[i] = readListFromDisk(position);
+		}
+				
+		prof.setListsOfElement(ge, lists);
 
 		return ge;
 	}

@@ -2,6 +2,7 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 
 import de.uni_koblenz.jgralab.schema.IncidenceClass;
 
@@ -39,5 +40,15 @@ public class IncidenceTracker extends Tracker{
 	
 	public ByteBuffer getVariables(){
 		return variables;
+	}
+
+	@Override
+	public String[] getStrings() {
+		throw new UnsupportedOperationException("Tried to access strings[] for an IncidenceTracker");
+	}
+
+	@Override
+	public List[] getLists() {
+		throw new UnsupportedOperationException("Tried to access lists[] for an IncidenceTracker");
 	}
 }

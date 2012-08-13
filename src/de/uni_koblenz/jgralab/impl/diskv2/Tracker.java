@@ -1,6 +1,7 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Abstract class used to track a graph object. Every tracker tracks
@@ -70,4 +71,14 @@ public abstract class Tracker {
 	 * Method to access the ByteBuffer.
 	 */
 	public abstract ByteBuffer getVariables();
+	
+	/**
+	 * Method to access the Strings.
+	 */
+	public abstract String[] getStrings();
+	
+	/**
+	 * Method to access the Lists.
+	 */
+	public abstract List[] getLists();
 }

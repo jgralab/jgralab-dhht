@@ -1,15 +1,18 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import de.uni_koblenz.jgralab.GraphElement;
 
 public class GraphElementTracker extends Tracker{
 	
 	/**
-	 * Stores the attributes of a GraphElement.
+	 * Store the attributes, Strings and Lists of a GraphElement.
 	 */
 	private ByteBuffer attributes;
+	private String[] strings;
+	private List[] lists;
 	
 	/**
 	 * Create a new tracker with a ByteBuffer size of 64 Bytes.
@@ -35,6 +38,7 @@ public class GraphElementTracker extends Tracker{
 		putVariable(44, ge.getSigmaId());
 		putVariable(52, ge.getSubOrdinateGraphId());
 		putKappa(ge.getKappa());
+		
 		storeAttributes(ge);
 	}
 	
@@ -51,6 +55,8 @@ public class GraphElementTracker extends Tracker{
 		int typeId = ge.getType().getId();
 		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		attributes = profile.getAttributesForElement(ge);
+		strings = profile.getStringsForElement(ge);
+		lists = profile.getListsForElement(ge);
 	}
 	
 	public ByteBuffer getVariables(){
@@ -62,6 +68,14 @@ public class GraphElementTracker extends Tracker{
 		buf.put(variables.array());
 		buf.put(attributes.array());
 		return buf;
+	}
+	
+	public String[] getStrings(){
+		return strings;
+	}
+	
+	public List[] getLists(){
+		return lists;
 	}
 
 }
