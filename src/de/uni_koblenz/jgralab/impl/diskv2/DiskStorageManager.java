@@ -150,9 +150,10 @@ public class DiskStorageManager {
 		
 		//determine the size of the element we want to store
 		int byteSize = profile.getSize();
+		long baseLocation = byteSize * vRef.getKey();
 		
 		//write the primitive attributes to a file
-		file.write(attributes, byteSize * vRef.getKey());
+		file.write(attributes, baseLocation);
 		
 		//write all Strings to a file, and store their location on the disk
 		int numElems = profile.getNumStrings();
@@ -164,7 +165,7 @@ public class DiskStorageManager {
 		}
 		
 		locations.position(0);
-		file.write(locations, profile.getStartOfStrings());
+		file.write(locations, baseLocation + profile.getStartOfStrings());
 		
 		//write all Lists to a file, and store their location on the disk
 		numElems = profile.getNumLists();
@@ -174,7 +175,7 @@ public class DiskStorageManager {
 			locations.putLong(writeListToDisk(lists[i]));
 		}
 
-		file.write(locations, profile.getStartOfLists());
+		file.write(locations, baseLocation + profile.getStartOfLists());
 	}
 	
 	/**
@@ -285,6 +286,8 @@ public class DiskStorageManager {
 	}
 	
 	public long writeStringToDisk(String s){
+		if (s == null) return -1;
+		
 		long currentPosition = stringsPointer;
 		
 		byte[] bytes = s.getBytes();
@@ -302,6 +305,8 @@ public class DiskStorageManager {
 	}
 	
 	public String readStringFromDisk(long position){
+		if (position == -1) return null;
+		
 		ByteBuffer buf = strings.read(4, position);
 		int length = buf.getInt(0);
 		
@@ -311,6 +316,8 @@ public class DiskStorageManager {
 	}
 	
 	public long writeListToDisk(List<?> l){
+		if (l == null) return -1;
+		
 		long currentPosition = listsPointer;
 		
 		byte[] bytes = serializeList(l);
@@ -328,6 +335,8 @@ public class DiskStorageManager {
 	}
 	
 	public List readListFromDisk(long position){
+		if (position == -1) return null;
+		
 		ByteBuffer buf = lists.read(4, position);
 		int length = buf.getInt(0);
 		
