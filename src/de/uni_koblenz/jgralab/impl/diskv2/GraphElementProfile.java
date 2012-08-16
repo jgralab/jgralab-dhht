@@ -201,7 +201,7 @@ public class GraphElementProfile {
 	 */
 	public ByteBuffer getAttributesForElement(GraphElement<?,?,?,?> ge){
 		//make enough room to store all attributes
-		ByteBuffer buf = ByteBuffer.allocate(size);
+		ByteBuffer buf = ByteBuffer.allocate(startOfStrings - 64);
 		
 		//iterate over every attribute
 		for (int i = 0; i < attrTypeIDs.length; i++){
@@ -268,6 +268,8 @@ public class GraphElementProfile {
 	 * 		An Array containing the given GraphElement's Strings
 	 */
 	public String[] getStringsForElement(GraphElement<?,?,?,?> ge){
+		if (stringGetters.length == 0) return null;
+		
 		String[] strings = new String[stringGetters.length];
 		for(int i = 0; i < stringGetters.length; i++){
 			strings[i] = invokeGetString(ge, i);
@@ -300,6 +302,8 @@ public class GraphElementProfile {
 	 * 		An Array containing the given GraphElement's Lists
 	 */
 	public List[] getListsForElement(GraphElement<?,?,?,?> ge){
+		if (listGetters.length == 0) return null;
+	
 		List[] lists = new List[listGetters.length];
 		for(int i = 0; i < listGetters.length; i++){
 			lists[i] = invokeGetList(ge, i);

@@ -83,13 +83,33 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	public abstract GraphElementTracker getTracker();
 	
 	/**
-	 * Called whenever an attribute of this GraphElement changed so the
+	 * Called whenever a primitive attribute of this GraphElement changed so the
 	 * new attribute value is stored in the Tracker.
 	 */
 	public void attributeChanged() {
 		GraphElementTracker tracker = getTracker();
 		if (tracker != null)
 			tracker.storeAttributes(this);
+	}
+	
+	/**
+	 * Called whenever a String of this GraphElement changed so the
+	 * new String is stored in the Tracker.
+	 */
+	public void stringChanged() {
+		GraphElementTracker tracker = getTracker();
+		if (tracker != null)
+			tracker.storeStrings(this);
+	}
+	
+	/**
+	 * Called whenever a List of this GraphElement changed so the
+	 * new list value is stored in the Tracker.
+	 */
+	public void listChanged() {
+		GraphElementTracker tracker = getTracker();
+		if (tracker != null)
+			tracker.storeLists(this);
 	}
 
 	/**

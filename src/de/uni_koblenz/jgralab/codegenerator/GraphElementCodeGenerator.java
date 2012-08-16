@@ -204,7 +204,13 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 		code.setVariable("name", attr.getName());
 		code.setVariable("type", attr.getDomain()
 				.getJavaAttributeImplementationTypeName(schemaRootPackageName));
-		code.setVariable("dname", attr.getDomain().getSimpleName());
+		
+		String dsn = attr.getDomain().getSimpleName();
+		code.setVariable("dname", dsn);
+		
+		if (dsn.equals("String")) code.setVariable("mPrefix", "string");
+		else if (dsn.startsWith("List")) code.setVariable("mPrefix", "list");
+		else code.setVariable("mPrefix", "attribute");
 
 		switch (currentCycle) {
 		case ABSTRACT:
@@ -221,7 +227,7 @@ public abstract class GraphElementCodeGenerator<MetaClass extends GraphElementCl
 			code.add("public void set_#name#(#type# new_#name#) {",
 					 "\t_#name# = new_#name#;", 
 					 "\tgraphModified();",
-					 "\tattributeChanged();",
+					 "\t#mPrefix#Changed();",
 					 "}");
 			break;
 		case DISKBASED:

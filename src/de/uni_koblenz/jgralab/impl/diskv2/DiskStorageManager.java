@@ -156,26 +156,32 @@ public class DiskStorageManager {
 		file.write(attributes, baseLocation);
 		
 		//write all Strings to a file, and store their location on the disk
-		int numElems = profile.getNumStrings();
-		ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
-		
-		for (int i = 0; i < numElems; i++){
-			long location = writeStringToDisk(strings[i]);
-			locations.putLong(location);
+		if (strings != null){
+			System.out.println("Writing Strings");
+			int numElems = profile.getNumStrings();
+			ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
+			
+			for (int i = 0; i < numElems; i++){
+				long location = writeStringToDisk(strings[i]);
+				locations.putLong(location);
+			}
+			
+			locations.position(0);
+			file.write(locations, baseLocation + profile.getStartOfStrings());
 		}
-		
-		locations.position(0);
-		file.write(locations, baseLocation + profile.getStartOfStrings());
 		
 		//write all Lists to a file, and store their location on the disk
-		numElems = profile.getNumLists();
-		locations = ByteBuffer.allocate(numElems * 8);
+		if (lists != null){
+			System.out.println("Writing Lists");
+			int numElems = profile.getNumLists();
+			ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
 				
-		for (int i = 0; i < numElems; i++){
-			locations.putLong(writeListToDisk(lists[i]));
-		}
+			for (int i = 0; i < numElems; i++){
+				locations.putLong(writeListToDisk(lists[i]));
+			}
 
-		file.write(locations, baseLocation + profile.getStartOfLists());
+			file.write(locations, baseLocation + profile.getStartOfLists());
+		}
 	}
 	
 	/**

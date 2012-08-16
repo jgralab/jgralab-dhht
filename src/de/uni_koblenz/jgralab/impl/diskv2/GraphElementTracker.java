@@ -27,9 +27,16 @@ public class GraphElementTracker extends Tracker{
 	 * @param ge - The GraphElement to be tracked
 	 */
 	public void fill(GraphElementImpl<?,?,?,?> ge){
+		storeAttributes(ge);
+		storeStrings(ge);
+		storeLists(ge);
+	}
+	
+	private void storeVariables(GraphElementImpl<?,?,?,?> ge){
+		//TODO Don't put typeID in the buffer, but declare it as a normal member
 		int typeId = ge.getType().getId();
 		variables.putInt(0, (typeId + 1));
-		
+				
 		putVariable(4, ge.getNextElementId());
 		putVariable(12, ge.getPreviousElementId());
 		putVariable(20, ge.getFirstIncidenceId());
@@ -38,8 +45,6 @@ public class GraphElementTracker extends Tracker{
 		putVariable(44, ge.getSigmaId());
 		putVariable(52, ge.getSubOrdinateGraphId());
 		putKappa(ge.getKappa());
-		
-		storeAttributes(ge);
 	}
 	
 	public void putKappa(int kappa){
@@ -52,10 +57,35 @@ public class GraphElementTracker extends Tracker{
 	 * @param ge - The GraphElement to be tracked
 	 */
 	public void storeAttributes(GraphElementImpl<?,?,?,?> ge){
+		storeVariables(ge);
 		int typeId = ge.getType().getId();
 		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		attributes = profile.getAttributesForElement(ge);
+	}
+	
+	/**
+	 * Stores the attributes of a GraphElement in the ByteBuffer.
+	 * 
+	 * @param ge - The GraphElement to be tracked
+	 */
+	public void storeStrings(GraphElementImpl<?,?,?,?> ge){
+		//TODO avoid doing this
+		if (attributes == null) storeAttributes(ge);
+		int typeId = ge.getType().getId();
+		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		strings = profile.getStringsForElement(ge);
+	}
+	
+	/**
+	 * Stores the attributes of a GraphElement in the ByteBuffer.
+	 * 
+	 * @param ge - The GraphElement to be tracked
+	 */
+	public void storeLists(GraphElementImpl<?,?,?,?> ge){
+		//TODO avoid doing this
+		if (attributes == null) storeAttributes(ge);
+		int typeId = ge.getType().getId();
+		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		lists = profile.getListsForElement(ge);
 	}
 	

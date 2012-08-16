@@ -260,7 +260,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
 		putElement(vEntry, vertexCache, hash(v.hashCode(), vertexMask));
 		
-		vEntry.getOrCreateGETracker(v);
+		vEntry.getOrCreateGETracker(v).fill(v);
 		
 		FileAccess dict = diskStorage.getVertexDict();
 		ByteBuffer buf = ByteBuffer.allocate(4);
@@ -280,7 +280,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
 		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
 		
-		eEntry.getOrCreateGETracker(e);
+		eEntry.getOrCreateGETracker(e).fill(e);
 		
 		FileAccess dict = diskStorage.getEdgeDict();
 		ByteBuffer buf = ByteBuffer.allocate(4);

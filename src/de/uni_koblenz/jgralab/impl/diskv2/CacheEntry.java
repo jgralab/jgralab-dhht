@@ -67,7 +67,7 @@ public class CacheEntry<V>{
 	public GraphElementTracker getOrCreateGETracker(GraphElementImpl<?,?,?,?> ge){
 		if (tracker == null){
 			GraphElementTracker geTracker = new GraphElementTracker();
-			geTracker.fill(ge);
+			geTracker.storeAttributes(ge);
 			this.tracker = geTracker;
 		}
 		
