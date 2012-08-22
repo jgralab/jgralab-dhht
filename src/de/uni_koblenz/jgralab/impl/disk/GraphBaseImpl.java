@@ -1270,8 +1270,12 @@ public abstract class GraphBaseImpl implements Graph {
 	
 	@Override
 	public void savePartialGraphs(GraphIO graphIO) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
+	}
+	
+	@Override
+	public void setMaxDiskStorageSize(long size){
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

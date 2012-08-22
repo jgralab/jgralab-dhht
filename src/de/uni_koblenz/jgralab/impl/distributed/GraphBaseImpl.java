@@ -1277,6 +1277,11 @@ public abstract class GraphBaseImpl implements Graph {
 	}
 	
 	@Override
+	public void setMaxDiskStorageSize(long size){
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public Record createRecord(Class<? extends Record> cls,
 			Map<String, Object> values) {
 		try {

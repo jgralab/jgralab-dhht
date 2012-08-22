@@ -26,6 +26,7 @@ import de.uni_koblenz.jgralab.NoSuchAttributeException;
 import de.uni_koblenz.jgralab.Record;
 import de.uni_koblenz.jgralab.Vertex;
 import de.uni_koblenz.jgralab.impl.RemoteGraphDatabaseAccess;
+import de.uni_koblenz.jgralab.impl.diskv2.DiskStorageManager;
 import de.uni_koblenz.jgralab.schema.EdgeClass;
 import de.uni_koblenz.jgralab.schema.GraphClass;
 import de.uni_koblenz.jgralab.schema.Schema;
@@ -623,6 +624,11 @@ public class MarkerGraphImpl implements Graph {
 	@Override
 	public RemoteGraphDatabaseAccess getGraphDatabase() {
 		throw new UnsupportedOperationException(MARKER_GRAPH_EXCEPTION);
+	}
+	
+	@Override
+	public void setMaxDiskStorageSize(long size){
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

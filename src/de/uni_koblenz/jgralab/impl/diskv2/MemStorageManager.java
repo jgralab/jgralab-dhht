@@ -121,10 +121,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	public DiskStorageManager getDiskStorage(){
 		return diskStorage;
 	}
-	
-	public void printStats(){
-		diskStorage.printStats();
-	}
 	//TODO: End of block to be deleted
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {

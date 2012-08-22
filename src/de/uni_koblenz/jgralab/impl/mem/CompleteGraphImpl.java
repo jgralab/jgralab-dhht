@@ -1565,7 +1565,7 @@ public abstract class CompleteGraphImpl extends GraphBaseImpl {
 		vMax = newSize;
 		notifyMaxVertexCountIncreased(newSize);
 	}
-
+	
 	// ============================================================================
 	// Methods to create complex values such as lists and maps
 	// ============================================================================

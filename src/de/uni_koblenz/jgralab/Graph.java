@@ -803,6 +803,13 @@ public interface Graph extends AttributedElement<GraphClass, Graph> {
 	 */
 	public RemoteGraphDatabaseAccess getGraphDatabase();
 	
+	/**
+	 * Sets the maximum allowed size of the disk storage, if it is used.
+	 * 
+	 * @param size
+	 */
+	public void setMaxDiskStorageSize(long size);
+	
 	
 	// ============================================================================
 	// Methods to create complex values such as lists and maps

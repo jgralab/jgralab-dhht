@@ -728,6 +728,11 @@ public abstract class ViewGraphImpl implements Graph,
 	public void readAttributeValues(GraphIO io) throws GraphIOException {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public void setMaxDiskStorageSize(long size){
+		throw new UnsupportedOperationException();
+	}
 
 	@Override
 	public Record createRecord(Class<? extends Record> cls,

@@ -26,7 +26,7 @@ public class FileAccessDefault extends FileAccess{
 	/**
 	 * The size of the area of the file that is mapped into memory, in bytes.
 	 */
-	private static final int FILE_AREA = 1048576;
+	private static final int FILE_AREA = 104857600;
 	
 	/**
 	 * Denotes the first byte of the access window.
@@ -112,14 +112,16 @@ public class FileAccessDefault extends FileAccess{
 			if (index < 512){
 				//case 1: index < FILE_AREA/2
 				//map the first FILE_AREA bytes
+				requestSizeChange(FILE_AREA);
 				firstByte = 0;
 				lastByte = FILE_AREA;
 			}
 			else {
 				//case 2: index > FILE_AREA/2
 				//map from index - FILE_AREA/2 to index + FILE_AREA/2
-				firstByte = index - 512;
-				lastByte = index + 512;
+				requestSizeChange(FILE_AREA/2);
+				firstByte = index - FILE_AREA/2;
+				lastByte = index + FILE_AREA/2;
 			}
 			
 			try {

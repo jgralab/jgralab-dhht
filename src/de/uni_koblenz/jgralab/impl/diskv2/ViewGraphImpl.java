@@ -731,6 +731,10 @@ public abstract class ViewGraphImpl implements Graph,
 	public void initializeAttributesWithDefaultValues() {
 		throw new UnsupportedOperationException();
 	}
+	
+	public void setMaxDiskStorageSize(long size){
+		DiskStorageManager.setMaxDiskStorageSize(size * 1024576);
+	}
 
 	@Override
 	public Record createRecord(Class<? extends Record> cls,

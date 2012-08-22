@@ -38,6 +38,7 @@ public class FileAccessForWindows extends FileAccess{
 	@Override
 	public void write(ByteBuffer content, long index){
 	
+		requestSizeChange(index);
 		content.position(0);
 		
 		try {

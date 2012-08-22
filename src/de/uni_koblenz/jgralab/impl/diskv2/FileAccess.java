@@ -3,7 +3,6 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.HashMap;
 
 /**
  * Wrapper class to provide access to a file.
@@ -26,12 +25,18 @@ public abstract class FileAccess {
 	/**
 	 * Checks if the used OS is windows
 	 */
-	private static boolean windows = isWindows();
+	//private static boolean windows = isWindows();
+	private static boolean windows = false;
 	
 	/**
 	 * The FileChannel used to access the file.
 	 */
 	protected FileChannel channel;
+	
+	/**
+	 * The current size of the accessed file
+	 */
+	private long size;
 	
 	/**
 	 * Factory method that provides a FileAccess object for a specific file.
@@ -92,6 +97,13 @@ public abstract class FileAccess {
 	public static boolean isWindows() {
 		String os = System.getProperty("os.name").toLowerCase();
 		return (os.indexOf("win") >= 0);
+	}
+	
+	protected void requestSizeChange(long newSize){
+		if (newSize > size){
+			DiskStorageManager.increaseDiskStorageSize(newSize - size);
+			size = newSize;
+		}
 	}
 	
 	/**

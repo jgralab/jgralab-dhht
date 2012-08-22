@@ -1236,6 +1236,10 @@ public abstract class GraphBaseImpl implements Graph, GraphInternalMethods {
 		throw new UnsupportedOperationException("InMemory implementation does not support partial graphs and their distribution");
 	}
 	
+	@Override
+	public void setMaxDiskStorageSize(long size){
+		throw new UnsupportedOperationException();
+	}
 //	
 //	@Override
 //	public Object getEnumConstant(Class<? extends Enum> enumDomain, String constantName) {

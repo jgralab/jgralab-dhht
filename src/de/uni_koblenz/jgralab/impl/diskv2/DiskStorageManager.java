@@ -18,16 +18,7 @@ import de.uni_koblenz.jgralab.schema.Schema;
 import de.uni_koblenz.jgralab.schema.VertexClass;
 
 public class DiskStorageManager {
-	
-	//TODO: For testing purposes, delete eventually
-	boolean LOG = true;
-	int deletedGEs;
-	int writtenGEs;
-	int restoredGEs;
-	int deletedIncidences;
-	int writtenIncidences;
-	int restoredIncidences;
-	
+		
 	/**
 	 * The GraphDatabase that this DiskStorageManager works for
 	 */
@@ -53,14 +44,6 @@ public class DiskStorageManager {
 		this.graphdb = graphdb;
 
 		setupFilesAndProfiles();
-		
-		//TODO: For testing purposes, delete eventually
-		deletedGEs = 0;
-		writtenGEs = 0;
-		restoredGEs = 0;
-		deletedIncidences = 0;
-		writtenIncidences = 0;
-		restoredIncidences = 0;
 	}
 	
 	/**
@@ -110,16 +93,6 @@ public class DiskStorageManager {
 		}
 	}
 	
-	//TODO: testing
-	public void printStats(){
-		System.out.println("Deleted  Elements  : " + deletedGEs);
-		System.out.println("Written to Disk    : " + writtenGEs);
-		System.out.println("Restored Elements  : " + restoredGEs);
-		System.out.println("Deleted  Incidences: " + deletedIncidences);
-		System.out.println("Written to Disk    : " + writtenIncidences);
-		System.out.println("Restored Incidences: " + restoredIncidences);
-	}
-	
 	/**
 	 * Writes a Graph Element to the disk if it has been newly created, or if it has
 	 * been changed since the last time it was loaded from the disk.
@@ -128,13 +101,11 @@ public class DiskStorageManager {
 	 */
 	public void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> vRef){
 		Tracker tracker = vRef.getTracker();
-		if (LOG) deletedGEs++;
 		
 		if (tracker == null) {
 			//element is neither new nor has it been changed since its last reload
 			return;
 		}
-		if (LOG) writtenGEs++;
 		ByteBuffer attributes = tracker.getVariables();
 		String[] strings = tracker.getStrings();
 		List[] lists = tracker.getLists();
@@ -157,7 +128,6 @@ public class DiskStorageManager {
 		
 		//write all Strings to a file, and store their location on the disk
 		if (strings != null){
-			System.out.println("Writing Strings");
 			int numElems = profile.getNumStrings();
 			ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
 			
@@ -172,7 +142,6 @@ public class DiskStorageManager {
 		
 		//write all Lists to a file, and store their location on the disk
 		if (lists != null){
-			System.out.println("Writing Lists");
 			int numElems = profile.getNumLists();
 			ByteBuffer locations = ByteBuffer.allocate(numElems * 8);
 				
@@ -233,8 +202,6 @@ public class DiskStorageManager {
 	 * and readEdgeFromDisk
 	 */
 	private ByteBuffer readGraphElementFromDisk(int key, int typeId){
-		if (LOG) restoredGEs++;
-		
 		//determine the size of the GraphElement we want to restore
 		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
 		
@@ -254,13 +221,11 @@ public class DiskStorageManager {
 	 */
 	public void writeIncidenceToDisk(CacheEntry<IncidenceImpl> incidenceRef){
 		Tracker tracker = incidenceRef.getTracker();
-		if (LOG) deletedIncidences++;
 		
 		if (tracker == null) {
 			//incidence is neither new nor has it been changed since its last reload
 			return;
 		}
-		if (LOG) writtenIncidences++;
 
 		ByteBuffer attributes = tracker.getVariables();
 		
@@ -276,9 +241,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        A soft reference to the restored incidence
 	 */
-	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){
-		if (LOG) restoredIncidences++;
-		
+	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){		
 		//read 52 bytes from the file which stores the Incidences
 		ByteBuffer buf = incidences.read(52, key * 52);
 		
@@ -431,7 +394,7 @@ public class DiskStorageManager {
 		ge.restoreKappa(buf.getInt(60));
 		
 		//restore the generated attributes of this GraphElement
-		buf.position(64); //TODO: why?
+		buf.position(64);
 		GraphElementProfile prof = GraphElementProfile.getProfile(typeId);
 		prof.restoreAttributesOfElement(ge, buf);
 		
@@ -548,5 +511,31 @@ public class DiskStorageManager {
 	 */
 	public FileAccess getEdgeDict(){
 		return edgeDict;
+	}
+	
+	//-------------------------------------------------------------------
+	//Methods and Variables to enforce a maximum size of the disk storage
+	//-------------------------------------------------------------------
+	
+	private static long diskStorageSize;
+	private static long maxDiskStorageSize = -1;
+	
+	public static void setMaxDiskStorageSize(long size){
+		if (size < 1){
+			throw new IllegalArgumentException("Maximum Disk Storage size must be bigger than zero");
+		}
+		maxDiskStorageSize = size;
+		checkDiskStorage();
+	}
+	
+	public static void increaseDiskStorageSize(long increment){
+		diskStorageSize += increment;
+		checkDiskStorage();
+	}
+	
+	private static void checkDiskStorage(){
+		if (maxDiskStorageSize > 0 && diskStorageSize > maxDiskStorageSize){
+			throw new RuntimeException("Maximum Disk Storage size exceeded");
+		}
 	}
 }

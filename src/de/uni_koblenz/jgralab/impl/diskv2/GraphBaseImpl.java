@@ -1276,6 +1276,10 @@ public abstract class GraphBaseImpl implements Graph {
 		return getGraphDatabase().getEdgeObject(eid);
 	}
 	
+	public void setMaxDiskStorageSize(long size){
+		DiskStorageManager.setMaxDiskStorageSize(size * 1024576);
+	}
+	
 	@Override
 	public Record createRecord(Class<? extends Record> cls,
 			Map<String, Object> values) {
