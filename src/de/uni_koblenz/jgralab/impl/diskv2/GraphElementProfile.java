@@ -286,7 +286,7 @@ public class GraphElementProfile {
 	 * @param buf
 	 *      An Array containing the Strings
 	 */
-	public void setStringsOfElement(GraphElement<?,?,?,?> ge, String[] strings){
+	public void restoreStringsOfElement(GraphElement<?,?,?,?> ge, String[] strings){
 		for(int i = 0; i < strings.length; i++){
 			invokeSetString(ge, strings[i], i);
 		}
@@ -320,7 +320,7 @@ public class GraphElementProfile {
 	 * @param buf
 	 *      An Array containing the Lists
 	 */
-	public void setListsOfElement(GraphElement<?,?,?,?> ge, List[] lists){
+	public void restoreListsOfElement(GraphElement<?,?,?,?> ge, List[] lists){
 		for(int i = 0; i < lists.length; i++){
 			invokeSetList(ge, lists[i], i);
 		}

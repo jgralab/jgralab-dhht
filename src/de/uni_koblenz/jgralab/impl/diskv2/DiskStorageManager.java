@@ -410,7 +410,7 @@ public class DiskStorageManager {
 			strings[i] = readStringFromDisk(position);
 		}
 		
-		prof.setStringsOfElement(ge, strings);
+		prof.restoreStringsOfElement(ge, strings);
 		
 		//restore the Lists of this GraphElement
 		numElems = prof.getNumLists();
@@ -421,7 +421,7 @@ public class DiskStorageManager {
 			lists[i] = readListFromDisk(position);
 		}
 				
-		prof.setListsOfElement(ge, lists);
+		prof.restoreListsOfElement(ge, lists);
 
 		return ge;
 	}

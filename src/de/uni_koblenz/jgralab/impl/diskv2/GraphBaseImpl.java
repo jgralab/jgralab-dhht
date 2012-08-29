@@ -1276,8 +1276,14 @@ public abstract class GraphBaseImpl implements Graph {
 		return getGraphDatabase().getEdgeObject(eid);
 	}
 	
+	/**
+	 * Set the maximum size of the entire disk storage.
+	 * 
+	 * @param size
+	 *    The new maximum size of the disk storage in Gigabytes
+	 */
 	public void setMaxDiskStorageSize(long size){
-		DiskStorageManager.setMaxDiskStorageSize(size * 1024576);
+		DiskStorageManager.setMaxDiskStorageSize(size * 1049165824);
 	}
 	
 	@Override

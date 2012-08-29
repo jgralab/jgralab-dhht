@@ -25,8 +25,8 @@ public abstract class FileAccess {
 	/**
 	 * Checks if the used OS is windows
 	 */
-	//private static boolean windows = isWindows();
-	private static boolean windows = false;
+	private static boolean windows = isWindows();
+	//private static boolean windows = false;
 	
 	/**
 	 * The FileChannel used to access the file.
