@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.Queue;
 
@@ -29,8 +30,8 @@ public class CacheEntry<V> extends SoftReference<V>{
 	 */
 	private Tracker tracker;
 	
-	public CacheEntry(V value){
-		super(value);
+	public CacheEntry(V value, ReferenceQueue<V> refQueue){
+		super(value, refQueue);
 		key = value.hashCode();
 	}
 	

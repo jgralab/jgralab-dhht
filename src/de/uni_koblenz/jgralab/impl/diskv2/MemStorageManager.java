@@ -1,6 +1,8 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.nio.ByteBuffer;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
@@ -87,41 +89,14 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * Incidence object
 	 */
 	//TODO: Change to a ReferenceQueue
-	private Queue<CacheEntry<VertexImpl>> vertexQueue 
-		= new LinkedList<CacheEntry<VertexImpl>>();
+	private ReferenceQueue<VertexImpl> vertexQueue 
+		= new ReferenceQueue<VertexImpl>();
 	
-	private Queue<CacheEntry<EdgeImpl>> edgeQueue 
-	= new LinkedList<CacheEntry<EdgeImpl>>();
+	private ReferenceQueue<EdgeImpl> edgeQueue 
+		= new ReferenceQueue<EdgeImpl>();
 	
-	private Queue<CacheEntry<IncidenceImpl>> incidenceQueue 
-	= new LinkedList<CacheEntry<IncidenceImpl>>();
-	
-	//TODO: Temporary methods for testing, delete this eventually
-	public synchronized void nullVertexReference(int vertexId){
-		CacheEntry<VertexImpl> vRef = getElement(vertexCache, vertexId, 
-				hash(vertexId, vertexMask));
-		if (vRef == null) return;
-		vRef.delete(vertexQueue);
-	}
-	
-	public synchronized void nullEdgeReference(int edgeId){
-		CacheEntry<EdgeImpl> eRef = getElement(edgeCache, edgeId, 
-				hash(edgeId, edgeMask));
-		if (eRef == null) return;
-		eRef.delete(edgeQueue);
-	}
-	
-	public synchronized void nullIncidenceReference(int incidenceId){
-		CacheEntry<IncidenceImpl> iRef = getElement(incidenceCache, incidenceId, 
-				hash(incidenceId, incidenceMask));
-		if (iRef == null) return;
-		iRef.delete(incidenceQueue);
-	}
-	
-	public DiskStorageManager getDiskStorage(){
-		return diskStorage;
-	}
-	//TODO: End of block to be deleted
+	private ReferenceQueue<IncidenceImpl> incidenceQueue 
+		= new ReferenceQueue<IncidenceImpl>();
 	
 	public MemStorageManager(GraphDatabaseBaseImpl database) {
 		diskStorage = new DiskStorageManager(database);
@@ -168,10 +143,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
 		
 		if (entry == null){
-			CacheEntry<VertexImpl> vRef = diskStorage.readVertexFromDisk(id);
-			if (vRef == null){
+			VertexImpl v = diskStorage.readVertexFromDisk(id);
+			if (v == null){
 				return null;
 			}
+			CacheEntry<VertexImpl> vRef = new CacheEntry<VertexImpl>(v, vertexQueue);
 			putElement(vRef, vertexCache, hash(id, vertexMask));
 			return vRef.get();
 		}
@@ -191,10 +167,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
 		
 		if (entry == null){
-			CacheEntry<EdgeImpl> eRef = diskStorage.readEdgeFromDisk(id);
-			if (eRef == null){
+			EdgeImpl e = diskStorage.readEdgeFromDisk(id);
+			if (e == null){
 				return null;
 			}
+			CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
 			putElement(eRef, edgeCache, hash(id, edgeMask));
 			return eRef.get();
 		}
@@ -216,10 +193,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
 		if (entry == null){
-			CacheEntry<IncidenceImpl> incRef = diskStorage.readIncidenceFromDisk(id);
-			if (incRef == null){
+			IncidenceImpl inc = diskStorage.readIncidenceFromDisk(id);
+			if (inc == null){
 				return null;
 			}
+			CacheEntry<IncidenceImpl> incRef = new CacheEntry<IncidenceImpl>(inc, incidenceQueue);
 			putElement(incRef, incidenceCache, hash(id, incidenceMask));
 			return incRef.get();
 		}
@@ -253,7 +231,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param v the Vertex to be cached
 	 */
 	public synchronized void putVertex(VertexImpl v) {
-		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v);
+		CacheEntry<VertexImpl> vEntry = new CacheEntry<VertexImpl>(v, vertexQueue);
 		putElement(vEntry, vertexCache, hash(v.hashCode(), vertexMask));
 		
 		vEntry.getOrCreateGETracker(v).fill(v);
@@ -273,7 +251,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param e the Edge to be cached
 	 */
 	public synchronized void putEdge(EdgeImpl e) {
-		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e);
+		CacheEntry<EdgeImpl> eEntry = new CacheEntry<EdgeImpl>(e, edgeQueue);
 		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
 		
 		eEntry.getOrCreateGETracker(e).fill(e);
@@ -293,7 +271,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * @param i the Incidence to be cached
 	 */
 	public synchronized void putIncidence(IncidenceImpl i) {
-		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i);
+		CacheEntry<IncidenceImpl> iEntry = new CacheEntry<IncidenceImpl>(i, incidenceQueue);
 		
 		//this method isn't called when incidences are read from the disk
 		//so we know that the incidence has been newly created
@@ -749,13 +727,13 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * the CacheEntry that referenced the deleted object is removed from the cache.
 	 */
 	private void cleanupVertexCache(){
-		CacheEntry<VertexImpl> current = vertexQueue.poll();
+		CacheEntry<VertexImpl> current = (CacheEntry<VertexImpl>) vertexQueue.poll();
 		
 		while(current != null){
 			diskStorage.writeGraphElementToDisk(current);
 			removeElement(vertexCache, current.getKey(), 
 					hash(current.getKey(), vertexMask));
-			current = vertexQueue.poll();
+			current = (CacheEntry<VertexImpl>) vertexQueue.poll();
 		}
 	}
 	
@@ -767,13 +745,13 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * the CacheEntry that referenced the deleted object is removed from the cache.
 	 */
 	private void cleanupEdgeCache(){
-		CacheEntry<EdgeImpl> current = edgeQueue.poll();
+		CacheEntry<EdgeImpl> current = (CacheEntry<EdgeImpl>) edgeQueue.poll();
 		
 		while(current != null){
 			diskStorage.writeGraphElementToDisk(current);
 			removeElement(edgeCache, current.getKey(), 
 					hash(current.getKey(), edgeMask));
-			current = edgeQueue.poll();
+			current = (CacheEntry<EdgeImpl>) edgeQueue.poll();
 		}
 	}
 	
@@ -785,13 +763,13 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	 * the CacheEntry that referenced the deleted object is removed from the cache.
 	 */
 	private void cleanupIncidenceCache(){
-		CacheEntry<IncidenceImpl> current = incidenceQueue.poll();
+		CacheEntry<IncidenceImpl> current = (CacheEntry<IncidenceImpl>) incidenceQueue.poll();
 		
 		while(current != null){
 			diskStorage.writeIncidenceToDisk(current);
 			removeElement(incidenceCache, current.getKey(), 
 					hash(current.getKey(), incidenceMask));
-			current = incidenceQueue.poll();
+			current = (CacheEntry<IncidenceImpl>) incidenceQueue.poll();
 		}
 	}
 	

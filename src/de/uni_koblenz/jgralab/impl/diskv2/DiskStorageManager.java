@@ -161,7 +161,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        A soft reference to the restored vertex
 	 */
-	public CacheEntry<VertexImpl> readVertexFromDisk(int key){
+	public VertexImpl readVertexFromDisk(int key){
 		//determine which vertex class we have to use
 		int typeId = vertexDict.read(4, key*4).getInt(0);
 		
@@ -172,7 +172,7 @@ public class DiskStorageManager {
 		VertexImpl ver = restoreVertex(buf, key);
 		
 		//return a CacheEntry for that new vertex so we can put it back in the cache
-		return new CacheEntry<VertexImpl>(ver);
+		return ver;
 	}
 	
 	/**
@@ -183,7 +183,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        A soft reference to the restored vertex
 	 */
-	public CacheEntry<EdgeImpl> readEdgeFromDisk(int key){
+	public EdgeImpl readEdgeFromDisk(int key){
 		//determine which edge class we have to use
 		int typeId = edgeDict.read(4, key*4).getInt(0);
 		
@@ -194,7 +194,7 @@ public class DiskStorageManager {
 		EdgeImpl edge = restoreEdge(buf, key);
 		
 		//return a CacheEntry for that new vertex so we can put it back in the cache
-		return new CacheEntry<EdgeImpl>(edge);
+		return edge;
 	}
 	
 	/**
@@ -241,7 +241,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        A soft reference to the restored incidence
 	 */
-	public CacheEntry<IncidenceImpl> readIncidenceFromDisk(int key){		
+	public IncidenceImpl readIncidenceFromDisk(int key){		
 		//read 52 bytes from the file which stores the Incidences
 		ByteBuffer buf = incidences.read(52, key * 52);
 		
@@ -251,7 +251,7 @@ public class DiskStorageManager {
 		IncidenceImpl inc = restoreIncidence(buf, key);
 		
 		//return a CacheEntry for that new incidence so we can put it back in the cache
-		return new CacheEntry<IncidenceImpl>(inc);
+		return inc;
 	}
 	
 	public long writeStringToDisk(String s){
