@@ -1,5 +1,6 @@
 package de.uni_koblenz.jgralab.impl.diskv2;
 
+import java.lang.ref.SoftReference;
 import java.util.Queue;
 
 import de.uni_koblenz.jgralab.GraphElement;
@@ -11,12 +12,7 @@ import de.uni_koblenz.jgralab.GraphElement;
  *
  */
 
-public class CacheEntry<V>{
-	
-	/**
-	 * the value of this entry
-	 */
-	private V value;
+public class CacheEntry<V> extends SoftReference<V>{
 	
 	/**
 	 * the key of this entry
@@ -34,7 +30,7 @@ public class CacheEntry<V>{
 	private Tracker tracker;
 	
 	public CacheEntry(V value){
-		this.value = value;
+		super(value);
 		key = value.hashCode();
 	}
 	
@@ -83,19 +79,9 @@ public class CacheEntry<V>{
 		return tracker;
 	}
 	
-	/**
-	 * Get the object referenced by this tracker. 
-	 * 
-	 * @return The object referenced by this tracker.
-	 */
-	public V get(){
-		return value;
-	}
-	
 	//TODO: Temporary method for testing, delete this eventually
 	public void delete(Queue<CacheEntry<V>> queue){
 		queue.add(this);
-		value = null;
 	}
 	
 	/**
