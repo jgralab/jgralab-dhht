@@ -2,6 +2,8 @@ package de.uni_koblenz.jgralab.impl.diskv2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -241,7 +243,7 @@ public class DiskStorageManager {
 	 * @return
 	 *        A soft reference to the restored incidence
 	 */
-	public IncidenceImpl readIncidenceFromDisk(int key){		
+	public IncidenceImpl readIncidenceFromDisk(int key){
 		//read 52 bytes from the file which stores the Incidences
 		ByteBuffer buf = incidences.read(52, key * 52);
 		
@@ -470,7 +472,7 @@ public class DiskStorageManager {
 	/**
 	 * Converts a List to a ByteArray using the Java Serialization API.
 	 * 
-	 * @param l
+	 * @param
 	 * 		The List to be serialized
 	 * 
 	 * @return

@@ -143,16 +143,25 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
 		
 		if (entry == null){
-			VertexImpl v = diskStorage.readVertexFromDisk(id);
-			if (v == null){
-				return null;
-			}
-			CacheEntry<VertexImpl> vRef = new CacheEntry<VertexImpl>(v, vertexQueue);
-			putElement(vRef, vertexCache, hash(id, vertexMask));
-			return vRef.get();
+			return getVertexObjectFromDisk(id);
 		}
 		
-		return entry.get();
+		VertexImpl v = entry.get();
+		
+		if(v == null){
+			cleanupVertexCache();
+			return getVertexObjectFromDisk(id);
+		}
+		
+		return v;
+	}
+	
+	private Vertex getVertexObjectFromDisk(int id){
+		cleanupVertexCache();
+		VertexImpl v = diskStorage.readVertexFromDisk(id);
+		CacheEntry<VertexImpl> vRef = new CacheEntry<VertexImpl>(v, vertexQueue);
+		putElement(vRef, vertexCache, hash(id, vertexMask));
+		return vRef.get();
 	}
 
 	/**
@@ -167,16 +176,25 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
 		
 		if (entry == null){
-			EdgeImpl e = diskStorage.readEdgeFromDisk(id);
-			if (e == null){
-				return null;
-			}
-			CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
-			putElement(eRef, edgeCache, hash(id, edgeMask));
-			return eRef.get();
+			return getEdgeObjectFromDisk(id);
 		}
 		
-		return entry.get();
+		EdgeImpl e = entry.get();
+		
+		if(e == null){
+			cleanupEdgeCache();
+
+			return getEdgeObjectFromDisk(id);
+		}
+		
+		return e;
+	}
+	
+	private Edge getEdgeObjectFromDisk(int id){
+		EdgeImpl e = diskStorage.readEdgeFromDisk(id);
+		CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
+		putElement(eRef, edgeCache, hash(id, edgeMask));
+		return eRef.get();
 	}
 	
 	/**
@@ -193,16 +211,24 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
 		
 		if (entry == null){
-			IncidenceImpl inc = diskStorage.readIncidenceFromDisk(id);
-			if (inc == null){
-				return null;
-			}
-			CacheEntry<IncidenceImpl> incRef = new CacheEntry<IncidenceImpl>(inc, incidenceQueue);
-			putElement(incRef, incidenceCache, hash(id, incidenceMask));
-			return incRef.get();
+			return getIncidenceObjectFromDisk(id);
 		}
 		
-		return entry.get();
+		IncidenceImpl i = entry.get();
+		
+		if(i == null){
+			cleanupIncidenceCache();
+			return getIncidenceObjectFromDisk(id);
+		}
+		
+		return i;
+	}
+	
+	private Incidence getIncidenceObjectFromDisk(int id){
+		IncidenceImpl i = diskStorage.readIncidenceFromDisk(id);
+		CacheEntry<IncidenceImpl> iRef = new CacheEntry<IncidenceImpl>(i, incidenceQueue);
+		putElement(iRef, incidenceCache, hash(id, incidenceMask));
+		return iRef.get();
 	}
 	
 	/**

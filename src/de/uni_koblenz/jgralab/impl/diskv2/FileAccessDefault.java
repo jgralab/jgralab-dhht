@@ -85,7 +85,7 @@ public class FileAccessDefault extends FileAccess{
 		
 		return ByteBuffer.wrap(readBytes);
 	}
-	
+
 	/**
 	 * Checks if the current read or write operation fits into the access window,
 	 * i.e. if the part of the file that the operation wants to access is currently
@@ -109,7 +109,7 @@ public class FileAccessDefault extends FileAccess{
 	private void checkAccessWindow(int bufSize, long index){
 		if (index < firstByte | index + bufSize > lastByte){
 			
-			if (index < 512){
+			if (index < FILE_AREA/2){
 				//case 1: index < FILE_AREA/2
 				//map the first FILE_AREA bytes
 				requestSizeChange(FILE_AREA);
