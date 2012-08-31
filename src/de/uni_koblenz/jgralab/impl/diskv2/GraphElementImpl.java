@@ -407,7 +407,7 @@ implements GraphElement<OwnTypeClass, OwnType, DualTypeClass, DualType> {
 	 * @see #isIncidenceListModified(long)
 	 */
 	public final long getIncidenceListVersion() {
-		assert isValid();
+		//assert isValid();
 		return incidenceListVersion;
 	}
 

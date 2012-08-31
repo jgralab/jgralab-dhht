@@ -149,8 +149,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		VertexImpl v = entry.get();
 		
 		if(v == null){
-			cleanupVertexCache();
-			return getVertexObjectFromDisk(id);
+			diskStorage.writeGraphElementToDisk(entry);
+			removeVertex(entry.getKey());
+			v = (VertexImpl) diskStorage.readVertexFromDisk(entry.getKey());
+			CacheEntry<VertexImpl> vRef = new CacheEntry<VertexImpl>(v, vertexQueue);
+			putElement(vRef, vertexCache, hash(id, vertexMask));
 		}
 		
 		return v;
@@ -182,9 +185,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		EdgeImpl e = entry.get();
 		
 		if(e == null){
-			cleanupEdgeCache();
-
-			return getEdgeObjectFromDisk(id);
+			diskStorage.writeGraphElementToDisk(entry);
+			removeEdge(entry.getKey());
+			e = (EdgeImpl) diskStorage.readEdgeFromDisk(entry.getKey());
+			CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
+			putElement(eRef, edgeCache, hash(id, edgeMask));
 		}
 		
 		return e;
@@ -217,8 +222,11 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		IncidenceImpl i = entry.get();
 		
 		if(i == null){
-			cleanupIncidenceCache();
-			return getIncidenceObjectFromDisk(id);
+			diskStorage.writeIncidenceToDisk(entry);
+			removeIncidence(entry.getKey());
+			i = (IncidenceImpl) diskStorage.readIncidenceFromDisk(entry.getKey());
+			CacheEntry<IncidenceImpl> iRef = new CacheEntry<IncidenceImpl>(i, incidenceQueue);
+			putElement(iRef, incidenceCache, hash(id, incidenceMask));
 		}
 		
 		return i;
@@ -757,8 +765,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		while(current != null){
 			diskStorage.writeGraphElementToDisk(current);
-			removeElement(vertexCache, current.getKey(), 
-					hash(current.getKey(), vertexMask));
+			removeVertex(current.getKey());
 			current = (CacheEntry<VertexImpl>) vertexQueue.poll();
 		}
 	}
@@ -775,8 +782,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		while(current != null){
 			diskStorage.writeGraphElementToDisk(current);
-			removeElement(edgeCache, current.getKey(), 
-					hash(current.getKey(), edgeMask));
+			removeEdge(current.getKey());
 			current = (CacheEntry<EdgeImpl>) edgeQueue.poll();
 		}
 	}
@@ -793,8 +799,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		while(current != null){
 			diskStorage.writeIncidenceToDisk(current);
-			removeElement(incidenceCache, current.getKey(), 
-					hash(current.getKey(), incidenceMask));
+			removeIncidence(current.getKey());
 			current = (CacheEntry<IncidenceImpl>) incidenceQueue.poll();
 		}
 	}
@@ -919,7 +924,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	    			current = oldEntries.pop();
 	    			//erase pointer, because it is now invalid
 	    			current.setNext(null);
-	    			putElement(current, newCache, hash(current.get().hashCode(), mask));
+	    			putElement(current, newCache, hash(current.getKey(), mask));
 	    		}
 	    	}
 	    }
