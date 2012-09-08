@@ -149,7 +149,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		VertexImpl v = entry.get();
 		
 		if(v == null){
-			diskStorage.writeGraphElementToDisk(entry);
+			diskStorage.writeVertexToDisk(entry);
 			removeVertex(entry.getKey());
 			v = (VertexImpl) diskStorage.readVertexFromDisk(entry.getKey());
 			CacheEntry<VertexImpl> vRef = new CacheEntry<VertexImpl>(v, vertexQueue);
@@ -185,7 +185,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		EdgeImpl e = entry.get();
 		
 		if(e == null){
-			diskStorage.writeGraphElementToDisk(entry);
+			diskStorage.writeEdgeToDisk(entry);
 			removeEdge(entry.getKey());
 			e = (EdgeImpl) diskStorage.readEdgeFromDisk(entry.getKey());
 			CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
@@ -764,7 +764,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<VertexImpl> current = (CacheEntry<VertexImpl>) vertexQueue.poll();
 		
 		while(current != null){
-			diskStorage.writeGraphElementToDisk(current);
+			diskStorage.writeVertexToDisk(current);
 			removeVertex(current.getKey());
 			current = (CacheEntry<VertexImpl>) vertexQueue.poll();
 		}
@@ -781,7 +781,7 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		CacheEntry<EdgeImpl> current = (CacheEntry<EdgeImpl>) edgeQueue.poll();
 		
 		while(current != null){
-			diskStorage.writeGraphElementToDisk(current);
+			diskStorage.writeEdgeToDisk(current);
 			removeEdge(current.getKey());
 			current = (CacheEntry<EdgeImpl>) edgeQueue.poll();
 		}
@@ -941,4 +941,33 @@ public final class MemStorageManager implements RemoteStorageAccess {
 	protected int hash(int hashCode, int mask){
 		return hashCode & mask;
 	}
+	
+	/**
+	 * The following methods can be used to remove a specific graph building block from the
+	 * cache. To call one of these methods, first call getStorage() on any GraphElement
+	 * to get a reference to the MemStorageManager. Then, call any of the methods defined
+	 * below with the local id of the object you want removed from the cache. The object will
+	 * then be written to the disk and removed from the cache.
+	 * 
+	 *  IMPORTANT:
+	 *  These methods are for debugging purposes only.
+	 */
+	/*
+	public void nullVertexReference(int id){
+		CacheEntry<VertexImpl> entry = getElement(vertexCache, id, hash(id, vertexMask));
+		diskStorage.writeVertexToDisk(entry);
+		removeVertex(entry.getKey());
+	}
+	
+	public void nullEdgeReference(int id){
+		CacheEntry<EdgeImpl> entry = getElement(edgeCache, id, hash(id, edgeMask));
+		diskStorage.writeEdgeToDisk(entry);
+		removeVertex(entry.getKey());
+	}
+	
+	public void nullIncidenceReference(int id){
+		CacheEntry<IncidenceImpl> entry = getElement(incidenceCache, id, hash(id, incidenceMask));
+		diskStorage.writeIncidenceToDisk(entry);
+		removeVertex(entry.getKey());
+	}*/
 }

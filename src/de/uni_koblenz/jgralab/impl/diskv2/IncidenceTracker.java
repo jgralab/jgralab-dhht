@@ -18,7 +18,7 @@ public class IncidenceTracker extends Tracker{
 	 * Create a new tracker with a ByteBuffer size of 48 Bytes.
 	 */
 	public IncidenceTracker(){
-		super(52);
+		super(INCIDENCE_SIZE);
 	}
 	
 	/**

@@ -12,6 +12,17 @@ import java.util.List;
  * @author aheld
  */
 public abstract class Tracker {
+	
+	/**
+	 * The amount of memory in bytes an incidence uses on the disk
+	 */
+	protected static final int INCIDENCE_SIZE = 52;
+	
+	/**
+	 * The amount of memory in bytes a GraphElement, sans its attributes,
+	 * needs on the disk
+	 */
+	protected static final int GRAPHELEMENT_BASE_SIZE = 64;
 
 	/**
 	 * A buffer used to track the variables of a GraphElement or Incidence

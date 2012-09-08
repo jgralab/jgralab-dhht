@@ -639,14 +639,13 @@ public class GraphElementProfile {
 	 *                   type of the argument passed to this method.
 	 */
 	private void invokeSetLong(GraphElement<?,?,?,?> ge, long argument, int position){
-		ge.setAttribute("value", argument);
-		/*try {
+		try {
 			attrSetters[position].invoke(ge, argument);
 		} catch (IllegalAccessException e) {
 			throw new IllegalArgumentException("Method " + attrSetters[position].getName() + " is not public");
 		} catch (InvocationTargetException e) {
 			throw new IllegalArgumentException("Exception thrown by invoked method " + attrSetters[position].getName());
-		}*/
+		}
 	}
 	
 	/**

@@ -18,7 +18,7 @@ public class GraphElementTracker extends Tracker{
 	 * Create a new tracker with a ByteBuffer size of 64 Bytes.
 	 */
 	public GraphElementTracker(){
-		super(64);
+		super(GRAPHELEMENT_BASE_SIZE);
 	}
 	
 	/**

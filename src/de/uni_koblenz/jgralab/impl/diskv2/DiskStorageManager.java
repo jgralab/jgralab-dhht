@@ -95,14 +95,22 @@ public class DiskStorageManager {
 		}
 	}
 	
+	public void writeVertexToDisk(CacheEntry<VertexImpl> vRef){
+		writeGraphElementToDisk(vRef);
+	}
+	
+	public void writeEdgeToDisk(CacheEntry<EdgeImpl> eRef){
+		writeGraphElementToDisk(eRef);
+	}
+	
 	/**
 	 * Writes a Graph Element to the disk if it has been newly created, or if it has
 	 * been changed since the last time it was loaded from the disk.
 	 * 
 	 * @param geRef - The Reference to the GraphElement that is written out.
 	 */
-	public void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> vRef){
-		Tracker tracker = vRef.getTracker();
+	private void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> geRef){
+		Tracker tracker = geRef.getTracker();
 		
 		if (tracker == null) {
 			//element is neither new nor has it been changed since its last reload
@@ -123,7 +131,7 @@ public class DiskStorageManager {
 		
 		//determine the size of the element we want to store
 		int byteSize = profile.getSize();
-		long baseLocation = byteSize * vRef.getKey();
+		long baseLocation = byteSize * geRef.getKey();
 		
 		//write the primitive attributes to a file
 		file.write(attributes, baseLocation);
