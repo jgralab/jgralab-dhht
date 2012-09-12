@@ -113,12 +113,13 @@ public class GraphElementProfile {
 	 * 		The GraphDatabase that we work with
 	 */
 	//TODO: Find a better way to implement this
-	public static void createProfile(VertexClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
+	public static int createProfile(VertexClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
 		Class<? extends Vertex> m1Class = cls.getM1Class();
 		GraphFactory factory = graphdb.getGraphFactory();
 		Vertex dummy = factory.createVertex_Diskv2BasedStorage(m1Class, 0, graphdb);
 		GraphElementProfile profile = new GraphElementProfile(dummy.getClass(), typeId);
 		profiles[typeId] = profile;
+		return profile.getSize();
 	}
 	
 	/**
@@ -132,12 +133,13 @@ public class GraphElementProfile {
 	 * 		The GraphDatabase that we work with
 	 */
 	//TODO: Find a better way to implement this
-	public static void createProfile(EdgeClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
+	public static int createProfile(EdgeClass cls, int typeId, GraphDatabaseBaseImpl graphdb){
 		Class<? extends Edge> m1Class = cls.getM1Class();
 		GraphFactory factory = graphdb.getGraphFactory();
 		Edge dummy = factory.createEdge_Diskv2BasedStorage(m1Class, 0, graphdb);
 		GraphElementProfile profile = new GraphElementProfile(dummy.getClass(), typeId);
 		profiles[typeId] = profile;
+		return profile.getSize();
 	}
 	
 	/**

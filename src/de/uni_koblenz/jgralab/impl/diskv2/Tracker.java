@@ -74,8 +74,8 @@ public abstract class Tracker {
 	 * @param attribute - the attribute to be tracked
 	 * @param index - the position at which the tracked attribute is stored
 	 */
-	public void putVariable(int index, long attribute){
-		variables.putLong(index, attribute);
+	public void putVariable(int index, long variable){
+		variables.putLong(index, variable);
 	}
 	
 	/**

@@ -270,11 +270,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		
 		vEntry.getOrCreateGETracker(v).fill(v);
 		
-		FileAccess dict = diskStorage.getVertexDict();
-		ByteBuffer buf = ByteBuffer.allocate(4);
-		buf.putInt(v.getType().getId());
-		dict.write(buf, v.getLocalId() * 4);
-		
 		vertexCacheEntries++;
 		testVertexLoadFactor();
 	}
@@ -289,11 +284,6 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		putElement(eEntry, edgeCache, hash(e.hashCode(), edgeMask));
 		
 		eEntry.getOrCreateGETracker(e).fill(e);
-		
-		FileAccess dict = diskStorage.getEdgeDict();
-		ByteBuffer buf = ByteBuffer.allocate(4);
-		buf.putInt(e.getType().getId());
-		dict.write(buf, e.getLocalId() * 4);
 		
 		edgeCacheEntries++;
 		testEdgeLoadFactor();

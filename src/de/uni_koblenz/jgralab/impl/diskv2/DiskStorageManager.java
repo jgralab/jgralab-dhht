@@ -29,18 +29,18 @@ public class DiskStorageManager {
 	/**
 	 * FileAccess objects to all the files used by this manager
 	 */
-	private FileAccess[] files;
-	
+	private FileAccess vertices;
+	private FileAccess edges;
 	private FileAccess incidences;
-	
-	private FileAccess vertexDict;
-	private FileAccess edgeDict;
 	
 	private FileAccess strings;
 	private FileAccess lists;
 	
 	private long stringsPointer;
 	private long listsPointer;
+	
+	private int maxVSize;
+	private int maxESize;
 	
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
 		this.graphdb = graphdb;
@@ -59,57 +59,80 @@ public class DiskStorageManager {
 		int amountOfClasses = s.getNumberOfTypedElementClasses();
 		//tell GraphElementProfile to instantiate the Array in which profiles are stored
 		GraphElementProfile.setup(amountOfClasses);
-		//make room for FileAccess objects, plus three more for incidences and the two dicts
-		files = new FileAccess[amountOfClasses];
 		
 		//get lists of all vertex and edge classes
 		List<VertexClass> vClasses = s.getVertexClassesInTopologicalOrder();
 		List<EdgeClass> eClasses = s.getEdgeClassesInTopologicalOrder();
 		
-		//make FileAccess objects for incidences, the two dicts, strings and lists
+		//make FileAccess objects for graph building blocks, strings and lists
+		vertices = FileAccess.createFileAccess("vertices");
+		edges = FileAccess.createFileAccess("edges");
 		incidences = FileAccess.createFileAccess("incidences");
-		vertexDict = FileAccess.createFileAccess("vertexDict");
-		edgeDict = FileAccess.createFileAccess("edgeDict");
 		strings = FileAccess.createFileAccess("strings");
 		lists = FileAccess.createFileAccess("lists");
 		
+		maxVSize = 0;
+		maxESize = 0;
 		stringsPointer = 0;
 		listsPointer = 0;
 		
 		//create a profile and a FileAccess for all non-abstract vertex classes
+		//also detect the biggest vertex class and store its size
+		int typeId, vSize, eSize;
 		for (VertexClass vClass: vClasses){
 			if (!vClass.isAbstract()){
-				int typeId = vClass.getId();
-				GraphElementProfile.createProfile(vClass, typeId, graphdb);
-				files[typeId] = FileAccess.createFileAccess(typeId + "_vertices");
+				typeId = vClass.getId();
+				vSize = GraphElementProfile.createProfile(vClass, typeId, graphdb);
+				if (vSize > maxVSize) maxVSize = vSize;
 			}
 		}
 		
 		//create a profile and a FileAccess for all non-abstract edge classes
+		//also detect the biggest edge class and store its size
 		for (EdgeClass eClass: eClasses){
 			if (!eClass.isAbstract()){
-				int typeId = eClass.getId();
+				typeId = eClass.getId();
 				GraphElementProfile.createProfile(eClass, typeId, graphdb);
-				files[typeId] = FileAccess.createFileAccess(typeId + "_edges");
+				eSize = GraphElementProfile.createProfile(eClass, typeId, graphdb);
+				if (eSize > maxESize) maxESize = eSize;
 			}
 		}
 	}
 	
+	/**
+	 * Writes a Vertex to the disk if it has been newly created, or if it has
+	 * been changed since the last time it was loaded from the disk.
+	 * 
+	 * @param vRef
+	 * 	    The Reference to the Vertex that is written out.
+	*/
 	public void writeVertexToDisk(CacheEntry<VertexImpl> vRef){
-		writeGraphElementToDisk(vRef);
+		writeGraphElementToDisk(vRef, vertices, maxVSize);
 	}
 	
+	/**
+	 * Writes a n Edge to the disk if it has been newly created, or if it has
+	 * been changed since the last time it was loaded from the disk.
+	 * 
+	 * @param eRef
+	 * 	    The Reference to the Vertex that is written out.
+	*/
 	public void writeEdgeToDisk(CacheEntry<EdgeImpl> eRef){
-		writeGraphElementToDisk(eRef);
+		writeGraphElementToDisk(eRef, edges, maxESize);
 	}
 	
 	/**
 	 * Writes a Graph Element to the disk if it has been newly created, or if it has
 	 * been changed since the last time it was loaded from the disk.
 	 * 
-	 * @param geRef - The Reference to the GraphElement that is written out.
+	 * @param geRef
+	 * 	    The Reference to the GraphElement that is written out.
+	 * 
+	 * @param file
+	 * 		The access to the file in which the GraphElement is stored.
 	 */
-	private void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> geRef){
+	private void writeGraphElementToDisk(CacheEntry<? extends GraphElementImpl<?,?,?,?>> geRef, 
+			FileAccess file, int byteSize){
 		Tracker tracker = geRef.getTracker();
 		
 		if (tracker == null) {
@@ -126,11 +149,7 @@ public class DiskStorageManager {
 		//fetch the profile of this type
 		GraphElementProfile profile = GraphElementProfile.getProfile(typeId);
 		
-		//get access to the file in which elements of this type are stored
-		FileAccess file = files[typeId];
-		
 		//determine the size of the element we want to store
-		int byteSize = profile.getSize();
 		long baseLocation = byteSize * geRef.getKey();
 		
 		//write the primitive attributes to a file
@@ -172,11 +191,8 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored vertex
 	 */
 	public VertexImpl readVertexFromDisk(int key){
-		//determine which vertex class we have to use
-		int typeId = vertexDict.read(4, key*4).getInt(0);
-		
 		//read the data from the disk
-		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
+		ByteBuffer buf = readGraphElementFromDisk(key, vertices, maxVSize);
 		
 		//create a vertex that is identical to the vertex we deleted earlier
 		VertexImpl ver = restoreVertex(buf, key);
@@ -194,11 +210,8 @@ public class DiskStorageManager {
 	 *        A soft reference to the restored vertex
 	 */
 	public EdgeImpl readEdgeFromDisk(int key){
-		//determine which edge class we have to use
-		int typeId = edgeDict.read(4, key*4).getInt(0);
-		
 		//read the data from the disk
-		ByteBuffer buf = readGraphElementFromDisk(key, typeId);
+		ByteBuffer buf = readGraphElementFromDisk(key, edges, maxESize);
 		
 		//create a vertex that is identical to the vertex we deleted earlier
 		EdgeImpl edge = restoreEdge(buf, key);
@@ -211,11 +224,7 @@ public class DiskStorageManager {
 	 * Helper method to avoid duplicate code in readVertexFromDisk 
 	 * and readEdgeFromDisk
 	 */
-	private ByteBuffer readGraphElementFromDisk(int key, int typeId){
-		//determine the size of the GraphElement we want to restore
-		int byteSize = GraphElementProfile.getProfile(typeId).getSize();
-		
-		FileAccess file = files[typeId];
+	private ByteBuffer readGraphElementFromDisk(int key, FileAccess file, int byteSize){
 		ByteBuffer buf = file.read(byteSize, key * byteSize);
 		
 		buf.position(0);
@@ -507,20 +516,6 @@ public class DiskStorageManager {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Unable to restore list");
 		}
-	}
-	
-	/**
-	 * Gets a file in which the vertex type ID for every vertex is stored
-	 */
-	public FileAccess getVertexDict(){
-		return vertexDict;
-	}
-	
-	/**
-	 * Gets a file in which the edge type ID for every edge is stored
-	 */
-	public FileAccess getEdgeDict(){
-		return edgeDict;
 	}
 	
 	//-------------------------------------------------------------------
