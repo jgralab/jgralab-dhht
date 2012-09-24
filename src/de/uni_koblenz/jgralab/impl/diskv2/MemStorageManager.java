@@ -159,6 +159,15 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		return v;
 	}
 	
+	/**
+	 * Read a vertex from the disk
+	 * 
+	 * @param id
+	 * 		The id of the vertex
+	 * 
+	 * @return
+	 * 		The vertex that was reconstructed with data from the disk
+	 */
 	private Vertex getVertexObjectFromDisk(int id){
 		cleanupVertexCache();
 		VertexImpl v = diskStorage.readVertexFromDisk(id);
@@ -195,6 +204,15 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		return e;
 	}
 	
+	/**
+	 * Read an Edge from the disk
+	 * 
+	 * @param id
+	 * 		The id of the edge
+	 * 
+	 * @return
+	 * 		The edge that was reconstructed with data from the disk
+	 */
 	private Edge getEdgeObjectFromDisk(int id){
 		EdgeImpl e = diskStorage.readEdgeFromDisk(id);
 		CacheEntry<EdgeImpl> eRef = new CacheEntry<EdgeImpl>(e, edgeQueue);
@@ -232,6 +250,15 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		return i;
 	}
 	
+	/**
+	 * Read an incidence from the disk
+	 * 
+	 * @param id
+	 * 		The id of the incidence
+	 * 
+	 * @return
+	 * 		The incidence that was reconstructed with data from the disk
+	 */
 	private Incidence getIncidenceObjectFromDisk(int id){
 		IncidenceImpl i = diskStorage.readIncidenceFromDisk(id);
 		CacheEntry<IncidenceImpl> iRef = new CacheEntry<IncidenceImpl>(i, incidenceQueue);
@@ -402,12 +429,30 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		}
 	}
 	
+	/**
+	 * Get a specific IncidenceTracker
+	 * 
+	 * @param incidenceId
+	 * 		The id of the incidence whose tracker is requested
+	 * 
+	 * @return
+	 * 		The tracker for the given incidence
+	 */
 	public IncidenceTracker getIncidenceTracker(int incidenceId){
 		CacheEntry<IncidenceImpl> iEntry = getElement
 				(incidenceCache, incidenceId, hash(incidenceId, incidenceMask));
 		return iEntry.getOrCreateIncidenceTracker(iEntry.get());
 	}
 	
+	/**
+	 * Get a specific GraphElementTracker
+	 * 
+	 * @param vertexId
+	 * 		The id of the vertex whose tracker is requested
+	 * 
+	 * @return
+	 * 		The tracker for the given vertex
+	 */
 	public GraphElementTracker getVertexTracker(int vertexId){
 		CacheEntry<VertexImpl> vEntry = getElement
 				(vertexCache, vertexId, hash(vertexId, vertexMask));
@@ -415,6 +460,15 @@ public final class MemStorageManager implements RemoteStorageAccess {
 		return vEntry.getOrCreateGETracker(vEntry.get());
 	}
 	
+	/**
+	 * Get a specific GraphElementTracker
+	 * 
+	 * @param edgeId
+	 * 		The id of the edge whose tracker is requested
+	 * 
+	 * @return
+	 * 		The tracker for the given edge
+	 */
 	public GraphElementTracker getEdgeTracker(int edgeId){
 		CacheEntry<EdgeImpl> eEntry = getElement
 				(edgeCache, edgeId, hash(edgeId, edgeMask));

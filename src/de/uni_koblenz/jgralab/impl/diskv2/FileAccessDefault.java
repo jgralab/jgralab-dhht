@@ -26,7 +26,7 @@ public class FileAccessDefault extends FileAccess{
 	/**
 	 * The size of the area of the file that is mapped into memory, in bytes.
 	 */
-	private static final int FILE_AREA = 104857600;
+	private static final int FILE_AREA = 1048576; //1 MB
 	
 	/**
 	 * Denotes the first byte of the access window.
@@ -119,17 +119,17 @@ public class FileAccessDefault extends FileAccess{
 			else {
 				//case 2: index > FILE_AREA/2
 				//map from index - FILE_AREA/2 to index + FILE_AREA/2
-				requestSizeChange(FILE_AREA/2);
+				requestSizeChange(index + FILE_AREA/2);
 				firstByte = index - FILE_AREA/2;
 				lastByte = index + FILE_AREA/2;
 			}
 			
 			try {
 				//write the pending changes to the disk and map the new area
-				if (accessWindow != null) accessWindow.force();
+				//if (accessWindow != null) accessWindow.force();
 				accessWindow = channel.map(MapMode.READ_WRITE, firstByte, FILE_AREA);
 			} catch (IOException e) {
-				throw new RuntimeException("Unable to map from file");
+				throw new RuntimeException(e);
 			}
 		}
 	}

@@ -36,12 +36,24 @@ public class DiskStorageManager {
 	private FileAccess strings;
 	private FileAccess lists;
 	
+	/**
+	 * Pointers to the first free byte in strings.dst and lists.dst
+	 */
 	private long stringsPointer;
 	private long listsPointer;
 	
+	/**
+	 * Sizes (in bytes) of the biggest vertex class and the biggest edge calss
+	 */
 	private int maxVSize;
 	private int maxESize;
 	
+	/**
+	 * Create a new DiskStorageManager.
+	 * 
+	 * @param graphdb
+	 * 		The Graph Database whose data this DiskStorageManager manages.
+	 */
 	public DiskStorageManager(GraphDatabaseBaseImpl graphdb){
 		this.graphdb = graphdb;
 
@@ -50,7 +62,8 @@ public class DiskStorageManager {
 	
 	/**
 	 * For every non-abstract Vertex and Edge class, this method creates
-	 * a GraphElementProfile and a FileAccess.
+	 * a GraphElementProfile. All files used by the DiskStorageManager are
+	 * also created here.
 	 */
 	private void setupFilesAndProfiles(){
 		Schema s = graphdb.getSchema();
@@ -249,7 +262,7 @@ public class DiskStorageManager {
 		ByteBuffer attributes = tracker.getVariables();
 		
 		//incidences always need 52 bytes because they have no attributes
-		incidences.write(attributes, incidenceRef.getKey() * 52);
+		incidences.write(attributes, incidenceRef.getKey() * Tracker.INCIDENCE_SIZE);
 	}
 	
 	/**
@@ -273,36 +286,72 @@ public class DiskStorageManager {
 		return inc;
 	}
 	
+	/**
+	 * Writes a String to the disk.
+	 * 
+	 * @param s
+	 * 		The String to be written to the disk
+	 * 
+	 * @return
+	 * 		The position in strings.dst at which the String was stored, or -1 if
+	 * 		the String was null.
+	 */
 	public long writeStringToDisk(String s){
 		if (s == null) return -1;
 		
+		//start write operation at the first free byte in strings.dst
 		long currentPosition = stringsPointer;
 		
+		//convert the String to a byte array and obtain its length
 		byte[] bytes = s.getBytes();
 		int length = bytes.length;
-		
+	
+		//write the length of the String into a ByteBuffer, followed by the String itself
 		ByteBuffer buf = ByteBuffer.allocate(4 + length);
 		buf.putInt(length);
 		buf.put(bytes);
 		
+		//write the contents of the buffer to strings.dst
 		strings.write(buf, stringsPointer);
 		
+		//advance the pointer to first free byte in strings.dst
 		stringsPointer += (4 + length);
 
 		return currentPosition;
 	}
 	
+	/**
+	 * Reads a String from the disk.
+	 * 
+	 * @param position
+	 * 		The position at which the String is stored in strings.dst
+	 * 
+	 * @return
+	 * 		The String, or a nullpointer if position was less than zero
+	 */
 	public String readStringFromDisk(long position){
-		if (position == -1) return null;
+		if (position < 0) return null;
 		
+		//read the length of the string from the file
 		ByteBuffer buf = strings.read(4, position);
 		int length = buf.getInt(0);
 		
+		//read 'length' bytes
 		String res = new String(strings.read(length, position + 4).array());
 
 		return res;
 	}
 	
+	/**
+	 * Writes a List to the disk.
+	 * 
+	 * @param s
+	 * 		The List to be written to the disk
+	 * 
+	 * @return
+	 * 		The position in lists.dst at which the List was stored, or -1 if
+	 * 		the List was null.
+	 */
 	public long writeListToDisk(List<?> l){
 		if (l == null) return -1;
 		
@@ -322,6 +371,15 @@ public class DiskStorageManager {
 		return currentPosition;
 	}
 	
+	/**
+	 * Reads a List from the disk.
+	 * 
+	 * @param position
+	 * 		The position at which the List is stored in lists.dst
+	 * 
+	 * @return
+	 * 		The List, or a nullpointer if position was less than zero
+	 */
 	public List readListFromDisk(long position){
 		if (position == -1) return null;
 		
@@ -506,6 +564,15 @@ public class DiskStorageManager {
 		return outStream.toByteArray();
 	}
 	
+	/**
+	 * Restore a List that was previously serialized. 
+	 * 
+	 * @param readBytes
+	 *      The byte array that represents the List
+	 *      
+	 * @return
+	 * 		The reconstructed List
+	 */
 	public List restoreList(byte[] readBytes){
 		ByteArrayInputStream inStream = new ByteArrayInputStream(readBytes);
 		try {
@@ -522,9 +589,23 @@ public class DiskStorageManager {
 	//Methods and Variables to enforce a maximum size of the disk storage
 	//-------------------------------------------------------------------
 	
+	/**
+	 * The current total size of all the files
+	 */
 	private static long diskStorageSize;
+	
+	/**
+	 * The maximum allowed size for all the files. If this is less than zero, no limit
+	 * has been set.
+	 */
 	private static long maxDiskStorageSize = -1;
 	
+	/**
+	 * Set the maximum aloowed size for all the files
+	 * 
+	 * @param size
+	 * 		The maximum allowed size
+	 */
 	public static void setMaxDiskStorageSize(long size){
 		if (size < 1){
 			throw new IllegalArgumentException("Maximum Disk Storage size must be bigger than zero");
@@ -533,11 +614,22 @@ public class DiskStorageManager {
 		checkDiskStorage();
 	}
 	
+	/**
+	 * Increase 'diskStorageSize' if a file will grow
+	 * 
+	 * @param increment
+	 * 		The amount in Bytes by which the file will grow
+	 */
 	public static void increaseDiskStorageSize(long increment){
 		diskStorageSize += increment;
 		checkDiskStorage();
 	}
 	
+	/**
+	 * Check if the growth of a file would make the total size of all files 
+	 * exceed the maximum allowed size, or if the size of the disk storage is beneath
+	 * the new limit if a new limit has been set.
+	 */
 	private static void checkDiskStorage(){
 		if (maxDiskStorageSize > 0 && diskStorageSize > maxDiskStorageSize){
 			throw new RuntimeException("Maximum Disk Storage size exceeded");

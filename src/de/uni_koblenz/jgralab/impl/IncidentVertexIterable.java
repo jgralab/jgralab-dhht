@@ -149,7 +149,7 @@ public class IncidentVertexIterable<V extends Vertex> extends
 	 */
 	public IncidentVertexIterable(Graph traversalContext, Edge edge,
 			Class<? extends Vertex> vc, Direction direction) {
-		assert edge != null && edge.isValid();
+		//assert edge != null && edge.isValid();
 		iter = new IncidentVertexIterator(traversalContext, edge, vc, direction);
 	}
 

@@ -35,6 +35,12 @@ public class GraphElementProfile {
 	 */
 	private int size;
 	
+	/**
+	 * The positions at which the addresses of the Strings and Lists will be stored
+	 * on the disk, relative to the position where the data for the GraphElement begins. 
+	 * For example, if a vertex needs 80 bytes for its primitive attributes, then 
+	 * startOfStrings #will be 81. 
+	 */
 	private int startOfStrings;
 	private int startOfLists;
 	
@@ -372,6 +378,18 @@ public class GraphElementProfile {
 		detectSize();
 	}
 	
+	/**
+	 * Initializes all the arrays in this class with given lengths.
+	 * 
+	 * @param numAttrs
+	 * 		The length of the arrays attrTypeIDs, attrGetters and attrSetters
+	 * 
+	 * @param numStrings
+	 * 		The length of the arrays stringGetters and stringSetters
+	 * 
+	 * @param numLists
+	 * 		The length of the arrays listGetters and listSetters
+	 */
 	private void initArrays(int numAttrs, int numStrings, int numLists){
 		attrTypeIDs = new byte[numAttrs];
 		attrGetters = new Method[numAttrs];
@@ -382,6 +400,12 @@ public class GraphElementProfile {
 		listSetters = new Method[numLists];
 	}
 	
+	/**
+	 * Detect the typeID for each primitive on the given Stack.
+	 * 
+	 * @param primitive
+	 * 		A stack containing primitive data types, e.g. integer or double.
+	 */
 	private void detectAttrTypes(Stack<Field> primitives){
 		int index = 0;
 		for (Field f: primitives){
@@ -480,6 +504,9 @@ public class GraphElementProfile {
 		}
 	}
 	
+	/**
+	 * Detect the proper values for startOfStrings, startOfLists and size
+	 */
 	private void detectSize(){
 		for (int id: attrTypeIDs){
 			switch(id){

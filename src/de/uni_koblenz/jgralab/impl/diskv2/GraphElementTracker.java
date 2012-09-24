@@ -32,6 +32,12 @@ public class GraphElementTracker extends Tracker{
 		storeLists(ge);
 	}
 	
+	/**
+	 * Store all variables of a GraphElement in the Tracker
+	 * 
+	 * @param ge
+	 * 		The GraphElement whose variables will be stored
+	 */
 	private void storeVariables(GraphElementImpl<?,?,?,?> ge){
 		//TODO Don't put typeID in the buffer, but declare it as a normal member
 		int typeId = ge.getType().getId();
@@ -47,6 +53,12 @@ public class GraphElementTracker extends Tracker{
 		putKappa(ge.getKappa());
 	}
 	
+	/**
+	 * Store the kappa value of a GraphElement
+	 * 
+	 * @param kappa
+	 * 		The kappa value
+	 */
 	public void putKappa(int kappa){
 		variables.putInt(60, kappa);
 	}
@@ -89,6 +101,10 @@ public class GraphElementTracker extends Tracker{
 		lists = profile.getListsForElement(ge);
 	}
 	
+	/**
+	 * Put the contents of 'variables' and 'attributes' in a single Buffer and 
+	 * return it
+	 */
 	public ByteBuffer getVariables(){
 		if (attributes == null)
 			return variables;
@@ -100,10 +116,16 @@ public class GraphElementTracker extends Tracker{
 		return buf;
 	}
 	
+	/**
+	 * Return all Strings 
+	 */
 	public String[] getStrings(){
 		return strings;
 	}
 	
+	/**
+	 * Return all Lists
+	 */
 	public List[] getLists(){
 		return lists;
 	}

@@ -25,8 +25,9 @@ public abstract class FileAccess {
 	/**
 	 * Checks if the used OS is windows
 	 */
-	private static boolean windows = isWindows();
-	//private static boolean windows = false;
+	//always use the windows variant, because the default one isn't stable
+	//private static boolean windows = isWindows();
+	private static boolean windows = true;
 	
 	/**
 	 * The FileChannel used to access the file.
@@ -99,6 +100,12 @@ public abstract class FileAccess {
 		return (os.indexOf("win") >= 0);
 	}
 	
+	/**
+	 * Tell the DiskStorageManager that a file will grow
+	 * 
+	 * @param newSize
+	 * 		What the new size of the file will be after it has grown
+	 */
 	protected void requestSizeChange(long newSize){
 		if (newSize > size){
 			DiskStorageManager.increaseDiskStorageSize(newSize - size);

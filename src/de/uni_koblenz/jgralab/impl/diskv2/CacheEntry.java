@@ -30,6 +30,17 @@ public class CacheEntry<V> extends SoftReference<V>{
 	 */
 	private Tracker tracker;
 	
+	/**
+	 * Creates a new CacheEntry object that softly references the given value and is
+	 * associated with a ReferenceQueue.
+	 * 
+	 * @param value
+	 * 		The object referenced by the entry
+	 * 
+	 * @param refQueue
+	 * 		The queue the referenence will be put into when the referenced object is
+	 * 		deleted by the Garbage Collector
+	 */
 	public CacheEntry(V value, ReferenceQueue<V> refQueue){
 		super(value, refQueue);
 		key = value.hashCode();
@@ -78,11 +89,6 @@ public class CacheEntry<V> extends SoftReference<V>{
 	 */
 	public Tracker getTracker(){
 		return tracker;
-	}
-	
-	//TODO: Temporary method for testing, delete this eventually
-	public void delete(Queue<CacheEntry<V>> queue){
-		queue.add(this);
 	}
 	
 	/**
